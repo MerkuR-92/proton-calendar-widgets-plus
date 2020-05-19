@@ -1,0 +1,125 @@
+package me.proton.android.calendar.common
+
+import at.favre.lib.crypto.bcrypt.BCrypt
+import at.favre.lib.crypto.bcrypt.Radix64Encoder
+import com.google.crypto.tink.subtle.Base64
+import com.proton.gopenpgp.armor.Armor
+import com.proton.gopenpgp.crypto.KeyRing
+import com.proton.gopenpgp.crypto.PGPSignature
+import com.proton.gopenpgp.crypto.PlainMessage
+import com.proton.gopenpgp.helper.Helper
+import com.proton.gopenpgp.srp.Proofs
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.Logger
+
+
+class CryptoImpl(private val logger: Logger) : Crypto {
+
+    private val SRP_PROOF_BITS: Long = 2048
+
+    override fun generateUserPassphrase(passphrase: ByteArray, encodedSalt: String): ByteArray {
+        val decodedKeySalt: ByteArray = Base64.decode(encodedSalt, Base64.DEFAULT)
+        val generatedUserPassphraseByteRawHash = BCrypt.with(BCrypt.Version.VERSION_2Y).hashRaw(10, decodedKeySalt, passphrase).rawHash
+        return Radix64Encoder.Default().encode(generatedUserPassphraseByteRawHash)
+    }
+
+    override fun checkPassphrase(armoredKey: String, passphrase: ByteArray): Boolean {
+        return try {
+            val unlockedKey = com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredKey).unlock(passphrase)
+            unlockedKey.clearPrivateParams()
+            true
+        } catch (e: Exception) {
+            System.out.println(e.localizedMessage)
+            logger.i("checkPassphrase failed", e)
+            false
+        }
+    }
+
+    override fun signTextDetached(
+        plainText: String,
+        armoredPrivateKey: String,
+        passphrase: ByteArray
+    ) : String? {
+        return try {
+            val privateKeyRing: KeyRing = createAndUnlockKeyring(armoredPrivateKey, passphrase)
+            val result = privateKeyRing.signDetached(PlainMessage(plainText)).armored
+            privateKeyRing.clearPrivateParams()
+            return result
+        } catch (e: java.lang.Exception) {
+            logger.i("signTextDetached failed", e)
+            null
+        }
+    }
+
+    override fun verifyTextDetached(
+        plainText: String,
+        armoredSignature: String,
+        armoredPublicKeys: List<String>
+    ): Boolean {
+        return try {
+            val keyring = com.proton.gopenpgp.crypto.Crypto.newKeyRing(null)
+            armoredPublicKeys.forEach { keyring.addKey(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(it)) }
+            keyring.verifyDetached(PlainMessage(plainText), PGPSignature(armoredSignature), 0L) // TODO handle actual error? use different method?
+            true
+        } catch (e: Exception) {
+            logger.i("verifyTextDetached failed", e)
+            false
+        }
+    }
+
+    override fun decryptText(
+        cipherText: String,
+        armoredPrivateKey: String,
+        passphrase: ByteArray
+    ): String? {
+        return try {
+            Helper.decryptMessageArmored(armoredPrivateKey, passphrase, cipherText)
+        } catch (e: Exception) {
+            logger.i("decrypt failed", e)
+            null
+        }
+    }
+
+    override fun encryptText(
+        plainText: String,
+        armoredKey: String
+    ): String? {
+        return try {
+            Helper.encryptMessageArmored(armoredKey, plainText)
+        } catch (e: Exception) {
+            logger.i("decrypt failed", e)
+            null
+        }
+    }
+
+    override fun getArmoredPublicKey(armoredKey: String): String? {
+        return try {
+            Armor.armorKey(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredKey).publicKey)
+        } catch (e: Exception) {
+            logger.i("getArmoredPublicKey failed", e)
+            null
+        }
+    }
+
+    override fun generateSrpProofs(
+        username: String,
+        passphrase: ByteArray,
+        signedModulus: String,
+        serverEphemeral: String,
+        authVersion: Int,
+        salt: String
+    ): Proofs? {
+        return try {
+            val srpAuth = com.proton.gopenpgp.srp.Auth(authVersion.toLong(), username, String(passphrase) /*TODO change to bytes when supported by gopenpgp*/, salt, signedModulus, serverEphemeral)
+            srpAuth.generateProofs(SRP_PROOF_BITS)
+        } catch (e: Exception) {
+            logger.i("generateSrpProofs failed", e)
+            null
+        }
+    }
+
+    private fun createAndUnlockKeyring(armoredPrivateKey: String, passphrase: ByteArray) : KeyRing {
+        return com.proton.gopenpgp.crypto.Crypto.newKeyRing(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredPrivateKey).unlock(passphrase))
+    }
+
+}

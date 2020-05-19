@@ -1,0 +1,65 @@
+package me.proton.android.calendar.domain.usecase
+
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueKey
+import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.api.ServerEventsApi
+
+class SyncServerEventsUseCase(
+    private val logger: Logger,
+    private val valueStoreProvider: ValueStoreProvider,
+    private val serverEventsApi: ServerEventsApi,
+    private val handleServerEventsUseCase: HandleServerEventsUseCase
+): UseCase {
+
+    companion object {
+        const val WORKER_ID = "SYNC_SERVER_EVENTS"
+    }
+
+    suspend fun execute(userId: String): UseCase.Result {
+
+        logger.v("executing SyncServerEventsUseCase")
+
+        val valueStore = valueStoreProvider.provideValueStore(userId)
+        var lastProtonEventId = valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)
+            ?: return UseCase.Result.InvalidParams("no last server event id")
+
+        do {
+            var moreEvents = false
+
+            // TODO we need to properly authorize all API requests for specific users!!!
+            when (val eventsReponse = serverEventsApi.getServerEvents(lastProtonEventId)) {
+                is ApiResponse.Success -> {
+                    logger.v("fetched Server Events for ID: $lastProtonEventId")
+                    // TODO handle eventsReponse.data.refresh, I think it's "force wipe database"?????
+                    moreEvents = eventsReponse.data.more == 1 // TODO parse as boolean
+                    logger.v("moreEvents: $moreEvents")
+
+                    when (val result =
+                        handleServerEventsUseCase.execute(eventsReponse.data, userId)) {
+                        UseCase.Result.Success -> {
+                            logger.v("correctly handled Proton Events $lastProtonEventId")
+                            lastProtonEventId = eventsReponse.data.eventId
+                            valueStore.putString(
+                                ValueKey.LAST_SERVER_EVENT_ID,
+                                eventsReponse.data.eventId
+                            )
+                            logger.v("next Proton Events ID is saved as $lastProtonEventId")
+                        }
+                        is UseCase.Result.InvalidParams -> UseCase.Result.InvalidParams("invalid params handling server events: ${result.message}")
+                        is UseCase.Result.Error -> UseCase.Result.Error("error handling server events: ${result.message}")
+                    }
+                }
+                is ApiResponse.Error -> return UseCase.Result.Error("api error getting server events: $eventsReponse")
+                is ApiResponse.Exception -> return UseCase.Result.Error("exception getting server events: $eventsReponse")
+            }
+
+        } while (moreEvents)
+
+        logger.v("success syncing Proton Events, ID saved for later is $lastProtonEventId")
+
+        return UseCase.Result.Success
+    }
+
+}

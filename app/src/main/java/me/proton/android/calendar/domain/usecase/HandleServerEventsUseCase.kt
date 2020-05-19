@@ -1,0 +1,90 @@
+package me.proton.android.calendar.domain.usecase
+
+import me.proton.android.calendar.data.api.ServerEvent
+import me.proton.android.calendar.data.api.ServerEventsApiResponse
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.Logger
+import java.lang.Exception
+
+class HandleServerEventsUseCase(
+    private val logger: Logger,
+    private val calendarsRepository: CalendarsRepository,
+    private val usersRepository: UsersRepository,
+    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase) : UseCase {
+
+    suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: String) : UseCase.Result {
+
+        logger.v("handling server events in usecase")
+
+        return try {
+            eventsResponse.user?.let {
+                usersRepository.persistUser(it)
+            }
+            eventsResponse.calendars?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deleteCalendarById(it.id) },
+                    { calendarsRepository.persistCalendar(userId, it.calendar!!) }
+                )
+            }
+            eventsResponse.addresses?.forEach {
+                it.handleAction(
+                    { usersRepository.deleteAddressById(it.id) },
+                    { usersRepository.persistAddress(userId, it.address!!) }
+                )
+            }
+            eventsResponse.calendarEvents?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deleteEventById(it.id) },
+                    { calendarsRepository.persistEvents(it.event!!) }
+                )
+            }
+            eventsResponse.calendarAlarms?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deleteEventAlarmById(it.id) },
+                    { calendarsRepository.persistEventAlarm(it.alarm!!) }
+                )
+            }
+            eventsResponse.calendarKeys?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deleteCalendarKeyById(it.id) },
+                    { calendarsRepository.persistCalendarKey(it.key!!) }
+                )
+            }
+            eventsResponse.calendarMembers?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deleteMemberById(it.id) },
+                    { calendarsRepository.persistMember(it.member!!) }
+                )
+            }
+            eventsResponse.calendarPassphrases?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deletePassphraseById(it.id) },
+                    {
+                        calendarsRepository.persistPassphrase(it.passphrase!!)
+                        cacheCalendarPassphraseUseCase.execute(userId, it.passphrase.calendarId)
+                    }
+                )
+            }
+            eventsResponse.calendarSettings?.forEach {
+                it.handleAction(
+                    { calendarsRepository.deleteSettingsById(it.id) },
+                    { calendarsRepository.persistSettings(it.calendarSettings!!) }
+                )
+            }
+            UseCase.Result.Success
+        } catch (e: Exception) {
+            UseCase.Result.Error(e.message ?: "no stack trace message available")
+        }
+    }
+
+    private suspend fun ServerEvent.BaseServerEventApiResponse.handleAction(delete: suspend () -> Unit, create: suspend () -> Unit, update: suspend () -> Unit = create) {
+        when (this.action) {
+            0 -> delete.invoke()
+            1 -> create.invoke()
+            2 -> update.invoke()
+            // TODO there's also 3 = UPDATE FLAGS but not used yet
+        }
+    }
+
+}

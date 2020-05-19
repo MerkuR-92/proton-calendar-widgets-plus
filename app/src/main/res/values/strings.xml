@@ -1,0 +1,110 @@
+<resources>
+    <string name="app_name">Proton Calendar</string>
+
+    <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+
+    <string name="dialog_title_delete_event">Delete event?</string>
+    <string name="dialog_title_calendar_picker">Calendar</string>
+
+    <string name="dialog_button_delete">Delete</string>
+    <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_set">Set</string>
+
+    <string name="action_save">Save</string>
+    <string name="action_done">Done</string>
+    <string name="action_edit">Edit</string>
+
+    <string name="footer_text">Encrypted by Proton</string>
+
+    <!-- EVENT DETAILS   -->
+    <string name="event_all_day">All Day</string>
+    <string name="event_time_period_spanning_single_day">%s \u2013 %s</string>
+    <string name="event_time_period_spanning_many_days">%s \u2013\n%s</string>
+    <string name="event_alarm_label_before">%s before</string>
+    <string name="event_alarm_label_before_by_email">%s before by email</string>
+    <string name="event_alarm_label_before_with_time">%s before at %s</string>
+    <string name="event_alarm_label_before_with_time_by_email">%s before at %s by email</string> <!--"1 day before at 9:00 by email"-->
+    <string name="event_recurrence_every_some_period">Every %d %s</string>
+    <string name="event_recurrence_occurs_on_day_of_week">%s on %s</string><!--"weekly on Friday"-->
+    <string name="event_recurrence_occurs_on_day_of_month">%s on day %d</string><!--"monthly on day 15"-->
+    <string name="event_recurrence_occurs_on_day_of_week_full_words">%s on the %s</string><!--"monthly on the first Friday"-->
+    <string name="event_recurrence_none">Does not repeat</string>
+    <string name="event_recurrence_daily">Daily</string>
+    <string name="event_recurrence_weekly">Weekly</string>
+    <string name="event_recurrence_monthly">Monthly</string>
+    <string name="event_recurrence_yearly">Yearly</string>
+    <string name="event_recurrence_until">until %s</string>
+
+    <!-- CREATE / EDIT EVENT   -->
+    <string name="title_create_event">New event</string>
+    <string name="event_text_edit_event">Edit event</string>
+    <string name="event_hint_title">Title</string>
+    <string name="event_hint_location">Location</string>
+    <string name="event_text_switch_all_day">All day</string>
+    <string name="event_text_date_start">Start</string>
+    <string name="event_text_date_end">End</string>
+    <string name="event_text_date_repeat">Repeat</string>
+    <string name="event_text_date_repeat_never">Does not repeat</string>
+    <string name="event_text_attendees">Attendees</string>
+    <string name="event_text_attendees_none">None</string>
+    <string name="event_text_calendar">Calendar</string>
+    <string name="event_text_timezone_start">Timezone</string> <!-- TODO Start Timezone / End Timezone? -->
+    <string name="event_text_alarms">Notifications</string>
+    <string name="event_text_add_alarm">Add notification</string>
+    <string name="event_text_description">Description</string>
+    <string name="event_hint_description">Add description</string>
+    <string name="event_text_custom">Custom</string>
+    <string name="event_alarm_partial_day_1">10 minutes before</string>
+    <string name="event_alarm_partial_day_2">30 minutes before</string>
+    <string name="event_alarm_partial_day_3">1 hour before</string>
+    <string name="event_alarm_partial_day_4">1 week before</string>
+    <string name="event_alarm_all_day_1">On the day at %s</string>
+    <string name="event_alarm_all_day_2">The day before at %s</string>
+    <string name="event_alarm_all_day_3">1 week before at %s</string>
+    <string name="event_alarm_all_day_4">3 weeks before at %s</string>
+    <string name="event_alarm_at_time">At</string>
+    <string name="event_alarm_action">Send by</string>
+    <string name="event_alarm_action_notification">Notification</string>
+    <string name="event_alarm_action_email">Email</string>
+    <string name="event_recurrence_1">Do not repeat</string>
+    <string name="event_recurrence_2">Every day</string>
+    <string name="event_recurrence_3">Every week</string>
+    <string name="event_recurrence_4">Every month</string>
+    <string name="event_recurrence_5">Every year</string>
+
+    <string name="event_recurrence_occurs_every">Repeats every</string>
+    <string name="event_recurrence_occurs_on">Repeats on</string>
+    <string name="event_recurrence_occurs_monthly_on_day">On day %d</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week">On the %s</string>
+    <string name="event_recurrence_ends_on">Ends</string>
+    <string name="event_recurrence_ends_never">Never</string>
+    <string name="event_recurrence_ends_on_date_empty">On day</string>
+    <string name="event_recurrence_ends_on_date">On %s</string>
+    <string name="event_recurrence_ends_after_count_prefix">After</string>
+
+
+
+
+
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_login">LOGIN</string>
+    <string name="menu_settings">Settings TODO</string>
+    <string name="menu_contacts">Contacts TODO</string>
+    <string name="menu_feedback">Feedback TODO</string>
+
+    <string name="home_second">Home Second</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="hello_home_second">Hello HomeSecondFragment. Arg: %1$s</string>
+    <string name="hello_gallery_second">Hello GallerySecondFragment. Arg: %1$s</string>
+    <string name="hello_slideshow_second">Hello SlideshowSecondFragment. Arg: %1$s</string>
+    <string name="delete">Delete</string>
+</resources>

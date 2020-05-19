@@ -1,0 +1,18 @@
+package me.proton.android.calendar.data.db
+
+import androidx.room.Dao
+import androidx.room.Query
+import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+abstract class PassphrasesDao : BaseDao<PassphraseEntity> {
+
+    @Query("SELECT * FROM passphrases WHERE calendarId = :calendarId")
+    abstract fun select(calendarId: String): List<PassphraseEntity>
+
+    @Query("DELETE FROM passphrases WHERE id = :id")
+    abstract fun deleteById(id: String)
+
+}

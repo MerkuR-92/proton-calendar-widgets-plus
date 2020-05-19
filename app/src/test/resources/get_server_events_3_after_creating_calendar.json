@@ -1,0 +1,220 @@
+{
+    "Code": 1000,
+    "EventID": "OYludcH6yhRe9X4Hgsxa9yeEOD-yMAsQVzehHyOxOgEf2owoLdVmWD1v_yzq_WuPWf3CX0fqpmIpqg-7PYxhIg==",
+    "Refresh": 0,
+    "More": 1,
+    "Calendars": [
+        {
+            "ID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+            "Action": 1,
+            "Calendar": {
+                "ID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                "Name": "Second Calendar",
+                "Description": "Description of second calendar",
+                "Color": "#C3D261",
+                "Display": 1
+            }
+        },
+        {
+            "ID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==",
+            "Action": 2,
+            "Calendar": {
+                "ID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==",
+                "Name": "My calendar (edited)",
+                "Description": "Description edited",
+                "Color": "#CF5858",
+                "Display": 1
+            }
+        }
+    ],
+    "CalendarKeys": [
+        {
+            "ID": "-tERCJ15hVftXEHOJTibcfh7-WIlaNAQTKgBCMQDJqarnomC7qfMiYbn5AjaVEqEl5KW_XYf68cZoyPQQHq1dg==",
+            "Action": 1,
+            "Key": {
+                "ID": "-tERCJ15hVftXEHOJTibcfh7-WIlaNAQTKgBCMQDJqarnomC7qfMiYbn5AjaVEqEl5KW_XYf68cZoyPQQHq1dg==",
+                "PrivateKey": "-----BEGIN PGP PRIVATE KEY BLOCK-----\nVersion: ProtonMail\n\nxYYEXmJS3xYJKwYBBAHaRw8BAQdA0/uzBPKD0Mi7oAJnotHWcu6G6RpaW1oz\nJMKE1cFAz07+CQMI5bDC16KvAQdgw6CZ5snnoZo7mygXcRa5TbXRVN2ckcfL\nktn5vcKyfjMSaah+8y6wRb3XybqLAaf6FACqYckwEVW1Utn2hbp0EFcZrwxK\nWs0MQ2FsZW5kYXIga2V5wngEEBYKACAFAl5iUt8GCwkHCAMCBBUICgIEFgIB\nAAIZAQIbAwIeAQAKCRBSITaeWFvfrXeBAQDghpLB5UTH3UncMgGSzcdHcAuw\nV2gKoJTwL2FA1dO7iQEAqt0LjUn89vXzDN/54Ae+mczTq1Mk0U6NVfsKG86b\nUgLHiwReYlLfEgorBgEEAZdVAQUBAQdAGf7HMzTZ2eKD4nCfiKcQ6hD8YDjA\nyNQFBiwPSHnDBBwDAQgH/gkDCDuFKdOB3xd6YDNCq78QvF1T+ZXTyqQJpPVj\nZFjbj5oJR5leIXuaefsF1WIhMnlgwKSdF+p6YYwt8pO+YTfrWsbUn7JIjB4z\nu7G0sdBkBx7CYQQYFggACQUCXmJS3wIbDAAKCRBSITaeWFvfreEUAQDuWkZf\n6QxJ7KhHJZsd5vtnuT8dYE1RBEpLh/KxFW2C2AEAu9tWqb1bvKU2zAzClsXX\nET2V6XeJvqemv6VsWdpIfwg=\n=GP7S\n-----END PGP PRIVATE KEY BLOCK-----\n",
+                "PassphraseID": "-tERCJ15hVftXEHOJTibcfh7-WIlaNAQTKgBCMQDJqarnomC7qfMiYbn5AjaVEqEl5KW_XYf68cZoyPQQHq1dg==",
+                "Flags": 3,
+                "CalendarID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg=="
+            }
+        }
+    ],
+    "CalendarMembers": [
+        {
+            "ID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+            "Action": 1,
+            "Member": {
+                "ID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                "Permissions": 127,
+                "Email": "adamtst@protonmail.blue",
+                "CalendarID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg=="
+            }
+        }
+    ],
+    "CalendarPassphrases": [
+        {
+            "ID": "-tERCJ15hVftXEHOJTibcfh7-WIlaNAQTKgBCMQDJqarnomC7qfMiYbn5AjaVEqEl5KW_XYf68cZoyPQQHq1dg==",
+            "Action": 1,
+            "Passphrase": {
+                "Flags": 1,
+                "ID": "-tERCJ15hVftXEHOJTibcfh7-WIlaNAQTKgBCMQDJqarnomC7qfMiYbn5AjaVEqEl5KW_XYf68cZoyPQQHq1dg==",
+                "MemberPassphrases": [
+                    {
+                        "MemberID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                        "Passphrase": "-----BEGIN PGP MESSAGE-----\nVersion: ProtonMail\n\nwcBMA5kajsUECZmgAQf/a6tz6yvC+D5UtpBntvhRD14zhEGb39XTybvnheFa\nLVgKdKVlet/NA4wBsm0jXvc8eS/HJnhWKt86zqONhTrgg8qNAZH8hf5y5DyU\n570GMQnw6uTXMAhxKyDtyTPmFJSxQT8/KH0nJZgXSRhYbGfHh0K/nCi0kR2w\nCii9hpmvfs/d6Nk8jmh/JftIx6fs5s4iNGc2VoprupVC0yUPHnxuQyoAm2Vt\nm5XrphDrLzWrEv4pQYdcpRq4DU/MDLLEH5PgG87oD8LJ0bPFBlzh6cFchaCQ\nZC3uhwU6j3uv+aFvKjRQl+yIHCbPwgtAYMBh1nvpPsKj1IlNut1UaMCie5Mb\n0NJkAUeWQlqcnamiGkMNnHG1LRenE3jwx6dSZrAropJhgBMFkBQBgniUOlxp\n3hCpjDVmtK6r72qlJaJBC/6Fdn3IUGDusTCRpakjGnkpQeMYFJ4Cy5tn5Q6B\ni8tf1n+aadlw8WXhHw==\n=KZxz\n-----END PGP MESSAGE-----\n",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\nVersion: ProtonMail\n\nwsBcBAEBCAAGBQJeYlLfAAoJEBHDHo5eB/TQmAsH/2iZIjlJnseaKjqQ9lbo\nIpQBYX5eskW4GYeyhKzRW7U21byQfHx3sx0hxPth4fQ4ErktUtZ3BOLTKGt0\nh1x9uq0oYha8kfkv+NN4UwrYDD/BF5l8Z53jJs4CMNov/RxB4iPFMcqZ29rQ\n47SLyoNLKeaiQw8Ho1csA/XeTrjdesEabh+qrRhXAnCpIXT/MXtEEVy/GPla\ntqyQMAZWFbGIRUHQKfRBfynbDwtlSOd42mx6sykBG63UFeNHw4emlUafBhsT\nNRxC7Mu5yZfZpyemAOMITni+KqC9T/K+34lkWNBrtW97gkL3zXrlwQuMyngD\nxEzOoWs4S1K5Tbusfb//isE=\n=Aeaq\n-----END PGP SIGNATURE-----\n"
+                    }
+                ],
+                "CalendarID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg=="
+            }
+        }
+    ],
+    "CalendarEvents": [
+        {
+            "ID": "P75T2IwiYBkr_tf1VggIp69_vC0LWMM8yWQmz72EWsg5C54Y7FmV0gmpxOw8jiFRaFmX1Ylm1IFqSXNoJubBng==",
+            "Action": 1,
+            "Event": {
+                "ID": "P75T2IwiYBkr_tf1VggIp69_vC0LWMM8yWQmz72EWsg5C54Y7FmV0gmpxOw8jiFRaFmX1Ylm1IFqSXNoJubBng==",
+                "CalendarID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==",
+                "CalendarKeyPacket": null,
+                "CreateTime": 1583502259,
+                "LastEditTime": 1583502259,
+                "Author": "adamtst@protonmail.blue",
+                "Permissions": 3,
+                "SharedKeyPacket": "wV4DP+KI9zrxP8QSAQdA8SuDwD1OEJ9VeSd4dfIkX1xj6t4ymo6ZayawMoIAEFAw6JbdDCWRLoDycCIuambBKjfJsniifX1EZHvgnpWyfFmN2pXv2HgPdp8Go4QecH4c",
+                "SharedEvents": [
+                    {
+                        "Type": 2,
+                        "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-810d75da-9c01-4c38-8ab6-5f4ba9372456\r\nDTSTAMP:20200306T134414Z\r\nDTSTART;TZID=Europe/Budapest:20200308T073000\r\nDTEND;TZID=Europe/Budapest:20200308T083000\r\nEND:VEVENT\nEND:VCALENDAR",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlOtAAoJEBHDHo5eB/TQyK0IAJlL7lr7wHQMGQ0Bl1yk\r\nodSBCgIQGeKm5pnCIIUFs5S2UnVDBQrshRjRfq0wiVWKa8z6bI01we9q+qEG\r\ntbt7U3cGUISU4dlv+Tn9epsTuwqg/TUyB0oHOqnnMrmUKaZozrsuk2Ym5Cf6\r\ntfp3sYqMXSIb4Ehh5rStzgte0aPTinvroG5Lzwyaiq+T2SaI2OBzqItfxG1m\r\nYK50g1Z3JEsbuVNtrOfvS1fzq50jUqEVs754HiYRElOwpQW2E/j2Q9rZrNDH\r\n55rRHFjFqac/ASaKBfUSJIw0g+pFvpOc0KFLY+MAf5ogFsu7P/XFCs1b5mS8\r\nHwnysetN2K+pIBCFUEm94e4=\r\n=61+F\r\n-----END PGP SIGNATURE-----\r\n"
+                    },
+                    {
+                        "Type": 3,
+                        "Data": "0sAfAXilOqy9rk9rs6U29KgnJ8vvvyij5YfsotnVKaptiQh5we9qKTv7q7a5JenzdG/29NibtTFX2W6RZpKubZxt12rQ3IiqJiCdUmEk/tixUm8vtzWYLL89cP/Sqqx4s7WY6hZP94scnBCAhJnbWaEmUNtrlvxLNx1cX9pvb+XBcyshklrQi9iThrIRjAAjSZ7Np3J9Q4qU4Mp3J0YIMqu0DrFRZMSTZFyt+PRgGiIYFzgCklHdGB0051BXSfsB7PSrynPahmp/T1uhDq+jpeh0xQwL2rfA1yozEM33fdjkTQ==",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlOtAAoJEBHDHo5eB/TQt34IAJ1FRU5ATp8+qg2OIB5b\r\n5mJ1RJwuvsasxnYbF8yPoMgxxgKcr0nSiGyydvoT4c0A8PMhDvu0Yx1cfl5Q\r\nbW1aptssMAHUD2q4x8vBFEcTRjNSzXxd6ClxwmZ0uFsLym8c8A6qonihgg5F\r\nbJGYcpsiRq9TDqxOG7gYMnXO49HvlaD0qj2EbL4M+GNNbKRP9ahgxjDupS2z\r\n8NkSwHQiuH89FIY5aZG7Xo4gKqjaKzN9c/E3y9vDZ1sjTOmwqOAZr0PzpYDq\r\nOIjozR4KtDhLV8S18geylsssV8fbG30j9BrLSrhb/1pcxZaS+QcDXemkUy5G\r\nzaUZ6vaTTOSO0BpBCKVLpz0=\r\n=0Abr\r\n-----END PGP SIGNATURE-----\r\n"
+                    }
+                ],
+                "CalendarEvents": [],
+                "PersonalEvent": [
+                    {
+                        "Type": 2,
+                        "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-810d75da-9c01-4c38-8ab6-5f4ba9372456\r\nDTSTAMP:20200306T134414Z\r\nBEGIN:VALARM\r\nTRIGGER:-PT15M\r\nACTION:DISPLAY\r\nEND:VALARM\r\nEND:VEVENT\nEND:VCALENDAR",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlOtAAoJEBHDHo5eB/TQmeMIAKAmZUfRaoBDwUqX8ruX\r\ne4iazN84mjtRTSCIncJnA9bU4ixY+NV8AqIyn0xrgNB1Tpfd7Ec2QMRjgEUs\r\nCiVBrXqXouP3P7bsXgGU2xJYW22+5pdE/Z16AMZoX94dgzCSUa/eHMvjouMK\r\nq7UsJM+G5UZKuzRC4YwJ7VplG9ZgOL3RhNYRWaMH8YwS3IAYe4+mFcLCh08y\r\nrgHrbxTWXcEVVo9lG17bCIlw9cxtAhXjZy54+iIGkJTGQV6wnOlmG7Jt0h0H\r\nKS7WSz8xLJjnCFkmgNbdC6sry8TLBvqETklwNMWKL/IuIRAp6ydkI4Vramrc\r\nxVtHg1PXkcSqD4MerJU6xUQ=\r\n=Rclf\r\n-----END PGP SIGNATURE-----\r\n",
+                        "MemberID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ=="
+                    }
+                ]
+            }
+        },
+        {
+            "ID": "MhvPNSqsK9OFAQHIgciGF_9pbul5lYfQqj1rKUZFcBYvAN6sUnOLwofdWhDI20rJj8J2-3hiedIMiyloEebU_w==",
+            "Action": 1,
+            "Event": {
+                "ID": "MhvPNSqsK9OFAQHIgciGF_9pbul5lYfQqj1rKUZFcBYvAN6sUnOLwofdWhDI20rJj8J2-3hiedIMiyloEebU_w==",
+                "CalendarID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                "CalendarKeyPacket": null,
+                "CreateTime": 1583502437,
+                "LastEditTime": 1583502441,
+                "Author": "adamtst@protonmail.blue",
+                "Permissions": 3,
+                "SharedKeyPacket": "wV4D42Fnq5vY6kYSAQdAXmOyUPZs6id4S0VcaVu5vG73FXcPzMWLtTveeW09AXMwYyNJfajPTQnEGmeu+98rFM95Z8VDr1Y/fICt9IBKm+V5PUQLlSuGVcUva7NKbXyb",
+                "SharedEvents": [
+                    {
+                        "Type": 2,
+                        "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nDTSTAMP:20200306T134711Z\r\nUID:proton-calendar-6433d0bd-c323-bd60-f71d-4a1514799e5d\r\nDTSTART;TZID=Europe/Budapest:20200306T143000\r\nDTEND;TZID=Europe/Budapest:20200306T163000\r\nEND:VEVENT\nEND:VCALENDAR",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlRmAAoJEBHDHo5eB/TQxzUIAKPbCTRrqTIpmMlzKRUs\r\npOvyOE/lIuQH0iwRVFJ0ygtZYs1gWKYA+x3pqU3InZg7EdocuMzlwY4WcpeQ\r\nI/PnfxY3ftzf6zU4T/FiVGYEnW9fkkKmDfsiupxAuNdVxxw30KcPXQ9C3wTb\r\nb1bGjuOyWzMOdF6OTcfHBYbViRUfQJnqz55sxQInS1LM3/XPytVgq8mXRKZO\r\n4tdC/qc8JwPf926KMp7z/jjGla0yE6l1GvCuE9IWMgYRMJKsUmzUs2aNLilL\r\nU13Ku1GPw6PlJ6ScQC/ZE3UT7nk/vEWG/DCN+UGFhVwdAMZhhqXtlqtUl8NL\r\nKVsVGDBzXNzdqiEuKRrGoGA=\r\n=B3BZ\r\n-----END PGP SIGNATURE-----\r\n"
+                    },
+                    {
+                        "Type": 3,
+                        "Data": "0sAeAfJP61euoe5c12IU4H1Q//akBYJv8FQMLvJ32qW9hcmVwZdwc7kJDhBj4E1BOYpZOz1mpq6XxjqZ4S74XuVdEgU94HPpn4RS0hQTU/KFEFeZ7keb8XVqYIBD0G2P9pgxMO5hFIVCu/NqKBoa9kpDiMVag1HxUBzTatVZlFxVUI5H/ju4XFC0AyC4qKhY24zF++MfiQPH1SJmnDFtx4lR/1PgYeYX4HfdGdmI7M0Hn9lzoKd9fb31xUUsyo49eZjBzHYCPRMLkiHloAgA6jaD1fPsD/FvK4SLJaO6hpEu",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlRmAAoJEBHDHo5eB/TQQzsIAJMOBls1TH+dYcxPqdl9\r\nlwCu6okXHUbW15s00FCGqmZGp3RxSNG1AU83/EYar8uTbIfYW0FxdGXw9pcy\r\n+KeQ2LjXMJ3PfWkQDt/uLvNd90oy8TkDa+FSovu6if1HewQW+ppLMNZ2FGWk\r\nFipz6V0VHeCjJQz/UqRuBLOAQX9nJi1O0auGLFSy4wmO/rYlrbGP+82IeLtA\r\nPx2nMOXe5p9yYfxa3PIZrWlZ/O7SgXgaXpL5RNKrQ5uVpejKw4jXGJmxcMMo\r\ntdWuG7hMR9LVH/vx32IoQB7tldmoqA039LubThqgNiYdUZ7r6i/7rJ5hCVG/\r\nMR5SUPw+259KZm5ju00BVzU=\r\n=WuNc\r\n-----END PGP SIGNATURE-----\r\n"
+                    }
+                ],
+                "CalendarEvents": [],
+                "PersonalEvent": [
+                    {
+                        "Type": 2,
+                        "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nDTSTAMP:20200306T134711Z\r\nUID:proton-calendar-6433d0bd-c323-bd60-f71d-4a1514799e5d\r\nBEGIN:VALARM\r\nTRIGGER:-PT15M\r\nACTION:DISPLAY\r\nEND:VALARM\r\nEND:VEVENT\nEND:VCALENDAR",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlRmAAoJEBHDHo5eB/TQzMEH/jbxm7bhJ9BW4t49XRyd\r\nx10RvU/mYYE0yPmr0jIQ1SAspTRcRmAuV83vvQbNj552HS0tSBSjUiheDm8U\r\nY5W3cv2RZxRzBDbS4JUbZbZ7+2EiKzZN9eRzt6xUlUN37DXD6AaoeCe+K6/u\r\npcB7OHpmONpIia0DVlTJDy+mXGki0o2/SRlsROQR87o5tkDWfJqUiIE0ricB\r\nRgTLsAOpDq5H6BjocA5wWBZI2DvhUL/zgyGlwOFF+R8ySd2To+UnLMBfqYU/\r\nub8AvZftfJX+u0VLAc3aaXAvoUsKavupvPC6qHCza/vexn4XqjZ6FXYiqvsI\r\njx7kUAHOl4agm71vVDt+2VM=\r\n=ZGui\r\n-----END PGP SIGNATURE-----\r\n",
+                        "MemberID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg=="
+                    }
+                ]
+            }
+        },
+        {
+            "ID": "2GXummgWOD9gH120_CGus9Mn24yCso4LTAW12QvQd93k6d2wYk-8LRGkUPx0OwJ_azpQwHcKbk3-OiNQWcXNYw==",
+            "Action": 1,
+            "Event": {
+                "ID": "2GXummgWOD9gH120_CGus9Mn24yCso4LTAW12QvQd93k6d2wYk-8LRGkUPx0OwJ_azpQwHcKbk3-OiNQWcXNYw==",
+                "CalendarID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                "CalendarKeyPacket": null,
+                "CreateTime": 1583502447,
+                "LastEditTime": 1583502447,
+                "Author": "adamtst@protonmail.blue",
+                "Permissions": 3,
+                "SharedKeyPacket": "wV4D42Fnq5vY6kYSAQdAQuda5xsV4e+Ij8ShiZceUifyKBSYGVKc4dxWcWo9NgIwgwL1ZZLUw6kDAT4Am1YtXc+sUyf8K1KRouHK6sQRBhQwpew467m1nQOumyZtFdZf",
+                "SharedEvents": [
+                    {
+                        "Type": 2,
+                        "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-3df4593d-a2c6-5d65-528e-167f0ff193ef\r\nDTSTAMP:20200306T134722Z\r\nDTSTART;TZID=Europe/Budapest:20200306T150000\r\nDTEND;TZID=Europe/Budapest:20200306T160000\r\nEND:VEVENT\nEND:VCALENDAR",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlRpAAoJEBHDHo5eB/TQp2UH/R9G+JZkkBndQ2C+RzAe\r\nor9c8Iih4B1Wk3z7R+C1O+YGcVZoLpYJATGx7SF9++TjuNXOdtZPbLIsGLc1\r\nPLUs+peJ1Id3gnqGvC7lZNcffnTEh0Rxi2V0TaD37KvBZdHUs0VgphtWWKrw\r\nvGHRXcX6cWMB9ScP1lRpfMzDqbsXDqHGFOXBLlkTrLe+1YClBDVVRFaMolZA\r\nQU8BusItw1guqPycBZWaoJoTuW50kVpaUorswrJSDlH0DBPtam1wJU9jLrds\r\n5kFrjecgfojo+7nvwpsNvugCrG2eNzOFABYeKBJtsIosU2mWmwQn0j+dIbBQ\r\nD9LA+uJEvJG+3kzNFjRJU+4=\r\n=S0cN\r\n-----END PGP SIGNATURE-----\r\n"
+                    },
+                    {
+                        "Type": 3,
+                        "Data": "0sAeATi+kMuR4DrWMUEUtvFsZGiRgHc4Ps73aPuQwhQKMShSWUIeRAg18fCDDsQW8m/zTTBOgjon/BaLBUUE8O3DXXgrz4WUFe0RgpheiSQYYbsy/pj4OxjizTclc0m7eBpSL3TQTgQbHI/MVfh1DtRTrfg71Rf5CRqtRq11Kil4da5lK2+wHV+T0uSvmIF/8liaIA7+wJVdZ52oz7YJlZ17l3DMrs/Gojvr+mixf/5S5+gJpykOgJNUA++wAYmzgDSrXcaTAZ787GNOn4fZ2BxTeImjEf0U2cy4zyvEZwiH",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlRpAAoJEBHDHo5eB/TQzzoIAL8fx9d2CpeYF4n+/zap\r\n2HB55KkhjeT7begRDc2O1jMIXh2+qYILA8ZBRmo7HFQnf4u0E5d5KOuF/C31\r\nPTV+IW7mtsllQfs/tODip0KG2XV99opNpncQPvIueq2ojQpiyEYcrijB63FZ\r\nZXm4n5TPSf9U+gesosm2DJFpt2bJCMoEKImpzWC8CjE1txPF4r9k696g25MS\r\nTBEIC/gnctjnT+NONCLtX6t5ASTnJf5B5IFh7molUnz6PMC3TtJgyKu3VUz6\r\ngqgCNduG1ILApxsr+gZ/4JLEab3yr+p4jqtHUNh6v01rz6es5H8vA8eHE6Xa\r\nIXMlTY02Q421xPtYZdMtubg=\r\n=28/2\r\n-----END PGP SIGNATURE-----\r\n"
+                    }
+                ],
+                "CalendarEvents": [],
+                "PersonalEvent": [
+                    {
+                        "Type": 2,
+                        "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-3df4593d-a2c6-5d65-528e-167f0ff193ef\r\nDTSTAMP:20200306T134722Z\r\nBEGIN:VALARM\r\nTRIGGER:-PT15M\r\nACTION:DISPLAY\r\nEND:VALARM\r\nEND:VEVENT\nEND:VCALENDAR",
+                        "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeYlRpAAoJEBHDHo5eB/TQ0XgIAIMO3XBiOJB1ytM0Tsxg\r\n2+bAgTlFg6BppTfLxVf2wBPCV+WW813WXX8YfjHwxFwFFrBHm9z1EX9QmsdF\r\nSQBjAK/50hKkyMj6/YXneKl1RKiYOwhxElIBzdu8fTLay8vrlgEmEMLQf+JY\r\nuQBA3EiM4uUufnqLL9H/rpPRW2X6lwOgSV+VM6F6S7DwFglwgY2aubleKtAC\r\nV+U1aA+v31U8Qv7PSKH4uTYueWKH8s0+57IJdiv2vDcDhS/i6/W2eMt8tgv3\r\nbJeVV4ygVhFcUqvgSLAgMSzXLLuoq3yxtZn11ol0bszJ/vo4hI0QLG922jPk\r\nVD+FUJQBUp26S91bOdifY6E=\r\n=oZNy\r\n-----END PGP SIGNATURE-----\r\n",
+                        "MemberID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg=="
+                    }
+                ]
+            }
+        }
+    ],
+    "CalendarSettings": [
+        {
+            "ID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+            "Action": 1,
+            "CalendarSettings": {
+                "ID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                "CalendarID": "rmnLoH671QYema5ZRQxpa6dB-jl6xHj9Fw-dXXRBGvnc0qmuO9FqE_1_nwH3bw2RfIk5XRGQnSk_81d3K21slg==",
+                "DefaultEventDuration": 30,
+                "DefaultPartDayNotifications": [
+                    {
+                        "Type": 1,
+                        "Trigger": "-PT15M"
+                    }
+                ],
+                "DefaultFullDayNotifications": [
+                    {
+                        "Type": 1,
+                        "Trigger": "-PT15H"
+                    }
+                ]
+            }
+        }
+    ],
+    "CalendarAlarms": [
+        {
+            "ID": "ymHQ5vTyT2Xq_moP6uXQ9R2SenuqtH457s82WNFs44Njjq3b6UNMzBZ6NMRQTyFs73J5NgfTPgWVmrdKc8DdVw==",
+            "Action": 1,
+            "Alarm": {
+                "Occurrence": 1583648100,
+                "Trigger": "-PT15M",
+                "Action": 2,
+                "ID": "ymHQ5vTyT2Xq_moP6uXQ9R2SenuqtH457s82WNFs44Njjq3b6UNMzBZ6NMRQTyFs73J5NgfTPgWVmrdKc8DdVw==",
+                "EventID": "P75T2IwiYBkr_tf1VggIp69_vC0LWMM8yWQmz72EWsg5C54Y7FmV0gmpxOw8jiFRaFmX1Ylm1IFqSXNoJubBng==",
+                "MemberID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==",
+                "CalendarID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ=="
+            }
+        }
+    ],
+    "UsedSpace": 3346854,
+    "Notices": []
+}

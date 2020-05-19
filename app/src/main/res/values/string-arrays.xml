@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="days_of_week">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+
+    <string-array name="days_of_week_letters">
+        <item>S</item>
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>T</item>
+        <item>F</item>
+        <item>S</item>
+        <item>S</item>
+    </string-array>
+
+    <string-array name="ordinals_as_words">
+        <item></item>
+        <item>first</item>
+        <item>second</item>
+        <item>third</item>
+        <item>fourth</item>
+        <item>fifth</item>
+    </string-array>
+
+    <string-array name="ordinals_as_words_backwards">
+        <item></item>
+        <item>last</item>
+        <item>second to last</item>
+        <item>third to last</item>
+        <item>fourth to last</item>
+        <item>fifth to last</item>
+    </string-array>
+
+    <string-array name="alarm_actions">
+        <item>Notification</item>
+        <item>Email</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,45 @@
+package me.proton.android.calendar.data.entity
+
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.ForeignKey.CASCADE
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.Expose
+import me.proton.android.calendar.data.db.AppDatabase
+
+@Entity(
+    tableName = AppDatabase.TABLE_CALENDARS,
+    foreignKeys = [ForeignKey(
+        entity = UserEntity::class,
+        parentColumns = ["id"],
+        childColumns = ["fkUserId"],
+        onDelete = CASCADE
+    )]
+)
+data class CalendarEntity(
+    @PrimaryKey
+    val id: String,
+    val name: String,
+    val description: String,
+    val color: String,
+    val display: Int // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
+//    val flags: Int? //, TODO unfortunately this is not being sent in /events TODO Valentin says it will be added
+    // 0 - Inactive: the calendar keys are not accessible and the current user cannot fix it
+    // 1 - Active: the calendar is all good!
+    // 2 - Update passphrase: a deactivated passphrase is again accessible, you should re-encrypt the linked calendar key using the primary passphrase
+    // 4 - Reset needed: the calendar needs to be reset
+    // 8 - Incomplete setup: the calendar setup was not completed, need to setup the key and passphrase
+    // 16 - Lost access: the user lost access to the calendar but an admin can re-invite him
+
+
+    // local database fields
+//    val fkUserId: String
+
+
+    // @ColumnInfo, @Ignore
+) {
+
+    //@Expose(serialize = false, deserialize = false)
+    lateinit var fkUserId: String
+
+}

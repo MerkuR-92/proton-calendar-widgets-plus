@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_calendar">
+
+    <fragment
+        android:id="@+id/nav_calendar"
+        android:name="me.proton.android.calendar.presentation.calendar.CalendarFragment"
+        android:label=""
+        tools:layout="@layout/fragment_calendar">
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_contacts"
+            app:destination="@id/nav_contacts" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_feedback"
+            app:destination="@id/nav_feedback" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_settings"
+            app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_event_details"
+            app:destination="@id/nav_event_details" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_event_create_edit"
+            app:destination="@id/nav_event_create_edit" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_login"
+            app:destination="@id/nav_login" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_contacts"
+        android:name="me.proton.android.calendar.presentation.contacts.ContactsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_contacts"/>
+    <fragment
+        android:id="@+id/nav_feedback"
+        android:name="me.proton.android.calendar.presentation.feedback.FeedbackFragment"
+        android:label=""
+        tools:layout="@layout/fragment_feedback"/>
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="me.proton.android.calendar.presentation.settings.SettingsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_settings"/>
+
+    <dialog
+        android:id="@+id/nav_event_details"
+        android:name="me.proton.android.calendar.presentation.calendar.EventDetailsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_event_details">
+        <action
+            android:id="@+id/action_nav_event_details_to_nav_event_create_edit"
+            app:destination="@id/nav_event_create_edit" />
+        <deepLink
+            android:id="@+id/deepLink"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/event/details?eventId={eventId}" />
+        <argument
+            android:name="eventId"
+            app:argType="string" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_event_create_edit"
+        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditFragment"
+        android:label="EventCreateEditFragment">
+        <deepLink
+            android:id="@+id/deepLink2"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;initStartDate={initStartDate}" />
+        <deepLink
+            android:id="@+id/deepLink3"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/event/create?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}" />
+        <argument
+            android:name="eventId"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="initStartDate"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="initStartTime"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_attendees"
+            app:destination="@id/nav_event_create_edit_attendees" />
+        <action
+            android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_recurrence"
+            app:destination="@id/nav_event_create_edit_recurrence" />
+        <action
+            android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_alarm"
+            app:destination="@id/nav_event_create_edit_alarm" />
+    </dialog>
+    <dialog
+        android:id="@+id/nav_event_create_edit_attendees"
+        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditAttendeesFragment"
+        android:label="EventCreateEditAttendeesFragment" />
+    <dialog
+        android:id="@+id/nav_event_create_edit_alarm"
+        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditAlarmFragment"
+        android:label="EventCreateEditAlarmFragment" />
+    <dialog
+        android:id="@+id/nav_event_create_edit_recurrence"
+        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditRecurrenceFragment"
+        android:label="EventCreateEditRecurrenceFragment" />
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="me.proton.android.calendar.presentation.LoginFragment"
+        android:label="LoginFragment" />
+
+</navigation>
