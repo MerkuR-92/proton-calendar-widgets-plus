@@ -207,7 +207,7 @@ fun VEvent.wrapInICalendar(): ICalendar {
 
 fun ICalendar.printToString() : String = Biweekly.write(this).go()
 
-fun LocalDate.toDate(): Date = Date.from(this.atStartOfDay(ZoneId.of("UTC")).toInstant())
+fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: "UTC")).toInstant())
 
 fun ZonedDateTime.formatDate(timeZoneId: String): String = this.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
 

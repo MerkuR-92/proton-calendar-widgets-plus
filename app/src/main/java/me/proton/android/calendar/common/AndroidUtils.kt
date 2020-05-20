@@ -294,11 +294,7 @@ class AndroidUtils(context: Context) {
 //            "INTERVAL: $it"
 //        },
                     recurrence.count?.let {
-                        context.resources.getQuantityString(
-                            R.plurals.plural_recurrence_count,
-                            it,
-                            it
-                        )
+                        "${if (it > 1) "$it " else ""}${context.resources.getQuantityString(R.plurals.plural_recurrence_count, it, it)}"
                     },
                     recurrence.until?.let {
                         context.getString(

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.gson.Gson
@@ -37,14 +38,27 @@ class EventViewModel(
     private val gson: Gson
 ) : ViewModel() {
 
+    // temporary values that might not be actually persisted in edited event
+    //  but should be editable in GUI until confirmed/cancelled
+    var tempRecurrenceUntilLocalDate: LocalDate? = null
+
     var summaryBackup: String? = null
     var locationBackup: String? = null
     var descriptionBackup: String? = null
 //    var isAllDay: Boolean = false
 //    private var eventStartTimeZoneIdBackup: String? = null
     //private var endTimeZoneIdBackup: String? = null
+
+
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
+
+
+    // TODO get this from preferences/settings
+    val startWeekOnMonday = true
+
+
+
 
 
 
@@ -328,11 +342,27 @@ class EventViewModel(
     /**
      * Handles simple Recurrence Rule like weekly or monthly.
      *
-     * @param frequency if null, removes entire recurrence rule // TODO is it required param for recurrence?
+     * @param frequency if null, removes entire recurrence rule
      */
-    fun handleRecurrence(frequency: Frequency?) {
-        val recurrence = if (frequency != null) Recurrence.Builder(frequency).build() else null
-        event.iCalEvent.setRecurrenceRule(recurrence)
+    fun handleRecurrence(frequency: Frequency?, untilDate: Boolean, interval: Int? = null, count: Int? = null, daysOfWeek: List<DayOfWeek>? = null) {
+        val builder = Recurrence.Builder(frequency)
+
+        if (frequency != null) {
+            interval?.let {
+                builder.interval(it)
+            }
+            count?.let {
+                builder.count(it)
+            }
+            if (untilDate) {
+                builder.until(tempRecurrenceUntilLocalDate?.toDate(initialTimeZoneId))
+            }
+            daysOfWeek?.let {
+                builder.byDay(daysOfWeek)
+            }
+        }
+
+        event.iCalEvent.setRecurrenceRule(if (frequency != null) builder.build() else null)
         _event.postValue(event)
     }
 
@@ -348,10 +378,10 @@ class EventViewModel(
 
     }
 
-    fun handleRecurrenceUntil(untilLocalDate: LocalDate) {
-        TimberLogger.d("TODO handleRecurrenceUntil: $untilLocalDate")
-        // TODO
+    fun handleRecurrenceUntilDate(untilLocalDate: LocalDate?) {
+        tempRecurrenceUntilLocalDate = untilLocalDate
     }
+
 
     fun handleRecurrenceRepeatOn(selectedIndex: Int) {
         TimberLogger.d("TODO handleRecurrenceRepeatOn: $selectedIndex") // TODO

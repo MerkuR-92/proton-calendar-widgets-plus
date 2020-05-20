@@ -2,22 +2,27 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
 import android.text.TextWatcher
-import android.view.*
-import android.widget.*
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.view.children
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
+import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.NoLayoutRadioGroup
-import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 
@@ -27,61 +32,119 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     override val layoutResourceId = R.layout.fragment_event_create_edit_recurrence
 
     override val actionMenuResourceId = R.menu.fragment_event_create_edit_recurrence
+    override val navigateUp = false
+
+
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
-         if (menuItem.itemId == R.id.action_menu_done) {
+        if (menuItem.itemId == R.id.action_menu_done) {
 
-             // TODO persist data
+            // TODO persist data
 
-             when (rg_recurrence.checkedRadioButtonId) {
-                 R.id.rb_recurrence_1 -> {
-                     eventViewModel.handleRecurrence(null)
-                 }
-                 R.id.rb_recurrence_2 -> {
-                    eventViewModel.handleRecurrence(Frequency.DAILY)
-                 }
-                 R.id.rb_recurrence_3 -> {
-                    eventViewModel.handleRecurrence(Frequency.WEEKLY)
-                 }
-                 R.id.rb_recurrence_4 -> {
-                    eventViewModel.handleRecurrence(Frequency.MONTHLY)
-                 }
-                 R.id.rb_recurrence_5 -> {
-                    eventViewModel.handleRecurrence(Frequency.YEARLY)
-                 }
-                 R.id.rb_recurrence_custom -> {
-                     // TODO
-                 }
-             }
+            when (rg_recurrence.checkedRadioButtonId) {
+                R.id.rb_recurrence_1 -> {
+                    eventViewModel.handleRecurrence(null, false)
+                }
+                R.id.rb_recurrence_2 -> {
+                    eventViewModel.handleRecurrence(Frequency.DAILY, false)
+                }
+                R.id.rb_recurrence_3 -> {
+                    eventViewModel.handleRecurrence(Frequency.WEEKLY, false)
+                }
+                R.id.rb_recurrence_4 -> {
+                    eventViewModel.handleRecurrence(Frequency.MONTHLY, false)
+                }
+                R.id.rb_recurrence_5 -> {
+                    eventViewModel.handleRecurrence(Frequency.YEARLY, false)
+                }
+                R.id.rb_recurrence_custom -> {
 
-             findNavController().navigateUp()
+//                    var untilDate: LocalDate? = null
+                    var untilDateChecked: Boolean = false
+                    var thisManyRepeats: Int? = null
 
-             TimberLogger.d("------------------")
-             TimberLogger.d("recurrence main type view ID: ${rg_recurrence.checkedRadioButtonId}")
-             TimberLogger.d("recurrence count: ${et_recurrence_count.text}")
-             TimberLogger.d("recurrence spinner position: ${s_recurrence_period.selectedItemPosition}")
+                    // "repeat until" options, apply to all recurrence periods
+                    when (customEndingRadioGroup.getCheckedRadioButtonId()) {
+                        R.id.rb_recurrence_custom_1 -> { // ends: never
+//                            eventViewModel.handleRecurrenceUntilDate(null)
+//                            eventViewModel.handleRecurrenceThisManyRepeats(null)
+                        }
+                        R.id.rb_recurrence_custom_2 -> { // ends: on specific Date
+                            untilDateChecked = true
+                        }
+                        R.id.rb_recurrence_custom_3 -> { // ends: after X occurrences
+//                            eventViewModel.handleRecurrenceUntilDate(null)
+                            thisManyRepeats = et_custom_recurrence_count.text.toString().toIntOrNull() ?: FormValidation.OCCURRENCE_COUNT_DEFAULT // TODO force when null?
+                        }
+                    }
 
-             // only for weekly
-             TimberLogger.d("weekdays selection: ")
-             (ll_chips_day_of_week as ViewGroup).children.forEachIndexed { index, chip ->
-                 TimberLogger.d("checked index: ${index} => ${(chip as Chip).isChecked}")
-             }
+                    // "repeat X times"
+                    when (s_recurrence_period.selectedItemPosition) {
+                        0 -> { // days
+                            val interval = et_recurrence_count.text.toString().toIntOrNull()
+                                ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
+//                            et_recurrence_count.setText(count.toString()) // TODO some kind of validation and showing in red?
+                            eventViewModel.handleRecurrence(Frequency.DAILY, untilDateChecked, interval, thisManyRepeats)
 
-             // only for monthly
+                        }
+                        1 -> { // weeks
+                            val interval = et_recurrence_count.text.toString().toIntOrNull()
+                                ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT
+
+                            // weekdays for occurence
+                            val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
+                            val daysOfWeek = (ll_chips_day_of_week as ViewGroup).children.mapIndexedNotNull() { index, chip ->
+                                if ((chip as Chip).isChecked) {
+                                    biweekly.util.DayOfWeek.values()[(dayNamesStartingIndex + index) % 7]
+                                } else null
+                            }.toList()
+
+                            eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = daysOfWeek)
+                        }
+                        2 -> { // months
+                            val interval = et_recurrence_count.text.toString().toIntOrNull()
+                                ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT
+
+                            eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDateChecked, interval, thisManyRepeats)
+
+                            // days in a month for occurence TODO
+                            // weird spinner index mapping!
+                            // TODO HANDLE IN: handleRecurrenceRepeatOn
+                        }
+                        3 -> { // years
+                            val interval = et_recurrence_count.text.toString().toIntOrNull()
+                                ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
+
+                            eventViewModel.handleRecurrence(Frequency.YEARLY, untilDateChecked, interval, thisManyRepeats)
+                        }
+                    }
 
 
-             // TODO "repeats on" value is set in handler
 
-             TimberLogger.d("ends type view ID${customEndingRadioGroup.getCheckedRadioButtonId()}")
-             TimberLogger.d("ends occurence count: ${et_custom_recurrence_count}")
 
-         }
+                    // TODO
+// after setup, persist custom recurrence in VM
+
+
+                }
+            }
+
+            findNavController().navigateUp()
+
+
+        }
     }
 
     private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by inject()
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
+
+    private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
+
+//    private val indexOfEventStartDay = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal// - if (eventViewModel.startWeekOnMonday) 0 else 1
+//    }// + dayNamesStartingIndex //.. + 1 - dayNamesStartingIndex
+
 
     lateinit var customEndingRadioGroup: NoLayoutRadioGroup
 
@@ -93,9 +156,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         observeEventLiveData()
 
 
-
-
-        }
+    }
 
     // TODO CLEANUP THIS ENTIRE METHOD
     private fun attachActionHandlers() {
@@ -142,27 +203,48 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
             // handle actions
             if (it == R.id.rb_recurrence_custom_2) {
 
-                val dateValue = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.toLocalDate()
-
-                AndroidUtils.displayDatePicker(requireContext(), if (dateValue != null) dateValue else null, FormValidation.OCURRENCE_MAX_UNTIL) {
-                    eventViewModel.handleRecurrenceUntil(it)
-                    rb_recurrence_custom_2.setText(if (dateValue != null) getString(R.string.event_recurrence_ends_on_date, dateValue!!.format()) else getString(R.string.event_recurrence_ends_on_date_empty))
+                AndroidUtils.displayDatePicker(
+                    requireContext(),
+                    eventViewModel.tempRecurrenceUntilLocalDate ?: eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.toLocalDate(),
+                    FormValidation.OCURRENCE_MAX_UNTIL
+                ) {
+                    eventViewModel.handleRecurrenceUntilDate(it)
+                    rb_recurrence_custom_2.setText(
+                        getString(
+                            R.string.event_recurrence_ends_on_date,
+                            it.format()
+                        )
+                    )
                 }
             }
         }
 
-        customEndingRadioGroup.add(requireView().findViewById(R.id.rb_recurrence_custom_1), requireView().findViewById(R.id.rb_recurrence_custom_2), requireView().findViewById(R.id.rb_recurrence_custom_3))
+        customEndingRadioGroup.add(
+            requireView().findViewById(R.id.rb_recurrence_custom_1),
+            requireView().findViewById(R.id.rb_recurrence_custom_2),
+            requireView().findViewById(R.id.rb_recurrence_custom_3)
+        )
 
-        tv_recurrence_custom_suffix.setText(resources.getQuantityString(R.plurals.plural_occurrence, FormValidation.OCCURRENCE_COUNT_DEFAULT))
+        tv_recurrence_custom_suffix.setText(
+            resources.getQuantityString(
+                R.plurals.plural_occurrence,
+                FormValidation.OCCURRENCE_COUNT_DEFAULT
+            )
+        )
         et_custom_recurrence_count.setText(FormValidation.OCCURRENCE_COUNT_DEFAULT.toString())
 
-        et_custom_recurrence_count.apply{
+        et_custom_recurrence_count.apply {
             doAfterFilteredIntValueChanged(
                 FormValidation.OCCURRENCE_COUNT_DEFAULT,
                 FormValidation.OCCURRENCE_COUNT_MIN,
                 FormValidation.OCCURRENCE_COUNT_MAX
             ) {
-                tv_recurrence_custom_suffix.setText(resources.getQuantityString(R.plurals.plural_occurrence, it))
+                tv_recurrence_custom_suffix.setText(
+                    resources.getQuantityString(
+                        R.plurals.plural_occurrence,
+                        it
+                    )
+                )
                 TimberLogger.d("ends after $it occurences")
             }
             setOnFocusChangeListener { _, hasFocus ->
@@ -239,19 +321,17 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         s_recurrence_period.setSelection(0)
 
 
-        // TODO
-        val startWeekOnMonday = true
-        val dayNamesStartingIndex = if (startWeekOnMonday) 1 else 0
+        val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
 
         resources.getStringArray(R.array.days_of_week_letters)
             .slice(dayNamesStartingIndex..(dayNamesStartingIndex + 6))
             .forEachIndexed { index, dayName ->
                 ((ll_chips_day_of_week as ViewGroup).getChildAt(index) as Chip).apply {
                     text = dayName
+                    isClickable = (index != indexOfEventStartDay) // we disable and check by default the day of event's start
+                    isChecked = (index == indexOfEventStartDay)
                 }
             }
-
-
 
 //        s_recurrence_period.adapter
 
@@ -262,15 +342,26 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 "TODO pass event start date AND bySetPos" // every fourth Monday <- OR -> on the last Friday (WHEN THIS IS THE LAST WEEK OF THE CURRENT MONTH)
 
             // TODO get this from VM
-            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.toLocalDate()
+            val eventStartDate =
+                eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+                    .toLocalDate()
 
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(), getString(R.string.event_recurrence_occurs_on), listOfNotNull(
-                    getString(R.string.event_recurrence_occurs_monthly_on_day, eventStartDate.dayOfMonth),
+                    getString(
+                        R.string.event_recurrence_occurs_monthly_on_day,
+                        eventStartDate.dayOfMonth
+                    ),
                     if (eventStartDate.weekInMonth() <= 4) { // we show only first 4 weeks of month this way
-                        getString(R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week, eventStartDate.formatMonthlyDayOfWeek(resources))
+                        getString(
+                            R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
+                            eventStartDate.formatMonthlyDayOfWeek(resources)
+                        )
                     } else null,
-                    if (eventStartDate.isLastDayOfWeekInMonth()) getString(R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week, eventStartDate.formatMonthlyDayOfWeek(resources, backwards = true)) else null
+                    if (eventStartDate.isLastDayOfWeekInMonth()) getString(
+                        R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
+                        eventStartDate.formatMonthlyDayOfWeek(resources, backwards = true)
+                    ) else null
                 ).toTypedArray(), 0 /*TODO*/
             ) {
                 eventViewModel.handleRecurrenceRepeatOn(it)
@@ -285,21 +376,29 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
 
             TimberLogger.d("event: ${it.iCalendar.printToString()}")
 
-            val radioButtonId = when(it.iCalEvent.recurrenceRule?.value?.frequency) {
+            val radioButtonId = when (it.iCalEvent.recurrenceRule?.value?.frequency) {
                 Frequency.DAILY -> R.id.rb_recurrence_2
                 Frequency.WEEKLY -> R.id.rb_recurrence_3
                 Frequency.MONTHLY -> R.id.rb_recurrence_4
                 Frequency.YEARLY -> R.id.rb_recurrence_5
                 else -> R.id.rb_recurrence_1
             }
-            rg_recurrence.check(if (it.isCustomRecurring()) {
+            rg_recurrence.check(
+                if (it.isCustomRecurring()) {
 
-                // fill in custom recurrence data in GUI
-                // TODO
+                    // fill in custom recurrence data in GUI
+                    // TODO
 
 
-                R.id.rb_recurrence_custom
-            } else radioButtonId)
+                    R.id.rb_recurrence_custom
+                } else radioButtonId
+            )
+
+
+
+
+            // set "ends" section
+
 
         })
     }
@@ -375,21 +474,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     private fun stash() {
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         var dateValue: LocalDate? = LocalDate.now() // TODO read this from VM, or null
-
-
 
 
         // TODO

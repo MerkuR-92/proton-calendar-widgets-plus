@@ -71,12 +71,12 @@ abstract class AppDatabase : RoomDatabase() {
 private class DatabaseTypeConverters { // TODO inject GSON, but it seems to be unsupported
 
     @TypeConverter
-    fun toListOfJsonElements(value: String): List<JsonElement> {
+    fun toListOfJsonElements(value: String): List<JsonElement> { // TODO if GSON passes null here, there be dragons
         return GsonCommon.gson.fromJson(value, GsonCommon.jsonElementListType)
     }
 
     @TypeConverter
-    fun fromListOfJsonElement(json: List<JsonElement>): String {
+    fun fromListOfJsonElement(json: List<JsonElement>): String { // TODO if GSON passes null here, there be dragons
         return GsonCommon.gson.toJson(json)
     }
 

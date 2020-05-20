@@ -34,12 +34,12 @@ data class EventEntity(
     // TODO ??? add type converters for Dao to serialize those as strings
     val sharedEvents: List<JsonElement>, // shared between all calendars // TODO nullable?
     val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar // TODO nullable?
-    @SerializedName("PersonalEvent") // TODO change this to PersonalEvents when api fixes naming
+//    @SerializedName("PersonalEvent") // TODO change this to PersonalEvents when api fixes naming
     val personalEvents: List<JsonElement> // specific to a member // TODO nullable?
 
     /** AttendeesEvent & Attendees: shared between all calendars
      *
-     * "AttendeesEvent": {
+     * "AttendeesEvents": {
     "Type": 3,
     "Data": "0sFQAWfo2r7cEhfZ94HhRlYsP4r...",
     "Signature": "-----BEGIN PGP SIGNATURE..."
