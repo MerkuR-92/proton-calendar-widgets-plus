@@ -209,6 +209,10 @@ fun ICalendar.printToString() : String = Biweekly.write(this).go()
 
 fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: "UTC")).toInstant())
 
+fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
+    return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
+}
+
 fun ZonedDateTime.formatDate(timeZoneId: String): String = this.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
 
 fun ZonedDateTime.formatTime(timeZoneId: String): String = this.toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))

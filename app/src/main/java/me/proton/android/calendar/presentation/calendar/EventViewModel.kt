@@ -41,6 +41,7 @@ class EventViewModel(
     // temporary values that might not be actually persisted in edited event
     //  but should be editable in GUI until confirmed/cancelled
     var tempRecurrenceUntilLocalDate: LocalDate? = null
+    var tempMonthlyRepeatOption: MonthlyRepatOnOption = EventViewModel.MonthlyRepatOnOption.ON_DAY_X
 
     var summaryBackup: String? = null
     var locationBackup: String? = null
@@ -52,6 +53,7 @@ class EventViewModel(
 
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
+
 
 
     // TODO get this from preferences/settings
@@ -344,7 +346,7 @@ class EventViewModel(
      *
      * @param frequency if null, removes entire recurrence rule
      */
-    fun handleRecurrence(frequency: Frequency?, untilDate: Boolean, interval: Int? = null, count: Int? = null, daysOfWeek: List<DayOfWeek>? = null) {
+    fun handleRecurrence(frequency: Frequency?, untilDate: Boolean, interval: Int? = null, count: Int? = null, daysOfWeek: List<DayOfWeek>? = null, customMonthly: Boolean = false) {
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -359,6 +361,18 @@ class EventViewModel(
             }
             daysOfWeek?.let {
                 builder.byDay(daysOfWeek)
+            }
+            if (customMonthly) {
+                val eventStartDate = event.getStart(initialTimeZoneId)!!.toLocalDate()
+                val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
+                val weekInMonth = eventStartDate.weekInMonth()
+
+                builder.byDay(iCalDayOfWeek)
+
+                when (tempMonthlyRepeatOption) {
+                    MonthlyRepatOnOption.ON_X_WEEKDAY -> builder.bySetPos(weekInMonth)
+                    MonthlyRepatOnOption.ON_LAST_WEEKDAY -> builder.bySetPos(-1)
+                }
             }
         }
 
@@ -382,13 +396,27 @@ class EventViewModel(
         tempRecurrenceUntilLocalDate = untilLocalDate
     }
 
-
-    fun handleRecurrenceRepeatOn(selectedIndex: Int) {
-        TimberLogger.d("TODO handleRecurrenceRepeatOn: $selectedIndex") // TODO
-
-        // TODO "on day 15" or "on first Monday"
-        // be careful how we determine what index means, maybe extract code from fragment
+    enum class MonthlyRepatOnOption {
+        ON_DAY_X,
+        ON_X_WEEKDAY,
+        ON_LAST_WEEKDAY
     }
 
+    /**
+     * Complicated logic for displaying monthly recurrence options is calculated by ViewModel.
+     */
+    fun calculateMonthlyRepeatOnOptions(): List<MonthlyRepatOnOption> {
+        val eventStartDate = event.getStart(initialTimeZoneId)!!.toLocalDate()
+
+        val options = mutableListOf(MonthlyRepatOnOption.ON_DAY_X)
+        if (eventStartDate.weekInMonth() <= 4) options.add(MonthlyRepatOnOption.ON_X_WEEKDAY)
+        if (eventStartDate.isLastDayOfWeekInMonth()) options.add(MonthlyRepatOnOption.ON_LAST_WEEKDAY)
+
+        return options
+    }
+
+    fun handleRecurrenceRepeatOn(selectedIndex: Int) {
+        this.tempMonthlyRepeatOption = calculateMonthlyRepeatOnOptions()[selectedIndex]
+    }
 
 }

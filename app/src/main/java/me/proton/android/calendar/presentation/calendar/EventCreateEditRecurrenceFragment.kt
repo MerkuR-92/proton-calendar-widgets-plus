@@ -21,8 +21,6 @@ import me.proton.android.calendar.presentation.NoLayoutRadioGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import timber.log.Timber
-import java.time.DayOfWeek
 import java.time.LocalDate
 
 
@@ -39,23 +37,21 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     override fun onMenuItemClicked(menuItem: MenuItem) {
         if (menuItem.itemId == R.id.action_menu_done) {
 
-            // TODO persist data
-
             when (rg_recurrence.checkedRadioButtonId) {
                 R.id.rb_recurrence_1 -> {
-                    eventViewModel.handleRecurrence(null, false)
+                    eventViewModel.handleRecurrence(null, untilDate = false)
                 }
                 R.id.rb_recurrence_2 -> {
-                    eventViewModel.handleRecurrence(Frequency.DAILY, false)
+                    eventViewModel.handleRecurrence(Frequency.DAILY, untilDate = false)
                 }
                 R.id.rb_recurrence_3 -> {
-                    eventViewModel.handleRecurrence(Frequency.WEEKLY, false)
+                    eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDate = false)
                 }
                 R.id.rb_recurrence_4 -> {
-                    eventViewModel.handleRecurrence(Frequency.MONTHLY, false)
+                    eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDate = false)
                 }
                 R.id.rb_recurrence_5 -> {
-                    eventViewModel.handleRecurrence(Frequency.YEARLY, false)
+                    eventViewModel.handleRecurrence(Frequency.YEARLY, untilDate = false)
                 }
                 R.id.rb_recurrence_custom -> {
 
@@ -105,11 +101,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                             val interval = et_recurrence_count.text.toString().toIntOrNull()
                                 ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT
 
-                            eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDateChecked, interval, thisManyRepeats)
-
-                            // days in a month for occurence TODO
-                            // weird spinner index mapping!
-                            // TODO HANDLE IN: handleRecurrenceRepeatOn
+                            eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDateChecked, interval, thisManyRepeats, customMonthly = true)
                         }
                         3 -> { // years
                             val interval = et_recurrence_count.text.toString().toIntOrNull()
@@ -346,29 +338,37 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
                     .toLocalDate()
 
+            val optionsRepeatOn = eventViewModel.calculateMonthlyRepeatOnOptions()
+
             AndroidUtils.displaySingleChoicePicker(
-                requireContext(), getString(R.string.event_recurrence_occurs_on), listOfNotNull(
-                    getString(
-                        R.string.event_recurrence_occurs_monthly_on_day,
-                        eventStartDate.dayOfMonth
-                    ),
-                    if (eventStartDate.weekInMonth() <= 4) { // we show only first 4 weeks of month this way
-                        getString(
-                            R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
-                            eventStartDate.formatMonthlyDayOfWeek(resources)
-                        )
-                    } else null,
-                    if (eventStartDate.isLastDayOfWeekInMonth()) getString(
-                        R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
-                        eventStartDate.formatMonthlyDayOfWeek(resources, backwards = true)
-                    ) else null
-                ).toTypedArray(), 0 /*TODO*/
+                requireContext(), getString(R.string.event_recurrence_occurs_on),
+                optionsRepeatOn.map {
+                    mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                }.toTypedArray(), 0 /*TODO init*/
             ) {
                 eventViewModel.handleRecurrenceRepeatOn(it)
+                tv_occurrence_time.setText(mapMonthlyRecurrenceOnToString(eventStartDate, optionsRepeatOn[it]))
             }
 
         }
 
+    }
+
+    private fun mapMonthlyRecurrenceOnToString(eventStartDate: LocalDate, option: EventViewModel.MonthlyRepatOnOption): String {
+        return when(option) {
+            EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> getString(
+                R.string.event_recurrence_occurs_monthly_on_day,
+                eventStartDate.dayOfMonth
+            )
+            EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> getString(
+                R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
+                eventStartDate.formatMonthlyDayOfWeek(resources)
+            )
+            EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> getString(
+                R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
+                eventStartDate.formatMonthlyDayOfWeek(resources, backwards = true)
+            )
+        }
     }
 
     private fun observeEventLiveData() {
@@ -394,10 +394,19 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 } else radioButtonId
             )
 
+            // TODO get this from VM
+            val eventStartDate =
+                eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+                    .toLocalDate()
+
+            val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.tempMonthlyRepeatOption)
+
+            tv_occurrence_time.setText(monthlyRecurrenceOn)
 
 
 
-            // set "ends" section
+
+            // TODO set "ends" section
 
 
         })

@@ -240,8 +240,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         press_recurrence.setOnClickListener {
-            //findNavController().navigate(R.id.nav_event_create_edit_recurrence)
-            Toast.makeText(requireContext(), "sorry, not yet", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.nav_event_create_edit_recurrence)
         }
 
 
