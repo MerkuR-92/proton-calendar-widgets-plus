@@ -27,7 +27,7 @@
     <string name="event_recurrence_every_some_period">Every %d %s</string>
     <string name="event_recurrence_occurs_on_day_of_week">%s on %s</string><!--"weekly on Friday"-->
     <string name="event_recurrence_occurs_on_day_of_month">%s on day %d</string><!--"monthly on day 15"-->
-    <string name="event_recurrence_occurs_on_day_of_week_full_words">%s on the %s</string><!--"monthly on the first Friday"-->
+    <string name="event_recurrence_occurs_on_day_of_week_full_words">%s on %s</string><!--"monthly on first Friday"-->
     <string name="event_recurrence_none">Does not repeat</string>
     <string name="event_recurrence_daily">Daily</string>
     <string name="event_recurrence_weekly">Weekly</string>

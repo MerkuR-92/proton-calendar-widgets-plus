@@ -139,8 +139,10 @@ data class Event(
 
     }
 
-    fun hasCustomRecurringEnd(): Boolean {
 
+
+    fun hasCustomRecurringEnd(): Boolean {
+// TODO
         return false
 
     }

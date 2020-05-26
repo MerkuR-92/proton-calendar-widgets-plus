@@ -8,6 +8,10 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.api.CalendarUserSettingsApiEntity
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -19,10 +23,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -41,7 +41,12 @@ class EventViewModel(
     // temporary values that might not be actually persisted in edited event
     //  but should be editable in GUI until confirmed/cancelled
     var tempRecurrenceUntilLocalDate: LocalDate? = null
-    var tempMonthlyRepeatOption: MonthlyRepatOnOption = EventViewModel.MonthlyRepatOnOption.ON_DAY_X
+    var tempMonthlyRepeatOption: MonthlyRepatOnOption = MonthlyRepatOnOption.ON_DAY_X
+
+    private var timeStartBackup: LocalTime? = null
+    private var timeEndBackup: LocalTime? = null
+
+
 
     var summaryBackup: String? = null
     var locationBackup: String? = null
@@ -51,8 +56,7 @@ class EventViewModel(
     //private var endTimeZoneIdBackup: String? = null
 
 
-    private var timeStartBackup: LocalTime? = null
-    private var timeEndBackup: LocalTime? = null
+
 
 
 
@@ -89,6 +93,14 @@ class EventViewModel(
     lateinit var initialTimeZoneId: String
 
     suspend fun initialise(eventId: String?, initStartDate: String?, initStartTime: String? /*TODO in the future also endDate for multi-day events*/): UseCase.Result /* TODO maybe use separate Result class */ {
+
+        // reset temp values
+        tempRecurrenceUntilLocalDate = null
+        tempMonthlyRepeatOption = EventViewModel.MonthlyRepatOnOption.ON_DAY_X
+
+        // reset backup values
+        timeStartBackup = null
+        timeEndBackup = null
 
         // TODO get those values from somewhere
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
@@ -356,8 +368,8 @@ class EventViewModel(
             count?.let {
                 builder.count(it)
             }
-            if (untilDate) {
-                builder.until(tempRecurrenceUntilLocalDate?.toDate(initialTimeZoneId))
+            if (untilDate && tempRecurrenceUntilLocalDate != null) {
+                builder.until(tempRecurrenceUntilLocalDate!!.toDate(initialTimeZoneId))
             }
             daysOfWeek?.let {
                 builder.byDay(daysOfWeek)
@@ -413,6 +425,36 @@ class EventViewModel(
         if (eventStartDate.isLastDayOfWeekInMonth()) options.add(MonthlyRepatOnOption.ON_LAST_WEEKDAY)
 
         return options
+    }
+
+    /**
+     * Complicated logic for determining selected recurrence option is calculated by ViewModel.
+     */
+    fun calculateMonthlyRepeatOnOptionIndex(): Int {
+
+        val repeatOptions = calculateMonthlyRepeatOnOptions()
+
+            event.iCalEvent.recurrenceRule?.value?.run {
+
+            if (this.frequency != Frequency.MONTHLY) return 0
+
+                val eventStartDate = event.getStart(initialTimeZoneId)!!.toLocalDate()
+
+                val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
+                val weekInMonth = eventStartDate.weekInMonth()
+
+                val eventDaySetPos = this.bySetPos.getOrNull(this.byDay.indexOfFirst { it.day == iCalDayOfWeek })
+
+                if (eventDaySetPos != null) {
+                    if (eventDaySetPos in 1..4) {
+                        return 1
+                    } else if (eventDaySetPos == -1) {
+                        return repeatOptions.lastIndex
+                    }
+                }
+        }
+
+        return 0 // default: Recurrence Rule never ends
     }
 
     fun handleRecurrenceRepeatOn(selectedIndex: Int) {
