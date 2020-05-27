@@ -38,35 +38,12 @@ class EventViewModel(
     private val gson: Gson
 ) : ViewModel() {
 
-    // temporary values that might not be actually persisted in edited event
-    //  but should be editable in GUI until confirmed/cancelled
-    var tempRecurrenceUntilLocalDate: LocalDate? = null
-    var tempMonthlyRepeatOption: MonthlyRepatOnOption = MonthlyRepatOnOption.ON_DAY_X
 
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
 
-
-
-    var summaryBackup: String? = null
-    var locationBackup: String? = null
-    var descriptionBackup: String? = null
-//    var isAllDay: Boolean = false
-//    private var eventStartTimeZoneIdBackup: String? = null
-    //private var endTimeZoneIdBackup: String? = null
-
-
-
-
-
-
     // TODO get this from preferences/settings
     val startWeekOnMonday = true
-
-
-
-
-
 
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -76,11 +53,6 @@ class EventViewModel(
 //        val data = database.loadUser() // loadUser is a suspend function.
 //        emit(data)
 //    }
-
-    override fun onCleared() {
-        TimberLogger.e("eventviewmodel cleared")
-        super.onCleared()
-    }
 
     private lateinit var event: Event
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
@@ -94,9 +66,6 @@ class EventViewModel(
 
     suspend fun initialise(eventId: String?, initStartDate: String?, initStartTime: String? /*TODO in the future also endDate for multi-day events*/): UseCase.Result /* TODO maybe use separate Result class */ {
 
-        // reset temp values
-        tempRecurrenceUntilLocalDate = null
-        tempMonthlyRepeatOption = EventViewModel.MonthlyRepatOnOption.ON_DAY_X
 
         // reset backup values
         timeStartBackup = null
@@ -220,27 +189,25 @@ class EventViewModel(
         return UseCase.Result.Success
     }
 
+    var tempRecurrenceUntilLocalDate: LocalDate? = null
+    var tempMonthlyRepeatOption: MonthlyRepatOnOption = MonthlyRepatOnOption.ON_DAY_X
+
+    /**
+     * Resets temporary values for Recurrence
+     */
+    fun initialiseForRecurrence() {
+        this.tempMonthlyRepeatOption = MonthlyRepatOnOption.ON_DAY_X
+        this.tempRecurrenceUntilLocalDate = null
+    }
+
+    /**
+     * Saves form data in iCalendar, but doesn't emit new LiveData
+     * because the changes are already there in user interface.
+     */
     fun persistFormData(summary: String?, location: String?, description: String?) {
-
-//        summaryBackup = summary
-//        locationBackup = location
-//        descriptionBackup = description
-
         event.iCalEvent.setSummary(summary)
         event.iCalEvent.setLocation(location)
         event.iCalEvent.setDescription(description)
-
-
-//        val eventToSave = (_event.value as Event).apply {
-//            iCalEvent.setSummary(summary)
-//            iCalEvent.setLocation(location)
-//            iCalEvent.setDescription(description)
-//        }
-//
-//        TimberLogger.d("event after persisting data:")
-//        TimberLogger.d(eventToSave.iCalendar.printToString())
-//
-//        _event.postValue(eventToSave)
     }
 
     suspend fun handleSave(): Boolean {
@@ -256,6 +223,8 @@ class EventViewModel(
             initialTimeZoneId = event.defaultTimeZone!!
             TimberLogger.d("calendar for part-time after adjusting timezones: " + calendarToSave.printToString())
         }
+
+        // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
         TimberLogger.d("calendar: ${event.calendar}")
 
@@ -460,5 +429,7 @@ class EventViewModel(
     fun handleRecurrenceRepeatOn(selectedIndex: Int) {
         this.tempMonthlyRepeatOption = calculateMonthlyRepeatOnOptions()[selectedIndex]
     }
+
+
 
 }

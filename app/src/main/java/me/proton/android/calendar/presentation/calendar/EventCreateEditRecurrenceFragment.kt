@@ -116,7 +116,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
 
     // index of the day of the week of Event start, used for forcing weekday picker to have it always picked
-    private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
+//    private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
 
     lateinit var customEndingRadioGroup: NoLayoutRadioGroup
 
@@ -286,7 +286,10 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
 
         val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
 
-        TimberLogger.d("recurr ${eventViewModel.eventLiveData.value!!.iCalEvent?.recurrenceRule?.value}") // TODO check all the weekdays!
+        val byDayIndices = eventViewModel.eventLiveData.value!!.iCalEvent?.recurrenceRule?.value?.byDay?.map { (it.day.ordinal + 7 - dayNamesStartingIndex) % 7 } ?: emptyList()
+
+        val indexOfEventStartDay = (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7
+        val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
         resources.getStringArray(R.array.days_of_week_letters)
             .slice(dayNamesStartingIndex..(dayNamesStartingIndex + 6))
@@ -294,18 +297,20 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 ((ll_chips_day_of_week as ViewGroup).getChildAt(index) as Chip).apply {
                     text = dayName
                     isClickable = (index != indexOfEventStartDay) // we disable and check by default the day of event's start
-                    isChecked = (index == indexOfEventStartDay)
+                    isChecked = (index in checkedDayIndices)
                 }
             }
 
+        // TODO get this from VM
+        val eventStartDate =
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+                .toLocalDate()
+
         // applies only to month
+        val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.tempMonthlyRepeatOption)
+        tv_occurrence_time.setText(monthlyRecurrenceOn)
+
         press_recurrence_time.setOnClickListener {
-
-            // TODO get this from VM
-            val eventStartDate =
-                eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
-                    .toLocalDate()
-
             val optionsRepeatOn = eventViewModel.calculateMonthlyRepeatOnOptions()
 
             AndroidUtils.displaySingleChoicePicker(
@@ -364,7 +369,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                         eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
                             .toLocalDate()
 
-                    val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.tempMonthlyRepeatOption)
+                    val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()])
                     tv_occurrence_time.setText(monthlyRecurrenceOn)
 
                     // ll_chips_day_of_week is initialised when populating spinner

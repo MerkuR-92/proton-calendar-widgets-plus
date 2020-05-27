@@ -240,6 +240,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         press_recurrence.setOnClickListener {
+            eventViewModel.initialiseForRecurrence()
             findNavController().navigate(R.id.nav_event_create_edit_recurrence)
         }
 
