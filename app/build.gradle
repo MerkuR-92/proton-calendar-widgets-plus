@@ -3,11 +3,33 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
+detekt {
+    failFast = false
+    config = files("$projectDir/config/detekt/detekt.yml")
+    reports {
+        xml {
+            enabled = false
+        }
+        html {
+            enabled = true
+        }
+        txt {
+            enabled = false
+        }
+        custom {
+            reportId = "DetektQualityOutputReport"
+            destination = file("build/reports/detekt.json")
+        }
+    }
+}
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-
+    ndkVersion "20.0.5594570"
+    
     defaultConfig {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
@@ -102,6 +124,10 @@ dependencies {
 //    implementation "org.mnode.ical4j:ical4j:${rootProject.ext.version.ical}"
     implementation "net.sf.biweekly:biweekly:${rootProject.ext.version.biweekly}"
 
+    detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
+    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'
+    detektPlugins 'pm.algirdas.detekt:codeanalysis:0.3.3'
+    detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
 
     androidTestImplementation 'androidx.test:core:1.2.0'
     androidTestImplementation 'androidx.test:runner:1.2.0'
