@@ -101,6 +101,18 @@ class AndroidUtils(context: Context) {
             builder.create().show()
         }
 
+        fun displaySimpleOkAlert(
+            context: Context,
+            message: String,
+            title: String? = null
+        ) {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            title?.apply { builder.setTitle(this) }
+            builder.setMessage(message)
+            builder.setPositiveButton(R.string.dialog_button_ok, null)
+            builder.create().show()
+        }
+
         fun displayCalendarPicker(
             context: Context,
             title: String?,

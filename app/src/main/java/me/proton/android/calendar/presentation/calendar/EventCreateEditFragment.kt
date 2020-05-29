@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -38,27 +39,26 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     override fun onMenuItemClicked(menuItem: MenuItem) {
         if (menuItem.itemId == R.id.action_menu_save) {
 
+            if (eventViewModel.validateDateTime()) {
+                lifecycleScope.launch {
+                    persistFormData()
 
-            lifecycleScope.launch {
-                persistFormData()
+                    val success = withContext(Dispatchers.IO) {
+                        eventViewModel.handleSave()
+                    }
 
-                val success = withContext(Dispatchers.IO) {
-                    eventViewModel.handleSave()
+                    if (success) {
+                        Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    } else {
+                        Toast.makeText(requireContext(), "ERROR", Toast.LENGTH_SHORT).show()
+                    }
+
                 }
-
-                if (success) {
-                    Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-                    findNavController().navigateUp()
-                } else {
-                    Toast.makeText(requireContext(), "ERROR", Toast.LENGTH_SHORT).show()
-                }
-
-
-
+            } else {
+                AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.event_alert_invalid_start_end_date))
             }
 
-
-            //persistFormData()
         }
     }
 
@@ -157,6 +157,14 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
             group_partial_day_event.visibleOrGone(!event.isAllDay())
 
+            if (eventViewModel.validateDateTime()) {
+                tv_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorSecondary))
+                tv_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorSecondary))
+            } else {
+                tv_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+                tv_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+            }
+
             val formattedStart = event.formatStart(eventViewModel.initialTimeZoneId)
             tv_start_date.text = formattedStart.first ?: ""
             tv_start_time.text = formattedStart.second ?: ""
@@ -216,7 +224,6 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-
         press_end_time.setOnClickListener {
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.initialTimeZoneId)?.toLocalTime()
@@ -260,8 +267,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         addAlarmView.findViewById<TextView>(R.id.tv_text).apply {
             text = resources.getString(R.string.event_text_add_alarm)
             setOnClickListener {
-//                findNavController().navigate(R.id.nav_event_create_edit_alarm) // TODO
-                Toast.makeText(requireContext(), "sorry, not yet", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.nav_event_create_edit_alarm) // TODO
+//                Toast.makeText(requireContext(), "sorry, not yet", Toast.LENGTH_SHORT).show()
             }
         }
 

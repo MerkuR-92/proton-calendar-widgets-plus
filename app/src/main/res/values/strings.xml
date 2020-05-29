@@ -9,6 +9,7 @@
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_set">Set</string>
+    <string name="dialog_button_ok">OK</string>
 
     <string name="action_save">Save</string>
     <string name="action_done">Done</string>
@@ -54,6 +55,7 @@
     <string name="event_text_description">Description</string>
     <string name="event_hint_description">Add description</string>
     <string name="event_text_custom">Custom</string>
+    <string name="event_alert_invalid_start_end_date">Event start date can\'t be after end date</string>
     <string name="event_alarm_partial_day_1">10 minutes before</string>
     <string name="event_alarm_partial_day_2">30 minutes before</string>
     <string name="event_alarm_partial_day_3">1 hour before</string>
@@ -81,6 +83,10 @@
     <string name="event_recurrence_ends_on_date_empty">On day</string>
     <string name="event_recurrence_ends_on_date">On %s</string>
     <string name="event_recurrence_ends_after_count_prefix">After</string>
+
+
+
+
 
 
 

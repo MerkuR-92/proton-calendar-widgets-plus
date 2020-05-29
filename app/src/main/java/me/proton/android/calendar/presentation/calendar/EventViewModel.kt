@@ -210,6 +210,14 @@ class EventViewModel(
         event.iCalEvent.setDescription(description)
     }
 
+    /**
+     * Checks if start date/time is before end date/time
+     */
+    fun validateDateTime(): Boolean {
+        // TODO this works only as long as we have the same timezone for start and end
+        return event.getStart(initialTimeZoneId)?.isBefore(event.getEnd(initialTimeZoneId)) ?: false
+    }
+
     suspend fun handleSave(): Boolean {
 
         val calendarToSave = event.iCalendar
@@ -241,6 +249,8 @@ class EventViewModel(
         return createEventResult.await() == UseCase.Result.Success
 
     }
+
+
 
     fun handleCalendar(calendar: CalendarEntity) {
         event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color))
