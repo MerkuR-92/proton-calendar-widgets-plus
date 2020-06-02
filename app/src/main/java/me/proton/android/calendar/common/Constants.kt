@@ -14,10 +14,6 @@ const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edi
 const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/create"
 
 
-const val VALIDATION_ALARM_PERIOD_COUNT_DEFAULT = 1
-const val VALIDATION_ALARM_PERIOD_COUNT_MIN = 1
-const val VALIDATION_ALARM_PERIOD_COUNT_MAX = 50
-
 
 object FormValidation {
 
@@ -47,6 +43,17 @@ object FormValidation {
     const val EVENT_SUMMARY_MAX_LENGTH = 255
     const val EVENT_LOCATION_MAX_LENGTH = 255
     const val EVENT_DESCRIPTION_MAX_LENGTH = 3000
+
+
+    const val ALARM_PERIOD_COUNT_DEFAULT = 1
+    const val ALARM_PERIOD_COUNT_MIN = 1
+    const val ALARM_PERIOD_COUNT_MAX = 50
+
+    const val ALARM_PERIOD_MAX_WEEKS = 999
+    const val ALARM_PERIOD_MAX_DAYS = 6999
+    const val ALARM_PERIOD_MAX_HOURS = 999
+    const val ALARM_PERIOD_MAX_MINUTES = 9999
+
 }
 
 val allowedTimezoneIds = listOf(

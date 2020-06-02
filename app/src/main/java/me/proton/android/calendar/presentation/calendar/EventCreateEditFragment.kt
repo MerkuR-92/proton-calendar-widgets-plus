@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import biweekly.component.VAlarm
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
@@ -73,7 +74,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
 //            withContext(Dispatchers.Default) {
 //
-                eventViewModel.persistFormData(
+                eventViewModel.persistRecurrenceFormData(
                     et_summary.text.toString().ifBlank { null },
                     et_location.text.toString().ifBlank { null },
                     et_description.text.toString().ifBlank { null }
@@ -180,6 +181,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
             tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.initialTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
+            displayAlarms(event.iCalEvent.alarms)
 
             event.description?.let { et_description.setText(event.description) }
         })
@@ -261,25 +263,9 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
 
 
+//eventViewModel.eventLiveData.value!!.iCalEvent.alarms[0]
 
 
-        val addAlarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
-        addAlarmView.findViewById<TextView>(R.id.tv_text).apply {
-            text = resources.getString(R.string.event_text_add_alarm)
-            setOnClickListener {
-                findNavController().navigate(R.id.nav_event_create_edit_alarm) // TODO
-//                Toast.makeText(requireContext(), "sorry, not yet", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        addAlarmView.findViewById<ImageButton>(R.id.ib_cross).apply {
-            visibleOrGone(false)
-            setOnClickListener {
-                // TODO
-            }
-        }
-
-        ll_alarms.addView(addAlarmView)
 
 
 
@@ -305,5 +291,44 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
 
     }
+
+    fun displayAlarms(alarms: List<VAlarm>) {
+
+        ll_alarms.removeAllViews()
+
+        alarms.forEach { alarm ->
+
+            val alarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
+            alarmView.findViewById<TextView>(R.id.tv_text).apply {
+                text = "TODO FORMAT ALARM" + alarm.trigger.duration.toString()
+                setOnClickListener {
+//                    eventViewModel.initialiseForAlarm() // TODO initialise for edit
+//                    findNavController().navigate(R.id.nav_event_create_edit_alarm)
+                }
+            }
+            alarmView.findViewById<ImageButton>(R.id.ib_cross).apply {
+//                visibleOrGone(false)
+                setOnClickListener {
+                    // TODO delete alarm from event
+                }
+            }
+            ll_alarms.addView(alarmView)
+
+        }
+
+        // "add notification" button
+        val addAlarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
+        addAlarmView.findViewById<TextView>(R.id.tv_text).apply {
+            text = resources.getString(R.string.event_text_add_alarm)
+            setOnClickListener {
+                eventViewModel.initialiseForAlarm()
+                findNavController().navigate(R.id.nav_event_create_edit_alarm)
+            }
+        }
+        addAlarmView.findViewById<ImageButton>(R.id.ib_cross).visibleOrGone(false)
+        ll_alarms.addView(addAlarmView)
+
+    }
+
 
 }

@@ -53,6 +53,15 @@
             tools:text="RadioButton" />
 
         <RadioButton
+            android:id="@+id/rb_alarm_5"
+            style="@style/AppFormTextContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            tools:text="RadioButton" />
+
+        <RadioButton
             android:id="@+id/rb_alarm_custom"
             style="@style/AppFormTextContent"
             android:layout_width="match_parent"

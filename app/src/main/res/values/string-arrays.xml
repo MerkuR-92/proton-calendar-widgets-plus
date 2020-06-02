@@ -40,9 +40,4 @@
         <item>fifth to last</item>
     </string-array>
 
-    <string-array name="alarm_actions">
-        <item>Notification</item>
-        <item>Email</item>
-    </string-array>
-
 </resources>

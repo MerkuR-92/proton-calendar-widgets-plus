@@ -56,10 +56,11 @@
     <string name="event_hint_description">Add description</string>
     <string name="event_text_custom">Custom</string>
     <string name="event_alert_invalid_start_end_date">Event start date can\'t be after end date</string>
-    <string name="event_alarm_partial_day_1">10 minutes before</string>
-    <string name="event_alarm_partial_day_2">30 minutes before</string>
-    <string name="event_alarm_partial_day_3">1 hour before</string>
-    <string name="event_alarm_partial_day_4">1 week before</string>
+    <string name="event_alarm_partial_day_1">At time of event</string>
+    <string name="event_alarm_partial_day_2">10 minutes before</string>
+    <string name="event_alarm_partial_day_3">30 minutes before</string>
+    <string name="event_alarm_partial_day_4">1 hour before</string>
+    <string name="event_alarm_partial_day_5">1 week before</string>
     <string name="event_alarm_all_day_1">On the day at %s</string>
     <string name="event_alarm_all_day_2">The day before at %s</string>
     <string name="event_alarm_all_day_3">1 week before at %s</string>

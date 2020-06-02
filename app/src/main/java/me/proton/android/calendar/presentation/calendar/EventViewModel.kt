@@ -4,7 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import biweekly.component.VAlarm
+import biweekly.parameter.Related
+import biweekly.property.Trigger
 import biweekly.util.DayOfWeek
+import biweekly.util.Duration
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.gson.Gson
@@ -28,7 +32,6 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-
 
 class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
@@ -189,6 +192,7 @@ class EventViewModel(
         return UseCase.Result.Success
     }
 
+    // recurrence temp values
     var tempRecurrenceUntilLocalDate: LocalDate? = null
     var tempMonthlyRepeatOption: MonthlyRepatOnOption = MonthlyRepatOnOption.ON_DAY_X
 
@@ -204,7 +208,7 @@ class EventViewModel(
      * Saves form data in iCalendar, but doesn't emit new LiveData
      * because the changes are already there in user interface.
      */
-    fun persistFormData(summary: String?, location: String?, description: String?) {
+    fun persistRecurrenceFormData(summary: String?, location: String?, description: String?) {
         event.iCalEvent.setSummary(summary)
         event.iCalEvent.setLocation(location)
         event.iCalEvent.setDescription(description)
@@ -215,7 +219,21 @@ class EventViewModel(
      */
     fun validateDateTime(): Boolean {
         // TODO this works only as long as we have the same timezone for start and end
-        return event.getStart(initialTimeZoneId)?.isBefore(event.getEnd(initialTimeZoneId)) ?: false
+        return if (event.isAllDay()) {
+            !(event.getStart(initialTimeZoneId)?.isAfter(event.getEnd(initialTimeZoneId)) ?: false)
+        } else {
+            event.getStart(initialTimeZoneId)?.isBefore(event.getEnd(initialTimeZoneId)) ?: false
+        }
+    }
+
+    // alarm temp values
+    var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
+
+    /**
+     * Resets temporary values for Alarm and optionally provides Alarm for editing.
+     */
+    fun initialiseForAlarm(/*TODO pass alarm index or sth?*/) {
+        this.tempAlarmSendByOption = SendByOption.NOTIFICATION
     }
 
     suspend fun handleSave(): Boolean {
@@ -440,6 +458,63 @@ class EventViewModel(
         this.tempMonthlyRepeatOption = calculateMonthlyRepeatOnOptions()[selectedIndex]
     }
 
+    enum class SendByOption {
+        NOTIFICATION,
+        EMAIL
+    }
+
+    enum class RelativeNotificationTrigger {
+
+    }
+
+    fun handleAlarmSendBy(option: SendByOption) {
+        this.tempAlarmSendByOption = option
+    }
+
+    fun handleNotification(alarmTypeOption: Int) {
+
+        val duration = if (event.isAllDay()) {
+            when (alarmTypeOption) {
+                0 -> Duration.builder().prior(false).hours(9).build() // on the day at 9:00
+                1 -> Duration.builder().prior(true).hours(6).build() // day before at 18:00
+                2 -> Duration.builder().prior(true).days(6).hours(15).build() // 1 week before at 9:00, -P6DT15H
+                3 -> Duration.builder().prior(true).weeks(2).days(6).hours(15).build() // 3 weeks before at 9:00, -P2W6DT15H
+                4 -> { // custom
+                    //custom
+                    TODO()
+                }
+                else -> null
+            }
+        } else { // partial-day trigger can contain only one component
+            when (alarmTypeOption) {
+                0 -> Duration.builder().prior(false).seconds(0).build() // at the time of event
+                1 -> Duration.builder().prior(true).minutes(10).build()
+                2 -> Duration.builder().prior(true).minutes(30).build()
+                3 -> Duration.builder().prior(true).hours(1).build()
+                4 -> Duration.builder().prior(true).weeks(1).build()
+                5 -> { // custom
+                    Duration.builder().build() // TODO
+                }
+                else -> null
+            }
+        }
+
+        duration?.apply {
+
+            val alarm = when (tempAlarmSendByOption) {
+                SendByOption.NOTIFICATION -> VAlarm.display(Trigger(duration, Related.START), null)
+                SendByOption.EMAIL -> VAlarm.email(Trigger(duration, Related.START), null, null, emptyList())
+            }
+
+            val test = ICalUtils.createNewEvent()
+                test.addAlarm(alarm)
+            TimberLogger.d("alarm to create: ${test.wrapInICalendar()}")
+
+            event.iCalEvent.addAlarm(alarm)
+            _event.postValue(event)
+        }
+
+    }
 
 
 }
