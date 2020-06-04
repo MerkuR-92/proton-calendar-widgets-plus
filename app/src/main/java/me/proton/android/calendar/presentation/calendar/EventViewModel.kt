@@ -506,15 +506,15 @@ class EventViewModel(
                 SendByOption.EMAIL -> VAlarm.email(Trigger(duration, Related.START), null, null, emptyList())
             }
 
-            val test = ICalUtils.createNewEvent()
-                test.addAlarm(alarm)
-            TimberLogger.d("alarm to create: ${test.wrapInICalendar()}")
-
             event.iCalEvent.addAlarm(alarm)
             _event.postValue(event)
         }
 
     }
 
+    fun handleAlarmDelete(index: Int) {
+        event.iCalEvent.alarms.removeAt(index)
+        _event.postValue(event)
+    }
 
 }

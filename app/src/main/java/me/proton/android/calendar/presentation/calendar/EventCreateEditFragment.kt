@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.animation.LayoutTransition
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -14,16 +15,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import biweekly.component.VAlarm
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
-import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.presentation.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_event_create_edit.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.AndroidUtils
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.allowedTimezoneIds
+import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -295,11 +298,12 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
     fun displayAlarms() {
 
+//        ll_alarms.layoutTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING)
         ll_alarms.removeAllViews()
 
         val event = eventViewModel.eventLiveData.value!!
 
-        event.iCalEvent.alarms.forEach { alarm ->
+        event.iCalEvent.alarms.forEachIndexed { index, alarm ->
 
             val alarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
             alarmView.findViewById<TextView>(R.id.tv_text).apply {
@@ -310,9 +314,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 }
             }
             alarmView.findViewById<ImageButton>(R.id.ib_cross).apply {
-//                visibleOrGone(false)
                 setOnClickListener {
-                    // TODO delete alarm from event
+                    eventViewModel.handleAlarmDelete(index)
                 }
             }
             ll_alarms.addView(alarmView)
