@@ -21,8 +21,12 @@
     <string name="event_all_day">All Day</string>
     <string name="event_time_period_spanning_single_day">%s \u2013 %s</string>
     <string name="event_time_period_spanning_many_days">%s \u2013\n%s</string>
+    <string name="event_alarm_label_at_event_time">At time of event</string>
+    <string name="event_alarm_label_on_the_same_day">On the same day</string>
     <string name="event_alarm_label_before">%s before</string>
     <string name="event_alarm_label_before_by_email">%s before by email</string>
+    <string name="event_alarm_label_not_before_with_time">%s at %s</string>
+    <string name="event_alarm_label_not_before_with_time_by_email">%s at %s by email</string> <!--"1 day before at 9:00 by email"-->
     <string name="event_alarm_label_before_with_time">%s before at %s</string>
     <string name="event_alarm_label_before_with_time_by_email">%s before at %s by email</string> <!--"1 day before at 9:00 by email"-->
     <string name="event_recurrence_every_some_period">Every %d %s</string>
@@ -61,8 +65,8 @@
     <string name="event_alarm_partial_day_3">30 minutes before</string>
     <string name="event_alarm_partial_day_4">1 hour before</string>
     <string name="event_alarm_partial_day_5">1 week before</string>
-    <string name="event_alarm_all_day_1">On the day at %s</string>
-    <string name="event_alarm_all_day_2">The day before at %s</string>
+    <string name="event_alarm_all_day_1">On the same day at %s</string>
+    <string name="event_alarm_all_day_2">1 day before at %s</string>
     <string name="event_alarm_all_day_3">1 week before at %s</string>
     <string name="event_alarm_all_day_4">3 weeks before at %s</string>
     <string name="event_alarm_at_time">At</string>

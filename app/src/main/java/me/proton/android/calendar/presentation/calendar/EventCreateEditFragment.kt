@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.time.ZonedDateTime
 
 
 class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
@@ -181,7 +182,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
             tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.initialTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
-            displayAlarms(event.iCalEvent.alarms)
+            displayAlarms()
 
             event.description?.let { et_description.setText(event.description) }
         })
@@ -292,15 +293,17 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
     }
 
-    fun displayAlarms(alarms: List<VAlarm>) {
+    fun displayAlarms() {
 
         ll_alarms.removeAllViews()
 
-        alarms.forEach { alarm ->
+        val event = eventViewModel.eventLiveData.value!!
+
+        event.iCalEvent.alarms.forEach { alarm ->
 
             val alarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
             alarmView.findViewById<TextView>(R.id.tv_text).apply {
-                text = "TODO FORMAT ALARM" + alarm.trigger.duration.toString()
+                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), calendarViewModel.timeZoneId), alarm)
                 setOnClickListener {
 //                    eventViewModel.initialiseForAlarm() // TODO initialise for edit
 //                    findNavController().navigate(R.id.nav_event_create_edit_alarm)

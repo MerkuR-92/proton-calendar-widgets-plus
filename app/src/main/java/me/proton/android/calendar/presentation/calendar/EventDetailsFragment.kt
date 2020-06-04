@@ -127,62 +127,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 text_event_title.text = event.summary + "\n"
 
-                val alarmLabels = it.iCalEvent.alarms.filter { it.trigger?.duration?.isPrior ?: false /*only show triggers "before" event*/ }.mapNotNull {
-
-//                    TimberLogger.D()
-
-                    val trigger = it.trigger.duration
-                    if (event.isAllDay()) { // example: "1 day before at 9:00"
-
-                        // TODO FIXME this is device timezone, use this only as a fallback for given calendar
-                        val startDate = ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), calendarViewModel.timeZoneId)
-                            .minus(Period.ofWeeks(trigger.weeks ?: 0))
-                            .minus(Period.ofDays(trigger.days ?: 0))
-                            .minus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
-                            .minus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
-
-                        TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
-
-                        val label = listOfNotNull(
-                            trigger.weeks?.let { "$it ${resources.getQuantityString(R.plurals.plural_week, it, it)}" },
-                            // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
-                            trigger.days?.let { "${it + 1} ${resources.getQuantityString(R.plurals.plural_day, (it + 1), (it + 1))}" } ?: "1 ${resources.getQuantityString(R.plurals.plural_day, 1, 1)}"
-                        ).joinToString(separator = ", ")
-
-                        val alarmTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(startDate.toInstant()))
-
-                        if (label.isBlank()) {
-                            null
-                        } else if (it.action?.isEmail == true) {
-                            getString(R.string.event_alarm_label_before_with_time_by_email, label, alarmTime)
-                        } else if (it.action?.isDisplay == true) {
-                            getString(R.string.event_alarm_label_before_with_time, label, alarmTime)
-                        } else {
-                            null
-                        }
-
-                    } else { // example: "15 minutes before"
-                        val label = listOfNotNull(
-                            trigger.weeks?.let { "$it ${resources.getQuantityString(R.plurals.plural_week, it, it)}" },
-                            trigger.days?.let { "$it ${resources.getQuantityString(R.plurals.plural_day, it, it)}" },
-                            trigger.hours?.let { "$it ${resources.getQuantityString(R.plurals.plural_hour, it, it)}" },
-                            trigger.minutes?.let { "$it ${resources.getQuantityString(R.plurals.plural_minute, it, it)}" }
-                        ).joinToString(separator = ", ")
-
-                        if (label.isBlank()) {
-                            null
-                        } else if (it.action?.isEmail == true) {
-                            getString(R.string.event_alarm_label_before_by_email, label)
-                        } else if (it.action?.isDisplay == true) {
-                            getString(R.string.event_alarm_label_before, label)
-                        } else {
-                            null
-                        }
-                    }
-
+                val alarmLabels = it.iCalEvent.alarms./*filter { it.trigger?.duration?.isPrior ?: false /*only show triggers "before" event*/ }*/mapNotNull { alarm ->
+                    AndroidUtils.formatAlarm(resources, it.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), calendarViewModel.timeZoneId), alarm)
                 }
 
                 text_event_notifications.text = "NOTIFICATIONS:\n" + alarmLabels.joinToString(separator = "\n")
+
 
                     if (event.spansSingleDay()) {
 

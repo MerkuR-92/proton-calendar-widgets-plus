@@ -5,6 +5,7 @@ import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -38,6 +39,7 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
 //                 val customTime = nullable
 
              eventViewModel.handleNotification(alarmTypeOption/*alarmType, customPeriod?, alarmCount?, alarmTime?*/)
+             findNavController().navigateUp()
 
              // TODO
              // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved

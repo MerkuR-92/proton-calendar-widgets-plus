@@ -13,6 +13,7 @@ import me.proton.android.calendar.domain.api.SettingsApi
 /**
  * Sets up all the user's calendars, call this only once after successful login.
  */
+// TODO Valentin go over this entire use case
 class BootstrapCalendarsUseCase( // TODO TEST
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,

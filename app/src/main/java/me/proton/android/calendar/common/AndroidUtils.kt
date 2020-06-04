@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckedTextView
 import androidx.core.view.children
 import androidx.core.widget.doAfterTextChanged
+import biweekly.component.VAlarm
 import biweekly.util.Frequency
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -321,6 +322,93 @@ return label
             }
 
 return null
+        }
+
+
+        fun formatAlarm(resources: Resources, isAllDay: Boolean, startZonedDateTime: ZonedDateTime, alarm: VAlarm): String? {
+
+            val trigger = alarm.trigger.duration
+            return if (isAllDay) { // example: "1 day before at 9:00"
+
+                val startDate = if (trigger.isPrior) {
+                    startZonedDateTime
+                        .minus(Period.ofWeeks(trigger.weeks ?: 0))
+                        .minus(Period.ofDays(trigger.days ?: 0))
+                        .minus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
+                        .minus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
+                } else {
+                    startZonedDateTime
+                        .plus(Period.ofWeeks(trigger.weeks ?: 0))
+                        .plus(Period.ofDays(trigger.days ?: 0))
+                        .plus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
+                        .plus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
+                }
+
+                TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
+
+                val onTheSameDay = !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
+
+                // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
+                var daysFormatted: Int? = if (trigger.days != null) { // (trigger.days?.toInt() ?: 0) + 1
+                        trigger.days + 1
+                } else {
+                    if (trigger.hours != null || trigger.minutes != null) {
+                        1
+                    } else null
+                }
+
+                if (onTheSameDay) daysFormatted = null
+
+                var weeksFormatted = trigger.weeks?.toInt()
+                if (daysFormatted == 7) {
+                    weeksFormatted = (weeksFormatted ?: 0) + 1
+                    daysFormatted = null
+                }
+
+                val label = listOfNotNull(
+                    if (onTheSameDay) { resources.getString(R.string.event_alarm_label_on_the_same_day) } else null,
+                    weeksFormatted?.let { "${it} ${resources.getQuantityString(R.plurals.plural_week, it, it)}" },
+                    daysFormatted?.let { "${it} ${resources.getQuantityString(R.plurals.plural_day, it, it)}" }
+                ).joinToString(separator = ", ")
+
+                val alarmTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(startDate.toInstant()))
+
+                if (label.isBlank()) {
+                    null
+                } else if (alarm.action?.isEmail == true) {
+                    resources.getString(if (onTheSameDay) R.string.event_alarm_label_not_before_with_time_by_email else R.string.event_alarm_label_before_with_time_by_email, label, alarmTime)
+                } else if (alarm.action?.isDisplay == true) {
+                    resources.getString(if (onTheSameDay) R.string.event_alarm_label_not_before_with_time else R.string.event_alarm_label_before_with_time, label, alarmTime)
+                } else {
+                    null
+                }
+
+            } else { // example: "15 minutes before"
+
+                // Proton support only 1 component for partial-day alarms
+
+                val label = listOfNotNull(
+                    trigger.weeks?.let { "$it ${resources.getQuantityString(R.plurals.plural_week, it, it)}" },
+                    trigger.days?.let { "$it ${resources.getQuantityString(R.plurals.plural_day, it, it)}" },
+                    trigger.hours?.let { "$it ${resources.getQuantityString(R.plurals.plural_hour, it, it)}" },
+                    trigger.minutes?.let { "$it ${resources.getQuantityString(R.plurals.plural_minute, it, it)}" }
+                ).joinToString(separator = ", ")
+
+                if (label.isBlank()) {
+                    if (!trigger.isPrior && (trigger.seconds != null && trigger.seconds == 0)) {
+                        resources.getString(R.string.event_alarm_label_at_event_time)
+                    } else {
+                        null
+                    }
+                } else if (alarm.action?.isEmail == true) {
+                    resources.getString(R.string.event_alarm_label_before_by_email, label)
+                } else if (alarm.action?.isDisplay == true) {
+                    resources.getString(R.string.event_alarm_label_before, label)
+                } else {
+                    null
+                }
+            }
+
         }
     }
 

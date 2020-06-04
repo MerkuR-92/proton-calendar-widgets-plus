@@ -21,6 +21,7 @@ class TransformEventUseCase(
     private val iCal: ICalUtils
 ) : UseCase { // TODO ADD TEST
 
+    // TODO Valentin go over this entire use case
     suspend fun execute(eventEntity: EventEntity) : Event? {
 
 
