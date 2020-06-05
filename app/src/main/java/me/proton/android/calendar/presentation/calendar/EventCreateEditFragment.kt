@@ -296,9 +296,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
     }
 
-    fun displayAlarms() {
+    private fun displayAlarms() {
 
-//        ll_alarms.layoutTransition.disableTransitionType(LayoutTransition.CHANGE_APPEARING)
         ll_alarms.removeAllViews()
 
         val event = eventViewModel.eventLiveData.value!!
@@ -308,15 +307,13 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             val alarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
             alarmView.findViewById<TextView>(R.id.tv_text).apply {
                 text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), calendarViewModel.timeZoneId), alarm)
-                setOnClickListener {
-//                    eventViewModel.initialiseForAlarm() // TODO initialise for edit
-//                    findNavController().navigate(R.id.nav_event_create_edit_alarm)
-                }
+                isClickable = false
             }
             alarmView.findViewById<ImageButton>(R.id.ib_cross).apply {
                 setOnClickListener {
                     eventViewModel.handleAlarmDelete(index)
                 }
+                isClickable = true
             }
             ll_alarms.addView(alarmView)
 

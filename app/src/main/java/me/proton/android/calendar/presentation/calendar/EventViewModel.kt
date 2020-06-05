@@ -184,12 +184,34 @@ class EventViewModel(
             return UseCase.Result.Error("not implemented yet") // TODO
         }
 
+        setDefaultAlarms(event)
+
         _event.postValue(event)
 
         // adjust GUI for all-day event
         //handleAllDaySwitch(initStartTime == null)
 
         return UseCase.Result.Success
+    }
+
+    // Full day: 1 day before 9am
+    //Partial day: 15min before
+    //Event is partial-day and has 1 notification 15 minutes before.
+    //I add an extra notification 30 minutes before
+    //I switch to full-day, notification 1 and 2 disappear
+    //The default notification is added (1 day before at 9:00), then switch back to partial-day.
+    //You should switch to the default notification and remove 30 minutes before
+
+    private fun setDefaultAlarms(event: Event) {
+        event.iCalEvent.alarms.clear()
+
+        val duration = if (event.isAllDay()) {
+            Duration.builder().prior(true).hours(15).build() // 1 day before at 9:00
+        } else {
+            Duration.builder().prior(true).minutes(15).build()
+        }
+
+        event.iCalEvent.addAlarm(VAlarm.display(Trigger(duration, Related.START), null))
     }
 
     // recurrence temp values
@@ -348,6 +370,8 @@ class EventViewModel(
 //            event.iCalendar.setStartTimeZone(defaultTimeZoneId)
 //            event.iCalendar.setEndTimeZone(eventStartTimeZoneIdBackup)
         }
+
+        setDefaultAlarms(event)
 
         _event.postValue(event)
     }
