@@ -488,6 +488,10 @@ fun RadioGroup.checkIndex(index: Int) {
     }
 }
 
+fun LocalTime.format(/* force AM/PM */): String {
+    return this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+}
+
 // TODO add and change parameters for customisation
 fun LocalDate.format(showDayOfWeek: Boolean = false): String {
 

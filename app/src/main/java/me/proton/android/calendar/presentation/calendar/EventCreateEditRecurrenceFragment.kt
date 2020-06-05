@@ -449,17 +449,16 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     }
 
     // we keep track of TextWatcher so we can remove it when resetting recurrence validation
-    var etRecurrencetextWatcher: TextWatcher? = null
+    var etRecurrenceTextWatcher: TextWatcher? = null
 
     private fun resetRecurrenceCountValidation(default: Int, min: Int, max: Int) {
 
         // remove current recurrence count text watcher
-        etRecurrencetextWatcher?.let { et_recurrence_count.removeTextChangedListener(it) }
+        etRecurrenceTextWatcher?.let { et_recurrence_count.removeTextChangedListener(it) }
 
         // set new text watcher with new config
-        etRecurrencetextWatcher =
+        etRecurrenceTextWatcher =
             et_recurrence_count.doAfterFilteredIntValueChanged(default, min, max) {
-                TimberLogger.d("resetRecurrencePeriodAdapter = ${it}")
                 resetRecurrencePeriodAdapter(it)
             }
 

@@ -228,12 +228,14 @@ class EventViewModel(
 
     // alarm temp values
     var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
+    var tempAlarmTime: LocalTime = LocalTime.of(9, 0)
 
     /**
      * Resets temporary values for Alarm and optionally provides Alarm for editing.
      */
     fun initialiseForAlarm(/*TODO pass alarm index or sth?*/) {
         this.tempAlarmSendByOption = SendByOption.NOTIFICATION
+        this.tempAlarmTime = LocalTime.of(9, 0)
     }
 
     suspend fun handleSave(): Boolean {
@@ -471,7 +473,11 @@ class EventViewModel(
         this.tempAlarmSendByOption = option
     }
 
-    fun handleNotification(alarmTypeOption: Int) {
+    fun handleAlarmTime(time: LocalTime) {
+        this.tempAlarmTime = time
+    }
+
+    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null) {
 
         val duration = if (event.isAllDay()) {
             when (alarmTypeOption) {
@@ -479,9 +485,53 @@ class EventViewModel(
                 1 -> Duration.builder().prior(true).hours(6).build() // day before at 18:00
                 2 -> Duration.builder().prior(true).days(6).hours(15).build() // 1 week before at 9:00, -P6DT15H
                 3 -> Duration.builder().prior(true).weeks(2).days(6).hours(15).build() // 3 weeks before at 9:00, -P2W6DT15H
-                4 -> { // custom
-                    //custom
-                    TODO()
+                4 -> null // all-day alarms have 1 fewer option
+                5 -> { // custom
+                    TimberLogger.d(" time = ${tempAlarmTime}") // TODO
+
+                    // -P6DT15H 1 week before at 9
+                    // -P6DT23H59M 1 week before at 00:01
+
+                    if (count != null && countTypeOption != null) {
+                        Duration.builder().apply {
+                            prior(true)
+                            when (countTypeOption) {
+                                0 -> {
+//                                    if (tempAlarmTime.hour == 0 && tempAlarmTime.minute == 0) {
+//                                        days(count)
+//                                    } else {
+                                        //if (count > 1)
+                                        val adjustedDays = count - 1
+                                        if (adjustedDays > 0) days(adjustedDays)
+
+                                        val negativeTimeOfDay = LocalTime.of(0, 0).minusHours(tempAlarmTime.hour.toLong()).minusMinutes(tempAlarmTime.minute.toLong())
+
+                                        if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
+                                        if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
+//                                    }
+                                }
+                                1 -> {
+//                                    if (tempAlarmTime.hour == 0 && tempAlarmTime.minute == 0) {
+//                                        weeks(count)
+//                                    } else {
+                                        //if (count > 1)
+                                        val adjustedWeeks = count - 1
+                                        if (adjustedWeeks > 0) weeks(adjustedWeeks)
+                                        days(7 - 1)
+
+                                        val negativeTimeOfDay = LocalTime.of(0, 0).minusHours(tempAlarmTime.hour.toLong()).minusMinutes(tempAlarmTime.minute.toLong())
+
+                                        if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
+                                        if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
+//                                    }
+
+
+                                    // TODO
+
+                                }
+                            }
+                        }.build()
+                    } else null
                 }
                 else -> null
             }
@@ -493,11 +543,21 @@ class EventViewModel(
                 3 -> Duration.builder().prior(true).hours(1).build()
                 4 -> Duration.builder().prior(true).weeks(1).build()
                 5 -> { // custom
-                    Duration.builder().build() // TODO
+                    Duration.builder().apply {
+                        prior(true)
+                        when (countTypeOption) {
+                            0 -> minutes(count)
+                            1 -> hours(count)
+                            2 -> days(count)
+                            3 -> weeks(count)
+                        }
+                    }.build()
                 }
                 else -> null
             }
         }
+
+        TimberLogger.d("duration: ${duration}")
 
         duration?.apply {
 
@@ -516,5 +576,7 @@ class EventViewModel(
         event.iCalEvent.alarms.removeAt(index)
         _event.postValue(event)
     }
+
+
 
 }

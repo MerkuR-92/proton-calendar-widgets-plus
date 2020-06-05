@@ -1,9 +1,11 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
+import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -11,6 +13,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
+import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.group_custom
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -38,7 +41,7 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
 //             val customCount = et_alarm_count.text.toString().toIntOrNull() ?: FormValidation.
 //                 val customTime = nullable
 
-             eventViewModel.handleNotification(alarmTypeOption/*alarmType, customPeriod?, alarmCount?, alarmTime?*/)
+             eventViewModel.handleAlarm(alarmTypeOption, count = et_alarm_count.text.toString().toIntOrNull(), countTypeOption = s_alarm_period.selectedItemPosition)
              findNavController().navigateUp()
 
              // TODO
@@ -107,17 +110,6 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
             rb_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
         }
 
-        et_alarm_count.doAfterFilteredIntValueChanged(
-            FormValidation.ALARM_PERIOD_COUNT_DEFAULT, // TODO APPLY DIFFERENT LIMITS FOR DIFFERENT
-            FormValidation.ALARM_PERIOD_COUNT_MIN,
-            FormValidation.ALARM_PERIOD_COUNT_MAX) {
-
-            onAlarmCountChanged(it)
-            resetAlarmPeriodAdapter(it)
-        }
-
-        et_alarm_count.setText(FormValidation.ALARM_PERIOD_COUNT_DEFAULT.toString())
-
         rg_alarm.check(rb_alarm_1.id) // TODO read from event alarm
 
         rg_alarm.setOnCheckedChangeListener { radioGroup, index ->
@@ -138,12 +130,86 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        s_alarm_period.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            var lastSelectedIndex: Int? = null
+
+            override fun onItemSelected(parent: AdapterView<*>?,
+                                        view: View?,
+                                        position: Int,
+                                        id: Long) {
+
+                // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
+                if (lastSelectedIndex != null && lastSelectedIndex == position) {
+                    return
+                }
+                lastSelectedIndex = position
+
+                // all-day events have only days and weeks, partial-day events have minutes, hours, days and weeks
+                //  this is an offset for Alarm Count Validation reset
+                val positionAdjustedForEventType = position + (if (isAllDay) 2 else 0)
+
+                 when (positionAdjustedForEventType) {
+                                    0 -> { // minute
+                                        resetAlarmCountValidation(
+                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
+                                            FormValidation.ALARM_PERIOD_MAX_MINUTES
+                                        )
+                                    }
+                                    1 -> { // hour
+                                        resetAlarmCountValidation(
+                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
+                                            FormValidation.ALARM_PERIOD_MAX_HOURS
+                                        )
+                                    }
+                                    2 -> { // day
+                                        resetAlarmCountValidation(
+                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
+                                            FormValidation.ALARM_PERIOD_MAX_DAYS
+                                        )
+                                    }
+                                    3 -> { // week
+                                        resetAlarmCountValidation(
+                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
+                                            FormValidation.ALARM_PERIOD_MAX_WEEKS
+                                        )
+                                    }
+                                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+        }
+
+        // init
+        if (isAllDay) {
+            et_alarm_count.setText("1")
+            resetAlarmPeriodAdapter(1)
+            s_alarm_period.setSelection(0)
+            tv_alarm_time.text = eventViewModel.tempAlarmTime.format()
+        } else {
+            et_alarm_count.setText("15")
+            resetAlarmPeriodAdapter(15)
+            s_alarm_period.setSelection(0)
+        }
+
+
+
+
+
+
+
+
         press_alarm_time.setOnClickListener {
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
 
-            // TODO init with 9:00 or already defined time if editing
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
-                TimberLogger.d("${it}")
+                eventViewModel.handleAlarmTime(it)
+                tv_alarm_time.text = it.format()
             }
         }
 
@@ -159,6 +225,24 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
         tv_alarm_action.text = formatNotification(eventViewModel.tempAlarmSendByOption)
 
+    }
+
+    // we keep track of TextWatcher so we can remove it when resetting alarm validation
+    var etAlarmTextWatcher: TextWatcher? = null
+
+    private fun resetAlarmCountValidation(default: Int, min: Int, max: Int) {
+
+        // remove current alarm count text watcher
+        etAlarmTextWatcher?.let { et_alarm_count.removeTextChangedListener(it) }
+
+        // set new text watcher with new config
+        etAlarmTextWatcher =
+            et_alarm_count.doAfterFilteredIntValueChanged(default, min, max) {
+                resetAlarmPeriodAdapter(it)
+            }
+
+        // set current value again because it might be outside of newly set limits
+        et_alarm_count.setText(et_alarm_count.text)
     }
 
     private fun formatNotification(option: EventViewModel.SendByOption): String {
