@@ -16,7 +16,6 @@ import java.time.format.FormatStyle
 
 data class Event(
     override val id: String, // ID from API and local database
-    val author: String,
     val calendar: Calendar,
     val iCalendar: ICalendar
 //    val iCalEvent: VEvent,
@@ -151,7 +150,8 @@ data class Event(
         data class SharedEvent( // TODO maybe this could be named "SharedPart" or "SharedSplit", the same for others
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
             val data: String,
-            val signature: String
+            val signature: String,
+            val author: String
         ) {
             val isEncrypted: Boolean get() = type and 1 > 0
 //        val isSigned: Boolean get() = type and 2 > 0
@@ -160,7 +160,8 @@ data class Event(
         data class CalendarEvent(
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
             val data: String,
-            val signature: String
+            val signature: String,
+            val author: String
         ) {
             val isEncrypted: Boolean get() = type and 1 > 0
 //        val isSigned: Boolean get() = type and 2 > 0
@@ -170,6 +171,7 @@ data class Event(
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
             val data: String,
             val signature: String,
+            val author: String,
             val memberId: String
         ) {
 //        val isSigned: Boolean get() = type and 2 > 0

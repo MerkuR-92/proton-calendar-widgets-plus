@@ -1,9 +1,6 @@
 package me.proton.android.calendar.data.entity
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 import me.proton.android.calendar.data.db.AppDatabase
 
 // = calendar key
@@ -14,7 +11,8 @@ import me.proton.android.calendar.data.db.AppDatabase
         parentColumns = ["id"],
         childColumns = ["calendarId"],
         onDelete = ForeignKey.CASCADE
-    )])
+    )],
+    indices = [Index(value = ["calendarId"])])
 data class CalendarKeyEntity(
     @PrimaryKey
     val id: String, //

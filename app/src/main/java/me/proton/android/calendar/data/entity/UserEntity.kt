@@ -14,7 +14,7 @@ data class UserEntity(
     @PrimaryKey
     val id: String,
     val keys: List<JsonElement>, // this is actually UserKey
-    val email: String, // TODO Valentin find out how this can be changed over time
+    val email: String, // TODO this can change over time! this is user's primary address!
     val displayName: String
 /*
 "ID": "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==",

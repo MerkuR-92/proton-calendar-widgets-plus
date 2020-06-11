@@ -2,6 +2,7 @@ package me.proton.android.calendar.data.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import me.proton.android.calendar.data.db.AppDatabase
 
@@ -16,7 +17,8 @@ import me.proton.android.calendar.data.db.AppDatabase
         parentColumns = ["id"],
         childColumns = ["eventId"],
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index(value = ["eventId"])]
 )
 data class EventAlarmEntity(
     @PrimaryKey

@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.common.wrapInICalendar
+import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateEventApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -47,8 +48,8 @@ class EditCreateEventUseCase(
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).first()
-        val userAddresses = database.addressesDao().select(userId, member.email).map { it.toAddress(gson) } // TODO figure out "multiple members for 1 calendar case"
-        val memberAddressKey = userAddresses.first().primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO how to select address? how to select address-key?
+        val userAddresses = database.addressesDao().select(userId, member.email).map { it.toAddress(gson) } // TODO in the future we will have dropdown with memberID, but now we take first
+        val memberAddressKey = userAddresses.first().primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO Valentin how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
         val calendarKey = database.calendarKeysDao().select(calendarId).first { it.isActive && it.isPrimary }
@@ -86,14 +87,15 @@ class EditCreateEventUseCase(
         // TODO GET RID OF THIS, GET MEMBER-ID
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-        val calendarId = newEvent.calendar.id
-        val TODOmemberId = calendarId // TODO determine where we can get memberID
+        val calendarId = newEvent.calendar.id // TODO get all members for this calendar and get 1st one
+        val TODOmemberId = calendarId // TODO TAKE IT FROM MEMBER!!!
+
 
         // 8. assemble API request
         val requestBody = CreateEventApiRequest(
             memberId = TODOmemberId, // TODO
 
-            permissions = 6, // Permissions: 2 (enum[number]) - Bitmap TODO discuss with V., it will probably be hardcoded in Android
+            permissions = 6, // Permissions: 2 (enum[number]) - Bitmap
 //            1 - Can invite -- attendees can invite other attendees!
 //            2 - Can modify event
 //            4 - Can see attendees list
@@ -104,12 +106,14 @@ class EditCreateEventUseCase(
                 Event.SharedEvent(
                     2,
                     sharedPartICalString,
-                    signatureOfSharedPart!! // TODO
+                    signatureOfSharedPart!!, // TODO
+                    "" // on server, "author" will be extracted from MemberID and this value ignored
                 ),
                 Event.SharedEvent(
                     3,
                     encryptedSharedPartCiphertext.encodedDataPacket,
-                    signatureOfEncryptedSharedPart!!
+                    signatureOfEncryptedSharedPart!!, // TODO
+                    "" // on server, "author" will be extracted from MemberID and this value ignored
                 )
             ),
 
@@ -120,14 +124,16 @@ class EditCreateEventUseCase(
                     Event.CalendarEvent(
                         2,
                         calendarPartICalString,
-                        signatureOfCalendarPart
+                        signatureOfCalendarPart,
+                        "" // on server, "author" will be extracted from MemberID and this value ignored
                     )
                 } else null,
                 if (encryptedCalendarPartCiphertext != null && signatureOfEncryptedCalendarPart != null) {
                     Event.CalendarEvent(
                         3,
                         encryptedCalendarPartCiphertext.encodedDataPacket,
-                        signatureOfEncryptedCalendarPart
+                        signatureOfEncryptedCalendarPart,
+                        "" // on server, "author" will be extracted from MemberID and this value ignored
                     )
                 } else null
             ).ifEmpty { null },
@@ -137,15 +143,22 @@ class EditCreateEventUseCase(
                         2,
                         personalPartICalString,
                         signatureOfPersonalPart,
+                    "", // on server, "author" will be extracted from MemberID and this value ignored
                     TODOmemberId // TODO
                 )
             } else null
         )
 
-        calendarsApi.createEvent(calendarId, requestBody)
-        // TODO when success, insert event into local DB
+        val createResponse = calendarsApi.createEvent(calendarId, requestBody)
+        return when (createResponse) {
+            is ApiResponse.Success -> {
+                //             TODO insert event into local DB
+                UseCase.Result.Success
+            }
+            is ApiResponse.Error -> UseCase.Result.Error(createResponse.error)
+            is ApiResponse.Exception -> UseCase.Result.Error(createResponse.exception.message ?: "(no exception message)")
+        }
 
-        return UseCase.Result.Success
     }
 
 }

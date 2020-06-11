@@ -175,7 +175,7 @@ class EventViewModel(
 
             TimberLogger.d("INIT: ${newICalendar.printToString()}")
 
-            Event(ICalUtils.generateOfflineEventId(), "TODO get author" /*TODO*/, Calendar(defaultCalendar.id, defaultCalendar.name, defaultCalendar.color), newICalendar)
+            Event(ICalUtils.generateOfflineEventId(), Calendar(defaultCalendar.id, defaultCalendar.name, defaultCalendar.color), newICalendar)
 
         } else {
 

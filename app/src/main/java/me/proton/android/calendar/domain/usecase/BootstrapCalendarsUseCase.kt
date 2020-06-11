@@ -13,7 +13,6 @@ import me.proton.android.calendar.domain.api.SettingsApi
 /**
  * Sets up all the user's calendars, call this only once after successful login.
  */
-// TODO Valentin go over this entire use case
 class BootstrapCalendarsUseCase( // TODO TEST
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
@@ -31,7 +30,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         }
 
-        val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings()
+        val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings() // TODO this will have a value if we have at least 1 calendar
         if (calendarUserSettingsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
@@ -50,6 +49,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
                         bootstrapResponse.data.members.forEach { persistMember(it) }
                     }
 
+                    // TODO cached calendar passphrase will be invalidated when I reset my password and I was the only member of this calendar
+                    // when calendar is shared it might get invalidated while I'm still logged in -- you can have only 1 ACTIVE calendar passphrase
+                    // for this calendar at the same time, this will be sent in the event loop automatically
+
                     // extract passphrase for just saved Calendar
                     cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
 
@@ -57,6 +60,9 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
                     // save User CalendarSettings
                     // TODO deal with nullable DefaultCalendarID!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                    // solution: EVEN IF THIS IS NON-EMPTY ON SERVER, THE CALENDAR CAN BE NON-EXISTING, ALL CLIENTS SHOULD ALWAYS FALLBACK
+
                     val todoUserCalendarSettings = if (calendarUserSettingsResponse.data.calendarUserSettings.defaultCalendarId == null) {
                         calendarUserSettingsResponse.data.calendarUserSettings.copy(defaultCalendarId = calendarEntity.id)
                     } else calendarUserSettingsResponse.data.calendarUserSettings

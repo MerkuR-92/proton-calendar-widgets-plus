@@ -2,6 +2,7 @@ package me.proton.android.calendar.data.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -15,7 +16,9 @@ import me.proton.android.calendar.domain.model.Event
         parentColumns = ["id"],
         childColumns = ["calendarId"],
         onDelete = ForeignKey.CASCADE
-    )])
+    )],
+    indices = [Index(value = ["calendarId"])]
+)
 data class EventEntity(
     @PrimaryKey
     val id: String,

@@ -56,7 +56,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                         Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
                         findNavController().navigateUp()
                     } else {
-                        Toast.makeText(requireContext(), "ERROR", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_SHORT).show()
                     }
 
                 }

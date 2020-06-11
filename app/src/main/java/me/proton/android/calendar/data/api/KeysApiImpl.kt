@@ -18,7 +18,7 @@ interface KeysApiService {
 
     // TODO test response is for adamtst@protonmail.blue
     @GET("keys")
-    fun getPublicKeys(@Query("Email") email: String): Response<PublicKeysApiResponse>
+    suspend fun getPublicKeys(@Query("Email") email: String): Response<PublicKeysApiResponse>
 
 }
 

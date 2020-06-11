@@ -34,7 +34,6 @@ data class CalendarUserSettingsApiEntity(
     val displaySecondaryTimezone: Int, // 0 off, 1 on
     val secondaryTimezone: String?, // Can be null if DisplaySecondaryTimezone is 0
     val viewPreference: Int, /* 0 - DAILY, 1 - WEEKLY, 2 - MONTHLY, 3 - YEARLY, 4 - PLANNING */
-    val defaultCalendarId: String? // TODO Valentin -- I still get null for old accounts (even when web says there is default calendar)
-    // TODO this is unfortunately nullable! TODO this should be now "Id of the calendar created when the settings are created"
+    val defaultCalendarId: String? // TODO we still get null for old accounts (even when web says there is default calendar)
 )
 

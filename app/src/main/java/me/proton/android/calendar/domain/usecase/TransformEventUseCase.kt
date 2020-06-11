@@ -18,12 +18,11 @@ class TransformEventUseCase(
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
-    private val iCal: ICalUtils
+    private val iCal: ICalUtils,
+    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase
 ) : UseCase { // TODO ADD TEST
 
-    // TODO Valentin go over this entire use case
     suspend fun execute(eventEntity: EventEntity) : Event? {
-
 
         val calendar = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendar.fkUserId
@@ -40,8 +39,14 @@ class TransformEventUseCase(
 
 
 
-        // TODO Valentin: either take author's public key as argument or get it from database
         // TODO HERE WE JUST TAKE OUR OWN PUBLIC KEY
+
+        // 1. check if .notExpired()
+        // 2. we need to verify signatures for all parts separately, because they might be signed by different authors!
+
+
+
+        // TODO delete this and get keys for all parts separately
         val eventAuthorsPublicKeys = database.addressesDao().select(userId).map { it.toAddress(gson).primaryKey?.publicKey ?: ""}
 
 
@@ -54,6 +59,14 @@ class TransformEventUseCase(
 
         sharedEvents.forEach {
 
+            // TODO fetch author's keys
+            fetchPublicKeysUseCase.execute(it.author)
+
+            val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
+
+
+
+
             logger.v("shared event ${it}")
 
             val decryptedText = if (it.isEncrypted) {
@@ -62,9 +75,9 @@ class TransformEventUseCase(
             } else null
 
             val signatureOk = if (decryptedText != null) {
-                    crypto.verifyTextDetached(decryptedText, it.signature, eventAuthorsPublicKeys)
+                    crypto.verifyTextDetached(decryptedText, it.signature, verificationKeys)
                 } else {
-                    crypto.verifyTextDetached(it.data, it.signature, eventAuthorsPublicKeys)
+                    crypto.verifyTextDetached(it.data, it.signature, verificationKeys)
                 }
 
             if (decryptedText != null) {
@@ -134,7 +147,6 @@ class TransformEventUseCase(
 
             Event(
                 id = eventEntity.id,
-                author = eventEntity.author,
                 calendar = Calendar(
                     calendar.id,
                     calendar.name,

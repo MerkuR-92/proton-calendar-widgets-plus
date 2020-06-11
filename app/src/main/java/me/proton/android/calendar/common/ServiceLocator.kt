@@ -94,12 +94,13 @@ val viewModelModule = module {
 }
 
 val useCaseModule = module {
+    factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
     factory<LoginUserUseCase> { LoginUserUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get()) }
-    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get()) }

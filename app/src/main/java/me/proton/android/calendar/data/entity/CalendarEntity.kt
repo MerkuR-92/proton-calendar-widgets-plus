@@ -3,6 +3,7 @@ package me.proton.android.calendar.data.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import me.proton.android.calendar.data.db.AppDatabase
@@ -14,7 +15,8 @@ import me.proton.android.calendar.data.db.AppDatabase
         parentColumns = ["id"],
         childColumns = ["fkUserId"],
         onDelete = CASCADE
-    )]
+    )],
+    indices = [Index(value = ["fkUserId"])]
 )
 data class CalendarEntity(
     @PrimaryKey
@@ -23,7 +25,7 @@ data class CalendarEntity(
     val description: String,
     val color: String,
     val display: Int // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
-//    val flags: Int? //, TODO unfortunately this is not being sent in /events TODO Valentin says it will be added
+//    val flags: Int? //, TODO unfortunately this is not being sent in /events TODO it will be added on server
     // 0 - Inactive: the calendar keys are not accessible and the current user cannot fix it
     // 1 - Active: the calendar is all good!
     // 2 - Update passphrase: a deactivated passphrase is again accessible, you should re-encrypt the linked calendar key using the primary passphrase

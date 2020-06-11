@@ -3,6 +3,7 @@ package me.proton.android.calendar.data.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -18,7 +19,8 @@ import me.proton.android.calendar.domain.model.AddressKey
         parentColumns = ["id"],
         childColumns = ["fkUserId"],
         onDelete = CASCADE
-    )]
+    )],
+    indices = [Index(value = ["fkUserId"])]
 )
 data class AddressEntity(
     @PrimaryKey

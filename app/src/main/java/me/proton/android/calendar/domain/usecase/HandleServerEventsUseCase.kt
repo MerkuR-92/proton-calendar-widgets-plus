@@ -58,10 +58,13 @@ class HandleServerEventsUseCase(
                 )
             }
             eventsResponse.calendarPassphrases?.forEach {
+                // TODO when passphrase is force changed, we will get action=UPDATE for old (now inactive) passphrase
+                // and action=CREATE for the new one
                 it.handleAction(
                     { calendarsRepository.deletePassphraseById(it.id) },
                     {
                         calendarsRepository.persistPassphrase(it.passphrase!!)
+                        // TODO make sure we delete passphrase from cache if it becomes inactive
                         cacheCalendarPassphraseUseCase.execute(userId, it.passphrase.calendarId)
                     }
                 )

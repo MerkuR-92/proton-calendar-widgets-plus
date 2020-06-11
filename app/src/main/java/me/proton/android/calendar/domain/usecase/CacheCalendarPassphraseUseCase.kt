@@ -30,7 +30,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         // Passphrase is linked to Calendar and is used by all CalendarKeys of that Calendar
 
         val member = calendarMembers.first() // TODO change to multiple members
-        // also something to keep in mind is that you can have multiple members for the user in the same calendar
+        // TODO also something to keep in mind is that you can have multiple members for the user in the same calendar
         // you can join a calendar using Address1 and Address2
         // you can have more than one member
 
