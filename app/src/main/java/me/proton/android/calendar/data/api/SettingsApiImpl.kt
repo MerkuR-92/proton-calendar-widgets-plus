@@ -30,7 +30,7 @@ data class CalendarUserSettingsApiEntity(
     val dateFormat: Int, // 0 (number) - DD/MM/YYYY, 1 (number) - DD/MM/YYYY , 2 (number) - YYYY/MM/DD
     val timeFormat: Int, // 0 (number) - 24h, 1 (number) - 12h
     val autoDetectPrimaryTimezone: Int, // 0 off, 1 on
-    val primaryTimezone: String?, // "Europe/Budapest", Can be null if AutoDetectPrimaryTimezone is 0
+    val primaryTimezone: String, // "Europe/Budapest", NO LONGER NULL AFTER 12/06/2020: "Can be null if AutoDetectPrimaryTimezone is 0"
     val displaySecondaryTimezone: Int, // 0 off, 1 on
     val secondaryTimezone: String?, // Can be null if DisplaySecondaryTimezone is 0
     val viewPreference: Int, /* 0 - DAILY, 1 - WEEKLY, 2 - MONTHLY, 3 - YEARLY, 4 - PLANNING */

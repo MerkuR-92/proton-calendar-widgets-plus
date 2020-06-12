@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
+import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import timber.log.Timber
 
 // TODO better name? move to separate package?

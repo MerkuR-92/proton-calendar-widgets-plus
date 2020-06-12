@@ -16,16 +16,22 @@ class FetchPublicKeysUseCase(
 
     suspend fun execute(email: String): UseCase.Result {
 
-        logger.v("executing FetchPublicKeysUseCase")
+        logger.v("executing FetchPublicKeysUseCase for $email")
 
-        val keysResponse = keysApi.getPublicKeys(email)
-        return if (keysResponse is ApiResponse.Success) {
-            database.publicKeysDao().insert(*keysResponse.data.keys.map { PublicKeyEntity(email, it.flags, it.publicKey) }.toTypedArray())
-            logger.v("persisted keys for $email -> ${keysResponse.data}")
-            UseCase.Result.Success
-        } else {
-            UseCase.Result.Error("error fetching public keys for email: ")
+        if (database.publicKeysDao().select(email).isEmpty()) {
+
+            val keysResponse = keysApi.getPublicKeys(email)
+            return if (keysResponse is ApiResponse.Success) {
+                database.publicKeysDao().insert(*keysResponse.data.keys.map { PublicKeyEntity(email, it.flags, it.publicKey) }.toTypedArray())
+                logger.v("persisted keys for $email -> ${keysResponse.data}")
+                UseCase.Result.Success
+            } else {
+                UseCase.Result.Error("error fetching public keys for email: ")
+            }
+
         }
+
+        return UseCase.Result.Success
 
     }
 

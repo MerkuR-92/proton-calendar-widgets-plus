@@ -26,7 +26,6 @@ data class EventEntity(
     val calendarKeyPacket: String?, // keypackets used to decrypt Type 3 CalendarEventData, to be armored with Data packets, base64
     val createTime: Long, // unix timestamps
     val lastEditTime: Long,
-    val author: String, // Address of the last member that modified the event
     val permissions: Int, // Permissions of the attendees (bitmap)
     // 1 (number) - Can invite
     //2 (number) - Can modify event

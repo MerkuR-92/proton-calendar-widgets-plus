@@ -11,7 +11,8 @@ class HandleServerEventsUseCase(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
-    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase) : UseCase {
+    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
+    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase) : UseCase {
 
     suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: String) : UseCase.Result {
 
@@ -36,7 +37,23 @@ class HandleServerEventsUseCase(
             eventsResponse.calendarEvents?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteEventById(it.id) },
-                    { calendarsRepository.persistEvents(it.event!!) }
+                    {
+                        calendarsRepository.persistEvents(it.event!!)
+
+                        // TODO move this to worker
+                        try {
+                            val emails =
+                                it.event.sharedEvents.map { it.asJsonObject.get("Author").asString } +
+                                it.event.calendarEvents.map { it.asJsonObject.get("Author").asString } +
+                                it.event.personalEvents.map { it.asJsonObject.get("Author").asString }
+
+                            emails.distinct().forEach {
+                                fetchPublicKeysUseCase.execute(it)
+                            }
+                        } catch (e: IllegalStateException) {
+                            logger.e("error getting event's author from JSON")
+                        }
+                    }
                 )
             }
             eventsResponse.calendarAlarms?.forEach {

@@ -6,6 +6,7 @@ import biweekly.property.DateOrDateTimeProperty
 import biweekly.util.Frequency
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.OFFLINE_EVENT_ID_PREFIX
+import java.security.Signature
 import java.text.DateFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -17,11 +18,8 @@ import java.time.format.FormatStyle
 data class Event(
     override val id: String, // ID from API and local database
     val calendar: Calendar,
-    val iCalendar: ICalendar
-//    val iCalEvent: VEvent,
-//    val iCalTimezoneInfo: TimezoneInfo
-//    ,
-//    val sharedEvents: List<SharedEvent>
+    val iCalendar: ICalendar,
+    val verificationStatus: SignatureVerification? = null
 ) : BaseModel() {
 
     val iCalEvent: VEvent get() = iCalendar.events.first()
@@ -176,6 +174,13 @@ data class Event(
         ) {
 //        val isSigned: Boolean get() = type and 2 > 0
         }
+
+        enum class SignatureVerification {
+            SUCCESS,
+            FAILURE,
+            NO_KEYS
+        }
+
     }
 
 

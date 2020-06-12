@@ -125,7 +125,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
 
-                text_event_title.text = event.summary + "\n"
+                text_event_title.text = "SIGNATURE VERIFICATION: ${event.verificationStatus}\n\n" + event.summary + "\n"
 
                 val alarmLabels = it.iCalEvent.alarms./*filter { it.trigger?.duration?.isPrior ?: false /*only show triggers "before" event*/ }*/mapNotNull { alarm ->
                     AndroidUtils.formatAlarm(resources, it.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), calendarViewModel.timeZoneId), alarm)

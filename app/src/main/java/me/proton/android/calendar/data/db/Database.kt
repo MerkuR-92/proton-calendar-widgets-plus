@@ -11,7 +11,7 @@ import me.proton.android.calendar.data.entity.*
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, SettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class],
-    version = 14
+    version = 15
 )
 @TypeConverters(DatabaseTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {

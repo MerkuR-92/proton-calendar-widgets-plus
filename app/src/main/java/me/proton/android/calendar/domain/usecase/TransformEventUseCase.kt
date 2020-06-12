@@ -3,13 +3,11 @@ package me.proton.android.calendar.domain.usecase
 import com.google.gson.Gson
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import kotlinx.coroutines.flow.first
 
 
 class TransformEventUseCase(
@@ -18,8 +16,7 @@ class TransformEventUseCase(
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
-    private val iCal: ICalUtils,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase
+    private val iCal: ICalUtils
 ) : UseCase { // TODO ADD TEST
 
     suspend fun execute(eventEntity: EventEntity) : Event? {
@@ -30,27 +27,9 @@ class TransformEventUseCase(
         val calendarPassphrase = database.passphrasesDao().select(eventEntity.calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return null
 
-        val decryptedAndCorrectlySignedParts = mutableListOf<String>()
+        val calendarParts = mutableListOf<String>()
 
-        // TODO just for testing:
-        val calendarMembers = database.membersDao().select(calendar.id)
-        logger.v("members: $calendarMembers}")
-
-
-
-
-        // TODO HERE WE JUST TAKE OUR OWN PUBLIC KEY
-
-        // 1. check if .notExpired()
-        // 2. we need to verify signatures for all parts separately, because they might be signed by different authors!
-
-
-
-        // TODO delete this and get keys for all parts separately
-        val eventAuthorsPublicKeys = database.addressesDao().select(userId).map { it.toAddress(gson).primaryKey?.publicKey ?: ""}
-
-
-
+        val verificationStatuses: MutableList<Event.SignatureVerification> = mutableListOf()
 
         // process Shared Events
         val sharedEvents = eventEntity.sharedEvents.map {
@@ -58,15 +37,6 @@ class TransformEventUseCase(
         }
 
         sharedEvents.forEach {
-
-            // TODO fetch author's keys
-            fetchPublicKeysUseCase.execute(it.author)
-
-            val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
-
-
-
-
             logger.v("shared event ${it}")
 
             val decryptedText = if (it.isEncrypted) {
@@ -74,11 +44,25 @@ class TransformEventUseCase(
                 crypto.decryptText(cipherText.asArmoredPGPMessage(), calendarKey.privateKey, keyPassphrase.toByteArray())
             } else null
 
-            val signatureOk = if (decryptedText != null) {
+            val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
+            if (verificationKeys.isEmpty()) {
+                verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
+            } else {
+                val signatureOk = if (decryptedText != null) {
                     crypto.verifyTextDetached(decryptedText, it.signature, verificationKeys)
                 } else {
                     crypto.verifyTextDetached(it.data, it.signature, verificationKeys)
                 }
+
+                if (signatureOk) {
+                    verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+                } else {
+                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                    logger.e("signature not okay for ${decryptedText}")
+                }
+            }
+
+            calendarParts.add(decryptedText ?: it.data)
 
             if (decryptedText != null) {
                 logger.v("decrypted shared event: " + decryptedText)
@@ -86,11 +70,6 @@ class TransformEventUseCase(
                 logger.v("not-decrypted shared event: " + it.data)
             }
 
-            if (signatureOk) {
-                decryptedAndCorrectlySignedParts.add(decryptedText ?: it.data)
-            } else {
-                logger.e("signature not okay for ${decryptedText}")
-            }
         }
 
         // process Calendar Events
@@ -104,11 +83,25 @@ class TransformEventUseCase(
                 crypto.decryptText(cipherText.asArmoredPGPMessage(), calendarKey.privateKey, keyPassphrase.toByteArray())
             } else null
 
-            val signatureOk = if (decryptedText != null) {
-                crypto.verifyTextDetached(decryptedText, it.signature, eventAuthorsPublicKeys)
+            val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
+            if (verificationKeys.isEmpty()) {
+                verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
             } else {
-                crypto.verifyTextDetached(it.data, it.signature, eventAuthorsPublicKeys)
+                val signatureOk = if (decryptedText != null) {
+                    crypto.verifyTextDetached(decryptedText, it.signature, verificationKeys)
+                } else {
+                    crypto.verifyTextDetached(it.data, it.signature, verificationKeys)
+                }
+
+                if (signatureOk) {
+                    verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+                } else {
+                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                    logger.e("signature not okay for ${decryptedText}")
+                }
             }
+
+            calendarParts.add(decryptedText ?: it.data)
 
             if (decryptedText != null) {
                 logger.v("decrypted calendar event: " + decryptedText)
@@ -116,9 +109,6 @@ class TransformEventUseCase(
                 logger.v("not-decrypted calendar event: " + it.data)
             }
 
-            if (signatureOk) {
-                decryptedAndCorrectlySignedParts.add(decryptedText ?: it.data)
-            }
         }
 
         // process Personal Events, those are only signed
@@ -127,24 +117,33 @@ class TransformEventUseCase(
         }
 
         personalEvents.forEach {
-            val signatureOk = crypto.verifyTextDetached(it.data, it.signature, eventAuthorsPublicKeys)
-
-            logger.v("signature ok for personal event: " + signatureOk)
-            logger.v("not-decrypted personal event: " + it.data)
-
-            if (signatureOk) {
-                decryptedAndCorrectlySignedParts.add(it.data)
+            val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
+            if (verificationKeys.isEmpty()) {
+                verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
+            } else {
+                val signatureOk = crypto.verifyTextDetached(it.data, it.signature, verificationKeys)
+                if (signatureOk) {
+                    verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+                } else {
+                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                }
+                logger.v("signature ok for personal event: " + signatureOk)
+                logger.v("not-decrypted personal event: " + it.data)
             }
+
+            calendarParts.add(it.data)
         }
 
-        if (decryptedAndCorrectlySignedParts.isEmpty()) return null
+        if (calendarParts.isEmpty()) return null
 
-        val iCalendar = iCal.mergeCalendarPartsIntoICalendar(decryptedAndCorrectlySignedParts)
+        val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)
 
 //        TimberLogger.e("after merging: ${iCalendar!!.printToString()}")
+//        TimberLogger.e("verification statueses: ${verificationStatuses}")
+
+
 
         return if (iCalendar != null && iCalendar.events.isNotEmpty()) {
-
             Event(
                 id = eventEntity.id,
                 calendar = Calendar(
@@ -152,7 +151,14 @@ class TransformEventUseCase(
                     calendar.name,
                     calendar.color
                 ),
-                iCalendar = iCalendar
+                iCalendar = iCalendar,
+                verificationStatus = if (verificationStatuses.all { it == Event.SignatureVerification.SUCCESS }) {
+                    Event.SignatureVerification.SUCCESS
+                } else if (verificationStatuses.any { it == Event.SignatureVerification.FAILURE }) {
+                    Event.SignatureVerification.FAILURE
+                } else if (verificationStatuses.any { it == Event.SignatureVerification.NO_KEYS }) {
+                    Event.SignatureVerification.NO_KEYS
+                } else null
             )
         } else null
     }
