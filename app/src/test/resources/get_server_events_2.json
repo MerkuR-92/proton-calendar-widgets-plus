@@ -13,25 +13,27 @@
                 "CalendarKeyPacket": null,
                 "CreateTime": 1582209565,
                 "LastEditTime": 1582209565,
-                "Author": "adamtst@protonmail.blue",
                 "Permissions": 3,
                 "SharedKeyPacket": "wV4DP+KI9zrxP8QSAQdAWXntHvLJpjUXbhSDkuWEkGI5/6eQ9x6ATOvGNfSvmQwwfnaeYFVmmluKMzduoiyMMhfVdhuCsKZXAYYAw0Ld2ekUmDnfC8jJoosky0h3+940",
                 "SharedEvents": [
                     {
                         "Type": 2,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-f1e19e65-af7f-ff4d-5bf3-ed380f7c1784\r\nDTSTAMP:20200220T143921Z\r\nDTSTART;VALUE=DATE:20200224\r\nDTEND;VALUE=DATE:20200225\r\nEND:VEVENT\nEND:VCALENDAR",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeTpoKAAoJEBHDHo5eB/TQcokIANAfMUlVS//ODNIgnMdA\r\nV1t/LbkpNt5q9x7gduNf9oepSv92BUQIK1Ugnrdyd4nftOjkGivAvASn1y1E\r\nozSmtE2RY3IW0x8Z5qDI1QRANTJfZGghV2hcm3ik2Uc9iMjcvhdVhrjn44iX\r\nbS88NjJT81T3Ao4Npwypx0Datu7cWQ78Os7IRKIH+WDnqaJ0JbUogfULp8eK\r\nmYtj1/vJtPzZHq4xHIxfYyYig7BE+FSIZ2Sn8yI2O9kNg9NcLiQWRRxQw0/g\r\n0Nb5Lj5pNfVUO1Oh7zyYWYTV1edkmSCJ/2jOv4UAyjBciLSR9UE7Qpjm728y\r\nN2BHN2XVlOsje57MGIVk8qA=\r\n=K6ud\r\n-----END PGP SIGNATURE-----\r\n"
                     },
                     {
                         "Type": 3,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "0sAiAR6Nq5eGb4sXrKM4zU4fF9/NLfthEHqiKfmzo2HH+KEMMy67Wcr+iykfKE2n9/lLnavX6EZwMWYoAsNV54ITx0Ab1myNP/BRDlAaeXiCmb5YN83gZ8eb4FUDmVEyFj843vcDcnsoYzoX1gURLCjVZuzYWJpRRtoRMdWAidToPht/+f7rcmRxRK0Ne+yVEMandsPlSWM6ARlQn8/Zend7A3qqfOCGgcCx/3jM5/3/h0L10+DyvaOp6rBeo2yb/akrRXhtb1UUQzSXZrw/bMeS29dtr1O+T7U/cGcLaBXs5IbwJw==",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeTpoKAAoJEBHDHo5eB/TQS6MIANLVVFPE166y8wG1rNV8\r\nDJ6fv/rtDr4QRxo92Eu1l2BAiYZ86r00huNTJA77PBVPSFV4g1YE3CdG7g5g\r\nvPhcaw2gvFrHx5W39eQHsxg0FIbunJWTOpekKodItn8Yy8o1g117dtQx6flr\r\ne9NlSefTBK1aq2NPFjP06gsfv3FJoseg4Fc5xa2nnSBRyShsyFRVAMws0lNF\r\nnYmeEsOVxvzJ0Fc+z7cq8CLlIhOmFyUmxBO2A9+Z4NSwFBrGXRozDloclYQW\r\nYHyRCgpSEmLvdyPlp0MxRGJPqPEIXmm8k0A0o5t31xxBQA2bGTy/Zai2EeL5\r\n5hUIFlhVnMPCbjr5L/B6MOY=\r\n=SJxz\r\n-----END PGP SIGNATURE-----\r\n"
                     }
                 ],
                 "CalendarEvents": [],
-                "PersonalEvent": [
+                "PersonalEvents": [
                     {
                         "Type": 2,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-f1e19e65-af7f-ff4d-5bf3-ed380f7c1784\r\nDTSTAMP:20200220T143921Z\r\nBEGIN:VALARM\r\nTRIGGER:-PT15H\r\nACTION:DISPLAY\r\nEND:VALARM\r\nEND:VEVENT\nEND:VCALENDAR",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeTpoKAAoJEBHDHo5eB/TQkhQIAMqnMq3/vVqXHQMTpK5F\r\nVOhFr4ZbvYTet8vF2IKR3M1xKNdizCtic6YYZCbTP+oGxLnUNEQoWN1+ua84\r\nlvVX3h8UG8imHjrp+B7gtY+t45JJAunbfsqmlyKvSxo7WubwLQ1TdDKPjFzm\r\n3sJGgCbiBi9Nx0PFsPdvdp3M8GHqxpQiYcNFbAdnPtNEp0bhdIPKyMpnt+wb\r\nI7tLtwHN0o5LiDwyeAtfniMSA5tH23PIKucuYYgba2vxkT+qTj23gicpkF94\r\n/j2HGQm7JfIdfpEOPxvzrczNVK6gvK1UNSx/VGzIH8TGVfdipn0f+57sLOSK\r\nGaXC8tmH5K60BtBMd1IYBMA=\r\n=7HtI\r\n-----END PGP SIGNATURE-----\r\n",
                         "MemberID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ=="
@@ -48,25 +50,27 @@
                 "CalendarKeyPacket": null,
                 "CreateTime": 1582209680,
                 "LastEditTime": 1582209680,
-                "Author": "adamtst@protonmail.blue",
                 "Permissions": 3,
                 "SharedKeyPacket": "wV4DP+KI9zrxP8QSAQdAlZql7sODRTmoXk9zWwLOtUBHz+HeNEW4khyPZ8ZyNicwLpiWY9cenFgAv1n7xUxTAqdI+Fbj3nBw8sgZTKeUujKXjys8Xn4VWsk5ibk8Ftht",
                 "SharedEvents": [
                     {
                         "Type": 2,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-0bc59234-c6f9-319a-bc5a-e5a97e0d4370\r\nDTSTAMP:20200220T144116Z\r\nDTSTART;TZID=Europe/Budapest:20200225T160000\r\nDTEND;TZID=Europe/Budapest:20200225T163000\r\nEND:VEVENT\nEND:VCALENDAR",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeTpp6AAoJEBHDHo5eB/TQPh8H/iYi02Pd3ie+2qcjHoYv\r\nxU9uafi5zjfA+yT0o4wRJ2asyYBebkwyIcszRfM/XZSP1AqSEJNQgNYHNgwD\r\nTegUNitScwqC2+CjAYgsP891OzYpz4EogIGPY3WGF358UujvB6x0B5Ac0aIn\r\nUa9XW9+GFy4IqKV++o21dAOTVf4SLlkLohZ+sxLC5Jt+XBj/PfbovQvdRvH6\r\nJkgm+sCyanMP0vDluludJDCQAbjrbNQ3wy2T/e1EbbZLgZWwRHbyRW5Ruw9J\r\nP78YU7255lTLY+OKb+HMVXtwXIfjjQz87niX8JuOf0ZylHTBM8cekre+W+82\r\npFlBkALyazBVBYhClGJ70Lk=\r\n=KnOs\r\n-----END PGP SIGNATURE-----\r\n"
                     },
                     {
                         "Type": 3,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "0sCUAUOoA39E0QEhkd9HSewy66Q3Pq62sUDs4FSzYJJQlrcEeFuuLWKWUKqp2Tx5Aes6APkqU/sJ2mOKS1aMzLRfP2UiUwDdQTlwHMHrdOaZ49NWkSjnKMUyNz24CHTLty3Bs/TAzmZsPkc69MjrwkAaIUKx3kIt2DF/yM0r8TiAiUt3fJkmzT9AUmUOxz+iuhcIOZb3AI+kAAvhukvVjtlZRmPdA67e/YolbgmT1yOk2b+vVz/MSk/oGQv9rm6D0zYaGrzi4lLr93jbxkRK5t84sV1aBEi3KOhWVfxzZpGUNvzh8xhjfHju7aK5zLTlKez+Ssjrw5AnY2k7b306MzRyq3i9nymCzbnCykYz9SWQuDdc6cyAPSilLMDCbVZUNqJZBtmWqqOFSlTpFjNzjud+IjN8SFlRedaQGqYLEr4oRbkLEn586WT/jefBvCBT4sZ2lmrq0w==",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeTpp6AAoJEBHDHo5eB/TQV8QH/1ZGeHnu54vWu1LvhRJH\r\noJr6/3bMQ2cy/YdldnHwayb9W6xQg40gR9G1qarTyVK9fWoN+Bn2YcyWYbxH\r\nX1+IswyJSNZ1IqRNNqaoZQS6HZ25m/GS7OzrYf3hcmSsI2oTzyMpfKlgqO4y\r\nsyW/KVgitktmeyip+6X25dRJ7SdMftUva0zzuDLBJfI35ggoDuOACSfllzun\r\n8T79Q79+h4a5Bvojh4p2KYLjNphkZ+RCHAMRsquYQM72sinXf+A/pvlfgYf7\r\ntc2V8btLXzudFexdDBLUy8nCAUKizu7xqLPCKBVhyH11EXAGZ3FHrfuPtFb5\r\noTAJb+q1EviBS5wnDvlKtR0=\r\n=n8OD\r\n-----END PGP SIGNATURE-----\r\n"
                     }
                 ],
                 "CalendarEvents": [],
-                "PersonalEvent": [
+                "PersonalEvents": [
                     {
                         "Type": 2,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nUID:proton-calendar-0bc59234-c6f9-319a-bc5a-e5a97e0d4370\r\nDTSTAMP:20200220T144116Z\r\nBEGIN:VALARM\r\nTRIGGER:-PT15M\r\nACTION:DISPLAY\r\nEND:VALARM\r\nBEGIN:VALARM\r\nTRIGGER:-PT2H\r\nACTION:DISPLAY\r\nEND:VALARM\r\nEND:VEVENT\nEND:VCALENDAR",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeTpp6AAoJEBHDHo5eB/TQIIoIAJxIzt+9azbFo0V9QQrj\r\n7U5H9RVmuYJeCOwDLbc5FQARn7lSBU/BH8DpV5TNhEuYHxdNBeABPmNJ96dl\r\n/cjGH90p2nwic9+tvtfODPbQUin1dObSDEp1HZbON9T1AUz+eK94m0BINTiU\r\nt9tnbQq/KMhYgRPqwTdldrbF+8/X3kIUIdV5+f08QM2oOuUneFJhrAA4ALak\r\nDjTLbL+SPJ7lvl5Lth6xQJePqbjh69XVi2unZ06NcWFvbYW/sJAPDJHWFRTA\r\nvUse1GZGjJ5E24F/O/pT+CaAFBbVhQqPFOMicO2VGkyhOzUROaTqscCevUew\r\nFXMAClS1CUHBxSBh+JqQYFY=\r\n=7KQG\r\n-----END PGP SIGNATURE-----\r\n",
                         "MemberID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ=="
@@ -83,25 +87,27 @@
                 "CalendarKeyPacket": null,
                 "CreateTime": 1582560333,
                 "LastEditTime": 1582560356,
-                "Author": "adamtst@protonmail.blue",
                 "Permissions": 3,
                 "SharedKeyPacket": "wV4DP+KI9zrxP8QSAQdAonpqwjP9cLoqugfN7+l4pe5EyvKYbvMtw+yEKcMfoyQwypZXe34S2wPVOuvpGQEqNT0ys54C+4RKsSJiAroSKJqUWuCvWVzvXSve418CxN0l",
                 "SharedEvents": [
                     {
                         "Type": 2,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nDTSTAMP:20200224T160528Z\r\nUID:proton-calendar-3281587b-7411-1f7c-302c-a5d940737ef4\r\nDTSTART;TZID=Europe/Budapest:20200226T173000\r\nDTEND;TZID=Europe/Budapest:20200226T180000\r\nEND:VEVENT\nEND:VCALENDAR",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeU/RNAAoJEBHDHo5eB/TQYB8H/j4AnbI4FMX9uB8T4u3R\r\n7JWVlvhceigUgV2omAGG7bMl3lCPxq9+Mvlt9dIQ8tfd8dMZ/b6/ZGw4FRh0\r\nijAl0PM48UT4lIpdB30AAwogAXVM4leKUnWZ0RY9qNR/kiQoP7X6nR5MfnuO\r\nKfNFSYOwpzSCRveSfThevE+ofieTi+h3OjCidFA+fYwPc5P3TKjKk7v7BaQ8\r\nSmxAG/YFQNUsJgAMq5gzoZxPPiYHCUzIjtD77EH4Hna8ut26MoTDNqd3Rk4t\r\n0z1tyDGyKvH4mYkE2hpLyuETp02f1UNTn9MQOOfsKWNkH3iMtgsQeIwXiNbw\r\n2GVp6yyVv0AbyLRO5ZEfqqQ=\r\n=3hNM\r\n-----END PGP SIGNATURE-----\r\n"
                     },
                     {
                         "Type": 3,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "0sA8AUzOHkDqsKRBm0ZD3PA8CQospmeHUm9wNk8LH4TrTNROTf6MNVRj3ZSZJmXbSg75xbvVWWzZt3vTdu7PEiaAzEmYAyyyUyv8XF9+sL/r5pbLBSWsz0sLcAiEYfd8IoxTbaZ96JQT2y5m5voDY7y2AdGpt6ujzIZknIDUwkyJ7wJ3UDPtoDylsZBNHszGhaqB2qpvyIqS6VhSgHMvu/kpkuEYfBWS8RN+jReCJktYLJZlGp5TP1a8cHuxULI0jlsPyctTLmyheUq/J0IK5Kkb/OoYxQFSdtn9GgT8hTSktDIeCNSD5I55bc3PWnA9AwHdXYLXA5wwuTLLXxBv",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeU/RNAAoJEBHDHo5eB/TQ/2gIAMZHFBchKBTxN0w+Z9WD\r\nhM7ZsnkoxuI9KUBclqNcz4c7/m2WwJSvRDkhUnUL+NMXCu72JTScRaUNpYQ3\r\nsVfamGNyDU/tE0o75ovDTAPdMiqtEMtRe6iXdz/iRWM0bN3QyJtJTtJ6ahWE\r\npnjR4N1HuPjc3/TBOeL6Xeq/Szkw1vKvamNHvud/EN9UymkJfZ3Ay7xTaotZ\r\n6ZETOZI7Z18cPeCEBb8tSsRBL/tOeJHmVd+iyu2hHveu6G6VDQclNhq7W30+\r\nb+qvDqShSIklXBEztX/9pyKRDWfnjLdE5sealtd701DCPYpzS5Q/IbzHie5n\r\nGqHp41s05dg5R04zSS5hYs8=\r\n=a3sV\r\n-----END PGP SIGNATURE-----\r\n"
                     }
                 ],
                 "CalendarEvents": [],
-                "PersonalEvent": [
+                "PersonalEvents": [
                     {
                         "Type": 2,
+                        "Author": "adamtst@protonmail.blue",
                         "Data": "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\r\nDTSTAMP:20200224T160528Z\r\nUID:proton-calendar-3281587b-7411-1f7c-302c-a5d940737ef4\r\nBEGIN:VALARM\r\nTRIGGER:-PT15M\r\nACTION:DISPLAY\r\nEND:VALARM\r\nEND:VEVENT\nEND:VCALENDAR",
                         "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.8.1\r\nComment: https://openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJeU/RNAAoJEBHDHo5eB/TQMGoIAKZTdz2Jb5bhgwCNBnnO\r\nazk/88K1HxYUBvvhDZ+LNn8E9yuGcxp4LzaT/p/7rKKbQ3ToUw4tmv1rudHE\r\nHe1/29DJOgLxFoVLOaw9Fauu0JlXwvA7q5ETWxuaHAH68SxiYugiUewnoi0e\r\nZEg1pZJ3ZipJmGn2YHObNkIcaR/mn/oG3cxxIRlz1DGHhJjZQL0A5GkOeq5C\r\nkFWeb/sUg33p9uqeGGDyoImSNLUUjwlXODdU37TSq4pKU/eEeZ+XlZPjQ7OJ\r\n9+4lYz7JaV+cjRNzShVnzQn6e3+6BYRVOAm6VbreE01rtEuPn2l2r8Q4wTEE\r\nTD02kswwW1QhsYbQM1HxaxQ=\r\n=f3G7\r\n-----END PGP SIGNATURE-----\r\n",
                         "MemberID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ=="

@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+// TODO add test for verification when there are different authors for different Event Parts
+
 internal class SyncServerEventsUseCaseTest {
 
     private val serverEventsApiMock: ServerEventsApi = mockk()
@@ -23,6 +25,7 @@ internal class SyncServerEventsUseCaseTest {
     private val valueStoreMock: ValueStore = mockk()
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val cacheCalendarPassphraseUseCaseMock: CacheCalendarPassphraseUseCase = mockk()
+    private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
 
     private val userId = "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
 
@@ -90,8 +93,9 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistMember(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistSettings(any()) } just Runs
+            coEvery { fetchPublicKeysUseCaseMock.execute(any()) } returns UseCase.Result.Success
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock)
+            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, fetchPublicKeysUseCaseMock)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
@@ -138,6 +142,9 @@ internal class SyncServerEventsUseCaseTest {
             }
             coVerify(exactly = 2) {
                 calendarsRepositoryMock.persistSettings(any())
+            }
+            coVerify(atLeast = 1) {
+                fetchPublicKeysUseCaseMock.execute("adamtst@protonmail.blue")
             }
         }
     }
