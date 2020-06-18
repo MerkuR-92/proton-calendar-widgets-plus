@@ -20,10 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.AndroidUtils
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.allowedTimezoneIds
-import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -107,8 +104,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
 
             if (viewModeInitStatus == UseCase.Result.Success) {
-                attachActionHandlers()
                 observeEventLiveData()
+                attachActionHandlers()
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
@@ -147,18 +144,11 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     private fun observeEventLiveData() {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
 
-//            TimberLogger.d("live data, isAllDAy?=${event.isAllDay()}")
-
             event.summary?.let { et_summary.setText(it) }
-
             event.location?.let { et_location.setText(it) }
+            event.description?.let { et_description.setText(it) }
 
-            TimberLogger.d("observer is all day: ${event.isAllDay()}")
-//            if (switch_all_day.isChecked && !event.isAllDay()) {
-//                switch_all_day.isChecked = true
-//            } else if (!switch_all_day.isChecked && event.isAllDay()) {
-                switch_all_day.isChecked = event.isAllDay()
-//            }
+            switch_all_day.isChecked = event.isAllDay()
 
             group_partial_day_event.visibleOrGone(!event.isAllDay())
 
@@ -187,7 +177,6 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
             displayAlarms()
 
-            event.description?.let { et_description.setText(event.description) }
         })
     }
 

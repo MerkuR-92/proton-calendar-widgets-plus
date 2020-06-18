@@ -70,7 +70,7 @@
         <deepLink
             android:id="@+id/deepLink2"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;initStartDate={initStartDate}" />
+            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}" />
         <deepLink
             android:id="@+id/deepLink3"
             android:autoVerify="true"

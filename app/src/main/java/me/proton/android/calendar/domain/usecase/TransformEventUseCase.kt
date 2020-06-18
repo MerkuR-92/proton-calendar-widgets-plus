@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import com.google.gson.Gson
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.setDefaultTimeZone
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
@@ -138,13 +139,20 @@ class TransformEventUseCase(
 
         val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)
 
+        if (iCalendar == null || iCalendar.events.isEmpty()) return null
+
+//        iCalendar.events.first().let {
+//
+//        }
+//
+//        iCalendar.setDefaultTimeZone(iCalendar.events.first().)
+
 //        TimberLogger.e("after merging: ${iCalendar!!.printToString()}")
 //        TimberLogger.e("verification statueses: ${verificationStatuses}")
 
 
 
-        return if (iCalendar != null && iCalendar.events.isNotEmpty()) {
-            Event(
+        return Event(
                 id = eventEntity.id,
                 calendar = Calendar(
                     calendar.id,
@@ -160,7 +168,7 @@ class TransformEventUseCase(
                     Event.SignatureVerification.NO_KEYS
                 } else null
             )
-        } else null
+
     }
 
 

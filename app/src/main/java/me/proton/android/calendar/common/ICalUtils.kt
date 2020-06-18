@@ -285,13 +285,34 @@ fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZon
  *
  * @param timeZoneId needed to correctly interpret Dates if we are about to remove timezone info
  */
-fun ICalendar.adjustAllDayEvent(timeZoneId: String) {
+fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
     this.timezoneInfo.timezones.clear()
     this.events.first().apply {
         setStart(this.getStart(timeZoneId)!!.toLocalDate())
         setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
     }
 }
+
+///**
+// * Standardises iCal Event.
+// */
+//fun ICalendar.adjustIncomingEvent() {
+//    this.events.first().apply {
+//
+//        if (this.dateEnd == null) {
+//            if (this.dateStart.value.hasTime()) { // partial-day event
+//                this.setDateEnd(this.dateStart.value)
+//            } else { // all-day event
+//
+//            }
+//        }
+//
+//        // if there is no end date, it's a valid all-day event
+//        if (this.dateEnd == null) {
+////            this.setDateEnd(this.dateStart.value) TODO +1 day midnight
+//        }
+//    }
+//}
 
 fun VEvent.getStart(timeZoneId: String? = "UTC"): ZonedDateTime? {
     return if (this.dateStart?.value != null) ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null

@@ -128,7 +128,7 @@ internal class ICalUtilsTest {
         calendar.setStartTimeZone(timeZoneId)
         calendar.setEndTimeZone(timeZoneId)
 
-        calendar.adjustAllDayEvent(timeZoneId)
+        calendar.adjustOutgoingAllDayEvent(timeZoneId)
 
         assertThat(calendar.events.first().dateStart.value.hasTime()).isFalse()
         assertThat(calendar.events.first().dateEnd.value.hasTime()).isFalse()

@@ -37,11 +37,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val navigateUp = false
     override val actionMenuResourceId = R.menu.fragment_event_details
 
-    override fun onMenuItemClicked(menuItem: MenuItem) { // TODO maybe move this logic to viewmodel, but it's just 1 line
-//        when (menuItem.itemId) {
-//            R.id.action_menu_edit -> findNavController().navigate((Navigation.Deeplink.toEventEdit(navigationArguments.eventId)))
-//        }
-        // TODO
+    override fun onMenuItemClicked(menuItem: MenuItem) {
+        when (menuItem.itemId) {
+            R.id.action_menu_edit -> findNavController().navigate((Navigation.Deeplink.toEventEdit(navigationArguments.eventId)))
+        }
     }
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()

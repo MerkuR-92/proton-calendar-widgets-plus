@@ -1,9 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Trigger
@@ -16,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.api.CalendarUserSettingsApiEntity
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -69,47 +67,50 @@ class EventViewModel(
 
     suspend fun initialise(eventId: String?, initStartDate: String?, initStartTime: String? /*TODO in the future also endDate for multi-day events*/): UseCase.Result /* TODO maybe use separate Result class */ {
 
-
         // reset backup values
         timeStartBackup = null
         timeEndBackup = null
 
-        // TODO get those values from somewhere
+//            calendarUserSettings.defaultCalendarId // TODO we still can't rely on this, it can be null in API!!!
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
+        val todoDefaultCalendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")!!
+        // TODO get those values from somewhere
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
         val userId = TODOuserID//"IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
-        initialTimeZoneId = "Europe/Zurich"
+        val calendarUserSettings = gson.fromJson(valueStoreProvider.provideValueStore(userId).getString(ValueKey.USER_CALENDAR_SETTINGS), CalendarUserSettingsApiEntity::class.java) ?: return UseCase.Result.Error("could not get User CalendarSettings")
+
+        initialTimeZoneId = "Europe/Zurich" // TODO
 
         TimberLogger.d("EventViewModel initialise with EventId: $eventId")
         TimberLogger.d("EventViewModel initialise with startDate: $initStartDate")
         TimberLogger.d("EventViewModel initialise with startTime: ${initStartTime}")
+
+
+
+        val defaultCalendar = calendarsRepository.selectCalendar(todoDefaultCalendarId) ?: return UseCase.Result.Error("could not get default Calendar from DB")
+        val calendarSettings = calendarsRepository.selectSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
 
         event = if (eventId == null) {
 
             val newICalendar = ICalUtils.createNewEvent().wrapInICalendar()
             val newVEvent = newICalendar.events.first()
 
-            val calendarUserSettings = gson.fromJson(valueStoreProvider.provideValueStore(userId).getString(ValueKey.USER_CALENDAR_SETTINGS), CalendarUserSettingsApiEntity::class.java) ?: return UseCase.Result.Error("could not get User CalendarSettings")
-//            calendarUserSettings.defaultCalendarId // TODO we still can't rely on this, it can be null in API!!!
-            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-            val todoDefaultCalendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")!!
 
-            val defaultCalendar = calendarsRepository.selectCalendar(todoDefaultCalendarId) ?: return UseCase.Result.Error("could not get default Calendar from DB")
-            val calendarSettings = calendarsRepository.selectSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
+
+
 
             // if there is no requested start date, we take today
             val startDate = if (initStartDate != null) LocalDate.parse(initStartDate) else LocalDate.now()
-            // if there is no requested start time, we calculate it according to "now" and set it in ICal anyway, then hide time controls in GUI
-            val startTime = if (initStartTime != null) LocalTime.parse(initStartTime) else LocalTime.now().plusHours(1).truncatedTo(ChronoUnit.HOURS)
+            // if there is no requested start time, we calculate it according to "now"
+            val startTime = if (initStartTime != null) LocalTime.parse(initStartTime) else LocalTime.now().plusMinutes(calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS)
             // end Zoned Date Time according to default event duration
             val endZonedDateTime = ZonedDateTime.of(startDate, startTime, ZoneId.of(initialTimeZoneId)).plusMinutes(calendarSettings.defaultEventDuration.toLong())
 
             timeStartBackup = startTime
             timeEndBackup = endZonedDateTime.toLocalTime() // this time can be before timeStartBackup at this point
 
-            // TODO maybe get rid of default time zone and take it from "backup" in VM
+            // TODO GUI takes timezone from iCalendar's "default timezone", maybe this should be moved to "Event" model?
             newICalendar.setDefaultTimeZone(initialTimeZoneId)
 
             if (initStartTime == null) { // create new all-day event
@@ -153,54 +154,47 @@ class EventViewModel(
 //            }
 
 
-
-            // TODO
-            //-- Start/End
-//            -- Notification: It should be default one set in the settings
-
-
-
-
-
-
-
-
-
-//                .apply {
-//                setDateStart(startDate.toDate())
-//            }
-
-
-
-
             TimberLogger.d("INIT: ${newICalendar.printToString()}")
 
-            Event(ICalUtils.generateOfflineEventId(), Calendar(defaultCalendar.id, defaultCalendar.name, defaultCalendar.color), newICalendar)
+            val newEvent = Event(ICalUtils.generateOfflineEventId(), Calendar(defaultCalendar.id, defaultCalendar.name, defaultCalendar.color), newICalendar)
+
+            setDefaultAlarms(newEvent)
+            newEvent
 
         } else {
 
-            // TODO adjust endDate to -1 day if event has no time
+            val dbEvent = viewModelScope.async(Dispatchers.IO) {
+                calendarsRepository.event(eventId).first()
+            }.await()
 
-            return UseCase.Result.Error("not implemented yet") // TODO
+
+            dbEvent?.apply {
+
+                if (dbEvent.isAllDay()) { // adjust endDate to -1 day if event has no time
+                    dbEvent.iCalEvent.setEnd(dbEvent.endLocalDate!!.minusDays(1)) // TODO NPE
+
+                    timeStartBackup = LocalTime.now()
+                    timeEndBackup = LocalTime.now().plusMinutes(calendarSettings.defaultEventDuration.toLong())//.truncatedTo(ChronoUnit.HOURS)
+                } else {
+                    timeStartBackup = dbEvent.getStart(initialTimeZoneId)!!.toLocalTime()
+                    timeEndBackup = dbEvent.getEnd(initialTimeZoneId)!!.toLocalTime()
+                }
+
+                // default timezone in iCalendar is used for GUI
+                dbEvent.iCalendar.setDefaultTimeZone(dbEvent.iCalendar.timezoneInfo.getTimezone(dbEvent.iCalEvent.dateStart)?.timeZone?.id ?: initialTimeZoneId)
+
+            } ?: return UseCase.Result.Error("could not find event ${eventId}")
+
+                // TODO
+                //handleAllDaySwitch(initStartTime == null)
+
+
         }
-
-        setDefaultAlarms(event)
 
         _event.postValue(event)
 
-        // adjust GUI for all-day event
-        //handleAllDaySwitch(initStartTime == null)
-
         return UseCase.Result.Success
     }
-
-    // Full day: 1 day before 9am
-    //Partial day: 15min before
-    //Event is partial-day and has 1 notification 15 minutes before.
-    //I add an extra notification 30 minutes before
-    //I switch to full-day, notification 1 and 2 disappear
-    //The default notification is added (1 day before at 9:00), then switch back to partial-day.
-    //You should switch to the default notification and remove 30 minutes before
 
     private fun setDefaultAlarms(event: Event) {
         event.iCalEvent.alarms.clear()
@@ -265,7 +259,7 @@ class EventViewModel(
         val calendarToSave = event.iCalendar
 
         if (event.isAllDay()) {
-            calendarToSave.adjustAllDayEvent(event.defaultTimeZone!!)
+            calendarToSave.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
             initialTimeZoneId = event.defaultTimeZone!!
             TimberLogger.d("calendar for all-day: " + calendarToSave.printToString())
         } else {
