@@ -25,7 +25,7 @@ data class CalendarEntity(
     val description: String,
     val color: String,
     val display: Int // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
-//    val flags: Int? //, TODO unfortunately this is not being sent in /events TODO it will be added on server
+//    val flags: Int //, TODO this will be deployed on production soon^TM and we will have non-null flags
     // 0 - Inactive: the calendar keys are not accessible and the current user cannot fix it
     // 1 - Active: the calendar is all good!
     // 2 - Update passphrase: a deactivated passphrase is again accessible, you should re-encrypt the linked calendar key using the primary passphrase

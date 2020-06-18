@@ -167,7 +167,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                     eventViewModel.tempRecurrenceUntilLocalDate
                         ?: eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
                             .toLocalDate(),
-                    FormValidation.OCURRENCE_MAX_UNTIL
+                    FormValidation.OCURRENCE_MAX_UNTIL.toLocalDate()
                 ) {
                     eventViewModel.handleRecurrenceUntilDate(it)
                     rb_recurrence_custom_2.setText(

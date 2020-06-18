@@ -14,9 +14,7 @@
     <string name="action_save">Save</string>
     <string name="action_done">Done</string>
     <string name="action_edit">Edit</string>
-
-    <string name="footer_text">Encrypted by Proton</string>
-
+    
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">All Day</string>
     <string name="event_time_period_spanning_single_day">%s \u2013 %s</string>

@@ -5,6 +5,7 @@ import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
+import biweekly.property.Status
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
@@ -93,7 +94,7 @@ object ICalUtils {
                     setCreated(event.created)
                     setLastModified(event.lastModified)
 //                    setDateTimeStamp(event.dateTimeStamp)
-                    setStatus(event.status) // TODO set to CONFIRMED when creating event
+                    setStatus(event.status)
                     setTransparency(event.transparency)
                     wrapInICalendar()
                 }
@@ -168,6 +169,8 @@ object ICalUtils {
 
     fun createNewEvent() = VEvent().apply {
         setUid(generateProtonUid())
+        setStatus(Status(Status.CONFIRMED)) // TODO set this as default if imported event has this field empty
+        setSequence(0)
     }
 
     /**

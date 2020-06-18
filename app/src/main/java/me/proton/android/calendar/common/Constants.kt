@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common
 
 import java.time.LocalDate
+import java.time.ZoneId
 
 const val API_VERSION_CALENDAR = "v1"
 const val API_BASE_URL = "https://beta.protonmail.com/api/"//"https://api.protonmail.ch/"
@@ -17,7 +18,7 @@ const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/c
 
 object FormValidation {
 
-    val OCURRENCE_MAX_UNTIL = LocalDate.of(2038, 1, 1)
+    val OCURRENCE_MAX_UNTIL = LocalDate.of(2038, 1, 1).atStartOfDay(ZoneId.of("UTC"))
 
     const val OCCURRENCE_COUNT_DEFAULT = 1
     const val OCCURRENCE_COUNT_MIN = 1
