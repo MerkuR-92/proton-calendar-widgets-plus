@@ -21,7 +21,7 @@ data class Ciphertext(
         /**
          * PGPMessage has to contain both KeyPacket(s) and DataPacket(s).
          */
-        fun from(armoredPgpMessage: String): Ciphertext {
+        fun from(armoredPgpMessage: String): Ciphertext { // TODO catch errors and return null???
             val pgpSplitMessage = PGPSplitMessage(armoredPgpMessage)
             return Ciphertext(pgpSplitMessage.keyPacket, pgpSplitMessage.dataPacket)
         }

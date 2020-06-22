@@ -39,12 +39,12 @@ interface Crypto {
     fun decryptText(cipherText: String, armoredPrivateKey: String, passphrase: ByteArray): String?
 
     /**
-     * Encrypts plaintext with armored PublicKey and returns Armored PGPMessage as String. This message contains KeyPacket and DataPacket. // TODO TEST
+     * Encrypts plaintext with armored PublicKey and returns Armored PGPMessage as String. This message contains KeyPacket and DataPacket.
      */
     fun encryptText(plainText: String, armoredPublicKey: String): String?
 
     /**
-     * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket. // TODO TEST
+     * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket.
      */
     fun encryptText(plainText: String, sessionKey: SessionKey): String?
 
@@ -63,10 +63,10 @@ interface Crypto {
         serverEphemeral: String,
         authVersion: Int,
         salt: String
-    ): Proofs? // TODO return type with simple data class?
+    ): Proofs?
 
     /**
-     * Decrypts Base64-encoded KeyPacket. // TODO TEST
+     * Decrypts Base64-encoded KeyPacket.
      */
     fun decryptSessionKey(
         encodedKeyPacket: String,
