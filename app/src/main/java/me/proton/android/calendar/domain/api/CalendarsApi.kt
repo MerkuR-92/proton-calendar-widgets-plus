@@ -1,7 +1,5 @@
 package me.proton.android.calendar.domain.api
 
-import com.google.gson.JsonElement
-import com.google.gson.annotations.SerializedName
 import me.proton.android.calendar.data.api.*
 
 interface CalendarsApi {
@@ -37,8 +35,7 @@ interface CalendarsApi {
      */
     suspend fun deleteEvent(calendarId: String, eventId: String) : ApiResponse<StatusCodeApiResponse>
 
-    // TODO see if we can do CREATE/EDIT using the same payloads
-    suspend fun createEvent(calendarId: String, body: CreateEventApiRequest) : ApiResponse<CreateEventApiResponse>
+    suspend fun syncEvents(calendarId: String, body: SyncEventsUpdateApiRequest) : ApiResponse<SyncEventsApiResponse>
 
 }
 

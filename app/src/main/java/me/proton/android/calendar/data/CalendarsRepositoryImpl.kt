@@ -1,7 +1,6 @@
 package me.proton.android.calendar.data
 
 import com.google.gson.Gson
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -9,7 +8,6 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
-import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import timber.log.Timber
 
 // TODO better name? move to separate package?
@@ -52,7 +50,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
     }
 
     override fun event(eventId: String): Flow<Event?> {
-        return database.eventsDao().selectById(eventId)./*distinctUntilChanged().*/map {
+        return database.eventsDao().selectByIdFlow(eventId)./*distinctUntilChanged().*/map {
             if (it != null) {
                 transformEventUseCase.execute(it)
             } else {
@@ -61,7 +59,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         }
     }
 
-    override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectById(eventId).first()
+    override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
 
     override suspend fun persistEvents(vararg events: EventEntity) {
         database.eventsDao().insert(*events)

@@ -4,9 +4,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import at.favre.lib.crypto.bcrypt.Radix64Encoder
 import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.armor.Armor
-import com.proton.gopenpgp.crypto.KeyRing
-import com.proton.gopenpgp.crypto.PGPSignature
-import com.proton.gopenpgp.crypto.PlainMessage
+import com.proton.gopenpgp.crypto.*
 import com.proton.gopenpgp.helper.Helper
 import com.proton.gopenpgp.srp.Proofs
 import me.proton.android.calendar.domain.Crypto
@@ -82,12 +80,21 @@ class CryptoImpl(private val logger: Logger) : Crypto {
 
     override fun encryptText(
         plainText: String,
-        armoredKey: String
+        armoredPublicKey: String
     ): String? {
         return try {
-            Helper.encryptMessageArmored(armoredKey, plainText)
+            Helper.encryptMessageArmored(armoredPublicKey, plainText)
         } catch (e: Exception) {
-            logger.i("decrypt failed", e)
+            logger.i("encrypt text with public key failed", e)
+            null
+        }
+    }
+
+    override fun encryptText(plainText: String, sessionKey: SessionKey): String? {
+        return try {
+            Base64.encodeToString(PGPMessage(sessionKey.encrypt(PlainMessage(plainText))).data, Base64.DEFAULT)
+        } catch (e: Exception) {
+            logger.i("encrypt text with session key failed", e)
             null
         }
     }
@@ -114,6 +121,20 @@ class CryptoImpl(private val logger: Logger) : Crypto {
             srpAuth.generateProofs(SRP_PROOF_BITS)
         } catch (e: Exception) {
             logger.i("generateSrpProofs failed", e)
+            null
+        }
+    }
+
+    override fun decryptSessionKey(
+        encodedKeyPacket: String,
+        armoredPrivateKey: String,
+        passphrase: ByteArray
+    ): SessionKey? {
+        return try {
+            val keyRing = createAndUnlockKeyring(armoredPrivateKey, passphrase)
+            keyRing.decryptSessionKey(Base64.decode(encodedKeyPacket, Base64.DEFAULT))
+        } catch (e: Exception) {
+            logger.i("decryptSessionKey failed", e)
             null
         }
     }

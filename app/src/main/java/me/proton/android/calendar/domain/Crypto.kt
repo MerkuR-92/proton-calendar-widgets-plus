@@ -1,28 +1,37 @@
 package me.proton.android.calendar.domain
 
+import com.proton.gopenpgp.crypto.SessionKey
 import com.proton.gopenpgp.srp.Proofs
 
 interface Crypto {
 
     /**
-     * Generates BCrypted passphrase using provided salt.
+     * Generates BCrypted passphrase using provided Base64-encoded salt.
      */
     fun generateUserPassphrase(passphrase: ByteArray, encodedSalt: String): ByteArray
 
     /**
      * Checks if this key can be unlocked by this passphrase.
      */
-    fun checkPassphrase(armoredKey: String, passphrase: ByteArray) : Boolean
+    fun checkPassphrase(armoredKey: String, passphrase: ByteArray): Boolean
 
     /**
      * Signs plaintext using private key.
      */
-    fun signTextDetached(plainText: String, armoredPrivateKey: String, passphrase: ByteArray): String?
+    fun signTextDetached(
+        plainText: String,
+        armoredPrivateKey: String,
+        passphrase: ByteArray
+    ): String?
 
     /**
      * Verifies plaintext signature, success if at least one key verifies signature correctly.
      */
-    fun verifyTextDetached(plainText: String, armoredSignature: String, armoredPublicKeys: List<String>): Boolean
+    fun verifyTextDetached(
+        plainText: String,
+        armoredSignature: String,
+        armoredPublicKeys: List<String>
+    ): Boolean
 
     /**
      * Decrypts text using private key.
@@ -30,9 +39,14 @@ interface Crypto {
     fun decryptText(cipherText: String, armoredPrivateKey: String, passphrase: ByteArray): String?
 
     /**
-     * TODO comment and test for this
+     * Encrypts plaintext with armored PublicKey and returns Armored PGPMessage as String. This message contains KeyPacket and DataPacket. // TODO TEST
      */
-    fun encryptText(plainText: String, armoredKey: String): String?
+    fun encryptText(plainText: String, armoredPublicKey: String): String?
+
+    /**
+     * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket. // TODO TEST
+     */
+    fun encryptText(plainText: String, sessionKey: SessionKey): String?
 
     /**
      * Extracts public key from supplied key (private or public).
@@ -42,10 +56,21 @@ interface Crypto {
     /**
      * Generates Proofs for SRP login.
      */
-    fun generateSrpProofs(username: String,
-                          passphrase: ByteArray,
-                          signedModulus: String,
-                          serverEphemeral: String,
-                          authVersion: Int,
-                          salt: String): Proofs? // TODO return type with simple data class?
+    fun generateSrpProofs(
+        username: String,
+        passphrase: ByteArray,
+        signedModulus: String,
+        serverEphemeral: String,
+        authVersion: Int,
+        salt: String
+    ): Proofs? // TODO return type with simple data class?
+
+    /**
+     * Decrypts Base64-encoded KeyPacket. // TODO TEST
+     */
+    fun decryptSessionKey(
+        encodedKeyPacket: String,
+        armoredPrivateKey: String,
+        passphrase: ByteArray
+    ): SessionKey?
 }

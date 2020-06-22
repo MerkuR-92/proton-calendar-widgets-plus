@@ -37,8 +37,8 @@ interface CalendarsApiService {
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : Response<StatusCodeApiResponse>
 
-    @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
-    suspend fun createEvent(@Path("calendarId") calendarId: String, @Body body: CreateEventApiRequest) : Response<CreateEventApiResponse>
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/sync")
+    suspend fun syncEvents(@Path("calendarId") calendarId: String, @Body body: SyncEventsUpdateApiRequest) : Response<SyncEventsApiResponse>
 
 }
 
@@ -60,7 +60,7 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
 
     override suspend fun deleteEvent(calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse>  = safeApiCall { service.deleteEvent(calendarId, eventId) }
 
-    override suspend fun createEvent(calendarId: String, body: CreateEventApiRequest): ApiResponse<CreateEventApiResponse> = safeApiCall { service.createEvent(calendarId, body) }
+    override suspend fun syncEvents(calendarId: String, body: SyncEventsUpdateApiRequest): ApiResponse<SyncEventsApiResponse> = safeApiCall { service.syncEvents(calendarId, body) }
 
 }
 
@@ -93,7 +93,7 @@ data class EventsApiResponse(
 //    }
 data class CreateEventApiRequest(
     val memberId: String,
-    val permissions: Int, // TODO figure out what to do with this
+    val permissions: Int,
     val calendarKeyPacket: String?, // TODO for now, for simple example, but it can/must (sometimes) be empty
     val calendarEventContent: List<Event.CalendarEvent>?, // TODO empty for now
     val sharedKeyPacket: String, // TODO I think it always has to be there
@@ -101,6 +101,38 @@ data class CreateEventApiRequest(
     val personalEventContent: Event.PersonalEvent?
     // TODO AttendeesEventContent, Attendees
     )
+
+
+data class SyncEventsUpdateApiRequest(
+    val memberId: String,
+    val events: List<SyncEventContainer>
+)
+
+// TODO container for CREATE LINKED by adding SharedEventID and UID
+
+interface SyncEventContainer
+
+data class SyncEventCreateContainer(
+    val event: SyncEvent
+) : SyncEventContainer
+
+data class SyncEventUpdateContainer(
+    val id: String,
+    val event: SyncEvent
+) : SyncEventContainer
+
+data class SyncEvent(
+    val permissions: Int,
+    val calendarKeyPacket: String?,
+    val calendarEventContent: List<Event.CalendarEvent>?,
+    val sharedKeyPacket: String?,
+    val sharedEventContent: List<Event.SharedEvent>,
+    val personalEventContent: Event.PersonalEvent?
+)
+
+data class SyncEventDeleteContainer(
+    val id: String
+)
 
 data class BootstrapApiResponse(
     override val code: Int,
@@ -111,6 +143,10 @@ data class BootstrapApiResponse(
 ) : BaseApiResponse()
 
 data class CreateEventApiResponse(
+    override val code: Int // TODO other fields
+) : BaseApiResponse()
+
+data class SyncEventsApiResponse(
     override val code: Int // TODO other fields
 ) : BaseApiResponse()
 

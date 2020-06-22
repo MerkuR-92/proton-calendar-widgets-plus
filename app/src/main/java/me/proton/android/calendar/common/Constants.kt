@@ -4,7 +4,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 const val API_VERSION_CALENDAR = "v1"
-const val API_BASE_URL = "https://beta.protonmail.com/api/"//"https://api.protonmail.ch/"
+//const val API_BASE_URL = "https://protonmail.blue/api/"
+const val API_BASE_URL = "https://beta.protonmail.com/api/"
 const val API_APPLICATION_NAME = "AndroidCalendar"
 
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"

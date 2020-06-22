@@ -49,12 +49,22 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                         eventViewModel.handleSave()
                     }
 
-                    if (success) {
-                        Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-                        findNavController().navigateUp()
+                    if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
+                        if (success) {
+                            Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+                            findNavController().navigateUp()
+                        } else {
+                            Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
-                        Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_SHORT).show()
+                        if (success) {
+                            Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
+                            findNavController().navigateUp()
+                        } else {
+                            Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_SHORT).show()
+                        }
                     }
+
 
                 }
             } else {

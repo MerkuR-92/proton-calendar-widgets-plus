@@ -13,7 +13,10 @@ abstract class EventsDao : BaseDao<EventEntity> {
     abstract fun selectEvents(calendarId: String): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM events WHERE id = :id")
-    abstract fun selectById(id: String): Flow<EventEntity?>
+    abstract fun selectByIdFlow(id: String): Flow<EventEntity?>
+
+    @Query("SELECT * FROM events WHERE id = :id")
+    abstract suspend fun selectById(id: String): EventEntity?
 
     @Query("DELETE FROM events WHERE id = :id")
     abstract fun deleteById(id: String)
