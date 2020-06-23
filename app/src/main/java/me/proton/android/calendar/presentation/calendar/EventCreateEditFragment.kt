@@ -45,26 +45,37 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 lifecycleScope.launch {
                     persistFormData()
 
-                    val success = withContext(Dispatchers.IO) {
-                        eventViewModel.handleSave()
-                    }
+                    if (eventViewModel.hasEventBeenEdited()) {
 
-                    if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
-                        if (success) {
-                            Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-                            findNavController().navigateUp()
+                        if (eventViewModel.isEventRecurring() && eventViewModel.hasEventBeenEdited() && !eventViewModel.isEventNew()) { // edit recurring
+
+                            Toast.makeText(requireContext(), "HANDLE EDIT RECURRING", Toast.LENGTH_SHORT).show()
+
                         } else {
-                            Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_SHORT).show()
+                            val success = withContext(Dispatchers.IO) {
+                                eventViewModel.handleSave()
+                            }
+
+                            if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
+                                if (success) {
+                                    Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+                                    findNavController().navigateUp()
+                                } else {
+                                    Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                if (success) {
+                                    Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
+                                    findNavController().navigateUp()
+                                } else {
+                                    Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         }
+
                     } else {
-                        if (success) {
-                            Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-                            findNavController().navigateUp()
-                        } else {
-                            Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_SHORT).show()
-                        }
+                        findNavController().navigateUp()
                     }
-
 
                 }
             } else {

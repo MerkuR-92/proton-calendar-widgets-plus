@@ -120,6 +120,8 @@ data class Event(
         }
     }
 
+    fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
+
     fun isCustomRecurring(): Boolean {
 
         // no Recurrence Rule
@@ -132,14 +134,6 @@ data class Event(
         if (this.iCalEvent.recurrenceRule.value.count != null || this.iCalEvent.recurrenceRule.value.until != null) return true
 
         // by default we return false which means we will ignore non-supported combinations
-        return false
-
-    }
-
-
-
-    fun hasCustomRecurringEnd(): Boolean {
-// TODO
         return false
 
     }

@@ -43,6 +43,9 @@ class EventViewModel(
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
 
+    private var eventEdited = false
+    private var eventBumpSeqId = false
+
     // TODO get this from preferences/settings
     val startWeekOnMonday = true
 
@@ -70,6 +73,8 @@ class EventViewModel(
         // reset backup values
         timeStartBackup = null
         timeEndBackup = null
+        eventEdited = false
+        eventBumpSeqId = false
 
 //            calendarUserSettings.defaultCalendarId // TODO we still can't rely on this, it can be null in API!!!
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
@@ -225,6 +230,14 @@ class EventViewModel(
      * because the changes are already there in user interface.
      */
     fun persistRecurrenceFormData(summary: String?, location: String?, description: String?) {
+
+        if (event.iCalEvent.summary?.value != summary ||
+            event.iCalEvent.location?.value != location ||
+            event.iCalEvent.description?.value != description) {
+
+            markEventAsEdited()
+        }
+
         event.iCalEvent.setSummary(summary)
         event.iCalEvent.setLocation(location)
         event.iCalEvent.setDescription(description)
@@ -289,16 +302,19 @@ class EventViewModel(
 
 
     fun handleCalendar(calendar: CalendarEntity) {
+        markEventAsEdited()
         event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color))
         _event.postValue(event)
     }
 
     fun handleTimeZone(timeZoneId: String) {
+        markEventAsEdited(bumpSequenceId = true)
         event.iCalendar.setDefaultTimeZone(timeZoneId)
         _event.postValue(event)
     }
 
     fun handleStartDate(newDate: LocalDate) {
+        markEventAsEdited(bumpSequenceId = true)
         val old = event.getStart(initialTimeZoneId)!!
         if (event.isAllDay()) {
             event.iCalEvent.setStart(newDate)
@@ -309,6 +325,7 @@ class EventViewModel(
     }
 
     fun handleEndDate(newDate: LocalDate) {
+        markEventAsEdited(bumpSequenceId = true)
         val old = event.getEnd(initialTimeZoneId)!!
         if (event.isAllDay()) {
             event.iCalEvent.setEnd(newDate)
@@ -319,6 +336,7 @@ class EventViewModel(
     }
 
     fun handleStartTime(newTime: LocalTime) {
+        markEventAsEdited(bumpSequenceId = true)
         val old = event.getStart(initialTimeZoneId)!!
         event.iCalEvent.setStart(old.toLocalDate(), newTime, initialTimeZoneId)
         timeStartBackup = newTime
@@ -326,6 +344,7 @@ class EventViewModel(
     }
 
     fun handleEndTime(newTime: LocalTime) {
+        markEventAsEdited(bumpSequenceId = true)
         val old = event.getEnd(initialTimeZoneId)!!
         event.iCalEvent.setEnd(old.toLocalDate(), newTime, initialTimeZoneId)
         timeEndBackup = newTime
@@ -333,6 +352,7 @@ class EventViewModel(
     }
 
     fun handleAllDaySwitch(isAllDay: Boolean) {
+        markEventAsEdited()
 
         if (isAllDay) {
             // persist backup of timezone & start/end times
@@ -376,6 +396,9 @@ class EventViewModel(
      * @param frequency if null, removes entire recurrence rule
      */
     fun handleRecurrence(frequency: Frequency?, untilDate: Boolean, interval: Int? = null, count: Int? = null, daysOfWeek: List<DayOfWeek>? = null, customMonthly: Boolean = false) {
+
+        markEventAsEdited(bumpSequenceId = true)
+
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -409,19 +432,20 @@ class EventViewModel(
         _event.postValue(event)
     }
 
-    fun handleCustomRecurrence() {
-
+    private fun markEventAsEdited(bumpSequenceId: Boolean = false) {
+        TimberLogger.d("markEventAsEdited, bump seqid = $bumpSequenceId")
+        eventEdited = true
+        if (bumpSequenceId) eventBumpSeqId = true
     }
 
-    // makes sure event start happens before end
-    private fun sanitiseDateTimes() {
+    fun hasEventBeenEdited() = eventEdited
 
-        // TODO
-//        if (event.iCalEvent.)
+    fun isEventNew() = !event.isSyncedWithApi()
 
-    }
+    fun isEventRecurring() = event.isRecurring()
 
     fun handleRecurrenceUntilDate(untilLocalDate: LocalDate?) {
+        markEventAsEdited(bumpSequenceId = true)
         tempRecurrenceUntilLocalDate = untilLocalDate
     }
 
@@ -475,6 +499,7 @@ class EventViewModel(
     }
 
     fun handleRecurrenceRepeatOn(selectedIndex: Int) {
+        markEventAsEdited(bumpSequenceId = true)
         this.tempMonthlyRepeatOption = calculateMonthlyRepeatOnOptions()[selectedIndex]
     }
 
@@ -488,14 +513,17 @@ class EventViewModel(
     }
 
     fun handleAlarmSendBy(option: SendByOption) {
+        markEventAsEdited()
         this.tempAlarmSendByOption = option
     }
 
     fun handleAlarmTime(time: LocalTime) {
+        markEventAsEdited()
         this.tempAlarmTime = time
     }
 
     fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null) {
+        markEventAsEdited()
 
         val duration = if (event.isAllDay()) {
             when (alarmTypeOption) {
@@ -591,6 +619,7 @@ class EventViewModel(
     }
 
     fun handleAlarmDelete(index: Int) {
+        markEventAsEdited()
         event.iCalEvent.alarms.removeAt(index)
         _event.postValue(event)
     }
