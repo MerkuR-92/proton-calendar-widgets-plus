@@ -267,7 +267,36 @@ class EventViewModel(
         this.tempAlarmTime = LocalTime.of(9, 0)
     }
 
-    suspend fun handleSave(): Boolean {
+
+
+    suspend fun handleSave(editOption: EventEditDeleteOption? = null): Boolean { // create or edit
+
+        when (editOption) {
+            EventEditDeleteOption.THIS_EVENT -> {
+                // create new event with:
+                // UID copied from original event
+                // RECURRENCE-ID set to DTSTART of this occurence, so when clicked on 2nd occurence, we take this "phantom start date" of 2nd occurence
+
+                // TODO when expanding, we take all of the events with this UID and discard conflicting ones for displaying on calendar views
+
+            }
+            EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> TODO()
+            EventEditDeleteOption.ALL_EVENTS -> TODO()
+            null -> {
+                // CURRENT EDIT FOR ORIGINAL EVENT EDIT
+            }
+        }
+        
+        // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
+
+
+
+
+        TimberLogger.d("handleSave with editOption: $editOption")
+
+
+
+
 
         val calendarToSave = event.iCalendar
 
@@ -281,6 +310,10 @@ class EventViewModel(
             TimberLogger.d("calendar for part-time after adjusting timezones: " + calendarToSave.printToString())
         }
 
+        if (eventBumpSeqId) {
+            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1)
+        }
+
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
         TimberLogger.d("calendar: ${event.calendar}")
@@ -290,7 +323,7 @@ class EventViewModel(
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
-
+        // TODO run work manager
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
             createEventUseCase.execute(TODOuserID, event.calendar.id, event.copy(iCalendar = calendarToSave))// TODO make sure this is legit
         }
@@ -298,8 +331,6 @@ class EventViewModel(
         return createEventResult.await() == UseCase.Result.Success
 
     }
-
-
 
     fun handleCalendar(calendar: CalendarEntity) {
         markEventAsEdited()
@@ -443,6 +474,8 @@ class EventViewModel(
     fun isEventNew() = !event.isSyncedWithApi()
 
     fun isEventRecurring() = event.isRecurring()
+
+    fun isEventFirstOccurrence() = event.isFirstOccurrence()
 
     fun handleRecurrenceUntilDate(untilLocalDate: LocalDate?) {
         markEventAsEdited(bumpSequenceId = true)

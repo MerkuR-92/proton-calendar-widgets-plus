@@ -8,7 +8,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.ZoneId
 import java.util.*
@@ -80,11 +79,17 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         return calendarsRepository.eventsFlow(calendarId).asLiveData(Dispatchers.Default)
     }
 
-    suspend fun handleDeleteEvent(eventId: String): UseCase.Result {
+
+
+    suspend fun handleDeleteEvent(eventId: String, deleteOption: EventEditDeleteOption): UseCase.Result {
         // TODO ÜBER IMPORTANT -- FIXME, PUT INTO WORKER!!!!!!!
+
+
+        // TODO THIS IS NOT ENOUGH!!! WE NEED TO KNOW WHICH EXPANDED EVENT WE MEAN, eventId will be the same everywhere!!!!!
+
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-                deleteEventUseCase.execute(eventId)
+                deleteEventUseCase.execute(eventId, deleteOption)
             }
         }.await()
     }

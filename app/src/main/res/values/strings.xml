@@ -41,6 +41,7 @@
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
+    <string name="event_text_delete_event">Delete event</string>
     <string name="event_hint_title">Title</string>
     <string name="event_hint_location">Location</string>
     <string name="event_text_switch_all_day">All day</string>
@@ -86,6 +87,10 @@
     <string name="event_recurrence_ends_on_date_empty">On day</string>
     <string name="event_recurrence_ends_on_date">On %s</string>
     <string name="event_recurrence_ends_after_count_prefix">After</string>
+
+    <string name="event_recurring_edit_this">This event</string>
+    <string name="event_recurring_edit_this_and_following">This and the following events</string>
+    <string name="event_recurring_edit_all_events">All events</string>
 
 
 

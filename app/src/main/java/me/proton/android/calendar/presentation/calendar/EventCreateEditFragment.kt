@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.animation.LayoutTransition
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -49,7 +48,36 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
                         if (eventViewModel.isEventRecurring() && eventViewModel.hasEventBeenEdited() && !eventViewModel.isEventNew()) { // edit recurring
 
-                            Toast.makeText(requireContext(), "HANDLE EDIT RECURRING", Toast.LENGTH_SHORT).show()
+                            AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                                getString(R.string.event_recurring_edit_this),
+                                if (!eventViewModel.isEventFirstOccurrence()) getString(R.string.event_recurring_edit_this_and_following) else null,
+                                getString(R.string.event_recurring_edit_all_events)
+                            ).toTypedArray(), -1) {
+
+                                lifecycleScope.launch {
+                                    val success = withContext(Dispatchers.IO) {
+                                        if (it == 0) {
+                                            eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT)
+                                        } else if (it == 1) {
+                                            if (eventViewModel.isEventFirstOccurrence()) {
+                                                eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS)
+                                            } else {
+                                                eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING)
+                                            }
+                                        } else { // it == 2
+                                            eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS)
+                                        }
+                                    }
+
+                                    if (success) { // TODO remove duplicated code here and below
+                                        Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+                                        findNavController().navigateUp()
+                                    } else {
+                                        Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
+                                    }
+
+                                }
+                            }
 
                         } else {
                             val success = withContext(Dispatchers.IO) {
@@ -61,14 +89,14 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                                     Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
                                     findNavController().navigateUp()
                                 } else {
-                                    Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 if (success) {
                                     Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
                                     findNavController().navigateUp()
                                 } else {
-                                    Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
                                 }
                             }
                         }

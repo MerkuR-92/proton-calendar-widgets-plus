@@ -9,8 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import biweekly.Biweekly
-import biweekly.util.Frequency
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -18,7 +16,6 @@ import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import kotlinx.android.synthetic.main.fragment_event_details.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -64,6 +61,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
 
 
+
             // TODO make sure we support full-day events with DTSTART only
 //            val testVCal = """
 //                BEGIN:VCALENDAR
@@ -98,28 +96,62 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 button_delete.setOnClickListener {
 
-//                    text2.visibleOrGone(false)
 
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.dialog_title_delete_event)
-                        .setMessage(event.summary)
-                        .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
-                            lifecycleScope.launch { // TODO
-                                val deleteResult = withContext(Dispatchers.Default) {
-                                    calendarViewModel.handleDeleteEvent(event.id)
+
+                    if (event.isRecurring()) {
+
+                        AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                            getString(R.string.event_recurring_edit_this),
+                            if (!event.isFirstOccurrence()) getString(R.string.event_recurring_edit_this_and_following) else null,
+                            getString(R.string.event_recurring_edit_all_events)
+                        ).toTypedArray(), -1) {
+
+                            lifecycleScope.launch {
+                                val deleteResult = withContext(Dispatchers.IO) {
+                                    if (it == 0) {
+                                        calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT)
+                                    } else if (it == 1) {
+                                        if (event.isFirstOccurrence()) {
+                                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
+                                        } else {
+                                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING)
+                                        }
+                                    } else { // it == 2
+                                        calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
+                                    }
                                 }
+
                                 if (deleteResult == UseCase.Result.Success) {
-                                    Toast.makeText(requireContext(), "Event deleted only from WEB", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(requireContext(), "Event deleted only from WEB", Toast.LENGTH_SHORT).show()
+                                    findNavController().navigateUp()
                                 } else {
                                     Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
                                 }
+
                             }
                         }
-                        .setNegativeButton(R.string.dialog_button_cancel) { dialog, which ->
-                        }
-                        .show()
 
-                    //
+                    } else { // TODO unify showing dialog
+                        MaterialAlertDialogBuilder(context)
+                            .setTitle(R.string.dialog_title_delete_event)
+                            .setMessage(event.summary)
+                            .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
+                                lifecycleScope.launch { // TODO
+                                    val deleteResult = withContext(Dispatchers.Default) {
+                                        calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT)
+                                    }
+                                    if (deleteResult == UseCase.Result.Success) {
+                                        Toast.makeText(requireContext(), "Event deleted only from WEB", Toast.LENGTH_LONG).show()
+                                    } else {
+                                        Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                            .setNegativeButton(R.string.dialog_button_cancel) { dialog, which ->
+                            }
+                            .show()
+                    }
+
                 }
 
                 // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT

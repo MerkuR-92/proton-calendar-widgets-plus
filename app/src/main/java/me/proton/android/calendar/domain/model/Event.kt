@@ -120,6 +120,11 @@ data class Event(
         }
     }
 
+    fun isFirstOccurrence(): Boolean {
+        // TODO is recurring & expanded
+        return true // TODO all events are first occurrence now, opposite to this will be "is expanded"
+    }
+
     fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
 
     fun isCustomRecurring(): Boolean {
