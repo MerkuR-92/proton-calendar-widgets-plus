@@ -9,6 +9,10 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
 //    lateinit var userId: String
 
+//    @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds) AND (sharedEvents LIKE '%' || :sharedEventsFieldSubstring || '%')")
+    @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds) ORDER BY lastEditTime DESC") // TODO order just for testing
+    abstract fun flowEvents(calendarIds: List<String>): Flow<List<EventEntity>>
+
     @Query("SELECT * FROM events WHERE calendarId = :calendarId ORDER BY lastEditTime DESC") // TODO order just for testing
     abstract fun selectEvents(calendarId: String): Flow<List<EventEntity>>
 

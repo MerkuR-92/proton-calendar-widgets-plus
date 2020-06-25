@@ -9,7 +9,10 @@ import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
 import me.proton.android.calendar.domain.usecase.UseCase
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 class CalendarViewModel(private val calendarsRepository: CalendarsRepository, private val deleteEventUseCase: DeleteEventUseCase, private val createEventUseCase: EditCreateEventUseCase, private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
@@ -24,6 +27,10 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
     }
 
     val timeZoneId = ZoneId.of(TimeZone.getDefault().id) // TODO get timezone from settings OR fallback to default
+
+    val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+    //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
+    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
     suspend fun selectCalendars(): List<CalendarEntity> {
 
@@ -75,8 +82,9 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     }
 
-    fun events(calendarId: String) : LiveData<List<Event>> {
-        return calendarsRepository.eventsFlow(calendarId).asLiveData(Dispatchers.Default)
+    fun events(date: LocalDate): LiveData<List<Event>> {
+        val selectedCalendarIds = listOf<String>(calendarId!!) // TODO
+        return calendarsRepository.eventsFlow(selectedCalendarIds, date.atStartOfDay(timeZoneId), date.plusDays(1).atStartOfDay(timeZoneId)).asLiveData(Dispatchers.Default)
     }
 
 

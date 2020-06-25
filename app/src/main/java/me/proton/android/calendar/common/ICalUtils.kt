@@ -220,6 +220,18 @@ fun ZonedDateTime.formatDate(timeZoneId: String): String = this.toLocalDate().fo
 
 fun ZonedDateTime.formatTime(timeZoneId: String): String = this.toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 
+/**
+ * @param excludeTo will exclude exact toDateTime from rightmost range value
+ */
+fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean {
+
+    val thisInstant = this.toInstant()
+    val fromInstant = fromDateTime.toInstant()
+    val toInstant = toDateTime.toInstant()
+
+    return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
+}
+
 fun VEvent.setStart(date: LocalDate) {
     this.setDateStart(date.toDate(), false)
 }

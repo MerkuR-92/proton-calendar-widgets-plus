@@ -8,7 +8,11 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.isBetween
 import timber.log.Timber
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 // TODO better name? move to separate package?
 class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val crypto: Crypto) : CalendarsRepository {
@@ -43,9 +47,30 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.calendarsDao().deleteById(id)
     }
 
-    override fun eventsFlow(calendarId: String): Flow<List<Event>> {
-        return database.eventsDao().selectEvents(calendarId)./*distinctUntilChanged() TODO */map {
-            it.mapNotNull { transformEventUseCase.execute(it) }
+    override fun eventsFlow(calendarIds: List<String>, fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Flow<List<Event>> {
+        TimberLogger.d("eventsFlow: ${fromDateTime} - ${toDateTime}")
+
+//        val sharedEventsFieldSubstring = "DTSTART;VALUE=DATE:${fromDateTime.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE)}"
+
+        return database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().map {
+            it
+                .mapNotNull { transformEventUseCase.execute(it) }
+                .filter {
+                    // TODO optimise and select events that are within correct window
+                    //  not only starttime, but also overlapping
+
+                    // TODO fallback for no DTEND
+
+                    if (it.isRecurring()) {
+                        false
+                    } else {
+
+                        (it.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
+                                || (it.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
+                                || ((it.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && it.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
+
+                    }
+                }
         }
     }
 

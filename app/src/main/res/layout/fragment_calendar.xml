@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".presentation.calendar.CalendarFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:overScrollMode="never" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

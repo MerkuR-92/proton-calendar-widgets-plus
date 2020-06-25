@@ -57,10 +57,6 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     private val isAllDay by lazy { eventViewModel.eventLiveData.value!!.isAllDay() }
 
-    private fun onAlarmCountChanged(count: Int) {
-        TimberLogger.d("count=$count")
-    }
-
     /**
      * Applies correct pluralisation to dropdown items.
      */

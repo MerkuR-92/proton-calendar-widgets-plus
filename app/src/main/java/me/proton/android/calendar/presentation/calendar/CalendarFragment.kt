@@ -1,28 +1,25 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import kotlinx.android.synthetic.main.fragment_calendar.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import org.koin.android.ext.android.inject
+import java.time.LocalDate
 
 class CalendarFragment : Fragment() {
 
@@ -58,51 +55,51 @@ private val valueStoreProvider: ValueStoreProvider by inject()
         return inflater.inflate(R.layout.fragment_calendar, container, false)
     }
 
+    private inner class CalendarAgendaAdapter(activity: FragmentActivity, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
+
+        val startingPosition = itemCount / 2
+
+        override fun getItemCount(): Int {
+            return Int.MAX_VALUE
+        }
+
+        override fun createFragment(position: Int): Fragment {
+            return ItemCalendarAgendaFragment(calendarViewModel, position, startingDate.plusDays((position - startingPosition).toLong())) // TODO .getInstance(DATE RANGE) or refresh current fragment?
+        }
+
+    }
+
+    var pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            TimberLogger.d("page selected: $position")
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        pager.unregisterOnPageChangeCallback(pageChangeCallback)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO
-        // if needs login, navController.navigate(LOGIN/REGISTRATION)
+
+        pager.apply{
+            val agendaAdapter = CalendarAgendaAdapter(requireActivity(), LocalDate.now())
+            adapter = agendaAdapter
+            offscreenPageLimit = 1 // TODO
+            setCurrentItem(agendaAdapter.startingPosition, false)
+        }
+
+        pager.registerOnPageChangeCallback(pageChangeCallback)
 
 
 
 
-//        view.findViewById<View>(R.id.button_home).setOnClickListener {
-            GlobalScope.launch {
-
-                //loginUserUseCase.execute("adamtst", "123".toByteArray())
-                //bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
-
-//                fetchEventsUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==",
-//                    "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==")
-            }
-//
-////            val action = HomeFragmentDirections
-////                    .actionHomeFragmentToHomeSecondFragment("From HomeFragment")
-////            NavHostFragment.findNavController(this@HomeFragment)
-////                    .navigate(action)
-//
-//
-//        }
 
 
 
-//        view.findViewById<View>(R.id.button_login).setOnClickListener {
-//
-//            GlobalScope.launch {
-//
-//                loginUserUseCase.execute("adamtst", "123".toByteArray())
-//                bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
-//
-//
-//
-//            }
-//
-//        }
-
-
-
-        recyclerView.apply {
+        /*recyclerView.apply {
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@CalendarFragment.context)
             adapter = EventAdapter {
@@ -132,7 +129,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 //
 //        view.findViewById<Button>(R.id.button_home_second).setOnClickListener {
 //            findNavController().navigate(R.id.action_HomeSecondFragment_to_HomeFragment)
-        }
+        }*/
 
 //        viewModel = ViewModelProvider(this, CalendarViewModel.ViewModelFactory(// TODO fix this!!!!
 //            FakeCalendarRepositoryRepository(activity?.applicationContext!!), activity?.application!!)).get(CalendarViewModel::class.java)
@@ -146,24 +143,24 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 
     }
 
-    override fun onResume() {
-        super.onResume()
-
-
-        try {
-            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
-
-            TimberLogger.d("binding live data for events from calendar $calendarId")
-            calendarViewModel.events(calendarId!!).observe(viewLifecycleOwner, Observer {
-                (recyclerView.adapter as? EventAdapter)?.submitList(it)
-            })
-
-        } catch (e: Exception) {}
-
-
-    }
+//    override fun onResume() {
+//        super.onResume()
+//
+//
+//        try {
+//            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+////            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
+//            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
+//
+//            TimberLogger.d("binding live data for events from calendar $calendarId")
+//            calendarViewModel.events(startingDate, ).observe(viewLifecycleOwner, Observer {
+//                (recyclerView.adapter as? EventAdapter)?.submitList(it)
+//            })
+//
+//        } catch (e: Exception) {}
+//
+//
+//    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

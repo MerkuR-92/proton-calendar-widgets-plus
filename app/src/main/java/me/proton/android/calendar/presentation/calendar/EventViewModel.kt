@@ -286,7 +286,7 @@ class EventViewModel(
                 // CURRENT EDIT FOR ORIGINAL EVENT EDIT
             }
         }
-        
+
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
 

@@ -59,7 +59,17 @@ data class Event(
 
 
     fun getStart(timeZoneId: String): ZonedDateTime? {
-        return if (iCalEvent.dateStart?.value != null) ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null
+
+        if (iCalEvent.dateStart?.value == null) return null // TODO
+
+        return if (iCalEvent.dateStart.value.hasTime()) {
+            ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+        } else {
+            ZonedDateTime.of(iCalEvent.dateStart.value.rawComponents.year, iCalEvent.dateStart.value.rawComponents.month, iCalEvent.dateStart.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
+        }
+
+
+//        return if (iCalEvent.dateStart.value != null) ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null
     }
 
     fun getEnd(timeZoneId: String): ZonedDateTime? {

@@ -3,6 +3,8 @@ package me.proton.android.calendar.domain
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
 /**
  * Manages all Calendars, Events, Members, Passphrases etc.
@@ -25,7 +27,7 @@ interface CalendarsRepository {
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
     // events
-    fun eventsFlow(calendarId: String): Flow<List<Event>>
+    fun eventsFlow(calendarIds: List<String>, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Flow<List<Event>>
 
     fun event(eventId: String): Flow<Event?> // TODO separate Flow<> from normal DB queries?
 
