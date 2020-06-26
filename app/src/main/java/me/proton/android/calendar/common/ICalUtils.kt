@@ -327,9 +327,28 @@ fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
 //}
 
 fun VEvent.getStart(timeZoneId: String? = "UTC"): ZonedDateTime? {
-    return if (this.dateStart?.value != null) ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null
+
+    if (this.dateStart?.value == null) return null // TODO
+
+    return if (this.dateStart.value.hasTime()) {
+        ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+    } else {
+        ZonedDateTime.of(this.dateStart.value.rawComponents.year, this.dateStart.value.rawComponents.month, this.dateStart.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
+    }
+
+    //return if (this.dateStart?.value != null) ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null
 }
 
 fun VEvent.getEnd(timeZoneId: String? = "UTC"): ZonedDateTime? {
-    return if (this.dateEnd?.value != null) ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)) else null
+    if (this.dateEnd?.value == null) return null // TODO
+
+    return if (this.dateEnd.value.hasTime()) {
+        ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+    } else {
+        ZonedDateTime.of(this.dateEnd.value.rawComponents.year, this.dateEnd.value.rawComponents.month, this.dateEnd.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
+    }
+
+
+
+    //return if (this.dateEnd?.value != null) ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)) else null
 }

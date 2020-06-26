@@ -3,17 +3,14 @@ package me.proton.android.calendar.domain.model
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.property.DateOrDateTimeProperty
-import biweekly.util.Frequency
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.OFFLINE_EVENT_ID_PREFIX
-import java.security.Signature
-import java.text.DateFormat
+import me.proton.android.calendar.common.*
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.*
 
 data class Event(
     override val id: String, // ID from API and local database
@@ -59,21 +56,26 @@ data class Event(
 
 
     fun getStart(timeZoneId: String): ZonedDateTime? {
-
-        if (iCalEvent.dateStart?.value == null) return null // TODO
-
-        return if (iCalEvent.dateStart.value.hasTime()) {
-            ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-        } else {
-            ZonedDateTime.of(iCalEvent.dateStart.value.rawComponents.year, iCalEvent.dateStart.value.rawComponents.month, iCalEvent.dateStart.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
-        }
-
-
-//        return if (iCalEvent.dateStart.value != null) ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null
+        return iCalEvent.getStart(timeZoneId)
+//        if (iCalEvent.dateStart?.value == null) return null // TODO
+//
+//        return if (iCalEvent.dateStart.value.hasTime()) {
+//            ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+//        } else {
+//            ZonedDateTime.of(iCalEvent.dateStart.value.rawComponents.year, iCalEvent.dateStart.value.rawComponents.month, iCalEvent.dateStart.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
+//        }
     }
 
     fun getEnd(timeZoneId: String): ZonedDateTime? {
-        return if (iCalEvent.dateEnd?.value != null) ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)) else null
+        return iCalEvent.getEnd(timeZoneId)
+
+        /*if (iCalEvent.dateEnd?.value == null) return null // TODO
+
+        return if (iCalEvent.dateEnd.value.hasTime()) {
+            ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+        } else {
+            ZonedDateTime.of(iCalEvent.dateEnd.value.rawComponents.year, iCalEvent.dateEnd.value.rawComponents.month, iCalEvent.dateEnd.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
+        }*/
     }
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
@@ -128,6 +130,77 @@ data class Event(
         } else {
             dateStart == dateEnd
         }
+    }
+
+    // TODO isEndless?
+    data class Occurrence(val startDateTime: ZonedDateTime, val endDateTime: ZonedDateTime, val occurrenceNumber: Int)
+
+    fun occurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+
+        if (!isRecurring()) return null
+
+        val occurences = mutableListOf<Occurrence>()
+
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+
+        val startIterator = iCalEvent.recurrenceRule.getDateIterator(Date.from(getStart(timeZoneId)?.toInstant()), TimeZone.getTimeZone(timeZoneId))
+        val endIterator = iCalEvent.recurrenceRule.getDateIterator(Date.from(getEnd(timeZoneId)?.toInstant()), TimeZone.getTimeZone(timeZoneId))
+
+        TestsLogger.d("checking occurence between $fromDateTime - $toDateTime")
+
+        var occurrenceNumber = 0
+        while (startIterator.hasNext()) {
+
+            // TODO handle cases without DTEND
+
+            occurrenceNumber++
+
+            val occurrenceStart = ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId))
+            val occurrenceEnd = ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.of(timeZoneId))
+
+
+            if (occurrenceEnd.isBefore(fromDateTime)) continue
+
+            if (occurrenceStart.isAfter(toDateTime)) break
+
+            TestsLogger.d("occurrence after filter: ${occurrenceStart} - $occurrenceEnd")
+
+            if (occurrenceStart.isBetween(fromDateTime, toDateTime, false, true)) {
+                occurences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
+                TestsLogger.d("occurrence passed: ${occurrenceStart} - $occurrenceEnd")
+            }
+
+        }
+
+
+
+        return occurences
+    }
+
+//    fun overlapsRecurringWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): RecurrenceInfo? {
+//
+//
+//
+//        val overlaps = overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+//
+//        return
+//    }
+
+    fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
+
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+
+        return (iCalEvent.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
+                || (iCalEvent.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
+                || ((iCalEvent.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && iCalEvent.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
+    }
+
+    fun overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean {
+                return (iCalEvent.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // starts in the range
+                || (iCalEvent.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // ends in the range
+                || ((iCalEvent.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && iCalEvent.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
     }
 
     fun isFirstOccurrence(): Boolean {

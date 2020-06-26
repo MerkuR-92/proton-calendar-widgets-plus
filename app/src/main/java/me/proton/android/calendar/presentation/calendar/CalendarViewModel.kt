@@ -84,7 +84,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     fun events(date: LocalDate): LiveData<List<Event>> {
         val selectedCalendarIds = listOf<String>(calendarId!!) // TODO
-        return calendarsRepository.eventsFlow(selectedCalendarIds, date.atStartOfDay(timeZoneId), date.plusDays(1).atStartOfDay(timeZoneId)).asLiveData(Dispatchers.Default)
+        return calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
     }
 
 

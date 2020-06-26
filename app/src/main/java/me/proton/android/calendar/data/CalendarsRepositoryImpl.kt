@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.isBetween
 import timber.log.Timber
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 // TODO better name? move to separate package?
 class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val crypto: Crypto) : CalendarsRepository {
@@ -47,8 +49,8 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.calendarsDao().deleteById(id)
     }
 
-    override fun eventsFlow(calendarIds: List<String>, fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Flow<List<Event>> {
-        TimberLogger.d("eventsFlow: ${fromDateTime} - ${toDateTime}")
+    override fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>> {
+        TimberLogger.d("eventsFlow: ${fromDate} - ${toDate}")
 
 //        val sharedEventsFieldSubstring = "DTSTART;VALUE=DATE:${fromDateTime.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE)}"
 
@@ -62,13 +64,14 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     // TODO fallback for no DTEND
 
                     if (it.isRecurring()) {
-                        false
+
+                        val occurrences = it.occurrencesInFullDayRange(fromDate, toDate, timeZoneId)
+                        if (occurrences != null && occurrences.size > 0) {
+                            // TODO we have metadata in Occurrence, use it
+                            true
+                        } else false
                     } else {
-
-                        (it.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
-                                || (it.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
-                                || ((it.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && it.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
-
+                        it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
                     }
                 }
         }
