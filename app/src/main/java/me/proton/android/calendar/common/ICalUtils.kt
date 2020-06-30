@@ -42,6 +42,38 @@ object ICalUtils {
     }
 
     /**
+     * @return true if Event is valid
+     */
+    fun VEvent.sanitise(): Boolean {
+
+        if (this.dateStart == null) return false
+
+        // add DTEND
+        if (this.dateEnd == null) {
+            if (this.dateStart.value.hasTime()) {
+                this.setDateEnd(this.dateStart.value)
+            } else {
+
+                TestsLogger.d("start: ${this.getStart()}")
+
+//                val endLocalDate = LocalDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of("UTC")).toLocalDate()
+                val endLocalDate = this.getStart()!!.toLocalDate().plusDays(1)
+                this.setDateEnd(endLocalDate.toDate(), false)
+            }
+            /* else {
+                val dateEnd = LocalDate.of(
+                    this.dateStart.value.rawComponents.year,
+                    this.dateStart.value.rawComponents.month,
+                    this.dateStart.value.rawComponents.date
+                ).plusDays(1)
+                this.setEnd(dateEnd)
+            }*/
+        }
+
+        return true
+    }
+
+    /**
      * Takes one iCalendar object and splits it according to "the matrix".
      */
     fun splitICalendarIntoParts(iCalendar: ICalendar): CalendarSplit {
@@ -210,7 +242,7 @@ fun VEvent.wrapInICalendar(): ICalendar {
 
 fun ICalendar.printToString() : String = Biweekly.write(this).go()
 
-fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: "UTC")).toInstant())
+fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
 
 fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
     return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
@@ -305,50 +337,21 @@ fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
     }
 }
 
-///**
-// * Standardises iCal Event.
-// */
-//fun ICalendar.adjustIncomingEvent() {
-//    this.events.first().apply {
-//
-//        if (this.dateEnd == null) {
-//            if (this.dateStart.value.hasTime()) { // partial-day event
-//                this.setDateEnd(this.dateStart.value)
-//            } else { // all-day event
-//
-//            }
-//        }
-//
-//        // if there is no end date, it's a valid all-day event
-//        if (this.dateEnd == null) {
-////            this.setDateEnd(this.dateStart.value) TODO +1 day midnight
-//        }
-//    }
-//}
-
-fun VEvent.getStart(timeZoneId: String? = "UTC"): ZonedDateTime? {
+fun VEvent.getStart(timeZoneId: String? = null): ZonedDateTime? {
 
     if (this.dateStart?.value == null) return null // TODO
 
-    return if (this.dateStart.value.hasTime()) {
-        ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-    } else {
-        ZonedDateTime.of(this.dateStart.value.rawComponents.year, this.dateStart.value.rawComponents.month, this.dateStart.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
-    }
-
-    //return if (this.dateStart?.value != null) ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)) else null
+    return ZonedDateTime.ofInstant(
+        this.dateStart.value.toInstant(),
+        if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
+    )
 }
 
-fun VEvent.getEnd(timeZoneId: String? = "UTC"): ZonedDateTime? {
+fun VEvent.getEnd(timeZoneId: String? = null): ZonedDateTime? {
     if (this.dateEnd?.value == null) return null // TODO
 
-    return if (this.dateEnd.value.hasTime()) {
-        ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
-    } else {
-        ZonedDateTime.of(this.dateEnd.value.rawComponents.year, this.dateEnd.value.rawComponents.month, this.dateEnd.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
-    }
-
-
-
-    //return if (this.dateEnd?.value != null) ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)) else null
+    return ZonedDateTime.ofInstant(
+        this.dateEnd.value.toInstant(),
+        if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
+    )
 }

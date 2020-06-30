@@ -44,7 +44,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                         timeZoneId,
                         type,
                         page++,
-                        1
+                        100
                     )
 
                     val result = if (eventsResponse is ApiResponse.Success) {

@@ -2,6 +2,7 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.*
+import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
 import java.time.*
@@ -160,7 +161,7 @@ internal class ICalUtilsTest {
 
         val iCal = ICalUtils.parseICalString(iCalString)!!
         val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
-        val displayTimeZoneId = "Europe/Vilnius"
+        val displayTimeZoneId = "Europe/Zurich"
 
         assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 25),
@@ -212,7 +213,7 @@ internal class ICalUtilsTest {
 
         val iCal = ICalUtils.parseICalString(iCalString)!!
         val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
-        val displayTimeZoneId = "Europe/Vilnius"
+        val displayTimeZoneId = "Europe/Zurich"
 
         assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 25),
@@ -441,6 +442,37 @@ internal class ICalUtilsTest {
 
         assertThat(occurrences!!.size).isEqualTo(1)
         assertThat(occurrences.first().occurrenceNumber).isEqualTo(6)
+
+    }
+
+    @Test
+    fun `correctly sanitise partial-day Event without DTEND`() {
+
+        val event = ICalUtils.createNewEvent()
+        event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Zurich")
+
+        assertThat(event.sanitise()).isTrue()
+
+        assertThat(event.dateStart.value.hasTime()).isTrue()
+        assertThat(event.dateEnd.value.hasTime()).isTrue()
+
+        assertThat(event.getEnd()!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 20))
+        assertThat(event.getEnd()!!.toLocalTime()).isEqualTo(LocalTime.of(10, 0))
+
+    }
+
+    @Test
+    fun `correctly sanitise all-day Event without DTEND`() {
+
+        val event = ICalUtils.createNewEvent()
+        event.setStart(LocalDate.of(2020, 1, 20))
+
+        assertThat(event.sanitise()).isTrue()
+
+        assertThat(event.dateStart.value).isNotNull()
+        assertThat(event.dateEnd.value).isNotNull()
+
+        assertThat(event.getEnd()!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 21))
 
     }
 

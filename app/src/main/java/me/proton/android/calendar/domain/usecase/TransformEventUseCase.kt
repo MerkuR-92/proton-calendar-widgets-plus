@@ -1,14 +1,15 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.setDefaultTimeZone
+import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import java.time.LocalDate
+import java.util.*
 
 
 class TransformEventUseCase(
@@ -139,7 +140,10 @@ class TransformEventUseCase(
 
         val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)
 
-        if (iCalendar == null || iCalendar.events.isEmpty()) return null
+        if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) return null
+
+        // TODO move sanitising to helper function?
+
 
 //        iCalendar.events.first().let {
 //

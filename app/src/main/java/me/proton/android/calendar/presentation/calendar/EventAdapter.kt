@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
+import java.time.ZoneId
 
 class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use entire item click listener from RV*/) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
@@ -18,7 +19,10 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
 
         // TODO consider databinding
         fun bind(item: Event, clickListener: (Event) -> Unit) {
-            textView.setText(item.summary) // TODO
+
+            val time = if (item.isAllDay()) "(all-day)" else "${item.formatStart(ZoneId.systemDefault().id)} - ${item.formatEnd(ZoneId.systemDefault().id)}"
+
+            textView.setText(time + "\n" + item.summary) // TODO
             textView.setOnClickListener { clickListener(item) }
         }
     }
