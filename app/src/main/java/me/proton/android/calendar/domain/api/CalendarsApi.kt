@@ -17,7 +17,8 @@ interface CalendarsApi {
         calendarId: String,
         startTimestamp: Long,
         endTimestamp: Long,
-        timezone: String
+        timezone: String,
+        type: Int
     ): ApiResponse<EventsApiResponse>
 
     /**

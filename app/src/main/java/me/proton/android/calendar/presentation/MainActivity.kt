@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.time.LocalDate
@@ -211,15 +212,25 @@ class MainActivity : AppCompatActivity() {
                     //loginUserUseCase.execute("adamtst", "123".toByteArray())
                     //bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
-                    val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-                    if (valueStore.getString("USERID") != null && valueStore.getString("DEFAULT CALENDAR ID") != null) {
-                        fetchEventsUseCase.execute(valueStore.getString("USERID")!!, valueStore.getString("DEFAULT CALENDAR ID")!!)
+                    val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
+                    val result = if (valueStore.getString("USERID") != null && valueStore.getString("DEFAULT CALENDAR ID") != null) {
+                        fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
+                            //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
+                            valueStore.getString("DEFAULT CALENDAR ID")!!
+                        ), LocalDate.now().minusDays(7), LocalDate.now().plusDays(7), "Europe/Zurich")
                     } else {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(applicationContext, "Please login again", Toast.LENGTH_LONG).show()
                         }
                     }
 
+                    withContext(Dispatchers.Main) {
+                        if (result == UseCase.Result.Success) {
+                            Toast.makeText(applicationContext, "events fetched", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(applicationContext, "error fetching events", Toast.LENGTH_LONG).show()
+                        }
+                    }
 
                 }
 
