@@ -24,8 +24,8 @@ interface CalendarsApiService {
         @Query("End") endTimestamp: Long,
         @Query("Timezone") timezone: String,
         @Query("Type") type: Int,
-        @Query("Page") page: Int = 0, // TODO handle pagination
-        @Query("PageSize") pageSize: Int = 100
+        @Query("Page") page: Int,
+        @Query("PageSize") pageSize: Int
     ): Response<EventsApiResponse>
 
 
@@ -53,13 +53,17 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
         startTimestamp: Long,
         endTimestamp: Long,
         timezone: String,
-        type: Int
+        type: Int,
+        page: Int,
+        pageSize: Int
     ): ApiResponse<EventsApiResponse> = safeApiCall { service.getEvents(/*RetrofitTag(userId), */
         calendarId,
         startTimestamp,
         endTimestamp,
         timezone,
-        type
+        type,
+        page,
+        pageSize
     ) }
 
     override suspend fun getBootstrap(calendarId: String): ApiResponse<BootstrapApiResponse> = safeApiCall { service.getBootstrap(calendarId) }
@@ -80,7 +84,8 @@ data class CalendarsApiResponse(
 
 data class EventsApiResponse(
     override val code: Int,
-    val events: List<EventEntity>
+    val events: List<EventEntity>,
+    val more: Int
 ) : BaseApiResponse()
 
 //"MemberID": "{{Calendar.MemberID}}",

@@ -1,7 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
-import kotlinx.coroutines.withContext
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
@@ -33,40 +33,50 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
             for (type in 0..3) { // we need to fire off 4 requests with different types
 
-                val eventsResponse = calendarsApi.getEvents(/*userId,*/
-                    calendarId,
-                    fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
-                    toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
-                    timeZoneId,
-                    type)
+                var page = 0
 
-                val result = if (eventsResponse is ApiResponse.Success) {
+                do {
 
-                    calendarsRepository.persistEvents(*eventsResponse.data.events.toTypedArray())
+                    val eventsResponse = calendarsApi.getEvents(/*userId,*/
+                        calendarId,
+                        fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
+                        toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
+                        timeZoneId,
+                        type,
+                        page++,
+                        1
+                    )
 
-                    logger.v("persisted ${eventsResponse.data.events.size} events for calendar ${calendarId}")
+                    val result = if (eventsResponse is ApiResponse.Success) {
 
-                    // TODO collect all emails and move this to worker
-                    try {
-                        val emails = eventsResponse.data.events.flatMap {
-                            it.sharedEvents.map { it.asJsonObject.get("Author").asString } +
-                                    it.calendarEvents.map { it.asJsonObject.get("Author").asString } +
-                                    it.personalEvents.map { it.asJsonObject.get("Author").asString }
+                        TimberLogger.e("more: ${eventsResponse.data.more}")
+
+                        calendarsRepository.persistEvents(*eventsResponse.data.events.toTypedArray())
+
+                        logger.v("persisted ${eventsResponse.data.events.size} events for calendar ${calendarId}")
+
+                        // TODO collect all emails and move this to worker
+                        try {
+                            val emails = eventsResponse.data.events.flatMap {
+                                it.sharedEvents.map { it.asJsonObject.get("Author").asString } +
+                                        it.calendarEvents.map { it.asJsonObject.get("Author").asString } +
+                                        it.personalEvents.map { it.asJsonObject.get("Author").asString }
+                            }
+                            emails.distinct().forEach {
+                                fetchPublicKeysUseCase.execute(it)
+                            }
+                        } catch (e: IllegalStateException) {
+                            logger.e("error getting event's author from JSON")
                         }
-                        emails.distinct().forEach {
-                            fetchPublicKeysUseCase.execute(it)
-                        }
-                    } catch (e: IllegalStateException) {
-                        logger.e("error getting event's author from JSON")
+
+                        UseCase.Result.Success
+                    } else {
+                        UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
                     }
 
-                    UseCase.Result.Success
-                } else {
-                    UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
-                }
+                    results.add(result)
 
-
-                results.add(result)
+                } while (eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
 
             }
 
