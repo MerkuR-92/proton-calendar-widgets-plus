@@ -134,6 +134,10 @@ data class SyncEventUpdateContainer(
     val event: SyncEvent
 ) : SyncEventContainer
 
+data class SyncEventDeleteContainer(
+    val id: String
+) : SyncEventContainer
+
 data class SyncEvent(
     val permissions: Int,
     val calendarKeyPacket: String?,
@@ -141,10 +145,6 @@ data class SyncEvent(
     val sharedKeyPacket: String?,
     val sharedEventContent: List<Event.SharedEvent>,
     val personalEventContent: Event.PersonalEvent?
-)
-
-data class SyncEventDeleteContainer(
-    val id: String
 )
 
 data class BootstrapApiResponse(

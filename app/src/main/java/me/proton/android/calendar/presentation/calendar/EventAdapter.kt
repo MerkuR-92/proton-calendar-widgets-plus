@@ -22,7 +22,7 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
 
             val time = if (item.isAllDay()) "(all-day)" else "${item.formatStart(ZoneId.systemDefault().id)} - ${item.formatEnd(ZoneId.systemDefault().id)}"
 
-            textView.setText(time + "\n" + item.summary) // TODO
+            textView.setText(time + (if (item.occurence != null) " (occurrence: ${item.occurence?.occurrenceNumber})" else "") + "\n" + item.summary) // TODO
             textView.setOnClickListener { clickListener(item) }
         }
     }

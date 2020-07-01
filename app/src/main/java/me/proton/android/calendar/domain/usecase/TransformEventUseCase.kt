@@ -39,7 +39,7 @@ class TransformEventUseCase(
         }
 
         sharedEvents.forEach {
-            logger.v("shared event ${it}")
+            //logger.v("shared event ${it}")
 
             val decryptedText = if (it.isEncrypted) {
                 val cipherText = Ciphertext.from(eventEntity.sharedKeyPacket, it.data)
@@ -67,9 +67,9 @@ class TransformEventUseCase(
             calendarParts.add(decryptedText ?: it.data)
 
             if (decryptedText != null) {
-                logger.v("decrypted shared event: " + decryptedText)
+                //logger.v("decrypted shared event: " + decryptedText)
             } else {
-                logger.v("not-decrypted shared event: " + it.data)
+                //logger.v("not-decrypted shared event: " + it.data)
             }
 
         }
@@ -106,9 +106,9 @@ class TransformEventUseCase(
             calendarParts.add(decryptedText ?: it.data)
 
             if (decryptedText != null) {
-                logger.v("decrypted calendar event: " + decryptedText)
+                //logger.v("decrypted calendar event: " + decryptedText)
             } else {
-                logger.v("not-decrypted calendar event: " + it.data)
+                //logger.v("not-decrypted calendar event: " + it.data)
             }
 
         }
@@ -129,8 +129,8 @@ class TransformEventUseCase(
                 } else {
                     verificationStatuses.add(Event.SignatureVerification.FAILURE)
                 }
-                logger.v("signature ok for personal event: " + signatureOk)
-                logger.v("not-decrypted personal event: " + it.data)
+                //logger.v("signature ok for personal event: " + signatureOk)
+                //logger.v("not-decrypted personal event: " + it.data)
             }
 
             calendarParts.add(it.data)

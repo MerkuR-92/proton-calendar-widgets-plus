@@ -166,8 +166,8 @@ object ICalUtils {
      */
     private fun mergeICalendars(left: ICalendar, right: ICalendar) : ICalendar {
 
-        TimberLogger.v("merging left: ${left.printToString()}")
-        TimberLogger.v("merging right: ${right.printToString()}")
+//        TimberLogger.v("merging left: ${left.printToString()}")
+//        TimberLogger.v("merging right: ${right.printToString()}")
 
         // copy components and properties from the only event there is
         right.events.first().components.forEach {

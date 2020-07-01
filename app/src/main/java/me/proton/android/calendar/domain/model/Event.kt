@@ -19,6 +19,8 @@ data class Event(
     val verificationStatus: SignatureVerification? = null
 ) : BaseModel() {
 
+    var occurence: Occurrence? = null
+
     val iCalEvent: VEvent get() = iCalendar.events.first()
 
     val uid: String get() = iCalEvent.uid.value
@@ -34,7 +36,6 @@ data class Event(
 
 
 
-
 //    val startTimeZoneId: String? get() = iCalendar.timezoneInfo?.getTimezone(iCalEvent.dateStart)?.timeZone?.id
 //    val startTimeZoneId: String? get() = iCalendar.timezoneInfo?.getTimezone(iCalEvent.dateStart)?.timeZone?.id
 
@@ -42,6 +43,7 @@ data class Event(
     val startLocalDate: LocalDate? get() = Instant.ofEpochMilli(iCalEvent.dateStart?.value?.getTime()!!)
         .atZone(ZoneId.systemDefault())
         .toLocalDate() //LocalDate.from(iCalEvent.dateStart?.value?.toInstant())
+    // TODO TRY TO REMOVE THIS
     val endLocalDate: LocalDate? get() = Instant.ofEpochMilli(iCalEvent.dateEnd?.value?.getTime()!!)
         .atZone(ZoneId.systemDefault())
         .toLocalDate()
@@ -57,25 +59,10 @@ data class Event(
 
     fun getStart(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getStart(timeZoneId)
-//        if (iCalEvent.dateStart?.value == null) return null // TODO
-//
-//        return if (iCalEvent.dateStart.value.hasTime()) {
-//            ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-//        } else {
-//            ZonedDateTime.of(iCalEvent.dateStart.value.rawComponents.year, iCalEvent.dateStart.value.rawComponents.month, iCalEvent.dateStart.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
-//        }
     }
 
     fun getEnd(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getEnd(timeZoneId)
-
-        /*if (iCalEvent.dateEnd?.value == null) return null // TODO
-
-        return if (iCalEvent.dateEnd.value.hasTime()) {
-            ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
-        } else {
-            ZonedDateTime.of(iCalEvent.dateEnd.value.rawComponents.year, iCalEvent.dateEnd.value.rawComponents.month, iCalEvent.dateEnd.value.rawComponents.date, 0, 0, 0, 0, ZoneId.of(timeZoneId))
-        }*/
     }
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
@@ -116,10 +103,8 @@ data class Event(
 
     fun spansSingleDay(): Boolean {
 
-        // DateStart and DateEnd are normalized to UTC so we can easily determine if they happen on the same day or not
-
-        val dateStart = if (iCalEvent.dateStart == null) null else LocalDate.of(iCalEvent.dateStart.value.rawComponents.year, iCalEvent.dateStart.value.rawComponents.month, iCalEvent.dateStart.value.rawComponents.date)
-        val dateEnd = if (iCalEvent.dateEnd == null) null else LocalDate.of(iCalEvent.dateEnd.value.rawComponents.year, iCalEvent.dateEnd.value.rawComponents.month, iCalEvent.dateEnd.value.rawComponents.date)
+        val dateStart = this.getStart("UTC")?.toLocalDate()
+        val dateEnd = this.getEnd("UTC")?.toLocalDate()
 
         if (dateStart == null) {
             return false
@@ -147,8 +132,6 @@ data class Event(
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(Date.from(getStart(timeZoneId)?.toInstant()), TimeZone.getTimeZone(timeZoneId))
         val endIterator = iCalEvent.recurrenceRule.getDateIterator(Date.from(getEnd(timeZoneId)?.toInstant()), TimeZone.getTimeZone(timeZoneId))
 
-        TestsLogger.d("checking occurence between $fromDateTime - $toDateTime")
-
         var occurrenceNumber = 0
         while (startIterator.hasNext()) {
 
@@ -164,11 +147,8 @@ data class Event(
 
             if (occurrenceStart.isAfter(toDateTime)) break
 
-            TestsLogger.d("occurrence after filter: ${occurrenceStart} - $occurrenceEnd")
-
             if (occurrenceStart.isBetween(fromDateTime, toDateTime, false, true)) {
                 occurences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
-                TestsLogger.d("occurrence passed: ${occurrenceStart} - $occurrenceEnd")
             }
 
         }

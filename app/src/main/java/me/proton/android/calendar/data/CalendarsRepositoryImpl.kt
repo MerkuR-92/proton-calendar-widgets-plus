@@ -68,6 +68,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                         val occurrences = it.occurrencesInFullDayRange(fromDate, toDate, timeZoneId)
                         if (occurrences != null && occurrences.size > 0) {
                             // TODO we have metadata in Occurrence, use it
+                            it.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
                             true
                         } else false
                     } else {

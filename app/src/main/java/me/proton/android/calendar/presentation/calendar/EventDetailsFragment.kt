@@ -55,38 +55,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.observeEvent(
             navigationArguments.eventId
         ).observe(viewLifecycleOwner, Observer {
+
+
+
             TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $it")
-            TimberLogger.d("${it!!.iCalendar.printToString()}")
+            TimberLogger.d("${it?.iCalendar?.printToString()}")
 
-
-
-
-
-            // TODO make sure we support full-day events with DTSTART only
-//            val testVCal = """
-//                BEGIN:VCALENDAR
-//                PRODID:-//Proton Technologies//ProtonCalendar Beta//EN
-//                VERSION:2.0
-//                BEGIN:VEVENT
-//                DTSTAMP:20190719T130854Z
-//                CREATED:20200505T173304Z
-//                LAST-MODIFIED:20200505T173304Z
-//                UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
-//                DTSTART;VALUE=DATE:20200506
-//                SEQUENCE:0
-//                STATUS:CONFIRMED
-//                SUMMARY:API deploy
-//                END:VEVENT
-//                END:VCALENDAR
-//            """.trimIndent()
-
-
-//            val parsed= ICalUtils.parseICalString(it!!.iCalendar)
-
-
-            // LocalDate date = LocalDate.of(2000, Month.NOVEMBER, 20);
-            //LocalDate nextWed = date.with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
-            // DayOfWeek dotw = LocalDate.of(2012, Month.JULY, 9).getDayOfWeek()
 
             // TODO EXTRACT DATE FORMATTING TO UTILS
 
@@ -122,7 +96,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 }
 
                                 if (deleteResult == UseCase.Result.Success) {
-                                    Toast.makeText(requireContext(), "Event deleted only from WEB", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_SHORT).show()
                                     findNavController().navigateUp()
                                 } else {
                                     Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
@@ -141,7 +115,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT)
                                     }
                                     if (deleteResult == UseCase.Result.Success) {
-                                        Toast.makeText(requireContext(), "Event deleted only from WEB", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_LONG).show()
+                                        findNavController().navigateUp()
                                     } else {
                                         Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
                                     }
@@ -167,10 +142,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                     if (event.spansSingleDay()) {
 
-                        val formattedDate = DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
+                        val formattedDate = event.formatStart(calendarViewModel.timeZoneId.id)// DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
 
                         if (event.isAllDay()) { // ignoring timezones
-                            text_event_date.text = formattedDate
+                            text_event_date.text = formattedDate.first
                         } else {
 
                              val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
@@ -184,7 +159,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     } else {
 
                         if (event.isAllDay()) { // ignoring timezones
-                            val startDate = DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
+                            val startDate = event.formatStart(calendarViewModel.timeZoneId.id) //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
                             // TODO maybe extract this to Event
 
                             val endDateMinus1Day = ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), calendarViewModel.timeZoneId).minusDays(1)
