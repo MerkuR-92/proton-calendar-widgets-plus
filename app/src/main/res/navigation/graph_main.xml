@@ -57,10 +57,14 @@
         <deepLink
             android:id="@+id/deepLink"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/details?eventId={eventId}" />
+            app:uri="proton-calendar://protonmail.com/event/details?eventId={eventId}&amp;occurrenceNumber={occurrenceNumber}" />
         <argument
             android:name="eventId"
             app:argType="string" />
+        <argument
+            android:name="occurrenceNumber"
+            app:argType="integer"
+            android:defaultValue="0" />
     </dialog>
 
     <dialog

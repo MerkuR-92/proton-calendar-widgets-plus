@@ -61,7 +61,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             adapter = EventAdapter {
-                findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id))
+                findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id, it.occurence?.occurrenceNumber ?: 0))
             }
             recyclerView.addItemDecoration(
                 DividerItemDecoration(

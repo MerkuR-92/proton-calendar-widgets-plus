@@ -10,9 +10,7 @@ import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 
 class CalendarViewModel(private val calendarsRepository: CalendarsRepository, private val deleteEventUseCase: DeleteEventUseCase, private val createEventUseCase: EditCreateEventUseCase, private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
@@ -46,7 +44,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 //    val calendars: LiveData<List<CalendarEntity>> = calendarsRepository.calendarsFlow(/*TODO*/ "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==").asLiveData(Dispatchers.Default)
     // TODO events need calendarID as param
 
-    fun observeEvent(eventId: String): LiveData<Event?> = calendarsRepository.event(eventId).asLiveData(Dispatchers.Default)
+    fun observeEvent(eventId: String): LiveData<Event?> = calendarsRepository.eventFlow(eventId).asLiveData(Dispatchers.Default)
 
 //    val users = UsersRepositoryImpl(AppDatabase.invoke(application), GsonCommon.gson).usersFlow().asLiveData(Dispatchers.Default)
 //    val addresses = UsersRepositoryImpl(AppDatabase.invoke(application), GsonCommon.gson).addressesFlow("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==" /*TODO*/).asLiveData(Dispatchers.Default)
@@ -91,7 +89,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
 
 
-    suspend fun handleDeleteEvent(eventId: String, deleteOption: EventEditDeleteOption): UseCase.Result {
+    suspend fun handleDeleteEvent(eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int? = null): UseCase.Result {
         // TODO ÜBER IMPORTANT -- FIXME, PUT INTO WORKER!!!!!!!
 
 
@@ -99,7 +97,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-                deleteEventUseCase.execute(eventId, deleteOption)
+                deleteEventUseCase.execute(eventId, deleteOption, occurrenceNumber)
             }
         }.await()
     }

@@ -8,7 +8,7 @@ import java.time.LocalTime
 object Navigation {
 
     object Deeplink {
-        fun toEventDetails(eventId: String) = Uri.parse("proton-calendar://protonmail.com/event/details?eventId=$eventId")
+        fun toEventDetails(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/details?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
         fun toEventEdit(eventId: String) = Uri.parse("proton-calendar://protonmail.com/event/edit?eventId=$eventId")
         fun toEventCreate(initStartDate: LocalDate, initStartTime: LocalTime? = null) = Uri.parse("proton-calendar://protonmail.com/event/create?initStartDate=${initStartDate}&initStartTime=${initStartTime ?: ""}")
     }

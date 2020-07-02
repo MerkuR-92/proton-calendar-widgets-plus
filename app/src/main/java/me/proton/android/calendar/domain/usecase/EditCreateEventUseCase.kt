@@ -32,6 +32,8 @@ class EditCreateEventUseCase(
         logger.v("executing EditCreateEventUseCase")
         logger.v("from icalendar: ${newEvent.iCalendar.printToString()}")
 
+        // TODO SEQUENCE ID has to be already incremented
+
         // 1. split original event according to the matrix
         val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
 

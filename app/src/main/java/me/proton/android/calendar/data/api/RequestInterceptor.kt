@@ -48,7 +48,6 @@ class RequestInterceptor(private val valueStoreProvider: ValueStoreProvider, and
             //header("Content-Type", "application/json;charset=utf-8") // TODO not always true
             header("x-pm-appversion", headerAppName)
             header("x-pm-locale", headerLocale)
-            header("x-pm-apiversion", "3")
         }
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
@@ -155,7 +154,6 @@ class RequestInterceptor(private val valueStoreProvider: ValueStoreProvider, and
 //        Content-Type: application/json;charset=utf-8
 //        x-pm-uid: {session_uid}
 //        x-pm-appversion: {app_version} or Other
-//        x-pm-apiversion: 3
 //        Accept: application/vnd.protonmail.v1+json
 
         val refreshPayload = RefreshAccessTokenApiBody(refreshToken)
@@ -164,9 +162,8 @@ class RequestInterceptor(private val valueStoreProvider: ValueStoreProvider, and
 //            .url("".toString() + "/users/detail")
 //            .post(body)
 //            .build()
-            .header("x-pm-appversion", headerAppName) // TODO
+            .header("x-pm-appversion", headerAppName)
             .header("x-pm-locale", headerLocale)
-            .header("x-pm-apiversion", "3")
             .header("x-pm-uid", uid)
 
 

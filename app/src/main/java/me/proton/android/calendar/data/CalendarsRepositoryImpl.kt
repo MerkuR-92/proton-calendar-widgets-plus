@@ -9,12 +9,8 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.isBetween
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 // TODO better name? move to separate package?
 class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val crypto: Crypto) : CalendarsRepository {
@@ -65,7 +61,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
                     if (it.isRecurring()) {
 
-                        val occurrences = it.occurrencesInFullDayRange(fromDate, toDate, timeZoneId)
+                        val occurrences = it.generateOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
                         if (occurrences != null && occurrences.size > 0) {
                             // TODO we have metadata in Occurrence, use it
                             it.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
@@ -78,7 +74,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         }
     }
 
-    override fun event(eventId: String): Flow<Event?> {
+    override fun eventFlow(eventId: String): Flow<Event?> {
         return database.eventsDao().selectByIdFlow(eventId)./*distinctUntilChanged().*/map {
             if (it != null) {
                 transformEventUseCase.execute(it)

@@ -53,21 +53,9 @@ object ICalUtils {
             if (this.dateStart.value.hasTime()) {
                 this.setDateEnd(this.dateStart.value)
             } else {
-
-                TestsLogger.d("start: ${this.getStart()}")
-
-//                val endLocalDate = LocalDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of("UTC")).toLocalDate()
                 val endLocalDate = this.getStart()!!.toLocalDate().plusDays(1)
                 this.setDateEnd(endLocalDate.toDate(), false)
             }
-            /* else {
-                val dateEnd = LocalDate.of(
-                    this.dateStart.value.rawComponents.year,
-                    this.dateStart.value.rawComponents.month,
-                    this.dateStart.value.rawComponents.date
-                ).plusDays(1)
-                this.setEnd(dateEnd)
-            }*/
         }
 
         return true

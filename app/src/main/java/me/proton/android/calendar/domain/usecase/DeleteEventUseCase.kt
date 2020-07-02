@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.property.ExceptionDates
 import com.google.gson.Gson
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.*
@@ -8,6 +9,7 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.KeysApi
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 
 class DeleteEventUseCase( // TODO TESTS
@@ -16,11 +18,11 @@ class DeleteEventUseCase( // TODO TESTS
     private val calendarsApi: CalendarsApi,
     private val addressesApi: AddressesApi,
     private val database: AppDatabase,
-    private val crypto: Crypto,
+    private val editCreateEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val calendarsRepository: CalendarsRepository): UseCase {
 
-    suspend fun execute(eventId: String, deleteOption: EventEditDeleteOption) : UseCase.Result {
+    suspend fun execute(eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -38,25 +40,14 @@ class DeleteEventUseCase( // TODO TESTS
 
                 if (event.isRecurring()) {
 
-                } else { // simple delete
+                    event.addExceptionDate(occurrenceNumber!!) // TODO
 
-                    syncRequestBody = SyncEventsUpdateApiRequest(
-                        memberId = member.id, // TODO if this works, do it also in EditCreateEventUseCase
-                        events = listOf(
-                            SyncEventDeleteContainer(event.id)
-                        )
-                    )
+//                    event.iCalEvent.addExceptionDates()
 
+                    // 1st event in chain  or  Nth event in chain
+                    // add EXDATE to original event and edit it
 
-                    TimberLogger.d("sync request: " + syncRequestBody)
-
-                }
-
-
-                // 1st event in chain  or  Nth event in chain
-                // add EXDATE to original event
-
-                /*
+                    /*
                 BEGIN:VCALENDAR
 		    VERSION:2.0
 		    BEGIN:VEVENT
@@ -92,6 +83,29 @@ class DeleteEventUseCase( // TODO TESTS
 			    END:VEVENT
 			    END:VCALENDAR
                  */
+
+                    TimberLogger.d("it's recurring, please delete: ${occurrenceNumber}")
+
+
+
+
+                } else { // simple delete
+
+                    syncRequestBody = SyncEventsUpdateApiRequest(
+                        memberId = member.id, // TODO if this works, do it also in EditCreateEventUseCase
+                        events = listOf(
+                            SyncEventDeleteContainer(event.id)
+                        )
+                    )
+
+                    TimberLogger.d("sync request: " + syncRequestBody)
+
+                }
+
+
+
+
+
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
 

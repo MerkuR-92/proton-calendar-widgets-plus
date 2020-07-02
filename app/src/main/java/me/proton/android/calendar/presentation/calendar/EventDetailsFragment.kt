@@ -59,6 +59,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
 
             TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $it")
+            TimberLogger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
             TimberLogger.d("${it?.iCalendar?.printToString()}")
 
 
@@ -83,7 +84,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             lifecycleScope.launch {
                                 val deleteResult = withContext(Dispatchers.IO) {
                                     if (it == 0) {
-                                        calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT)
+                                        calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
                                     } else if (it == 1) {
                                         if (event.isFirstOccurrence()) {
                                             calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)

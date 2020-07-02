@@ -169,7 +169,7 @@ class EventViewModel(
         } else {
 
             val dbEvent = viewModelScope.async(Dispatchers.IO) {
-                calendarsRepository.event(eventId).first()
+                calendarsRepository.eventFlow(eventId).first()
             }.await()
 
 
