@@ -123,15 +123,66 @@ data class Event(
     data class Occurrence(val startDateTime: ZonedDateTime, val endDateTime: ZonedDateTime, val occurrenceNumber: Int)
 
     /**
-     * Occurrences are generated using DTSTART/DTEND timezone, but formatted with passed param.
+     * Occurrences are generated using DTSTART/DTEND timezone, but formatted with passed timeZoneId param.
      */
     fun generateOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
 
         if (!isRecurring()) return null
 
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+
+        val occurences = generateOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
+
+        return occurences.filter {
+            it.startDateTime.isBetween(fromDateTime, toDateTime, false, true)
+        }
+
+    }
+
+    /**
+     * Generated occurrences and filters them out by EXDATE.
+     *
+     * @param timeZoneId timezone of toDate and returned occurrences
+     */
+    fun generateFilteredOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+
+        if (!isRecurring()) return null
+
+        val occurences = generateOccurrencesUntil(toDate, if (this.isAllDay()) ZoneId.systemDefault().id else timeZoneId) ?: emptyList()
+        val exceptionDates = this.getExceptionDates() ?: emptyList()
+
+        val result = occurences.filter { occurrence ->
+            !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
+        }
+
+        return result.map {
+            it.copy(
+                startDateTime = it.startDateTime.withZoneSameInstant(ZoneId.of(timeZoneId)),
+                endDateTime = it.endDateTime.withZoneSameInstant(ZoneId.of(timeZoneId))
+            )
+        }
+
+    }
+
+    fun filterOutOccurrences(occurences: List<Occurrence>): List<Occurrence> {
+        val exceptionDates = this.getExceptionDates() ?: emptyList()
+        return occurences.filter { occurrence ->
+            !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
+        }
+    }
+
+    // TODO GENERATE FIRST X OCCURRENCES?
+
+    /**
+     * Generates all occurrences of a recurring Event until given LocalDate in TimeZone.
+     */
+    fun generateOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+
+        if (!isRecurring()) return null
+
         val occurences = mutableListOf<Occurrence>()
 
-        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
         val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
         val iCalTimeZoneStart = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateStart)) {
@@ -141,7 +192,7 @@ data class Event(
             if (dtstartTimezone == null) TimeZone.getTimeZone("UTC") else dtstartTimezone.timeZone
         }
 
-        val iCalTimeZoneEnd =if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateEnd)) {
+        val iCalTimeZoneEnd = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateEnd)) {
             TimeZone.getDefault()
         } else {
             val dtendTimezone = iCalendar.timezoneInfo.getTimezone(iCalEvent.dateEnd)
@@ -165,13 +216,9 @@ data class Event(
                 ZonedDateTime.of(ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
             } else ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.of(timeZoneId))
 
-            if (occurrenceEnd.isBefore(fromDateTime)) continue
-
             if (occurrenceStart.isAfter(toDateTime)) break
 
-            if (occurrenceStart.isBetween(fromDateTime, toDateTime, false, true)) {
-                occurences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
-            }
+            occurences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
 
         }
 

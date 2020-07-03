@@ -446,9 +446,8 @@ internal class ICalUtilsTest {
 
     }
 
-    @Disabled
     @Test
-    fun `generate occurrences of part-day event with EXDATES within full-day range`() {
+    fun `generate occurrences of part-day event with EXDATES`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -472,33 +471,66 @@ internal class ICalUtilsTest {
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
 
-        val displayRangeFrom = LocalDate.of(2020, 7, 1)
-        val displayRangeTo = LocalDate.of(2020, 7, 1)
+        val displayRangeTo = LocalDate.of(2020, 7, 30)
 
         event.addExceptionDate(2)
+        event.addExceptionDate(3)
+        event.addExceptionDate(5)
+        event.addExceptionDate(10)
+        event.addExceptionDate(40) // non-existing occurrence
 
-        TestsLogger.d("" + event.iCalendar.printToString())
+        val occurrences = event.generateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList()
 
-        val startIterator = event.iCalEvent.recurrenceRule.getDateIterator(event.iCalEvent.dateStart.value, event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone).iterator()
-        while (startIterator.hasNext()) {
-            val t = startIterator.next()
-            TestsLogger.d("--- " + t + " instant: " +t.toInstant())
-        }
+        assertThat(occurrences.size).isEqualTo(16)
+        assertThat(occurrences.none { it.occurrenceNumber == 2 }).isTrue()
+        assertThat(occurrences.none { it.occurrenceNumber == 3 }).isTrue()
+        assertThat(occurrences.none { it.occurrenceNumber == 5 }).isTrue()
+        assertThat(occurrences.none { it.occurrenceNumber == 10 }).isTrue()
+        assertThat(occurrences.all { it.startDateTime.zone.id == displayTimeZoneId }).isTrue()
 
+    }
 
+    @Test
+    fun `generate occurrences of all-day event with EXDATES`() {
 
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200626
+    DTEND;VALUE=DATE:20200627
+    RRULE:FREQ=DAILY;COUNT=20
+    SUMMARY:recurring every day 20 times
+    UID:EGVy407XddW2_ESpoOVn7oN1qc9V@proton.me
+    DTSTAMP:20200625T143822Z
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
 
-        val occurrences = event.generateOccurrencesInFullDayRange(displayRangeFrom, displayRangeTo, displayTimeZoneId)
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
 
-        TestsLogger.d("" + occurrences)
-        event.getExceptionDates()?.forEach {
-            TestsLogger.d("exception date: " + it + ", instant: " + it.toInstant()) // TODO FILTER THIS OUT MANUALLY
-        }
+        val displayRangeTo = LocalDate.of(2020, 7, 30)
 
-        assertThat(occurrences!!.size).isEqualTo(1)
-        assertThat(occurrences.first().occurrenceNumber).isEqualTo(7)
-        assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 1, 17, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
-        assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 1, 17, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+        event.addExceptionDate(2)
+        event.addExceptionDate(3)
+        event.addExceptionDate(5)
+        event.addExceptionDate(10)
+        event.addExceptionDate(40) // non-existing occurrence
+
+        val occurrences = event.generateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList() //event.filterOutOccurrences(event.generateOccurrencesUntil(displayRangeTo, ZoneId.systemDefault().id) ?: emptyList())
+
+        assertThat(occurrences.size).isEqualTo(16)
+        assertThat(occurrences.none { it.occurrenceNumber == 2 }).isTrue()
+        assertThat(occurrences.none { it.occurrenceNumber == 3 }).isTrue()
+        assertThat(occurrences.none { it.occurrenceNumber == 5 }).isTrue()
+        assertThat(occurrences.none { it.occurrenceNumber == 10 }).isTrue()
+        assertThat(occurrences.all { it.startDateTime.zone.id == displayTimeZoneId }).isTrue()
 
     }
 
