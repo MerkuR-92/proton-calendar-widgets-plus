@@ -97,7 +97,14 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-                deleteEventUseCase.execute(eventId, deleteOption, occurrenceNumber)
+
+
+                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
+                val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+
+
+                deleteEventUseCase.execute(TODOuserID, eventId, deleteOption, occurrenceNumber)
             }
         }.await()
     }

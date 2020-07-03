@@ -227,7 +227,7 @@ data class Event(
 
     // TODO move all these helper methods to utils
 
-    fun addExceptionDate(occurrenceNumber: Int) {
+    fun addExceptionDate(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
         if (isRecurring()) {
 
             val iCalTimeZoneStart = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateStart)) {

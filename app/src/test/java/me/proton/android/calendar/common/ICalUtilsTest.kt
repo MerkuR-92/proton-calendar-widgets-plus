@@ -199,7 +199,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `multi-day all-day all-day event overlaps with full day range`() {
+    fun `multi-day all-day event overlaps with full day range`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
