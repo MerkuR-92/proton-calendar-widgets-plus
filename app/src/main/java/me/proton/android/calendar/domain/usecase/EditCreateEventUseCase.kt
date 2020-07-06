@@ -37,7 +37,7 @@ class EditCreateEventUseCase(
         // 1. split original event according to the matrix
         val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
 
-        logger.e("shared split: ${calendarSplit.sharedPart.printToString()}")
+        //logger.e("shared split: ${calendarSplit.sharedPart.printToString()}")
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).first()
@@ -198,7 +198,7 @@ class EditCreateEventUseCase(
 
         return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
             is ApiResponse.Success -> {
-                //             TODO insert event into local DB
+                //             TODO insert event into local DB: database.eventsDao().insert(syncResponse.data...
                 UseCase.Result.Success
             }
             is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)

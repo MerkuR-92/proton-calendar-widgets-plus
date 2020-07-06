@@ -228,7 +228,8 @@ fun VEvent.wrapInICalendar(): ICalendar {
     return calendar
 }
 
-fun ICalendar.printToString() : String = Biweekly.write(this).go()
+// TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
+fun ICalendar.printToString() : String = Biweekly.write(this).go().replace("TZID=/", "TZID=")
 
 fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
 

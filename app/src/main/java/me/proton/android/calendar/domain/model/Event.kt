@@ -6,11 +6,14 @@ import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
+import biweekly.property.ICalProperty
 import biweekly.util.ICalDate
+import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.temporal.ChronoField
 import java.util.*
 
 
@@ -101,7 +104,7 @@ data class Event(
 
     fun isSyncedWithApi(): Boolean = !id.startsWith(OFFLINE_EVENT_ID_PREFIX, ignoreCase = false)
 
-    fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateStart?.value?.hasTime() == false else true)
+    fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateEnd?.value?.hasTime() == false else true)
 
     fun spansSingleDay(): Boolean {
 
@@ -185,19 +188,9 @@ data class Event(
 
         val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
-        val iCalTimeZoneStart = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateStart)) {
-            TimeZone.getDefault()
-        } else {
-            val dtstartTimezone = iCalendar.timezoneInfo.getTimezone(iCalEvent.dateStart)
-            if (dtstartTimezone == null) TimeZone.getTimeZone("UTC") else dtstartTimezone.timeZone
-        }
+        val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
 
-        val iCalTimeZoneEnd = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateEnd)) {
-            TimeZone.getDefault()
-        } else {
-            val dtendTimezone = iCalendar.timezoneInfo.getTimezone(iCalEvent.dateEnd)
-            if (dtendTimezone == null) TimeZone.getTimeZone("UTC") else dtendTimezone.timeZone
-        }
+        val iCalTimeZoneEnd = iCalTimeZone(iCalEvent.dateEnd)
 
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
         val endIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateEnd.value, iCalTimeZoneEnd)
@@ -211,8 +204,16 @@ data class Event(
                 // unfortunately parser uses Calendar object with default timezone
                 ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
             } else ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId))
+
+            TimberLogger.d("has more? " + endIterator.hasNext())
+            TimberLogger.d("summary " + this.iCalEvent.summary)
+            TimberLogger.d("occurrence " + occurrenceNumber)
+
             val occurrenceEnd = if (this.isAllDay()) { // we force the timezone to be the one we got in param
                 // unfortunately parser uses Calendar object with default timezone
+
+                // TODO FIXME for last day of recurring, when endIterator finishes early because of UNTIL date
+
                 ZonedDateTime.of(ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
             } else ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.of(timeZoneId))
 
@@ -227,15 +228,19 @@ data class Event(
 
     // TODO move all these helper methods to utils
 
+    private fun iCalTimeZone(property: ICalProperty): TimeZone {
+        return if (iCalendar.timezoneInfo.isFloating(property)) {
+            TimeZone.getDefault()
+        } else {
+            val timezone = iCalendar.timezoneInfo.getTimezone(property)
+            if (timezone == null) TimeZone.getTimeZone("UTC") else timezone.timeZone
+        }
+    }
+
     fun addExceptionDate(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
         if (isRecurring()) {
 
-            val iCalTimeZoneStart = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateStart)) {
-                TimeZone.getDefault()
-            } else {
-                val dtstartTimezone = iCalendar.timezoneInfo.getTimezone(iCalEvent.dateStart)
-                if (dtstartTimezone == null) TimeZone.getTimeZone("UTC") else dtstartTimezone.timeZone
-            }
+            val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
 
             val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
 
@@ -261,6 +266,28 @@ data class Event(
     }
 
     /**
+     * @param occurrenceNumber has to be 2 or more for this to make sense
+     */
+    fun handleDeleteThisAndFollowing(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
+
+        val recurrenceRule = this.iCalEvent.recurrenceRule.value
+
+        if (occurrenceNumber > 1) { // update COUNT
+            if (recurrenceRule.count != null && recurrenceRule.count >= occurrenceNumber) {
+                this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).count(
+                    if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
+                ).build())
+            } else { // otherwise, set or update UNTIL
+                generateOccurrence(occurrenceNumber, iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
+                    this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
+                        Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant())
+                    ).build())
+                }
+            }
+        }
+    }
+
+    /**
      * Calculate all Exception Dates in either the timezone of the EXDATE property, or default system timezone (if event is All-Day).
      */
     fun getExceptionDates(): List<ZonedDateTime>? {
@@ -270,16 +297,11 @@ data class Event(
 
             iCalEvent.exceptionDates?.forEach {
 
-                val exceptionTimezone = iCalendar.timezoneInfo.getTimezone(it)
-                val exceptionDateTimezone = if (iCalendar.timezoneInfo.isFloating(it)) {
-                    TimeZone.getDefault()
-                } else {
-                    if (exceptionTimezone == null) TimeZone.getTimeZone("UTC") else exceptionTimezone.timeZone
-                }
+                val exceptionTimezone = iCalTimeZone(it)
 
                 it.values?.forEach {
                     val date = if (it.hasTime()) {
-                        ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(exceptionDateTimezone.id))
+                        ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(exceptionTimezone.id))
                     } else {
                         // unfortunately parser uses Calendar object with default timezone
                         ZonedDateTime.ofInstant(it.toInstant(), ZoneId.systemDefault())
@@ -302,19 +324,9 @@ data class Event(
 
         if (!isRecurring()) return null
 
-        val iCalTimeZoneStart = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateStart)) {
-            TimeZone.getDefault()
-        } else {
-            val dtstartTimezone = iCalendar.timezoneInfo?.getTimezone(iCalEvent.dateStart)
-            if (dtstartTimezone == null) TimeZone.getTimeZone("UTC") else dtstartTimezone.timeZone
-        }
+        val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
 
-        val iCalTimeZoneEnd = if (iCalendar.timezoneInfo.isFloating(iCalEvent.dateEnd)) {
-            TimeZone.getDefault()
-        } else {
-            val dtendTimezone = iCalendar.timezoneInfo?.getTimezone(iCalEvent.dateEnd)
-            if (dtendTimezone == null) TimeZone.getTimeZone("UTC") else dtendTimezone.timeZone
-        }
+        val iCalTimeZoneEnd = iCalTimeZone(iCalEvent.dateEnd)
 
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
         val endIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateEnd.value, iCalTimeZoneEnd)

@@ -38,44 +38,46 @@ class DeleteEventUseCase( // TODO TESTS
 
                 if (event.isRecurring()) {
 
-                    TimberLogger.d("it's recurring, please delete: ${occurrenceNumber}")
-
                     event.addExceptionDate(occurrenceNumber!!) // TODO
-
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
 
                 } else { // simple delete
-
-                    val syncRequestBody = SyncEventsUpdateApiRequest(
-                        memberId = member.id, // TODO if this works, do it also in EditCreateEventUseCase
-                        events = listOf(
-                            SyncEventDeleteContainer(event.id)
-                        )
-                    )
-
-                        when (val syncResponse = calendarsApi.syncEvents(event.calendar.id, syncRequestBody)) {
-                            is ApiResponse.Success -> {
-                                database.eventsDao().deleteById(event.id)
-                                UseCase.Result.Success
-                            }
-                            is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)
-                            is ApiResponse.Exception -> UseCase.Result.Error(syncResponse.exception.message ?: "(no exception message)")
-                        }
+                    deleteOriginalEvent(event.id, event.calendar.id, member.id)
                 }
-
-
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
-                UseCase.Result.InvalidParams("not implemented yet")
+
+                event.handleDeleteThisAndFollowing(occurrenceNumber!!) // TODO
+                editCreateEventUseCase.execute(userId, event.calendar.id, event)
+
             }
             EventEditDeleteOption.ALL_EVENTS -> {
-                UseCase.Result.InvalidParams("not implemented yet")
+                // simple delete
+                deleteOriginalEvent(event.id, event.calendar.id, member.id)
             }
             // TODO don't handle null and fallback to THIS_EVENT?
         }
 
         return result
+    }
+
+    private suspend fun deleteOriginalEvent(eventId: String, calendarId: String, memberId: String): UseCase.Result  {
+        val syncRequestBody = SyncEventsUpdateApiRequest(
+            memberId = memberId,
+            events = listOf(
+                SyncEventDeleteContainer(eventId)
+            )
+        )
+
+        return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
+            is ApiResponse.Success -> {
+                database.eventsDao().deleteById(eventId)
+                UseCase.Result.Success
+            }
+            is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)
+            is ApiResponse.Exception -> UseCase.Result.Error(syncResponse.exception.message ?: "(no exception message)")
+        }
     }
 
 }

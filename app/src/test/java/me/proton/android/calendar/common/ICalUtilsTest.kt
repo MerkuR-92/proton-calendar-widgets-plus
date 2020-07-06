@@ -651,8 +651,6 @@ internal class ICalUtilsTest {
 
         assertThat(exceptionDates.size).isEqualTo(3)
         assertThat(exceptionDates[0].toLocalDate()).isEqualTo(LocalDate.of(2020, 6, 26))
-        //assertThat(exceptionDates[1]).isEqualTo(ZonedDateTime.of(2020, 6, 28, 0, 0, 0, 0, ZoneId.of("Europe/Vilnius")))
-        //assertThat(exceptionDates[2]).isEqualTo(ZonedDateTime.of(2020, 7, 5, 0, 0, 0, 0, ZoneId.of("Europe/Vilnius")))
 
     }
 
@@ -681,6 +679,72 @@ internal class ICalUtilsTest {
         assertThat(exceptionDates[1]).isEqualTo(ZonedDateTime.of(2020, 1, 22, 10, 0, 0, 0, ZoneId.of("Europe/Vilnius")))
         assertThat(exceptionDates[2]).isEqualTo(ZonedDateTime.of(2020, 1, 29, 10, 0, 0, 0, ZoneId.of("Europe/Vilnius")))
 
+    }
+
+    @Test
+    fun `handle 'delete this and following' for part-day event with COUNT`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=/Europe/Vilnius:20200706T130000
+    DTEND;TZID=/Europe/Vilnius:20200706T133000
+    RRULE:FREQ=DAILY;COUNT=5
+    SUMMARY:part-day every day 5 times\, Vilnius
+    UID:b87agM1DYlWT_cNwG1DeMN90qxw5@proton.me
+    DTSTAMP:20200706T100055Z
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        event.handleDeleteThisAndFollowing(4)
+        assertThat(event.iCalEvent.recurrenceRule.value.count).isEqualTo(3)
+
+        event.handleDeleteThisAndFollowing(2)
+        assertThat(event.iCalEvent.recurrenceRule.value.count).isEqualTo(1)
+
+    }
+
+    @Test
+    fun `handle 'delete this and following' for part-day event without COUNT`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Vilnius:20200707T190000
+    DTEND;TZID=Europe/Vilnius:20200707T193000
+    RRULE:FREQ=DAILY
+    SUMMARY:part-day\, Vilnius\, every day without stop
+    UID:yb2puCFfwOqo40SypyVBBCUsnQ2I@proton.me
+    DTSTAMP:20200706T154349Z
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        event.handleDeleteThisAndFollowing(6)
+
+        // we delete "6th and following occurrences"
+        // 6th occurrence happens on 2020-07-12
+        // so we should set UNTIL to 1 second before midnight of the previous day
+
+        assertThat(event.iCalEvent.recurrenceRule.value.frequency).isEqualTo(Frequency.DAILY)
+        assertThat(ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of("Europe/Vilnius"))).isEqualTo(ZonedDateTime.of(2020, 7, 11, 23, 59, 59, 0, ZoneId.of("Europe/Vilnius")))
+
+    }
+
+    @Disabled
+    @Test
+    fun `handle 'delete this and following' for all-day event without COUNT`() {
+
+        // TODO
     }
 
     @Test

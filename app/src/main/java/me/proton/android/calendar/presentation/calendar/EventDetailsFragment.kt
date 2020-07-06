@@ -77,7 +77,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                         AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                             getString(R.string.event_recurring_edit_this),
-                            if (!event.isFirstOccurrence()) getString(R.string.event_recurring_edit_this_and_following) else null,
+                            if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_following) else null,
                             getString(R.string.event_recurring_edit_all_events)
                         ).toTypedArray(), -1) {
 
@@ -86,10 +86,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                     if (it == 0) {
                                         calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
                                     } else if (it == 1) {
-                                        if (event.isFirstOccurrence()) {
+                                        if (navigationArguments.occurrenceNumber == 1) {
                                             calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
                                         } else {
-                                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING)
+                                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING, navigationArguments.occurrenceNumber)
                                         }
                                     } else { // it == 2
                                         calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
