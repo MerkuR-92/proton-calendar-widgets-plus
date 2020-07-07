@@ -61,6 +61,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $it")
             TimberLogger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
             TimberLogger.d("${it?.iCalendar?.printToString()}")
+            TimberLogger.d("uid: ${it?.iCalEvent?.uid}")
+            TimberLogger.d("id: ${it?.id}")
 
 
             // TODO EXTRACT DATE FORMATTING TO UTILS

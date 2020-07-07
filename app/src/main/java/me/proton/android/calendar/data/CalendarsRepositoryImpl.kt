@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.filterOccurencesByRecurrenceId
 import timber.log.Timber
 import java.time.LocalDate
 
@@ -57,10 +58,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     // TODO optimise and select events that are within correct window
                     //  not only starttime, but also overlapping
 
-                    // TODO fallback for no DTEND
-
                     if (it.isRecurring()) {
-
                         val occurrences = it.generateOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
                         if (occurrences != null && occurrences.size > 0) {
                             // TODO we have metadata in Occurrence, use it
@@ -70,7 +68,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     } else {
                         it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
                     }
-                }
+                }.filterOccurencesByRecurrenceId()
         }
     }
 

@@ -6,7 +6,6 @@ import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.*
 import java.util.*
@@ -479,7 +478,7 @@ internal class ICalUtilsTest {
         event.addExceptionDate(10)
         event.addExceptionDate(40) // non-existing occurrence
 
-        val occurrences = event.generateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList()
+        val occurrences = event.generateExdateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList()
 
         assertThat(occurrences.size).isEqualTo(16)
         assertThat(occurrences.none { it.occurrenceNumber == 2 }).isTrue()
@@ -523,7 +522,7 @@ internal class ICalUtilsTest {
         event.addExceptionDate(10)
         event.addExceptionDate(40) // non-existing occurrence
 
-        val occurrences = event.generateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList() //event.filterOutOccurrences(event.generateOccurrencesUntil(displayRangeTo, ZoneId.systemDefault().id) ?: emptyList())
+        val occurrences = event.generateExdateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList() //event.filterOutOccurrences(event.generateOccurrencesUntil(displayRangeTo, ZoneId.systemDefault().id) ?: emptyList())
 
         assertThat(occurrences.size).isEqualTo(16)
         assertThat(occurrences.none { it.occurrenceNumber == 2 }).isTrue()
@@ -531,6 +530,74 @@ internal class ICalUtilsTest {
         assertThat(occurrences.none { it.occurrenceNumber == 5 }).isTrue()
         assertThat(occurrences.none { it.occurrenceNumber == 10 }).isTrue()
         assertThat(occurrences.all { it.startDateTime.zone.id == displayTimeZoneId }).isTrue()
+
+    }
+
+    @Test
+    fun `filter out occurrences by RECURRENCE-ID`() {
+
+        val iCals = listOf(
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200710
+    RECURRENCE-ID;VALUE=DATE:20200710
+    SUMMARY:full day reccur\, single edit
+    UID:VrLeK2GFu96clzUzTLofDf0_hSDy@proton.me
+    DTSTAMP:20200706T161209Z
+    DTEND;VALUE=DATE:20200711
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent(),
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200708
+    RRULE:FREQ=DAILY;UNTIL=20200710
+    SUMMARY:full day reccur
+    UID:VrLeK2GFu96clzUzTLofDf0_hSDy@proton.me
+    DTSTAMP:20200706T161209Z
+    DTEND;VALUE=DATE:20200709
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR    
+            """.trimIndent(),
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Vilnius:20200707T190000
+    DTEND;TZID=Europe/Vilnius:20200707T193000
+    RRULE:FREQ=DAILY;UNTIL=20200711T205959Z
+    SUMMARY:part-day\, Vilnius\, every day without stop
+    UID:yb2puCFfwOqo40SypyVBBCUsnQ2I@proton.me
+    DTSTAMP:20200706T154349Z
+    BEGIN:VALARM
+    TRIGGER:-PT15M
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent()
+        )
+
+        val events = iCals.mapIndexed { index, iCal ->
+            Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), ICalUtils.parseICalString(iCal)!!, null)
+        }
+
+        val filtered = events.filterOccurencesByRecurrenceId()
+
+        assertThat(filtered.size).isEqualTo(2)
+        assertThat(filtered.map { it.summary }.containsAll(listOf("full day reccur, single edit", "part-day, Vilnius, every day without stop")))
 
     }
 
@@ -736,15 +803,45 @@ internal class ICalUtilsTest {
         // so we should set UNTIL to 1 second before midnight of the previous day
 
         assertThat(event.iCalEvent.recurrenceRule.value.frequency).isEqualTo(Frequency.DAILY)
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isTrue()
         assertThat(ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of("Europe/Vilnius"))).isEqualTo(ZonedDateTime.of(2020, 7, 11, 23, 59, 59, 0, ZoneId.of("Europe/Vilnius")))
 
     }
 
-    @Disabled
     @Test
-    fun `handle 'delete this and following' for all-day event without COUNT`() {
+    fun `handle 'delete this and following' for partial-day event without COUNT`() {
 
-        // TODO
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200708
+    RRULE:FREQ=DAILY;UNTIL=20200712
+    SUMMARY:full day reccur
+    UID:VrLeK2GFu96clzUzTLofDf0_hSDy@proton.me
+    DTSTAMP:20200706T161209Z
+    DTEND;VALUE=DATE:20200709
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        event.handleDeleteThisAndFollowing(4)
+
+        // we delete "4th and following occurrences"
+        // 4th occurrence happens on 2020-07-11
+        // so we should set UNTIL to previous day without TIME part
+
+        TestsLogger.d("${ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.systemDefault()).toLocalDate()}")
+
+        //RRULE:FREQ=DAILY;UNTIL=20200710
+
+        assertThat(event.iCalEvent.recurrenceRule.value.frequency).isEqualTo(Frequency.DAILY)
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isFalse()
+        assertThat(ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.systemDefault()).toLocalDate()).isEqualTo(LocalDate.of(2020, 7, 10))
+
     }
 
     @Test

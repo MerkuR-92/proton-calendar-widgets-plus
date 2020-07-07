@@ -51,6 +51,8 @@ class DeleteEventUseCase( // TODO TESTS
                 event.handleDeleteThisAndFollowing(occurrenceNumber!!) // TODO
                 editCreateEventUseCase.execute(userId, event.calendar.id, event)
 
+                // TODO FIXME nuke rest of the occurrences!!!
+
             }
             EventEditDeleteOption.ALL_EVENTS -> {
                 // simple delete

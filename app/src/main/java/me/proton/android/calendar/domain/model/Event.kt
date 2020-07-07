@@ -150,7 +150,7 @@ data class Event(
      *
      * @param timeZoneId timezone of toDate and returned occurrences
      */
-    fun generateFilteredOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+    fun generateExdateFilteredOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
 
         if (!isRecurring()) return null
 
@@ -169,6 +169,8 @@ data class Event(
         }
 
     }
+
+
 
     fun filterOutOccurrences(occurences: List<Occurrence>): List<Occurrence> {
         val exceptionDates = this.getExceptionDates() ?: emptyList()
@@ -270,9 +272,17 @@ data class Event(
                 ).build())
             } else { // otherwise, set or update UNTIL
                 generateOccurrence(occurrenceNumber, iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
-                    this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
-                        Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant())
-                    ).build())
+                    if (this.isAllDay()) {
+                        this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
+                            Date.from(it.startDateTime.minusDays(1).toInstant()),
+                            false
+                        ).build())
+                    } else {
+                        this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
+                            Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()),
+                            true
+                        ).build())
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@ import biweekly.property.Status
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
+import me.proton.android.calendar.domain.model.Event
 import java.lang.Exception
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -343,4 +344,17 @@ fun VEvent.getEnd(timeZoneId: String? = null): ZonedDateTime? {
         this.dateEnd.value.toInstant(),
         if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
     )
+}
+
+
+/**
+ * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
+ * that original Event.
+ */
+fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
+
+    // TODO maybe we should make this use LocalDate so we can use an actual value of the RECURRENCE-ID
+    return this.groupBy({it.uid}).mapValues { events ->
+        events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
+    }.map { it.value }.toList()
 }

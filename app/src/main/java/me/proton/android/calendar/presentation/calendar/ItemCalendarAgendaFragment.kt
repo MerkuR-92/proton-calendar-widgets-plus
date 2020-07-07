@@ -79,7 +79,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 
             TimberLogger.d("binding live data for events from calendar $calendarId")
             calendarViewModel.events(date).observe(viewLifecycleOwner, Observer {
-                TimberLogger.d("observed events arrived: $date")
+                TimberLogger.d("observed events arrived: $it")
                 (recyclerView.adapter as? EventAdapter)?.submitList(it)
             })
 
