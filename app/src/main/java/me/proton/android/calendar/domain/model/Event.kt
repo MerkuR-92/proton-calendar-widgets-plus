@@ -14,6 +14,8 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 import java.util.*
 
 
@@ -190,10 +192,9 @@ data class Event(
 
         val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
 
-        val iCalTimeZoneEnd = iCalTimeZone(iCalEvent.dateEnd)
-
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
-        val endIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateEnd.value, iCalTimeZoneEnd)
+
+        val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
 
         var occurrenceNumber = 0
         while (startIterator.hasNext()) {
@@ -205,17 +206,7 @@ data class Event(
                 ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
             } else ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId))
 
-            TimberLogger.d("has more? " + endIterator.hasNext())
-            TimberLogger.d("summary " + this.iCalEvent.summary)
-            TimberLogger.d("occurrence " + occurrenceNumber)
-
-            val occurrenceEnd = if (this.isAllDay()) { // we force the timezone to be the one we got in param
-                // unfortunately parser uses Calendar object with default timezone
-
-                // TODO FIXME for last day of recurring, when endIterator finishes early because of UNTIL date
-
-                ZonedDateTime.of(ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
-            } else ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.of(timeZoneId))
+            val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
 
             if (occurrenceStart.isAfter(toDateTime)) break
 
