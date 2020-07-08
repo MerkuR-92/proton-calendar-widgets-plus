@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.*
+import retrofit2.Response
+import retrofit2.http.Body
 
 interface CalendarsApi {
 
@@ -39,6 +41,8 @@ interface CalendarsApi {
     suspend fun deleteEvent(calendarId: String, eventId: String) : ApiResponse<StatusCodeApiResponse>
 
     suspend fun syncEvents(calendarId: String, body: SyncEventsUpdateApiRequest) : ApiResponse<SyncEventsApiResponse>
+
+    suspend fun getEventsByUid(eventUid: String, page: Int, pageSize: Int) : ApiResponse<EventsByUidApiResponse>
 
 }
 

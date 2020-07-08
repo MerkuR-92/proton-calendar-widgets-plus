@@ -145,6 +145,21 @@ data class Event(
 
     }
 
+    fun generateExdateFilteredOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+
+        if (!isRecurring()) return null
+
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+
+        val occurences = generateExdateFilteredOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
+
+        return occurences.filter {
+            it.startDateTime.isBetween(fromDateTime, toDateTime, false, true)
+        }
+
+    }
+
     /**
      * Generated occurrences and filters them out by EXDATE.
      *
@@ -230,7 +245,10 @@ data class Event(
         }
     }
 
-    fun addExceptionDate(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
+    /**
+     * @return Exception Date if it has been set
+     */
+    fun addExceptionDate(occurrenceNumber: Int): ZonedDateTime? { // TODO decrement COUNT in RRULE?
         if (isRecurring()) {
 
             val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
@@ -240,22 +258,24 @@ data class Event(
             var counter = 1
             while (startIterator.hasNext() && counter <= occurrenceNumber) {
 
+                val nextValue = startIterator.next()
+
                 if (counter == occurrenceNumber) {
                     val exceptionDates = ExceptionDates()
-                    exceptionDates.values.add(ICalDate(startIterator.next(), iCalEvent.dateStart.value.hasTime()))
+                    exceptionDates.values.add(ICalDate(nextValue, iCalEvent.dateStart.value.hasTime()))
                     iCalendar.events.first().dateStart
                     val exceptionDateIndex = iCalEvent.exceptionDates.size
                     iCalEvent.addExceptionDates(exceptionDates)
                     iCalendar.timezoneInfo.setTimezone(iCalEvent.exceptionDates[exceptionDateIndex], TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
-                    return
+                    return ZonedDateTime.ofInstant(nextValue.toInstant(), ZoneId.systemDefault())
                 } else {
                     counter++
-                    startIterator.next()
                 }
             }
 
-
         }
+
+        return null // no exception date has been set
     }
 
     /**

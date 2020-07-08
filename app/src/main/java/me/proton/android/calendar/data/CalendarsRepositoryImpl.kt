@@ -51,7 +51,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
 //        val sharedEventsFieldSubstring = "DTSTART;VALUE=DATE:${fromDateTime.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE)}"
 
-        return database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().map {
+        return database.eventsDao().flowEvents(calendarIds)./*distinctUntilChanged() TODO.*/map {
             it
                 .mapNotNull { transformEventUseCase.execute(it) }
                 .filter {
@@ -59,7 +59,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     //  not only starttime, but also overlapping
 
                     if (it.isRecurring()) {
-                        val occurrences = it.generateOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
+                        val occurrences = it.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
                         if (occurrences != null && occurrences.size > 0) {
                             // TODO we have metadata in Occurrence, use it
                             it.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)

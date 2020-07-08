@@ -1,16 +1,14 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.property.ExceptionDates
 import com.google.gson.Gson
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.KeysApi
-import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class DeleteEventUseCase( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
@@ -42,39 +40,52 @@ class DeleteEventUseCase( // TODO TESTS
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
 
                 } else { // simple delete
-                    deleteOriginalEvent(event.id, event.calendar.id, member.id)
+                    deleteEvents(listOf(event.id), event.calendar.id, member.id)
                 }
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
 
-                event.handleDeleteThisAndFollowing(occurrenceNumber!!) // TODO
-                editCreateEventUseCase.execute(userId, event.calendar.id, event)
+                val occurrenceStart = event.generateOccurrence(occurrenceNumber!! /* TODO*/, ZoneId.systemDefault().id)?.startDateTime
 
-                // TODO FIXME nuke rest of the occurrences!!!
+                event.handleDeleteThisAndFollowing(occurrenceNumber)
+                val editResult = editCreateEventUseCase.execute(userId, event.calendar.id, event)
+
+                val eventsSharingUidResponse = calendarsApi.getEventsByUid(event.uid,0,100) // TODO paging
+                val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return UseCase.Result.Error("error fetching events sharing UID")
+
+                // we need to manually delete all "single-edited" events with RecurrenceID after just-deleted occurrence
+                val eventsToDelete = eventsSharingUid.filter {
+                    it.iCalEvent.recurrenceId != null &&
+                    ZonedDateTime.ofInstant(it.iCalEvent.recurrenceId.value.toInstant(), ZoneId.systemDefault()).isAfter(occurrenceStart)
+                }
+
+                val deleteResult = if (eventsToDelete.isNotEmpty()) {
+                    deleteEvents(eventsToDelete.map { it.id }, event.calendar.id, member.id)
+                } else UseCase.Result.Success
+
+                if ((editResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and following< events")
 
             }
             EventEditDeleteOption.ALL_EVENTS -> {
                 // simple delete
-                deleteOriginalEvent(event.id, event.calendar.id, member.id)
+                deleteEvents(listOf(event.id), event.calendar.id, member.id)
             }
-            // TODO don't handle null and fallback to THIS_EVENT?
         }
 
         return result
     }
 
-    private suspend fun deleteOriginalEvent(eventId: String, calendarId: String, memberId: String): UseCase.Result  {
+    private suspend fun deleteEvents(eventIds: List<String>, calendarId: String, memberId: String): UseCase.Result  {
         val syncRequestBody = SyncEventsUpdateApiRequest(
             memberId = memberId,
-            events = listOf(
-                SyncEventDeleteContainer(eventId)
-            )
+            events = eventIds.map { SyncEventDeleteContainer(it) }
         )
 
         return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
             is ApiResponse.Success -> {
-                database.eventsDao().deleteById(eventId)
+                // TODO it looks like /sync does not return IDs of deleted events so we can't check which ones were deleted successfully
+                database.eventsDao().deleteByIds(eventIds)
                 UseCase.Result.Success
             }
             is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)

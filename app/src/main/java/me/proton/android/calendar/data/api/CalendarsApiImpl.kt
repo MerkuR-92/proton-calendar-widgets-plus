@@ -41,6 +41,9 @@ interface CalendarsApiService {
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/sync")
     suspend fun syncEvents(@Path("calendarId") calendarId: String, @Body body: SyncEventsUpdateApiRequest) : Response<SyncEventsApiResponse>
 
+    @GET("calendar/$API_VERSION_CALENDAR/events")
+    suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : Response<EventsByUidApiResponse>
+
 }
 
 class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, logger: Logger) : BaseApi(gson, logger), CalendarsApi {
@@ -73,6 +76,8 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
     override suspend fun deleteEvent(calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse>  = safeApiCall { service.deleteEvent(calendarId, eventId) }
 
     override suspend fun syncEvents(calendarId: String, body: SyncEventsUpdateApiRequest): ApiResponse<SyncEventsApiResponse> = safeApiCall { service.syncEvents(calendarId, body) }
+
+    override suspend fun getEventsByUid(eventUid: String, page: Int, pageSize: Int): ApiResponse<EventsByUidApiResponse> = safeApiCall { service.getEventsByUid(eventUid, page, pageSize) }
 
 }
 
@@ -176,3 +181,23 @@ data class AlarmsApiResponse(
     override val code: Int,
     val eventAlarms: List<EventAlarmEntity>
 ) : BaseApiResponse()
+
+
+data class EventsByUidApiRequest(
+    val uid: String,
+    val recurrenceId: Long,
+    val page: Int,
+    val pageSize: Int
+)
+
+data class EventsByUidApiResponse(
+    override val code: Int,
+    val events: List<EventEntity>
+) : BaseApiResponse()
+
+//{
+//  "UID": "d79b258a-a428-4a9c-bd80-da8cd20f35aa@proton.me",
+//  "RecurrenceID": 1564141942,
+//  "Page": 1,
+//  "PageSize": 100
+//}
