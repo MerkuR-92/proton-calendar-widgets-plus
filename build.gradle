@@ -22,7 +22,7 @@ buildscript {
         jcenter() 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0-beta02'
+        classpath 'com.android.tools.build:gradle:4.1.0-beta03'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.ext.version.kotlin}"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${rootProject.ext.version.navigation}"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.9.1"

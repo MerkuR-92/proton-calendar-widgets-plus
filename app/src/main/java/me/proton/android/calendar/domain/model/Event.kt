@@ -134,13 +134,10 @@ data class Event(
 
         if (!isRecurring()) return null
 
-        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
-        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
-
         val occurences = generateOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
 
         return occurences.filter {
-            it.startDateTime.isBetween(fromDateTime, toDateTime, false, true)
+            startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
         }
 
     }
@@ -149,13 +146,10 @@ data class Event(
 
         if (!isRecurring()) return null
 
-        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
-        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
-
         val occurences = generateExdateFilteredOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
 
         return occurences.filter {
-            it.startDateTime.isBetween(fromDateTime, toDateTime, false, true)
+            startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
         }
 
     }
@@ -397,6 +391,22 @@ data class Event(
                 || (iCalEvent.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
                 || ((iCalEvent.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && iCalEvent.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
     }
+
+    /**
+     * Checks if Event starting at [startDateTime] and ending at [endDateTime] overlaps with
+     * range [fromDate]-[toDate].
+     */
+    fun startEndOverlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Boolean {
+
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+
+        return (startDateTime.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
+                || (endDateTime.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
+                || ((startDateTime.isBefore(fromDateTime) ?: false) && endDateTime.isAfter(toDateTime)) // starts before or ends after range, but happens during range
+    }
+
+
 
     fun overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean {
                 return (iCalEvent.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // starts in the range
