@@ -77,9 +77,9 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
             val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
-            TimberLogger.d("binding live data for events from calendar $calendarId")
+//            TimberLogger.d("binding live data for events from calendar $calendarId")
             calendarViewModel.events(date).observe(viewLifecycleOwner, Observer {
-                TimberLogger.d("observed events arrived: $it")
+//                TimberLogger.d("observed events arrived: $it")
                 (recyclerView.adapter as? EventAdapter)?.submitList(it)
             })
 

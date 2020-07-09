@@ -257,10 +257,11 @@ data class Event(
                 if (counter == occurrenceNumber) {
                     val exceptionDates = ExceptionDates()
                     exceptionDates.values.add(ICalDate(nextValue, iCalEvent.dateStart.value.hasTime()))
-                    iCalendar.events.first().dateStart
-                    val exceptionDateIndex = iCalEvent.exceptionDates.size
+                    val exceptionDateIndex = iCalEvent.exceptionDates?.size ?: 0
                     iCalEvent.addExceptionDates(exceptionDates)
-                    iCalendar.timezoneInfo.setTimezone(iCalEvent.exceptionDates[exceptionDateIndex], TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
+                    if (iCalEvent.dateStart.value.hasTime()) {
+                        iCalendar.timezoneInfo.setTimezone(iCalEvent.exceptionDates[exceptionDateIndex], TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
+                    }
                     return ZonedDateTime.ofInstant(nextValue.toInstant(), ZoneId.systemDefault())
                 } else {
                     counter++

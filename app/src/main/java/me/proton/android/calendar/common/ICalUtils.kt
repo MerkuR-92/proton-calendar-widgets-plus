@@ -94,6 +94,12 @@ object ICalUtils {
                 if (iCalendar.timezoneInfo.getTimezone(event.dateEnd) != null) {
                     calendar.timezoneInfo.setTimezone(event.dateEnd, iCalendar.timezoneInfo.getTimezone(event.dateEnd))
                 }
+                this.exceptionDates.forEach {
+                    val timezoneAssignment = iCalendar.timezoneInfo.getTimezone(it)
+                    if (timezoneAssignment != null) {
+                        calendar.timezoneInfo.setTimezone(it, timezoneAssignment)
+                    }
+                }
                 // delete timezone info created automatically when setting timezones
                 calendar.timezoneInfo.timezones.clear()
 
@@ -230,131 +236,133 @@ fun VEvent.wrapInICalendar(): ICalendar {
 }
 
 // TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
-fun ICalendar.printToString() : String = Biweekly.write(this).go().replace("TZID=/", "TZID=")
-
-fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
-
-fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
-    return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
+fun ICalendar.printToString() : String {
+    return Biweekly.write(this).go().replace("TZID=/", "TZID=")
 }
 
-fun ZonedDateTime.formatDate(timeZoneId: String): String = this.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+    fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
 
-fun ZonedDateTime.formatTime(timeZoneId: String): String = this.toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+    fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
+        return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
+    }
 
-/**
- * @param excludeTo will exclude exact toDateTime from rightmost range value
- */
-fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean {
+    fun ZonedDateTime.formatDate(timeZoneId: String): String = this.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
 
-    val thisInstant = this.toInstant()
-    val fromInstant = fromDateTime.toInstant()
-    val toInstant = toDateTime.toInstant()
+    fun ZonedDateTime.formatTime(timeZoneId: String): String = this.toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 
-    return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
-}
+    /**
+     * @param excludeTo will exclude exact toDateTime from rightmost range value
+     */
+    fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean {
 
-fun VEvent.setStart(date: LocalDate) {
-    this.setDateStart(date.toDate(), false)
-}
+        val thisInstant = this.toInstant()
+        val fromInstant = fromDateTime.toInstant()
+        val toInstant = toDateTime.toInstant()
 
-fun VEvent.setEnd(date: LocalDate) {
-    this.setDateEnd(date.toDate(), false)
-}
+        return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
+    }
 
-fun VEvent.setStart(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
-    this.setDateStart(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
-}
+    fun VEvent.setStart(date: LocalDate) {
+        this.setDateStart(date.toDate(), false)
+    }
 
-fun VEvent.setEnd(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
-    this.setDateEnd(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
-}
+    fun VEvent.setEnd(date: LocalDate) {
+        this.setDateEnd(date.toDate(), false)
+    }
 
-/**
- * Sets or clears TimeZone for Date Start.
- */
-fun ICalendar.setStartTimeZone(timeZoneId: String?) {
-    this.events.first()?.dateStart?.let { this.timezoneInfo.setTimezone(this.events.first().dateStart, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
-}
+    fun VEvent.setStart(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateStart(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
+    }
 
-/**
- * Sets or clears TimeZone for Date End.
- */
-fun ICalendar.setEndTimeZone(timeZoneId: String?) {
-    this.events.first()?.dateEnd?.let { this.timezoneInfo.setTimezone(this.events.first().dateEnd, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
-}
+    fun VEvent.setEnd(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateEnd(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
+    }
 
-fun ICalendar.setDefaultTimeZone(timeZoneId: String?) {
-    this.timezoneInfo.defaultTimezone = if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))
-}
+    /**
+     * Sets or clears TimeZone for Date Start.
+     */
+    fun ICalendar.setStartTimeZone(timeZoneId: String?) {
+        this.events.first()?.dateStart?.let { this.timezoneInfo.setTimezone(this.events.first().dateStart, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
+    }
 
-/**
- * Sets start and end timezones, preserving the original local datetimes.
- */
-fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZoneId: String) {
+    /**
+     * Sets or clears TimeZone for Date End.
+     */
+    fun ICalendar.setEndTimeZone(timeZoneId: String?) {
+        this.events.first()?.dateEnd?.let { this.timezoneInfo.setTimezone(this.events.first().dateEnd, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
+    }
+
+    fun ICalendar.setDefaultTimeZone(timeZoneId: String?) {
+        this.timezoneInfo.defaultTimezone = if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))
+    }
+
+    /**
+     * Sets start and end timezones, preserving the original local datetimes.
+     */
+    fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZoneId: String) {
 
 
-    val event = this.events.first()
+        val event = this.events.first()
 
-    TimberLogger.d("adjusting timezone from ${currentDateTimeTimezoneId} to $timeZoneId")
+        TimberLogger.d("adjusting timezone from ${currentDateTimeTimezoneId} to $timeZoneId")
 //    TimberLogger.d("current start timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
 //    TimberLogger.d("current end timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
 
-    val endTimeZoneId = currentDateTimeTimezoneId//this.timezoneInfo.getTimezone(event.dateEnd)?.timeZone?.id ?: this.timezoneInfo.defaultTimezone?.timeZone?.id ?: "UTC"
+        val endTimeZoneId = currentDateTimeTimezoneId//this.timezoneInfo.getTimezone(event.dateEnd)?.timeZone?.id ?: this.timezoneInfo.defaultTimezone?.timeZone?.id ?: "UTC"
 
-    TimberLogger.d("adjusting using timezone $currentDateTimeTimezoneId, $endTimeZoneId")
+        TimberLogger.d("adjusting using timezone $currentDateTimeTimezoneId, $endTimeZoneId")
 
-    event.setStart(event.getStart(currentDateTimeTimezoneId)!!.toLocalDate(), event.getStart(currentDateTimeTimezoneId)!!.toLocalTime(), timeZoneId)
-    event.setEnd(event.getEnd(endTimeZoneId)!!.toLocalDate(), event.getEnd(endTimeZoneId)!!.toLocalTime(), timeZoneId)
+        event.setStart(event.getStart(currentDateTimeTimezoneId)!!.toLocalDate(), event.getStart(currentDateTimeTimezoneId)!!.toLocalTime(), timeZoneId)
+        event.setEnd(event.getEnd(endTimeZoneId)!!.toLocalDate(), event.getEnd(endTimeZoneId)!!.toLocalTime(), timeZoneId)
 
-    this.setStartTimeZone(timeZoneId)
-    this.setEndTimeZone(timeZoneId)
+        this.setStartTimeZone(timeZoneId)
+        this.setEndTimeZone(timeZoneId)
 
-    this.timezoneInfo.timezones.clear()
+        this.timezoneInfo.timezones.clear()
 
-}
-
-/**
- * Removes Timezone Assignments and sets correct DTEND according to standard, not GUI form.
- *
- * @param timeZoneId needed to correctly interpret Dates if we are about to remove timezone info
- */
-fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
-    this.timezoneInfo.timezones.clear()
-    this.events.first().apply {
-        setStart(this.getStart(timeZoneId)!!.toLocalDate())
-        setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
     }
-}
 
-fun VEvent.getStart(timeZoneId: String? = null): ZonedDateTime? {
+    /**
+     * Removes Timezone Assignments and sets correct DTEND according to standard, not GUI form.
+     *
+     * @param timeZoneId needed to correctly interpret Dates if we are about to remove timezone info
+     */
+    fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
+        this.timezoneInfo.timezones.clear()
+        this.events.first().apply {
+            setStart(this.getStart(timeZoneId)!!.toLocalDate())
+            setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
+        }
+    }
 
-    if (this.dateStart?.value == null) return null // TODO
+    fun VEvent.getStart(timeZoneId: String? = null): ZonedDateTime? {
 
-    return ZonedDateTime.ofInstant(
-        this.dateStart.value.toInstant(),
-        if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
-    )
-}
+        if (this.dateStart?.value == null) return null // TODO
 
-fun VEvent.getEnd(timeZoneId: String? = null): ZonedDateTime? {
-    if (this.dateEnd?.value == null) return null // TODO
+        return ZonedDateTime.ofInstant(
+            this.dateStart.value.toInstant(),
+            if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
+        )
+    }
 
-    return ZonedDateTime.ofInstant(
-        this.dateEnd.value.toInstant(),
-        if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
-    )
-}
+    fun VEvent.getEnd(timeZoneId: String? = null): ZonedDateTime? {
+        if (this.dateEnd?.value == null) return null // TODO
+
+        return ZonedDateTime.ofInstant(
+            this.dateEnd.value.toInstant(),
+            if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
+        )
+    }
 
 
-/**
- * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
- * that original Event.
- */
-fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
+    /**
+     * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
+     * that original Event.
+     */
+    fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
 
-    // TODO maybe we should make this use LocalDate so we can use an actual value of the RECURRENCE-ID
-    return this.groupBy({it.uid}).mapValues { events ->
-        events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
-    }.map { it.value }.toList()
-}
+        // TODO maybe we should make this use LocalDate so we can use an actual value of the RECURRENCE-ID
+        return this.groupBy({it.uid}).mapValues { events ->
+            events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
+        }.map { it.value }.toList()
+    }
