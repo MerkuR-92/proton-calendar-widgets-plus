@@ -58,6 +58,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
 
 
+
             TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $it")
             TimberLogger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
             TimberLogger.d("${it?.iCalendar?.printToString()}")
@@ -70,6 +71,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val TODOcalendarTimeZoneId = TimeZone.getDefault()
 
             it?.let { event -> // TODO move somewhere else?
+
+                val eventOccurrence = it.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
+
+
+
 
                 button_delete.setOnClickListener {
 
@@ -145,34 +151,34 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                     if (event.spansSingleDay()) {
 
-                        val formattedDate = event.formatStart(calendarViewModel.timeZoneId.id)// DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
+                        val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(calendarViewModel.timeZoneId.id) ?: event.formatStart(calendarViewModel.timeZoneId.id).first
 
                         if (event.isAllDay()) { // ignoring timezones
-                            text_event_date.text = formattedDate.first
+                            text_event_date.text = formattedStartDate
                         } else {
 
                              val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
                              val endDateTimeInStartTimezone = ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
 
-                             val startTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
-                             val endTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
+                             val formattedStartTime = eventOccurrence?.startDateTime?.formatTime(calendarViewModel.timeZoneId.id) ?: DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
+                             val formattedEndTime = eventOccurrence?.endDateTime?.formatTime(calendarViewModel.timeZoneId.id) ?:  DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
 
-                             text_event_date.text = "${formattedDate}\n${getString(R.string.event_time_period_spanning_single_day, startTime, endTime)}"
+                             text_event_date.text = "${formattedStartDate}\n${getString(R.string.event_time_period_spanning_single_day, formattedStartTime, formattedEndTime)}"
                         }
                     } else {
 
                         if (event.isAllDay()) { // ignoring timezones
-                            val startDate = event.formatStart(calendarViewModel.timeZoneId.id) //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
-                            // TODO maybe extract this to Event
+                            val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(calendarViewModel.timeZoneId.id) ?: event.formatStart(calendarViewModel.timeZoneId.id).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
 
-                            val endDateMinus1Day = ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), calendarViewModel.timeZoneId).minusDays(1)
-                            val endDate = DateFormat.getDateInstance(DateFormat.FULL).format(Date.from(endDateMinus1Day.toInstant()))
+                            val endDateMinus1Day = (eventOccurrence?.endDateTime ?: ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), calendarViewModel.timeZoneId)).minusDays(1)
+                            val formattedEndDate = endDateMinus1Day.formatDate(calendarViewModel.timeZoneId.id)//DateFormat.getDateInstance(DateFormat.FULL).format()
 
-                            text_event_date.text = getString(R.string.event_time_period_spanning_many_days, startDate, endDate)
+                            text_event_date.text = getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
                         } else {
 
-                                val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
-                                val endDateTimeInStartTimezone = ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
+
+                                val startDateTimeInStartTimezone = eventOccurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(TODOcalendarTimeZoneId.id)) ?: ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
+                                val endDateTimeInStartTimezone = eventOccurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(TODOcalendarTimeZoneId.id)) ?: ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(TODOcalendarTimeZoneId.id))
 
                                 val startDateTime = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
                                 val endDateTime = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
@@ -183,35 +189,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 text_event_all_day_pill.visibleOrGone(event.isAllDay())
                 text_event_all_day_pill.background.setTint(Color.parseColor(event.calendar.color))
-
-                // TODO this will be used when displaying recurring events on grid
-                //event.iCalEvent.exceptionDates
-                // The exception dates, if specified, are used in
-                //      computing the recurrence set.  The recurrence set is the complete
-                //      set of recurrence instances for a calendar component.  The
-                //      recurrence set is generated by considering the initial "DTSTART"
-                //      property along with the "RRULE", "RDATE", and "EXDATE" properties
-                //      contained within the recurring component.  The "DTSTART" property
-                //      defines the first instance in the recurrence set.  The "DTSTART"
-                //      property value SHOULD match the pattern of the recurrence rule, if
-                //      specified.  The recurrence set generated with a "DTSTART" property
-                //      value that doesn't match the pattern of the rule is undefined.
-                //      The final recurrence set is generated by gathering all of the
-                //      start DATE-TIME values generated by any of the specified "RRULE"
-                //      and "RDATE" properties, and then excluding any start DATE-TIME
-                //      values specified by "EXDATE" properties.  This implies that start
-                //      DATE-TIME values specified by "EXDATE" properties take precedence
-                //      over those specified by inclusion properties (i.e., "RDATE" and
-                //      "RRULE").  When duplicate instances are generated by the "RRULE"
-                //      and "RDATE" properties, only one recurrence is considered.
-                //      Duplicate instances are ignored.
-                //
-                //      The "EXDATE" property can be used to exclude the value specified
-                //      in "DTSTART".  However, in such cases, the original "DTSTART" date
-                //      MUST still be maintained by the calendaring and scheduling system
-                //      because the original "DTSTART" value has inherent usage
-                //      dependencies by other properties such as the "RECURRENCE-ID".
-
 
                 val recurrenceLabel = AndroidUtils.formatRecurrence(requireContext(), it, TODOcalendarTimeZoneId.id)
 

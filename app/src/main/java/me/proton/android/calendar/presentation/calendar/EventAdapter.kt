@@ -20,9 +20,9 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
         // TODO consider databinding
         fun bind(item: Event, clickListener: (Event) -> Unit) {
 
-            val time = if (item.isAllDay()) "(all-day)" else "${item.formatStart(ZoneId.systemDefault().id)} - ${item.formatEnd(ZoneId.systemDefault().id)}"
+            //val time = if (item.isAllDay()) "(all-day)" else "${item.formatStart(ZoneId.systemDefault().id)} - ${item.formatEnd(ZoneId.systemDefault().id)}"
 
-            textView.setText(time + (if (item.occurence != null) " (occurrence: ${item.occurence?.occurrenceNumber})" else "") + "\n" + item.summary) // TODO
+            textView.setText(item.summary + (if (item.occurence != null) "\n(occurrence: ${item.occurence?.occurrenceNumber})" else "")) // TODO
             textView.setOnClickListener { clickListener(item) }
         }
     }

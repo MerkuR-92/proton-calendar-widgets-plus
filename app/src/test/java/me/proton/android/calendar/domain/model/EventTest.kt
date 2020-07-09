@@ -3,9 +3,7 @@ package me.proton.android.calendar.domain.model
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import assertk.fail
 import biweekly.component.VEvent
-import biweekly.property.RecurrenceRule
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
@@ -32,7 +30,9 @@ internal class EventTest {
     @Test
     fun `is all day event`() {
         val event = Event("id", Calendar("id", "name", "color"), calendarAllDaySingleDay!!)
+        val eventRecurring = Event("id", Calendar("id", "name", "color"), calendarAllDaySingleDayRecurring!!)
         assertTrue(event.isAllDay())
+        assertTrue(eventRecurring.isAllDay())
     }
 
     @Test
@@ -50,7 +50,9 @@ internal class EventTest {
     @Test
     fun `all-day event is on single day`() {
         val event = Event("id", Calendar("id", "name", "color"), calendarAllDaySingleDay!!)
+        val eventRecurring = Event("id", Calendar("id", "name", "color"), calendarAllDaySingleDayRecurring!!)
         assertTrue(event.spansSingleDay())
+        assertTrue(eventRecurring.spansSingleDay())
     }
 
     @Test
@@ -189,6 +191,24 @@ internal class EventTest {
     SUMMARY:All-day event on 2nd April
     UID:proton-calendar-11667b13-2041-adde-3bc8-34952f4c0578
     DTSTAMP:20200330T155327Z
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+    val calendarAllDaySingleDayRecurring = ICalUtils.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200708
+    RRULE:FREQ=DAILY
+    SUMMARY:all-day recurring
+    UID:0E5ZIn1likmkmo7BIkX8vaGswv1D@proton.me
+    DTSTAMP:20200709T085114Z
+    DTEND;VALUE=DATE:20200709
     BEGIN:VALARM
     TRIGGER:-PT15H
     ACTION:DISPLAY
