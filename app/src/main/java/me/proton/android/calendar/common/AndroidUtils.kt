@@ -102,6 +102,27 @@ class AndroidUtils(context: Context) {
             builder.create().show()
         }
 
+        fun displaySingleChoiceConfirmationPicker(
+            context: Context,
+            title: String?,
+            items: Array<String>,
+            selectedIndex: Int,
+            callback: (selectedIndex: Int) -> Unit
+        ) {
+            var selectedItem: Int = 0
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            title?.apply { builder.setTitle(this) }
+            builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
+                selectedItem = item
+            }
+            builder.setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
+                callback(selectedItem)
+                dialog.dismiss()
+            }
+            builder.setNegativeButton(R.string.dialog_button_cancel, null)
+            builder.create().show()
+        }
+
         fun displaySimpleOkAlert(
             context: Context,
             message: String,

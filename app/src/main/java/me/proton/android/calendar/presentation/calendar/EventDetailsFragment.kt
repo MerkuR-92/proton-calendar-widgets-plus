@@ -83,11 +83,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                     if (event.isRecurring()) {
 
-                        AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                        AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
                             getString(R.string.event_recurring_edit_this),
                             if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_following) else null,
                             getString(R.string.event_recurring_edit_all_events)
                         ).toTypedArray(), -1) {
+
+                            TimberLogger.e("WORKS")
 
                             lifecycleScope.launch {
                                 val deleteResult = withContext(Dispatchers.IO) {

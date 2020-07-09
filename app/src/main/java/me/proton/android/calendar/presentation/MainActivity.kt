@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
                         fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
                             //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
                             valueStore.getString("DEFAULT CALENDAR ID")!!
-                        ), LocalDate.now().minusDays(7), LocalDate.now().plusDays(7), "Europe/Zurich")
+                        ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), "Europe/Zurich")
                     } else {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(applicationContext, "Please login again", Toast.LENGTH_LONG).show()
