@@ -421,6 +421,8 @@ data class Event(
 
     fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
 
+    fun isFromRecurring(): Boolean = this.iCalEvent.recurrenceId != null
+
     fun isCustomRecurring(): Boolean {
 
         // no Recurrence Rule

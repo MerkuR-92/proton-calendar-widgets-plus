@@ -74,11 +74,11 @@
         <deepLink
             android:id="@+id/deepLink2"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}" />
+            app:uri="proton-calendar://protonmail.com/event/edit?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
         <deepLink
             android:id="@+id/deepLink3"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/create?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}" />
+            app:uri="proton-calendar://protonmail.com/event/create?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
         <argument
             android:name="eventId"
             app:argType="string"
@@ -91,6 +91,10 @@
             android:name="initStartTime"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="occurrenceNumber"
+            app:argType="integer"
+            android:defaultValue="0" />
         <action
             android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_attendees"
             app:destination="@id/nav_event_create_edit_attendees" />

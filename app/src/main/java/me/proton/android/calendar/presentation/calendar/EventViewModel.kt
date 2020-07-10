@@ -1,13 +1,12 @@
 package me.proton.android.calendar.presentation.calendar
 
 import androidx.lifecycle.*
+import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
+import biweekly.property.RecurrenceId
 import biweekly.property.Trigger
-import biweekly.util.DayOfWeek
-import biweekly.util.Duration
-import biweekly.util.Frequency
-import biweekly.util.Recurrence
+import biweekly.util.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,17 +23,19 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val createEventUseCase: EditCreateEventUseCase,
+    private val transformEventUseCase: TransformEventUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val gson: Gson
 ) : ViewModel() {
@@ -269,15 +270,67 @@ class EventViewModel(
 
 
 
-    suspend fun handleSave(editOption: EventEditDeleteOption? = null): Boolean { // create or edit
+    suspend fun handleSave(editOption: EventEditDeleteOption? = null, occurrenceNumber: Int? = null): Boolean { // create or edit
+
+//        val calendarToSave = event.iCalendar
+
+        // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
+
+        TimberLogger.d("handleSave with editOption: $editOption")
+        TimberLogger.d("calendar before adjusting: " + event.iCalendar.printToString())
+
+        if (event.isAllDay()) {
+            event.iCalendar.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
+            initialTimeZoneId = event.defaultTimeZone!!
+            TimberLogger.d("calendar for all-day: " + event.iCalendar.printToString())
+        } else {
+            event.iCalendar.adjustStartEndTimeZones(initialTimeZoneId, event.defaultTimeZone!!)
+            initialTimeZoneId = event.defaultTimeZone!!
+            TimberLogger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
+        }
+
+        if (eventBumpSeqId) {
+            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1)
+        }
+
+        val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
+
+        //TimberLogger.d(("occurence generated: ${occurrence}"))
+
+        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
+//        val dbEventOccurrence = dbEvent?.let {
+//            dbEventgenerateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
+//        }
+
+        //TimberLogger.d(("dbEventOccurrence generated: ${dbEventOccurrence}"))
+
+
 
         when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
-                // create new event with:
-                // UID copied from original event
-                // RECURRENCE-ID set to DTSTART of this occurence, so when clicked on 2nd occurence, we take this "phantom start date" of 2nd occurence
 
-                // TODO when expanding, we take all of the events with this UID and discard conflicting ones for displaying on calendar views
+                if (event.isRecurring()) { // TODO this is not completely correct, because singly-edited events with recurrence-id and UID are still linked with original event
+
+                    if (occurrence == null) return false
+
+                    event = event.copy( // TODO move to helper method?
+                        id = ICalUtils.generateOfflineEventId()
+                        //,
+                        //iCalendar = ICalendar(calendarToSave)
+                    )
+                    // event.uid is still the same
+
+
+                    val recurrenceStartDate = Date.from(occurrence.startDateTime.toInstant())
+                    val recurrenceEndDate = Date.from(occurrence.endDateTime.toInstant())
+
+                    event.iCalEvent.setDateStart(recurrenceStartDate, !event.isAllDay())
+                    event.iCalEvent.setDateEnd(recurrenceEndDate, !event.isAllDay())
+
+                    event.iCalEvent.recurrenceRule = null
+                    event.iCalEvent.setRecurrenceId(RecurrenceId(recurrenceStartDate, !event.isAllDay()))
+
+                } // else no special changes for regular event, just overwrite everything
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> TODO()
@@ -287,48 +340,21 @@ class EventViewModel(
             }
         }
 
-        // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
-
-
-
-
-        TimberLogger.d("handleSave with editOption: $editOption")
-
-
-
-
-
-        val calendarToSave = event.iCalendar
-
-        if (event.isAllDay()) {
-            calendarToSave.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
-            initialTimeZoneId = event.defaultTimeZone!!
-            TimberLogger.d("calendar for all-day: " + calendarToSave.printToString())
-        } else {
-            calendarToSave.adjustStartEndTimeZones(initialTimeZoneId, event.defaultTimeZone!!)
-            initialTimeZoneId = event.defaultTimeZone!!
-            TimberLogger.d("calendar for part-time after adjusting timezones: " + calendarToSave.printToString())
-        }
-
-        if (eventBumpSeqId) {
-            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1)
-        }
+        // TODO figure out if there was time-change
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
-
-        TimberLogger.d("calendar: ${event.calendar}")
-
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
         // TODO run work manager
+        TimberLogger.d(("calling use case with ${event.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
-            createEventUseCase.execute(TODOuserID, event.calendar.id, event.copy(iCalendar = calendarToSave))// TODO make sure this is legit
+            //createEventUseCase.execute(TODOuserID, event.calendar.id, event)
         }
 
-        return createEventResult.await() == UseCase.Result.Success
+        return false//createEventResult.await() == UseCase.Result.Success
 
     }
 
@@ -470,6 +496,8 @@ class EventViewModel(
     }
 
     fun hasEventBeenEdited() = eventEdited
+
+    fun hasEventTimeBeenEdited() = eventEdited
 
     fun isEventNew() = !event.isSyncedWithApi()
 

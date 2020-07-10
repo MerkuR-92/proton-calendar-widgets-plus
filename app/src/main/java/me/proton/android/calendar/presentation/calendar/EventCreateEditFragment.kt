@@ -46,23 +46,23 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
                     if (eventViewModel.hasEventBeenEdited()) {
 
-                        if (eventViewModel.isEventRecurring() && eventViewModel.hasEventBeenEdited() && !eventViewModel.isEventNew()) { // edit recurring
+                        if (eventViewModel.isEventRecurring() && !eventViewModel.isEventNew()) { // edit recurring
 
-                            AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                            AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                                 getString(R.string.event_recurring_edit_this),
                                 if (!eventViewModel.isEventFirstOccurrence()) getString(R.string.event_recurring_edit_this_and_following) else null,
                                 getString(R.string.event_recurring_edit_all_events)
-                            ).toTypedArray(), -1) {
+                            ).toTypedArray(), 0) {
 
                                 lifecycleScope.launch {
                                     val success = withContext(Dispatchers.IO) {
                                         if (it == 0) {
-                                            eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT)
+                                            eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
                                         } else if (it == 1) {
                                             if (eventViewModel.isEventFirstOccurrence()) {
                                                 eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS)
                                             } else {
-                                                eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING)
+                                                eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING, navigationArguments.occurrenceNumber)
                                             }
                                         } else { // it == 2
                                             eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS)

@@ -36,7 +36,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
         when (menuItem.itemId) {
-            R.id.action_menu_edit -> findNavController().navigate((Navigation.Deeplink.toEventEdit(navigationArguments.eventId)))
+            R.id.action_menu_edit -> findNavController().navigate((Navigation.Deeplink.toEventEdit(navigationArguments.eventId, navigationArguments.occurrenceNumber)))
         }
     }
 
@@ -81,15 +81,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
 
 
-                    if (event.isRecurring()) {
+                    if (event.isRecurring()/* || event.isFromRecurring()*/) {
 
                         AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
                             getString(R.string.event_recurring_edit_this),
                             if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_following) else null,
                             getString(R.string.event_recurring_edit_all_events)
-                        ).toTypedArray(), -1) {
-
-                            TimberLogger.e("WORKS")
+                        ).toTypedArray(), 0) {
 
                             lifecycleScope.launch {
                                 val deleteResult = withContext(Dispatchers.IO) {

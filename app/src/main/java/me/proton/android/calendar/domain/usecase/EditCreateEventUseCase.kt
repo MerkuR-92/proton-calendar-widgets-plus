@@ -29,8 +29,8 @@ class EditCreateEventUseCase(
         // TODO userId
         val valueStore = valueStoreProvider.provideValueStore(userId)
 
-        logger.v("executing EditCreateEventUseCase")
-        logger.v("from icalendar: ${newEvent.iCalendar.printToString()}")
+        logger.e("executing EditCreateEventUseCase from newEvent: ${newEvent}")
+        logger.e("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
 
         // TODO SEQUENCE ID has to be already incremented
 

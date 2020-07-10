@@ -182,14 +182,6 @@ data class AlarmsApiResponse(
     val eventAlarms: List<EventAlarmEntity>
 ) : BaseApiResponse()
 
-
-data class EventsByUidApiRequest(
-    val uid: String,
-    val recurrenceId: Long,
-    val page: Int,
-    val pageSize: Int
-)
-
 data class EventsByUidApiResponse(
     override val code: Int,
     val events: List<EventEntity>

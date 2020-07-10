@@ -60,6 +60,9 @@ class DeleteEventUseCase( // TODO TESTS
                     ZonedDateTime.ofInstant(it.iCalEvent.recurrenceId.value.toInstant(), ZoneId.systemDefault()).isAfter(occurrenceStart)
                 }
 
+                // TODO FIXME it would be better to join those 2 requests into one "sync" request and perform it only once -- now it will break in case of network problems
+                // however entire /sync payload is NOT executed in transaction so we need to handle multi-status response and retry if anything fails
+
                 val deleteResult = if (eventsToDelete.isNotEmpty()) {
                     deleteEvents(eventsToDelete.map { it.id }, event.calendar.id, member.id)
                 } else UseCase.Result.Success
@@ -81,6 +84,8 @@ class DeleteEventUseCase( // TODO TESTS
             memberId = memberId,
             events = eventIds.map { SyncEventDeleteContainer(it) }
         )
+
+        // TODO we will not get IDs of events that were successfully deleted, but we will get them when deletion fails
 
         return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
             is ApiResponse.Success -> {
