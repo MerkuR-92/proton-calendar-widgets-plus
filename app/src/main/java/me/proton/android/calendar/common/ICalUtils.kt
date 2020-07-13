@@ -62,90 +62,106 @@ object ICalUtils {
         return true
     }
 
+    fun VEvent.isDateTimeTheSame(that: VEvent?): Boolean {
+
+        if (that == null) return false
+
+        return (this.dateStart == that.dateStart) && (this.dateEnd == that.dateEnd)
+    }
+
+    fun ICalendar.isDateTimeTheSame(that: ICalendar?): Boolean {
+
+        if (that == null) return false
+
+        return (this.timezoneInfo.getTimezone(this.events.first().dateStart)?.timeZone?.id == that.timezoneInfo.getTimezone(that.events.first().dateStart)?.timeZone?.id) &&
+                (this.timezoneInfo.getTimezone(this.events.first().dateEnd)?.timeZone?.id == that.timezoneInfo.getTimezone(that.events.first().dateEnd)?.timeZone?.id) &&
+                (this.events.first().isDateTimeTheSame(that.events.first()))
+    }
+
     /**
      * Takes one iCalendar object and splits it according to "the matrix".
      */
-    fun splitICalendarIntoParts(iCalendar: ICalendar): CalendarSplit {
+    fun splitICalendarIntoParts(originalCalendar: ICalendar): CalendarSplit {
 
         // TODO Attendees Part
 
-        val event = iCalendar.events.first()
+        val originalEvent = originalCalendar.events.first()
+
         return CalendarSplit(
             sharedPart = VEvent().run {
-                setUid(event.uid)
-                setCreated(event.created)
-                setLastModified(event.lastModified)
+
+                val newCalendar = wrapInICalendar()
+
+                setUid(originalEvent.uid)
+                setCreated(originalEvent.created)
+                setLastModified(originalEvent.lastModified)
 //                setDateTimeStamp(event.dateTimeStamp)
-                setDateStart(event.dateStart)
-                setDateEnd(event.dateEnd)
-                setRecurrenceRule(event.recurrenceRule)
-                setRecurrenceId(event.recurrenceId)
-                setSequence(event.sequence)
-                event.exceptionDates.forEach {
-                    addExceptionDates(it)
-                }
+                setDateStart(originalEvent.dateStart)
+                setDateEnd(originalEvent.dateEnd)
+                setRecurrenceRule(originalEvent.recurrenceRule)
+                setRecurrenceId(originalEvent.recurrenceId)
+                setSequence(originalEvent.sequence)
+                originalEvent.exceptionDates.forEachIndexed { index, exceptionDate ->
+                    addExceptionDates(exceptionDate)
 
-                val calendar = wrapInICalendar()
-
-                // copy timezone assignments for DateStart & DateEnd
-                if (iCalendar.timezoneInfo.getTimezone(event.dateStart) != null) {
-                    calendar.timezoneInfo.setTimezone(event.dateStart, iCalendar.timezoneInfo.getTimezone(event.dateStart))
-                }
-                if (iCalendar.timezoneInfo.getTimezone(event.dateEnd) != null) {
-                    calendar.timezoneInfo.setTimezone(event.dateEnd, iCalendar.timezoneInfo.getTimezone(event.dateEnd))
-                }
-                this.exceptionDates.forEach {
-                    val timezoneAssignment = iCalendar.timezoneInfo.getTimezone(it)
+                    // copy timezone assignments for EXDATEs
+                    val timezoneAssignment = originalCalendar.timezoneInfo.getTimezone(exceptionDate) ?: originalCalendar.timezoneInfo.defaultTimezone
                     if (timezoneAssignment != null) {
-                        calendar.timezoneInfo.setTimezone(it, timezoneAssignment)
+                        newCalendar.timezoneInfo.setTimezone(exceptionDates[index], timezoneAssignment)
                     }
                 }
-                // delete timezone info created automatically when setting timezones
-                calendar.timezoneInfo.timezones.clear()
 
-                calendar
+                // copy timezone assignments
+                newCalendar.timezoneInfo.setTimezone(this.dateStart, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateStart) ?: originalCalendar.timezoneInfo.defaultTimezone)
+                newCalendar.timezoneInfo.setTimezone(this.dateEnd, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateEnd) ?: originalCalendar.timezoneInfo.defaultTimezone)
+                newCalendar.timezoneInfo.setTimezone(this.recurrenceId, originalCalendar.timezoneInfo.getTimezone(originalEvent.recurrenceId) ?: originalCalendar.timezoneInfo.defaultTimezone)
+
+                // delete timezone info created automatically when setting timezones
+                newCalendar.timezoneInfo.timezones.clear()
+
+                newCalendar
             },
             sharedPartToEncrypt = VEvent().run {
-                setUid(event.uid)
-                setCreated(event.created)
-                setLastModified(event.lastModified)
+                setUid(originalEvent.uid)
+                setCreated(originalEvent.created)
+                setLastModified(originalEvent.lastModified)
 //                setDateTimeStamp(event.dateTimeStamp)
-                setDescription(event.description) // TODO force substring to be max VALIDATION_EVENT_DESCRIPTION_MAX_LENGTH long?
-                setSummary(event.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
-                setLocation(event.location) // TODO force substring to be max VALIDATION_EVENT_LOCATION_MAX_LENGTH long?
+                setDescription(originalEvent.description) // TODO force substring to be max VALIDATION_EVENT_DESCRIPTION_MAX_LENGTH long?
+                setSummary(originalEvent.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
+                setLocation(originalEvent.location) // TODO force substring to be max VALIDATION_EVENT_LOCATION_MAX_LENGTH long?
                 wrapInICalendar()
             },
-            calendarPart = if (event.status != null || event.transparency != null) {
+            calendarPart = if (originalEvent.status != null || originalEvent.transparency != null) {
                 VEvent().run {
-                    setUid(event.uid)
-                    setCreated(event.created)
-                    setLastModified(event.lastModified)
+                    setUid(originalEvent.uid)
+                    setCreated(originalEvent.created)
+                    setLastModified(originalEvent.lastModified)
 //                    setDateTimeStamp(event.dateTimeStamp)
-                    setStatus(event.status)
-                    setTransparency(event.transparency)
+                    setStatus(originalEvent.status)
+                    setTransparency(originalEvent.transparency)
                     wrapInICalendar()
                 }
             } else null,
-            calendarPartToEncrypt = if (event.comments.isNotEmpty()) {
+            calendarPartToEncrypt = if (originalEvent.comments.isNotEmpty()) {
                 VEvent().run {
-                    setUid(event.uid)
-                    setCreated(event.created)
-                    setLastModified(event.lastModified)
+                    setUid(originalEvent.uid)
+                    setCreated(originalEvent.created)
+                    setLastModified(originalEvent.lastModified)
 //                    setDateTimeStamp(event.dateTimeStamp)
-                    event.comments.forEach {
+                    originalEvent.comments.forEach {
                         addComment(it)
                     }
                     // TODO here should be inserted "all the rest" of the properties
                     wrapInICalendar()
                 }
             } else null,
-            personalPart = if (event.alarms.isNotEmpty()) {
+            personalPart = if (originalEvent.alarms.isNotEmpty()) {
                 VEvent().run {
-                    setUid(event.uid)
-                    setCreated(event.created)
-                    setLastModified(event.lastModified)
+                    setUid(originalEvent.uid)
+                    setCreated(originalEvent.created)
+                    setLastModified(originalEvent.lastModified)
 //                    setDateTimeStamp(event.dateTimeStamp)
-                    event.alarms.forEach {
+                    originalEvent.alarms.forEach {
                         addAlarm(it)
                     }
                     wrapInICalendar()
@@ -182,14 +198,25 @@ object ICalUtils {
 
         // copy additional metadata that is not yet set
         if (left.timezoneInfo.getTimezone(left.events[0].dateStart) == null) {
-            left.timezoneInfo.setTimezone(left.events[0].dateStart, right.timezoneInfo.getTimezone(left.events[0].dateStart))
+            left.timezoneInfo.setTimezone(left.events[0].dateStart, right.timezoneInfo.getTimezone(right.events[0].dateStart))
         }
         if (left.timezoneInfo.getTimezone(left.events[0].dateEnd) == null) {
-            left.timezoneInfo.setTimezone(left.events[0].dateEnd, right.timezoneInfo.getTimezone(left.events[0].dateEnd))
+            left.timezoneInfo.setTimezone(left.events[0].dateEnd, right.timezoneInfo.getTimezone(right.events[0].dateEnd))
+        }
+        if (left.timezoneInfo.getTimezone(left.events[0].recurrenceId) == null) {
+            left.timezoneInfo.setTimezone(left.events[0].recurrenceId, right.timezoneInfo.getTimezone(right.events[0].recurrenceId))
         }
         if (left.productId == null) {
             left.productId = right.productId
         }
+
+        left.events[0].exceptionDates.forEachIndexed { index, exceptionDate ->
+
+        }
+
+//        if (left.timezoneInfo.getTimezone(left.events[0].dateStart) == null) {
+//            left.timezoneInfo.setTimezone(left.events[0].dateStart, right.timezoneInfo.getTimezone(right.events[0].dateStart))
+//        }
 
         return left
     }

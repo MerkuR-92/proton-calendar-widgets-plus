@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
@@ -12,6 +13,70 @@ import java.util.*
 
 
 internal class ICalUtilsTest {
+
+    @Test
+    fun `is date-time-timezone the same between two ICalendars`() {
+
+        val iCalendar1 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
+            setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
+        }.wrapInICalendar()
+        iCalendar1.setStartTimeZone("Europe/Vilnius")
+        iCalendar1.setEndTimeZone("Europe/Vilnius")
+
+        val iCalendar2 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
+            setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
+        }.wrapInICalendar()
+        iCalendar2.setStartTimeZone("Europe/Vilnius")
+        iCalendar2.setEndTimeZone("Europe/Vilnius")
+
+        val iCalendar3 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
+            setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
+        }.wrapInICalendar()
+        iCalendar3.setStartTimeZone("Europe/Zurich")
+        iCalendar3.setEndTimeZone("Europe/Zurich")
+
+        val iCalendar4 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
+            setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 14, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
+        }.wrapInICalendar()
+        iCalendar4.setStartTimeZone("Europe/Vilnius")
+        iCalendar4.setEndTimeZone("Europe/Vilnius")
+
+        val iCalendar5 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
+            setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
+        }.wrapInICalendar()
+        iCalendar5.setStartTimeZone("Europe/Vilnius")
+        iCalendar5.setEndTimeZone("Europe/Vilnius")
+
+        assertThat(iCalendar1.isDateTimeTheSame(iCalendar2)).isFalse()
+        assertThat(iCalendar2.isDateTimeTheSame(iCalendar3)).isFalse()
+        assertThat(iCalendar3.isDateTimeTheSame(iCalendar4)).isFalse()
+        assertThat(iCalendar4.isDateTimeTheSame(iCalendar5)).isTrue()
+        assertThat(iCalendar5.isDateTimeTheSame(iCalendar5)).isTrue()
+        assertThat(iCalendar5.isDateTimeTheSame(null)).isFalse()
+
+        val iCalendar6 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(LocalDate.of(2020, 1, 10).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
+            setDateEnd(Date.from(LocalDate.of(2020, 1, 11).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
+        }.wrapInICalendar()
+        val iCalendar7 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(LocalDate.of(2020, 1, 10).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
+            setDateEnd(Date.from(LocalDate.of(2020, 1, 11).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
+        }.wrapInICalendar()
+        val iCalendar8 = ICalUtils.createNewEvent().apply {
+            setDateStart(Date.from(LocalDate.of(2020, 1, 10).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
+            setDateEnd(Date.from(LocalDate.of(2020, 1, 12).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
+        }.wrapInICalendar()
+
+        assertThat(iCalendar6.isDateTimeTheSame(iCalendar7)).isTrue()
+        assertThat(iCalendar7.isDateTimeTheSame(iCalendar8)).isFalse()
+        assertThat(iCalendar7.isDateTimeTheSame(null)).isFalse()
+
+    }
 
     @Test
     fun `all timezone IDs allowed by server are correctly recognised`() {

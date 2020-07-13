@@ -149,7 +149,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
             val viewModeInitStatus = withContext(Dispatchers.Default) {
-                eventViewModel.initialise(navigationArguments.eventId, navigationArguments.initStartDate, navigationArguments.initStartTime)
+                eventViewModel.initialise(navigationArguments.eventId, if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber, navigationArguments.initStartDate, navigationArguments.initStartTime)
             }
 
             if (viewModeInitStatus == UseCase.Result.Success) {
