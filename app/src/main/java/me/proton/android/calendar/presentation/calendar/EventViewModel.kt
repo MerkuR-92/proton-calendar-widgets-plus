@@ -298,7 +298,7 @@ class EventViewModel(
         }
 
         if (eventBumpSeqId) {
-        //    event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1)
+        //    event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO FIXME
         }
 
         val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)

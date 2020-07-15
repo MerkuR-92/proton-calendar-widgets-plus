@@ -342,46 +342,32 @@ data class Event(
 
         val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
 
-        val iCalTimeZoneEnd = iCalTimeZone(iCalEvent.dateEnd)
-
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
-        val endIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateEnd.value, iCalTimeZoneEnd)
+
+        val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
 
         var counter = 1
         while (startIterator.hasNext() && counter <= occurrenceNumber) {
 
             if (counter == occurrenceNumber) {
 
-                return if (this.isAllDay()) { // we force the timezone to be the one we got in param
-                    Occurrence(
-                        // unfortunately parser uses Calendar object with default timezone
-                        ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId)),
-                        ZonedDateTime.of(ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId)),
-                        counter)
-                } else {
-                    Occurrence(
-                        ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId)),
-                        ZonedDateTime.ofInstant(endIterator.next().toInstant(), ZoneId.of(timeZoneId)),
-                        counter)
-                }
+                val occurrenceStart = if (this.isAllDay()) { // we force the timezone to be the one we got in param
+                    // unfortunately parser uses Calendar object with default timezone
+                    ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
+                } else ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId))
+
+                val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+
+                return Occurrence(occurrenceStart, occurrenceEnd, counter)
+
             } else {
                 counter++
                 startIterator.next()
-                endIterator.next()
             }
         }
 
         return null
     }
-
-//    fun overlapsRecurringWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): RecurrenceInfo? {
-//
-//
-//
-//        val overlaps = overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
-//
-//        return
-//    }
 
     fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
 

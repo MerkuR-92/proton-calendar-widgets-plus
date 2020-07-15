@@ -953,6 +953,49 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate n-th occurrence of partial-day multi-day event with BYDAY, display in different timezone`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200708T154500
+    DTEND;TZID=Europe/Zurich:20200709T161500
+    RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=WE
+    SUMMARY:recurring every week 5 times
+    UID:EGVy407XddW2_ESpoOVn7oN1qc9V@proton.me
+    DTSTAMP:20200625T143822Z
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
+        val occurrence2 = event.generateOccurrence(2, displayTimeZoneId)
+
+        TestsLogger.d("$occurrence1")
+        TestsLogger.d("$occurrence2")
+
+        assertThat(occurrence1).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 7, 8, 16, 45, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 7, 9, 17, 15, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrence2).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 7, 15, 16, 45, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 7, 16, 17, 15, 0, 0, ZoneId.of(displayTimeZoneId)),
+            2))
+
+    }
+
+    @Test
     fun `correctly sanitise partial-day Event without DTEND`() {
 
         val event = ICalUtils.createNewEvent()
