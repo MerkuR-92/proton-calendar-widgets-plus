@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation.calendar
 
 import androidx.lifecycle.*
+import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.RecurrenceId
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.api.CalendarUserSettingsApiEntity
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -301,64 +303,74 @@ class EventViewModel(
         //    event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO FIXME
         }
 
-        val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
 
-        //TimberLogger.d(("occurence generated: ${occurrence}"))
+        // TODO FIXME THIS HAS TO COUNT FROM db-EVENT START, NOT MODIFIED CURRENT EVENT!
+        //val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
+
 
         val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
-//        val dbEventOccurrence = dbEvent?.let {
-//            dbEventgenerateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
-//        }
+        val dbEventStartDate = dbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!) ?: return false
+        val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!) ?: return false
+        val dbEventWithOccurrenceStartDate = dbEventWithOccurrence.iCalEvent.getStart(event.defaultTimeZone!!) ?: return false
 
-        //TimberLogger.d(("dbEventOccurrence generated: ${dbEventOccurrence}"))
+        TimberLogger.d("db event =${dbEvent?.iCalendar?.printToString()}")
+        TimberLogger.d(("dbEventStartDate : ${dbEventStartDate}"))
+        TimberLogger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence.iCalendar.printToString()}"))
+        TimberLogger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
 
 
 
-        when (editOption) {
+        val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
                 if (event.isRecurring()) { // TODO this is not completely correct, because singly-edited events with recurrence-id and UID are still linked with original event
 
-                    if (occurrence == null) return false
+                    //if (occurrence == null) return false
 
-                    event = event.copy( // TODO move to helper method?
-                        id = ICalUtils.generateOfflineEventId()
-                        //,
-                        //iCalendar = ICalendar(calendarToSave)
+
+
+                    val eventToCreate = event.copy( // TODO move to helper method?
+                        id = ICalUtils.generateOfflineEventId(),
+                        iCalendar = event.iCalendar.clone() /*ICalendar(event.iCalendar).apply {
+                            this.setStartTimeZone(event.iCalendar.getTimezoneInfo().getTimezone(event.iCalEvent.dateStart).timeZone.id)
+                            this.setEndTimeZone(event.iCalendar.getTimezoneInfo().getTimezone(event.iCalEvent.dateEnd).timeZone.id)
+                            // TODO FIXME OTHER TIMEZONES
+//                            ICalendar()
+                        }*/
                     )
                     // event.uid is still the same
 
-                    val occurrenceStartDate = Date.from(occurrence.startDateTime.toInstant())
-                    val occurrenceEndDate = Date.from(occurrence.endDateTime.toInstant())
+                    //val occurrenceStartDate = Date.from(occurrence.startDateTime.toInstant())
+                    //val occurrenceEndDate = Date.from(occurrence.endDateTime.toInstant())
 
-                    event.iCalEvent.setDateStart(occurrenceStartDate, !event.isAllDay())
-                    event.iCalEvent.setDateEnd(occurrenceEndDate, !event.isAllDay())
+                    //event.iCalEvent.setDateStart(occurrenceStartDate, !event.isAllDay())
+                    //event.iCalEvent.setDateEnd(occurrenceEndDate, !event.isAllDay())
 
-                    event.iCalEvent.recurrenceRule = null
+                    eventToCreate.iCalEvent.recurrenceRule = null
 
-                    val timeHasBeenChanged = event.iCalendar.isDateTimeTheSame(dbEvent?.iCalendar)
+                    TimberLogger.d("final event to save =${eventToCreate.iCalendar.printToString()}")
+
+                    val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
                     if (timeHasBeenChanged) {
                         TimberLogger.d("time has been changed")
-
-                        val dbEventOccurrence = dbEvent?.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!) ?: return false
-                        val dbEventStartDate = Date.from(dbEventOccurrence.startDateTime.toInstant())
-
-                        event.iCalEvent.setRecurrenceId(RecurrenceId(dbEventStartDate, !event.isAllDay())) // original event's start time
-
+                        eventToCreate.setRecurrenceId(dbEventStartDate, !eventToCreate.isAllDay())
+//                        eventToCreate.iCalEvent.setRecurrenceId(RecurrenceId(dbEventStartDate, !eventToCreate.isAllDay())) // original event's start time
                     } else {
                         TimberLogger.d("time is the same")
-
-                        event.iCalEvent.setRecurrenceId(RecurrenceId(occurrenceStartDate, !event.isAllDay())) // this occurrence's start time
+                        eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
+//                        eventToCreate.iCalEvent.setRecurrenceId(RecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())) // this occurrence's start time
                     }
 
-                } // else no special changes for regular event, just overwrite everything
+                    eventToCreate
+
+                } else {
+                    event // else no special changes for regular event, just overwrite everything
+                }
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> TODO()
             EventEditDeleteOption.ALL_EVENTS -> TODO()
-            null -> {
-                // CURRENT EDIT FOR ORIGINAL EVENT EDIT
-            }
+            else -> event // else no special changes for regular event, just overwrite everything
         }
 
         // TODO figure out if there was time-change
@@ -370,9 +382,9 @@ class EventViewModel(
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
         // TODO run work manager
-        TimberLogger.d(("calling use case with ${event.iCalendar.printToString()}"))
+        TimberLogger.d(("calling use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
-            createEventUseCase.execute(TODOuserID, event.calendar.id, event)
+            createEventUseCase.execute(TODOuserID, newEvent.calendar.id, newEvent)
         }
 
         return createEventResult.await() == UseCase.Result.Success

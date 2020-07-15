@@ -73,7 +73,7 @@ class EditCreateEventUseCase(
 
         TimberLogger.e("shared part: ${sharedPartICalString}")
 
-        //return UseCase.Result.Error("TODO")
+//        return UseCase.Result.Error("TODO")
 
         val signatureOfSharedPart = crypto.signTextDetached(sharedPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
 

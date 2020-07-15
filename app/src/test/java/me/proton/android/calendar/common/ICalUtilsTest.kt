@@ -996,6 +996,49 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate entire Event model with datetime overwritten by n-th occurrence`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Budapest:20200708T140000
+    DTEND;TZID=Europe/Budapest:20200709T143000
+    RRULE:FREQ=WEEKLY
+    SUMMARY:weekly\, 2-day part-time
+    UID:iUsRIL4N3Wq6LN9MgvYdV42m2FIY@proton.me
+    DTSTAMP:20200716T113118Z
+    BEGIN:VALARM
+    TRIGGER:-PT15M
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        val eventWithOccurrence1 = event.withOccurrence(1, displayTimeZoneId)!!
+        val eventWithOccurrence2 = event.withOccurrence(2, displayTimeZoneId)!!
+        val eventWithOccurrence5 = event.withOccurrence(5, displayTimeZoneId)!!
+
+        assertThat(event.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 8, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(event.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 9, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(eventWithOccurrence1.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 8, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(eventWithOccurrence1.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 9, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(eventWithOccurrence2.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 15, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(eventWithOccurrence2.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 16, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(eventWithOccurrence5.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 8, 5, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(eventWithOccurrence5.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 8, 6, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
     fun `correctly sanitise partial-day Event without DTEND`() {
 
         val event = ICalUtils.createNewEvent()

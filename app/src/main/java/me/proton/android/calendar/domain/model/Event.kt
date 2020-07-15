@@ -7,6 +7,7 @@ import biweekly.io.TimezoneAssignment
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.ICalProperty
+import biweekly.property.RecurrenceId
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
@@ -273,6 +274,17 @@ data class Event(
         return null // no exception date has been set
     }
 
+    fun setRecurrenceId(recurrenceId: ZonedDateTime, hasTime: Boolean) {
+
+        iCalEvent.setRecurrenceId(RecurrenceId(Date.from(recurrenceId.toInstant()), hasTime))
+
+        val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
+
+        if (iCalEvent.dateStart.value.hasTime()) {
+            iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
+        }
+    }
+
     /**
      * @param occurrenceNumber has to be 2 or more for this to make sense
      */
@@ -423,6 +435,30 @@ data class Event(
         // by default we return false which means we will ignore non-supported combinations
         return false
 
+    }
+
+    fun withOccurrence(occurrenceNumber: Int, timeZoneId: String): Event? {
+
+        val occurrence = generateOccurrence(occurrenceNumber, timeZoneId)
+
+        return if (occurrence != null) withOccurrence(occurrence) else null
+    }
+
+    /**
+     * Overwrites start & end datetime with [Occurrence] values.
+     */
+    fun withOccurrence(occurrence: Occurrence): Event? {
+        return this.copy(iCalendar = this.iCalendar.copy() as ICalendar).apply {
+            if (this.isAllDay()) {
+                this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate())
+                this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate())
+            } else {
+                this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate(), occurrence.startDateTime.toLocalTime(), occurrence.startDateTime.zone.id)
+                this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate(), occurrence.endDateTime.toLocalTime(), occurrence.endDateTime.zone.id)
+                this.iCalendar.setStartTimeZone(occurrence.startDateTime.zone.id)
+                this.iCalendar.setEndTimeZone(occurrence.endDateTime.zone.id)
+            }
+        }
     }
 
 

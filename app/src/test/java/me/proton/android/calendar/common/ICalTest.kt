@@ -75,7 +75,7 @@ internal class ICalTest {
     }
 
     @Test
-    fun `merge calendars preserving timezone info`() {
+    fun `merge calendars preserving timezone info`() { // TODO FIXME add RECURRENCE-ID & EXDATES
 
         val calendarParts = listOf(
             """

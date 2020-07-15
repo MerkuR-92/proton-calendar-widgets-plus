@@ -43,6 +43,13 @@ object ICalUtils {
     }
 
     /**
+     * Clones the ICalendar copying timezones.
+     */
+    fun ICalendar.clone(): ICalendar {
+        return mergeICalendars(ICalendar(this), this)
+    }
+
+    /**
      * @return true if Event is valid
      */
     fun VEvent.sanitise(): Boolean {
@@ -66,7 +73,7 @@ object ICalUtils {
 
         if (that == null) return false
 
-        return (this.dateStart == that.dateStart) && (this.dateEnd == that.dateEnd)
+        return (this.dateStart.value.toInstant() == that.dateStart.value.toInstant()) && (this.dateEnd.value.toInstant() == that.dateEnd.value.toInstant())
     }
 
     fun ICalendar.isDateTimeTheSame(that: ICalendar?): Boolean {
@@ -211,7 +218,7 @@ object ICalUtils {
         }
 
         left.events[0].exceptionDates.forEachIndexed { index, exceptionDate ->
-
+            // TODO FIXME copy timezones for EXDATEs
         }
 
 //        if (left.timezoneInfo.getTimezone(left.events[0].dateStart) == null) {
