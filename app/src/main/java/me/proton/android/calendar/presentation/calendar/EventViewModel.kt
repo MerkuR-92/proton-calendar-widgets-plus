@@ -177,37 +177,27 @@ class EventViewModel(
                 calendarsRepository.eventFlow(eventId).first()
             }.await()
 
-            dbEvent?.apply {
+            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, initialTimeZoneId) ?: dbEvent)?.apply {
 
-                occurrenceNumber?.let {
-                    val occurrence = dbEvent.generateOccurrence(it, initialTimeZoneId) ?: return UseCase.Result.Error("could not generate occurrence ${it}")
-                    dbEvent.iCalEvent.setStart(occurrence.startDateTime.toLocalDate(), occurrence.startDateTime.toLocalTime(), initialTimeZoneId)
-                    dbEvent.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate(), occurrence.endDateTime.toLocalTime(), initialTimeZoneId)
-                    TimberLogger.v("occurrence dates set")
-                }
-
-                if (dbEvent.isAllDay()) { // adjust endDate to -1 day if event has no time
-                    dbEvent.iCalEvent.setEnd(dbEvent.endLocalDate!!.minusDays(1)) // TODO NPE
+                if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
+                    this.iCalEvent.setEnd(this.endLocalDate!!.minusDays(1)) // TODO NPE
 
                     timeStartBackup = LocalTime.now()
                     timeEndBackup = LocalTime.now().plusMinutes(calendarSettings.defaultEventDuration.toLong())//.truncatedTo(ChronoUnit.HOURS)
                 } else {
-                    timeStartBackup = dbEvent.getStart(initialTimeZoneId)!!.toLocalTime()
-                    timeEndBackup = dbEvent.getEnd(initialTimeZoneId)!!.toLocalTime()
+                    timeStartBackup = this.getStart(initialTimeZoneId)!!.toLocalTime()
+                    timeEndBackup = this.getEnd(initialTimeZoneId)!!.toLocalTime()
                 }
 
                 // default timezone in iCalendar is used for GUI
-                dbEvent.iCalendar.setDefaultTimeZone(dbEvent.iCalendar.timezoneInfo.getTimezone(dbEvent.iCalEvent.dateStart)?.timeZone?.id ?: initialTimeZoneId)
+                this.iCalendar.setDefaultTimeZone(this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart)?.timeZone?.id ?: initialTimeZoneId)
 
             } ?: return UseCase.Result.Error("could not find event ${eventId}")
-
-                // TODO
-                //handleAllDaySwitch(initStartTime == null)
-
-
         }
 
         _event.postValue(event)
+
+        handleAllDaySwitch(event.isAllDay())
 
         return UseCase.Result.Success
     }
@@ -323,6 +313,7 @@ class EventViewModel(
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
+                // TODO FIXME isRecurring OR isInChain?????????
                 if (event.isRecurring()) { // TODO this is not completely correct, because singly-edited events with recurrence-id and UID are still linked with original event
 
                     //if (occurrence == null) return false
@@ -331,34 +322,19 @@ class EventViewModel(
 
                     val eventToCreate = event.copy( // TODO move to helper method?
                         id = ICalUtils.generateOfflineEventId(),
-                        iCalendar = event.iCalendar.clone() /*ICalendar(event.iCalendar).apply {
-                            this.setStartTimeZone(event.iCalendar.getTimezoneInfo().getTimezone(event.iCalEvent.dateStart).timeZone.id)
-                            this.setEndTimeZone(event.iCalendar.getTimezoneInfo().getTimezone(event.iCalEvent.dateEnd).timeZone.id)
-                            // TODO FIXME OTHER TIMEZONES
-//                            ICalendar()
-                        }*/
+                        iCalendar = event.iCalendar.clone()
                     )
                     // event.uid is still the same
 
-                    //val occurrenceStartDate = Date.from(occurrence.startDateTime.toInstant())
-                    //val occurrenceEndDate = Date.from(occurrence.endDateTime.toInstant())
-
-                    //event.iCalEvent.setDateStart(occurrenceStartDate, !event.isAllDay())
-                    //event.iCalEvent.setDateEnd(occurrenceEndDate, !event.isAllDay())
-
                     eventToCreate.iCalEvent.recurrenceRule = null
-
-                    TimberLogger.d("final event to save =${eventToCreate.iCalendar.printToString()}")
 
                     val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
                     if (timeHasBeenChanged) {
                         TimberLogger.d("time has been changed")
                         eventToCreate.setRecurrenceId(dbEventStartDate, !eventToCreate.isAllDay())
-//                        eventToCreate.iCalEvent.setRecurrenceId(RecurrenceId(dbEventStartDate, !eventToCreate.isAllDay())) // original event's start time
                     } else {
                         TimberLogger.d("time is the same")
                         eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
-//                        eventToCreate.iCalEvent.setRecurrenceId(RecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())) // this occurrence's start time
                     }
 
                     eventToCreate
