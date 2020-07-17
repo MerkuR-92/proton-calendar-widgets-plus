@@ -270,7 +270,7 @@ class EventViewModel(
 
 
 
-    suspend fun handleSave(editOption: EventEditDeleteOption? = null, occurrenceNumber: Int? = null): Boolean { // create or edit
+    suspend fun handleSave(editOption: EventEditDeleteOption? = null, occurrenceNumber: Int): Boolean { // create or edit
 
 //        val calendarToSave = event.iCalendar
 
@@ -298,14 +298,14 @@ class EventViewModel(
         //val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
 
 
-        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
+        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) } ?: return false
         val dbEventStartDate = dbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!) ?: return false
         val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!) ?: return false
-        val dbEventWithOccurrenceStartDate = dbEventWithOccurrence.iCalEvent.getStart(event.defaultTimeZone!!) ?: return false
+        val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.iCalEvent?.getStart(event.defaultTimeZone!!) ?: return false
 
         TimberLogger.d("db event =${dbEvent?.iCalendar?.printToString()}")
         TimberLogger.d(("dbEventStartDate : ${dbEventStartDate}"))
-        TimberLogger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence.iCalendar.printToString()}"))
+        TimberLogger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence?.iCalendar?.printToString()}"))
         TimberLogger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
 
 
@@ -316,9 +316,7 @@ class EventViewModel(
                 // TODO FIXME isRecurring OR isInChain?????????
                 if (event.isRecurring()) { // TODO this is not completely correct, because singly-edited events with recurrence-id and UID are still linked with original event
 
-                    //if (occurrence == null) return false
-
-
+                    if (dbEventWithOccurrenceStartDate == null) return false
 
                     val eventToCreate = event.copy( // TODO move to helper method?
                         id = ICalUtils.generateOfflineEventId(),
@@ -345,11 +343,32 @@ class EventViewModel(
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> TODO()
-            EventEditDeleteOption.ALL_EVENTS -> TODO()
+            EventEditDeleteOption.ALL_EVENTS -> { // update 1st occurrence
+
+                if (dbEventWithOccurrenceStartDate.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone)?.truncatedTo(ChronoUnit.DAYS) &&
+                    dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
+
+                    // update the original event's DTSTART only with new time (leave day the same)
+                    TimberLogger.d("maybe time is changed but rrule not")
+
+                    event.also {
+                        it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate(), event.getStart(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
+                        it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate(), event.getEnd(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
+                    }
+
+                } else {
+
+                    // update the original event's DTSTART with date and time
+                    TimberLogger.d("day is changed or rrule")
+
+                    event
+
+                }
+
+                // TODO FIXME nuke all single-edits and single-deletions AFTER 1st occurrence
+            }
             else -> event // else no special changes for regular event, just overwrite everything
         }
-
-        // TODO figure out if there was time-change
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 

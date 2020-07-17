@@ -153,6 +153,27 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `set only time of event's start and end`() {
+
+        val event = ICalUtils.createNewEvent()
+        event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Vilnius")
+        event.setEnd(LocalDate.of(2020, 2, 20), LocalTime.of(11, 0), "Europe/Vilnius")
+
+        event.setStart(LocalTime.of(15, 10, 40), "Europe/Vilnius")
+        event.setEnd(LocalTime.of(16, 20, 50), "Europe/Vilnius")
+
+        assertThat(event.dateStart.value.hasTime()).isTrue()
+        assertThat(event.dateEnd.value.hasTime()).isTrue()
+
+        assertThat(event.getStart("Europe/Vilnius")!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 20))
+        assertThat(event.getEnd("Europe/Vilnius")!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 2, 20))
+
+        assertThat(event.getStart("Europe/Vilnius")!!.toLocalTime()).isEqualTo(LocalTime.of(15, 10, 40))
+        assertThat(event.getEnd("Europe/Vilnius")!!.toLocalTime()).isEqualTo(LocalTime.of(16, 20, 50))
+
+    }
+
+    @Test
     fun `adjust time zones of start & end dates for partial-day event`() {
 
         val originalTimeZoneId = "Pacific/Saipan"

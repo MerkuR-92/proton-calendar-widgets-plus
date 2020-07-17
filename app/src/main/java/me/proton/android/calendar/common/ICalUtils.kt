@@ -296,6 +296,14 @@ fun ICalendar.printToString() : String {
         this.setDateEnd(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
     }
 
+    fun VEvent.setStart(time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateStart(Date.from(ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
+    }
+
+    fun VEvent.setEnd(time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateEnd(Date.from(ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
+    }
+
     /**
      * Sets or clears TimeZone for Date Start.
      */

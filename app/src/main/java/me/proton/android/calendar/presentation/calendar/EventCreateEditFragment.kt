@@ -60,12 +60,12 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                                             eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
                                         } else if (it == 1) {
                                             if (eventViewModel.isEventFirstOccurrence()) {
-                                                eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS)
+                                                eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
                                             } else {
                                                 eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING, navigationArguments.occurrenceNumber)
                                             }
                                         } else { // it == 2
-                                            eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS)
+                                            eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
                                         }
                                     }
 
@@ -79,9 +79,9 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                                 }
                             }
 
-                        } else {
+                        } else { // TODO merge this with code above
                             val success = withContext(Dispatchers.IO) {
-                                eventViewModel.handleSave()
+                                eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
                             }
 
                             if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {

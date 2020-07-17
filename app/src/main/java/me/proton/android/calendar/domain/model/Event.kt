@@ -36,6 +36,7 @@ data class Event(
     val location: String? get() = iCalEvent.location?.value
     val description: String? get() = iCalEvent.description?.value
 
+    // TODO FIXME if we're not always setting it, it will be null!!!!!!!!!!!!!!!!!!
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
 
 
