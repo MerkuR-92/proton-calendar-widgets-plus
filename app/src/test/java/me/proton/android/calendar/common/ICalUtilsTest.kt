@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event

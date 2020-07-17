@@ -200,30 +200,14 @@ object ICalUtils {
             val properties = it.value
             properties.forEach {
                 left.events.first().setProperty(it)
+                left.timezoneInfo.setTimezone(it, right.timezoneInfo.getTimezone(it))
             }
         }
 
         // copy additional metadata that is not yet set
-        if (left.timezoneInfo.getTimezone(left.events[0].dateStart) == null) {
-            left.timezoneInfo.setTimezone(left.events[0].dateStart, right.timezoneInfo.getTimezone(right.events[0].dateStart))
-        }
-        if (left.timezoneInfo.getTimezone(left.events[0].dateEnd) == null) {
-            left.timezoneInfo.setTimezone(left.events[0].dateEnd, right.timezoneInfo.getTimezone(right.events[0].dateEnd))
-        }
-        if (left.timezoneInfo.getTimezone(left.events[0].recurrenceId) == null) {
-            left.timezoneInfo.setTimezone(left.events[0].recurrenceId, right.timezoneInfo.getTimezone(right.events[0].recurrenceId))
-        }
         if (left.productId == null) {
             left.productId = right.productId
         }
-
-        left.events[0].exceptionDates.forEachIndexed { index, exceptionDate ->
-            // TODO FIXME copy timezones for EXDATEs
-        }
-
-//        if (left.timezoneInfo.getTimezone(left.events[0].dateStart) == null) {
-//            left.timezoneInfo.setTimezone(left.events[0].dateStart, right.timezoneInfo.getTimezone(right.events[0].dateStart))
-//        }
 
         return left
     }
