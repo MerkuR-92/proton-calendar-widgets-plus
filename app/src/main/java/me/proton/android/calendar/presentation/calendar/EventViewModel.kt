@@ -5,6 +5,7 @@ import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.RecurrenceId
+import biweekly.property.RecurrenceRule
 import biweekly.property.Trigger
 import biweekly.util.*
 import com.google.gson.Gson
@@ -28,6 +29,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -36,6 +38,7 @@ class EventViewModel(
     private val createEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val deleteSingleEventEditsUseCase: DeleteSingleEventEditsUseCase,
+    private val editCreateEventUseCase: EditCreateEventUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val gson: Gson
 ) : ViewModel() {
@@ -342,7 +345,54 @@ class EventViewModel(
                 }
 
             }
-            EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> TODO()
+            EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
+
+                // delete single edits starting with just edited occurrence
+                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate.minusNanos(1))
+                if (deleteSingleEditsResult != UseCase.Result.Success ) return false
+
+                // update original event:
+                // - change COUNT to ((current occurrence number) - 1)
+                // OR
+                // - change UNTIL equal to (previous occurrence from just edited).endDate
+                val dbEventToUpdate = dbEvent.copy(iCalendar = dbEvent.iCalendar.clone())
+                dbEventToUpdate.iCalEvent.recurrenceRule?.value?.let {
+                    dbEventToUpdate.iCalEvent.setRecurrenceRule(Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
+                        // TODO count = 0 will not happen because this edit option is not available for first occurrence
+                        .count(if (it.count != null) occurrenceNumber - 1 else null)
+                        // 1 second to midnight on the end-day of previous original occurrence
+                        .until(Date.from(dbEvent.generateOccurrence(occurrenceNumber - 1, event.defaultTimeZone!!)!!.endDateTime.plusDays(1).with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()), true)
+                        .build())
+
+                    val editOriginalEventResult = editCreateEventUseCase.execute(TODOuserID, dbEventToUpdate.calendar.id, dbEventToUpdate)
+                    if (editOriginalEventResult != UseCase.Result.Success ) return false
+                }
+
+                // TODO delete exdates after this occurrence?
+
+                // --------------------------------------
+
+                val eventToCreate = event.copy(
+                    id = ICalUtils.generateOfflineEventId(),
+                    iCalendar = event.iCalendar.clone().apply {
+                        this.events.first().apply {
+                            setUid(ICalUtils.generateProtonUid(event.uid, ICalDateFormat.DATE_TIME_BASIC_WITHOUT_TZ.format(Date.from(dbEventWithOccurrenceStartDate.toInstant()))))
+                            exceptionDates.clear()
+                            val nullDate: Date? = null
+                            setRecurrenceId(nullDate)
+                            dbEvent.iCalEvent.recurrenceRule?.value?.let {
+                                setRecurrenceRule(Recurrence.Builder(dbEvent.iCalEvent.recurrenceRule.value)
+                                    .count(if (it.count != null) it.count - occurrenceNumber + 1 else null)
+                                    // UNTIL is copied from original event's RRULE
+                                    .build())
+                            }
+                        }
+                    }
+                )
+
+                eventToCreate
+
+            }
             EventEditDeleteOption.ALL_EVENTS -> {
 
                 // delete all single edits

@@ -224,6 +224,13 @@ object ICalUtils {
     fun generateProtonUid() = "${com.google.crypto.tink.subtle.Base64.urlSafeEncode(Random.randBytes(21))}@proton.me"
 
     /**
+     * Generates UID in the form of "original UID prefix + recurrenceId + original UID postfix (after @ symbol)".
+     */
+    fun generateProtonUid(originalUid: String, recurrenceId: String): String {
+        return "${originalUid.substringBefore("@")}_R$recurrenceId@${originalUid.substringAfter("@")}"
+    }
+
+    /**
      * Generates Proton Product Identifier.
      */
     fun generateProtonProdId() = "-//Proton Technologies//${API_APPLICATION_NAME} ${BuildConfig.VERSION_NAME}//EN"

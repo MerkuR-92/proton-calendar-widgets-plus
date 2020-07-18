@@ -50,7 +50,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
                             AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                                 getString(R.string.event_recurring_edit_this),
-                                if (!eventViewModel.isEventFirstOccurrence()) getString(R.string.event_recurring_edit_this_and_following) else null,
+                                if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_following) else null,
                                 getString(R.string.event_recurring_edit_all_events)
                             ).toTypedArray(), 0) {
 
@@ -59,7 +59,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                                         if (it == 0) {
                                             eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
                                         } else if (it == 1) {
-                                            if (eventViewModel.isEventFirstOccurrence()) {
+                                            if (navigationArguments.occurrenceNumber == 1) {
                                                 eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
                                             } else {
                                                 eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING, navigationArguments.occurrenceNumber)
