@@ -23,10 +23,7 @@ import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
-import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
-import me.proton.android.calendar.domain.usecase.TransformEventUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -38,6 +35,7 @@ class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val createEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
+    private val deleteSingleEventEditsUseCase: DeleteSingleEventEditsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val gson: Gson
 ) : ViewModel() {
@@ -308,7 +306,9 @@ class EventViewModel(
         TimberLogger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence?.iCalendar?.printToString()}"))
         TimberLogger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
 
-
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
+        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
@@ -343,13 +343,19 @@ class EventViewModel(
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> TODO()
-            EventEditDeleteOption.ALL_EVENTS -> { // update 1st occurrence
+            EventEditDeleteOption.ALL_EVENTS -> {
+
+                // delete all single edits
+                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventStartDate.minusNanos(1))
+                if (deleteSingleEditsResult != UseCase.Result.Success ) return false
+
+                // delete all single deletions
+                event.iCalEvent.exceptionDates.clear()
 
                 if (dbEventWithOccurrenceStartDate.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone)?.truncatedTo(ChronoUnit.DAYS) &&
                     dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
 
                     // update the original event's DTSTART only with new time (leave day the same)
-                    TimberLogger.d("maybe time is changed but rrule not")
 
                     event.also {
                         it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate(), event.getStart(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
@@ -359,25 +365,21 @@ class EventViewModel(
                 } else {
 
                     // update the original event's DTSTART with date and time
-                    TimberLogger.d("day is changed or rrule")
+                    //  which means no changes to just edited event, but it will overwrite the original event
 
                     event
 
                 }
-
-                // TODO FIXME nuke all single-edits and single-deletions AFTER 1st occurrence
             }
             else -> event // else no special changes for regular event, just overwrite everything
         }
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+
 
         // TODO run work manager
-        TimberLogger.d(("calling use case with ${newEvent.iCalendar.printToString()}"))
+        TimberLogger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
             createEventUseCase.execute(TODOuserID, newEvent.calendar.id, newEvent)
         }

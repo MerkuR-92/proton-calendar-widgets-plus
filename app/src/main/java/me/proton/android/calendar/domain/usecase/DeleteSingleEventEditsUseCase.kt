@@ -6,21 +6,20 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class DeleteEventUseCase( // TODO TESTS
+class DeleteSingleEventEditsUseCase( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
     private val gson: Gson,
     private val calendarsApi: CalendarsApi,
-    private val deleteSingleEventEditsUseCase: DeleteSingleEventEditsUseCase,
+    private val addressesApi: AddressesApi,
     private val database: AppDatabase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val calendarsRepository: CalendarsRepository): UseCase {
 
-    suspend fun execute(userId: String, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
+    suspend fun execute(userId: String, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -31,39 +30,20 @@ class DeleteEventUseCase( // TODO TESTS
 
         val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
 
-        var result = when (deleteOption) {
-            EventEditDeleteOption.THIS_EVENT -> {
+                val eventsSharingUidResponse = calendarsApi.getEventsByUid(event.uid,0,100) // TODO paging
+                val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return UseCase.Result.Error("error fetching events sharing UID")
 
-                if (event.isRecurring()) {
-
-                    event.addExceptionDate(occurrenceNumber!!) // TODO
-                    editCreateEventUseCase.execute(userId, event.calendar.id, event)
-
-                } else { // simple delete
-                    deleteEvents(listOf(event.id), event.calendar.id, member.id)
+                // we need to manually delete all "single-edited" events with RecurrenceID after just-deleted occurrence
+                val eventsToDelete = eventsSharingUid.filter {
+                    it.iCalEvent.recurrenceId != null &&
+                    ZonedDateTime.ofInstant(it.iCalEvent.recurrenceId.value.toInstant(), ZoneId.systemDefault()).isAfter(recurrenceIdIsAfter)
                 }
 
-            }
-            EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
+                val deleteResult = if (eventsToDelete.isNotEmpty()) {
+                    deleteEvents(eventsToDelete.map { it.id }, event.calendar.id, member.id)
+                } else UseCase.Result.Success
 
-                val occurrenceStart = event.generateOccurrence(occurrenceNumber!! /* TODO*/, ZoneId.systemDefault().id)?.startDateTime ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
-
-                event.handleDeleteThisAndFollowing(occurrenceNumber)
-                val editResult = editCreateEventUseCase.execute(userId, event.calendar.id, event)
-
-                // delete single edits happening after this occurrence
-                val deleteResult = deleteSingleEventEditsUseCase.execute(userId, event.id, occurrenceStart)
-
-                if ((editResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and following< events")
-
-            }
-            EventEditDeleteOption.ALL_EVENTS -> {
-                // simple delete
-                deleteEvents(listOf(event.id), event.calendar.id, member.id)
-            }
-        }
-
-        return result
+        return deleteResult
     }
 
     private suspend fun deleteEvents(eventIds: List<String>, calendarId: String, memberId: String): UseCase.Result  {
