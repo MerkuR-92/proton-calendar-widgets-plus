@@ -34,8 +34,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 5
-        versionName "0.2.2"
+        versionCode 6
+        versionName "0.2.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //signingConfig signingConfigs.debug TODO

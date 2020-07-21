@@ -299,10 +299,10 @@ class EventViewModel(
         //val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
 
 
-        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) } ?: return false
-        val dbEventStartDate = dbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!) ?: return false
-        val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!) ?: return false
-        val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.iCalEvent?.getStart(event.defaultTimeZone!!) ?: return false
+        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
+        val dbEventStartDate = dbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
+        val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
+        val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.iCalEvent?.getStart(event.defaultTimeZone!!)
 
         TimberLogger.d("db event =${dbEvent?.iCalendar?.printToString()}")
         TimberLogger.d(("dbEventStartDate : ${dbEventStartDate}"))
@@ -332,7 +332,7 @@ class EventViewModel(
                     val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
                     if (timeHasBeenChanged) {
                         TimberLogger.d("time has been changed")
-                        eventToCreate.setRecurrenceId(dbEventStartDate, !eventToCreate.isAllDay())
+                        eventToCreate.setRecurrenceId(dbEventStartDate!!, !eventToCreate.isAllDay())
                     } else {
                         TimberLogger.d("time is the same")
                         eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
@@ -348,7 +348,7 @@ class EventViewModel(
             EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
 
                 // delete single edits starting with just edited occurrence
-                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate.minusNanos(1))
+                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
                 if (deleteSingleEditsResult != UseCase.Result.Success ) return false
 
                 // update original event:
@@ -396,13 +396,13 @@ class EventViewModel(
             EventEditDeleteOption.ALL_EVENTS -> {
 
                 // delete all single edits
-                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventStartDate.minusNanos(1))
+                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
                 if (deleteSingleEditsResult != UseCase.Result.Success ) return false
 
                 // delete all single deletions
                 event.iCalEvent.exceptionDates.clear()
 
-                if (dbEventWithOccurrenceStartDate.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone)?.truncatedTo(ChronoUnit.DAYS) &&
+                if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone)?.truncatedTo(ChronoUnit.DAYS) &&
                     dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
 
                     // update the original event's DTSTART only with new time (leave day the same)
