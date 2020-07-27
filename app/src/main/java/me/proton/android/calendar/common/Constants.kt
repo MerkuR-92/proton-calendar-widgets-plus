@@ -21,7 +21,7 @@ object FormValidation {
 
     val OCURRENCE_MAX_UNTIL = LocalDate.of(2038, 1, 1).atStartOfDay(ZoneId.of("UTC"))
 
-    const val OCCURRENCE_COUNT_DEFAULT = 1
+    const val OCCURRENCE_COUNT_DEFAULT = 2
     const val OCCURRENCE_COUNT_MIN = 1
     const val OCCURRENCE_COUNT_MAX = 50
 
@@ -46,6 +46,8 @@ object FormValidation {
     const val EVENT_LOCATION_MAX_LENGTH = 255
     const val EVENT_DESCRIPTION_MAX_LENGTH = 3000
 
+
+    const val ALARM_COUNT_MAX = 10
 
     const val ALARM_PERIOD_COUNT_DEFAULT = 1
     const val ALARM_PERIOD_COUNT_MIN = 1

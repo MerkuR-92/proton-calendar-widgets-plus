@@ -117,6 +117,7 @@ object ICalUtils {
                         newCalendar.timezoneInfo.setTimezone(exceptionDates[index], timezoneAssignment)
                     }
                 }
+                setOrganizer(originalEvent.organizer)
 
                 // copy timezone assignments
                 newCalendar.timezoneInfo.setTimezone(this.dateStart, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateStart) ?: originalCalendar.timezoneInfo.defaultTimezone)

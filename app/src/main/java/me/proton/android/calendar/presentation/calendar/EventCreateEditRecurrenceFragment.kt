@@ -186,6 +186,8 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
             requireView().findViewById(R.id.rb_recurrence_custom_3)
         )
 
+        customEndingRadioGroup.check(R.id.rb_recurrence_custom_1)
+
         // "after X occurrences" radio button
         tv_recurrence_custom_suffix.setText(
             resources.getQuantityString(

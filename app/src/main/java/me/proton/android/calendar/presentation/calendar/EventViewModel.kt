@@ -9,6 +9,7 @@ import biweekly.property.RecurrenceRule
 import biweekly.property.Trigger
 import biweekly.util.*
 import com.google.gson.Gson
+import com.proton.gopenpgp.constants.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -95,9 +96,8 @@ class EventViewModel(
         TimberLogger.d("EventViewModel initialise with startDate: $initStartDate")
         TimberLogger.d("EventViewModel initialise with startTime: ${initStartTime}")
 
+        val defaultCalendar = calendarsRepository.selectCalendars(userId).filter { it.isActive }.find { it.id == todoDefaultCalendarId } ?: return UseCase.Result.Error("could not get default Calendar from DB")
 
-
-        val defaultCalendar = calendarsRepository.selectCalendar(todoDefaultCalendarId) ?: return UseCase.Result.Error("could not get default Calendar from DB")
         val calendarSettings = calendarsRepository.selectSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
 
         event = if (eventId == null) {
@@ -261,10 +261,12 @@ class EventViewModel(
     var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
     var tempAlarmTime: LocalTime = LocalTime.of(9, 0)
 
+    fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
+
     /**
-     * Resets temporary values for Alarm and optionally provides Alarm for editing.
+     * Resets temporary values for Alarm.
      */
-    fun initialiseForAlarm(/*TODO pass alarm index or sth?*/) {
+    fun initialiseForAlarm(/*TODO pass alarm index for edit?*/) {
         this.tempAlarmSendByOption = SendByOption.NOTIFICATION
         this.tempAlarmTime = LocalTime.of(9, 0)
     }
@@ -540,7 +542,9 @@ class EventViewModel(
 
         if (frequency != null) {
             interval?.let {
-                builder.interval(it)
+                if (it > 1) {
+                    builder.interval(it)
+                }
             }
             count?.let {
                 builder.count(it)
@@ -556,11 +560,16 @@ class EventViewModel(
                 val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
                 val weekInMonth = eventStartDate.weekInMonth()
 
-                builder.byDay(iCalDayOfWeek)
-
                 when (tempMonthlyRepeatOption) {
-                    MonthlyRepatOnOption.ON_X_WEEKDAY -> builder.bySetPos(weekInMonth)
-                    MonthlyRepatOnOption.ON_LAST_WEEKDAY -> builder.bySetPos(-1)
+                    MonthlyRepatOnOption.ON_DAY_X -> { }
+                    MonthlyRepatOnOption.ON_X_WEEKDAY -> {
+                        builder.byDay(iCalDayOfWeek)
+                        builder.bySetPos(weekInMonth)
+                    }
+                    MonthlyRepatOnOption.ON_LAST_WEEKDAY -> {
+                        builder.byDay(iCalDayOfWeek)
+                        builder.bySetPos(-1)
+                    }
                 }
             }
         }

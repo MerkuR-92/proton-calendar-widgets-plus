@@ -158,7 +158,11 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
-                Toast.makeText(requireContext(), "Error opening event for edit", Toast.LENGTH_LONG).show()
+                if (navigationArguments.eventId != null) { // TODO FIXME
+                    Toast.makeText(requireContext(), "Error opening event for edit", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(requireContext(), "Error initialising new event", Toast.LENGTH_LONG).show()
+                }
                 findNavController().navigateUp()
             }
 
@@ -279,7 +283,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         press_calendar.setOnClickListener {
             lifecycleScope.launch {
                 val calendars = withContext(Dispatchers.Default) {
-                    calendarViewModel.selectCalendars()
+                    calendarViewModel.selectActiveCalendars()
                 }
 
                 val selectedIndex = calendars.indexOfFirst { it.id == eventViewModel.eventLiveData.value!!.calendar.id }
@@ -357,7 +361,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         }
 
-        // "add notification" button
+        // "add alarm" button
         val addAlarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
         addAlarmView.findViewById<TextView>(R.id.tv_text).apply {
             text = resources.getString(R.string.event_text_add_alarm)
@@ -367,7 +371,9 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
         addAlarmView.findViewById<ImageButton>(R.id.ib_cross).visibleOrGone(false)
-        ll_alarms.addView(addAlarmView)
+        if (!eventViewModel.isAlarmLimitReached()) {
+            ll_alarms.addView(addAlarmView)
+        }
 
     }
 

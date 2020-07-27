@@ -229,7 +229,7 @@ class AndroidUtils(context: Context) {
 
                         when (it) {
                             Frequency.DAILY -> {
-                                val repeat = if (recurrence.interval == null) {
+                                val repeat = if (recurrence.interval == null || recurrence.interval == 1) {
                                     context.getString(R.string.event_recurrence_daily)
                                 } else {
                                     context.getString(
@@ -245,7 +245,7 @@ class AndroidUtils(context: Context) {
                                 repeat
                             }
                             Frequency.WEEKLY -> {
-                                val repeat = if (recurrence.interval == null) {
+                                val repeat = if (recurrence.interval == null || recurrence.interval == 1)  {
                                     context.getString(R.string.event_recurrence_weekly)
                                 } else {
                                     context.getString(
@@ -268,7 +268,7 @@ class AndroidUtils(context: Context) {
                                 )
                             }
                             Frequency.MONTHLY -> {
-                                val repeat = if (recurrence.interval == null) {
+                                val repeat = if (recurrence.interval == null || recurrence.interval == 1) {
                                     context.getString(R.string.event_recurrence_monthly)
                                 } else {
                                     context.getString(
@@ -297,7 +297,7 @@ class AndroidUtils(context: Context) {
                                 }
                             }
                             Frequency.YEARLY -> {
-                                val repeat = if (recurrence.interval == null) {
+                                val repeat = if (recurrence.interval == null || recurrence.interval == 1) {
                                     context.getString(R.string.event_recurrence_yearly)
                                 } else {
                                     context.getString(
@@ -483,7 +483,7 @@ fun EditText.doAfterFilteredIntValueChanged(
         if (!it.isNullOrBlank()) {
             val count = it.toString().toIntOrNull()
             when {
-                count == null -> {
+                count == null || it.toString().startsWith("0") -> {
                     this.setText(default.toString())
                 }
                 count < min -> {
@@ -549,7 +549,7 @@ fun LocalDate.formatMonthlyDayOfWeek(resources: Resources, backwards: Boolean = 
     }
 
     return "$ordinal ${this.dayOfWeek.getDisplayName(
-        TextStyle.FULL_STANDALONE,
+        TextStyle.FULL,
         Locale.getDefault()
     )}"
 

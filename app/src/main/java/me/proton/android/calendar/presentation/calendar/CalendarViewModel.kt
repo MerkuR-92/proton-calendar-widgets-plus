@@ -31,13 +31,13 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
     val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
-    suspend fun selectCalendars(): List<CalendarEntity> {
+    suspend fun selectActiveCalendars(): List<CalendarEntity> {
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
-        return calendarsRepository.selectCalendars(TODOuserID)
+        return calendarsRepository.selectCalendars(TODOuserID).filter { it.isActive }
     }
 
 
