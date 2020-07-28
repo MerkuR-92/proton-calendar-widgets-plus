@@ -85,7 +85,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                         AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
                             getString(R.string.event_recurring_edit_this),
-                            if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_following) else null,
+                            if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
                             getString(R.string.event_recurring_edit_all_events)
                         ).toTypedArray(), 0) {
 
@@ -97,7 +97,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         if (navigationArguments.occurrenceNumber == 1) {
                                             calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
                                         } else {
-                                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING, navigationArguments.occurrenceNumber)
+                                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT_AND_FUTURE, navigationArguments.occurrenceNumber)
                                         }
                                     } else { // it == 2
                                         calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)

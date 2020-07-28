@@ -121,6 +121,7 @@ internal class EventTest {
             Recurrence.Builder(Frequency.DAILY).until(Date.valueOf("2020-05-20")).build(), // until 20th May, implicitly every 1 day
 
             Recurrence.Builder(Frequency.WEEKLY).interval(1).byDay(DayOfWeek.MONDAY).build(), // every 1 week on Monday
+            Recurrence.Builder(Frequency.WEEKLY).byDay(DayOfWeek.MONDAY).build(), // implicitly every 1 week, on Monday
             Recurrence.Builder(Frequency.WEEKLY).count(5).build(), // 5 times, implicitly every 1 week
             Recurrence.Builder(Frequency.WEEKLY).until(Date.valueOf("2020-05-20")).build(), // until 20th May, implicitly every 1 week
 
@@ -148,7 +149,6 @@ internal class EventTest {
             val event = Event("id", Calendar("id", "name", "color"), calendar)
 
             TestsLogger.d(calendar.printToString())
-
 
             assertThat(event.isCustomRecurring()).isTrue()
         }

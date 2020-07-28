@@ -4,11 +4,9 @@ import com.google.gson.Gson
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
-import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import java.time.ZoneId
-import java.time.ZonedDateTime
 
 class DeleteEventUseCase( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
@@ -44,17 +42,17 @@ class DeleteEventUseCase( // TODO TESTS
                 }
 
             }
-            EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
+            EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
                 val occurrenceStart = event.generateOccurrence(occurrenceNumber!! /* TODO*/, ZoneId.systemDefault().id)?.startDateTime ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
 
-                event.handleDeleteThisAndFollowing(occurrenceNumber)
+                event.handleDeleteThisAndFuture(occurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, event.calendar.id, event)
 
                 // delete single edits happening after this occurrence
                 val deleteResult = deleteSingleEventEditsUseCase.execute(userId, event.id, occurrenceStart)
 
-                if ((editResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and following< events")
+                if ((editResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and future< events")
 
             }
             EventEditDeleteOption.ALL_EVENTS -> {

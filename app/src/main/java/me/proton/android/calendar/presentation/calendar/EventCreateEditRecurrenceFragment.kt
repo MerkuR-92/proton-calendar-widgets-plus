@@ -160,13 +160,16 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 et_custom_recurrence_count.clearFocus()
             }
 
+            val startDate = eventViewModel.tempRecurrenceUntilLocalDate
+                ?: eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+                    .toLocalDate()
+
             // handle click on day picker
             if (it == R.id.rb_recurrence_custom_2) {
                 AndroidUtils.displayDatePicker(
                     requireContext(),
-                    eventViewModel.tempRecurrenceUntilLocalDate
-                        ?: eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
-                            .toLocalDate(),
+                    startDate,
+                    startDate,
                     FormValidation.OCURRENCE_MAX_UNTIL.toLocalDate()
                 ) {
                     eventViewModel.handleRecurrenceUntilDate(it)
@@ -281,10 +284,10 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
-        // init with DAY
-        et_recurrence_count.setText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT.toString())
-        resetRecurrencePeriodAdapter(FormValidation.INTERVAL_DAY_COUNT_DEFAULT)
-        s_recurrence_period.setSelection(0)
+        // init with WEEK
+        et_recurrence_count.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
+        resetRecurrencePeriodAdapter(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
+        s_recurrence_period.setSelection(1)
 
         val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
 

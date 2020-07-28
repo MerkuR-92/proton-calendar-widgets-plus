@@ -36,6 +36,7 @@
     <string name="event_recurrence_weekly">Weekly</string>
     <string name="event_recurrence_monthly">Monthly</string>
     <string name="event_recurrence_yearly">Yearly</string>
+    <string name="event_recurrence_weekly_on_all_days">all days</string>
     <string name="event_recurrence_until">until %s</string>
 
     <!-- CREATE / EDIT EVENT   -->
@@ -89,7 +90,7 @@
     <string name="event_recurrence_ends_after_count_prefix">After</string>
 
     <string name="event_recurring_edit_this">This event</string>
-    <string name="event_recurring_edit_this_and_following">This and the following events</string>
+    <string name="event_recurring_edit_this_and_future">This and future events</string>
     <string name="event_recurring_edit_all_events">All events</string>
 
 

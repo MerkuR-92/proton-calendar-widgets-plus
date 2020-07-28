@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -202,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.action_create_event -> {
-                findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(LocalDate.now(), LocalTime.now())) /*TODO take it from click on calendar*/
+                findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtils.generateEventStartTime())) /*TODO take it from click on calendar*/
             }
 
             R.id.action_test -> {

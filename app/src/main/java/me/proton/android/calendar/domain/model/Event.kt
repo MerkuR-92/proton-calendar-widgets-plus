@@ -205,6 +205,7 @@ data class Event(
 
         val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
 
+        TestsLogger.d("using date start: ${iCalEvent.dateStart.value}")
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
@@ -289,7 +290,7 @@ data class Event(
     /**
      * @param occurrenceNumber has to be 2 or more for this to make sense
      */
-    fun handleDeleteThisAndFollowing(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
+    fun handleDeleteThisAndFuture(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
 
         val recurrenceRule = this.iCalEvent.recurrenceRule.value
 
@@ -425,13 +426,14 @@ data class Event(
     fun isCustomRecurring(): Boolean {
 
         // no Recurrence Rule
-        if (this.iCalEvent.recurrenceRule == null) return false
+        if (!this.isRecurring()) return false
 
-        // custom rule exists when there is at least Interval set
-        if (this.iCalEvent.recurrenceRule.value.interval != null) return true
-
-        // or if no Interval is set, it's implicitly set to 1 and Count or Until are set
-        if (this.iCalEvent.recurrenceRule.value.count != null || this.iCalEvent.recurrenceRule.value.until != null) return true
+        // look for any of the supported properties
+        if (this.iCalEvent.recurrenceRule.value.interval != null ||
+            this.iCalEvent.recurrenceRule.value.count != null ||
+            this.iCalEvent.recurrenceRule.value.until != null ||
+            this.iCalEvent.recurrenceRule.value.byDay?.size ?: 0 > 0
+        ) return true
 
         // by default we return false which means we will ignore non-supported combinations
         return false

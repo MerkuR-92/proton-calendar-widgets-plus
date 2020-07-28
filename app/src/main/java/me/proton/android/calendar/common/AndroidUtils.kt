@@ -64,6 +64,7 @@ class AndroidUtils(context: Context) {
         fun displayDatePicker(
             context: Context,
             initialDate: LocalDate?,
+            minDate: LocalDate? = null,
             maxDate: LocalDate? = null,
             callback: (result: LocalDate) -> Unit
         ) {
@@ -73,6 +74,9 @@ class AndroidUtils(context: Context) {
             val datePicker = customLayout.findViewById<DatePicker>(R.id.date_picker)
             initialDate?.let {
                 datePicker.init(it.year, it.monthValue - 1, it.dayOfMonth, null)
+            }
+            minDate?.let {
+                datePicker.minDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             }
             maxDate?.let {
                 datePicker.maxDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -207,22 +211,34 @@ class AndroidUtils(context: Context) {
 //        com.ibm.icu.text.MessageFormat.format(format, this)
 //    }
 
+                        val onDaysOfWeek = if (recurrence.byDay?.size == 7) {
+                            context.getString(R.string.event_recurrence_weekly_on_all_days)
+                        } else recurrence.byDay?.mapIndexedNotNull { index, byDay ->
 
-                        val onDaysOfWeek = recurrence.byDay?.mapIndexedNotNull { index, byDay ->
+                            val dayOfWeekAsWord = context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal]
+
                             if (recurrence.bySetPos.isNotEmpty()) {
                                 val setPos = recurrence.bySetPos[index]
-                                val dayAsWord = if (setPos > 0) {
-                                    context.resources.getStringArray(R.array.ordinals_as_words)
-                                        .getOrNull(setPos)
-                                } else {
-                                    context.resources.getStringArray(R.array.ordinals_as_words_backwards)
-                                        .getOrNull(setPos * -1)
-                                }
-                                "${dayAsWord ?: recurrence.bySetPos[index]} ${context.resources.getStringArray(
-                                    R.array.days_of_week
-                                )[byDay.day.ordinal]}"
+
+                                //val dayAsWord = if (setPos > 0) { // TODO FIXME
+//                                    context.resources.getStringArray(R.array.ordinals_as_words)
+//                                        .getOrNull(setPos)
+//                                } else {
+//                                    val setPos = recurrence.bySetPos[index]
+
+                                    val ordinal = if (setPos > 0) {
+                                        context.resources.getStringArray(R.array.ordinals_as_words)
+                                            .getOrNull(setPos)
+                                    } else {
+                                        context.resources.getStringArray(R.array.ordinals_as_words_backwards)
+                                            .getOrNull(setPos * -1)
+                                    }
+
+                                    "${ordinal ?: recurrence.bySetPos[index]} $dayOfWeekAsWord"
+//                                }
+//                                dayAsWord
                             } else {
-                                context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal]
+                                dayOfWeekAsWord
                             }
                         }?.joinToString(separator = ", ")
                         // TODO handle .byMonthDay, .byYearDay when needed
@@ -315,18 +331,6 @@ class AndroidUtils(context: Context) {
                             else -> null
                         }
                     },
-//        recurrence.interval?.let {
-
-//
-//            TimberLogger.e("interval jest: ${it}")
-//            TimberLogger.e("recurrence by day: ${recurrence.byDay}")
-//            TimberLogger.e("recurrence by day: ${recurrence.byMonth}")
-//            TimberLogger.e("recurrence by day: ${recurrence.byMonthDay}")
-//            TimberLogger.e("recurrence by day: ${recurrence.bySetPos}")
-//            TimberLogger.e("recurrence by day: ${recurrence.byWeekNo}")
-//            TimberLogger.e("recurrence by day: ${recurrence.byYearDay}")
-//            "INTERVAL: $it"
-//        },
                     recurrence.count?.let {
                         "${if (it > 1) "$it " else ""}${context.resources.getQuantityString(R.plurals.plural_recurrence_count, it, it)}"
                     },

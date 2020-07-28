@@ -4,11 +4,12 @@ import assertk.assertThat
 import assertk.assertions.*
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
-import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.*
 import java.util.*
 
@@ -836,7 +837,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `handle 'delete this and following' for part-day event with COUNT`() {
+    fun `handle 'delete this and future' for part-day event with COUNT`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -855,16 +856,16 @@ internal class ICalUtilsTest {
         val iCal = ICalUtils.parseICalString(iCalString)!!
         val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
 
-        event.handleDeleteThisAndFollowing(4)
+        event.handleDeleteThisAndFuture(4)
         assertThat(event.iCalEvent.recurrenceRule.value.count).isEqualTo(3)
 
-        event.handleDeleteThisAndFollowing(2)
+        event.handleDeleteThisAndFuture(2)
         assertThat(event.iCalEvent.recurrenceRule.value.count).isEqualTo(1)
 
     }
 
     @Test
-    fun `handle 'delete this and following' for part-day event without COUNT`() {
+    fun `handle 'delete this and future' for part-day event without COUNT`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -883,9 +884,9 @@ internal class ICalUtilsTest {
         val iCal = ICalUtils.parseICalString(iCalString)!!
         val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
 
-        event.handleDeleteThisAndFollowing(6)
+        event.handleDeleteThisAndFuture(6)
 
-        // we delete "6th and following occurrences"
+        // we delete "6th and future occurrences"
         // 6th occurrence happens on 2020-07-12
         // so we should set UNTIL to 1 second before midnight of the previous day
 
@@ -896,7 +897,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `handle 'delete this and following' for partial-day event without COUNT`() {
+    fun `handle 'delete this and future' for partial-day event without COUNT`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -915,9 +916,9 @@ internal class ICalUtilsTest {
         val iCal = ICalUtils.parseICalString(iCalString)!!
         val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
 
-        event.handleDeleteThisAndFollowing(4)
+        event.handleDeleteThisAndFuture(4)
 
-        // we delete "4th and following occurrences"
+        // we delete "4th and future occurrences"
         // 4th occurrence happens on 2020-07-11
         // so we should set UNTIL to previous day without TIME part
 

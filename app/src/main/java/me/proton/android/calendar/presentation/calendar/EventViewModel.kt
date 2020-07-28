@@ -1,15 +1,11 @@
 package me.proton.android.calendar.presentation.calendar
 
 import androidx.lifecycle.*
-import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
-import biweekly.property.RecurrenceId
-import biweekly.property.RecurrenceRule
 import biweekly.property.Trigger
 import biweekly.util.*
 import com.google.gson.Gson
-import com.proton.gopenpgp.constants.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -347,7 +343,7 @@ class EventViewModel(
                 }
 
             }
-            EventEditDeleteOption.THIS_EVENT_AND_FOLLOWING -> {
+            EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
                 // delete single edits starting with just edited occurrence
                 val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))

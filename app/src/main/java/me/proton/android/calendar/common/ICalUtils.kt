@@ -219,6 +219,11 @@ object ICalUtils {
         setSequence(0)
     }
 
+    fun generateEventStartTime(): LocalTime {
+        val time = LocalTime.now()
+        return time.plusMinutes(30L - (time.minute % 30))
+    }
+
     /**
      * Generates Proton UID for new ICalendar components.
      */
