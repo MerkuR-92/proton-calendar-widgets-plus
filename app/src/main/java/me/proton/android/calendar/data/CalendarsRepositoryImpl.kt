@@ -61,12 +61,6 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     if (it.isRecurring()) {
                         val occurrences = it.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
 
-                        if (it.summary == "monthly on fourth Tuesday") {
-                            TimberLogger.e("occurrences = ${it.generateOccurrencesUntil(LocalDate.now().plusDays(120), timeZoneId)}")
-                        }
-
-//                        val occurrences = it.generateExdateFilteredOccurrencesUntil(toDate, timeZoneId)
-
                         if (occurrences != null && occurrences.size > 0) {
                             // TODO we have metadata in Occurrence, use it
                             it.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)

@@ -3,14 +3,21 @@ package me.proton.android.calendar.common
 import assertk.assertThat
 import assertk.assertions.*
 import biweekly.util.Frequency
+import biweekly.util.Google2445Utils
+import biweekly.util.ICalDate
 import biweekly.util.Recurrence
+import biweekly.util.com.google.ical.compat.javautil.DateIteratorFactory
+import biweekly.util.com.google.ical.iter.RecurrenceIteratorFactory
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.*
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 
@@ -493,6 +500,51 @@ internal class ICalUtilsTest {
         assertThat(occurrences.first().occurrenceNumber).isEqualTo(7)
         assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 1, 17, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
         assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 1, 17, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
+    fun `generate occurrences of part-day event with BYSETPOS within full-day range`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200728T130000
+    DTEND;TZID=Europe/Zurich:20200728T133000
+    RRULE:FREQ=MONTHLY;BYDAY=TU;BYSETPOS=4
+    SEQUENCE:0
+    SUMMARY:monthly on fourth Tuesday
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        val displayRangeFrom = LocalDate.of(2020, 7, 1)
+        val displayRangeTo = LocalDate.of(2020, 10, 1)
+
+        val occurrences = event.generateOccurrencesUntil(displayRangeTo, displayTimeZoneId)
+
+        assertThat(occurrences!!.size).isEqualTo(3)
+
+        assertThat(occurrences.first().occurrenceNumber).isEqualTo(1)
+        assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 28, 14, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 28, 14, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences.last().occurrenceNumber).isEqualTo(3)
+        assertThat(occurrences.last().startDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 22, 14, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.last().endDateTime).isEqualTo(ZonedDateTime.of(2020, 9,  22, 14, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
 
     }
 
