@@ -15,6 +15,7 @@ import androidx.appcompat.widget.AppCompatCheckedTextView
 import androidx.core.view.children
 import androidx.core.widget.doAfterTextChanged
 import biweekly.component.VAlarm
+import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -196,6 +197,8 @@ class AndroidUtils(context: Context) {
 
         fun formatRecurrence(context: Context, event: Event, timeZoneId: String): String? {
 
+            // TODO
+            val startWeekOnMonday = true
 
             val recurrence = event.iCalEvent.recurrenceRule?.value
             if (recurrence != null) {
@@ -213,18 +216,12 @@ class AndroidUtils(context: Context) {
 
                         val onDaysOfWeek = if (recurrence.byDay?.size == 7) {
                             context.getString(R.string.event_recurrence_weekly_on_all_days)
-                        } else recurrence.byDay?.mapIndexedNotNull { index, byDay ->
+                        } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/})?.mapIndexedNotNull { index, byDay ->
 
                             val dayOfWeekAsWord = context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal]
 
                             if (recurrence.bySetPos.isNotEmpty()) {
                                 val setPos = recurrence.bySetPos[index]
-
-                                //val dayAsWord = if (setPos > 0) { // TODO FIXME
-//                                    context.resources.getStringArray(R.array.ordinals_as_words)
-//                                        .getOrNull(setPos)
-//                                } else {
-//                                    val setPos = recurrence.bySetPos[index]
 
                                     val ordinal = if (setPos > 0) {
                                         context.resources.getStringArray(R.array.ordinals_as_words)
@@ -236,7 +233,6 @@ class AndroidUtils(context: Context) {
 
                                     "${ordinal ?: recurrence.bySetPos[index]} $dayOfWeekAsWord"
 //                                }
-//                                dayAsWord
                             } else {
                                 dayOfWeekAsWord
                             }

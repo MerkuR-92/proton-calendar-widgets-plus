@@ -72,7 +72,7 @@ internal class ICalTest {
 
         val mergedCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts) ?: fail("calendar merging failed")
         val mergedEvent = mergedCalendar?.events?.first() ?: fail("calendar merging failed")
-        
+
         assertThat(mergedEvent.dateStart.value.toInstant()).isEqualTo(Instant.parse("2020-02-27T23:00:00Z"))
         assertThat(mergedEvent.summary.value).isEqualTo("Event after successful connection between database, usecase and api")
         assertThat(mergedEvent.alarms.first().action.value).isEqualTo("DISPLAY")
