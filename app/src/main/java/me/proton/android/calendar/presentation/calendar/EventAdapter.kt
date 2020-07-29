@@ -7,9 +7,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import me.proton.android.calendar.common.formatTime
 import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use entire item click listener from RV*/) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
@@ -20,9 +22,12 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
         // TODO consider databinding
         fun bind(item: Event, clickListener: (Event) -> Unit) {
 
-            //val time = if (item.isAllDay()) "(all-day)" else "${item.formatStart(ZoneId.systemDefault().id)} - ${item.formatEnd(ZoneId.systemDefault().id)}"
+            // TODO use timezone from settings
+            val time = if (item.isAllDay()) "(all-day)" else "${(item.occurence?.startDateTime ?: item.getStart(ZoneId.systemDefault().id))?.format(
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${(item.occurence?.endDateTime ?: item.getEnd(ZoneId.systemDefault().id))?.format(
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
 
-            textView.setText(item.summary + (if (item.occurence != null) "\n(occurrence: ${item.occurence?.occurrenceNumber})" else "")) // TODO
+            textView.setText(item.summary + "\n" + (if (item.occurence != null) "\n(occurrence: ${item.occurence?.occurrenceNumber})" else "") + "\n" + time) // TODO
             textView.setOnClickListener { clickListener(item) }
         }
     }

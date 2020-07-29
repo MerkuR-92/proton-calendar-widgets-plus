@@ -27,6 +27,10 @@ internal class ICalTest {
     DTSTAMP:20200228T170551Z
     SUMMARY:Event after successful connection between database\, usecase and ap
      i
+    BEGIN:VALARM
+    TRIGGER:-PT20H
+    ACTION:DISPLAY
+    END:VALARM    
     END:VEVENT
     END:VCALENDAR""".trimIndent(),
     """
@@ -37,6 +41,10 @@ internal class ICalTest {
     DTSTAMP:20200228T170551Z
     DTSTART;VALUE=DATE:20200228
     DTEND;VALUE=DATE:20200229
+    BEGIN:VALARM
+    TRIGGER:-PT20H
+    ACTION:DISPLAY
+    END:VALARM
     END:VEVENT
     END:VCALENDAR""".trimIndent(),
     """
@@ -64,11 +72,11 @@ internal class ICalTest {
 
         val mergedCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts) ?: fail("calendar merging failed")
         val mergedEvent = mergedCalendar?.events?.first() ?: fail("calendar merging failed")
-
+        
         assertThat(mergedEvent.dateStart.value.toInstant()).isEqualTo(Instant.parse("2020-02-27T23:00:00Z"))
         assertThat(mergedEvent.summary.value).isEqualTo("Event after successful connection between database, usecase and api")
         assertThat(mergedEvent.alarms.first().action.value).isEqualTo("DISPLAY")
-        assertThat(mergedEvent.alarms).hasSize(3)
+        assertThat(mergedEvent.alarms).hasSize(5)
         assertThat(mergedCalendar.events).hasSize(1)
         assertThat(mergedCalendar.productId.value).isEqualTo("-//Proton Technologies//AndroidCalendar 1.0//EN")
 

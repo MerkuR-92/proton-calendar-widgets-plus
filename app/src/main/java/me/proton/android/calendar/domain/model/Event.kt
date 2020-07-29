@@ -11,6 +11,7 @@ import biweekly.property.RecurrenceId
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -203,7 +204,7 @@ data class Event(
 
         val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
-        val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
+        val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
 
         // this is a workaround for bugs in generating occurrences for RRULE with BYSETPOS
         //  when Event start date contains time different than 00:00, then:
@@ -241,14 +242,7 @@ data class Event(
 
     // TODO move all these helper methods to utils
 
-    private fun iCalTimeZone(property: ICalProperty): TimeZone {
-        return if (iCalendar.timezoneInfo.isFloating(property)) {
-            TimeZone.getDefault()
-        } else {
-            val timezone = iCalendar.timezoneInfo.getTimezone(property)
-            if (timezone == null) TimeZone.getTimeZone("UTC") else timezone.timeZone
-        }
-    }
+
 
     /**
      * @return Exception Date if it has been set
@@ -256,7 +250,7 @@ data class Event(
     fun addExceptionDate(occurrenceNumber: Int): ZonedDateTime? { // TODO decrement COUNT in RRULE?
         if (isRecurring()) {
 
-            val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
+            val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
 
             val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
 
@@ -288,7 +282,7 @@ data class Event(
 
         iCalEvent.setRecurrenceId(RecurrenceId(Date.from(recurrenceId.toInstant()), hasTime))
 
-        val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
+        val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
 
         if (iCalEvent.dateStart.value.hasTime()) {
             iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
@@ -308,7 +302,7 @@ data class Event(
                     if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
                 ).build())
             } else { // otherwise, set or update UNTIL
-                generateOccurrence(occurrenceNumber, iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
+                generateOccurrence(occurrenceNumber, iCalendar.iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
                     if (this.isAllDay()) {
                         this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
                             Date.from(it.startDateTime.minusDays(1).toInstant()),
@@ -335,7 +329,7 @@ data class Event(
 
             iCalEvent.exceptionDates?.forEach {
 
-                val exceptionTimezone = iCalTimeZone(it)
+                val exceptionTimezone = iCalendar.iCalTimeZone(it)
 
                 it.values?.forEach {
                     val date = if (it.hasTime()) {
@@ -362,7 +356,7 @@ data class Event(
 
         if (!isRecurring()) return null
 
-        val iCalTimeZoneStart = iCalTimeZone(iCalEvent.dateStart)
+        val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
 
         val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
         val startICalDate = ICalDate(iCalEvent.dateStart.value, false)

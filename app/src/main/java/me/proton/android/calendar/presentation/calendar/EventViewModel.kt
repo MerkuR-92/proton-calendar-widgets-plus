@@ -12,6 +12,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.api.CalendarUserSettingsApiEntity
@@ -456,6 +457,7 @@ class EventViewModel(
         } else {
             event.iCalEvent.setStart(newDate, old.toLocalTime(), initialTimeZoneId)
         }
+        event.iCalendar.adjustRRuleToStartDate()
         _event.postValue(event)
     }
 
@@ -559,7 +561,7 @@ class EventViewModel(
                 when (tempMonthlyRepeatOption) {
                     MonthlyRepatOnOption.ON_DAY_X -> { }
                     MonthlyRepatOnOption.ON_X_WEEKDAY -> {
-                        builder.byDay(iCalDayOfWeek)
+                        builder.byDay(iCalDayOfWeek) // TODO be careful about using .byDay(ByDay(int, weekday)) because it uses different notation
                         builder.bySetPos(weekInMonth)
                     }
                     MonthlyRepatOnOption.ON_LAST_WEEKDAY -> {

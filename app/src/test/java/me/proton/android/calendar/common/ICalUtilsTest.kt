@@ -2,12 +2,10 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.*
-import biweekly.util.Frequency
-import biweekly.util.Google2445Utils
-import biweekly.util.ICalDate
-import biweekly.util.Recurrence
+import biweekly.util.*
 import biweekly.util.com.google.ical.compat.javautil.DateIteratorFactory
 import biweekly.util.com.google.ical.iter.RecurrenceIteratorFactory
+import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
@@ -178,6 +176,111 @@ internal class ICalUtilsTest {
 
         assertThat(event.getStart("Europe/Vilnius")!!.toLocalTime()).isEqualTo(LocalTime.of(15, 10, 40))
         assertThat(event.getEnd("Europe/Vilnius")!!.toLocalTime()).isEqualTo(LocalTime.of(16, 20, 50))
+
+    }
+
+    @Test
+    fun `adjust WEEKLY RRULE to start date`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200728T130000
+    DTEND;TZID=Europe/Zurich:20200728T133000
+    RRULE:FREQ=WEEKLY;BYDAY=TU,WE,TH,FR
+    SEQUENCE:0
+    SUMMARY:weekly on Tu, We, Th, Fr
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        event.iCalEvent.setStart(LocalDate.of(2020, 7, 30), LocalTime.of(13, 0), "Europe/Zurich")
+        event.iCalendar.setStartTimeZone("Europe/Zurich")
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(4)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.FRIDAY))).isTrue()
+
+        event.iCalEvent.setStart(LocalDate.of(2020, 7, 27), LocalTime.of(13, 0), "Europe/Zurich")
+        event.iCalendar.setStartTimeZone("Europe/Zurich")
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(5)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.MONDAY))).isTrue()
+
+    }
+
+    @Test
+    fun `adjust MONTHLY RRULE to start date`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200728T130000
+    DTEND;TZID=Europe/Zurich:20200728T133000
+    RRULE:FREQ=MONTHLY;BYDAY=TU;BYSETPOS=-1
+    SEQUENCE:0
+    SUMMARY:monthly on last Tuesday
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        // original event should occur on 4th Tuesday every month
+
+        // last Wednesday -- 2020-07-29
+        event.iCalEvent.setStart(LocalDate.of(2020, 7, 29), LocalTime.of(13, 0), "Europe/Zurich")
+        event.iCalendar.setStartTimeZone("Europe/Zurich")
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(1)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.WEDNESDAY))).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(-1)
+
+        // 1st Wednesday -- 2020-07-01
+        event.iCalEvent.setStart(LocalDate.of(2020, 7, 1), LocalTime.of(13, 0), "Europe/Zurich")
+        event.iCalendar.setStartTimeZone("Europe/Zurich")
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(1)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.WEDNESDAY))).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(1)
+
+        // 2nd Friday -- 2020-07-10
+        event.iCalEvent.setStart(LocalDate.of(2020, 7, 10), LocalTime.of(13, 0), "Europe/Zurich")
+        event.iCalendar.setStartTimeZone("Europe/Zurich")
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(1)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.FRIDAY))).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(2)
+
+        // fifth Wednesday -- 2020-07-29
+        event.iCalEvent.setStart(LocalDate.of(2020, 7, 29), LocalTime.of(13, 0), "Europe/Zurich")
+        event.iCalendar.setStartTimeZone("Europe/Zurich")
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(1)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.WEDNESDAY))).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(5)
 
     }
 

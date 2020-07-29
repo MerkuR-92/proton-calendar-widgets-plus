@@ -2,15 +2,20 @@ package me.proton.android.calendar.common
 
 import biweekly.Biweekly
 import biweekly.ICalendar
+import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
+import biweekly.property.ICalProperty
+import biweekly.property.RecurrenceRule
 import biweekly.property.Status
+import biweekly.util.ByDay
+import biweekly.util.Frequency
+import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.domain.model.Event
-import java.lang.Exception
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -69,6 +74,57 @@ object ICalUtils {
         return true
     }
 
+    fun Recurrence.clone(
+        byDay: List<biweekly.util.DayOfWeek>? = null,
+        bySetPos: List<Int>? = null
+    ): Recurrence {
+
+        val builder = Recurrence.Builder(this.frequency)
+
+        // TODO allow for overwriting of those params
+        builder.interval(this.interval)
+        builder.count(this.count)
+        builder.until(this.until)
+
+        builder.byDay(byDay ?: this.byDay.map { it.day })
+        builder.bySetPos(bySetPos ?: this.bySetPos)
+
+        return builder.build()
+    }
+
+    fun ICalendar.adjustRRuleToStartDate() {
+
+        val iCalEvent = this.events.first()
+        val startTimeZone = this.iCalTimeZone(iCalEvent.dateStart)
+        val startWeekday = (iCalEvent.getStart(startTimeZone.id)!!.dayOfWeek.toBiweeklyDayOfWeek())
+        val startDayWeekInMonth = iCalEvent.getStart(startTimeZone.id)!!.toLocalDate().weekInMonth()
+
+        when (iCalEvent.recurrenceRule.value.frequency) {
+            Frequency.WEEKLY -> {
+                if (!iCalEvent.recurrenceRule.value.byDay.contains(ByDay(startWeekday))) {
+                    iCalEvent.recurrenceRule = RecurrenceRule(Recurrence.Builder(iCalEvent.recurrenceRule.value).byDay(startWeekday).build())
+                }
+            }
+            Frequency.MONTHLY -> {
+                val rrule = iCalEvent.recurrenceRule.value
+
+                if (rrule.byDay.isNotEmpty() && rrule.bySetPos.isNotEmpty()) {
+
+                    val setPos = if (rrule.bySetPos[0] < 0 && iCalEvent.getStart(startTimeZone.id)!!.toLocalDate().isLastDayOfWeekInMonth()) {
+                        -1
+                    } else {
+                        startDayWeekInMonth
+                    }
+
+                    iCalEvent.recurrenceRule.value = iCalEvent.recurrenceRule.value.clone(
+                        byDay = listOf(startWeekday),
+                        bySetPos = listOf(setPos)
+                    )
+                }
+            }
+        }
+    }
+
     fun VEvent.isDateTimeTheSame(that: VEvent?): Boolean {
 
         if (that == null) return false
@@ -83,6 +139,15 @@ object ICalUtils {
         return (this.timezoneInfo.getTimezone(this.events.first().dateStart)?.timeZone?.id == that.timezoneInfo.getTimezone(that.events.first().dateStart)?.timeZone?.id) &&
                 (this.timezoneInfo.getTimezone(this.events.first().dateEnd)?.timeZone?.id == that.timezoneInfo.getTimezone(that.events.first().dateEnd)?.timeZone?.id) &&
                 (this.events.first().isDateTimeTheSame(that.events.first()))
+    }
+
+    fun ICalendar.iCalTimeZone(property: ICalProperty): TimeZone {
+        return if (this.timezoneInfo.isFloating(property)) {
+            TimeZone.getDefault()
+        } else {
+            val timezone = this.timezoneInfo.getTimezone(property)
+            if (timezone == null) TimeZone.getTimeZone("UTC") else timezone.timeZone
+        }
     }
 
     /**
@@ -192,8 +257,12 @@ object ICalUtils {
         right.events.first().components.forEach {
             val components = it.value
             components.forEach {
-                if (it !in left.events.first().components.values()) {
+                if (it is VAlarm) {
                     left.events.first().addComponent(it)
+                } else {
+                    if (it !in left.events.first().components.values()) {
+                        left.events.first().addComponent(it)
+                    }
                 }
             }
         }

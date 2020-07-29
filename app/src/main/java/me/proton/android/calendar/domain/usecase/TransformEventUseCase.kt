@@ -46,6 +46,8 @@ class TransformEventUseCase(
                 crypto.decryptText(cipherText.asArmoredPGPMessage(), calendarKey.privateKey, keyPassphrase.toByteArray())
             } else null
 
+            // TODO consider creating flag for disabling verification, OR maybe when we create repository cache,
+            //  too many open cursors won't be a problem anymore
             val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
             if (verificationKeys.isEmpty()) {
                 verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
@@ -129,8 +131,8 @@ class TransformEventUseCase(
                 } else {
                     verificationStatuses.add(Event.SignatureVerification.FAILURE)
                 }
-                //logger.v("signature ok for personal event: " + signatureOk)
-                //logger.v("not-decrypted personal event: " + it.data)
+                logger.v("signature ok for personal event: " + signatureOk)
+                logger.v("not-decrypted personal event: " + it.data)
             }
 
             calendarParts.add(it.data)
