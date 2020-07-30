@@ -23,6 +23,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.DateFormat
 import java.time.LocalDate
+import java.time.ZoneId
 
 class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
@@ -170,7 +171,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                     requireContext(),
                     startDate,
                     startDate,
-                    FormValidation.OCURRENCE_MAX_UNTIL.toLocalDate()
+                    FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
                 ) {
                     eventViewModel.handleRecurrenceUntilDate(it)
                     rb_recurrence_custom_2.setText(

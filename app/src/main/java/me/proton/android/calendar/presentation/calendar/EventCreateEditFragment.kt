@@ -26,6 +26,7 @@ import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -253,14 +254,23 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         press_start_date.setOnClickListener {
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toLocalDate()
-            AndroidUtils.displayDatePicker(requireContext(), date) {
+            AndroidUtils.displayDatePicker(
+                context = requireContext(),
+                initialDate = date,
+                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate(),
+                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()) {
                 eventViewModel.handleStartDate(it)
             }
         }
 
         press_end_date.setOnClickListener {
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.initialTimeZoneId)?.toLocalDate()
-            AndroidUtils.displayDatePicker(requireContext(), date) {
+            AndroidUtils.displayDatePicker(
+                context = requireContext(),
+                initialDate = date,
+                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate(),
+                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
+            ) {
                 eventViewModel.handleEndDate(it)
             }
         }

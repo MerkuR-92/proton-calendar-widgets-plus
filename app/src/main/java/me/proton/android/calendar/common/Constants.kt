@@ -20,7 +20,8 @@ const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/c
 
 object FormValidation {
 
-    val OCURRENCE_MAX_UNTIL = LocalDate.of(2038, 1, 1).atStartOfDay(ZoneId.of("UTC"))
+    val MIN_SUPPORTED_DATETIME = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.of("UTC"))
+    val MAX_SUPPORTED_DATETIME = LocalDate.of(2038, 12, 31).atStartOfDay(ZoneId.of("UTC"))
 
     const val OCCURRENCE_COUNT_DEFAULT = 2
     const val OCCURRENCE_COUNT_MIN = 1
