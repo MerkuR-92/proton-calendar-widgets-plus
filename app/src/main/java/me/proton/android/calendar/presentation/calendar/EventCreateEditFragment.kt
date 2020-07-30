@@ -27,6 +27,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.ZonedDateTime
+import java.util.*
 
 
 class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
@@ -221,7 +222,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             tv_end_date.text = formattedEnd.first ?: ""
             tv_end_time.text = formattedEnd.second ?: ""
 
-            tv_timezone_start.text = event.defaultTimeZone // TimeZone picked by user is saved in iCalendar's Default Timezone
+            tv_timezone_start.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             tv_calendar.text = event.calendar.name
             tv_calendar.compoundDrawables.firstOrNull()?.setTint(Color.parseColor(event.calendar.color))
@@ -245,7 +246,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         press_timezone_start.setOnClickListener {
             val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
-            AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.toTypedArray(), selectedIndex) {
+            AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
                 eventViewModel.handleTimeZone(allowedTimezoneIds[it])
             }
         }

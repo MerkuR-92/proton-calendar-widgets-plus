@@ -195,8 +195,6 @@ class EventViewModel(
 
         _event.postValue(event)
 
-        handleAllDaySwitch(event.isAllDay())
-
         return UseCase.Result.Success
     }
 

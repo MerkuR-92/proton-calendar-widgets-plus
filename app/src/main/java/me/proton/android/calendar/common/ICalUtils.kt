@@ -40,6 +40,15 @@ object ICalUtils {
 
     }
 
+    fun formatTimeZoneId(timeZoneId: String, forInstant: Instant): String {
+        val rawOffset = TimeZone.getTimeZone(timeZoneId).getOffset(Date.from(forInstant).time).toLong()
+        val offsetLocalTime = LocalTime.MIDNIGHT.plus(if (rawOffset < 0) -rawOffset else rawOffset, ChronoUnit.MILLIS)
+
+        val offset = "${offsetLocalTime.hour}${if (offsetLocalTime.minute > 0) ":${offsetLocalTime.minute}" else ""}"
+
+        return "${timeZoneId} (GMT${if (rawOffset < 0) "-" else "+"}${offset})"
+    }
+
     /**
      * Takes iCalendar parts split according to "the matrix" and returns one iCalendar object.
      */
@@ -95,6 +104,9 @@ object ICalUtils {
     fun ICalendar.adjustRRuleToStartDate() {
 
         val iCalEvent = this.events.first()
+
+        if (iCalEvent.recurrenceRule == null) return
+
         val startTimeZone = this.iCalTimeZone(iCalEvent.dateStart)
         val startWeekday = (iCalEvent.getStart(startTimeZone.id)!!.dayOfWeek.toBiweeklyDayOfWeek())
         val startDayWeekInMonth = iCalEvent.getStart(startTimeZone.id)!!.toLocalDate().weekInMonth()

@@ -2,6 +2,7 @@ package me.proton.android.calendar.common
 
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.*
 
 const val API_VERSION_CALENDAR = "v1"
 //const val API_BASE_URL = "https://protonmail.blue/api/"
@@ -486,4 +487,4 @@ val allowedTimezoneIds = listOf(
     "Pacific/Tongatapu",
     "Pacific/Wake",
     "Pacific/Wallis"
-)
+).sortedWith(compareBy({ -TimeZone.getTimeZone(it).rawOffset }, { it }))
