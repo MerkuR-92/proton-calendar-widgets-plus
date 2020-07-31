@@ -324,7 +324,9 @@ class EventViewModel(
                     )
                     // event.uid is still the same
 
+                    // delete all recurring properties
                     eventToCreate.iCalEvent.recurrenceRule = null
+                    eventToCreate.iCalEvent.exceptionDates.clear()
 
                     val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
                     if (timeHasBeenChanged) {
