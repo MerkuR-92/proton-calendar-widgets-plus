@@ -20,6 +20,11 @@ sealed class ApiResponse<out T : Any> {
  */
 abstract class BaseApiResponse {
     abstract val code: Int
+
+    val error: String? = null
+    val errorDescription: String? = null
+
+    val isSuccessful: Boolean get() = code == 1000 || code == 1001 // single- and multiple-success
 }
 
 class StatusCodeApiResponse(override val code: Int) : BaseApiResponse()

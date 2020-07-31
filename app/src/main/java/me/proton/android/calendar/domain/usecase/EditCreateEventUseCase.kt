@@ -71,7 +71,7 @@ class EditCreateEventUseCase(
         // 5. sign and encrypt Shared Parts
         val sharedPartICalString = calendarSplit.sharedPart.printToString()
 
-        TimberLogger.e("shared part: ${sharedPartICalString}")
+//        TimberLogger.v("shared part: ${sharedPartICalString}")
 
 //        return UseCase.Result.Error("TODO")
 
@@ -203,8 +203,23 @@ class EditCreateEventUseCase(
 
         return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
             is ApiResponse.Success -> {
-                //             TODO insert event into local DB: database.eventsDao().insert(syncResponse.data...
-                UseCase.Result.Success
+                val eventsToInsertOrUpdate = syncResponse.data.responses.mapNotNull {
+                    if (it.response.isSuccessful) {
+                        it.response.event
+                    } else {
+                        logger.e("${it.response.error}: ${it.response.errorDescription}")
+                        null
+                    }
+                }
+
+                database.eventsDao().insert(*eventsToInsertOrUpdate.toTypedArray())
+
+                // TODO collect and handle multiple errors
+                if (syncResponse.data.responses.any { !it.response.isSuccessful }) {
+                    UseCase.Result.Error("TODO one of sync responses is an error")
+                } else {
+                    UseCase.Result.Success
+                }
             }
             is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)
             is ApiResponse.Exception -> UseCase.Result.Error(syncResponse.exception.message ?: "(no exception message)")

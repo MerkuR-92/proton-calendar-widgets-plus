@@ -165,7 +165,20 @@ data class CreateEventApiResponse(
 ) : BaseApiResponse()
 
 data class SyncEventsApiResponse(
-    override val code: Int // TODO other fields
+    override val code: Int, // TODO other fields
+    val responses: List<SyncResponseWrapper>
+) : BaseApiResponse()
+
+data class SyncResponseWrapper(
+    val index: Int,
+    val response: SyncResponse
+    // TODO errors and other types of payload
+)
+
+data class SyncResponse(
+    override val code: Int,
+    val event: EventEntity?
+    // TODO errors and other types of payload
 ) : BaseApiResponse()
 
 //@Serializable
