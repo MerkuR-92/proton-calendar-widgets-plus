@@ -60,7 +60,7 @@ object ICalUtils {
      * Clones the ICalendar copying timezones.
      */
     fun ICalendar.clone(): ICalendar {
-        return mergeICalendars(ICalendar(this), this)
+        return parseICalString(this.printToString())!!
     }
 
     /**

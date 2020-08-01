@@ -3,15 +3,12 @@ package me.proton.android.calendar.common
 import assertk.assertThat
 import assertk.assertions.*
 import biweekly.util.*
-import biweekly.util.com.google.ical.compat.javautil.DateIteratorFactory
-import biweekly.util.com.google.ical.iter.RecurrenceIteratorFactory
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
+import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -1244,6 +1241,49 @@ internal class ICalUtilsTest {
         assertThat(event.dateEnd.value).isNotNull()
 
         assertThat(event.getEnd()!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 21))
+
+    }
+
+    @Test
+    fun `clone iCalendar`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200728T130000
+    DTEND;TZID=Europe/Zurich:20200728T133000
+    RRULE:FREQ=MONTHLY;BYDAY=TU;BYSETPOS=-1
+    SEQUENCE:0
+    SUMMARY:monthly on last Tuesday
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT30M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val original = ICalUtils.parseICalString(iCalString)!!
+        val cloned = original.clone()
+
+        original.events.first().summary.value = "edited summary of original event"
+
+        assertThat(cloned.events.first().summary.value).isEqualTo("monthly on last Tuesday")
+        assertThat(cloned.events.first().alarms.size).isEqualTo(3)
+        assertThat(cloned.timezoneInfo.getTimezone(cloned.events.first().dateStart).globalId).isEqualTo("Europe/Zurich")
 
     }
 
