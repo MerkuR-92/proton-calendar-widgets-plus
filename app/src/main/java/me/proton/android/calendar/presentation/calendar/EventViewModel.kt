@@ -35,9 +35,9 @@ class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val createEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
-    private val deleteSingleEventEditsUseCase: DeleteSingleEventEditsUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val valueStoreProvider: ValueStoreProvider,
+    private val deleteEventUseCase: DeleteEventUseCase,
     private val gson: Gson
 ) : ViewModel() {
 
@@ -346,8 +346,11 @@ class EventViewModel(
             }
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
+                if (dbEvent == null) return false
+                if (dbEventWithOccurrenceStartDate == null) return false
+
                 // delete single edits starting with just edited occurrence
-                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
+                val deleteSingleEditsResult = deleteEventUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
                 if (deleteSingleEditsResult != UseCase.Result.Success ) return false
 
                 // update original event:
@@ -395,7 +398,7 @@ class EventViewModel(
             EventEditDeleteOption.ALL_EVENTS -> {
 
                 // delete all single edits
-                val deleteSingleEditsResult = deleteSingleEventEditsUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
+                val deleteSingleEditsResult = deleteEventUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
                 if (deleteSingleEditsResult != UseCase.Result.Success ) return false
 
                 // delete all single deletions

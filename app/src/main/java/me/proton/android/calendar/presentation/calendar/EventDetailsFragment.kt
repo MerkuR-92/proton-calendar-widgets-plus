@@ -56,6 +56,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             navigationArguments.eventId
         ).observe(viewLifecycleOwner, Observer {
 
+            // TODO when we perform "edit this", new event is created and it won't automatically refresh here
+            //  because we're still listening for the old event.id !!!
 
 
 
