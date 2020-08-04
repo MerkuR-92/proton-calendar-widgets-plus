@@ -2,6 +2,7 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.*
+import biweekly.property.RecurrenceRule
 import biweekly.util.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.clone
@@ -322,11 +323,20 @@ internal class ICalUtilsTest {
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(1, 0), timeZoneId)
         event.setEnd(LocalDate.of(2020, 1, 22), LocalTime.of(2, 0), "Europe/Zurich")
 
+        val untilDate = Date.from(ZonedDateTime.of(LocalDate.of(2020, 1, 25), LocalTime.of(23, 59, 59), ZoneId.of("UTC")).withZoneSameInstant(
+            ZoneId.of(timeZoneId)).toInstant())
+        event.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.DAILY).until(untilDate).build())
+
         val calendar = event.wrapInICalendar()
         calendar.setStartTimeZone(timeZoneId)
         calendar.setEndTimeZone(timeZoneId)
 
+//        TestsLogger.d("${calendar.printToString()}")
+
         calendar.adjustOutgoingAllDayEvent(timeZoneId)
+
+        // TODO assert for UNTIL
+//        TestsLogger.d("${calendar.printToString()}")
 
         assertThat(calendar.events.first().dateStart.value.hasTime()).isFalse()
         assertThat(calendar.events.first().dateEnd.value.hasTime()).isFalse()
@@ -1164,7 +1174,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `handle 'delete this and future' for part-day event without COUNT`() {
+    fun `handle 'delete this and future' for part-day event without COUNT & UNTIL`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -1196,7 +1206,43 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `handle 'delete this and future' for partial-day event without COUNT`() {
+    fun `handle 'delete this and future' for all-day event without COUNT`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200708
+    RRULE:FREQ=DAILY;UNTIL=20200712
+    SUMMARY:full day reccur
+    UID:VrLeK2GFu96clzUzTLofDf0_hSDy@proton.me
+    DTSTAMP:20200706T161209Z
+    DTEND;VALUE=DATE:20200709
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), iCal, null)
+
+        event.handleDeleteThisAndFuture(4)
+
+        // we delete "4th and future occurrences"
+        // 4th occurrence happens on 2020-07-11
+        // so we should set UNTIL to previous day without TIME part
+
+        TestsLogger.d("${ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.systemDefault()).toLocalDate()}")
+
+        //RRULE:FREQ=DAILY;UNTIL=20200710
+
+        assertThat(event.iCalEvent.recurrenceRule.value.frequency).isEqualTo(Frequency.DAILY)
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isFalse()
+        assertThat(ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.systemDefault()).toLocalDate()).isEqualTo(LocalDate.of(2020, 7, 10))
+
+    }
+
+    @Test
+    fun `handle 'delete this and future' for part-day event with UNTIL`() {
 
         val iCalString = """
     BEGIN:VCALENDAR

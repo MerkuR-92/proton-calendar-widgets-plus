@@ -24,6 +24,7 @@ import org.koin.core.inject
 import java.text.DateFormat
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
@@ -161,16 +162,22 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 et_custom_recurrence_count.clearFocus()
             }
 
-            val startDate = eventViewModel.tempRecurrenceUntilLocalDate
-                ?: eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
-                    .toLocalDate()
+            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+                .toLocalDate()
+
+            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toInstant()
+
+            val untilDate = eventViewModel.tempRecurrenceUntilLocalDate
+                ?: if (currentRecurrenceUntilInstant != null) {
+                    ZonedDateTime.ofInstant(currentRecurrenceUntilInstant, ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
+                } else eventStartDate
 
             // handle click on day picker
             if (it == R.id.rb_recurrence_custom_2) {
                 AndroidUtils.displayDatePicker(
                     requireContext(),
-                    startDate,
-                    startDate,
+                    untilDate,
+                    eventStartDate,
                     FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
                 ) {
                     eventViewModel.handleRecurrenceUntilDate(it)

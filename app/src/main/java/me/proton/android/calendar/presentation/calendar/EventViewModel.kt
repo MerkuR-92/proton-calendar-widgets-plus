@@ -5,6 +5,8 @@ import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.*
+import biweekly.util.DayOfWeek
+import biweekly.util.Duration
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,10 +26,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
 import timber.log.Timber
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -565,7 +564,7 @@ class EventViewModel(
                 builder.count(it)
             }
             if (untilDate && tempRecurrenceUntilLocalDate != null) {
-                builder.until(tempRecurrenceUntilLocalDate!!.toDate(initialTimeZoneId))
+                builder.until(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(initialTimeZoneId)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()))
             }
             daysOfWeek?.let {
                 builder.byDay(daysOfWeek)

@@ -486,6 +486,11 @@ fun ICalendar.printToString() : String {
         this.events.first().apply {
             setStart(this.getStart(timeZoneId)!!.toLocalDate())
             setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
+
+            // TODO maybe move this to where we handle "all-day switch"
+            if (this.recurrenceRule?.value?.until != null) {
+                this.recurrenceRule = RecurrenceRule(Recurrence.Builder(this.recurrenceRule.value).until(this.recurrenceRule?.value?.until, false).build())
+            }
         }
     }
 
