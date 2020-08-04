@@ -8,8 +8,9 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
+import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.filterOccurencesByRecurrenceId
 import timber.log.Timber
 import java.time.LocalDate
 
@@ -51,25 +52,73 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
 //        val sharedEventsFieldSubstring = "DTSTART;VALUE=DATE:${fromDateTime.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE)}"
 
-        return database.eventsDao().flowEvents(calendarIds)./*distinctUntilChanged() TODO.*/map {
-            it
-                .mapNotNull { transformEventUseCase.execute(it) }
-                .filter {
+        return database.eventsDao().flowEvents(calendarIds)./*distinctUntilChanged() TODO.*/map { events ->
+            val dbEvents = events.mapNotNull { transformEventUseCase.execute(it) }
+
+            // TODO THIS CODE IS PROTOTYPE, KILL IT WITH FIRE
+            dbEvents
+                .filter { event ->
                     // TODO optimise and select events that are within correct window
                     //  not only starttime, but also overlapping
 
-                    if (it.isRecurring()) {
-                        val occurrences = it.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
+                    if (event.isRecurring()) {
+
+                        val mapped = ICalUtils.mapOccurrencesToSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
+                        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
+
+                        if (event.summary == "d2") {
+                            filteredByExdates.forEach {
+                                //TimberLogger.e("mapped (occ ${it.occurence?.occurrenceNumber}) ${it.summary}\nevent start: ${it.getStart(timeZoneId)} occurr start: ${it.occurence?.startDateTime}")
+                            }
+                        }
+
+                        // original event
+                        val originalEvent = filteredByExdates.find { it.isRecurring() && !it.isFromRecurring() && it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId) }
+
+                        // if original event is there, but there is another single edit that superseeds it
+                        if (filteredByExdates.find { it.iCalEvent.recurrenceId?.value?.toInstant() == originalEvent?.getStart(timeZoneId)?.toInstant()} != null) {
+                            false
+                        } else if (originalEvent != null) {
+
+                            val occurrences = event.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
+
+                            if (occurrences != null && occurrences.size > 0) {
+                                event.occurrence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
+                                true
+                            } else false
+                        } else false
+
+//                        if (eventWithOccurrence?.occurence == null) {
+//                            TimberLogger.e("event with occurrence: ${eventWithOccurrence}")
+//                        }
+
+//                        if  true else false
+
+
+                        /*if (event.summary == "d2") {
+                            mapped.forEach {
+                                TimberLogger.e("mapped (occ ${it.occurence?.occurrenceNumber}) ${it.summary}\nevent start: ${it.getStart(timeZoneId)} occurr start: ${it.occurence?.startDateTime}")
+                            }
+                        }
+
+
+                        val occurrences = event.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
 
                         if (occurrences != null && occurrences.size > 0) {
                             // TODO we have metadata in Occurrence, use it
-                            it.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
+                            event.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
                             true
                         } else false
+
+                         */
+                    } else if (event.isFromRecurring()) {
+
+                        // TODO probably occurrence property in these events is here only as a side effect from above ^
+                        event.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
                     } else {
-                        it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+                        event.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
                     }
-                }.filterOccurencesByRecurrenceId()
+                }//.filterOccurencesByRecurrenceId()
         }
     }
 

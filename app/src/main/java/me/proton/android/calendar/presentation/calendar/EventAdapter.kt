@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import me.proton.android.calendar.common.formatTime
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import java.time.ZoneId
@@ -23,11 +23,22 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
         fun bind(item: Event, clickListener: (Event) -> Unit) {
 
             // TODO use timezone from settings
-            val time = if (item.isAllDay()) "(all-day)" else "${(item.occurence?.startDateTime ?: item.getStart(ZoneId.systemDefault().id))?.format(
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${(item.occurence?.endDateTime ?: item.getEnd(ZoneId.systemDefault().id))?.format(
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
 
-            textView.setText(item.summary + "\n" + (if (item.occurence != null) "\n(occurrence: ${item.occurence?.occurrenceNumber})" else "") + "\n" + time) // TODO
+            val time = if (item.isFromRecurring()) {
+                if (item.isAllDay()) "(all-day)" else "${item.getStart(ZoneId.systemDefault().id)?.format(
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${item.getEnd(ZoneId.systemDefault().id)?.format(
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
+            } else {
+                if (item.isAllDay()) "(all-day)" else "${(item.occurrence?.startDateTime ?: item.getStart(ZoneId.systemDefault().id))?.format(
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${(item.occurrence?.endDateTime ?: item.getEnd(ZoneId.systemDefault().id))?.format(
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
+            }
+
+//            if (item.occurence == null) {
+                //TimberLogger.e("binding ${item}")
+//            }
+
+            textView.setText(item.summary + "\n" + (if (item.occurrence != null) "\n(occurrence: ${item.occurrence?.occurrenceNumber})" else "") + "\n" + time) // TODO
             textView.setOnClickListener { clickListener(item) }
         }
     }

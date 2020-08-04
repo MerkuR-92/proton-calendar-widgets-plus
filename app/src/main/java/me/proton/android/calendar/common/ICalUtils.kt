@@ -345,7 +345,7 @@ object ICalUtils {
 
         return occurrences.map { occurrence ->
             val event = events.find { it.iCalEvent.recurrenceId?.value == Date.from(occurrence.startDateTime.toInstant())} ?: originalEvent.withOccurrence(occurrence)!!
-            event.occurence = occurrence
+            event.occurrence = occurrence
             event
         }
 
@@ -358,7 +358,7 @@ object ICalUtils {
 
         val exZonedDateTimes = originalEvent.iCalEvent.exceptionDates.flatMap { exDates -> exDates.values.map { exDate -> exDate.toInstant() } }
 
-        return this.filterNot { it.occurence!!.startDateTime.toInstant() in exZonedDateTimes }
+        return this.filterNot { it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes }
     }
 
 }

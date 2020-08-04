@@ -983,7 +983,7 @@ internal class ICalUtilsTest {
 
         // one of the occurrences should be filtered out by exdate
         assertThat(filteredByExdates.size).isEqualTo(7)
-        assertThat(filteredByExdates.find { it.occurence!!.occurrenceNumber == 5 }).isNull()
+        assertThat(filteredByExdates.find { it.occurrence!!.occurrenceNumber == 5 }).isNull()
 
 
     }

@@ -1,37 +1,22 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
-import android.text.TextWatcher
-import android.text.format.DateFormat
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.presentation.BaseDialogFragment
-import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
-import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.group_custom
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import me.proton.android.calendar.domain.ValueStoreProvider
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import timber.log.Timber
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 
 class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val position: Int, val date: LocalDate) : Fragment(), KoinComponent {
@@ -61,7 +46,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             adapter = EventAdapter {
-                findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id, it.occurence?.occurrenceNumber ?: 0))
+                findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id, it.occurrence?.occurrenceNumber ?: 0))
             }
             recyclerView.addItemDecoration(
                 DividerItemDecoration(

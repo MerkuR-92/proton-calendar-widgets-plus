@@ -6,7 +6,6 @@ import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
-import biweekly.property.ICalProperty
 import biweekly.property.RecurrenceId
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
@@ -17,7 +16,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 import java.util.*
 
 
@@ -28,7 +26,7 @@ data class Event(
     val verificationStatus: SignatureVerification? = null
 ) : BaseModel() {
 
-    var occurence: Occurrence? = null
+    var occurrence: Occurrence? = null
 
     val iCalEvent: VEvent get() = iCalendar.events.first()
 
@@ -422,7 +420,7 @@ data class Event(
     }
 
     fun isFirstOccurrence(): Boolean {
-        return isRecurring() && this.occurence?.occurrenceNumber == 1
+        return isRecurring() && this.occurrence?.occurrenceNumber == 1
     }
 
     fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
