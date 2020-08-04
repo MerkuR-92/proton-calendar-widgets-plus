@@ -314,7 +314,7 @@ class EventViewModel(
             EventEditDeleteOption.THIS_EVENT -> {
 
                 // TODO FIXME isRecurring OR isInChain?????????
-                if (event.isRecurring()) { // TODO this is not completely correct, because singly-edited events with recurrence-id and UID are still linked with original event
+                if (event.isRecurring() || event.isFromRecurring()) {
 
                     if (dbEventWithOccurrenceStartDate == null) return false
 
@@ -335,7 +335,7 @@ class EventViewModel(
                     } else {
                         TimberLogger.d("time is the same")
                     }
-                    eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
+                    eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !dbEvent.isAllDay()) // RecurrenceId has to be in original event's format
 
                     eventToCreate
 
@@ -382,15 +382,20 @@ class EventViewModel(
                             exceptionDates.clear()
                             val nullDate: Date? = null
                             setRecurrenceId(nullDate)
-                            dbEvent.iCalEvent.recurrenceRule?.value?.let {
-                                setRecurrenceRule(Recurrence.Builder(dbEvent.iCalEvent.recurrenceRule.value)
+                            event.iCalEvent.recurrenceRule?.value?.let {
+                                setRecurrenceRule(Recurrence.Builder(event.iCalEvent.recurrenceRule.value)
                                     .count(if (it.count != null) it.count - occurrenceNumber + 1 else null)
-                                    // UNTIL is copied from original event's RRULE
+                                    // UNTIL is copied from event's RRULE
                                     .build())
                             }
                         }
                     }
                 )
+
+                //
+//            if (this.recurrenceRule?.value?.until != null) {
+//                this.recurrenceRule = RecurrenceRule(Recurrence.Builder(this.recurrenceRule.value).until(this.recurrenceRule?.value?.until, false).build())
+//            }
 
                 eventToCreate
 

@@ -282,10 +282,8 @@ data class Event(
 
         iCalEvent.setRecurrenceId(RecurrenceId(Date.from(recurrenceId.toInstant()), hasTime))
 
-        val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
-
-        if (iCalEvent.dateStart.value.hasTime()) {
-            iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
+        if (hasTime) {
+            iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(TimeZone.getTimeZone(recurrenceId.zone.id), VTimezone(recurrenceId.zone.id)))
         }
     }
 
