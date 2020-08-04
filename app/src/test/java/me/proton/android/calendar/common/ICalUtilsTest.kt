@@ -5,6 +5,7 @@ import assertk.assertions.*
 import biweekly.util.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
@@ -838,6 +839,152 @@ internal class ICalUtilsTest {
 
         assertThat(filtered.size).isEqualTo(2)
         assertThat(filtered.map { it.summary }.containsAll(listOf("full day reccur, single edit", "part-day, Vilnius, every day without stop")))
+
+    }
+
+    @Test
+    fun `filter and generate occurrences with single edits`() {
+
+        val iCals = listOf( // original event on 3rd
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200803T120000
+    DTEND;TZID=Europe/Zurich:20200803T123000
+    RRULE:FREQ=DAILY
+    EXDATE;TZID=Europe/Zurich:20200807T120000
+    SEQUENCE:0
+    SUMMARY:d2
+    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+    DTSTAMP:20200803T150732Z
+    BEGIN:VALARM
+    TRIGGER:-PT15M
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent(), // event on 4th, changed only time
+            """
+        BEGIN:VCALENDAR
+	    VERSION:2.0
+	    BEGIN:VEVENT
+	    DTSTART;TZID=Europe/Zurich:20200804T133000
+	    DTEND;TZID=Europe/Zurich:20200804T140000
+	    RECURRENCE-ID;TZID=Europe/Zurich:20200804T120000
+	    SEQUENCE:1
+	    SUMMARY:d2
+	    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+	    DTSTAMP:20200803T150732Z
+	    BEGIN:VALARM
+	    TRIGGER:-PT15M
+	    ACTION:DISPLAY
+	    END:VALARM
+	    END:VEVENT
+	    END:VCALENDAR
+            """.trimIndent(), // event on 6th, changed only summary, not time
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200806T120000
+    DTEND;TZID=Europe/Zurich:20200806T123000
+    RECURRENCE-ID;TZID=Europe/Zurich:20200806T120000
+    SEQUENCE:1
+    SUMMARY:d2 only summary edit
+    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+    DTSTAMP:20200803T150732Z
+    BEGIN:VALARM
+    TRIGGER:-PT15M
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent(), // event on 8th moved to 9th on different time & edited summary
+            """
+        BEGIN:VCALENDAR
+	    VERSION:2.0
+	    BEGIN:VEVENT
+	    DTSTART;TZID=Europe/Zurich:20200809T133000
+	    DTEND;TZID=Europe/Zurich:20200809T140000
+	    RECURRENCE-ID;TZID=Europe/Zurich:20200808T120000
+	    SEQUENCE:1
+	    SUMMARY:d2 moved from 8th to 9th
+	    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+	    DTSTAMP:20200803T150732Z
+	    BEGIN:VALARM
+	    TRIGGER:-PT15M
+	    ACTION:DISPLAY
+	    END:VALARM
+	    END:VEVENT
+	    END:VCALENDAR
+            """.trimIndent(), // event on 2nd moved from 3rd by "this" editing original event
+            """
+            BEGIN:VCALENDAR
+		    VERSION:2.0
+		    BEGIN:VEVENT
+		    DTSTART;TZID=Europe/Zurich:20200802T120000
+		    DTEND;TZID=Europe/Zurich:20200802T123000
+		    RECURRENCE-ID;TZID=Europe/Zurich:20200803T120000
+		    SEQUENCE:1
+		    SUMMARY:d2
+		    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+		    DTSTAMP:20200803T150732Z
+		    BEGIN:VALARM
+		    TRIGGER:-PT15M
+		    ACTION:DISPLAY
+		    END:VALARM
+		    END:VEVENT
+		    END:VCALENDAR
+            """.trimIndent(),
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200809T183000
+    DTEND;TZID=Europe/Zurich:20200809T190000
+    RECURRENCE-ID;TZID=Europe/Zurich:20200810T120000
+    SEQUENCE:2
+    SUMMARY:d2 moved from 10th to 9th
+    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+    DTSTAMP:20200803T150732Z
+    BEGIN:VALARM
+    TRIGGER:-PT15M
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent()
+        )
+
+        val displayRangeTo = LocalDate.of(2020, 8, 9)
+        val displayTimeZoneId = "Europe/Zurich"
+
+        val events = iCals.mapIndexed { index, iCal ->
+            Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar("id", "calendar", ""), ICalUtils.parseICalString(iCal)!!, null)
+        }
+
+        // 2: 12:00-12:30 [occ 1]
+        // 3: nothing visible, it was moved to 2nd
+        // 4: 13:30-14:00  [occ 2]
+        // 5: 12:00-12:30  [occ 3]
+        // 6: 12:00-12:30 edited summary [occ 4]
+        // 7: nothing visible because of exdate [occ 5]
+        // 8: nothing visible, it was moved to 9th and changed time
+        // 9: 12:00-12:30 [occ 7], 13:30-14:00 [occ 6], 18:30-19:00 [occ8]
+        // last "ghost occurrence" is on 10th but it was moved to 9th
+
+        val mapped = ICalUtils.mapOccurrencesToSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
+
+        // there are 7 occurrences until 2020-08-09 and one additional that was moved from 2020-08-10 to 2020-08-09
+        assertThat(mapped.size).isEqualTo(8)
+
+        val filteredByExdates = mapped.filterOutOccurrencesByExdates(events.first())
+
+        // one of the occurrences should be filtered out by exdate
+        assertThat(filteredByExdates.size).isEqualTo(7)
+        assertThat(filteredByExdates.find { it.occurence!!.occurrenceNumber == 5 }).isNull()
+
 
     }
 

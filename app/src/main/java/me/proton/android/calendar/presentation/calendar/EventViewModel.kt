@@ -23,6 +23,7 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -178,7 +179,7 @@ class EventViewModel(
             (dbEvent?.withOccurrence(occurrenceNumber ?: 0, initialTimeZoneId) ?: dbEvent)?.apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
-                    this.iCalEvent.setEnd(this.endLocalDate!!.minusDays(1)) // TODO NPE
+                    this.iCalEvent.setEnd(this.endLocalDate!!.minusDays(1)) // TODO NPE FIXME REMOVE THIS PROPERTY!!!!
 
                     timeStartBackup = LocalTime.now()
                     timeEndBackup = LocalTime.now().plusMinutes(calendarSettings.defaultEventDuration.toLong())//.truncatedTo(ChronoUnit.HOURS)
@@ -329,13 +330,13 @@ class EventViewModel(
                     eventToCreate.iCalEvent.exceptionDates.clear()
 
                     val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
-                    if (timeHasBeenChanged) {
+                    if (timeHasBeenChanged) { // TODO it looks like we always use occurrence start date anyway
                         TimberLogger.d("time has been changed")
-                        eventToCreate.setRecurrenceId(dbEventStartDate!!, !eventToCreate.isAllDay())
+//                        eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
                     } else {
                         TimberLogger.d("time is the same")
-                        eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
                     }
+                    eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
 
                     eventToCreate
 
@@ -404,14 +405,27 @@ class EventViewModel(
                 // delete all single deletions
                 event.iCalEvent.exceptionDates.clear()
 
+//                TWO SEPARATE THINGS:
+//                - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
+//                - the same DAY but different TIME
+
                 if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone)?.truncatedTo(ChronoUnit.DAYS) &&
                     dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
 
                     // update the original event's DTSTART only with new time (leave day the same)
 
-                    event.also {
-                        it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate(), event.getStart(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
-                        it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate(), event.getEnd(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
+                    if (event.isAllDay()) {
+                        event.also {
+                            TimberLogger.e("all day, updating only new time: ${dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate()}/${dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate()}")
+                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate())
+                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate())
+                        }
+                    } else {
+                        TimberLogger.e("part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone)!!}/${dbEvent.getEnd(event.defaultTimeZone)!!}")
+                        event.also {
+                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate(), event.getStart(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
+                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate(), event.getEnd(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
+                        }
                     }
 
                 } else {

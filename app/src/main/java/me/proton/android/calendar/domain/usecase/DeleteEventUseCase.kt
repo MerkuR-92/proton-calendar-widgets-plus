@@ -62,7 +62,7 @@ class DeleteEventUseCase( // TODO TESTS
                 // delete single edits and the original event as the last one
 
                 // TODO maybe merge this into one request
-                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, event.getStart(ZoneId.systemDefault().id)!!)
+                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, event.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
                 val deleteResult = deleteEvents(listOf(event.id), event.calendar.id, member.id)
 
                 if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >all< events")

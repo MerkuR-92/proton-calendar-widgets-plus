@@ -327,6 +327,40 @@ object ICalUtils {
      */
     fun generateOfflineEventId() = "$OFFLINE_EVENT_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
 
+    /**
+     * @param events all single edits selected by UID
+     */
+    fun mapOccurrencesToSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, displayTimeZoneId: String): List<Event>? {
+
+        val maxRecurrenceIdEvent = events.maxBy { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
+
+        // take either maximum RecurrenceId from single edits or the requested "toDate"
+        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(displayTimeZoneId)).toInstant()) == true) {
+            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(displayTimeZoneId)).toLocalDate()
+        } else {
+            toDate
+        }
+
+        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, displayTimeZoneId) ?: return null
+
+        return occurrences.map { occurrence ->
+            val event = events.find { it.iCalEvent.recurrenceId?.value == Date.from(occurrence.startDateTime.toInstant())} ?: originalEvent.withOccurrence(occurrence)!!
+            event.occurence = occurrence
+            event
+        }
+
+    }
+
+    /**
+     * Given original Event, filter out all occurrences that are excluded by EXDATE
+     */
+    fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event): List<Event> {
+
+        val exZonedDateTimes = originalEvent.iCalEvent.exceptionDates.flatMap { exDates -> exDates.values.map { exDate -> exDate.toInstant() } }
+
+        return this.filterNot { it.occurence!!.startDateTime.toInstant() in exZonedDateTimes }
+    }
+
 }
 
 data class CalendarSplit(
@@ -486,3 +520,5 @@ fun ICalendar.printToString() : String {
             events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
         }.map { it.value }.toList()
     }
+
+

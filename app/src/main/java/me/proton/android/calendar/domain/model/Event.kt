@@ -193,6 +193,8 @@ data class Event(
 
     // TODO GENERATE FIRST X OCCURRENCES?
 
+    // TODO merge this method with "generate occurrence x" to have something like "generate occurrences"
+    //  until X date or until Y occurrence number
     /**
      * Generates all occurrences of a recurring Event until given LocalDate in TimeZone.
      */
