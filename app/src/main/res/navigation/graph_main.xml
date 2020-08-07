@@ -50,7 +50,7 @@
         android:id="@+id/nav_event_details"
         android:name="me.proton.android.calendar.presentation.calendar.EventDetailsFragment"
         android:label=""
-        tools:layout="@layout/fragment_event_details">
+        tools:layout="@layout/fragment_event_details_old">
         <action
             android:id="@+id/action_nav_event_details_to_nav_event_create_edit"
             app:destination="@id/nav_event_create_edit" />

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <item name="appBarLayoutStyle">@style/AppTheme.Toolbar</item>
+        <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
+
+<!--        in case we need custom font-->
+<!--        <item name="android:fontFamily">@font/space_mono</item>-->
+
+    </style>
+
+<!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight" />-->
+<!--   -->
+
+    <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+        <!--        <item name="titleTextAppearance">@style/MyToolbartitleTextAppearance</item>-->
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <!--        <item name="titleTextAppearance">@style/MyTextAppearance</item>-->
+    </style>
+
+
+
+
+
+</resources>

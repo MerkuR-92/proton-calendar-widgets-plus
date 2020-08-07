@@ -1,4 +1,18 @@
 <resources>
+    <dimen name="spacing_page">16dp</dimen>
+    <dimen name="spacing_element">12dp</dimen>
+    <dimen name="spacing_element_small">8dp</dimen>
+
+
+
+
+
+
+
+
+
+
+
     <dimen name="default_inner_padding">10dp</dimen>
 
 

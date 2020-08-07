@@ -98,7 +98,7 @@
         style="@style/AppImageViewIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_map_marker"
+        android:src="@drawable/ic_map_marker_old"
         app:layout_constraintBottom_toBottomOf="@+id/et_location"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="@+id/et_location" />
@@ -275,7 +275,7 @@
         style="@style/AppImageViewIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_calendar"
+        android:src="@drawable/ic_calendarold"
         app:layout_constraintBottom_toBottomOf="@+id/textView9"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="@+id/textView9" />
@@ -355,7 +355,7 @@
         style="@style/AppImageViewIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/ic_bell"
+        android:src="@drawable/ic_bell_old"
         app:layout_constraintBottom_toBottomOf="@+id/textView15"
         app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="@+id/textView15" />

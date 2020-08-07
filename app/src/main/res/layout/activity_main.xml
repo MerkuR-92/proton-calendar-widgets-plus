@@ -27,10 +27,6 @@
 <!--            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"-->
 <!--            android:background="@color/colorAccent">-->
 
-<!--&lt;!&ndash;          TODO  tutaj wstawic ten fragment container zamiast framelayouta-->
-
-<!-- zamiast hideable = true, mozna dac false i recznie ukrywac caly widok-->
-<!-- &ndash;&gt;-->
 
 <!--            <include-->
 <!--                layout="@layout/fragment_event_create_edit"-->

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.model
 
+import android.content.res.Resources
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
@@ -9,8 +10,10 @@ import biweekly.property.ExceptionDates
 import biweekly.property.RecurrenceId
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
+import java.text.DateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -77,7 +80,51 @@ data class Event(
 
     fun formatEnd(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId)
 
+    fun formatStartEnd(timeZoneId: String, eventOccurrence: Occurrence?, resources: Resources): String {
+        return if (this.spansSingleDay()) {
 
+            // TODO cleanup and check against requirements
+            val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first
+
+            if (this.isAllDay()) { // ignoring timezones
+                formattedStartDate!! //TODO
+            } else {
+
+                // TODO these two dates were formatted with calendar_timezone, check if this makes sense or not, it's changed to 1 timezone throughout this function
+                val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+                val endDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+
+                val formattedStartTime = eventOccurrence?.startDateTime?.formatTime(timeZoneId) ?: DateFormat.getTimeInstance(
+                    DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
+                val formattedEndTime = eventOccurrence?.endDateTime?.formatTime(timeZoneId) ?:  DateFormat.getTimeInstance(
+                    DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
+
+                // TODO R dependency
+                "${formattedStartDate}\n${resources.getString(R.string.event_time_period_spanning_single_day, formattedStartTime, formattedEndTime)}"
+            }
+        } else {
+
+            if (this.isAllDay()) { // ignoring timezones
+                val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
+
+                val endDateMinus1Day = (eventOccurrence?.endDateTime ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))).minusDays(1)
+                val formattedEndDate = endDateMinus1Day.formatDate(timeZoneId)//DateFormat.getDateInstance(DateFormat.FULL).format()
+
+                resources.getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
+            } else {
+
+
+                // TODO these two dates were formatted with calendar_timezone, check if this makes sense or not, it's changed to 1 timezone throughout this function
+                val startDateTimeInStartTimezone = eventOccurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+                val endDateTimeInStartTimezone = eventOccurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+
+                val startDateTime = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
+                val endDateTime = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
+
+                resources.getString(R.string.event_time_period_spanning_many_days, startDateTime, endDateTime)
+            }
+        }
+    }
 
 
     /**

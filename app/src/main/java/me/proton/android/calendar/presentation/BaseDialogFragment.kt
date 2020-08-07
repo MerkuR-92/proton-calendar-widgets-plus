@@ -44,7 +44,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                     inflater.inflate(layoutResourceId, container, false)
                 )
 
-                toolbar = rootView.findViewById<Toolbar>(R.id.base_fragment_toolbar)
+                toolbar = rootView.findViewById<Toolbar>(R.id.toolbar)
 
                 toolbar.apply {
                     setTitle("")

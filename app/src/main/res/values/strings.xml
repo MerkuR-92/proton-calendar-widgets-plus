@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
 
+    <string name="default_event_summary">(no title)</string>
+
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
 
     <string name="dialog_title_delete_event">Delete event?</string>
@@ -14,7 +16,8 @@
     <string name="action_save">Save</string>
     <string name="action_done">Done</string>
     <string name="action_edit">Edit</string>
-    
+    <string name="action_delete">Delete</string>
+
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">All Day</string>
     <string name="event_time_period_spanning_single_day">%s \u2013 %s</string>
@@ -38,6 +41,7 @@
     <string name="event_recurrence_yearly">Yearly</string>
     <string name="event_recurrence_weekly_on_all_days">all days</string>
     <string name="event_recurrence_until">until %s</string>
+    <string name="event_attendee_count">%d %s</string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>

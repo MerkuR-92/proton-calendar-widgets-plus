@@ -1,15 +1,71 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:textColorSecondary">@color/textColorSecondary</item>
+
+    <style name="Text" parent="TextAppearance.AppCompat">
+
+    </style>
+
+    <style name="Text.Main">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#262a33</item> <!-- TODO extract colors -->
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="Text.FormHeader">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">#262a33</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="Text.FormHeader.Super">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">#262a33</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="Text.FormContent">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">#727680</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+    </style>
+
+
+
+
+
+
+
+
+
+<!--    <style name="AppThemeDEPRECATED" parent="Theme.MaterialComponents.DayNight">-->
+
+<!--    <item name="buttonStyle">@style/Widget.AppCompat.Button.Borderless</item>-->
+
+<!--        <item name="android:textColorPrimary">@color/textColorPrimary</item>-->
+<!--        <item name="android:textColorSecondary">@color/textColorSecondary</item>-->
+
+<!--        <item name="appBarLayoutStyle">@style/AppToolbar</item>-->
+
+<!--        <item name="toolbarStyle">@style/AppToolbar</item>-->
+<!--        <item name="toolbarNavigationButtonStyle">@style/AppToolbar</item>-->
 
 <!--       customise custom background ripple, but it looks like for ex. buttons have custom material selectors and apply different alphas for bg-ripple -->
 <!--        <item name="android:colorControlHighlight">@color/controlHighlight</item>-->
 
 
-        <item name="colorPrimary">#657ee4</item>
-        <item name="colorSecondary">#657ee4</item>
+<!--        <item name="colorPrimary">#657ee4</item>-->
+<!--        <item name="colorSecondary">#657ee4</item>-->
 
 
 
@@ -51,7 +107,34 @@
 <!--        GLOBAL DEFINITION FOR ALL MATERIAL BUTTONS, ALL MATERIAL COMPONENTS HAVE DEFAULT STYLES THAT CAN BE SET IN A THEME, LIKE chipGroupStyle, snackbarStyle, tabStyle... -->
 <!--        <item name="materialButtonStyle">@style/AppButtonStyle</item>-->
 
+<!--    </style>-->
+
+
+    <style name="TextviewStyle" parent="@android:style/Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">100dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:textColor">#86AD33</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20dp</item>
     </style>
+    <style name="ButtonStyle" parent="@android:style/Widget.Button">
+        <item name="android:layout_width">200dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">100dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:background">#F1511B</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15dp</item>
+    </style>
+
+
+
+
+
+
 
     <style name="AppFullscreenDialogTheme" parent="AppTheme">
         <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
@@ -207,13 +290,13 @@
 
 
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
+<!--    <style name="AppTheme.NoActionBar">-->
+<!--        <item name="windowActionBar">false</item>-->
+<!--        <item name="windowNoTitle">true</item>-->
+<!--    </style>-->
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+<!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />-->
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+<!--    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />-->
 
 </resources>
