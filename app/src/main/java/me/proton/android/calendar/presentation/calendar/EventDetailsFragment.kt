@@ -2,6 +2,10 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
@@ -11,24 +15,24 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import biweekly.property.Status
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.event_info.view.*
 import kotlinx.android.synthetic.main.fragment_event_details.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
-import me.proton.android.calendar.presentation.BaseDialogFragment
-import me.proton.android.calendar.presentation.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.text.DateFormat
-import java.time.*
+import java.time.ZonedDateTime
 import java.util.*
 
 
@@ -191,23 +195,23 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             with (section_event_info) {
 
-                // TODO adjust visibility in this section
-
                 this.view_calendar_bar.background.setTint(Color.parseColor(event.calendar.color))
 
-                this.text_status.visibleOrGone(true)
-                this.text_status.text = "Cancelled TODO"
+                if (event.status != null) {
+                    if ((event.status as Status).isCancelled) {
+                        this.text_status.visibleOrGone(true)
+                        this.text_status.text = getString(R.string.event_status_cancelled)
+                    }
+                }
 
                 this.text_summary.text = event.summary ?: resources.getString(R.string.default_event_summary)
 
                 this.text_date_time.text = event.formatStartEnd(calendarViewModel.timeZoneId.id, eventOccurrence, resources)
 
-                this.image_icon_recurrence.visibleOrGone(true)
-                this.text_recurrence.visibleOrGone(true)
-                this.text_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, TODOcalendarTimeZoneId.id)
-
-
-
+                if (event.isRecurring()) {
+                    this.text_recurrence.visibleOrGone(true)
+                    this.text_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, TODOcalendarTimeZoneId.id)
+                }
 
                 visibleOrGone(true)
             }
@@ -215,6 +219,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             event.location?.let {
                 with (section_location) {
                     text_header.text = event.location
+                    val typedValue = TypedValue()
+                    requireContext().theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                    text_header.isClickable = true
+                    text_header.setBackgroundResource(typedValue.resourceId)
+
                     image_icon.setImageResource(R.drawable.ic_map_marker)
                     image_button_action.setImageResource(R.drawable.ic_copy_clipboard)
                     image_button_action.visibleOrGone(true)
@@ -223,14 +232,18 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // TODO attendees dummy data
-            val attendees = listOf("Participant One", "Participant Two")
+            val attendees = mutableListOf<String>()
+            val attendeeCount = (-1..10).random()
+            if (attendeeCount > 0) {
+                for (count in 0..attendeeCount) {
+                    attendees.add("Attendee ${count+1}")
+                }
+            }
             if (attendees.isNotEmpty()) {
                 with (section_attendees) {
                     text_subheader.text = "4 yes, 3 maybe, 1 no, TODO"
                     text_header.text = resources.getString(R.string.event_attendee_count, attendees.size, resources.getQuantityString(R.plurals.plural_participant_uppercase, attendees.size, attendees.size))
                     image_icon.setImageResource(R.drawable.ic_contact_groups)
-                    image_button_action.setImageResource(R.drawable.ic_chevron_down)
-                    image_button_action.visibleOrGone(true)
                     visibleOrGone(true)
                 }
                 section_attendees_container.removeAllViews()
@@ -239,15 +252,28 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     tv.text = it // TODO PROPER ITEM VIEW
                     section_attendees_container.addView(tv)
                 }
+                section_attendees.image_button_action.visibleOrGone(true)
+                if (attendees.size > FormValidation.ATTENDEE_SHOW_TRESHOLD) {
+                    section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_down)
+                    section_attendees_container.visibleOrGone(false)
+                } else {
+                    section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_up)
+                    section_attendees_container.visibleOrGone(true)
+                }
+
             }
 
             with (section_calendar) {
-                text_header.text = event.calendar.name
+                text_header.text = if (event.calendar.isActive) {
+                    event.calendar.name
+                } else {
+                    requireContext().getText(R.string.event_calendar_disabled, event.calendar.name)
+                }
                 image_icon.setImageResource(R.drawable.ic_calendar)
                 visibleOrGone(true)
             }
 
-            val alarmLabels = event.iCalEvent.alarms.mapNotNull { alarm ->
+            val alarmLabels = event.iCalEvent.alarms.sortedBy { it.trigger.duration.toMillis() }.mapNotNull { alarm ->
                 AndroidUtils.formatAlarm(
                     resources,
                     event.isAllDay(),
@@ -270,6 +296,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             event.description?.let {
                 with(section_description) {
                     text_header.text = event.description
+                    Linkify.addLinks(text_header, Linkify.ALL)
                     image_icon.setImageResource(R.drawable.ic_text_align_left)
                     visibleOrGone(true)
                 }

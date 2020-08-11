@@ -16,7 +16,7 @@
 
     <TextView
         android:id="@+id/text_header"
-        style="@style/Text.FormHeader"
+        style="@style/Text.Default"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_element"
@@ -29,7 +29,7 @@
         android:id="@+id/text_subheader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/Text.FormContent"
+        android:textAppearance="@style/Text.DefaultSmall.Weak"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/text_header"
         app:layout_constraintTop_toBottomOf="@+id/text_header"

@@ -8,6 +8,7 @@ import biweekly.io.TimezoneAssignment
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.RecurrenceId
+import biweekly.property.Status
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.R
@@ -37,6 +38,8 @@ data class Event(
     val summary: String? get() = iCalEvent.summary?.value // TODO maybe go back to properties?
     val location: String? get() = iCalEvent.location?.value
     val description: String? get() = iCalEvent.description?.value
+
+    val status: Status? get() = iCalEvent.status
 
     // TODO FIXME if we're not always setting it, it will be null!!!!!!!!!!!!!!!!!!
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
@@ -107,8 +110,9 @@ data class Event(
             if (this.isAllDay()) { // ignoring timezones
                 val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
 
-                val endDateMinus1Day = (eventOccurrence?.endDateTime ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))).minusDays(1)
-                val formattedEndDate = endDateMinus1Day.formatDate(timeZoneId)//DateFormat.getDateInstance(DateFormat.FULL).format()
+//                val endDateMinus1Day = (eventOccurrence?.endDateTime ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))).minusDays(1)
+//                val formattedEndDate = endDateMinus1Day.formatDate(timeZoneId)//DateFormat.getDateInstance(DateFormat.FULL).format()
+                val formattedEndDate = eventOccurrence?.endDateTime?.formatDate(timeZoneId) ?: this.formatEnd(timeZoneId).first//DateFormat.getDateInstance(DateFormat.FULL).format()
 
                 resources.getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
             } else {

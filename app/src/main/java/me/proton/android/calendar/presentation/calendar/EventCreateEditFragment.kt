@@ -38,6 +38,11 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     override val actionMenuResourceId = R.menu.fragment_event_create_edit
     override val navigateUp = false
 
+    override fun onNavigationIconClicked(): Boolean {
+        findNavController().navigate(Navigation.Deeplink.toCalendar())
+        return true
+    }
+
     override fun onMenuItemClicked(menuItem: MenuItem) {
         if (menuItem.itemId == R.id.action_menu_save) {
 
@@ -88,14 +93,14 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                             if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                                 if (success) {
                                     Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-                                    findNavController().navigateUp()
+                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
                                 } else {
                                     Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 if (success) {
                                     Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-                                    findNavController().navigateUp()
+                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
                                 } else {
                                     Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
                                 }

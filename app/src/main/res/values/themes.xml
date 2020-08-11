@@ -6,7 +6,10 @@
         <item name="appBarLayoutStyle">@style/AppTheme.Toolbar</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
 
-<!--        in case we need custom font-->
+        <item name="android:textColorLink">@color/interaction_norm</item>
+
+
+        <!--        in case we need custom font-->
 <!--        <item name="android:fontFamily">@font/space_mono</item>-->
 
     </style>

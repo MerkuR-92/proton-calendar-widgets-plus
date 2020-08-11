@@ -10,8 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckedTextView
+import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.widget.doAfterTextChanged
 import biweekly.component.VAlarm
@@ -331,6 +333,9 @@ class AndroidUtils(context: Context) {
                         "${if (it > 1) "$it " else ""}${context.resources.getQuantityString(R.plurals.plural_recurrence_count, it, it)}"
                     },
                     recurrence.until?.let {
+
+//                        if (timeZoneId != event.GET TIMEZONE FROM RRULE OR DTSTART)
+
                         context.getString(
                             R.string.event_recurrence_until, DateFormat.getDateInstance(
                                 DateFormat.LONG
@@ -573,3 +578,10 @@ fun LocalDateTime.format(showDayOfWeek: Boolean = false): String {
     return "TODO"
 }
 
+/**
+ * @param id string resource formatted with CDATA if support for basic formatting is needed
+ */
+fun Context.getText(@StringRes id: Int, vararg args: Any?): CharSequence {
+    val text = String.format(getString(id), *args)
+    return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT)
+}

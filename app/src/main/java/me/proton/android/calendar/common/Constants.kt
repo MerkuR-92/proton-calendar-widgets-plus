@@ -59,6 +59,8 @@ object FormValidation {
     const val ALARM_PERIOD_MAX_HOURS = 999
     const val ALARM_PERIOD_MAX_MINUTES = 9999
 
+    const val ATTENDEE_SHOW_TRESHOLD = 5
+
 }
 
 val allowedTimezoneIds = listOf(

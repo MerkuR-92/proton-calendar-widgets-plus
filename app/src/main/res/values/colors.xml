@@ -1,10 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- color palette -->
+
+    <color name="woodsmoke">#17181C</color>
+    <color name="storm_gray">#727680</color>
+    <color name="french_gray">#BABDC6</color>
+    <color name="athens_gray">#EAECF1</color>
+    <color name="cornflower_blue">#657EE4</color>
+
+    <!-- design color aliases -->
+
+    <color name="shade_100">@color/woodsmoke</color>
+    <color name="shade_80">@color/storm_gray</color>
+    <color name="shade_60">@color/french_gray</color>
+    <color name="shade_20">@color/athens_gray</color>
+    <color name="brand_norm">@color/cornflower_blue</color>
+
+    <!-- colors to use in the app -->
+
+    <color name="text_norm">@color/shade_100</color>
+    <color name="text_weak">@color/storm_gray</color>
+    <color name="text_placeholder">@color/shade_60</color>
+
+    <color name="interaction_norm">@color/brand_norm</color>
+
+    <color name="icon_norm">@color/shade_100</color>
+
+    <color name="separator_norm">@color/shade_20</color>
+
+
+
+
+
+
+
+
+
+    <!--    TODO below maybe won't be used-->
+
+
     <color name="textColorPrimary">#000000</color>
     <color name="textColorSecondary">#80848e</color>
 
     <color name="textColorValidationError">#F44336</color>
 
-    <color name="iconTint">#000000</color>
     <color name="controlHighlight">#1F657ee4</color> <!--12% alpha on colorPrimary-->
 </resources>

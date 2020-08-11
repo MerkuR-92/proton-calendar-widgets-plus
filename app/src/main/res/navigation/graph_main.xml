@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_nav_calendar_to_nav_login"
             app:destination="@id/nav_login" />
+        <deepLink
+            android:id="@+id/deepLink4"
+            app:uri="proton-calendar://protonmail.com/calendar" />
     </fragment>
 
     <fragment

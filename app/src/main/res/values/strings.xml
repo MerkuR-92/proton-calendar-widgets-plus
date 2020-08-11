@@ -41,7 +41,10 @@
     <string name="event_recurrence_yearly">Yearly</string>
     <string name="event_recurrence_weekly_on_all_days">all days</string>
     <string name="event_recurrence_until">until %s</string>
+    <string name="event_recurrence_until_with_timezone">until %s (%s)</string>
     <string name="event_attendee_count">%d %s</string>
+    <string name="event_status_cancelled">Cancelled</string>
+    <string name="event_calendar_disabled"><![CDATA[%s <i>(Disabled)</i>]]></string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>

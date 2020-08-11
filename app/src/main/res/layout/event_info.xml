@@ -24,11 +24,11 @@
 
     <TextView
         android:id="@+id/text_status"
-        style="@style/Text.FormHeader.Super"
-        android:visibility="gone"
+        style="@style/Text.Caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toTopOf="parent"
@@ -37,7 +37,7 @@
 
     <TextView
         android:id="@+id/text_summary"
-        style="@style/Text.Main"
+        style="@style/Text.Headline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +47,7 @@
 
     <TextView
         android:id="@+id/text_date_time"
-        style="@style/Text.FormHeader"
+        style="@style/Text.Default"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -56,28 +56,16 @@
         app:layout_constraintTop_toBottomOf="@+id/text_summary"
         tools:text="Wednesday, 12. Feb. 2020\n08:00 - 13:00" />
 
-    <ImageView
-        android:id="@+id/image_icon_recurrence"
-        style="@style/Text.FormContent"
-        android:paddingTop="2dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/text_date_time"
-        app:srcCompat="@drawable/ic_arrows" />
-
     <TextView
         android:id="@+id/text_recurrence"
+        style="@style/Text.DefaultSmall.Weak"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/image_icon_recurrence"
-        app:layout_constraintTop_toTopOf="@+id/image_icon_recurrence"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/text_date_time"
         tools:text="Weekly on Friday"
         tools:visibility="visible" />
 

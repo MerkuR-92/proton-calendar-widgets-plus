@@ -18,6 +18,11 @@ abstract class BaseDialogFragment : DialogFragment() {
     protected open val navigateUp: Boolean = true
     protected open val actionMenuResourceId: Int? = null
     protected open fun onMenuItemClicked(menuItem: MenuItem) {}
+
+    /**
+     * Override this to customise action on "close/arrow back" click.
+     */
+    protected open fun onNavigationIconClicked(): Boolean = false
     // ^ properties for subclasses to override
 
     protected lateinit var toolbar: Toolbar
@@ -57,7 +62,9 @@ abstract class BaseDialogFragment : DialogFragment() {
                         setNavigationIcon(R.drawable.ic_times)
                     }
                     setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
-                        dismiss()
+                        if (!onNavigationIconClicked()) {
+                            dismiss()
+                        }
                         // TODO navigate up or close
                     }
                     // action menu

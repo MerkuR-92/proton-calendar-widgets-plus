@@ -8,8 +8,6 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import java.time.LocalDate
-import java.util.*
 
 
 class TransformEventUseCase(
@@ -23,8 +21,8 @@ class TransformEventUseCase(
 
     suspend fun execute(eventEntity: EventEntity) : Event? {
 
-        val calendar = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
-        val userId = calendar.fkUserId
+        val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
+        val userId = calendarEntity.fkUserId
         val calendarKey = database.calendarKeysDao().select(eventEntity.calendarId).firstOrNull { it.isActive && it.isPrimary } ?: return null // TODO this "fixes" crashes when being connected to vpn and not having login/bootstrap performerd -- but why do we lose CalendarKeys from db?
         val calendarPassphrase = database.passphrasesDao().select(eventEntity.calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return null
@@ -161,9 +159,10 @@ class TransformEventUseCase(
         return Event(
                 id = eventEntity.id,
                 calendar = Calendar(
-                    calendar.id,
-                    calendar.name,
-                    calendar.color
+                    calendarEntity.id,
+                    calendarEntity.name,
+                    calendarEntity.color,
+                    calendarEntity.isActive
                 ),
                 iCalendar = iCalendar,
                 verificationStatus = if (verificationStatuses.all { it == Event.SignatureVerification.SUCCESS }) {

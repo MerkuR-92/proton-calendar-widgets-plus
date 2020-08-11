@@ -1,113 +1,126 @@
 <resources>
 
-    <style name="Text" parent="TextAppearance.AppCompat">
+    <style name="Text" parent="TextAppearance.AppCompat" />
 
-    </style>
-
-    <style name="Text.Main">
+    <style name="Text.Headline">
         <item name="android:textSize">20sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#262a33</item> <!-- TODO extract colors -->
+        <item name="android:textColor">@color/text_norm</item>
         <item name="android:letterSpacing">0.01</item>
-        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:lineSpacingExtra">2sp</item>
     </style>
 
-    <style name="Text.FormHeader">
+    <style name="Text.Headline.Placeholder">
+        <item name="android:textColor">@color/text_placeholder</item>
+    </style>
+
+    <style name="Text.Subheadline">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_norm</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="Text.Default">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#262a33</item>
-        <item name="android:letterSpacing">0.03</item>
-        <item name="android:lineSpacingExtra">8sp</item>
-    </style>
-
-    <style name="Text.FormHeader.Super">
-        <item name="android:textSize">12sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#262a33</item>
+        <item name="android:textColor">@color/text_norm</item>
         <item name="android:letterSpacing">0.03</item>
         <item name="android:lineSpacingExtra">4sp</item>
     </style>
 
-    <style name="Text.FormContent">
+    <style name="Text.Default.Strong">
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Text.DefaultSmall">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textColor">#727680</item>
-        <item name="android:letterSpacing">0.02</item>
-        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textColor">@color/text_norm</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="Text.DefaultSmall.Weak">
+        <item name="android:textColor">@color/text_weak</item>
+    </style>
+
+    <style name="Text.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_norm</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="Text.Caption.Weak">
+        <item name="android:textColor">@color/text_weak</item>
     </style>
 
 
+    <!--    <style name="AppThemeDEPRECATED" parent="Theme.MaterialComponents.DayNight">-->
+
+    <!--    <item name="buttonStyle">@style/Widget.AppCompat.Button.Borderless</item>-->
+
+    <!--        <item name="android:textColorPrimary">@color/textColorPrimary</item>-->
+    <!--        <item name="android:textColorSecondary">@color/textColorSecondary</item>-->
+
+    <!--        <item name="appBarLayoutStyle">@style/AppToolbar</item>-->
+
+    <!--        <item name="toolbarStyle">@style/AppToolbar</item>-->
+    <!--        <item name="toolbarNavigationButtonStyle">@style/AppToolbar</item>-->
+
+    <!--       customise custom background ripple, but it looks like for ex. buttons have custom material selectors and apply different alphas for bg-ripple -->
+    <!--        <item name="android:colorControlHighlight">@color/controlHighlight</item>-->
 
 
+    <!--        <item name="colorPrimary">#657ee4</item>-->
+    <!--        <item name="colorSecondary">#657ee4</item>-->
 
 
+    <!--        TODO extract do day/night?-->
+    <!--        <item name="colorControlNormal">#eaecf1</item>-->
+
+    <!--        customise fonts -->
+    <!--        <item name="fontFamily">@font/roboto_mono</item>-->
+    <!--        <item name="android:fontFamily">@font/roboto_mono</item>-->
 
 
+    <!--        <item name="colorAccent">@color/colorAccent</item>-->
 
-<!--    <style name="AppThemeDEPRECATED" parent="Theme.MaterialComponents.DayNight">-->
+    <!--        <item name="colorControlHighlight">?attr/selectableItemBackground</item>-->
 
-<!--    <item name="buttonStyle">@style/Widget.AppCompat.Button.Borderless</item>-->
+    <!--        background, surface, error, onPrimary, onSecondary, onBackground...-->
 
-<!--        <item name="android:textColorPrimary">@color/textColorPrimary</item>-->
-<!--        <item name="android:textColorSecondary">@color/textColorSecondary</item>-->
-
-<!--        <item name="appBarLayoutStyle">@style/AppToolbar</item>-->
-
-<!--        <item name="toolbarStyle">@style/AppToolbar</item>-->
-<!--        <item name="toolbarNavigationButtonStyle">@style/AppToolbar</item>-->
-
-<!--       customise custom background ripple, but it looks like for ex. buttons have custom material selectors and apply different alphas for bg-ripple -->
-<!--        <item name="android:colorControlHighlight">@color/controlHighlight</item>-->
+    <!--        app:shapeAppearance can style borders for different components: *Small, *Medium, *Large -->
 
 
-<!--        <item name="colorPrimary">#657ee4</item>-->
-<!--        <item name="colorSecondary">#657ee4</item>-->
+    <!--        https://medium.com/over-engineering/setting-up-a-material-components-theme-for-android-fbf7774da739-->
 
 
+    <!--        <item name="fontFamily">@font/roboto_mono</item> : https://developer.android.com/guide/topics/ui/look-and-feel/fonts-in-xml-->
+    <!--        <item name="android:fontFamily">@font/roboto_mono</item>-->
 
-        <!--        TODO extract do day/night?-->
-        <!--        <item name="colorControlNormal">#eaecf1</item>-->
+    <!--        <item name="textAppearanceButton">@style/AppTextAppearance.Button</item>-->
 
-        <!--        customise fonts -->
-        <!--        <item name="fontFamily">@font/roboto_mono</item>-->
-        <!--        <item name="android:fontFamily">@font/roboto_mono</item>-->
+    <!--        <item name="shapeAppearanceSmallComponent">@style/AppShapeAppearance.SmallComponent</item>-->
+    <!--        <item name="shapeAppearanceMediumComponent">@style/AppShapeAppearance.MediumComponent</item>-->
+    <!--        <item name="shapeAppearanceLargeComponent">@style/AppShapeAppearance.LargeComponent</item>-->
+    <!--        <item name="shapeAppearanceLargeComponent">@style/AppShapeAppearance.LargeComponent</item>-->
 
+    <!--        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialog</item>-->
+    <!--        <item name="bottomSheetStyle">@style/AppBottomSheet</item>-->
 
-<!--        <item name="colorAccent">@color/colorAccent</item>-->
+    <!--        GLOBAL DEFINITION FOR ALL MATERIAL BUTTONS, ALL MATERIAL COMPONENTS HAVE DEFAULT STYLES THAT CAN BE SET IN A THEME, LIKE chipGroupStyle, snackbarStyle, tabStyle... -->
+    <!--        <item name="materialButtonStyle">@style/AppButtonStyle</item>-->
 
-<!--        <item name="colorControlHighlight">?attr/selectableItemBackground</item>-->
-
-<!--        background, surface, error, onPrimary, onSecondary, onBackground...-->
-
-<!--        app:shapeAppearance can style borders for different components: *Small, *Medium, *Large -->
-
-
-<!--        https://medium.com/over-engineering/setting-up-a-material-components-theme-for-android-fbf7774da739-->
-
-
-
-
-<!--        <item name="fontFamily">@font/roboto_mono</item> : https://developer.android.com/guide/topics/ui/look-and-feel/fonts-in-xml-->
-<!--        <item name="android:fontFamily">@font/roboto_mono</item>-->
-
-<!--        <item name="textAppearanceButton">@style/AppTextAppearance.Button</item>-->
-
-<!--        <item name="shapeAppearanceSmallComponent">@style/AppShapeAppearance.SmallComponent</item>-->
-<!--        <item name="shapeAppearanceMediumComponent">@style/AppShapeAppearance.MediumComponent</item>-->
-<!--        <item name="shapeAppearanceLargeComponent">@style/AppShapeAppearance.LargeComponent</item>-->
-<!--        <item name="shapeAppearanceLargeComponent">@style/AppShapeAppearance.LargeComponent</item>-->
-
-<!--        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialog</item>-->
-<!--        <item name="bottomSheetStyle">@style/AppBottomSheet</item>-->
-
-<!--        GLOBAL DEFINITION FOR ALL MATERIAL BUTTONS, ALL MATERIAL COMPONENTS HAVE DEFAULT STYLES THAT CAN BE SET IN A THEME, LIKE chipGroupStyle, snackbarStyle, tabStyle... -->
-<!--        <item name="materialButtonStyle">@style/AppButtonStyle</item>-->
-
-<!--    </style>-->
+    <!--    </style>-->
 
 
     <style name="TextviewStyle" parent="@android:style/Widget.TextView">
@@ -119,6 +132,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">20dp</item>
     </style>
+
     <style name="ButtonStyle" parent="@android:style/Widget.Button">
         <item name="android:layout_width">200dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -131,25 +145,19 @@
     </style>
 
 
-
-
-
-
-
     <style name="AppFullscreenDialogTheme" parent="AppTheme">
         <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
         <item name="android:windowExitAnimation">@anim/fragment_fade_exit</item>
     </style>
 
-    <style name="AppFormTextHeader" parent="@android:style/TextAppearance">
-    </style>
+    <style name="AppFormTextHeader" parent="@android:style/TextAppearance"></style>
 
     <style name="AppFormTextContent" parent="@android:style/TextAppearance">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="AppImageViewIcon" parent="">
-        <item name="tint">@color/iconTint</item>
+        <item name="tint">@color/icon_norm</item>
     </style>
 
     <style name="AppFormEditText">
@@ -172,131 +180,66 @@
     </style>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <!--    <style name="AppButtonStyle" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">-->
-<!--&lt;!&ndash;        <item name="iconSize">24dp</item>&ndash;&gt;-->
-<!--        <item name="strokeColor">?attr/colorAccent</item>-->
-<!--    </style>-->
+    <!--&lt;!&ndash;        <item name="iconSize">24dp</item>&ndash;&gt;-->
+    <!--        <item name="strokeColor">?attr/colorAccent</item>-->
+    <!--    </style>-->
 
 
+    <!--    <style name="AppToolbarExpandedTitleTextAppearance" parent="@android:style/TextAppearance.Large">-->
+    <!--&lt;!&ndash;        <item name="android:textColor">#FFFFFF</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <item name="android:textSize">20sp</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <item name="android:singleLine">false</item>&ndash;&gt;-->
+    <!--    </style>-->
 
-<!--    <style name="AppToolbarExpandedTitleTextAppearance" parent="@android:style/TextAppearance.Large">-->
-<!--&lt;!&ndash;        <item name="android:textColor">#FFFFFF</item>&ndash;&gt;-->
-<!--&lt;!&ndash;        <item name="android:textSize">20sp</item>&ndash;&gt;-->
-<!--&lt;!&ndash;        <item name="android:singleLine">false</item>&ndash;&gt;-->
-<!--    </style>-->
+    <!--    <style name="HeaderTitleStyle" parent="@android:style/TextAppearance.Large">-->
+    <!--        <item name="android:singleLine">false</item>-->
 
-<!--    <style name="HeaderTitleStyle" parent="@android:style/TextAppearance.Large">-->
-<!--        <item name="android:singleLine">false</item>-->
-
-<!--    </style>-->
-
+    <!--    </style>-->
 
 
+    <!--    <style name="AppShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">-->
+    <!--        <item name="cornerFamily">rounded</item>-->
+    <!--        <item name="cornerSize">16dp</item>-->
+    <!--    </style>-->
+
+    <!--&lt;!&ndash;    This is also "LargeComponent"&ndash;&gt;-->
+    <!--    <style name="AppBottomSheetDialog" parent="ShapeAppearance.MaterialComponents.LargeComponent">-->
+
+    <!--        <item name="cornerFamily">rounded</item>-->
+    <!--        <item name="cornerSize">16dp</item>-->
+
+    <!--&lt;!&ndash;        <item name="shapeAppearance">?attr/shapeAppearanceLargeComponent</item>&ndash;&gt;-->
+    <!--        <item name="backgroundColor">#ffccee</item>-->
+    <!--&lt;!&ndash;        <item name="android:elevation">16dp</item>&ndash;&gt;-->
+    <!--        <item name="behavior_hideable">true</item>-->
+    <!--&lt;!&ndash;        <item name="behavior_draggable">true</item>&ndash;&gt;-->
+    <!--        <item name="behavior_skipCollapsed">true</item>-->
+    <!--        <item name="behavior_peekHeight">0dp</item>-->
+    <!--&lt;!&ndash;        <item name="behavior_fitToContents">true</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <item name="behavior_halfExpandedRatio">0.5</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;        app:behavior_saveFlags="none"&ndash;&gt;-->
+    <!--&lt;!&ndash;        <item name="behavior_expandedOffset">100</item>&ndash;&gt;-->
+    <!--    </style>-->
 
 
+    <!--    <style name="ModalBottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">-->
+    <!--&lt;!&ndash;        <item name="bottomSheetStyle">@style/ModalBottomSheet</item>&ndash;&gt;-->
+    <!--    </style>-->
 
 
+    <!--    <style name="AppTextAppearance.Button" parent="TextAppearance.MaterialComponents.Button">-->
+    <!--        <item name="android:textAllCaps">false</item>-->
+    <!--    </style>-->
 
 
+    <!--    <style name="AppTheme.NoActionBar">-->
+    <!--        <item name="windowActionBar">false</item>-->
+    <!--        <item name="windowNoTitle">true</item>-->
+    <!--    </style>-->
 
+    <!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />-->
 
-<!--    <style name="AppShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">-->
-<!--        <item name="cornerFamily">rounded</item>-->
-<!--        <item name="cornerSize">16dp</item>-->
-<!--    </style>-->
-
-<!--&lt;!&ndash;    This is also "LargeComponent"&ndash;&gt;-->
-<!--    <style name="AppBottomSheetDialog" parent="ShapeAppearance.MaterialComponents.LargeComponent">-->
-
-<!--        <item name="cornerFamily">rounded</item>-->
-<!--        <item name="cornerSize">16dp</item>-->
-
-<!--&lt;!&ndash;        <item name="shapeAppearance">?attr/shapeAppearanceLargeComponent</item>&ndash;&gt;-->
-<!--        <item name="backgroundColor">#ffccee</item>-->
-<!--&lt;!&ndash;        <item name="android:elevation">16dp</item>&ndash;&gt;-->
-<!--        <item name="behavior_hideable">true</item>-->
-<!--&lt;!&ndash;        <item name="behavior_draggable">true</item>&ndash;&gt;-->
-<!--        <item name="behavior_skipCollapsed">true</item>-->
-<!--        <item name="behavior_peekHeight">0dp</item>-->
-<!--&lt;!&ndash;        <item name="behavior_fitToContents">true</item>&ndash;&gt;-->
-<!--&lt;!&ndash;        <item name="behavior_halfExpandedRatio">0.5</item>&ndash;&gt;-->
-<!--&lt;!&ndash;        app:behavior_saveFlags="none"&ndash;&gt;-->
-<!--&lt;!&ndash;        <item name="behavior_expandedOffset">100</item>&ndash;&gt;-->
-<!--    </style>-->
-
-
-
-
-
-<!--    <style name="ModalBottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">-->
-<!--&lt;!&ndash;        <item name="bottomSheetStyle">@style/ModalBottomSheet</item>&ndash;&gt;-->
-<!--    </style>-->
-
-
-<!--    <style name="AppTextAppearance.Button" parent="TextAppearance.MaterialComponents.Button">-->
-<!--        <item name="android:textAllCaps">false</item>-->
-<!--    </style>-->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--    <style name="AppTheme.NoActionBar">-->
-<!--        <item name="windowActionBar">false</item>-->
-<!--        <item name="windowNoTitle">true</item>-->
-<!--    </style>-->
-
-<!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />-->
-
-<!--    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />-->
+    <!--    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />-->
 
 </resources>

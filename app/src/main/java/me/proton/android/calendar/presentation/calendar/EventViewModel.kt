@@ -25,7 +25,6 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
-import timber.log.Timber
 import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -162,7 +161,12 @@ class EventViewModel(
 
             TimberLogger.d("INIT: ${newICalendar.printToString()}")
 
-            val newEvent = Event(ICalUtils.generateOfflineEventId(), Calendar(defaultCalendar.id, defaultCalendar.name, defaultCalendar.color), newICalendar)
+            val newEvent = Event(ICalUtils.generateOfflineEventId(), Calendar(
+                defaultCalendar.id,
+                defaultCalendar.name,
+                defaultCalendar.color,
+                defaultCalendar.isActive
+            ), newICalendar)
 
             setDefaultAlarms(newEvent)
             newEvent
@@ -460,7 +464,7 @@ class EventViewModel(
 
     fun handleCalendar(calendar: CalendarEntity) {
         markEventAsEdited()
-        event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color))
+        event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive))
         _event.postValue(event)
     }
 
