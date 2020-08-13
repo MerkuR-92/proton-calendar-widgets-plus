@@ -148,7 +148,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 //
 //                }
 
-                TimberLogger.e("menu handled in fragment")
+                TimberLogger.d("menu handled in fragment")
 
 
 //                LoginUserUseCase(TimberLogger, UsersApiImpl(GsonCommon.gson, TimberLogger, context?.applicationContext!!),

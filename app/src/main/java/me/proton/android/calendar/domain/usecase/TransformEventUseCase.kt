@@ -60,7 +60,7 @@ class TransformEventUseCase(
                     verificationStatuses.add(Event.SignatureVerification.SUCCESS)
                 } else {
                     verificationStatuses.add(Event.SignatureVerification.FAILURE)
-                    logger.e("signature not okay for ${decryptedText}")
+                    logger.v("signature not okay for ${decryptedText}")
                 }
             }
 
@@ -99,7 +99,7 @@ class TransformEventUseCase(
                     verificationStatuses.add(Event.SignatureVerification.SUCCESS)
                 } else {
                     verificationStatuses.add(Event.SignatureVerification.FAILURE)
-                    logger.e("signature not okay for ${decryptedText}")
+                    logger.v("signature not okay for ${decryptedText}")
                 }
             }
 
@@ -153,8 +153,8 @@ class TransformEventUseCase(
 //
 //        iCalendar.setDefaultTimeZone(iCalendar.events.first().)
 
-//        TimberLogger.e("after merging: ${iCalendar!!.printToString()}")
-//        TimberLogger.e("verification statueses: ${verificationStatuses}")
+//        TimberLogger.v("after merging: ${iCalendar!!.printToString()}")
+//        TimberLogger.v("verification statueses: ${verificationStatuses}")
 
 
 

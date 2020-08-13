@@ -18,6 +18,7 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
+import me.proton.android.calendar.BuildConfig
 import org.koin.android.ext.android.inject
 import java.time.LocalDate
 
@@ -92,11 +93,6 @@ private val valueStoreProvider: ValueStoreProvider by inject()
         }
 
         pager.registerOnPageChangeCallback(pageChangeCallback)
-
-
-
-
-
 
 
         /*recyclerView.apply {
@@ -175,7 +171,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 //
 //                }
 
-                TimberLogger.e("menu handled in fragment")
+                TimberLogger.d("menu handled in fragment")
 
 
 //                LoginUserUseCase(TimberLogger, UsersApiImpl(GsonCommon.gson, TimberLogger, context?.applicationContext!!),

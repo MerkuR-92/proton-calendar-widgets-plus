@@ -8,7 +8,7 @@ buildscript {
                 "androidx": "2.2.0",
                 "navigation": "2.3.0",
                 "work": "2.3.2",
-                "security": "1.1.0-alpha01",
+                "security": "1.1.0-alpha02",
                 "timber": "4.7.1",
                 "koin": "2.1.2",
                 "biweekly": "0.6.3",

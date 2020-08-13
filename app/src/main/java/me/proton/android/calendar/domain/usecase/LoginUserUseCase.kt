@@ -142,7 +142,7 @@ class LoginUserUseCase(
         )
         if (loginResponse !is ApiResponse.Success) return UseCase.Result.Error("login request failed: ${loginResponse}")
 
-        logger.e("loginResponse: ${loginResponse}")
+        logger.v("loginResponse: ${loginResponse}")
 
 
         /* ApiResponse.Success<LoginApiResponse>(LoginApiResponse(

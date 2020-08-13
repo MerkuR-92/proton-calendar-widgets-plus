@@ -49,7 +49,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                     val result = if (eventsResponse is ApiResponse.Success) {
 
-                        TimberLogger.e("more: ${eventsResponse.data.more}")
+                        TimberLogger.v("more: ${eventsResponse.data.more}")
 
                         calendarsRepository.persistEvents(*eventsResponse.data.events.toTypedArray())
 

@@ -66,12 +66,6 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                         val mapped = ICalUtils.mapOccurrencesToSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
                         val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
 
-                        if (event.summary == "d2") {
-                            filteredByExdates.forEach {
-                                //TimberLogger.e("mapped (occ ${it.occurence?.occurrenceNumber}) ${it.summary}\nevent start: ${it.getStart(timeZoneId)} occurr start: ${it.occurence?.startDateTime}")
-                            }
-                        }
-
                         // original event
                         val originalEvent = filteredByExdates.find { it.isRecurring() && !it.isFromRecurring() && it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId) }
 
@@ -88,29 +82,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                             } else false
                         } else false
 
-//                        if (eventWithOccurrence?.occurence == null) {
-//                            TimberLogger.e("event with occurrence: ${eventWithOccurrence}")
-//                        }
 
-//                        if  true else false
-
-
-                        /*if (event.summary == "d2") {
-                            mapped.forEach {
-                                TimberLogger.e("mapped (occ ${it.occurence?.occurrenceNumber}) ${it.summary}\nevent start: ${it.getStart(timeZoneId)} occurr start: ${it.occurence?.startDateTime}")
-                            }
-                        }
-
-
-                        val occurrences = event.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
-
-                        if (occurrences != null && occurrences.size > 0) {
-                            // TODO we have metadata in Occurrence, use it
-                            event.occurence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
-                            true
-                        } else false
-
-                         */
                     } else if (event.isFromRecurring()) {
 
                         // TODO probably occurrence property in these events is here only as a side effect from above ^

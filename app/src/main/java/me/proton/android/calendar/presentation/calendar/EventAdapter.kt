@@ -34,10 +34,6 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
             }
 
-//            if (item.occurence == null) {
-                //TimberLogger.e("binding ${item}")
-//            }
-
             textView.setText(item.summary + "\n" + (if (item.occurrence != null) "\n(occurrence: ${item.occurrence?.occurrenceNumber})" else "") + "\n" + time) // TODO
             textView.setOnClickListener { clickListener(item) }
         }

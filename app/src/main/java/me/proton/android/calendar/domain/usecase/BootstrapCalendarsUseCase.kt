@@ -56,7 +56,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     // extract passphrase for just saved Calendar
                     cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
 
-                    TimberLogger.e("calendar settings when bootstrapping: ${calendarUserSettingsResponse.data.calendarUserSettings}")
+                    TimberLogger.v("calendar settings when bootstrapping: ${calendarUserSettingsResponse.data.calendarUserSettings}")
 
                     // save User CalendarSettings
                     // TODO deal with nullable DefaultCalendarID!!!!!!!!!!!!!!!!!!!!!!!!!

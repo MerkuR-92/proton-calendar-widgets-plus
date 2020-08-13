@@ -29,15 +29,15 @@ class EditCreateEventUseCase(
         // TODO userId
         val valueStore = valueStoreProvider.provideValueStore(userId)
 
-        logger.e("executing EditCreateEventUseCase from newEvent: ${newEvent}")
-        logger.e("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
+        logger.d("executing EditCreateEventUseCase from newEvent: ${newEvent}")
+        logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
 
         // TODO SEQUENCE ID has to be already incremented
 
         // 1. split original event according to the matrix
         val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
 
-        //logger.e("shared split: ${calendarSplit.sharedPart.printToString()}")
+        //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).first()
@@ -207,7 +207,7 @@ class EditCreateEventUseCase(
                     if (it.response.isSuccessful) {
                         it.response.event
                     } else {
-                        logger.e("${it.response.error}: ${it.response.errorDescription}")
+                        logger.e("error in sync: ${it.response.error}: ${it.response.errorDescription}")
                         null
                     }
                 }

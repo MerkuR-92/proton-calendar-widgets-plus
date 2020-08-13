@@ -40,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.ext.android.inject
@@ -225,6 +226,7 @@ class MainActivity : AppCompatActivity() {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(applicationContext, "Please login again", Toast.LENGTH_LONG).show()
                         }
+                        UseCase.Result.Error("error fetching events in Main Activity")
                     }
 
                     withContext(Dispatchers.Main) {
@@ -239,8 +241,8 @@ class MainActivity : AppCompatActivity() {
 
 //                GlobalScope.launch {
 //
-//                    TimberLogger.e("LOGIN USECASE: ${loginUserUseCase.execute("adamtst", "123".toByteArray())}")
-//                    TimberLogger.e("BOOTSTRAP USECASE: ${bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")}")
+//                    TimberLogger.v("LOGIN USECASE: ${loginUserUseCase.execute("adamtst", "123".toByteArray())}")
+//                    TimberLogger.v("BOOTSTRAP USECASE: ${bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")}")
 //
 //
 //                }

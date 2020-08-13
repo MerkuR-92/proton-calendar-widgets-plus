@@ -91,9 +91,6 @@ class DeleteEventUseCase( // TODO TESTS
 
                 database.eventsDao().deleteByIds(eventIds.filterNot { it in errorEventIds })
 
-                eventIds.filterNot { it in errorEventIds }
-                    .forEach { logger.e("!!!! deleted event from local db: ${it}") }
-
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success
                 } else {

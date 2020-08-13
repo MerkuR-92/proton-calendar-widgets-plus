@@ -5,6 +5,8 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 
+def sentryDsn = project.hasProperty("sentryDsn") ? sentryDsn : "null"
+
 detekt {
     failFast = false
     config = files("$projectDir/config/detekt/detekt.yml")
@@ -34,8 +36,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 9
-        versionName "0.3.0"
+        versionCode 10
+        versionName "0.3.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //signingConfig signingConfigs.debug TODO
@@ -56,6 +58,12 @@ android {
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+
+            buildConfigField("String", "SENTRY_DSN", "\"${sentryDsn}\"")
+//            resValue("string", "build_time", "${minutesSinceEpoch}")
+        }
+        debug {
+            buildConfigField("String", "SENTRY_DSN", "\"null\"")
         }
     }
     compileOptions {
@@ -106,7 +114,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.version.retrofit}"
     implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7"
 //    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2"
     implementation 'com.squareup.okhttp3:logging-interceptor:4.4.0'
@@ -119,7 +127,9 @@ dependencies {
 //    kapt "com.google.dagger:dagger-android-processor:${rootProject.ext.dagger_version}"
 
     implementation "androidx.security:security-crypto:${rootProject.ext.version.security}"
-    implementation "com.google.crypto.tink:tink-android:1.3.0" // it's included in security-crypto
+    implementation "com.google.crypto.tink:tink-android:1.4.0" // it's included in security-crypto
+
+    implementation 'io.sentry:sentry-android:1.7.30'
 
     implementation "at.favre.lib:bcrypt:0.9.0"
 //    implementation "org.mnode.ical4j:ical4j:${rootProject.ext.version.ical}"
