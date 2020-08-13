@@ -19,6 +19,7 @@ import androidx.core.widget.doAfterTextChanged
 import biweekly.component.VAlarm
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
+import biweekly.util.Recurrence
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
@@ -205,6 +206,9 @@ class AndroidUtils(context: Context) {
             val recurrence = event.iCalEvent.recurrenceRule?.value
             if (recurrence != null) {
 
+
+
+
                 val label = listOfNotNull(
                     recurrence.frequency?.let { // non-custom recurrence
 
@@ -341,13 +345,38 @@ class AndroidUtils(context: Context) {
                                 DateFormat.LONG
                             ).format(it)
                         )
-                    }
+                    },
                 ).joinToString(separator = ", ")
 
-return label
+                val startTimeZone = event.iCalendar.timezoneInfo?.getTimezone(event.iCalendar.events.first().dateStart)?.timeZone
+                val startJavaTime = event.iCalendar.events.first().dateStart.value.time
+                val formatTimeZone = TimeZone.getTimeZone(timeZoneId)
+
+                TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
+
+                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.getOffset(startJavaTime) != startTimeZone.getOffset(startJavaTime)) {
+                    return "${label} (${startTimeZone.id})"
+                } else {
+                    return label
+                }
+
             }
 
-return null
+            return null
+        }
+
+        private fun shouldShowRecurrenceTimeZone(recurrence: Recurrence): Boolean {
+            return when (recurrence.frequency) {
+                Frequency.DAILY -> {
+                    recurrence.until != null
+                }
+                Frequency.WEEKLY -> true
+                Frequency.MONTHLY -> true
+                Frequency.YEARLY -> {
+                    recurrence.until != null
+                }
+                else -> false
+            }
         }
 
 

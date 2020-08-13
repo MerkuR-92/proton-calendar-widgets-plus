@@ -162,14 +162,14 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 et_custom_recurrence_count.clearFocus()
             }
 
-            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                 .toLocalDate()
 
             val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toInstant()
 
             val untilDate = eventViewModel.tempRecurrenceUntilLocalDate
                 ?: if (currentRecurrenceUntilInstant != null) {
-                    ZonedDateTime.ofInstant(currentRecurrenceUntilInstant, ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
+                    ZonedDateTime.ofInstant(currentRecurrenceUntilInstant, ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
                 } else eventStartDate
 
             // handle click on day picker
@@ -178,7 +178,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                     requireContext(),
                     untilDate,
                     eventStartDate,
-                    FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
+                    FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
                 ) {
                     eventViewModel.handleRecurrenceUntilDate(it)
                     rb_recurrence_custom_2.setText(
@@ -301,7 +301,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
 
         val byDayIndices = eventViewModel.eventLiveData.value!!.iCalEvent?.recurrenceRule?.value?.byDay?.map { (it.day.ordinal + 7 - dayNamesStartingIndex) % 7 } ?: emptyList()
 
-        val indexOfEventStartDay = (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7
+        val indexOfEventStartDay = (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7
         val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
         resources.getStringArray(R.array.days_of_week_letters)
@@ -316,7 +316,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
 
         // TODO get this from VM
         val eventStartDate =
-            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                 .toLocalDate()
 
         // applies only to month
@@ -379,7 +379,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
 
                     // TODO get this from VM
                     val eventStartDate =
-                        eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!
+                        eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                             .toLocalDate()
 
                     val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()])

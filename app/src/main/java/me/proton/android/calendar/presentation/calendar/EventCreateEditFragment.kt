@@ -39,7 +39,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     override val navigateUp = false
 
     override fun onNavigationIconClicked(): Boolean {
-        findNavController().navigate(Navigation.Deeplink.toCalendar())
+//        findNavController().navigate(Navigation.Deeplink.toCalendar())
+        findNavController().popBackStack(R.id.nav_calendar, false)
         return true
     }
 
@@ -93,14 +94,16 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                             if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                                 if (success) {
                                     Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                                    findNavController().popBackStack(R.id.nav_calendar, false)
                                 } else {
                                     Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 if (success) {
                                     Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                                    findNavController().popBackStack(R.id.nav_calendar, false)
                                 } else {
                                     Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
                                 }
@@ -219,20 +222,20 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 tv_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
             }
 
-            val formattedStart = event.formatStart(eventViewModel.initialTimeZoneId)
+            val formattedStart = event.formatStart(eventViewModel.displayTimeZoneId)
             tv_start_date.text = formattedStart.first ?: ""
             tv_start_time.text = formattedStart.second ?: ""
 
-            val formattedEnd = event.formatEnd(eventViewModel.initialTimeZoneId)
+            val formattedEnd = event.formatEnd(eventViewModel.displayTimeZoneId)
             tv_end_date.text = formattedEnd.first ?: ""
             tv_end_time.text = formattedEnd.second ?: ""
 
-            tv_timezone_start.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
+            tv_timezone_start.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             tv_calendar.text = event.calendar.name
             tv_calendar.compoundDrawables.firstOrNull()?.setTint(Color.parseColor(event.calendar.color))
 
-            tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.initialTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+            tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.displayTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
 
@@ -251,29 +254,29 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         press_timezone_start.setOnClickListener {
             val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
-            AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
+            AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
                 eventViewModel.handleTimeZone(allowedTimezoneIds[it])
             }
         }
 
         press_start_date.setOnClickListener {
-            val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toLocalDate()
+            val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
                 initialDate = date,
-                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate(),
-                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()) {
+                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate(),
+                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()) {
                 eventViewModel.handleStartDate(it)
             }
         }
 
         press_end_date.setOnClickListener {
-            val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.initialTimeZoneId)?.toLocalDate()
+            val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
                 initialDate = date,
-                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate(),
-                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.initialTimeZoneId)).toLocalDate()
+                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate(),
+                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
             ) {
                 eventViewModel.handleEndDate(it)
             }
@@ -281,7 +284,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         press_start_time.setOnClickListener {
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
-            val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.initialTimeZoneId)?.toLocalTime()
+            val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
                 eventViewModel.handleStartTime(it)
             }
@@ -289,7 +292,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         press_end_time.setOnClickListener {
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
-            val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.initialTimeZoneId)?.toLocalTime()
+            val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
                 eventViewModel.handleEndTime(it)
             }

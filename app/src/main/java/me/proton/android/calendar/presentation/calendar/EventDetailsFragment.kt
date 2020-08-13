@@ -150,10 +150,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 mainViewModel.handleEventLocationShow(it)
             }
         }
-        section_location.image_button_action.setOnLongClickListener {
-            if (eventViewModel.eventLiveData.value?.location != null) {
+        section_location.image_button_action.setOnClickListener {
+            eventViewModel.eventLiveData.value?.location?.let {
                 mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)
-            } else false
+            }
         }
         section_attendees.image_button_action.setOnClickListener {
             section_attendees_container.visibleOrGone(!section_attendees_container.isVisible)

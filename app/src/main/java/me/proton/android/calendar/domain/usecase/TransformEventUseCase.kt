@@ -67,9 +67,9 @@ class TransformEventUseCase(
             calendarParts.add(decryptedText ?: it.data)
 
             if (decryptedText != null) {
-                //logger.v("decrypted shared event: " + decryptedText)
+                logger.v("decrypted shared event: " + decryptedText)
             } else {
-                //logger.v("not-decrypted shared event: " + it.data)
+                logger.v("not-decrypted shared event: " + it.data)
             }
 
         }
@@ -106,9 +106,9 @@ class TransformEventUseCase(
             calendarParts.add(decryptedText ?: it.data)
 
             if (decryptedText != null) {
-                //logger.v("decrypted calendar event: " + decryptedText)
+                logger.v("decrypted calendar event: " + decryptedText)
             } else {
-                //logger.v("not-decrypted calendar event: " + it.data)
+                logger.v("not-decrypted calendar event: " + it.data)
             }
 
         }
@@ -141,6 +141,8 @@ class TransformEventUseCase(
         val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)
 
         if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) return null
+
+        TimberLogger.d("merged calendar: ${iCalendar.printToString()}")
 
         // TODO move sanitising to helper function?
 

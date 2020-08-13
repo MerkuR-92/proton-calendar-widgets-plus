@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="textColorPrimary">#EEEEEE</color>
-    <color name="textColorSecondary">#80848e</color>
-
-    <color name="iconTint">#FFFFFF</color>
-    <color name="controlHighlight">#61FFFFFF</color> <!--38% alpha on white-->
+<!--    TODO -->
 </resources>

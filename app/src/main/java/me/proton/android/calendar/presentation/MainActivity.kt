@@ -46,6 +46,7 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -219,7 +220,7 @@ class MainActivity : AppCompatActivity() {
                         fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
                             //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
                             valueStore.getString("DEFAULT CALENDAR ID")!!
-                        ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), "Europe/Zurich")
+                        ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), TimeZone.getDefault().id /*TODO get it from settings*/)
                     } else {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(applicationContext, "Please login again", Toast.LENGTH_LONG).show()
