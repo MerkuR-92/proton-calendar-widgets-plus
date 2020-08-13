@@ -40,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.ext.android.inject

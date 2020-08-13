@@ -207,7 +207,7 @@ class EditCreateEventUseCase(
                     if (it.response.isSuccessful) {
                         it.response.event
                     } else {
-                        logger.e("error in sync: ${it.response.error}: ${it.response.errorDescription}")
+                        logger.e("error in sync: ${it.response.code}: ${it.response.error}")
                         null
                     }
                 }

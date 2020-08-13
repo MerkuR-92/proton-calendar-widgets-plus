@@ -18,36 +18,41 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-# TODO COPY-PASTE FROM INTERNET, HAVE A LOOK LATER
-
 -renamesourcefileattribute SourceFile
+
+-dontwarn kotlin.**
 
 -dontobfuscate
 -dontoptimize
 -keepattributes Signature
 -keepattributes Exceptions
 -keepattributes *Annotation*
--keep class il.ronmad.speedruntimer.** { *; }
+
+# Biweekly
+-keep class biweekly.** { *; }
 
 # Gson
 -dontwarn sun.misc.**
--keep class com.google.gson.examples.android.model.** { *; }
+-keep class * implements com.google.gson.TypeAdapter
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
 
-# Coroutines
--dontwarn org.jetbrains.kotlinx.**
--keepclassmembernames class kotlinx.** {
-    volatile <fields>;
+# Gson: Prevent R8 from leaving Data object members always null
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
 }
--keepnames class kotlinx.** { *; }
 
 # Retrofit
--dontnote retrofit2.Platform
--dontwarn retrofit2.Platform$Java8
--dontwarn okio.**
--dontwarn retrofit2.**
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn javax.annotation.**
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
