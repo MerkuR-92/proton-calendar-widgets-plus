@@ -33,6 +33,12 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
+    /**
+     * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself
+     * if there is only one event with this UID.
+     */
+    suspend fun selectRootEventEntity(eventUid: String): EventEntity?
+
     suspend fun persistEvents(vararg events: EventEntity)
 
     suspend fun deleteEventById(id: String)

@@ -106,6 +106,10 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
     override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
 
+    override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
+        return database.eventsDao().selectByUid(eventUid).find { it.sharedEvents.any { if (it.isJsonObject) (it.asJsonObject.get("Data").asString.contains("RRULE:")) else false } }
+    }
+
     override suspend fun persistEvents(vararg events: EventEntity) {
         TimberLogger.v("persist Event: ${events.map { it.id + " for calendar " + it.calendarId }}")
         database.eventsDao().insert(*events)

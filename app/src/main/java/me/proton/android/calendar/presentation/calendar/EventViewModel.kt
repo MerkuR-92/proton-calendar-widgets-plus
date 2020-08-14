@@ -297,7 +297,7 @@ class EventViewModel(
         }
 
         if (eventBumpSeqId) {
-        //    event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO FIXME
+//            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO FIXME
         }
 
 
@@ -337,6 +337,7 @@ class EventViewModel(
                     eventToCreate.iCalEvent.recurrenceRule = null
                     eventToCreate.iCalEvent.exceptionDates.clear()
 
+//                    TODO dtstart/end is incorrect, when creating new event that is in different timezone -- we should normalize the time back to original!!!!!
                     val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
                     if (timeHasBeenChanged) { // TODO it looks like we always use occurrence start date anyway
                         TimberLogger.d("time has been changed")

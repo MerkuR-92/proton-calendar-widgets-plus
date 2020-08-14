@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -29,17 +31,27 @@ class DeleteEventUseCase( // TODO TESTS
 
         val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
 
+        val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+
         // TODO when event is in the middle of chain, we need to select the root event and deal with it accordingly!!!
 
         var result = when (deleteOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
                 if (event.isRecurring()) {
+                    // add EXDATE to root event
+                    rootEvent.addExceptionDate(occurrenceNumber!!) // TODO
+                    editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                }
+                else if (event.isFromRecurring()) {
+                    // add EXDATE to root event
+                    rootEvent.addExceptionDate(occurrenceNumber!!) // TODO
+                    editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
 
-                    event.addExceptionDate(occurrenceNumber!!) // TODO
-                    editCreateEventUseCase.execute(userId, event.calendar.id, event)
-
-                } else { // simple delete
+                    // delete the single edit
+                    deleteEvents(listOf(event.id), event.calendar.id, member.id)
+                } else {
+                    // delete the non-recurring event
                     deleteEvents(listOf(event.id), event.calendar.id, member.id)
                 }
 
