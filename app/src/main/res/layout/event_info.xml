@@ -24,7 +24,7 @@
 
     <TextView
         android:id="@+id/text_status"
-        style="@style/Text.Caption"
+        style="@style/Text.Caption.Strong"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"

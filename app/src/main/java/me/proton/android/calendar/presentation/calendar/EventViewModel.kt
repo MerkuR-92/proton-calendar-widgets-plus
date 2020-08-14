@@ -19,6 +19,7 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.api.CalendarUserSettingsApiEntity
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.SettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -60,6 +61,7 @@ class EventViewModel(
 //    }
 
     private lateinit var event: Event
+    private lateinit var calendarSettings: SettingsEntity
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
 
     val eventLiveData: LiveData<Event> = _event
@@ -94,7 +96,7 @@ class EventViewModel(
 
         val defaultCalendar = calendarsRepository.selectCalendars(userId).filter { it.isActive }.find { it.id == todoDefaultCalendarId } ?: return UseCase.Result.Error("could not get default Calendar from DB")
 
-        val calendarSettings = calendarsRepository.selectSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
+        calendarSettings = calendarsRepository.selectSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
 
         event = if (eventId == null) {
 
@@ -168,7 +170,7 @@ class EventViewModel(
                 defaultCalendar.isActive
             ), newICalendar)
 
-            setDefaultAlarms(newEvent)
+            setDefaultAlarms(newEvent, calendarSettings)
             newEvent
 
         } else {
@@ -207,16 +209,40 @@ class EventViewModel(
         return UseCase.Result.Success
     }
 
-    private fun setDefaultAlarms(event: Event) {
+    private fun setDefaultAlarms(event: Event, settings: SettingsEntity) {
         event.iCalEvent.alarms.clear()
 
-        val duration = if (event.isAllDay()) {
-            Duration.builder().prior(true).hours(15).build() // 1 day before at 9:00
+        if (event.isAllDay()) {
+            if (settings.defaultFullDayNotifications.isNotEmpty()) {
+                settings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, SettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+                    alarm.parseTrigger()?.let {
+                        if (alarm.type == "0") {
+                            event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
+                        } else {
+                            event.iCalEvent.addAlarm(VAlarm.display(it, null))
+                        }
+                    }
+                }
+            } else {
+
+            }
         } else {
-            Duration.builder().prior(true).minutes(15).build()
+            if (settings.defaultPartDayNotifications.isNotEmpty()) {
+                settings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, SettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+                    alarm.parseTrigger()?.let {
+                        if (alarm.type == "0") {
+                            event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
+                        } else {
+                            event.iCalEvent.addAlarm(VAlarm.display(it, null))
+                        }
+                    }
+                }
+            } else {
+                val duration = Duration.builder().prior(true).minutes(15).build()
+                event.iCalEvent.addAlarm(VAlarm.display(Trigger(duration, Related.START), null))
+            }
         }
 
-        event.iCalEvent.addAlarm(VAlarm.display(Trigger(duration, Related.START), null))
     }
 
     // recurrence temp values
@@ -561,7 +587,7 @@ class EventViewModel(
 //            event.iCalendar.setEndTimeZone(eventStartTimeZoneIdBackup)
         }
 
-        setDefaultAlarms(event)
+        setDefaultAlarms(event, calendarSettings)
 
         _event.postValue(event)
     }

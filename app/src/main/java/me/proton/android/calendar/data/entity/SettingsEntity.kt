@@ -4,6 +4,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import biweekly.parameter.Related
+import biweekly.property.Trigger
+import biweekly.util.Duration
 import com.google.gson.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 
@@ -27,10 +30,17 @@ data class SettingsEntity(
 
 ) {
 
-    // TODO map to this
-    data class ReminderEntity(
-        val Type: String, // 0: Email reminder, 1: Desktop reminder // TODO we'll probably only get desktop reminders from API, or maybe mobile reminders?
-        val Trigger: String // RFC5545 encoded trigger
-    )
+    data class AlarmEntity(
+        val type: String, // 0: Email reminder, 1: Desktop reminder
+        val trigger: String // RFC5545 encoded trigger
+    ) {
+        fun parseTrigger(): Trigger? {
+            return try {
+                Trigger(Duration.parse(trigger), Related.START)
+            } catch(e: IllegalArgumentException) {
+                null
+            }
+        }
+    }
 
 }
