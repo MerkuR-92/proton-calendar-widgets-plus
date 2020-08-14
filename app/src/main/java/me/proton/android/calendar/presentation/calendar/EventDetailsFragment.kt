@@ -186,7 +186,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val TODOcalendarTimeZoneId = TimeZone.getDefault()
 
 
-                val eventOccurrence = event.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
+                //val eventOccurrence = event.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
+//            TimberLogger.d("event occurrence generated: ${eventOccurrence}")
 
 
                 // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
@@ -206,7 +207,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 this.text_summary.text = event.summary ?: resources.getString(R.string.default_event_summary)
 
-                this.text_date_time.text = event.formatStartEnd(calendarViewModel.timeZoneId.id, eventOccurrence, resources)
+                this.text_date_time.text = event.formatStartEnd(calendarViewModel.timeZoneId.id, null, resources)
 
                 if (event.isRecurring()) {
                     this.text_recurrence.visibleOrGone(true)

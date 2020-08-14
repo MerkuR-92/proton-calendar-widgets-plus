@@ -78,7 +78,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
                                     if (success) { // TODO remove duplicated code here and below
                                         Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-                                        findNavController().navigateUp()
+                                        findNavController().popBackStack(R.id.nav_calendar, false)
                                     } else {
                                         Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                                     }
