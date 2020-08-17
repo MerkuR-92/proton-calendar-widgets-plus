@@ -11,6 +11,7 @@ import biweekly.property.RecurrenceRule
 import biweekly.property.Status
 import biweekly.util.ByDay
 import biweekly.util.Frequency
+import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
@@ -85,7 +86,8 @@ object ICalUtils {
 
     fun Recurrence.clone(
         byDay: List<biweekly.util.DayOfWeek>? = null,
-        bySetPos: List<Int>? = null
+        bySetPos: List<Int>? = null,
+        until: ICalDate? = null
     ): Recurrence {
 
         val builder = Recurrence.Builder(this.frequency)
@@ -93,8 +95,8 @@ object ICalUtils {
         // TODO allow for overwriting of those params
         builder.interval(this.interval)
         builder.count(this.count)
-        builder.until(this.until)
 
+        builder.until(until ?: this.until)
         builder.byDay(byDay ?: this.byDay.map { it.day })
         builder.bySetPos(bySetPos ?: this.bySetPos)
 
@@ -107,7 +109,10 @@ object ICalUtils {
 
         if (iCalEvent.recurrenceRule == null) return
 
-        val startTimeZone = this.iCalTimeZone(iCalEvent.dateStart)
+        // TODO when editing, we keep the chosen timezone as default timezone, this is an ugly hack
+        //  so this.iCalTimeZone doesn't return default timezone, but should be fixed
+        val startTimeZone = this.timezoneInfo.defaultTimezone?.timeZone ?: this.iCalTimeZone(iCalEvent.dateStart)
+        val startDate = iCalEvent.getStart(startTimeZone.id)!!
         val startWeekday = (iCalEvent.getStart(startTimeZone.id)!!.dayOfWeek.toBiweeklyDayOfWeek())
         val startDayWeekInMonth = iCalEvent.getStart(startTimeZone.id)!!.toLocalDate().weekInMonth()
 
@@ -135,6 +140,27 @@ object ICalUtils {
                 }
             }
         }
+
+        iCalEvent.recurrenceRule.value.until?.let {
+            val untilDate = ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(startTimeZone.id))
+
+            val newUntilDate = if (startDate.isAfter(untilDate)) startDate else untilDate
+
+                val until : ICalDate = if (iCalEvent.dateStart.value.hasTime()) {
+
+                    ICalDate(Date.from(ZonedDateTime.of(newUntilDate.toLocalDate(), LocalTime.of(23, 59, 59), ZoneId.of(startTimeZone.id)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
+
+
+//                    ICalDate(Date.from(startDate.withHour(23).withMinute(59).withSecond(59).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
+                } else {
+                    ICalDate(Date.from(newUntilDate.toInstant()), false)
+                }
+
+                iCalEvent.recurrenceRule.value = iCalEvent.recurrenceRule.value.clone(
+                    until = until
+                )
+        }
+        
     }
 
     fun VEvent.isDateTimeTheSame(that: VEvent?): Boolean {

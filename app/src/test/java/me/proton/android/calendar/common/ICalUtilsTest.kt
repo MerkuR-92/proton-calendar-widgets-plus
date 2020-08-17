@@ -15,6 +15,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoField
 import java.util.*
 
 
@@ -290,6 +291,77 @@ internal class ICalUtilsTest {
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(1)
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.WEDNESDAY))).isTrue()
         assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(5)
+
+    }
+
+    @Test
+    fun `adjust UNTIL RRULE to start date for part-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200728T130000
+    DTEND;TZID=Europe/Zurich:20200728T133000
+    RRULE:FREQ=DAILY;UNTIL=20200711
+    SEQUENCE:0
+    SUMMARY:blah
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.until).isEqualTo(ICalDate.from(ZonedDateTime.of(2020, 7, 28, 21, 59, 59, 0, ZoneId.of("UTC")).toInstant()))
+
+    }
+
+    @Test
+    fun `adjust UNTIL RRULE to start date for all-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200728
+    DTEND;TZID=Europe/Zurich:20200728
+    RRULE:FREQ=DAILY;UNTIL=20200711T215959Z
+    SEQUENCE:0
+    SUMMARY:blah
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        event.iCalendar.adjustRRuleToStartDate()
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isFalse()
+        assertThat(event.iCalEvent.recurrenceRule.value.until).isEqualTo(ICalDate.from(LocalDate.of(2020, 7, 28).atStartOfDay(ZoneId.of("Europe/Zurich")).withZoneSameInstant(
+            ZoneId.of("UTC")).toInstant()))
 
     }
 
@@ -1337,7 +1409,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `handle 'delete this and future' for part-day event with UNTIL`() {
+    fun `handle 'delete this and future' for all-day event with UNTIL`() {
 
         val iCalString = """
     BEGIN:VCALENDAR

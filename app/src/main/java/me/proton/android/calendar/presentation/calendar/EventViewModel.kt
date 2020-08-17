@@ -589,6 +589,8 @@ class EventViewModel(
 
         setDefaultAlarms(event, calendarSettings)
 
+        event.iCalendar.adjustRRuleToStartDate()
+
         _event.postValue(event)
     }
 
@@ -613,7 +615,12 @@ class EventViewModel(
                 builder.count(it)
             }
             if (untilDate && tempRecurrenceUntilLocalDate != null) {
-                builder.until(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(displayTimeZoneId)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()))
+                val until = if (event.isAllDay()) {
+                    ICalDate(tempRecurrenceUntilLocalDate!!.toDate("UTC"), false)
+                } else {
+                    ICalDate(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(displayTimeZoneId)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
+                }
+                builder.until(until)
             }
             daysOfWeek?.let {
                 builder.byDay(daysOfWeek)
