@@ -194,7 +194,7 @@ class EventViewModel(
             (dbEvent?.withOccurrence(occurrenceNumber ?: 0, eventStartTimeZone) ?: dbEvent)?.apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
-                    this.iCalEvent.setEnd(this.endLocalDate!!.minusDays(1)) // TODO NPE FIXME REMOVE THIS PROPERTY!!!!
+//                    this.iCalEvent.setEnd(this.endLocalDate!!.minusDays(1)) // TODO NPE FIXME REMOVE THIS PROPERTY!!!!
 
                     timeStartBackup = LocalTime.now()
                     timeEndBackup = LocalTime.now().plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())//.truncatedTo(ChronoUnit.HOURS)
