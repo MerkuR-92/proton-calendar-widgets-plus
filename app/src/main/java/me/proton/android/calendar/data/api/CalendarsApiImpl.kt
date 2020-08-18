@@ -157,7 +157,7 @@ data class BootstrapApiResponse(
     val keys: List<CalendarKeyEntity>,
     val passphrase: PassphraseEntity,
     val members: List<MemberEntity>,
-    val calendarSettings: SettingsEntity // settings specific to calendar, not user
+    val calendarSettings: CalendarSettingsEntity // settings specific to calendar, not user
 ) : BaseApiResponse()
 
 data class CreateEventApiResponse(

@@ -88,8 +88,8 @@ class HandleServerEventsUseCase(
             }
             eventsResponse.calendarSettings?.forEach {
                 it.handleAction(
-                    { calendarsRepository.deleteSettingsById(it.id) },
-                    { calendarsRepository.persistSettings(it.calendarSettings!!) }
+                    { calendarsRepository.deleteCalendarSettingsById(it.id) },
+                    { calendarsRepository.persistCalendarSettings(it.calendarSettings!!) }
                 )
             }
             UseCase.Result.Success

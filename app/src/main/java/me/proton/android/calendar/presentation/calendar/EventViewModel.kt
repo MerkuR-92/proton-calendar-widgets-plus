@@ -19,7 +19,7 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.api.CalendarUserSettingsApiEntity
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.SettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -61,7 +61,7 @@ class EventViewModel(
 //    }
 
     private lateinit var event: Event
-    private lateinit var calendarSettings: SettingsEntity
+    private lateinit var calendarSettings: CalendarSettingsEntity
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
 
     val eventLiveData: LiveData<Event> = _event
@@ -96,7 +96,7 @@ class EventViewModel(
 
         val defaultCalendar = calendarsRepository.selectCalendars(userId).filter { it.isActive }.find { it.id == todoDefaultCalendarId } ?: return UseCase.Result.Error("could not get default Calendar from DB")
 
-        calendarSettings = calendarsRepository.selectSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
+        calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
 
         event = if (eventId == null) {
 
@@ -209,12 +209,12 @@ class EventViewModel(
         return UseCase.Result.Success
     }
 
-    private fun setDefaultAlarms(event: Event, settings: SettingsEntity) {
+    private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
         event.iCalEvent.alarms.clear()
 
         if (event.isAllDay()) {
-            if (settings.defaultFullDayNotifications.isNotEmpty()) {
-                settings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, SettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+            if (calendarSettings.defaultFullDayNotifications.isNotEmpty()) {
+                calendarSettings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
                     alarm.parseTrigger()?.let {
                         if (alarm.type == "0") {
                             event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
@@ -227,8 +227,8 @@ class EventViewModel(
 
             }
         } else {
-            if (settings.defaultPartDayNotifications.isNotEmpty()) {
-                settings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, SettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+            if (calendarSettings.defaultPartDayNotifications.isNotEmpty()) {
+                calendarSettings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
                     alarm.parseTrigger()?.let {
                         if (alarm.type == "0") {
                             event.iCalEvent.addAlarm(VAlarm.email(it, null, null))

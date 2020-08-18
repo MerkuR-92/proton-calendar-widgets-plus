@@ -156,16 +156,16 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.membersDao().deleteById(id)
     }
 
-    override suspend fun selectSettings(calendarId: String): SettingsEntity? {
-        return database.settingsDao().select(calendarId)
+    override suspend fun selectCalendarSettings(calendarId: String): CalendarSettingsEntity? {
+        return database.calendarSettingsDao().select(calendarId)
     }
 
-    override suspend fun persistSettings(settings: SettingsEntity) {
-        database.settingsDao().insert(settings)
+    override suspend fun persistCalendarSettings(calendarSettings: CalendarSettingsEntity) {
+        database.calendarSettingsDao().insert(calendarSettings)
     }
 
-    override suspend fun deleteSettingsById(id: String) {
-        database.settingsDao().deleteById(id)
+    override suspend fun deleteCalendarSettingsById(id: String) {
+        database.calendarSettingsDao().deleteById(id)
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

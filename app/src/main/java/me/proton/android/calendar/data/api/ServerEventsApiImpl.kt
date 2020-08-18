@@ -141,7 +141,7 @@ class ServerEvent {
     class SettingsApiResponse(
         override val id: String,
         override val action: Int,
-        val calendarSettings: SettingsEntity?
+        val calendarSettings: CalendarSettingsEntity?
     ) : BaseServerEventApiResponse()
 
     class AlarmsApiResponse(

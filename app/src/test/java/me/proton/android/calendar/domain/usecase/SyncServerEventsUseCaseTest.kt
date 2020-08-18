@@ -92,7 +92,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistCalendarKey(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistMember(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistSettings(any()) } just Runs
+            coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
             coEvery { fetchPublicKeysUseCaseMock.execute(any()) } returns UseCase.Result.Success
 
             val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, fetchPublicKeysUseCaseMock)
@@ -141,7 +141,7 @@ internal class SyncServerEventsUseCaseTest {
                 calendarsRepositoryMock.persistPassphrase(any())
             }
             coVerify(exactly = 2) {
-                calendarsRepositoryMock.persistSettings(any())
+                calendarsRepositoryMock.persistCalendarSettings(any())
             }
             coVerify(atLeast = 1) {
                 fetchPublicKeysUseCaseMock.execute("adamtst@protonmail.blue")

@@ -43,7 +43,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
                     calendarsRepository.apply {
                         persistCalendar(userId, calendarEntity)
-                        persistSettings(bootstrapResponse.data.calendarSettings)
+                        persistCalendarSettings(bootstrapResponse.data.calendarSettings)
                         persistPassphrase(bootstrapResponse.data.passphrase)
                         bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }
                         bootstrapResponse.data.members.forEach { persistMember(it) }

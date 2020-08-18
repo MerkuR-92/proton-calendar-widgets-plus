@@ -10,9 +10,9 @@ import biweekly.util.Duration
 import com.google.gson.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 
-// settings specific to calendar
+// settings specific to Calendar
 
-@Entity(tableName = AppDatabase.TABLE_SETTINGS,
+@Entity(tableName = AppDatabase.TABLE_CALENDAR_SETTINGS,
     foreignKeys = [ForeignKey(
         entity = CalendarEntity::class,
         parentColumns = ["id"],
@@ -20,7 +20,7 @@ import me.proton.android.calendar.data.db.AppDatabase
         onDelete = ForeignKey.CASCADE
     )],
     indices = [Index(value = ["calendarId"])])
-data class SettingsEntity(
+data class CalendarSettingsEntity(
     @PrimaryKey
     val id: String,
     val calendarId: String,

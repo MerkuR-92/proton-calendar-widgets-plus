@@ -4,7 +4,6 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
-import java.time.ZonedDateTime
 
 /**
  * Manages all Calendars, Events, Members, Passphrases etc.
@@ -66,11 +65,11 @@ interface CalendarsRepository {
     suspend fun deleteMemberById(id: String)
 
     // calendar settings
-    suspend fun selectSettings(calendarId: String): SettingsEntity?
+    suspend fun selectCalendarSettings(calendarId: String): CalendarSettingsEntity?
 
-    suspend fun persistSettings(settings: SettingsEntity) // calendarId is already there
+    suspend fun persistCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
 
-    suspend fun deleteSettingsById(id: String)
+    suspend fun deleteCalendarSettingsById(id: String)
 
     // event alarms
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>

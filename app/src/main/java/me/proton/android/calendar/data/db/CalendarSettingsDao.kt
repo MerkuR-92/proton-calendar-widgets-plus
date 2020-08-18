@@ -1,0 +1,19 @@
+package me.proton.android.calendar.data.db
+
+import androidx.room.Dao
+import androidx.room.Query
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+
+
+@Dao
+abstract class CalendarSettingsDao : BaseDao<CalendarSettingsEntity> {
+
+//    lateinit var userId: String
+
+    @Query("SELECT * FROM calendar_settings WHERE calendarId = :calendarId")
+    abstract fun select(calendarId: String): CalendarSettingsEntity?
+
+    @Query("DELETE FROM calendar_settings WHERE id = :id")
+    abstract fun deleteById(id: String)
+
+}
