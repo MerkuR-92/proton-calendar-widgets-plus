@@ -5,7 +5,9 @@ import assertk.assertions.*
 import biweekly.property.RecurrenceRule
 import biweekly.util.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
+import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.createNewEvent
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
@@ -15,7 +17,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoField
 import java.util.*
 
 
@@ -362,6 +363,33 @@ internal class ICalUtilsTest {
         assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isFalse()
         assertThat(event.iCalEvent.recurrenceRule.value.until).isEqualTo(ICalDate.from(LocalDate.of(2020, 7, 28).atStartOfDay(ZoneId.of("Europe/Zurich")).withZoneSameInstant(
             ZoneId.of("UTC")).toInstant()))
+
+    }
+
+    @Test
+    fun `adjust RRULE to WEEK START`() {
+
+        val eventNoAdjustment = createNewEvent()
+        eventNoAdjustment.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.WEEKLY).interval(1).byDay(DayOfWeek.FRIDAY).build())
+
+        assertThat(eventNoAdjustment.recurrenceRule.value.workweekStarts).isNull()
+
+        val eventWeekly = createNewEvent()
+        eventWeekly.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.WEEKLY).interval(2).byDay(DayOfWeek.FRIDAY).build())
+        eventWeekly.recurrenceRule.adjustToWeekStart(7) // Sunday
+
+        TestsLogger.d("${eventWeekly.wrapInICalendar().printToString()}")
+
+        assertThat(eventWeekly.recurrenceRule.value.workweekStarts).isEqualTo(DayOfWeek.SUNDAY)
+
+        val eventYearly = createNewEvent()
+        eventYearly.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.YEARLY).byWeekNo(10).build())
+        eventYearly.recurrenceRule.adjustToWeekStart(1) // Monday
+
+        TestsLogger.d("${eventYearly.wrapInICalendar().printToString()}")
+
+        assertThat(eventYearly.recurrenceRule.value.workweekStarts).isEqualTo(DayOfWeek.MONDAY)
+
 
     }
 

@@ -84,21 +84,32 @@ object ICalUtils {
         return true
     }
 
+    /**
+     * This methods clones Recurrence and overwrites only parameters supplied.
+     */
     fun Recurrence.clone(
         byDay: List<biweekly.util.DayOfWeek>? = null,
         bySetPos: List<Int>? = null,
-        until: ICalDate? = null
+        until: ICalDate? = null,
+        workweekStarts: biweekly.util.DayOfWeek? = null
     ): Recurrence {
 
         val builder = Recurrence.Builder(this.frequency)
 
-        // TODO allow for overwriting of those params
+        builder.bySecond(this.bySecond)
+        builder.byMinute(this.byMinute)
+        builder.byHour(this.byHour)
+        builder.byDay(byDay ?: this.byDay.map { it.day })
+        builder.byMonthDay(this.byMonthDay)
+        builder.byYearDay(this.byYearDay)
+        builder.byWeekNo(this.byWeekNo)
+        builder.byMonth(this.byMonth)
+        builder.bySetPos(bySetPos ?: this.bySetPos)
+
         builder.interval(this.interval)
         builder.count(this.count)
-
         builder.until(until ?: this.until)
-        builder.byDay(byDay ?: this.byDay.map { it.day })
-        builder.bySetPos(bySetPos ?: this.bySetPos)
+        builder.workweekStarts(workweekStarts ?: this.workweekStarts)
 
         return builder.build()
     }
@@ -161,6 +172,27 @@ object ICalUtils {
                 )
         }
         
+    }
+
+    /**
+     * @param settingsWeekStart taken from UserSettings, 1 - Monday, 7 - Sunday
+     */
+    fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: Int) {
+
+        val addWkst = when (this.value.frequency) {
+            Frequency.WEEKLY -> {
+                this.value.interval != null && this.value.interval > 1 && (this.value.byDay?.isNotEmpty() == true)
+            }
+            Frequency.YEARLY -> {
+                this.value.byWeekNo?.isNotEmpty() == true
+            }
+            else -> false
+        }
+
+        if (addWkst) {
+            this.value = this.value.clone(workweekStarts = if (settingsWeekStart == 1) biweekly.util.DayOfWeek.MONDAY else if (settingsWeekStart == 7) biweekly.util.DayOfWeek.SUNDAY else null)
+        }
+
     }
 
     fun VEvent.isDateTimeTheSame(that: VEvent?): Boolean {

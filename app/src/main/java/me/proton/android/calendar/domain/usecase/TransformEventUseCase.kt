@@ -142,7 +142,7 @@ class TransformEventUseCase(
 
         if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) return null
 
-        TimberLogger.d("merged calendar: ${iCalendar.printToString()}")
+        TimberLogger.v("merged calendar: ${iCalendar.printToString()}")
 
         // TODO move sanitising to helper function?
 

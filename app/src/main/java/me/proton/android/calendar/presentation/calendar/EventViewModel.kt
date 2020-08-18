@@ -15,10 +15,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
+import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
@@ -69,6 +71,8 @@ class EventViewModel(
      */
     lateinit var displayTimeZoneId: String
 
+    lateinit var userSettings: UserSettingsEntity
+
     suspend fun initialise(eventId: String?, occurrenceNumber: Int?, initStartDate: String?, initStartTime: String? /*TODO in the future also endDate for multi-day events*/): UseCase.Result /* TODO maybe use separate Result class */ {
 
         // reset backup values
@@ -87,7 +91,7 @@ class EventViewModel(
 
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId) ?: return UseCase.Result.Error("could not get default calendar ID")
 
-//        val userSettings = calendarsRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
+        userSettings = calendarsRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
 
 //        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 
@@ -322,6 +326,8 @@ class EventViewModel(
             displayTimeZoneId = event.defaultTimeZone!!
             TimberLogger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
+
+        event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStart)
 
         if (eventBumpSeqId) {
 //            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO FIXME
