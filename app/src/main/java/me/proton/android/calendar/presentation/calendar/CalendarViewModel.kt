@@ -37,7 +37,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
-        return calendarsRepository.selectCalendars(TODOuserID).filter { it.isActive }
+        return calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive }
     }
 
 

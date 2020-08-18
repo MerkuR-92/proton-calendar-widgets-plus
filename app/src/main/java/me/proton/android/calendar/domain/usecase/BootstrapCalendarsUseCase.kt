@@ -30,9 +30,9 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         }
 
-        val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings() // TODO this will have a value if we have at least 1 calendar
-        if (calendarUserSettingsResponse !is ApiResponse.Success) {
-            return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
+        val userSettingsResponse = settingsApi.getUserSettings() // TODO this will have a value if we have at least 1 calendar
+        if (userSettingsResponse !is ApiResponse.Success) {
+            return UseCase.Result.Error("error getting user settings from API: $userSettingsResponse")
         }
 
         val failedCalendarIds = mutableListOf<String>()
@@ -56,20 +56,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     // extract passphrase for just saved Calendar
                     cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
 
-                    TimberLogger.v("calendar settings when bootstrapping: ${calendarUserSettingsResponse.data.calendarUserSettings}")
-
-                    // save User CalendarSettings
-                    // TODO deal with nullable DefaultCalendarID!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                    // solution: EVEN IF THIS IS NON-EMPTY ON SERVER, THE CALENDAR CAN BE NON-EXISTING, ALL CLIENTS SHOULD ALWAYS FALLBACK
-
-                    val todoUserCalendarSettings = if (calendarUserSettingsResponse.data.calendarUserSettings.defaultCalendarId == null) {
-                        calendarUserSettingsResponse.data.calendarUserSettings.copy(defaultCalendarId = calendarEntity.id)
-                    } else calendarUserSettingsResponse.data.calendarUserSettings
-                    valueStoreProvider.provideValueStore(userId).putString(USER_CALENDAR_SETTINGS, GsonCommon.gson.toJson(todoUserCalendarSettings))
-
-                    // TODO ONLY FOR LOGIN MOCK, REMOVE THIS
-                    valueStoreProvider.provideValueStore("TODO LOGIN").putString("DEFAULT CALENDAR ID", todoUserCalendarSettings.defaultCalendarId!!)
+                    // save User Settings
+                    calendarsRepository.persistUserSettings(userId, userSettingsResponse.data.calendarUserSettings)
 
                 }
                 is ApiResponse.Error -> {

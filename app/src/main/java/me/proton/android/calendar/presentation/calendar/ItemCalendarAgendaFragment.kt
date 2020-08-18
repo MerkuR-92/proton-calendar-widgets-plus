@@ -58,9 +58,9 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
         }
 
         try {
-            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+//            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
+//            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
 //            TimberLogger.d("binding live data for events from calendar $calendarId")
             calendarViewModel.events(date).observe(viewLifecycleOwner, Observer {

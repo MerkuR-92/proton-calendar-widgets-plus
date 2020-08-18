@@ -22,6 +22,8 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarById(id: String)
 
+    suspend fun getActiveCalendars(userId: String): List<CalendarEntity>
+
 
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
@@ -70,6 +72,15 @@ interface CalendarsRepository {
     suspend fun persistCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
 
     suspend fun deleteCalendarSettingsById(id: String)
+
+    // user settings
+    suspend fun selectUserSettings(userId: String): UserSettingsEntity?
+
+    suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity)
+
+    suspend fun deleteUserSettingsByUserId(id: String)
+
+    suspend fun getDefaultCalendarId(userId: String): String?
 
     // event alarms
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>

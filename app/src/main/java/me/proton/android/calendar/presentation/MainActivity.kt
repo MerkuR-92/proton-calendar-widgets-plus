@@ -41,6 +41,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     private val loginUserUseCase: LoginUserUseCase by inject()
     private val bootstrapUseCase: BootstrapCalendarsUseCase by inject()
     private val valueStoreProvider: ValueStoreProvider by inject()
+    private val calendarsRepository: CalendarsRepository by inject()
 
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -215,7 +217,12 @@ class MainActivity : AppCompatActivity() {
                     //loginUserUseCase.execute("adamtst", "123".toByteArray())
                     //bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
+
                     val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
+
+//                    val defaultCalendarId = calendarsRepository.getDefaultCalendarId()
+
+                    // TODO GET RID OF THIS CODE AND MOVE TO WORKER
                     val result = if (valueStore.getString("USERID") != null && valueStore.getString("DEFAULT CALENDAR ID") != null) {
                         fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
                             //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",

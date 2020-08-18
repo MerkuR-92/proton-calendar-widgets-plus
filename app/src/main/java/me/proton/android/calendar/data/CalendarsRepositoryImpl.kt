@@ -47,6 +47,10 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.calendarsDao().deleteById(id)
     }
 
+    override suspend fun getActiveCalendars(userId: String): List<CalendarEntity> {
+        return selectCalendars(userId).filter { it.isActive }
+    }
+
     override fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>> {
         TimberLogger.d("eventsFlow: ${fromDate} - ${toDate}")
 
@@ -166,6 +170,25 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
     override suspend fun deleteCalendarSettingsById(id: String) {
         database.calendarSettingsDao().deleteById(id)
+    }
+
+    override suspend fun selectUserSettings(userId: String): UserSettingsEntity? {
+        return database.userSettingsDao().select(userId)
+    }
+
+    override suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity) {
+        userSettings.fkUserId = userId
+        database.userSettingsDao().insert(userSettings)
+    }
+
+    override suspend fun deleteUserSettingsByUserId(userId: String) {
+        database.userSettingsDao().deleteByUserId(userId)
+    }
+
+    override suspend fun getDefaultCalendarId(userId: String): String? {
+        return selectUserSettings(userId)?.let {
+            it.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
+        }
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

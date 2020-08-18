@@ -92,6 +92,7 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.persistCalendarSettings(it.calendarSettings!!) }
                 )
             }
+            // TODO FIXME USER SETTINGS?
             UseCase.Result.Success
         } catch (e: Exception) {
             UseCase.Result.Error(e.message ?: "no stack trace message available")
