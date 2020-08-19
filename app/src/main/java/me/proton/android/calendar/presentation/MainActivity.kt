@@ -220,13 +220,13 @@ class MainActivity : AppCompatActivity() {
 
                     val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
 
-//                    val defaultCalendarId = calendarsRepository.getDefaultCalendarId()
+                    val defaultCalendarId = calendarsRepository.getDefaultCalendarId(valueStore.getString("USERID")!!)
 
                     // TODO GET RID OF THIS CODE AND MOVE TO WORKER
-                    val result = if (valueStore.getString("USERID") != null && valueStore.getString("DEFAULT CALENDAR ID") != null) {
+                    val result = if (valueStore.getString("USERID") != null && defaultCalendarId != null) {
                         fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
                             //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                            valueStore.getString("DEFAULT CALENDAR ID")!!
+                            defaultCalendarId
                         ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), TimeZone.getDefault().id /*TODO get it from settings*/)
                     } else {
                         withContext(Dispatchers.Main) {

@@ -8,7 +8,9 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.LocalDate
 import java.time.ZoneId
@@ -29,7 +31,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
+//    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
     suspend fun selectActiveCalendars(): List<CalendarEntity> {
 
@@ -82,10 +84,29 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
     }
 
     fun events(date: LocalDate): LiveData<List<Event>> {
-        val selectedCalendarIds = listOf<String>(
-            //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-            calendarId!!) // TODO
-        return calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
+
+        return liveData<List<Event>>(Dispatchers.IO) {
+
+            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+            val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+
+            val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
+
+            val selectedCalendarIds = listOf<String>(
+                //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
+                defaultCalendar!!) // TODO
+
+//            calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
+//        emit(.first())
+
+            emitSource(calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default))
+
+
+        }
+
+//        return calendarsRepository.eventsFlow(listOf("jnPU5bvPhktDV035mLlDyXjp6lUvBtVKEnnp--S8AWhZqvfFKNd7TkvFMtMcPZSs0lDpH2IqUthEfF8uHrncZg=="), date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
+
+
     }
 
 
