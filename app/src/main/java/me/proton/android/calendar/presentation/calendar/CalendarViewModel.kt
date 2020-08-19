@@ -88,20 +88,19 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         return liveData<List<Event>>(Dispatchers.IO) {
 
             val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-            val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+            val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+            if (TODOuserID != null) {
+                val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
 
-            val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
-
-            val selectedCalendarIds = listOf<String>(
-                //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                defaultCalendar!!) // TODO
+                val selectedCalendarIds = listOf<String>(
+                    //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
+                    defaultCalendar!!) // TODO
 
 //            calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
 //        emit(.first())
 
-            emitSource(calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default))
-
-
+                emitSource(calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default))
+            }
         }
 
 //        return calendarsRepository.eventsFlow(listOf("jnPU5bvPhktDV035mLlDyXjp6lUvBtVKEnnp--S8AWhZqvfFKNd7TkvFMtMcPZSs0lDpH2IqUthEfF8uHrncZg=="), date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
