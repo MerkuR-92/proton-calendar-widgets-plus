@@ -67,7 +67,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
 
             buildConfigField("String", "SENTRY_DSN", "\"${sentryDsn}\"")
 //            resValue("string", "build_time", "${minutesSinceEpoch}")
