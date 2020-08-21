@@ -1,6 +1,7 @@
 package me.proton.android.calendar.data.api
 
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.Logger
@@ -176,7 +177,9 @@ data class SyncResponseWrapper(
 )
 
 data class SyncResponse(
+    @SerializedName("Code") // workaround for obfuscated members in release builds
     override val code: Int,
+    @SerializedName("Event")
     val event: EventEntity?
     // TODO errors and other types of payload
 ) : BaseApiResponse()

@@ -32,7 +32,11 @@
 -keep class biweekly.** { *; }
 
 # Gson
+#-keepclassmembers class me.proton.android.calendar.data.** { <fields>; }
+#-keep class me.proton.android.calendar.data.** { <fields>; }
+
 -dontwarn sun.misc.**
+#-keep class sun.misc.Unsafe { *; }
 -keep class * implements com.google.gson.TypeAdapter
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
@@ -54,5 +58,7 @@
 -dontwarn kotlin.Unit
 -dontwarn retrofit2.KotlinExtensions
 -dontwarn retrofit2.KotlinExtensions$*
+#-dontnote retrofit2.Platform
+#-dontwarn retrofit2.Platform$Java8
 -if interface * { @retrofit2.http.* <methods>; }
 -keep,allowobfuscation interface <1>

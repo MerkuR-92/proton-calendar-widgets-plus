@@ -189,7 +189,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        Timber.e("onSupportNavigateUp")
         val navController = findNavController(R.id.nav_host_fragment_container_view)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
