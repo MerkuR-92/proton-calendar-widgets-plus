@@ -6,57 +6,37 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:liftOnScroll="true"
->
-
-<!--        android:theme="@style/AppTheme.AppBarOverlay"-->
-
+        android:stateListAnimator="@animator/design_appbar_state_list_animator"
+        app:liftOnScroll="true">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:theme="@style/AppTheme.Toolbar"
+            app:layout_scrollFlags="noScroll">
 
-            />
-<!--        app:popupTheme="@style/AppTheme.PopupOverlay"-->
-<!--        android:theme="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary"-->
-<!--        app:popupTheme="@style/AppTheme.PopupOverlay"-->
+            <LinearLayout
+                android:id="@+id/toolbar_content"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:divider="@drawable/toolbar_divider"
+                android:gravity="center_vertical|end"
+                android:orientation="horizontal"
+                android:paddingEnd="@dimen/spacing_page"
+                android:showDividers="middle" />
 
-
-<!--        <com.google.android.material.appbar.CollapsingToolbarLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:contentScrim="?attr/colorPrimary"-->
-<!--            app:expandedTitleMarginEnd="@dimen/activity_horizontal_margin"-->
-<!--            app:expandedTitleMarginStart="@dimen/activity_horizontal_margin"-->
-<!--            app:layout_scrollFlags="scroll|exitUntilCollapsed"-->
-<!--            app:expandedTitleTextAppearance="@style/HeaderTitleStyle"-->
-<!--            >-->
-
-<!--            &lt;!&ndash;            <View&ndash;&gt;-->
-<!--            &lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
-<!--            &lt;!&ndash;                android:layout_height="120dp"/>&ndash;&gt;-->
-
-<!--            -->
-
-<!--        TODO PUT HERE TOOLBAR WHEN COLLAPSIBLE NEEDED-->
-
-<!--        </com.google.android.material.appbar.CollapsingToolbarLayout>-->
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
-
-        <FrameLayout android:id="@+id/base_fragment_container"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent" />
-
-    </androidx.core.widget.NestedScrollView>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

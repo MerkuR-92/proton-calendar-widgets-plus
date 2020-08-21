@@ -2,6 +2,12 @@
     <dimen name="spacing_page">16dp</dimen>
     <dimen name="spacing_element">12dp</dimen>
     <dimen name="spacing_element_small">8dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+
+    <dimen name="spacing_toolbar_horizontal">16dp</dimen>
+
+    <dimen name="icon_size">32dp</dimen>
+    <dimen name="clickable_size">48dp</dimen>
 
 
 

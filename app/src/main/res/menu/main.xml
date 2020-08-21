@@ -9,7 +9,8 @@
     <item
         android:id="@+id/action_test"
         android:title="(fetch events)"
-        app:showAsAction="always" />
+        app:showAsAction="never"
+        />
     <item
         android:id="@+id/action_create_event"
         android:title="(create event)"

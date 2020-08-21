@@ -7,6 +7,10 @@
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
 
         <item name="android:textColorLink">@color/interaction_norm</item>
+        <item name="android:textColorPrimary">@color/text_norm</item>
+        <item name="android:textColor">@color/text_norm</item>
+
+<!--        <item name="android:actionOverflowMenuStyle-->
 
 
         <!--        in case we need custom font-->
@@ -18,6 +22,12 @@
 <!--   -->
 
     <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+
+<!--        <item name="actionMenuTextColor">@android:color/holo_green_light</item>-->
+<!--        <item name="colorAccent">#a24f22</item>-->
+        <item name="colorControlNormal">@color/icon_norm</item>
+<!--        <item name="colorControlActivated">#f74f99</item>-->
+        <item name="colorControlHighlight">@color/interaction_weak_pressed</item>
         <!--        <item name="titleTextAppearance">@style/MyToolbartitleTextAppearance</item>-->
     </style>
 

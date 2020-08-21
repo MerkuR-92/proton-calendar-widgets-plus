@@ -16,7 +16,20 @@
             android:id="@+id/toolbar_main"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-             />
+            android:theme="@style/AppTheme.Toolbar"
+             >
+
+            <include layout="@layout/toolbar_action_secondary"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                />
+
+            <include layout="@layout/toolbar_action_primary"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                />
+
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 

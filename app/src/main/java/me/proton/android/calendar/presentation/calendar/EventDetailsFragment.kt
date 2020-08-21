@@ -2,14 +2,14 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.graphics.Color
 import android.os.Bundle
-import android.text.Html
-import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -18,8 +18,10 @@ import androidx.navigation.fragment.navArgs
 import biweekly.property.Status
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.event_info.view.*
+import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_details.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
+import kotlinx.android.synthetic.main.item_popup.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,13 +44,60 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val layoutResourceId = R.layout.fragment_event_details
 
     override val navigateUp = false
-    override val actionMenuResourceId = R.menu.fragment_event_details
+    //override val actionMenuResourceId = R.menu.fragment_event_details
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
         when (menuItem.itemId) {
-            R.id.action_menu_edit -> findNavController().navigate((Navigation.Deeplink.toEventEdit(navigationArguments.eventId, navigationArguments.occurrenceNumber)))
-            R.id.action_menu_delete -> handleDelete()
+//            R.id.action_menu_edit ->
+//            )
+//            R.id.action_menu_delete -> {
+
+
+
+
+//                handleDelete()
+//            }
         }
+    }
+
+
+    override fun onToolbarCreated(toolbar: Toolbar) {
+
+        val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_primary, toolbar_content, false)
+        with (buttonEdit) {
+            (this as ImageButton).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pen))
+            setOnClickListener {
+                findNavController().navigate(
+                    (Navigation.Deeplink.toEventEdit(
+                        navigationArguments.eventId,
+                        navigationArguments.occurrenceNumber
+                    )))
+            }
+        }
+        val buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_navigation, toolbar_content, false)
+        buttonMenu.setOnClickListener {
+            AndroidUtils.displayPopupMenu(
+                view = it,
+                labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
+                icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
+            )
+        }
+
+        // TODO extract somewhere to remove boilerplate
+        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+            addView(
+                buttonMenu, resources.getDimensionPixelSize(
+                    R.dimen.icon_size
+                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+            )
+            addView(
+                buttonEdit, resources.getDimensionPixelSize(
+                    R.dimen.icon_size
+                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+            )
+        }
+
+
     }
 
     private fun handleDelete() {
@@ -56,24 +105,40 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         if (event.isRecurring()/* || event.isFromRecurring()*/) {
 
-            AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
-                getString(R.string.event_recurring_edit_this),
-                if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
-                getString(R.string.event_recurring_edit_all_events)
-            ).toTypedArray(), 0) {
+            AndroidUtils.displaySingleChoiceConfirmationPicker(
+                requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
+                    getString(R.string.event_recurring_edit_this),
+                    if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
+                    getString(R.string.event_recurring_edit_all_events)
+                ).toTypedArray(), 0
+            ) {
 
                 lifecycleScope.launch {
                     val deleteResult = withContext(Dispatchers.IO) {
                         if (it == 0) {
-                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
+                            calendarViewModel.handleDeleteEvent(
+                                event.id,
+                                EventEditDeleteOption.THIS_EVENT,
+                                navigationArguments.occurrenceNumber
+                            )
                         } else if (it == 1) {
                             if (navigationArguments.occurrenceNumber == 1) {
-                                calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
+                                calendarViewModel.handleDeleteEvent(
+                                    event.id,
+                                    EventEditDeleteOption.ALL_EVENTS
+                                )
                             } else {
-                                calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT_AND_FUTURE, navigationArguments.occurrenceNumber)
+                                calendarViewModel.handleDeleteEvent(
+                                    event.id,
+                                    EventEditDeleteOption.THIS_EVENT_AND_FUTURE,
+                                    navigationArguments.occurrenceNumber
+                                )
                             }
                         } else { // it == 2
-                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.ALL_EVENTS)
+                            calendarViewModel.handleDeleteEvent(
+                                event.id,
+                                EventEditDeleteOption.ALL_EVENTS
+                            )
                         }
                     }
 
@@ -94,13 +159,20 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
                     lifecycleScope.launch { // TODO
                         val deleteResult = withContext(Dispatchers.Default) {
-                            calendarViewModel.handleDeleteEvent(event.id, EventEditDeleteOption.THIS_EVENT)
+                            calendarViewModel.handleDeleteEvent(
+                                event.id,
+                                EventEditDeleteOption.THIS_EVENT
+                            )
                         }
                         if (deleteResult == UseCase.Result.Success) {
                             Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_LONG).show()
                             findNavController().navigateUp()
                         } else {
-                            Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Error deleting event",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
@@ -126,7 +198,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
             val viewModeInitStatus = withContext(Dispatchers.Default) {
-                eventViewModel.initialise(navigationArguments.eventId, if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber, null, null)
+                eventViewModel.initialise(
+                    navigationArguments.eventId,
+                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                    null,
+                    null
+                )
             }
 
             if (viewModeInitStatus == UseCase.Result.Success) {
@@ -173,7 +250,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             //  because we're still listening for the old event.id !!!
 
 
-
             TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $event")
             TimberLogger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
             TimberLogger.d("${event?.iCalendar?.printToString()}")
@@ -186,15 +262,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val TODOcalendarTimeZoneId = TimeZone.getDefault()
 
 
-                //val eventOccurrence = event.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
+            //val eventOccurrence = event.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
 //            TimberLogger.d("event occurrence generated: ${eventOccurrence}")
 
 
-                // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
+            // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
 
 //                text_event_title.text = "SIGNATURE VERIFICATION: ${event.verificationStatus}\n\n" + event.summary + "\n"
 
-            with (section_event_info) {
+            with(section_event_info) {
 
                 this.view_calendar_bar.background.setTint(Color.parseColor(event.calendar.color))
 
@@ -205,23 +281,36 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     }
                 }
 
-                this.text_summary.text = event.summary ?: resources.getString(R.string.default_event_summary)
+                this.text_summary.text =
+                    event.summary ?: resources.getString(R.string.default_event_summary)
 
-                this.text_date_time.text = event.formatStartEnd(calendarViewModel.timeZoneId.id, null, resources)
+                this.text_date_time.text = event.formatStartEnd(
+                    calendarViewModel.timeZoneId.id,
+                    null,
+                    resources
+                )
 
                 if (event.isRecurring()) {
                     this.text_recurrence.visibleOrGone(true)
-                    this.text_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, TODOcalendarTimeZoneId.id)
+                    this.text_recurrence.text = AndroidUtils.formatRecurrence(
+                        requireContext(),
+                        event,
+                        TODOcalendarTimeZoneId.id
+                    )
                 }
 
                 visibleOrGone(true)
             }
 
             event.location?.let {
-                with (section_location) {
+                with(section_location) {
                     text_header.text = event.location
                     val typedValue = TypedValue()
-                    requireContext().theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true)
+                    requireContext().theme.resolveAttribute(
+                        android.R.attr.selectableItemBackground,
+                        typedValue,
+                        true
+                    )
                     text_header.isClickable = true
                     text_header.setBackgroundResource(typedValue.resourceId)
 
@@ -237,13 +326,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val attendeeCount = (-1..10).random()
             if (attendeeCount > 0) {
                 for (count in 0..attendeeCount) {
-                    attendees.add("Attendee ${count+1}")
+                    attendees.add("Attendee ${count + 1}")
                 }
             }
             if (attendees.isNotEmpty()) {
-                with (section_attendees) {
+                with(section_attendees) {
                     text_subheader.text = "4 yes, 3 maybe, 1 no, TODO"
-                    text_header.text = resources.getString(R.string.event_attendee_count, attendees.size, resources.getQuantityString(R.plurals.plural_participant_uppercase, attendees.size, attendees.size))
+                    text_header.text = resources.getString(
+                        R.string.event_attendee_count, attendees.size, resources.getQuantityString(
+                            R.plurals.plural_participant_uppercase,
+                            attendees.size,
+                            attendees.size
+                        )
+                    )
                     image_icon.setImageResource(R.drawable.ic_contact_groups)
                     visibleOrGone(true)
                 }
@@ -264,7 +359,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             }
 
-            with (section_calendar) {
+            with(section_calendar) {
                 text_header.text = if (event.calendar.isActive) {
                     event.calendar.name
                 } else {
@@ -274,17 +369,18 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 visibleOrGone(true)
             }
 
-            val alarmLabels = event.iCalEvent.alarms.sortedBy { it.trigger.duration.toMillis() }.mapNotNull { alarm ->
-                AndroidUtils.formatAlarm(
-                    resources,
-                    event.isAllDay(),
-                    ZonedDateTime.ofInstant(
-                        event.iCalEvent.dateStart.value.toInstant(),
-                        calendarViewModel.timeZoneId
-                    ),
-                    alarm
-                )
-            }
+            val alarmLabels = event.iCalEvent.alarms.sortedBy { it.trigger.duration.toMillis() }
+                .mapNotNull { alarm ->
+                    AndroidUtils.formatAlarm(
+                        resources,
+                        event.isAllDay(),
+                        ZonedDateTime.ofInstant(
+                            event.iCalEvent.dateStart.value.toInstant(),
+                            calendarViewModel.timeZoneId
+                        ),
+                        alarm
+                    )
+                }
 
             if (alarmLabels.isNotEmpty()) {
                 with(section_alarms) {
@@ -304,13 +400,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
 
-
-
-
-
-
-
-
 //                text_event_all_day_pill.visibleOrGone(event.isAllDay())
 //
 
@@ -321,7 +410,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
 
 //                text_event_notes.text = "NOTES:" + event.notes.joinToString()
-
 
 
         })

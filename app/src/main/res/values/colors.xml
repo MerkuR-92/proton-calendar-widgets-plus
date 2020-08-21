@@ -8,13 +8,20 @@
     <color name="french_gray">#BABDC6</color>
     <color name="athens_gray">#EAECF1</color>
     <color name="cornflower_blue">#657EE4</color>
+    <color name="whisper">#F5F6FA</color>
+    <color name="white">#FFFFFF</color>
+    <color name="mischka">#DADCE3</color>
+    <color name="pomegranate">#E84118</color>
 
     <!-- design color aliases -->
 
     <color name="shade_100">@color/woodsmoke</color>
     <color name="shade_80">@color/storm_gray</color>
     <color name="shade_60">@color/french_gray</color>
+    <color name="shade_40">@color/mischka</color>
     <color name="shade_20">@color/athens_gray</color>
+    <color name="shade_10">@color/whisper</color>
+    <color name="shade_0">@color/white</color>
     <color name="brand_norm">@color/cornflower_blue</color>
 
     <!-- colors to use in the app -->
@@ -24,10 +31,20 @@
     <color name="text_placeholder">@color/shade_60</color>
 
     <color name="interaction_norm">@color/brand_norm</color>
+    <color name="interaction_strong">@color/shade_100</color>
+    <color name="interaction_strong_pressed">@color/shade_80</color>
+    <color name="interaction_weak">@color/shade_20</color>
+    <color name="interaction_weak_pressed">@color/shade_40</color>
 
     <color name="icon_norm">@color/shade_100</color>
+    <color name="icon_inverted">@color/shade_0</color>
 
     <color name="separator_norm">@color/shade_20</color>
+
+    <color name="background_norm">@color/shade_0</color>
+    <color name="background_secondary">@color/shade_10</color>
+
+    <color name="notification_error">@color/pomegranate</color>
 
 
 

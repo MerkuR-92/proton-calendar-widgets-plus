@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--    TODO remove this button -->
+    <item
+        android:id="@+id/action_test"
+        android:title="(fetch events)"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_today"
+        android:title="@string/action_today"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_calendar_today"
+        style="@style/"
+        />
+
+    <item
+        android:id="@+id/action_create_event"
+        android:title="@string/action_create_event"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_plus" />
+</menu>

@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckedTextView
@@ -222,12 +223,14 @@ class AndroidUtils(context: Context) {
 
                         val onDaysOfWeek = if (recurrence.byDay?.size == 7) {
                             context.getString(R.string.event_recurrence_weekly_on_all_days)
-                        } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/})?.mapIndexedNotNull { index, byDay ->
+                        } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/ })
+                            ?.mapIndexedNotNull { index, byDay ->
 
-                            val dayOfWeekAsWord = context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal]
+                                val dayOfWeekAsWord =
+                                    context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal]
 
-                            if (recurrence.bySetPos.isNotEmpty()) {
-                                val setPos = recurrence.bySetPos[index]
+                                if (recurrence.bySetPos.isNotEmpty()) {
+                                    val setPos = recurrence.bySetPos[index]
 
                                     val ordinal = if (setPos > 0) {
                                         context.resources.getStringArray(R.array.ordinals_as_words)
@@ -239,44 +242,47 @@ class AndroidUtils(context: Context) {
 
                                     "${ordinal ?: recurrence.bySetPos[index]} $dayOfWeekAsWord"
 //                                }
-                            } else {
-                                dayOfWeekAsWord
-                            }
-                        }?.joinToString(separator = ", ")
+                                } else {
+                                    dayOfWeekAsWord
+                                }
+                            }?.joinToString(separator = ", ")
                         // TODO handle .byMonthDay, .byYearDay when needed
 
                         when (it) {
                             Frequency.DAILY -> {
-                                val repeat = if (recurrence.interval == null || recurrence.interval == 1) {
-                                    context.getString(R.string.event_recurrence_daily)
-                                } else {
-                                    context.getString(
-                                        R.string.event_recurrence_every_some_period,
-                                        recurrence.interval,
-                                        context.resources.getQuantityString(
-                                            R.plurals.plural_day,
+                                val repeat =
+                                    if (recurrence.interval == null || recurrence.interval == 1) {
+                                        context.getString(R.string.event_recurrence_daily)
+                                    } else {
+                                        context.getString(
+                                            R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            recurrence.interval
-                                        ) /*TODO remove double quantity param, it's not needed anymore because we're not formatting plural string*/
-                                    )
-                                }
+                                            context.resources.getQuantityString(
+                                                R.plurals.plural_day,
+                                                recurrence.interval,
+                                                recurrence.interval
+                                            ) /*TODO remove double quantity param, it's not needed anymore because we're not formatting plural string*/
+                                        )
+                                    }
                                 repeat
                             }
                             Frequency.WEEKLY -> {
-                                val repeat = if (recurrence.interval == null || recurrence.interval == 1)  {
-                                    context.getString(R.string.event_recurrence_weekly)
-                                } else {
-                                    context.getString(
-                                        R.string.event_recurrence_every_some_period,
-                                        recurrence.interval,
-                                        context.resources.getQuantityString(
-                                            R.plurals.plural_week,
+                                val repeat =
+                                    if (recurrence.interval == null || recurrence.interval == 1) {
+                                        context.getString(R.string.event_recurrence_weekly)
+                                    } else {
+                                        context.getString(
+                                            R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            recurrence.interval
+                                            context.resources.getQuantityString(
+                                                R.plurals.plural_week,
+                                                recurrence.interval,
+                                                recurrence.interval
+                                            )
                                         )
-                                    )
-                                }
-                                val dayOfWeekJavaTimeOrdinal = ((event.iCalEvent.getStart(timeZoneId)!!.dayOfWeek.ordinal) + 1 % 7)
+                                    }
+                                val dayOfWeekJavaTimeOrdinal =
+                                    ((event.iCalEvent.getStart(timeZoneId)!!.dayOfWeek.ordinal) + 1 % 7)
                                 context.getString(
                                     R.string.event_recurrence_occurs_on_day_of_week,
                                     repeat,
@@ -286,25 +292,27 @@ class AndroidUtils(context: Context) {
                                 )
                             }
                             Frequency.MONTHLY -> {
-                                val repeat = if (recurrence.interval == null || recurrence.interval == 1) {
-                                    context.getString(R.string.event_recurrence_monthly)
-                                } else {
-                                    context.getString(
-                                        R.string.event_recurrence_every_some_period,
-                                        recurrence.interval,
-                                        context.resources.getQuantityString(
-                                            R.plurals.plural_month,
+                                val repeat =
+                                    if (recurrence.interval == null || recurrence.interval == 1) {
+                                        context.getString(R.string.event_recurrence_monthly)
+                                    } else {
+                                        context.getString(
+                                            R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            recurrence.interval
+                                            context.resources.getQuantityString(
+                                                R.plurals.plural_month,
+                                                recurrence.interval,
+                                                recurrence.interval
+                                            )
                                         )
-                                    )
-                                }
+                                    }
 
                                 if (onDaysOfWeek.isNullOrBlank()) {
                                     context.getString(
                                         R.string.event_recurrence_occurs_on_day_of_month,
                                         repeat,
-                                        event.iCalEvent.getStart(timeZoneId)!!.toLocalDate().dayOfMonth
+                                        event.iCalEvent.getStart(timeZoneId)!!
+                                            .toLocalDate().dayOfMonth
                                     )
                                 } else {
                                     context.getString(
@@ -315,26 +323,33 @@ class AndroidUtils(context: Context) {
                                 }
                             }
                             Frequency.YEARLY -> {
-                                val repeat = if (recurrence.interval == null || recurrence.interval == 1) {
-                                    context.getString(R.string.event_recurrence_yearly)
-                                } else {
-                                    context.getString(
-                                        R.string.event_recurrence_every_some_period,
-                                        recurrence.interval,
-                                        context.resources.getQuantityString(
-                                            R.plurals.plural_year,
+                                val repeat =
+                                    if (recurrence.interval == null || recurrence.interval == 1) {
+                                        context.getString(R.string.event_recurrence_yearly)
+                                    } else {
+                                        context.getString(
+                                            R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            recurrence.interval
+                                            context.resources.getQuantityString(
+                                                R.plurals.plural_year,
+                                                recurrence.interval,
+                                                recurrence.interval
+                                            )
                                         )
-                                    )
-                                }
+                                    }
                                 repeat
                             }
                             else -> null
                         }
                     },
                     recurrence.count?.let {
-                        "${if (it > 1) "$it " else ""}${context.resources.getQuantityString(R.plurals.plural_recurrence_count, it, it)}"
+                        "${if (it > 1) "$it " else ""}${
+                            context.resources.getQuantityString(
+                                R.plurals.plural_recurrence_count,
+                                it,
+                                it
+                            )
+                        }"
                     },
                     recurrence.until?.let {
 
@@ -354,7 +369,9 @@ class AndroidUtils(context: Context) {
 
                 TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
 
-                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.getOffset(startJavaTime) != startTimeZone.getOffset(startJavaTime)) {
+                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.getOffset(
+                        startJavaTime
+                    ) != startTimeZone.getOffset(startJavaTime)) {
                     return "${label} (${startTimeZone.id})"
                 } else {
                     return label
@@ -380,7 +397,12 @@ class AndroidUtils(context: Context) {
         }
 
 
-        fun formatAlarm(resources: Resources, isAllDay: Boolean, startZonedDateTime: ZonedDateTime, alarm: VAlarm): String? {
+        fun formatAlarm(
+            resources: Resources,
+            isAllDay: Boolean,
+            startZonedDateTime: ZonedDateTime,
+            alarm: VAlarm
+        ): String? {
 
             val trigger = alarm.trigger.duration
             return if (isAllDay) { // example: "1 day before at 9:00"
@@ -421,19 +443,49 @@ class AndroidUtils(context: Context) {
                 }
 
                 val label = listOfNotNull(
-                    if (onTheSameDay) { resources.getString(R.string.event_alarm_label_on_the_same_day) } else null,
-                    weeksFormatted?.let { "${it} ${resources.getQuantityString(R.plurals.plural_week, it, it)}" },
-                    daysFormatted?.let { "${it} ${resources.getQuantityString(R.plurals.plural_day, it, it)}" }
+                    if (onTheSameDay) {
+                        resources.getString(R.string.event_alarm_label_on_the_same_day)
+                    } else null,
+                    weeksFormatted?.let {
+                        "${it} ${
+                            resources.getQuantityString(
+                                R.plurals.plural_week,
+                                it,
+                                it
+                            )
+                        }"
+                    },
+                    daysFormatted?.let {
+                        "${it} ${
+                            resources.getQuantityString(
+                                R.plurals.plural_day,
+                                it,
+                                it
+                            )
+                        }"
+                    }
                 ).joinToString(separator = ", ")
 
-                val alarmTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date.from(startDate.toInstant()))
+                val alarmTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(
+                    Date.from(
+                        startDate.toInstant()
+                    )
+                )
 
                 if (label.isBlank()) {
                     null
                 } else if (alarm.action?.isEmail == true) {
-                    resources.getString(if (onTheSameDay) R.string.event_alarm_label_not_before_with_time_by_email else R.string.event_alarm_label_before_with_time_by_email, label, alarmTime)
+                    resources.getString(
+                        if (onTheSameDay) R.string.event_alarm_label_not_before_with_time_by_email else R.string.event_alarm_label_before_with_time_by_email,
+                        label,
+                        alarmTime
+                    )
                 } else if (alarm.action?.isDisplay == true) {
-                    resources.getString(if (onTheSameDay) R.string.event_alarm_label_not_before_with_time else R.string.event_alarm_label_before_with_time, label, alarmTime)
+                    resources.getString(
+                        if (onTheSameDay) R.string.event_alarm_label_not_before_with_time else R.string.event_alarm_label_before_with_time,
+                        label,
+                        alarmTime
+                    )
                 } else {
                     null
                 }
@@ -443,10 +495,42 @@ class AndroidUtils(context: Context) {
                 // Proton support only 1 component for partial-day alarms
 
                 val label = listOfNotNull(
-                    trigger.weeks?.let { "$it ${resources.getQuantityString(R.plurals.plural_week, it, it)}" },
-                    trigger.days?.let { "$it ${resources.getQuantityString(R.plurals.plural_day, it, it)}" },
-                    trigger.hours?.let { "$it ${resources.getQuantityString(R.plurals.plural_hour, it, it)}" },
-                    trigger.minutes?.let { "$it ${resources.getQuantityString(R.plurals.plural_minute, it, it)}" }
+                    trigger.weeks?.let {
+                        "$it ${
+                            resources.getQuantityString(
+                                R.plurals.plural_week,
+                                it,
+                                it
+                            )
+                        }"
+                    },
+                    trigger.days?.let {
+                        "$it ${
+                            resources.getQuantityString(
+                                R.plurals.plural_day,
+                                it,
+                                it
+                            )
+                        }"
+                    },
+                    trigger.hours?.let {
+                        "$it ${
+                            resources.getQuantityString(
+                                R.plurals.plural_hour,
+                                it,
+                                it
+                            )
+                        }"
+                    },
+                    trigger.minutes?.let {
+                        "$it ${
+                            resources.getQuantityString(
+                                R.plurals.plural_minute,
+                                it,
+                                it
+                            )
+                        }"
+                    }
                 ).joinToString(separator = ", ")
 
                 if (label.isBlank()) {
@@ -465,6 +549,72 @@ class AndroidUtils(context: Context) {
             }
 
         }
+
+        /**
+         * @param labels Pair<String Resource ID, Color Resource ID>
+         * @param icons Pair<Drawable Resource ID, Color Resource ID>
+         */
+        fun displayPopupMenu(view: View, labels: List<Pair<Int, Int?>>, icons: List<Pair<Int?, Int?>>) {
+
+            // TODO we need custom adapter to apply custom colors to icon and text, this is workaround for now
+
+            val data = ArrayList<HashMap<String, Any>>()
+            data.add(hashMapOf("text" to view.resources.getText(R.string.action_delete), "icon" to R.drawable.ic_trash))
+
+            val adapter: ListAdapter = SimpleAdapter(
+                view.context,
+                data,
+                R.layout.item_popup_error, // TODO
+                arrayOf("text", "icon"),
+                intArrayOf(R.id.tv_text, R.id.iv_icon)
+            )
+
+            val popupWindow = ListPopupWindow(view.context)
+            with (popupWindow) {
+                isModal = true
+                anchorView = view
+                verticalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
+                horizontalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
+                width = measureContentWidth(view.context, adapter)
+                height = ListPopupWindow.WRAP_CONTENT
+                setAdapter(adapter)
+                setOnItemClickListener { adapterView, view, i, l ->
+                    TimberLogger.d("clicked: $view, $i, $l")
+                    popupWindow.dismiss()
+                }
+                show()
+            }
+
+        }
+
+        // https://stackoverflow.com/questions/14200724/listpopupwindow-not-obeying-wrap-content-width-spec/26814964#26814964
+        private fun measureContentWidth(context: Context, listAdapter: ListAdapter): Int {
+            var mMeasureParent: ViewGroup? = null
+            var maxWidth = 0
+            var itemView: View? = null
+            var itemType = 0
+            val widthMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            val heightMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            val count = listAdapter.count
+            for (i in 0 until count) {
+                val positionType = listAdapter.getItemViewType(i)
+                if (positionType != itemType) {
+                    itemType = positionType
+                    itemView = null
+                }
+                if (mMeasureParent == null) {
+                    mMeasureParent = FrameLayout(context)
+                }
+                itemView = listAdapter.getView(i, itemView, mMeasureParent)
+                itemView.measure(widthMeasureSpec, heightMeasureSpec)
+                val itemWidth = itemView.measuredWidth
+                if (itemWidth > maxWidth) {
+                    maxWidth = itemWidth
+                }
+            }
+            return maxWidth
+        }
+
     }
 
 }

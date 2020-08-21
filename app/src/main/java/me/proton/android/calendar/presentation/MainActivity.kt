@@ -1,14 +1,17 @@
 package me.proton.android.calendar.presentation
 
 import android.content.Context
+import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.widget.NestedScrollView
 import androidx.drawerlayout.widget.DrawerLayout
@@ -134,6 +137,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+
+
 //        calTest.calendars.observe(this) {
 //            TimberLogger.d("injected view observer got scoped caldnears:")
 //            it.forEach {
@@ -184,9 +189,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
+//        menuInflater.inflate(R.menu.main, menu)
         return true
     }
+
+//    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+
+//        val d = ContextCompat.getDrawable(this, R.drawable.ic_calendar_today)
+//        (d as VectorDrawable)background = ContextCompat.getDrawable(this, R.drawable.ripple_action_primary).?
+
+//        menu?.findItem(R.id.action_test)?.setIcon(d)
+//        return super.onPrepareOptionsMenu(menu)
+//    }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_container_view)
@@ -206,43 +220,11 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
 
             R.id.action_create_event -> {
-                findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtils.generateEventStartTime())) /*TODO take it from click on calendar*/
             }
 
             R.id.action_test -> {
 //
-                GlobalScope.launch {
 
-                    //loginUserUseCase.execute("adamtst", "123".toByteArray())
-                    //bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
-
-
-                    val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
-
-                    val defaultCalendarId = calendarsRepository.getDefaultCalendarId(valueStore.getString("USERID")!!)
-
-                    // TODO GET RID OF THIS CODE AND MOVE TO WORKER
-                    val result = if (valueStore.getString("USERID") != null && defaultCalendarId != null) {
-                        fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
-                            //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                            defaultCalendarId
-                        ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), TimeZone.getDefault().id /*TODO get it from settings*/)
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(applicationContext, "Please login again", Toast.LENGTH_LONG).show()
-                        }
-                        UseCase.Result.Error("error fetching events in Main Activity")
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        if (result == UseCase.Result.Success) {
-                            Toast.makeText(applicationContext, "events fetched", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(applicationContext, "error fetching events", Toast.LENGTH_LONG).show()
-                        }
-                    }
-
-                }
 
 //                GlobalScope.launch {
 //

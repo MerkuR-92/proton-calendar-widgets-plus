@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar
@@ -18,6 +17,7 @@ abstract class BaseDialogFragment : DialogFragment() {
     protected open val navigateUp: Boolean = true
     protected open val actionMenuResourceId: Int? = null
     protected open fun onMenuItemClicked(menuItem: MenuItem) {}
+    protected open fun onToolbarCreated(toolbar: Toolbar) {}
 
     /**
      * Override this to customise action on "close/arrow back" click.
@@ -45,7 +45,7 @@ abstract class BaseDialogFragment : DialogFragment() {
 
 
                 val rootView = inflater.inflate(R.layout.fragment_base_dialog, container, false)
-                rootView.findViewById<ViewGroup>(R.id.base_fragment_container).addView(
+                rootView.findViewById<ViewGroup>(R.id.container).addView(
                     inflater.inflate(layoutResourceId, container, false)
                 )
 
@@ -57,9 +57,9 @@ abstract class BaseDialogFragment : DialogFragment() {
                     if (navigateUp) {
 //                val icon = resources.getDrawable(R.drawable.ic_arrow_left)
 //                icon.setTint(resources.getColor(R.color.iconTint)) // doesn't work
-                        setNavigationIcon(R.drawable.ic_arrow_left)
+                        setNavigationIcon(R.drawable.ic_arrow_left_nav)
                     } else {
-                        setNavigationIcon(R.drawable.ic_times)
+                        setNavigationIcon(R.drawable.ic_close_nav)
                     }
                     setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
                         if (!onNavigationIconClicked()) {
@@ -67,7 +67,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                         }
                         // TODO navigate up or close
                     }
-                    // action menu
+                    // action menu TODO deprecated, use custom toolbar views
                     actionMenuResourceId?.let {
                         inflateMenu(it)
                         setOnMenuItemClickListener {
@@ -75,6 +75,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                             return@setOnMenuItemClickListener true
                         }
                     }
+                    onToolbarCreated(this)
                 }
 
 

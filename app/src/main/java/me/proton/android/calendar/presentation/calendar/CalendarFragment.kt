@@ -1,13 +1,12 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import me.proton.android.calendar.R
@@ -18,9 +17,18 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.ext.android.inject
 import java.time.LocalDate
+import java.util.*
 
 class CalendarFragment : Fragment() {
 
@@ -32,6 +40,7 @@ class CalendarFragment : Fragment() {
     private val bootstrapUseCase: BootstrapCalendarsUseCase by inject()
     // TODO ^^^^^
     private val fetchEventsUseCase: FetchEventsUseCase by inject()
+    private val calendarsRepository: CalendarsRepository by inject()
 
 
 private val valueStoreProvider: ValueStoreProvider by inject()
@@ -54,6 +63,11 @@ private val valueStoreProvider: ValueStoreProvider by inject()
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_calendar, container, false)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     private inner class CalendarAgendaAdapter(activity: FragmentActivity, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
@@ -158,6 +172,11 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 //
 //    }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        requireActivity().menuInflater.inflate(R.menu.fragment_calendar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_test -> {
@@ -172,6 +191,38 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 //                }
 
                 TimberLogger.d("menu handled in fragment")
+                GlobalScope.launch {
+
+                    //loginUserUseCase.execute("adamtst", "123".toByteArray())
+                    //bootstrapUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
+
+
+                    val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
+
+                    val defaultCalendarId = calendarsRepository.getDefaultCalendarId(valueStore.getString("USERID")!!)
+
+                    // TODO GET RID OF THIS CODE AND MOVE TO WORKER
+                    val result = if (valueStore.getString("USERID") != null && defaultCalendarId != null) {
+                        fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
+                            //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
+                            defaultCalendarId
+                        ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), TimeZone.getDefault().id /*TODO get it from settings*/)
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(requireContext(), "Please login again", Toast.LENGTH_LONG).show()
+                        }
+                        UseCase.Result.Error("error fetching events in Main Activity")
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        if (result == UseCase.Result.Success) {
+                            Toast.makeText(requireContext(), "events fetched", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(), "error fetching events", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                }
 
 
 //                LoginUserUseCase(TimberLogger, UsersApiImpl(GsonCommon.gson, TimberLogger, context?.applicationContext!!),
@@ -184,11 +235,14 @@ private val valueStoreProvider: ValueStoreProvider by inject()
                 // TODO this is hijacked by MainActivity anyway
                 true
             }
-//            R.id.action_create_event -> {
+            R.id.action_create_event -> {
+
+                requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtils.generateEventStartTime())) /*TODO take it from click on calendar*/
+
 //                TimberLogger.d("blabla")
 //                findNavController().navigate(Navigation.Deeplink.toEventCreate("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="))
-//                true
-//            }
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
