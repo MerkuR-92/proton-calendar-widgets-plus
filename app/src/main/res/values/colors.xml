@@ -28,7 +28,7 @@
 
     <color name="text_norm">@color/shade_100</color>
     <color name="text_weak">@color/storm_gray</color>
-    <color name="text_placeholder">@color/shade_60</color>
+    <color name="text_hint">@color/shade_60</color>
 
     <color name="interaction_norm">@color/brand_norm</color>
     <color name="interaction_strong">@color/shade_100</color>

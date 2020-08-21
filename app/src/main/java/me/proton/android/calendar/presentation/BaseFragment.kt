@@ -3,18 +3,29 @@ package me.proton.android.calendar.presentation
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.TimberLogger
 
-
-abstract class BaseDialogFragment : DialogFragment() {
+// TODO maybe remove DialogFragment whatsoever
+abstract class BaseFragment : DialogFragment() {
 
     // properties for subclasses to override
     abstract val TAG: String
     abstract val layoutResourceId: Int
     //    abstract val showToolbar: Boolean
 
+    /**
+     * Show navigation arrow or close button
+     */
     protected open val navigateUp: Boolean = true
+
+    /**
+     * Show hamburger icon and open drawer on navigation click
+     */
+    protected open val isTopLevel: Boolean = false
     protected open val actionMenuResourceId: Int? = null
     protected open fun onMenuItemClicked(menuItem: MenuItem) {}
     protected open fun onToolbarCreated(toolbar: Toolbar) {}
@@ -54,18 +65,25 @@ abstract class BaseDialogFragment : DialogFragment() {
                 toolbar.apply {
                     setTitle("")
                     // navigation
-                    if (navigateUp) {
-//                val icon = resources.getDrawable(R.drawable.ic_arrow_left)
-//                icon.setTint(resources.getColor(R.color.iconTint)) // doesn't work
-                        setNavigationIcon(R.drawable.ic_arrow_left_nav)
+                    if (isTopLevel) {
+                        setNavigationIcon(R.drawable.ic_hamburger_nav)
                     } else {
-                        setNavigationIcon(R.drawable.ic_close_nav)
-                    }
-                    setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
-                        if (!onNavigationIconClicked()) {
-                            dismiss()
+                        if (navigateUp) {
+                            setNavigationIcon(R.drawable.ic_arrow_left_nav)
+                        } else {
+                            setNavigationIcon(R.drawable.ic_close_nav)
                         }
-                        // TODO navigate up or close
+                    }
+
+                    setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
+                        if (isTopLevel) {
+                            ((requireActivity().findViewById(R.id.drawer_layout) as DrawerLayout).openDrawer(
+                                GravityCompat.START)) // TODO maybe move to activity
+                        } else {
+                            if (!onNavigationIconClicked()) {
+                                dismiss()
+                            }
+                        }
                     }
                     // action menu TODO deprecated, use custom toolbar views
                     actionMenuResourceId?.let {

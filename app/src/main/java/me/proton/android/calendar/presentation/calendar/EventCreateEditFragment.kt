@@ -22,7 +22,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.BaseFragment
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -30,7 +30,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 
-class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
+class EventCreateEditFragment() : BaseFragment(), KoinComponent {
 
     override val TAG = "EventCreateEditFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_create_edit

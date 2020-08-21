@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.BaseFragment
 import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
 import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.group_custom
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 
-class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
+class EventCreateEditAlarmFragment() : BaseFragment(), KoinComponent {
 
     override val TAG = "EventCreateEditAlarmFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_create_edit_alarm

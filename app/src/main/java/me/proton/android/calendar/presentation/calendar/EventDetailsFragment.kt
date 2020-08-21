@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.event_info.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_details.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
-import kotlinx.android.synthetic.main.item_popup.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,7 +28,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.BaseFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -38,7 +37,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 
-class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
+class EventDetailsFragment : BaseFragment(), KoinComponent {
 
     override val TAG = "EventDetailsFragment"
     override val layoutResourceId = R.layout.fragment_event_details
@@ -75,26 +74,30 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
         val buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_navigation, toolbar_content, false)
-        buttonMenu.setOnClickListener {
-            AndroidUtils.displayPopupMenu(
-                view = it,
-                labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
-                icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
-            )
+        with (buttonMenu) {
+            setOnClickListener {
+                AndroidUtils.displayPopupMenu(
+                    view = it,
+                    labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
+                    icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
+                )
+            }
         }
+
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
-            addView(
-                buttonMenu, resources.getDimensionPixelSize(
-                    R.dimen.icon_size
-                ), resources.getDimensionPixelSize(R.dimen.icon_size)
-            )
             addView(
                 buttonEdit, resources.getDimensionPixelSize(
                     R.dimen.icon_size
                 ), resources.getDimensionPixelSize(R.dimen.icon_size)
             )
+            addView(
+                buttonMenu, resources.getDimensionPixelSize(
+                    R.dimen.icon_size
+                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+            )
+
         }
 
 

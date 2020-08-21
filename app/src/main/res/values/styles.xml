@@ -11,8 +11,8 @@
         <item name="android:lineSpacingExtra">2sp</item>
     </style>
 
-    <style name="Text.Headline.Placeholder">
-        <item name="android:textColor">@color/text_placeholder</item>
+    <style name="Text.Headline.Hint">
+        <item name="android:textColor">@color/text_hint</item>
     </style>
 
     <style name="Text.Subheadline">

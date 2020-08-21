@@ -25,8 +25,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.time.LocalDate
+import java.util.*
 
 // TODO PROTOTYPE, NUKE THIS
 class LoginFragment : Fragment() {
@@ -38,6 +43,9 @@ class LoginFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login_todo, container, false)
     }
+
+    private val fetchEventsUseCase: FetchEventsUseCase by inject()
+    private val calendarsRepository: CalendarsRepository by inject()
 
     private val loginUserUseCase: LoginUserUseCase by inject()
     private val bootstrapUseCase: BootstrapCalendarsUseCase by inject()
@@ -65,8 +73,37 @@ class LoginFragment : Fragment() {
                     }
                         if (bootstrap == UseCase.Result.Success) {
 
-                            findNavController().navigateUp()
-                            Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()
+                            GlobalScope.launch {
+
+                                val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
+
+                                val defaultCalendarId = calendarsRepository.getDefaultCalendarId(valueStore.getString("USERID")!!)
+
+                                // TODO GET RID OF THIS CODE AND MOVE TO WORKER
+                                val result = if (valueStore.getString("USERID") != null && defaultCalendarId != null) {
+                                    fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
+                                        //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
+                                        defaultCalendarId
+                                    ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), TimeZone.getDefault().id /*TODO get it from settings*/)
+                                } else {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(requireContext(), "Please login again", Toast.LENGTH_LONG).show()
+                                    }
+                                    UseCase.Result.Error("error fetching events in Main Activity")
+                                }
+
+                                withContext(Dispatchers.Main) {
+                                    if (result == UseCase.Result.Success) {
+                                        Toast.makeText(requireContext(), "events fetched", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(requireContext(), "error fetching events", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+
+                            }
+
+                            findNavController().navigate(Navigation.Deeplink.toCalendar())
+                            //Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()
 
                         } else {
                                 Toast.makeText(requireContext(), "ERROR: ${(bootstrap as UseCase.Result.Error).message}", Toast.LENGTH_LONG).show()

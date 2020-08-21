@@ -77,11 +77,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar_main)
-        toolbar.apply {
-            setSupportActionBar(this)
-            title = ""
-        }
+//        val toolbar: Toolbar = findViewById(R.id.toolbar)
+//        toolbar.apply {
+//            setSupportActionBar(this)
+//            title = ""
+//        }
 
 
 //        bottomSheetBehavior = BottomSheetBehavior.from(standardBottomSheet);
@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(setOf(
             R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
         ), drawerLayout)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        //setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
 
