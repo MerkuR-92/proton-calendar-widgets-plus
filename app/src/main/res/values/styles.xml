@@ -15,6 +15,10 @@
         <item name="android:textColor">@color/text_hint</item>
     </style>
 
+    <style name="Text.Headline.Small">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="Text.Subheadline">
         <item name="android:textSize">20sp</item>
         <item name="android:fontFamily">sans-serif</item>

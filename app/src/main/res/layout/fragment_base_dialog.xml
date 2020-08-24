@@ -19,7 +19,11 @@
             android:theme="@style/AppTheme.Toolbar"
             app:layout_scrollFlags="noScroll">
 
-            <LinearLayout
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
                 android:id="@+id/toolbar_content"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -28,6 +32,17 @@
                 android:orientation="horizontal"
                 android:paddingEnd="@dimen/spacing_page"
                 android:showDividers="middle" />
+
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    style="@style/Text.Headline.Small" />
+
+            </FrameLayout>
+
+
 
         </androidx.appcompat.widget.Toolbar>
 

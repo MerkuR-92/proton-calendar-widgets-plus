@@ -7,4 +7,4 @@
     android:layout_height="@dimen/icon_size"
     android:background="@drawable/ripple_action_navigation_oval"
     android:tint="@color/icon_norm"
-    app:srcCompat="@drawable/ic_three_dots_vertical" />
+    app:srcCompat="@drawable/ic_three_dots_vertical_nav" />

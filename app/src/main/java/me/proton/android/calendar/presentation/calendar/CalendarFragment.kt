@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation.calendar
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -38,6 +39,8 @@ class CalendarFragment : BaseDialogFragment() {
 
     private val initialToday = LocalDate.now()
     private val agendaAdapter by lazy { CalendarAgendaAdapter(requireActivity(), initialToday) }
+
+    private lateinit var toolbarTitle: TextView
 
 private val valueStoreProvider: ValueStoreProvider by inject()
     override val TAG: String
@@ -83,6 +86,8 @@ private val valueStoreProvider: ValueStoreProvider by inject()
             )
         }
 
+        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
+
     }
 
     //    private val args: AgendaFragmentArgs by navArgs()
@@ -124,8 +129,12 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 
     var pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            TimberLogger.d("page selected: $position")
+            setToolbarTitle(position)
         }
+    }
+
+    private fun setToolbarTitle(position: Int) {
+        toolbarTitle.text = agendaAdapter.startingDate.plusDays((position - agendaAdapter.startingPosition).toLong()).formatMonth()
     }
 
     override fun onDestroyView() {
@@ -141,6 +150,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
             adapter = agendaAdapter
             offscreenPageLimit = 1 // TODO
             setCurrentItem(agendaAdapter.startingPosition, false)
+            setToolbarTitle(agendaAdapter.startingPosition)
         }
 
         pager.registerOnPageChangeCallback(pageChangeCallback)

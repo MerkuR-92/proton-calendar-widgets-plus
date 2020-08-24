@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckedTextView
@@ -27,6 +26,7 @@ import me.proton.android.calendar.domain.model.Event
 import java.text.DateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
@@ -554,12 +554,21 @@ class AndroidUtils(context: Context) {
          * @param labels Pair<String Resource ID, Color Resource ID>
          * @param icons Pair<Drawable Resource ID, Color Resource ID>
          */
-        fun displayPopupMenu(view: View, labels: List<Pair<Int, Int?>>, icons: List<Pair<Int?, Int?>>) {
+        fun displayPopupMenu(
+            view: View,
+            labels: List<Pair<Int, Int?>>,
+            icons: List<Pair<Int?, Int?>>
+        ) {
 
             // TODO we need custom adapter to apply custom colors to icon and text, this is workaround for now
 
             val data = ArrayList<HashMap<String, Any>>()
-            data.add(hashMapOf("text" to view.resources.getText(R.string.action_delete), "icon" to R.drawable.ic_trash))
+            data.add(
+                hashMapOf(
+                    "text" to view.resources.getText(R.string.action_delete),
+                    "icon" to R.drawable.ic_trash
+                )
+            )
 
             val adapter: ListAdapter = SimpleAdapter(
                 view.context,
@@ -570,7 +579,7 @@ class AndroidUtils(context: Context) {
             )
 
             val popupWindow = ListPopupWindow(view.context)
-            with (popupWindow) {
+            with(popupWindow) {
                 isModal = true
                 anchorView = view
                 verticalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
@@ -593,8 +602,14 @@ class AndroidUtils(context: Context) {
             var maxWidth = 0
             var itemView: View? = null
             var itemType = 0
-            val widthMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            val heightMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            val widthMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
+                0,
+                View.MeasureSpec.UNSPECIFIED
+            )
+            val heightMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
+                0,
+                View.MeasureSpec.UNSPECIFIED
+            )
             val count = listAdapter.count
             for (i in 0 until count) {
                 val positionType = listAdapter.getItemViewType(i)
@@ -718,6 +733,13 @@ fun LocalDate.isLastDayOfWeekInMonth() = this.plusDays(7).monthValue != this.mon
 // TODO add function for calculating how many days-of-week are there in a given month, we can use it for "backwards" formatting then
 
 fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
+
+/**
+ * Returns "January", etc.
+ */
+fun LocalDate.formatMonth(): String {
+    return DateTimeFormatter.ofPattern("MMMM", Locale.getDefault()).format(this)
+}
 
 /**
  * Returns "first Monday", "second Friday" etc.
