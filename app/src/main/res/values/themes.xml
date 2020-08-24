@@ -10,6 +10,8 @@
         <item name="android:textColorPrimary">@color/text_norm</item>
         <item name="android:textColor">@color/text_norm</item>
 
+        <item name="android:colorControlHighlight">@color/interaction_weak_pressed</item>
+
 <!--        <item name="android:actionOverflowMenuStyle-->
 
 
@@ -27,7 +29,7 @@
 <!--        <item name="colorAccent">#a24f22</item>-->
         <item name="colorControlNormal">@color/icon_norm</item>
 <!--        <item name="colorControlActivated">#f74f99</item>-->
-        <item name="colorControlHighlight">@color/interaction_weak_pressed</item>
+
         <!--        <item name="titleTextAppearance">@style/MyToolbartitleTextAppearance</item>-->
     </style>
 

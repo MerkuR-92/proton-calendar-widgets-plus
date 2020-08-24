@@ -80,7 +80,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     view = it,
                     labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
                     icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
-                )
+                ) {
+                    handleDelete()
+                }
             }
         }
 
@@ -149,6 +151,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_SHORT).show()
                         findNavController().navigateUp()
                     } else {
+
+                        if (deleteResult is UseCase.Result.Error) {
+                            TimberLogger.e("Error deleting event: ${deleteResult.message}")
+                        } else if (deleteResult is UseCase.Result.InvalidParams) {
+                            TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
+                        }
+
                         Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
                     }
 
@@ -171,6 +180,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_LONG).show()
                             findNavController().navigateUp()
                         } else {
+
+                            if (deleteResult is UseCase.Result.Error) {
+                                TimberLogger.e("Error deleting event: ${deleteResult.message}")
+                            } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
+                            }
+
                             Toast.makeText(
                                 requireContext(),
                                 "Error deleting event",

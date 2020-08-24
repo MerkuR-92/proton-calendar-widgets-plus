@@ -24,14 +24,13 @@ class DeleteEventUseCase( // TODO TESTS
 
         // TODO migrate to /sync route and handle recurring deletes
 
-        logger.v("executing DeleteEventUseCase")
+        logger.v("executing DeleteEventUseCase $userId, $eventId, $deleteOption, $occurrenceNumber")
 
         val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("event $eventId doesn't exist in DB")
         val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("event $eventId could not be transformed")
 
         val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
 
-        val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
 
         // TODO when event is in the middle of chain, we need to select the root event and deal with it accordingly!!!
 
@@ -39,11 +38,14 @@ class DeleteEventUseCase( // TODO TESTS
             EventEditDeleteOption.THIS_EVENT -> {
 
                 if (event.isRecurring()) {
-                    // add EXDATE to root event
-                    rootEvent.addExceptionDate(occurrenceNumber!!) // TODO
-                    editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                    // add EXDATE to it
+                    event.addExceptionDate(occurrenceNumber!!) // TODO
+                    editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 }
                 else if (event.isFromRecurring()) {
+
+                    val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+
                     // add EXDATE to root event
                     rootEvent.addExceptionDate(occurrenceNumber!!) // TODO
                     editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)

@@ -26,7 +26,6 @@ import me.proton.android.calendar.domain.model.Event
 import java.text.DateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
@@ -557,7 +556,8 @@ class AndroidUtils(context: Context) {
         fun displayPopupMenu(
             view: View,
             labels: List<Pair<Int, Int?>>,
-            icons: List<Pair<Int?, Int?>>
+            icons: List<Pair<Int?, Int?>>,
+            onItemClicked: (position: Int) -> Unit
         ) {
 
             // TODO we need custom adapter to apply custom colors to icon and text, this is workaround for now
@@ -570,13 +570,21 @@ class AndroidUtils(context: Context) {
                 )
             )
 
-            val adapter: ListAdapter = SimpleAdapter(
+            val adapter: SimpleAdapter = object: SimpleAdapter(
                 view.context,
                 data,
                 R.layout.item_popup_error, // TODO
                 arrayOf("text", "icon"),
                 intArrayOf(R.id.tv_text, R.id.iv_icon)
-            )
+            ) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                    return super.getView(position, convertView, parent).apply {
+                        this.setOnClickListener {
+                            onItemClicked(position)
+                        }
+                    }
+                }
+            }
 
             val popupWindow = ListPopupWindow(view.context)
             with(popupWindow) {
@@ -587,10 +595,6 @@ class AndroidUtils(context: Context) {
                 width = measureContentWidth(view.context, adapter)
                 height = ListPopupWindow.WRAP_CONTENT
                 setAdapter(adapter)
-                setOnItemClickListener { adapterView, view, i, l ->
-                    TimberLogger.d("clicked: $view, $i, $l")
-                    popupWindow.dismiss()
-                }
                 show()
             }
 

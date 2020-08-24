@@ -12,12 +12,13 @@
     <color name="white">#FFFFFF</color>
     <color name="mischka">#DADCE3</color>
     <color name="pomegranate">#E84118</color>
+    <color name="santas_gray">#9CA0AA</color>
 
     <!-- design color aliases -->
 
     <color name="shade_100">@color/woodsmoke</color>
     <color name="shade_80">@color/storm_gray</color>
-    <color name="shade_60">@color/french_gray</color>
+    <color name="shade_60">@color/santas_gray</color>
     <color name="shade_40">@color/mischka</color>
     <color name="shade_20">@color/athens_gray</color>
     <color name="shade_10">@color/whisper</color>
