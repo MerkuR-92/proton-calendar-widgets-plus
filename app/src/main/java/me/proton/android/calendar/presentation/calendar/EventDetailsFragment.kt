@@ -173,7 +173,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         val deleteResult = withContext(Dispatchers.Default) {
                             calendarViewModel.handleDeleteEvent(
                                 event.id,
-                                EventEditDeleteOption.THIS_EVENT
+                                EventEditDeleteOption.THIS_EVENT,
+                                navigationArguments.occurrenceNumber
                             )
                         }
                         if (deleteResult == UseCase.Result.Success) {

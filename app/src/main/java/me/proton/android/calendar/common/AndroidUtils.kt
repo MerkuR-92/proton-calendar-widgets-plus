@@ -570,6 +570,8 @@ class AndroidUtils(context: Context) {
                 )
             )
 
+            val popupWindow = ListPopupWindow(view.context)
+
             val adapter: SimpleAdapter = object: SimpleAdapter(
                 view.context,
                 data,
@@ -581,12 +583,12 @@ class AndroidUtils(context: Context) {
                     return super.getView(position, convertView, parent).apply {
                         this.setOnClickListener {
                             onItemClicked(position)
+                            popupWindow.dismiss()
                         }
                     }
                 }
             }
 
-            val popupWindow = ListPopupWindow(view.context)
             with(popupWindow) {
                 isModal = true
                 anchorView = view
