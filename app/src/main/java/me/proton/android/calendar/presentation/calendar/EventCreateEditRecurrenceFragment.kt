@@ -16,7 +16,7 @@ import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.presentation.BaseFragment
+import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.NoLayoutRadioGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -26,7 +26,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class EventCreateEditRecurrenceFragment() : BaseFragment(), KoinComponent {
+class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "EventCreateEditRecurrenceFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_create_edit_recurrence

@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.*
 import androidx.navigation.fragment.navArgs
 import me.proton.android.calendar.R
-import me.proton.android.calendar.presentation.BaseFragment
+import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 
-class EventCreateEditAttendeesFragment() : BaseFragment(), KoinComponent {
+class EventCreateEditAttendeesFragment() : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "EventCreateEditAttendeesFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_create_edit_attendees

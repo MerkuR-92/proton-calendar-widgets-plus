@@ -7,7 +7,7 @@ import me.proton.android.calendar.R
 import org.koin.core.KoinComponent
 
 
-class TimePickerFragment : BaseFragment(), KoinComponent {
+class TimePickerFragment : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "TimePickerFragment"
     override val layoutResourceId = R.layout.dialog_time_picker

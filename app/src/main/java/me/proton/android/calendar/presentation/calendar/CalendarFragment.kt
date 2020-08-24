@@ -19,13 +19,12 @@ import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.presentation.BaseFragment
+import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.android.ext.android.inject
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
-class CalendarFragment : BaseFragment() {
+class CalendarFragment : BaseDialogFragment() {
 
     private val calendarViewModel: CalendarViewModel by inject()
 
@@ -47,6 +46,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
         get() = R.layout.fragment_calendar
 
     override val isTopLevel = true
+    override val isScrollable = false
 
     override fun onToolbarCreated(toolbar: Toolbar) {
 

@@ -10,7 +10,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
 
 // TODO maybe remove DialogFragment whatsoever
-abstract class BaseFragment : DialogFragment() {
+abstract class BaseDialogFragment : DialogFragment() {
 
     // properties for subclasses to override
     abstract val TAG: String
@@ -26,6 +26,11 @@ abstract class BaseFragment : DialogFragment() {
      * Show hamburger icon and open drawer on navigation click
      */
     protected open val isTopLevel: Boolean = false
+
+    /**
+     * Wrap this Fragment's layout in ScrollView
+     */
+    protected open val isScrollable: Boolean = true
     protected open val actionMenuResourceId: Int? = null
     protected open fun onMenuItemClicked(menuItem: MenuItem) {}
     protected open fun onToolbarCreated(toolbar: Toolbar) {}
@@ -56,7 +61,7 @@ abstract class BaseFragment : DialogFragment() {
 
 
                 val rootView = inflater.inflate(R.layout.fragment_base_dialog, container, false)
-                rootView.findViewById<ViewGroup>(R.id.container).addView(
+                rootView.findViewById<ViewGroup>(if (isScrollable) R.id.container_scrollable else R.id.container).addView(
                     inflater.inflate(layoutResourceId, container, false)
                 )
 
