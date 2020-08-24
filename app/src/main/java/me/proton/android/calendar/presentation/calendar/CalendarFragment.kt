@@ -3,13 +3,11 @@ package me.proton.android.calendar.presentation.calendar
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
@@ -19,17 +17,13 @@ import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import kotlinx.android.synthetic.main.fragment_calendar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseFragment
 import org.koin.android.ext.android.inject
 import java.time.LocalDate
-import java.util.*
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 
 class CalendarFragment : BaseFragment() {
 
@@ -43,8 +37,8 @@ class CalendarFragment : BaseFragment() {
     private val fetchEventsUseCase: FetchEventsUseCase by inject()
     private val calendarsRepository: CalendarsRepository by inject()
 
-    private val today = LocalDate.now()
-    private val agendaAdapter by lazy { CalendarAgendaAdapter(requireActivity(), today) }
+    private val initialToday = LocalDate.now()
+    private val agendaAdapter by lazy { CalendarAgendaAdapter(requireActivity(), initialToday) }
 
 private val valueStoreProvider: ValueStoreProvider by inject()
     override val TAG: String
@@ -61,7 +55,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
             (this as ImageButton).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
             setOnClickListener {
                 // each item in the adapter is one day
-                val currentDate = today.plusDays((pager.currentItem - agendaAdapter.startingPosition).toLong())
+                val currentDate = initialToday.plusDays((pager.currentItem - agendaAdapter.startingPosition).toLong())
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime()))
             }
         }
@@ -70,7 +64,8 @@ private val valueStoreProvider: ValueStoreProvider by inject()
             (this as ImageButton).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
             (this as ImageButton).setColorFilter(0) // this image is not one color, so we remove default tinting
             setOnClickListener {
-                pager.setCurrentItem(agendaAdapter.startingPosition, true)
+                val todayOffset = ChronoUnit.DAYS.between(initialToday, LocalDate.now()).toInt()
+                pager.setCurrentItem(agendaAdapter.startingPosition + todayOffset, true)
             }
         }
 
@@ -122,7 +117,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
         }
 
         override fun createFragment(position: Int): Fragment {
-            return ItemCalendarAgendaFragment(calendarViewModel, position, startingDate.plusDays((position - startingPosition).toLong())) // TODO .getInstance(DATE RANGE) or refresh current fragment?
+            return ItemCalendarAgendaFragment(calendarViewModel, position, startingDate.plusDays((position - startingPosition).toLong()))
         }
 
     }
