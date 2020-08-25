@@ -744,7 +744,7 @@ fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
  * Returns "January", etc.
  */
 fun LocalDate.formatMonth(): String {
-    return DateTimeFormatter.ofPattern("MMMM", Locale.getDefault()).format(this)
+    return DateTimeFormatter.ofPattern("LLLL", Locale.getDefault()).format(this)
 }
 
 /**
