@@ -1,21 +1,65 @@
 package me.proton.android.calendar.data
 
 import com.google.gson.Gson
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
+import me.proton.android.calendar.common.DB_FLOW_DEBOUNCE_MS
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.printToString
+import me.proton.android.calendar.domain.Logger
 import timber.log.Timber
 import java.time.LocalDate
 
-// TODO better name? move to separate package?
-class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val crypto: Crypto) : CalendarsRepository {
+@FlowPreview
+@ExperimentalCoroutinesApi
+class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val logger: Logger) : CalendarsRepository {
+
+    private val daysToEvents = mutableMapOf<LocalDate, Event>()
+    private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
+
+    private val events = MutableStateFlow<List<Event>>(emptyList())
+
+    override suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String) {
+        logger.d("CalendarsRepository init()")
+
+        database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
+            logger.v("main events flow collect")
+            val dbEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
+
+            events.value = dbEvents.flatMap { event ->
+
+                if (event.isRecurring()) {
+
+                    val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
+                    val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
+
+                    filteredByExdates
+
+                } else if (event.isFromRecurring()) {
+                    // Event that is "from recurring" has already been created when expading ^
+                    emptyList()
+                } else {
+                    listOf(event)
+                }
+
+            }
+
+        }
+
+        // TODO launchIn coroutine scope?
+        //}.flowOn(Dispatchers.Default).collect()*/
+
+    }
+
+    // TODO add fetch(from, to)
 
     override suspend fun selectCalendar(calendarId: String): CalendarEntity? {
         return database.calendarsDao().selectById(calendarId)
@@ -28,14 +72,6 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
     override fun flowCalendars(userId: String): Flow<List<CalendarEntity>> {
         return database.calendarsDao().flowCalendars(userId)
     }
-
-//    override fun flowCalendars(userId: String): Flow<List<CalendarEntity>> {
-//        return database.calendarsDao().flowCalendars(userId)./*distinctUntilChanged().*/map {
-//            TimberLogger.d("mapping calendar list in thread ${Thread.currentThread().name}")
-//            // repository & flow doesn't care from where it's called
-//            it
-//        }.also { /*fire API request if online*/ }
-//    }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
         calendar.fkUserId = userId
@@ -51,12 +87,35 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         return selectCalendars(userId).filter { it.isActive }
     }
 
-    override fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>> {
+    override suspend fun eventsFlow(
+        calendarIds: List<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<List<Event>> {
+
+        // TODO PREFETCH EVENTS WHEN REQUESTING FLOWS
+
+        TimberLogger.d("createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
+
+        return events.map {
+            TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate}")
+            it.filter {
+                // these Events have already adjusted DTSTART/DTEND so we don't need to take Event.Occurrence into account
+                it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+            }.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
+
+        }.distinctUntilChanged()
+
+    }
+
+
+    /*override fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>> {
         TimberLogger.d("eventsFlow: ${fromDate} - ${toDate}")
 
 //        val sharedEventsFieldSubstring = "DTSTART;VALUE=DATE:${fromDateTime.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE)}"
 
-        return database.eventsDao().flowEvents(calendarIds)./*distinctUntilChanged() TODO.*/map { events ->
+        return database.eventsDao().flowEvents(calendarIds).*//*distinctUntilChanged() TODO.*//*map { events ->
             val dbEvents = events.mapNotNull { transformEventUseCase.execute(it) }
 
             // TODO THIS CODE IS PROTOTYPE, KILL IT WITH FIRE
@@ -96,7 +155,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     }
                 }//.filterOccurencesByRecurrenceId()
         }
-    }
+    }*/
 
     override fun eventFlow(eventId: String): Flow<Event?> {
         return database.eventsDao().selectByIdFlow(eventId)./*distinctUntilChanged().*/map {
@@ -186,9 +245,10 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {
-        return selectUserSettings(userId)?.let {
-            it.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
-        }
+        logger.d("getting default calendars, user ID: ${userId}")
+        logger.d("getting default calendars, user settings: ${selectUserSettings(userId)}")
+        logger.d("getting default calendars, active calendars: ${getActiveCalendars(userId)}")
+        return selectUserSettings(userId)?.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

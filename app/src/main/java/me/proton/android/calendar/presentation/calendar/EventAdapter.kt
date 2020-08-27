@@ -25,11 +25,11 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
             // TODO use timezone from settings
 
             val time = if (item.isFromRecurring()) {
-                if (item.isAllDay()) "(all-day)" else "${item.getStart(ZoneId.systemDefault().id)?.format(
+                (if (item.isAllDay()) "(all-day)" else "") + "${item.getStart(ZoneId.systemDefault().id)?.format(
                     DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${item.getEnd(ZoneId.systemDefault().id)?.format(
                     DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
             } else {
-                if (item.isAllDay()) "(all-day)" else "${(item.occurrence?.startDateTime ?: item.getStart(ZoneId.systemDefault().id))?.format(
+                (if (item.isAllDay()) "(all-day)" else "") + "${(item.occurrence?.startDateTime ?: item.getStart(ZoneId.systemDefault().id))?.format(
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${(item.occurrence?.endDateTime ?: item.getEnd(ZoneId.systemDefault().id))?.format(
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
             }

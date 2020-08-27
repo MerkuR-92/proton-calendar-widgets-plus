@@ -7,12 +7,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.domain.ValueStoreProvider
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -63,10 +68,19 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 //            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
 //            TimberLogger.d("binding live data for events from calendar $calendarId")
-            calendarViewModel.events(date).observe(viewLifecycleOwner, Observer {
+//            calendarViewModel.eventsLiveData(date).observe(viewLifecycleOwner, Observer {
 //                TimberLogger.d("observed events arrived: $it")
-                (recyclerView.adapter as? EventAdapter)?.submitList(it)
-            })
+//                (recyclerView.adapter as? EventAdapter)?.submitList(it)
+//            })
+
+            lifecycleScope.launch(Dispatchers.Default) {
+                calendarViewModel.eventsFlow(date).collect {
+                    TimberLogger.d("observed events arrived in flow, item agenda fragment: $it")
+                    withContext(Dispatchers.Main) {
+                        (recyclerView.adapter as? EventAdapter)?.submitList(it)
+                    }
+                }
+            }
 
         } catch (e: Exception) {}
 

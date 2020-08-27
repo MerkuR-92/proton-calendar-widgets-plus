@@ -28,7 +28,7 @@ interface CalendarsRepository {
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
     // events
-    fun eventsFlow(calendarIds: List<String>, startDate: LocalDate, endDate: LocalDate, timeZoneId: String): Flow<List<Event>>
+    suspend fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>>
 
     fun eventFlow(eventId: String): Flow<Event?> // TODO separate Flow<> from normal DB queries?
 
@@ -89,4 +89,5 @@ interface CalendarsRepository {
 
     suspend fun deleteEventAlarmById(id: String)
 
+    suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String)
 }

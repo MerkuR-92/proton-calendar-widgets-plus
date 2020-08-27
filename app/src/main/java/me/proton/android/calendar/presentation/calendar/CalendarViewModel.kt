@@ -8,9 +8,8 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.LocalDate
 import java.time.ZoneId
@@ -66,6 +65,25 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     init {
 
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+
+                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+                val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+                if (TODOuserID != null) {
+                    val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
+
+                    val selectedCalendarIds = listOf<String>(
+                        //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
+                        defaultCalendar!!) // TODO
+
+                    calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId.id)
+
+                }
+
+            }
+        }
+
 
 
 //        viewModelScope.launch {
@@ -83,13 +101,13 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     }
 
-    fun events(date: LocalDate): LiveData<List<Event>> {
+    suspend fun eventsFlow(date: LocalDate): Flow<List<Event>> {
 
-        return liveData<List<Event>>(Dispatchers.IO) {
+//        return liveData<List<Event>>(Dispatchers.IO) {
 
             val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
             val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-            if (TODOuserID != null) {
+            return if (TODOuserID != null) {
                 val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
 
                 val selectedCalendarIds = listOf<String>(
@@ -99,9 +117,9 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 //            calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
 //        emit(.first())
 
-                emitSource(calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default))
-            }
-        }
+                calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id)
+            } else flowOf<List<Event>>()
+//        }
 
 //        return calendarsRepository.eventsFlow(listOf("jnPU5bvPhktDV035mLlDyXjp6lUvBtVKEnnp--S8AWhZqvfFKNd7TkvFMtMcPZSs0lDpH2IqUthEfF8uHrncZg=="), date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
 

@@ -386,11 +386,14 @@ object ICalUtils {
     fun generateOfflineEventId() = "$OFFLINE_EVENT_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
 
     /**
+     * Returns iCal Events with already applied DTSTART/DTEND according to Occurrence.
+     * Takes single edits into account.
+     *
      * @param events all single edits selected by UID
      */
-    fun mapOccurrencesToSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, displayTimeZoneId: String): List<Event>? {
+    fun expandOccurrencesWithSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, displayTimeZoneId: String): List<Event>? {
 
-        val maxRecurrenceIdEvent = events.maxBy { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
+        val maxRecurrenceIdEvent = events.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
 
         // take either maximum RecurrenceId from single edits or the requested "toDate"
         val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(displayTimeZoneId)).toInstant()) == true) {

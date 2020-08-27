@@ -10,6 +10,7 @@ const val API_BASE_URL = "https://beta.protonmail.com/api/"
 const val API_APPLICATION_NAME = "AndroidCalendar"
 
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"
+const val DB_FLOW_DEBOUNCE_MS = 1000L
 
 // TODO change this also in Navigation.kt
 const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_details/"
