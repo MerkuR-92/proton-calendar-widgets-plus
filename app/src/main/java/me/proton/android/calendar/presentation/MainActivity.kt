@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
@@ -43,6 +44,12 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventDetailsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.SYNC_EVENTS_REFRESH_MS
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -128,10 +135,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         }
 
+
+        navView.getHeaderView(0).findViewById<TextView>(R.id.textView_version_number).setText("${BuildConfig.VERSION_NAME}")
+
+
 //        mainViewModel.syncServerEvents().observe(this, Observer {
 //            it?.let { TimberLogger.d("local server event sync state: ${it}") } // TODO progress indicator
 //        })
     }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
