@@ -8,16 +8,18 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
-import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
-import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import kotlinx.android.synthetic.main.fragment_calendar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -28,14 +30,6 @@ import java.time.temporal.ChronoUnit
 class CalendarFragment : BaseDialogFragment() {
 
     private val calendarViewModel: CalendarViewModel by inject()
-
-
-    // TODO only for testing now vvvvvv
-    private val loginUserUseCase: LoginUserUseCase by inject()
-    private val bootstrapUseCase: BootstrapCalendarsUseCase by inject()
-    // TODO ^^^^^
-    private val fetchEventsUseCase: FetchEventsUseCase by inject()
-    private val calendarsRepository: CalendarsRepository by inject()
 
     private val initialToday = LocalDate.now()
     private lateinit var agendaAdapter: CalendarAgendaAdapter
@@ -155,6 +149,16 @@ private val valueStoreProvider: ValueStoreProvider by inject()
         }
 
         pager.registerOnPageChangeCallback(pageChangeCallback)
+
+        lifecycleScope.launch {
+            calendarViewModel.fetchingState.collect {
+                when (it) {
+                    CalendarsRepository.FetchingState.NotNeeded -> setProgressBarVisibility(false)
+                    CalendarsRepository.FetchingState.Fetching -> setProgressBarVisibility(true)
+                    CalendarsRepository.FetchingState.Finished -> setProgressBarVisibility(false)
+                }
+            }
+        }
 
 
         /*recyclerView.apply {

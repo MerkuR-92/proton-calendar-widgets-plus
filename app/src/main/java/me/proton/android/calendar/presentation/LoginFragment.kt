@@ -73,32 +73,26 @@ class LoginFragment : Fragment() {
                     }
                         if (bootstrap == UseCase.Result.Success) {
 
-                            GlobalScope.launch {
+                            GlobalScope.launch { // TODO
 
-                                val valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")// TODO
+                            withContext(Dispatchers.Default) {
 
-                                val defaultCalendarId = calendarsRepository.getDefaultCalendarId(valueStore.getString("USERID")!!)
+                                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+                                val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+                                if (TODOuserID != null) {
+                                    val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
 
-                                // TODO GET RID OF THIS CODE AND MOVE TO WORKER
-                                val result = if (valueStore.getString("USERID") != null && defaultCalendarId != null) {
-                                    fetchEventsUseCase.execute(valueStore.getString("USERID")!!, listOf(
+                                    val selectedCalendarIds = listOf<String>(
                                         //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                                        defaultCalendarId
-                                    ), LocalDate.now().minusDays(14), LocalDate.now().plusDays(14), TimeZone.getDefault().id /*TODO get it from settings*/)
-                                } else {
-                                    withContext(Dispatchers.Main) {
-                                        Toast.makeText(requireContext(), "Please login again", Toast.LENGTH_LONG).show()
-                                    }
-                                    UseCase.Result.Error("error fetching events in Main Activity")
+                                        defaultCalendar!!) // TODO
+
+                                    val timeZoneId = calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!
+
+                                    calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId)
+
                                 }
 
-                                withContext(Dispatchers.Main) {
-                                    if (result == UseCase.Result.Success) {
-                                        Toast.makeText(requireContext(), "events fetched", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(requireContext(), "error fetching events", Toast.LENGTH_LONG).show()
-                                    }
-                                }
+                            }
 
                             }
 

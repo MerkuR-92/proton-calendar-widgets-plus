@@ -15,22 +15,31 @@ import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import timber.log.Timber
 import java.time.LocalDate
+import kotlin.math.log
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val logger: Logger) : CalendarsRepository {
+class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val logger: Logger, private val fetchEventsUseCase: FetchEventsUseCase) : CalendarsRepository {
 
     private val daysToEvents = mutableMapOf<LocalDate, Event>()
     private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
 
     private val events = MutableStateFlow<List<Event>>(emptyList())
 
+    override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
+
+    private lateinit var selectedCalendarIds: List<String>
+
     override suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String) {
+        selectedCalendarIds = calendarIds
         logger.d("CalendarsRepository init()")
 
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
+            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+
             logger.v("main events flow collect")
             val dbEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
 
@@ -52,6 +61,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
             }
 
+            fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
 
         // TODO launchIn coroutine scope?
@@ -88,13 +98,10 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
     }
 
     override suspend fun eventsFlow(
-        calendarIds: List<String>,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
     ): Flow<List<Event>> {
-
-        // TODO PREFETCH EVENTS WHEN REQUESTING FLOWS
 
         TimberLogger.d("createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
@@ -106,6 +113,21 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
             }.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
 
         }.distinctUntilChanged()
+
+    }
+
+    override suspend fun prefetchEvents(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ) {
+
+        if (::selectedCalendarIds.isInitialized) {
+            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+            // TODO add time buffer and some kind of debounce
+            fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)
+            fetchingState.value = CalendarsRepository.FetchingState.Finished
+        }
 
     }
 

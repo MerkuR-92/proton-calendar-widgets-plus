@@ -28,7 +28,17 @@ interface CalendarsRepository {
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
     // events
-    suspend fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>>
+    suspend fun eventsFlow(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<List<Event>>
+
+    suspend fun prefetchEvents(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    )
 
     fun eventFlow(eventId: String): Flow<Event?> // TODO separate Flow<> from normal DB queries?
 
@@ -90,4 +100,13 @@ interface CalendarsRepository {
     suspend fun deleteEventAlarmById(id: String)
 
     suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String)
+//    suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String)
+
+    val fetchingState: Flow<FetchingState>
+
+    sealed class FetchingState {
+        object NotNeeded : FetchingState()
+        object Fetching : FetchingState()
+        object Finished : FetchingState()
+    }
 }

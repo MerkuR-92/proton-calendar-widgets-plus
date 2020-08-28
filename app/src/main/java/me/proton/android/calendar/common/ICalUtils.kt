@@ -453,9 +453,9 @@ fun ICalendar.printToString() : String {
         return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
     }
 
-    fun ZonedDateTime.formatDate(timeZoneId: String): String = this.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+    fun ZonedDateTime.formatDate(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
 
-    fun ZonedDateTime.formatTime(timeZoneId: String): String = this.toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+    fun ZonedDateTime.formatTime(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 
     /**
      * @param excludeTo will exclude exact toDateTime from rightmost range value

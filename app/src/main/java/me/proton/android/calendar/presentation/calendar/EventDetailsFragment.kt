@@ -33,6 +33,7 @@ import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -204,8 +205,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
 
-    private val calendarViewModel: CalendarViewModel by inject()
-    private val eventViewModel: EventViewModel by inject()
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val eventViewModel: EventViewModel by sharedViewModel()
     private val mainViewModel: MainViewModel by sharedViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -279,7 +280,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             // TODO EXTRACT DATE FORMATTING TO UTILS
 
-            val TODOcalendarTimeZoneId = TimeZone.getDefault()
+
 
 
             //val eventOccurrence = event.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
@@ -305,8 +306,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     event.summary ?: resources.getString(R.string.default_event_summary)
 
                 this.text_date_time.text = event.formatStartEnd(
-                    calendarViewModel.timeZoneId.id,
-                    null,
+                    eventViewModel.displayTimeZoneId,
+                    null, // TODO attention we're not caring about occurrence here!
                     resources
                 )
 
@@ -315,7 +316,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     this.text_recurrence.text = AndroidUtils.formatRecurrence(
                         requireContext(),
                         event,
-                        TODOcalendarTimeZoneId.id
+                        eventViewModel.displayTimeZoneId
                     )
                 }
 
@@ -396,7 +397,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         event.isAllDay(),
                         ZonedDateTime.ofInstant(
                             event.iCalEvent.dateStart.value.toInstant(),
-                            calendarViewModel.timeZoneId
+                            ZoneId.of(eventViewModel.displayTimeZoneId)
                         ),
                         alarm
                     )

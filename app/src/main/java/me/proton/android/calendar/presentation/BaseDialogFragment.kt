@@ -44,7 +44,7 @@ abstract class BaseDialogFragment : DialogFragment() {
     // ^ properties for subclasses to override
 
     protected fun setProgressBarVisibility(visible: Boolean) {
-        progress_bar.visibleOrInvisible(visible)
+        progress_bar?.visibleOrInvisible(visible)
     }
 
     protected lateinit var toolbar: Toolbar

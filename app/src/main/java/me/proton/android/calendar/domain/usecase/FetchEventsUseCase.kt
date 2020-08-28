@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import com.google.gson.Gson
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -17,9 +18,14 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val keysApi: KeysApi,
     private val crypto: Crypto,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
-    private val calendarsRepository: CalendarsRepository): UseCase {
+    private val database: AppDatabase): UseCase {
 
-    suspend fun execute(userId: String, calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) : UseCase.Result {
+    suspend fun execute(
+        calendarIds: List<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ) : UseCase.Result {
 
         // TODO see if we should pass coroutinescope, so if worker gets cancelled, all operations continue anyway (is this needed?)
 
@@ -51,7 +57,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                         TimberLogger.v("more: ${eventsResponse.data.more}")
 
-                        calendarsRepository.persistEvents(*eventsResponse.data.events.toTypedArray())
+                        database.eventsDao().insert(*eventsResponse.data.events.toTypedArray())
 
                         logger.v("persisted ${eventsResponse.data.events.size} events for calendar ${calendarId}")
 

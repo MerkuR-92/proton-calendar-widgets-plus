@@ -366,7 +366,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
             val alarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
             alarmView.findViewById<TextView>(R.id.tv_text).apply {
-                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), calendarViewModel.timeZoneId), alarm)
+                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
                 isClickable = false
             }
             alarmView.findViewById<ImageButton>(R.id.ib_cross).apply {

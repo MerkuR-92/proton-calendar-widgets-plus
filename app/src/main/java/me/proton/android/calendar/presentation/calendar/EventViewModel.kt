@@ -95,7 +95,9 @@ class EventViewModel(
 
 //        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 
-        displayTimeZoneId = TimeZone.getDefault().id // TODO get it from settings
+        displayTimeZoneId = userSettings.primaryTimezone // TimeZone.getDefault().id // TODO get it from settings
+
+        TimberLogger.d("displayTimezoneid = ${displayTimeZoneId}")
 
         TimberLogger.d("EventViewModel initialise with EventId: $eventId")
         TimberLogger.d("EventViewModel initialise with startDate: $initStartDate")
@@ -188,7 +190,10 @@ class EventViewModel(
 
             TimberLogger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 
-            val eventStartTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?: displayTimeZoneId
+            val eventStartTimeZone = /*dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?:*/ displayTimeZoneId
+
+            TimberLogger.d("timezone to generate occurrence: ${eventStartTimeZone}")
+
 
             // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
             (dbEvent?.withOccurrence(occurrenceNumber ?: 0, eventStartTimeZone) ?: dbEvent)?.apply {
