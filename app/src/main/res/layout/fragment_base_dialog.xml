@@ -42,9 +42,19 @@
 
             </FrameLayout>
 
-
-
         </androidx.appcompat.widget.Toolbar>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            android:indeterminateOnly="true"
+            android:indeterminateTint="@color/brand_norm"
+            android:indeterminateTintMode="src_in"
+            />
 
     </com.google.android.material.appbar.AppBarLayout>
 

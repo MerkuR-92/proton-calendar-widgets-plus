@@ -6,8 +6,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
+import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.visibleOrInvisible
 
 // TODO maybe remove DialogFragment whatsoever
 abstract class BaseDialogFragment : DialogFragment() {
@@ -40,6 +42,10 @@ abstract class BaseDialogFragment : DialogFragment() {
      */
     protected open fun onNavigationIconClicked(): Boolean = false
     // ^ properties for subclasses to override
+
+    protected fun setProgressBarVisibility(visible: Boolean) {
+        progress_bar.visibleOrInvisible(visible)
+    }
 
     protected lateinit var toolbar: Toolbar
 
