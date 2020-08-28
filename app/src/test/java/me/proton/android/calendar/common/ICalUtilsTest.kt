@@ -1144,7 +1144,7 @@ internal class ICalUtilsTest {
         // 9: 12:00-12:30 [occ 7], 13:30-14:00 [occ 6], 18:30-19:00 [occ8]
         // last "ghost occurrence" is on 10th but it was moved to 9th
 
-        val mapped = ICalUtils.mapOccurrencesToSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
+        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
 
         // there are 7 occurrences until 2020-08-09 and one additional that was moved from 2020-08-10 to 2020-08-09
         assertThat(mapped.size).isEqualTo(8)
