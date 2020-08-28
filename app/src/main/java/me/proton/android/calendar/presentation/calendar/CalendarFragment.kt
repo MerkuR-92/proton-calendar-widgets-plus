@@ -38,7 +38,7 @@ class CalendarFragment : BaseDialogFragment() {
     private val calendarsRepository: CalendarsRepository by inject()
 
     private val initialToday = LocalDate.now()
-    private val agendaAdapter by lazy { CalendarAgendaAdapter(requireActivity(), initialToday) }
+    private lateinit var agendaAdapter: CalendarAgendaAdapter
 
     private lateinit var toolbarTitle: TextView
 
@@ -145,6 +145,7 @@ private val valueStoreProvider: ValueStoreProvider by inject()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        agendaAdapter = CalendarAgendaAdapter(requireActivity(), initialToday)
 
         pager.apply{
             adapter = agendaAdapter
