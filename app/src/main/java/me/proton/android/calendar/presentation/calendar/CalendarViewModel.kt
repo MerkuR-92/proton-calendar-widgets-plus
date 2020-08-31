@@ -60,11 +60,10 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
                     TestsLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 
-                    val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
+                    //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
 
-                    val selectedCalendarIds = listOf<String>(
-                        //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                        defaultCalendar!!) // TODO
+                    // TODO get calendars that are selected from the sidebar
+                    val selectedCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
 
                     calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId.id)
 

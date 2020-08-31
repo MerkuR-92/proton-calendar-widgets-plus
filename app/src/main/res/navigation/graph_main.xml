@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_calendar">
+    app:startDestination="@id/rootFragment">
 
     <fragment
         android:id="@+id/nav_calendar"
@@ -124,5 +124,13 @@
         android:id="@+id/nav_login"
         android:name="me.proton.android.calendar.presentation.LoginFragment"
         android:label="LoginFragment" />
+    <fragment
+        android:id="@+id/rootFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.RootFragment"
+        android:label="RootFragment" >
+        <action
+            android:id="@+id/action_rootFragment_to_nav_calendar"
+            app:destination="@id/nav_calendar" />
+    </fragment>
 
 </navigation>

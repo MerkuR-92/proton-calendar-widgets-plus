@@ -27,10 +27,14 @@ class HandleServerEventsUseCase(
             eventsResponse.user?.let {
                 usersRepository.persistUser(it)
             }
+            eventsResponse.calendarUserSettings?.let {
+                calendarsRepository.persistUserSettings(userId, it)
+            }
             eventsResponse.calendars?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarById(it.id) },
-                    { calendarsRepository.persistCalendar(userId, it.calendar!!) }
+                    { calendarsRepository.persistCalendar(userId, it.calendar!!) },
+                    { calendarsRepository.updateCalendar(userId, it.calendar!!) }
                 )
             }
             eventsResponse.addresses?.forEach {
@@ -112,7 +116,6 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.persistCalendarSettings(it.calendarSettings!!) }
                 )
             }
-            // TODO FIXME USER SETTINGS?
             UseCase.Result.Success
         } catch (e: Exception) {
             logger.e("Error in HandleServerEventsUseCase", e)

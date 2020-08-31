@@ -26,6 +26,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.hideKeyboard
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import org.koin.android.ext.android.inject
@@ -80,11 +81,10 @@ class LoginFragment : Fragment() {
                                 val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
                                 val TODOuserID = TODOvalueStore.getString("USERID") // TODO
                                 if (TODOuserID != null) {
-                                    val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
+                                    //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
 
-                                    val selectedCalendarIds = listOf<String>(
-                                        //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                                        defaultCalendar!!) // TODO
+                                    // TODO get only calendars selected in sidebar
+                                    val selectedCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
 
                                     val timeZoneId = calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!
 
@@ -95,6 +95,8 @@ class LoginFragment : Fragment() {
                             }
 
                             }
+
+                            requireActivity().hideKeyboard()
 
                             findNavController().navigate(Navigation.Deeplink.toCalendar())
                             //Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()

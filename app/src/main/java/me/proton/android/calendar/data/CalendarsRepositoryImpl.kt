@@ -89,6 +89,11 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.calendarsDao().insert(calendar)
     }
 
+    override suspend fun updateCalendar(userId: String, calendar: CalendarEntity) {
+        calendar.fkUserId = userId
+        database.calendarsDao().update(calendar)
+    }
+
     override suspend fun deleteCalendarById(id: String) {
         database.calendarsDao().deleteById(id)
     }

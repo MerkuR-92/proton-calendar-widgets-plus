@@ -22,6 +22,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenResumed
 import androidx.lifecycle.whenStarted
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -71,6 +73,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     lateinit var drawerLayout: DrawerLayout
+    private lateinit var navController: NavController
 
     private val valueStoreProvider: ValueStoreProvider by inject()
 
@@ -82,7 +85,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val navView: NavigationView = findViewById(R.id.nav_view)
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         appBarConfiguration = AppBarConfiguration(setOf(
             R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
@@ -158,8 +161,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     override fun onBackPressed() {
+
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
+        } else if (navController.currentDestination?.id == R.id.nav_calendar) {
+            moveTaskToBack(true)
         } else {
             super.onBackPressed()
         }

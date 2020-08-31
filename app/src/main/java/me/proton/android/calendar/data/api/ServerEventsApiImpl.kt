@@ -51,8 +51,9 @@ data class ServerEventsApiResponse(
     val calendarEvents: List<ServerEvent.EventsApiResponse>?,
 //    TODO: CalendarAttendees
 //    TODO:    val calendarUserSettings
-    val calendarSettings: List<ServerEvent.SettingsApiResponse>?,
-    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>?
+    val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>?,
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>?,
+    val calendarUserSettings: UserSettingsEntity?
 ) : BaseApiResponse()
 
 // TODO HANDLE ACTIONS AND CREATE TESTS FOR THAT!!!!!!!!!!!!!!!!!!
@@ -138,10 +139,16 @@ class ServerEvent {
             val event: EventEntity?
     ) : BaseServerEventApiResponse()
 
-    class SettingsApiResponse(
+    class CalendarSettingsApiResponse(
         override val id: String,
         override val action: Int,
         val calendarSettings: CalendarSettingsEntity?
+    ) : BaseServerEventApiResponse()
+
+    class UserSettingsApiResponse(
+        override val id: String,
+        override val action: Int,
+        val calendarUserSettings: UserSettingsEntity?
     ) : BaseServerEventApiResponse()
 
     class AlarmsApiResponse(
