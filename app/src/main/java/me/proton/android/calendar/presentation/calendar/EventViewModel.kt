@@ -190,7 +190,7 @@ class EventViewModel(
 
             TimberLogger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 
-            val eventStartTimeZone = /*dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?:*/ displayTimeZoneId
+            val eventStartTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?: displayTimeZoneId
 
             TimberLogger.d("timezone to generate occurrence: ${eventStartTimeZone}")
 
