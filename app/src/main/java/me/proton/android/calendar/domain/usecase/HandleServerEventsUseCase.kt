@@ -1,18 +1,23 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.ServerEventsApi
 import java.lang.Exception
+import kotlin.math.log
 
 class HandleServerEventsUseCase(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase) : UseCase {
+    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
+    private val calendarsApi: CalendarsApi) : UseCase {
 
     suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: String) : UseCase.Result {
 
@@ -35,17 +40,32 @@ class HandleServerEventsUseCase(
                 )
             }
             eventsResponse.calendarEvents?.forEach {
+                logger.d("usecase calendar events: ${it}")
                 it.handleAction(
                     { calendarsRepository.deleteEventById(it.id) },
                     {
-                        calendarsRepository.persistEvents(it.event!!)
+
+                        // TODO optimise this so we don't fetch unnecessary events outside of desired window
+
+                        // after "event metadata migration", we need to fetch events separately
+                        val singleEventResponse = calendarsApi.getEvent(it.event!!.calendarId, it.event!!.id)
+//                        logger.e("single event = ${singleEventResponse}")
+
+                        // TODO MOVE THIS TO SEPARATE USECASE
+                        when (singleEventResponse) {
+                            is ApiResponse.Success -> calendarsRepository.persistEvents(singleEventResponse.data.event)
+                            is ApiResponse.Error -> throw Exception(singleEventResponse.error)
+                            is ApiResponse.Exception -> throw Exception(singleEventResponse.exception)
+                        }
+
+//                        calendarsRepository.persistEvents(it.event!!)
 
                         // TODO move this to worker
                         try {
-                            val emails =
-                                it.event.sharedEvents.map { it.asJsonObject.get("Author").asString } +
-                                it.event.calendarEvents.map { it.asJsonObject.get("Author").asString } +
-                                it.event.personalEvents.map { it.asJsonObject.get("Author").asString }
+                            val emails = /* TODO GSON is causing trouble here, make this pretty*/
+                                (if (it.event.sharedEvents?.isNotEmpty() == true) it.event.sharedEvents.map { it.asJsonObject.get("Author").asString } else emptyList()) +
+                                (if (it.event.calendarEvents?.isNotEmpty() == true) it.event.calendarEvents.map { it.asJsonObject.get("Author").asString } else emptyList()) +
+                                (if (it.event.personalEvents?.isNotEmpty() == true) it.event.personalEvents.map { it.asJsonObject.get("Author").asString } else emptyList())
 
                             emails.distinct().forEach {
                                 fetchPublicKeysUseCase.execute(it)
@@ -95,6 +115,7 @@ class HandleServerEventsUseCase(
             // TODO FIXME USER SETTINGS?
             UseCase.Result.Success
         } catch (e: Exception) {
+            logger.e("Error in HandleServerEventsUseCase", e)
             UseCase.Result.Error(e.message ?: "no stack trace message available")
         }
     }

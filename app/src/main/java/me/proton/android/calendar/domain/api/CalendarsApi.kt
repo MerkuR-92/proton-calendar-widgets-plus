@@ -26,6 +26,11 @@ interface CalendarsApi {
     ): ApiResponse<EventsApiResponse>
 
     /**
+     * Get single event.
+     */
+    suspend fun getEvent(calendarId: String, eventId: String) : ApiResponse<EventApiResponse>
+
+    /**
      * Gets bootstrap for calendar setup.
      */
     suspend fun getBootstrap(calendarId: String): ApiResponse<BootstrapApiResponse>

@@ -58,7 +58,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
     }
 
     // TODO sync all "active" accounts
-    fun syncServerEvents() : LiveData<Operation.State> {
+    fun syncServerEvents(userId: String) : LiveData<Operation.State> {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -68,7 +68,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             .setConstraints(constraints)
             .setInputData(workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_SERVER_EVENTS,
-                UseCaseWorker.INPUT_USER_ID to "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
+                UseCaseWorker.INPUT_USER_ID to userId
             ))
             .build()
 

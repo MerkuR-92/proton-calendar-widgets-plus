@@ -11,6 +11,9 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
+import me.proton.android.calendar.data.api.EventApiResponse
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.domain.api.CalendarsApi
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -26,6 +29,7 @@ internal class SyncServerEventsUseCaseTest {
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val cacheCalendarPassphraseUseCaseMock: CacheCalendarPassphraseUseCase = mockk()
     private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
+    private val calendarsApi: CalendarsApi = mockk()
 
     private val userId = "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
 
@@ -44,6 +48,9 @@ internal class SyncServerEventsUseCaseTest {
 
             every { valueStoreMock.getString(ValueKey.LAST_SERVER_EVENT_ID) } returns "l_o7TdJpH3UCfYn-0xBWaJVlZ633baHNvjyZFvuX7TD6lFPaOzy-3YkSorWafW5nKivpxfZ1YaU66_d25R58-Q=="
             every { valueStoreMock.putString(any(), any()) } just Runs
+
+            // TODO "CalendarEvents" list looks differently now, it contains no shared/calendar/personal-Events and we need to fetch them
+            //  separately, by calling CalendarsApi
 
             coEvery {
                 serverEventsApiMock.getServerEvents("l_o7TdJpH3UCfYn-0xBWaJVlZ633baHNvjyZFvuX7TD6lFPaOzy-3YkSorWafW5nKivpxfZ1YaU66_d25R58-Q==")
@@ -94,8 +101,22 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
             coEvery { fetchPublicKeysUseCaseMock.execute(any()) } returns UseCase.Result.Success
+            coEvery { calendarsApi.getEvent(any(), any()) } returns ApiResponse.Success(
+                EventApiResponse(1000, EventEntity(
+                    "id",
+                    "calendarId",
+                    "calendarKeyPacket",
+                    0L,
+                    0L,
+                    0,
+                    "sharedKeyPacket",
+                    emptyList(),
+                    emptyList(),
+                    emptyList()
+                ))
+            )
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, fetchPublicKeysUseCaseMock)
+            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, fetchPublicKeysUseCaseMock, calendarsApi)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,

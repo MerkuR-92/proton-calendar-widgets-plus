@@ -9,9 +9,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -20,12 +22,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 class CalendarFragment : BaseDialogFragment() {
 
@@ -36,7 +42,9 @@ class CalendarFragment : BaseDialogFragment() {
 
     private lateinit var toolbarTitle: TextView
 
-private val valueStoreProvider: ValueStoreProvider by inject()
+    private val valueStoreProvider: ValueStoreProvider by inject()
+    private val mainViewModel: MainViewModel by viewModel()
+
     override val TAG: String
         get() = "CalendarFragment"
     override val layoutResourceId: Int
@@ -160,6 +168,23 @@ private val valueStoreProvider: ValueStoreProvider by inject()
             }
         }
 
+        lifecycleScope.launchWhenStarted {
+            while(true) {
+                delay(SYNC_EVENTS_REFRESH_MS)
+
+                val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
+                if (userId != null) {
+                    mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
+                        if (it is Operation.State.IN_PROGRESS) {
+                            setProgressBarVisibility(true)
+                        } else {
+                            setProgressBarVisibility(false)
+                        }
+                    }
+                }
+            }
+        }
+
 
         /*recyclerView.apply {
             //            setHasFixedSize(true)
@@ -197,13 +222,6 @@ private val valueStoreProvider: ValueStoreProvider by inject()
 //            FakeCalendarRepositoryRepository(activity?.applicationContext!!), activity?.application!!)).get(CalendarViewModel::class.java)
 
 
-
-
-
-
-
-
     }
-
 
 }

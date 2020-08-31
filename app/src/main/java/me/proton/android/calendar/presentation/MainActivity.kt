@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation
 import android.content.Context
 import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -11,12 +12,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.AlarmManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.widget.NestedScrollView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenResumed
 import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -39,25 +42,30 @@ import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventDetailsFragment
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.common.SYNC_EVENTS_REFRESH_MS
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.compat.SharedViewModelCompat.sharedViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.KoinComponent
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), KoinComponent {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     lateinit var drawerLayout: DrawerLayout
+
+    private val valueStoreProvider: ValueStoreProvider by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +90,17 @@ class MainActivity : AppCompatActivity() {
 //            }
 //            TextViewCompat.setPrecomputedText(textView, precomputedText)
         }
+
+//fixedRateTimer().
+
+
+
+
+        //CountDownTimer().
+
+//        AlarmManagerCompat.setAlarmClock()
+
+
 
         lifecycleScope.launch {
             whenStarted {
@@ -133,7 +152,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-      //    private fun showDialogFragmentBottomSheet() {
+
+
+    //    private fun showDialogFragmentBottomSheet() {
 //        val dialogView: View = layoutInflater.inflate(R.layout.fragment_bottom_sheet, null)
 //        val dialog = BottomSheetDialog(this)
 //        dialog.setContentView(dialogView)

@@ -36,7 +36,7 @@ class SyncServerEventsUseCase(
                     moreEvents = eventsReponse.data.more == 1 // TODO parse as boolean
                     logger.v("moreEvents: $moreEvents")
 
-                    when (val result =
+                    val handleServerEventsResult = when (val result =
                         handleServerEventsUseCase.execute(eventsReponse.data, userId)) {
                         UseCase.Result.Success -> {
                             logger.v("correctly handled Proton Events $lastProtonEventId")
@@ -46,10 +46,17 @@ class SyncServerEventsUseCase(
                                 eventsReponse.data.eventId
                             )
                             logger.v("next Proton Events ID is saved as $lastProtonEventId")
+                            UseCase.Result.Success
                         }
                         is UseCase.Result.InvalidParams -> UseCase.Result.InvalidParams("invalid params handling server events: ${result.message}")
-                        is UseCase.Result.Error -> UseCase.Result.Error("error handling server events: ${result.message}")
+                        is UseCase.Result.Error -> {
+                            logger.d("handleServerEventsResult error ${result.message}")
+
+                            UseCase.Result.Error("error handling server events: ${result.message}")
+                        }
                     }
+
+                    logger.d("handleServerEventsResult ${handleServerEventsResult}")
                 }
                 is ApiResponse.Error -> return UseCase.Result.Error("api error getting server events: $eventsReponse")
                 is ApiResponse.Exception -> return UseCase.Result.Error("exception getting server events: $eventsReponse")

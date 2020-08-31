@@ -173,6 +173,9 @@ class LoginUserUseCase(
             putString(ValueKey.LAST_SERVER_EVENT_ID, loginResponse.data.eventID)
         }
 
+        TimberLogger.d("eventId = userid ${userId}")
+        TimberLogger.d("eventId = ${loginResponse.data.eventID}")
+
         val userResponse = usersApi.getUser()
         if (userResponse is ApiResponse.Success) {
             usersRepository.persistUser(userResponse.data.user)
@@ -181,7 +184,7 @@ class LoginUserUseCase(
         val user = userResponse.data.user.toUser(gson)
         user.primaryKey ?: return UseCase.Result.Error("user has no primary key")
 
-        // get keysalts         // TODO fake response for now! TODOO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // get keysalts
         val keySaltsResponse = keysApi.getKeySalts()
         val keySalt = if (keySaltsResponse is ApiResponse.Success) {
             keySaltsResponse.data.keySalts.find { it.id == user.primaryKey.id } ?: return UseCase.Result.Error("no matching keysalt found")
@@ -199,6 +202,9 @@ class LoginUserUseCase(
                 usersRepository.persistAddress(userId, it)
             }
         } else return UseCase.Result.Error("addresses request failed: $addressesResponse")
+
+
+        TimberLogger.d("eventId finished success")
 
         return UseCase.Result.Success
     }

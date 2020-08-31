@@ -29,6 +29,8 @@ interface CalendarsApiService {
         @Query("PageSize") pageSize: Int
     ): Response<EventsApiResponse>
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
+    suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : Response<EventApiResponse>
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/bootstrap")
     suspend fun getBootstrap(@Path("calendarId") calendarId: String): Response<BootstrapApiResponse>
@@ -70,6 +72,11 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
         pageSize
     ) }
 
+    override suspend fun getEvent(
+        calendarId: String,
+        eventId: String
+    ): ApiResponse<EventApiResponse> = safeApiCall { service.getEvent(calendarId, eventId) }
+
     override suspend fun getBootstrap(calendarId: String): ApiResponse<BootstrapApiResponse> = safeApiCall { service.getBootstrap(calendarId) }
 
     override suspend fun getAlarms(calendarId: String): ApiResponse<AlarmsApiResponse> = safeApiCall { service.getAlarms(calendarId) }
@@ -92,6 +99,11 @@ data class EventsApiResponse(
     override val code: Int,
     val events: List<EventEntity>,
     val more: Int
+) : BaseApiResponse()
+
+data class EventApiResponse(
+    override val code: Int,
+    val event: EventEntity
 ) : BaseApiResponse()
 
 //"MemberID": "{{Calendar.MemberID}}",
