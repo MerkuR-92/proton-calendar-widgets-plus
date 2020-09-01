@@ -391,21 +391,21 @@ object ICalUtils {
      *
      * @param events all single edits selected by UID
      */
-    fun expandOccurrencesWithSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, displayTimeZoneId: String): List<Event>? {
+    fun expandOccurrencesWithSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, timeZoneId: String): List<Event>? {
 
         val maxRecurrenceIdEvent = events.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
 
         // take either maximum RecurrenceId from single edits or the requested "toDate"
-        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(displayTimeZoneId)).toInstant()) == true) {
-            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(displayTimeZoneId)).toLocalDate()
+        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
+            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
         } else {
             toDate
         }
 
-        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, displayTimeZoneId) ?: return null
+        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
-            val event = events.find { it.iCalEvent.recurrenceId?.value == Date.from(occurrence.startDateTime.toInstant())} ?: originalEvent.withOccurrence(occurrence)!!
+            val event = events.find { it.iCalEvent.recurrenceId?.value == Date.from(occurrence.startDateTime.toInstant())}?.copy() ?: originalEvent.copy()//.withOccurrence(occurrence)!!
             event.occurrence = occurrence
             event
         }

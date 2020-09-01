@@ -111,12 +111,14 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         TimberLogger.d("createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
         return events.map {
-            TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate}")
+            TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate} in $timeZoneId")
             it.filter {
-                // these Events have already adjusted DTSTART/DTEND so we don't need to take Event.Occurrence into account
-                it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+                if (it.occurrence != null) {
+                    it.startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.occurrence!!.startDateTime, it.occurrence!!.endDateTime)
+                } else {
+                    it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+                }
             }.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
-
         }.distinctUntilChanged()
 
     }
@@ -135,54 +137,6 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         }
 
     }
-
-
-    /*override fun eventsFlow(calendarIds: List<String>, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Flow<List<Event>> {
-        TimberLogger.d("eventsFlow: ${fromDate} - ${toDate}")
-
-//        val sharedEventsFieldSubstring = "DTSTART;VALUE=DATE:${fromDateTime.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE)}"
-
-        return database.eventsDao().flowEvents(calendarIds).*//*distinctUntilChanged() TODO.*//*map { events ->
-            val dbEvents = events.mapNotNull { transformEventUseCase.execute(it) }
-
-            // TODO THIS CODE IS PROTOTYPE, KILL IT WITH FIRE
-            dbEvents
-                .filter { event ->
-                    // TODO optimise and select events that are within correct window
-                    //  not only starttime, but also overlapping
-
-                    if (event.isRecurring()) {
-
-                        val mapped = ICalUtils.mapOccurrencesToSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
-                        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
-
-                        // original event
-                        val originalEvent = filteredByExdates.find { it.isRecurring() && !it.isFromRecurring() && it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId) }
-
-                        // if original event is there, but there is another single edit that superseeds it
-                        if (filteredByExdates.find { it.iCalEvent.recurrenceId?.value?.toInstant() == originalEvent?.getStart(timeZoneId)?.toInstant()} != null) {
-                            false
-                        } else if (originalEvent != null) {
-
-                            val occurrences = event.generateExdateFilteredOccurrencesInFullDayRange(fromDate, toDate, timeZoneId)
-
-                            if (occurrences != null && occurrences.size > 0) {
-                                event.occurrence = occurrences.first() // TODO in theory, there may be more occcurrences in given range (MINUTELY?)
-                                true
-                            } else false
-                        } else false
-
-
-                    } else if (event.isFromRecurring()) {
-
-                        // TODO probably occurrence property in these events is here only as a side effect from above ^
-                        event.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
-                    } else {
-                        event.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
-                    }
-                }//.filterOccurencesByRecurrenceId()
-        }
-    }*/
 
     override fun eventFlow(eventId: String): Flow<Event?> {
         return database.eventsDao().selectByIdFlow(eventId)./*distinctUntilChanged().*/map {

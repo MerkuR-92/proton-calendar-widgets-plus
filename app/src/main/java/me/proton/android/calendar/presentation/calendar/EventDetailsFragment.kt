@@ -32,10 +32,8 @@ import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 
 
 class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
@@ -305,9 +303,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 this.text_summary.text =
                     event.summary ?: resources.getString(R.string.default_event_summary)
 
-                this.text_date_time.text = event.formatStartEnd(
+                this.text_date_time.text = event.formatStartEndForActualEndDate(
                     eventViewModel.displayTimeZoneId,
-                    null, // TODO attention we're not caring about occurrence here!
                     resources
                 )
 

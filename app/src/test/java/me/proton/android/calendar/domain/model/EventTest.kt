@@ -56,6 +56,12 @@ internal class EventTest {
     }
 
     @Test
+    fun `all-day event with actual end date is on single day`() {
+        val event = Event("id", Calendar("id", "name", "color", true), calendarAllDaySingleDayActualEndDate!!)
+        assertTrue(event.spansSingleDay(actualEndDate = true))
+    }
+
+    @Test
     fun `all-day event without DTEND is on single day`() {
         val event = Event("id", Calendar("id", "name", "color", true), calendarAllDaySingleDayWithoutDTEnd!!)
         assertTrue(event.spansSingleDay())
@@ -189,6 +195,24 @@ internal class EventTest {
     DTSTART;VALUE=DATE:20200402
     DTEND;VALUE=DATE:20200403
     SUMMARY:All-day event on 2nd April
+    UID:proton-calendar-11667b13-2041-adde-3bc8-34952f4c0578
+    DTSTAMP:20200330T155327Z
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+    val calendarAllDaySingleDayActualEndDate = ICalUtils.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200402
+    DTEND;VALUE=DATE:20200402
+    SUMMARY:All-day event on 2nd April, actual end date
     UID:proton-calendar-11667b13-2041-adde-3bc8-34952f4c0578
     DTSTAMP:20200330T155327Z
     BEGIN:VALARM

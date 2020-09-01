@@ -50,7 +50,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
         recyclerView.apply {
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
-            adapter = EventAdapter {
+            adapter = EventAdapter(calendarViewModel.timeZoneId.id) {
                 findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id, it.occurrence?.occurrenceNumber ?: 0))
             }
             recyclerView.addItemDecoration(

@@ -81,27 +81,25 @@ data class Event(
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
 
-    fun formatEnd(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId, iCalEndDateHack = true)
+    fun formatEnd(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId)
 
-        fun formatStartEnd(timeZoneId: String, eventOccurrence: Occurrence?, resources: Resources): String {
+    fun formatStartEndForActualEndDate(timeZoneId: String, resources: Resources): String {
             TimberLogger.d("format startend for timezone=$timeZoneId")
-            return if (this.spansSingleDay()) {
+            TimberLogger.d("format startend with occurrence=${this.occurrence}")
+            return if (this.spansSingleDay(actualEndDate = true)) {
 
                 // TODO cleanup and check against requirements
-                val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first
+                val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first
 
                 if (this.isAllDay()) { // ignoring timezones
                     formattedStartDate!! //TODO
                 } else {
 
-                    // TODO these two dates were formatted with calendar_timezone, check if this makes sense or not, it's changed to 1 timezone throughout this function
                     val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
                     val endDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
 
-                    val formattedStartTime = eventOccurrence?.startDateTime?.formatTime(timeZoneId) ?: DateFormat.getTimeInstance(
-                        DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
-                    val formattedEndTime = eventOccurrence?.endDateTime?.formatTime(timeZoneId) ?:  DateFormat.getTimeInstance(
-                        DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
+                    val formattedStartTime = this.occurrence?.startDateTime?.formatTime(timeZoneId) ?: startDateTimeInStartTimezone.formatTime(timeZoneId)
+                    val formattedEndTime = this.occurrence?.endDateTime?.formatTime(timeZoneId) ?: endDateTimeInStartTimezone.formatTime(timeZoneId)
 
                     // TODO R dependency
                     "${formattedStartDate}\n${resources.getString(R.string.event_time_period_spanning_single_day, formattedStartTime, formattedEndTime)}"
@@ -109,19 +107,19 @@ data class Event(
             } else {
 
                 if (this.isAllDay()) { // ignoring timezones
-                    val formattedStartDate = eventOccurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
+                    val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
 
 //                val endDateMinus1Day = (eventOccurrence?.endDateTime ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))).minusDays(1)
 //                val formattedEndDate = endDateMinus1Day.formatDate(timeZoneId)//DateFormat.getDateInstance(DateFormat.FULL).format()
-                val formattedEndDate = eventOccurrence?.endDateTime?.minusDays(1)?.formatDate(timeZoneId) ?: this.formatEnd(timeZoneId).first//DateFormat.getDateInstance(DateFormat.FULL).format()
+                val formattedEndDate = this.occurrence?.endDateTime?.minusDays(1)?.formatDate(timeZoneId) ?: this.formatEnd(timeZoneId).first//DateFormat.getDateInstance(DateFormat.FULL).format()
 
                     resources.getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
                 } else {
 
 
                     // TODO these two dates were formatted with calendar_timezone, check if this makes sense or not, it's changed to 1 timezone throughout this function
-                    val startDateTimeInStartTimezone = eventOccurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-                    val endDateTimeInStartTimezone = eventOccurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+                    val startDateTimeInStartTimezone = this.occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+                    val endDateTimeInStartTimezone = this.occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
 
                     val startDateTime = "${startDateTimeInStartTimezone.formatDate(timeZoneId)} ${startDateTimeInStartTimezone.formatTime(timeZoneId)}" //DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
                     val endDateTime = "${endDateTimeInStartTimezone.formatDate(timeZoneId)} ${endDateTimeInStartTimezone.formatTime(timeZoneId)}"//DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
@@ -135,7 +133,7 @@ data class Event(
         /**
          * @return <formatted date?, formatted time?>
          */
-        private fun formatDateOrDateTimeProperty(property: DateOrDateTimeProperty?, timeZoneId: String, iCalEndDateHack: Boolean = false) : Pair<String?, String?> {
+        private fun formatDateOrDateTimeProperty(property: DateOrDateTimeProperty?, timeZoneId: String) : Pair<String?, String?> {
             var formattedDate: String? = null
             var formattedTime: String? = null
 
@@ -146,11 +144,11 @@ data class Event(
                     formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
                     formattedTime = zonedDateTime.toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
                 } else {
-                    if (iCalEndDateHack) { // when formatting END DATE for ALL-DAY events, we substract one day
-                        formattedDate = zonedDateTime.toLocalDate().minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
-                    } else {
+                    //if (iCalEndDateHack) { // when formatting END DATE for ALL-DAY events, we substract one day
+                    //    formattedDate = zonedDateTime.toLocalDate().minusDays(1).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+                    //} else {
                         formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
-                    }
+                    //}
                 }
             }
             return Pair(formattedDate, formattedTime)
@@ -168,24 +166,26 @@ data class Event(
 
         fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateEnd?.value?.hasTime() == false else true)
 
-        fun spansSingleDay(): Boolean {
+        fun spansSingleDay(actualEndDate: Boolean = false): Boolean {
 
-            val dateStart = this.getStart("UTC")?.toLocalDate()
-            val dateEnd = this.getEnd("UTC")?.toLocalDate()
+            val dateStart = this.getStart()?.toLocalDate()
+            val dateEnd = this.getEnd()?.toLocalDate()
 
             if (dateStart == null) {
                 return false
             }
 
             return if (isAllDay()) {
-                dateEnd == null || dateStart == dateEnd.minusDays(1)
+                dateEnd == null || dateStart == dateEnd.minusDays(if (actualEndDate) 0 else 1)
             } else {
                 dateStart == dateEnd
             }
         }
 
-        // TODO isEndless?
-        data class Occurrence(val startDateTime: ZonedDateTime, val endDateTime: ZonedDateTime, val occurrenceNumber: Int)
+    /**
+     * Occurrence should always be expressed in timezone we format or display the calenendar with.
+     */
+    data class Occurrence(val startDateTime: ZonedDateTime, val endDateTime: ZonedDateTime, val occurrenceNumber: Int)
 
         /**
          * Occurrences are generated using DTSTART/DTEND timezone, but formatted with passed timeZoneId param.
@@ -248,12 +248,12 @@ data class Event(
             }
         }
 
-        // TODO GENERATE FIRST X OCCURRENCES?
-
         // TODO merge this method with "generate occurrence x" to have something like "generate occurrences"
         //  until X date or until Y occurrence number
         /**
          * Generates all occurrences of a recurring Event until given LocalDate in TimeZone.
+         *
+         * Occurrences are in passed timezone, not in original Event's timezone.
          */
         fun generateOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
 

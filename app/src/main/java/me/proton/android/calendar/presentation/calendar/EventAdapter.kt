@@ -13,7 +13,7 @@ import me.proton.android.calendar.domain.model.Event
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use entire item click listener from RV*/) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
+class EventAdapter(private val timeZoneId: String, private val clickListener: (Event) -> Unit/*TODO or just use entire item click listener from RV*/) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
     inner class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -24,15 +24,15 @@ class EventAdapter(private val clickListener: (Event) -> Unit/*TODO or just use 
 
             // TODO use timezone from settings
 
-            val time = if (item.isFromRecurring()) {
-                (if (item.isAllDay()) "(all-day)" else "") + "${item.getStart(ZoneId.systemDefault().id)?.format(
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${item.getEnd(ZoneId.systemDefault().id)?.format(
+            val time = /* if (item.isFromRecurring()) {
+                (if (item.isAllDay()) "(all-day)" else "") + "${item.getStart(timeZoneId)?.format(
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${item.getEnd(timeZoneId)?.format(
                     DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
-            } else {
-                (if (item.isAllDay()) "(all-day)" else "") + "${(item.occurrence?.startDateTime ?: item.getStart(ZoneId.systemDefault().id))?.format(
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${(item.occurrence?.endDateTime ?: item.getEnd(ZoneId.systemDefault().id))?.format(
+            } else {*/
+                (if (item.isAllDay()) "(all-day)" else "") + "${(item.occurrence?.startDateTime ?: item.getStart(timeZoneId))?.format(
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME)} - ${(item.occurrence?.endDateTime ?: item.getEnd(timeZoneId))?.format(
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME)}"
-            }
+            //}
 
             textView.setText(item.summary + "\n" + (if (item.occurrence != null) "\n(occurrence: ${item.occurrence?.occurrenceNumber})" else "") + "\n" + time) // TODO
             textView.setOnClickListener { clickListener(item) }
