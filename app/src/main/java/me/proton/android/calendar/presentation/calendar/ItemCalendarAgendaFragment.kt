@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import biweekly.ICalendar
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
@@ -19,6 +17,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.Event
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDate
@@ -30,6 +30,8 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 
     private val valueStoreProvider: ValueStoreProvider by inject()
 
+    private val fakeHeaderEvent = Event("", Calendar("", "", "", true), ICalendar())
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,7 +39,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
     ): View? {
 
         val rootView = inflater.inflate(R.layout.item_calendar_agenda_fragment, container, false)
-        rootView.findViewById<TextView>(R.id.text).text = "$date"
+        //rootView.findViewById<TextView>(R.id.text_date_header).text = "${date.format(showDayOfWeek = true)}"
 
         return rootView
     }
@@ -47,19 +49,20 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 
         TimberLogger.d("onViewCreated: $date")
 
-        recyclerView.apply {
+        rv_agenda.apply {
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
-            adapter = EventAdapter(calendarViewModel.timeZoneId.id) {
+            adapter = EventAdapter(calendarViewModel.timeZoneId.id, date) {
                 findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id, it.occurrence?.occurrenceNumber ?: 0))
             }
-            recyclerView.addItemDecoration(
+
+            /*rv_agenda.addItemDecoration(
                 DividerItemDecoration(
                     this@ItemCalendarAgendaFragment.context,
                     LinearLayoutManager.VERTICAL
                 )
-            )
-
+            )*/
+            (rv_agenda.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
 
         try {
@@ -73,6 +76,8 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 //                (recyclerView.adapter as? EventAdapter)?.submitList(it)
 //            })
 
+
+
             lifecycleScope.launch(Dispatchers.Default) {
 
                 calendarViewModel.prefetchEvents(date, date, calendarViewModel.timeZoneId.id)
@@ -81,7 +86,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
                 calendarViewModel.eventsFlow(date).collect {
                     TimberLogger.d("observed events arrived in flow, item agenda fragment: ${it.size}")
                     withContext(Dispatchers.Main) {
-                        (recyclerView.adapter as? EventAdapter)?.submitList(it)
+                        (rv_agenda.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent).plus(it))
                     }
                 }
             }
