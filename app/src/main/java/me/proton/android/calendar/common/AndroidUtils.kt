@@ -15,6 +15,7 @@ import android.widget.*
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckedTextView
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.widget.doAfterTextChanged
@@ -25,6 +26,7 @@ import biweekly.util.Recurrence
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
+import okhttp3.internal.toHexString
 import java.text.DateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -638,7 +640,18 @@ class AndroidUtils(context: Context) {
             return maxWidth
         }
 
+        fun darkenEventColor(colorString: String): String {
+            val outHSL = FloatArray(3)
+            ColorUtils.colorToHSL(Integer.valueOf(colorString.substringAfter("#"), 16), outHSL)
+
+            // magic number, reducing lightness by 12
+            val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], outHSL[2] - 0.12f))
+            return "#${color.toHexString()}"
+        }
+
     }
+
+
 
 }
 

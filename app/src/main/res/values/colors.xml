@@ -47,6 +47,10 @@
 
     <color name="notification_error">@color/pomegranate</color>
 
+    <!-- constant colors, do not change in dark mode -->
+    <!--    TODO-->
+    <color name="text_on_calendar_color">#FFFFFF</color>
+
 
 
 

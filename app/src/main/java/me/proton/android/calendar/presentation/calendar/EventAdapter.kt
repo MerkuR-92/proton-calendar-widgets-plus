@@ -2,26 +2,29 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.property.Status
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.format
 import me.proton.android.calendar.common.formatTime
+import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 class EventAdapter(
     private val timeZoneId: String,
@@ -75,31 +78,35 @@ class EventAdapter(
             }
         }
 
-        class AllDayEventViewHolder(itemView: View) : EventViewHolder(itemView) {
+        class AllDayEventViewHolder(itemView: View, private val timeZoneId: String) : EventViewHolder(itemView) {
 
-            private val textView: TextView = itemView.findViewById(R.id.text_header) // TODO
+//            private val ivBackground: ImageView = itemView.findViewById(R.id.background)
+
+            private val viewBackground: LayerDrawable = itemView.findViewById<View>(R.id.view_background).background as LayerDrawable
+            private val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
+            private val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
+
+            private val textViewHeader: TextView = itemView.findViewById(R.id.text_header)
+            private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
 
             // TODO consider databinding
-            fun bind(item: Event, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, clickListener: ((Event) -> Unit)?) {
 
-                // TODO use timezone from settings
+                viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenEventColor(event.calendar.color))) // TODO
 
-                val time =
-                    (if (item.isAllDay()) "(all-day)" else "") + "${(item.occurrence?.startDateTime ?: item.getStart(
-                        //timeZoneId
-                        ZoneId.systemDefault().id
-                    ))?.format(
-                        DateTimeFormatter.ISO_LOCAL_DATE_TIME
-                    )} - ${(item.occurrence?.endDateTime ?: item.getEnd(
-                        //timeZoneId
-                        ZoneId.systemDefault().id
-                    ))?.format(
-                        DateTimeFormatter.ISO_LOCAL_DATE_TIME
-                    )}"
-                //}
+                // TODO ADD MULTI-DAY INDICATORS
 
-                textView.setText(item.summary + "\n" + (if (item.occurrence != null) "\n(occurrence: ${item.occurrence?.occurrenceNumber})" else "") + "\n" + time) // TODO
-                textView.setOnClickListener { clickListener?.invoke(item) }
+                if (!event.isAllDay() && !event.spansSingleDay()) {
+                    textViewHeader.visibleOrGone(true)
+                    textViewHeader.text = "${(event.occurrence?.startDateTime ?: event.getStart(timeZoneId))?.formatTime(timeZoneId)}"
+                } else {
+                    textViewHeader.visibleOrGone(false)
+                }
+
+                textViewSubheader.text = event.summary
+
+                itemView.setOnClickListener { clickListener?.invoke(event) }
             }
         }
     }
@@ -111,7 +118,7 @@ class EventAdapter(
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) {
             ITEM_TYPE_HEADER
-        } else if (getItem(position).isAllDay()) {
+        } else if (getItem(position).isAllDay() || !getItem(position).spansSingleDay()) {
             ITEM_TYPE_EVENT_ALL_DAY
         } else {
             ITEM_TYPE_EVENT_PARTIAL_DAY
@@ -154,7 +161,8 @@ class EventAdapter(
                         R.layout.item_agenda_event_all_day,
                         parent,
                         false
-                    )
+                    ),
+                    timeZoneId
                 )
             }
         }

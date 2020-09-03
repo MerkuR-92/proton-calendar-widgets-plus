@@ -4,48 +4,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/spacing_element"
-    android:paddingLeft="@dimen/spacing_page"
-    android:paddingRight="@dimen/spacing_page"
-    android:background="@drawable/shape_item_all_day_event_background"
-    android:foreground="?selectableItemBackground"
+    android:paddingBottom="1dp"
+    android:paddingTop="1dp"
+    android:background="?attr/selectableItemBackground"
     >
 
-    <ImageView
-        android:id="@+id/image_icon"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginTop="@dimen/spacing_page"
-        android:tint="@color/brand_norm"
+    <View
+        android:id="@+id/view_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/shape_item_all_day_event_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/shape_calendar_circle" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_header"
         style="@style/Text.DefaultSmall"
+        android:textColor="@color/text_on_calendar_color"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_element"
-        android:layout_marginEnd="@dimen/spacing_page"
-        app:layout_constraintBottom_toBottomOf="@+id/image_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/image_icon"
-        app:layout_constraintTop_toTopOf="@+id/image_icon"
-        android:maxLines="1"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
         android:ellipsize="end"
-        tools:text="Klosterstraße 44, 10179 Berlin, Germany" />
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Klosterstraße 44, 10179 Berlin, Germany"
+        />
 
     <TextView
         android:id="@+id/text_subheader"
         android:layout_width="0dp"
+        android:textColor="@color/text_on_calendar_color"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/Text.Default"
-        app:layout_constraintEnd_toEndOf="@+id/text_header"
-        app:layout_constraintStart_toStartOf="@+id/text_header"
-        app:layout_constraintTop_toBottomOf="@+id/text_header"
-        tools:text="Subheader text, 123, sdkfh sdkhf sdkj fksd jfsdfsdfsdfdsf"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
+        android:ellipsize="end"
         android:maxLines="1"
-        android:ellipsize="end"/>
+        app:layout_goneMarginTop="8dp"
+        android:textAppearance="@style/Text.Default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_header"
+        tools:text="Subheader text, 123, sdkfh sdkhf sdkj fksd jfsdfsdfsdfdsf" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
