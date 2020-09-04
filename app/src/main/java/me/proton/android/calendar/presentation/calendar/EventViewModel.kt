@@ -469,22 +469,22 @@ class EventViewModel(
 //                - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
 //                - the same DAY but different TIME
 
-                if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone)?.truncatedTo(ChronoUnit.DAYS) &&
+                if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone!!)?.truncatedTo(ChronoUnit.DAYS) &&
                     dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
 
                     // update the original event's DTSTART only with new time (leave day the same)
 
                     if (event.isAllDay()) {
                         event.also {
-                            TimberLogger.d("all day, updating only new time: ${dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate()}/${dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate()}")
-                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate())
-                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate())
+                            TimberLogger.d("all day, updating only new time: ${dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate()}/${dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate()}")
+                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
+                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate())
                         }
                     } else {
-                        TimberLogger.d("part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone)!!}/${dbEvent.getEnd(event.defaultTimeZone)!!}")
+                        TimberLogger.d("part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone!!)!!}/${dbEvent.getEnd(event.defaultTimeZone!!)!!}")
                         event.also {
-                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone)!!.toLocalDate(), event.getStart(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
-                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone)!!.toLocalDate(), event.getEnd(event.defaultTimeZone)!!.toLocalTime(), event.defaultTimeZone)
+                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(), event.getStart(event.defaultTimeZone!!)!!.toLocalTime(), event.defaultTimeZone)
+                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate(), event.getEnd(event.defaultTimeZone!!)!!.toLocalTime(), event.defaultTimeZone)
                         }
                     }
 

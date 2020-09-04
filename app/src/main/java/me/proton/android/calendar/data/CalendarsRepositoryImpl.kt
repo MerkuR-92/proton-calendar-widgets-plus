@@ -18,6 +18,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.math.log
 
 @FlowPreview
@@ -118,7 +119,8 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                 } else {
                     it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
                 }
-            }.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
+            }.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart(
+                ZoneId.systemDefault().id) }, { it.summary }))
         }.distinctUntilChanged()
 
     }

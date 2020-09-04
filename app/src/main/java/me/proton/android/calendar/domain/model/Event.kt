@@ -71,11 +71,11 @@ data class Event(
 //    fun getStart(): LocalDateTime
 
 
-    fun getStart(timeZoneId: String? = null): ZonedDateTime? {
+    fun getStart(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getStart(timeZoneId)
     }
 
-    fun getEnd(timeZoneId: String? = null): ZonedDateTime? {
+    fun getEnd(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getEnd(timeZoneId)
     }
 
@@ -168,8 +168,8 @@ data class Event(
 
         fun spansSingleDay(actualEndDate: Boolean = false): Boolean {
 
-            val dateStart = this.getStart()?.toLocalDate()
-            val dateEnd = this.getEnd()?.toLocalDate()
+            val dateStart = this.getStart(ZoneId.systemDefault().id)?.toLocalDate()
+            val dateEnd = this.getEnd(ZoneId.systemDefault().id)?.toLocalDate()
 
             if (dateStart == null) {
                 return false

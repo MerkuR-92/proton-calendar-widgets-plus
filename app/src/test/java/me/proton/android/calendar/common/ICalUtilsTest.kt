@@ -1632,8 +1632,8 @@ internal class ICalUtilsTest {
         assertThat(event.dateStart.value.hasTime()).isTrue()
         assertThat(event.dateEnd.value.hasTime()).isTrue()
 
-        assertThat(event.getEnd()!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 20))
-        assertThat(event.getEnd()!!.toLocalTime()).isEqualTo(LocalTime.of(10, 0))
+        assertThat(event.getEnd("Europe/Zurich")!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 20))
+        assertThat(event.getEnd("Europe/Zurich")!!.toLocalTime()).isEqualTo(LocalTime.of(10, 0))
 
     }
 
@@ -1648,7 +1648,7 @@ internal class ICalUtilsTest {
         assertThat(event.dateStart.value).isNotNull()
         assertThat(event.dateEnd.value).isNotNull()
 
-        assertThat(event.getEnd()!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 21))
+        assertThat(event.getEnd("Europe/Zurich")!!.toLocalDate()).isEqualTo(LocalDate.of(2020, 1, 21))
 
     }
 

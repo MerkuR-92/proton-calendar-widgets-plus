@@ -76,7 +76,7 @@ object ICalUtils {
             if (this.dateStart.value.hasTime()) {
                 this.setDateEnd(this.dateStart.value)
             } else {
-                val endLocalDate = this.getStart()!!.toLocalDate().plusDays(1)
+                val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
                 this.setDateEnd(endLocalDate.toDate(), false)
             }
         }
@@ -550,22 +550,23 @@ fun ICalendar.printToString() : String {
         }
     }
 
-    fun VEvent.getStart(timeZoneId: String? = null): ZonedDateTime? {
+    fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
 
         if (this.dateStart?.value == null) return null // TODO
 
         return ZonedDateTime.ofInstant(
             this.dateStart.value.toInstant(),
-            if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
+            ZoneId.of(timeZoneId)
         )
     }
 
-    fun VEvent.getEnd(timeZoneId: String? = null): ZonedDateTime? {
+    fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
+
         if (this.dateEnd?.value == null) return null // TODO
 
         return ZonedDateTime.ofInstant(
             this.dateEnd.value.toInstant(),
-            if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault()
+            ZoneId.of(timeZoneId)
         )
     }
 

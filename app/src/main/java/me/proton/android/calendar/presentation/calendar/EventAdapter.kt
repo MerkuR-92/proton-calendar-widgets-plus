@@ -59,11 +59,18 @@ class EventAdapter(
 
                 imageViewIcon.drawable.setTint(Color.parseColor(event.calendar.color))
 
-                textViewHeader.text = "${(event.occurrence?.startDateTime ?: event.getStart(
-                    timeZoneId
-                ))?.formatTime(timeZoneId)} ‐ ${(event.occurrence?.endDateTime ?: event.getEnd(
-                    timeZoneId
-                ))?.formatTime(timeZoneId)}" // TODO
+                textViewHeader.text = if (event.isFromRecurring()) { // it's a single edit
+                    "${(event.getStart(timeZoneId))?.formatTime(timeZoneId)} ‐ ${(event.getEnd(
+                        timeZoneId
+                    ))?.formatTime(timeZoneId)}" // TODO
+                } else {
+                    "${(event.occurrence?.startDateTime ?: event.getStart(
+                        timeZoneId
+                    ))?.formatTime(timeZoneId)} ‐ ${(event.occurrence?.endDateTime ?: event.getEnd(
+                        timeZoneId
+                    ))?.formatTime(timeZoneId)}" // TODO
+                }
+
                 textViewSubheader.text = event.summary
 
                 if (event.status != null) {
@@ -99,7 +106,12 @@ class EventAdapter(
 
                 if (!event.isAllDay() && !event.spansSingleDay()) {
                     textViewHeader.visibleOrGone(true)
-                    textViewHeader.text = "${(event.occurrence?.startDateTime ?: event.getStart(timeZoneId))?.formatTime(timeZoneId)}"
+
+                    textViewHeader.text = if (event.isFromRecurring()) { // it's a single edit
+                        "${(event.getStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
+                    } else {
+                        "${(event.occurrence?.startDateTime ?: event.getStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
+                    }
                 } else {
                     textViewHeader.visibleOrGone(false)
                 }
