@@ -59,17 +59,12 @@ class EventAdapter(
 
                 imageViewIcon.drawable.setTint(Color.parseColor(event.calendar.color))
 
-                textViewHeader.text = if (event.isFromRecurring()) { // it's a single edit
-                    "${(event.getStart(timeZoneId))?.formatTime(timeZoneId)} ‐ ${(event.getEnd(
+                textViewHeader.text =
+                    "${(event.getActualStart(
+                        timeZoneId
+                    ))?.formatTime(timeZoneId)} ‐ ${(event.getActualEnd(
                         timeZoneId
                     ))?.formatTime(timeZoneId)}" // TODO
-                } else {
-                    "${(event.occurrence?.startDateTime ?: event.getStart(
-                        timeZoneId
-                    ))?.formatTime(timeZoneId)} ‐ ${(event.occurrence?.endDateTime ?: event.getEnd(
-                        timeZoneId
-                    ))?.formatTime(timeZoneId)}" // TODO
-                }
 
                 textViewSubheader.text = event.summary
 
@@ -106,12 +101,7 @@ class EventAdapter(
 
                 if (!event.isAllDay() && !event.spansSingleDay()) {
                     textViewHeader.visibleOrGone(true)
-
-                    textViewHeader.text = if (event.isFromRecurring()) { // it's a single edit
-                        "${(event.getStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
-                    } else {
-                        "${(event.occurrence?.startDateTime ?: event.getStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
-                    }
+                    textViewHeader.text = "${(event.getActualStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
                 } else {
                     textViewHeader.visibleOrGone(false)
                 }

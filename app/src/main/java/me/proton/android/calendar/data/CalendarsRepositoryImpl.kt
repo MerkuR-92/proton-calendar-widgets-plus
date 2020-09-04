@@ -9,17 +9,13 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
-import me.proton.android.calendar.common.DB_FLOW_DEBOUNCE_MS
-import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlin.math.log
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -109,18 +105,42 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         timeZoneId: String
     ): Flow<List<Event>> {
 
+        fun isAllDayPrio(a: Event, b: Event): Boolean {
+            // If a is an all day event,
+            // b is a part day event,
+            // and the all day event starts on the same day that b ends and (b does not span multiple days)
+            // The last check is needed because a part day event can span on 2 days without being seen
+            // as an all day event
+            return a.isAllDay() &&
+                    !b.isAllDay() &&
+                    ((a.getActualStart(ZoneId.systemDefault().id))?.toLocalDate())?.isEqual((b.getActualEnd(ZoneId.systemDefault().id))?.toLocalDate()) == true &&
+                    b.spansSingleDay()
+        }
+
+        val comparator = Comparator<Event> { a, b ->
+            return@Comparator when {
+                isAllDayPrio(a, b) -> {
+                    -1
+                }
+                isAllDayPrio(b, a) -> {
+                    1
+                }
+                else -> {
+                    val coeficcient1 = ((a.getActualStart(ZoneId.systemDefault().id))?.toEpochSecond() ?: 0) - ((b.getActualStart(ZoneId.systemDefault().id))?.toEpochSecond() ?: 0)
+                    val coeficcient2 = ((b.getActualEnd(ZoneId.systemDefault().id))?.toEpochSecond() ?: 0) - ((a.getActualEnd(ZoneId.systemDefault().id))?.toEpochSecond() ?: 0)
+
+                    coeficcient1.toInt() or coeficcient2.toInt()
+                }
+            }
+        }
+
         TimberLogger.d("createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
         return events.map {
             TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate} in $timeZoneId")
             it.filter {
-                if (it.occurrence != null) {
-                    it.startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.occurrence!!.startDateTime, it.occurrence!!.endDateTime)
-                } else {
                     it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
-                }
-            }.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart(
-                ZoneId.systemDefault().id) }, { it.summary }))
+            }.sortedWith(comparator)//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
         }.distinctUntilChanged()
 
     }

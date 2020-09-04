@@ -79,6 +79,18 @@ data class Event(
         return iCalEvent.getEnd(timeZoneId)
     }
 
+    fun getActualStart(timeZoneId: String): ZonedDateTime? {
+        return if (this.isFromRecurring()) {
+            iCalEvent.getStart(timeZoneId)
+        } else occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
+    }
+
+    fun getActualEnd(timeZoneId: String): ZonedDateTime? {
+        return if (this.isFromRecurring()) {
+            iCalEvent.getEnd(timeZoneId)
+        } else occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
+    }
+
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
 
     fun formatEnd(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId)
@@ -449,9 +461,23 @@ data class Event(
             val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
             val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
-            return (iCalEvent.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
-                    || (iCalEvent.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
-                    || ((iCalEvent.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && iCalEvent.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
+//            val dateTimeStart = if (this.iCalEvent.dateStart != null) ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
+//            val dateTimeEnd = if (this.iCalEvent.dateEnd != null) ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
+
+            val dateTimeStart = if (this.occurrence == null) {
+                this.getActualStart(ZoneId.systemDefault().id)!!.withZoneSameLocal(ZoneId.of(timeZoneId))
+            } else {
+                this.getActualStart(timeZoneId)
+            }
+            val dateTimeEnd = if (this.occurrence == null) {
+                this.getActualEnd(ZoneId.systemDefault().id)!!.withZoneSameLocal(ZoneId.of(timeZoneId))
+            } else {
+                this.getActualEnd(timeZoneId)
+            }
+
+            return (dateTimeStart?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
+                    || (dateTimeEnd?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
+                    || ((dateTimeStart?.isBefore(fromDateTime) ?: false) && dateTimeEnd?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
         }
 
         /**
@@ -463,9 +489,9 @@ data class Event(
             val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
             val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
-            return (startDateTime.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
-                    || (endDateTime.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
-                    || ((startDateTime.isBefore(fromDateTime) ?: false) && endDateTime.isAfter(toDateTime)) // starts before or ends after range, but happens during range
+            return (startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
+                    || (endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
+                    || ((startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBefore(fromDateTime) ?: false) && endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isAfter(toDateTime)) // starts before or ends after range, but happens during range
         }
 
 
