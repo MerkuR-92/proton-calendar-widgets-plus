@@ -51,6 +51,7 @@
     <!--    TODO-->
     <color name="text_on_calendar_color">#FFFFFF</color>
     <color name="background_of_past_event">#ECEFF1</color>
+    <color name="background_of_cancelled_event">#FFFFFF</color>
 
 
 

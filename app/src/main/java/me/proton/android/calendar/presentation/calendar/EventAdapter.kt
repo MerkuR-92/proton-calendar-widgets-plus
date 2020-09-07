@@ -79,16 +79,6 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                if (event.status != null) {
-                    if ((event.status as Status).isCancelled) {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    } else {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                    }
-                }
-
                 if (event.isInThePast(timeZoneId)) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
@@ -97,6 +87,16 @@ class EventAdapter(
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
                     textViewSubheader.setTextAppearance(R.style.Text_Default)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
+                }
+
+                if (event.status != null) {
+                    if ((event.status as Status).isCancelled) {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    } else {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    }
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
@@ -139,16 +139,6 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                if (event.status != null) {
-                    if ((event.status as Status).isCancelled) {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    } else {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                    }
-                }
-
                 viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenEventColor(event.calendar.color))) // TODO
 
                 if (event.isInThePast(timeZoneId)) {
@@ -156,7 +146,11 @@ class EventAdapter(
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
 
-                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_past_event))
+                    if (event.isCancelled()) {
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_cancelled_event))
+                    } else {
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_past_event))
+                    }
                 } else {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
                     textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
@@ -165,7 +159,24 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
                     textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
 
-                    viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                    if (event.isCancelled()) {
+                        textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
+                        textViewSubheader.setTextAppearance(R.style.Text_Default)
+                        textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
+
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_cancelled_event))
+                    } else {
+                        viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                    }
+
+                }
+
+                if (event.isCancelled()) {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    } else {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }

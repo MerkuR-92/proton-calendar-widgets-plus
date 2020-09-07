@@ -92,7 +92,13 @@ data class Event(
     }
 
     fun isInThePast(timeZoneId: String): Boolean {
+//        return false
         return this.getActualEnd(timeZoneId)?.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId))) == true
+    }
+
+    fun isCancelled(): Boolean {
+//        return true
+        return (this.status != null) && (this.status as Status).isCancelled
     }
 
     fun formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
