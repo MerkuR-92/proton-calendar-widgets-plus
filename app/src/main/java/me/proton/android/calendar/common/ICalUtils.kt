@@ -16,6 +16,7 @@ import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
+import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -549,6 +550,19 @@ fun ICalendar.printToString() : String {
             setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
         }
     }
+
+    fun ICalendar.adjustIncomingAllDayEvent() {
+        this.events.first().apply {
+
+            if (this.dateStart.value != null && !this.dateStart.value.hasTime()) {
+                if (this.dateStart.value == this.dateEnd.value) {
+                    val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
+                    this.setDateEnd(endLocalDate.toDate(), false)
+                }
+            }
+        }
+    }
+
 
     fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
 
