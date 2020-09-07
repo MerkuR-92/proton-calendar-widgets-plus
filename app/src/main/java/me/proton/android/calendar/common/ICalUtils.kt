@@ -554,20 +554,35 @@ fun ICalendar.printToString() : String {
 
         if (this.dateStart?.value == null) return null // TODO
 
-        return ZonedDateTime.ofInstant(
-            this.dateStart.value.toInstant(),
-            ZoneId.of(timeZoneId)
-        )
+        return if (this.dateStart.value.hasTime()) {
+            ZonedDateTime.ofInstant(
+                this.dateStart.value.toInstant(),
+                ZoneId.of(timeZoneId)
+            )
+        } else {
+            ZonedDateTime.ofInstant(
+                this.dateStart.value.toInstant(),
+                ZoneId.systemDefault()
+            ).withZoneSameLocal(ZoneId.of(timeZoneId))
+        }
+
     }
 
     fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
 
         if (this.dateEnd?.value == null) return null // TODO
 
-        return ZonedDateTime.ofInstant(
-            this.dateEnd.value.toInstant(),
-            ZoneId.of(timeZoneId)
-        )
+        return if (this.dateEnd.value.hasTime()) {
+            ZonedDateTime.ofInstant(
+                this.dateEnd.value.toInstant(),
+                ZoneId.of(timeZoneId)
+            )
+        } else {
+            ZonedDateTime.ofInstant(
+                this.dateEnd.value.toInstant(),
+                ZoneId.systemDefault()
+            ).withZoneSameLocal(ZoneId.of(timeZoneId))
+        }
     }
 
 

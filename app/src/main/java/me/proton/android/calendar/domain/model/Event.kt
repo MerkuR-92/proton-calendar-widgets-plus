@@ -80,28 +80,29 @@ data class Event(
     }
 
     fun getActualStart(timeZoneId: String): ZonedDateTime? {
-        val dateTime = if (this.isFromRecurring()) {
+        return if (this.isFromRecurring()) {
             iCalEvent.getStart(timeZoneId)
         } else occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
-
-        return if (this.isAllDay()) { // adjust for all-day events with no timezone
-            dateTime?.withZoneSameInstant(ZoneId.systemDefault())?.withZoneSameLocal(ZoneId.of(timeZoneId))
-        } else dateTime
-
     }
 
     fun getActualEnd(timeZoneId: String): ZonedDateTime? {
-        val dateTime = if (this.isFromRecurring()) {
+        return if (this.isFromRecurring()) {
             iCalEvent.getEnd(timeZoneId)
         } else occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
-
-        return if (this.isAllDay()) { // adjust for all-day events with no timezone
-            dateTime?.withZoneSameInstant(ZoneId.systemDefault())?.withZoneSameLocal(ZoneId.of(timeZoneId))
-        } else dateTime
     }
 
     fun isInThePast(timeZoneId: String): Boolean {
         return this.getActualEnd(timeZoneId)?.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId))) == true
+    }
+
+    fun formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
+
+        if (spansSingleDay()) return null
+
+        val todayOffset = ChronoUnit.DAYS.between(getActualStart(timeZoneId)!!.toLocalDate(), date).toInt() + 1
+        val durationInDays = ChronoUnit.DAYS.between(getActualStart(timeZoneId)!!.toLocalDate(), getActualEnd(timeZoneId)!!.toLocalDate()).toInt() + (if (this.isAllDay()) 0 else 1)
+
+        return "(${todayOffset}/${durationInDays})"
     }
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)

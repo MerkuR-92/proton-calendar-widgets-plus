@@ -49,9 +49,10 @@ class EventAdapter(
             private val imageViewIcon: ImageView = itemView.findViewById(R.id.image_icon)
             private val textViewHeader: TextView = itemView.findViewById(R.id.text_header)
             private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
+            private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
 
             // TODO consider databinding
-            fun bind(event: Event, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, date: LocalDate, clickListener: ((Event) -> Unit)?) {
 
 //                if (/*TODO if event is unanswered*/ true) {
 //                    imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_event_unanswered_circle))
@@ -68,7 +69,15 @@ class EventAdapter(
                         timeZoneId
                     ))?.formatTime(timeZoneId)}" // TODO
 
-                textViewSubheader.text = event.summary
+                textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
+
+                if (event.spansSingleDay()) {
+                    textViewSubheaderSide.visibleOrGone(false)
+                } else {
+
+                    textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
+                    textViewSubheaderSide.visibleOrGone(true)
+                }
 
                 if (event.status != null) {
                     if ((event.status as Status).isCancelled) {
@@ -80,10 +89,14 @@ class EventAdapter(
                     }
                 }
 
-                // adjust colors for past event
                 if (event.isInThePast(timeZoneId)) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
+                    textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
+                } else {
+                    textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
+                    textViewSubheader.setTextAppearance(R.style.Text_Default)
+                    textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
@@ -101,14 +114,12 @@ class EventAdapter(
 
             private val textViewHeader: TextView = itemView.findViewById(R.id.text_header)
             private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
+            private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
 
             // TODO consider databinding
-            fun bind(event: Event, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, date: LocalDate, clickListener: ((Event) -> Unit)?) {
 
 //                TODO if event is unanswered, add tiled backgrounds
-
-                viewMainSurface.setTint(Color.parseColor(event.calendar.color))
-                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenEventColor(event.calendar.color))) // TODO
 
                 // TODO ADD MULTI-DAY INDICATORS
 
@@ -119,7 +130,14 @@ class EventAdapter(
                     textViewHeader.visibleOrGone(false)
                 }
 
-                textViewSubheader.text = event.summary
+                textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
+
+                if (event.spansSingleDay()) {
+                    textViewSubheaderSide.visibleOrGone(false)
+                } else {
+                    textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
+                    textViewSubheaderSide.visibleOrGone(true)
+                }
 
                 if (event.status != null) {
                     if ((event.status as Status).isCancelled) {
@@ -131,12 +149,23 @@ class EventAdapter(
                     }
                 }
 
-                // adjust colors for past event
+                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenEventColor(event.calendar.color))) // TODO
+
                 if (event.isInThePast(timeZoneId)) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
+                    textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
 
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_past_event))
+                } else {
+                    textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
+                    textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                    textViewSubheader.setTextAppearance(R.style.Text_Default)
+                    textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                    textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
+                    textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+
+                    viewMainSurface.setTint(Color.parseColor(event.calendar.color))
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
@@ -206,10 +235,12 @@ class EventAdapter(
             is EventViewHolder.HeaderViewHolder -> holder.bind(date)
             is EventViewHolder.PartialDayEventViewHolder -> holder.bind(
                 getItem(position),
+                date,
                 clickListener
             )
             is EventViewHolder.AllDayEventViewHolder -> holder.bind(
                 getItem(position),
+                date,
                 clickListener
             )
         }

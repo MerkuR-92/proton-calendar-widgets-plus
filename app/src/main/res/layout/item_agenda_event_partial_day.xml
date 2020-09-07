@@ -39,12 +39,21 @@
         android:id="@+id/text_subheader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textAppearance="@style/Text.Default"
-        app:layout_constraintEnd_toEndOf="@+id/text_header"
+        app:layout_constraintEnd_toStartOf="@+id/text_subheader_side"
         app:layout_constraintStart_toStartOf="@+id/text_header"
         app:layout_constraintTop_toBottomOf="@+id/text_header"
-        tools:text="Subheader text, 123, sdkfh sdkhf sdkj fksd jfsdfsdfsdfdsf"
-        android:maxLines="1"
-        android:ellipsize="end"/>
+        tools:text="Subheader text, 123, sdkfh sdkhf sdkj fksd jfsdfsdfsdfdsf" />
+
+    <TextView
+        android:id="@+id/text_subheader_side"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/Text.Default"
+        app:layout_constraintEnd_toEndOf="@+id/text_header"
+        app:layout_constraintTop_toBottomOf="@+id/text_header"
+        tools:text="(1/2)" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
