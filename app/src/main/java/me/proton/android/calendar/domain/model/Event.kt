@@ -100,6 +100,10 @@ data class Event(
         } else dateTime
     }
 
+    fun isInThePast(timeZoneId: String): Boolean {
+        return this.getActualEnd(timeZoneId)?.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId))) == true
+    }
+
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
 
     fun formatEnd(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId)

@@ -151,7 +151,7 @@ class CalendarFragment : BaseDialogFragment() {
 
         pager.apply{
             adapter = agendaAdapter
-            offscreenPageLimit = 1 // TODO
+            offscreenPageLimit = 3 // TODO
             setCurrentItem(agendaAdapter.startingPosition, false)
             setToolbarTitle(agendaAdapter.startingPosition)
         }

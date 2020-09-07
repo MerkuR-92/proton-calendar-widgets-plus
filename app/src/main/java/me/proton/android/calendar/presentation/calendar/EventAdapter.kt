@@ -25,6 +25,8 @@ import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class EventAdapter(
     private val timeZoneId: String,
@@ -70,16 +72,25 @@ class EventAdapter(
 
                 if (event.status != null) {
                     if ((event.status as Status).isCancelled) {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                         textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     } else {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                         textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                     }
+                }
+
+                // adjust colors for past event
+                if (event.isInThePast(timeZoneId)) {
+                    textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
+                    textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
             }
         }
 
+        // TODO this viewholder can actually is used also for partial-day events, that span more than one day
         class AllDayEventViewHolder(itemView: View, private val timeZoneId: String) : EventViewHolder(itemView) {
 
 //            private val ivBackground: ImageView = itemView.findViewById(R.id.background)
@@ -94,6 +105,8 @@ class EventAdapter(
             // TODO consider databinding
             fun bind(event: Event, clickListener: ((Event) -> Unit)?) {
 
+//                TODO if event is unanswered, add tiled backgrounds
+
                 viewMainSurface.setTint(Color.parseColor(event.calendar.color))
                 viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenEventColor(event.calendar.color))) // TODO
 
@@ -107,6 +120,24 @@ class EventAdapter(
                 }
 
                 textViewSubheader.text = event.summary
+
+                if (event.status != null) {
+                    if ((event.status as Status).isCancelled) {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    } else {
+                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    }
+                }
+
+                // adjust colors for past event
+                if (event.isInThePast(timeZoneId)) {
+                    textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
+                    textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
+
+                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_past_event))
+                }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
             }

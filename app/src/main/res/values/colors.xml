@@ -50,6 +50,7 @@
     <!-- constant colors, do not change in dark mode -->
     <!--    TODO-->
     <color name="text_on_calendar_color">#FFFFFF</color>
+    <color name="background_of_past_event">#ECEFF1</color>
 
 
 

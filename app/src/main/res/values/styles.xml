@@ -41,6 +41,10 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="Text.Default.Weak">
+        <item name="android:textColor">@color/text_weak</item>
+    </style>
+
     <style name="Text.DefaultSmall">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif</item>
