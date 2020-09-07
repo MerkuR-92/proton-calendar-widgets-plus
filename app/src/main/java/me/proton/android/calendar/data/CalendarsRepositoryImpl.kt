@@ -138,9 +138,18 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
         return events.map {
             TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate} in $timeZoneId")
-            it.filter {
+            val filtered = it.filter {
                     it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
-            }.sortedWith(comparator)//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
+            }.groupBy { it.isAllDay() || !it.spansSingleDay() }
+
+//            (filtered.get(true)?.sortedWith(comparator) ?: emptyList())
+
+            val result = mutableListOf<Event>()
+                result.addAll(filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
+                result.addAll(filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
+            result
+
+            //filtered.groupBy { it.isAllDay() || !it.spansSingleDay() }.flatMap { it.value.sortedWith(comparator) }//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
         }.distinctUntilChanged()
 
     }

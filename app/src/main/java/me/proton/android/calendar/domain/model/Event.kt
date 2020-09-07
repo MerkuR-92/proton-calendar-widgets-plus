@@ -80,15 +80,24 @@ data class Event(
     }
 
     fun getActualStart(timeZoneId: String): ZonedDateTime? {
-        return if (this.isFromRecurring()) {
+        val dateTime = if (this.isFromRecurring()) {
             iCalEvent.getStart(timeZoneId)
         } else occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
+
+        return if (this.isAllDay()) { // adjust for all-day events with no timezone
+            dateTime?.withZoneSameInstant(ZoneId.systemDefault())?.withZoneSameLocal(ZoneId.of(timeZoneId))
+        } else dateTime
+
     }
 
     fun getActualEnd(timeZoneId: String): ZonedDateTime? {
-        return if (this.isFromRecurring()) {
+        val dateTime = if (this.isFromRecurring()) {
             iCalEvent.getEnd(timeZoneId)
         } else occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
+
+        return if (this.isAllDay()) { // adjust for all-day events with no timezone
+            dateTime?.withZoneSameInstant(ZoneId.systemDefault())?.withZoneSameLocal(ZoneId.of(timeZoneId))
+        } else dateTime
     }
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
@@ -464,16 +473,8 @@ data class Event(
 //            val dateTimeStart = if (this.iCalEvent.dateStart != null) ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
 //            val dateTimeEnd = if (this.iCalEvent.dateEnd != null) ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
 
-            val dateTimeStart = if (this.occurrence == null) {
-                this.getActualStart(ZoneId.systemDefault().id)!!.withZoneSameLocal(ZoneId.of(timeZoneId))
-            } else {
-                this.getActualStart(timeZoneId)
-            }
-            val dateTimeEnd = if (this.occurrence == null) {
-                this.getActualEnd(ZoneId.systemDefault().id)!!.withZoneSameLocal(ZoneId.of(timeZoneId))
-            } else {
-                this.getActualEnd(timeZoneId)
-            }
+            val dateTimeStart = this.getActualStart(timeZoneId)
+            val dateTimeEnd = this.getActualEnd(timeZoneId)
 
             return (dateTimeStart?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
                     || (dateTimeEnd?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
