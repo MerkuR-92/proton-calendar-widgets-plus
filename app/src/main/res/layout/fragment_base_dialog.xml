@@ -12,16 +12,37 @@
         android:stateListAnimator="@animator/design_appbar_state_list_animator"
         app:liftOnScroll="true">
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:indeterminateOnly="true"
+                android:indeterminateTint="@color/brand_norm"
+                android:indeterminateTintMode="src_in"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="-4dp"
+                />
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/AppTheme.Toolbar"
-            app:layout_scrollFlags="noScroll">
+            app:layout_scrollFlags="noScroll"
+            android:background="@null">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@null"
+                >
 
                 <LinearLayout
                 android:id="@+id/toolbar_content"
@@ -31,30 +52,23 @@
                 android:gravity="center_vertical|end"
                 android:orientation="horizontal"
                 android:paddingEnd="@dimen/spacing_element"
-                android:showDividers="middle" />
+                android:showDividers="middle"
+                    android:background="@null"/>
 
                 <TextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    style="@style/Text.Headline.Small" />
+                    style="@style/Text.Headline.Small"
+                    android:background="@null"/>
 
             </FrameLayout>
 
         </androidx.appcompat.widget.Toolbar>
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"
-            tools:visibility="visible"
-            android:indeterminateOnly="true"
-            android:indeterminateTint="@color/brand_norm"
-            android:indeterminateTintMode="src_in"
-            />
+
+        </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
