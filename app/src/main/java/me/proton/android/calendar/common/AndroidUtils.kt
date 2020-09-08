@@ -28,6 +28,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import okhttp3.internal.toHexString
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -767,10 +768,8 @@ fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
  * Returns "January", etc.
  */
 fun LocalDate.formatMonth(): String {
-    return this.month.getDisplayName(
-        TextStyle.FULL_STANDALONE,
-        Locale.getDefault()
-    )
+    val dateFormat = SimpleDateFormat("LLLL", Locale.getDefault())
+    return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
 }
 
 /**
