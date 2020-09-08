@@ -234,7 +234,8 @@ class EventViewModel(
                     }
                 }
             } else {
-
+                val duration = Duration.builder().prior(true).hours(15).build() // 1 day before at 9:00
+                event.iCalEvent.addAlarm(VAlarm.display(Trigger(duration, Related.START), null))
             }
         } else {
             if (calendarSettings.defaultPartDayNotifications.isNotEmpty()) {
