@@ -5,7 +5,7 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 
-def sentryDsn = project.hasProperty("sentryDsn") ? sentryDsn : "null"
+def sentryDsn = project.hasProperty("sentryDsn") ? sentryDsn : "https://abc@sentry.com/666"
 def storeFilePath = project.hasProperty('keyStoreFilePath') ? keyStoreFilePath : "protonkey.jks"
 def storeKeyAlias = project.hasProperty('keyStoreKeyAlias') ? keyStoreKeyAlias : 'proton'
 def storePass = project.hasProperty('keyStorePassword') ? keyStorePassword : "\"Store password\""
