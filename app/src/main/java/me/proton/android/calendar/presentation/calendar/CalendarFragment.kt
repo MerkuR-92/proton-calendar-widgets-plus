@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -18,11 +17,9 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_calendar.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -31,7 +28,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.*
 
 class CalendarFragment : BaseDialogFragment() {
 
@@ -57,7 +53,7 @@ class CalendarFragment : BaseDialogFragment() {
 
         val buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, toolbar_content, false)
         with (buttonCreate) {
-            (this as ImageButton).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
             setOnClickListener {
                 // each item in the adapter is one day
                 val currentDate = initialToday.plusDays((pager.currentItem - agendaAdapter.startingPosition).toLong())
@@ -66,8 +62,8 @@ class CalendarFragment : BaseDialogFragment() {
         }
         val buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonToday) {
-            (this as ImageButton).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
-            (this as ImageButton).setColorFilter(0) // this image is not one color, so we remove default tinting
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
+//            (this as ImageButton).setColorFilter(0) // this image is not one color, so we remove default tinting
             setOnClickListener {
                 val todayOffset = ChronoUnit.DAYS.between(initialToday, LocalDate.now()).toInt()
                 pager.setCurrentItem(agendaAdapter.startingPosition + todayOffset, true)
@@ -78,13 +74,13 @@ class CalendarFragment : BaseDialogFragment() {
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
             addView(
                 buttonToday, resources.getDimensionPixelSize(
-                    R.dimen.icon_size
-                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+                    R.dimen.action_clickable_size
+                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
             addView(
                 buttonCreate, resources.getDimensionPixelSize(
-                    R.dimen.icon_size
-                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+                    R.dimen.action_clickable_size
+                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
         }
 

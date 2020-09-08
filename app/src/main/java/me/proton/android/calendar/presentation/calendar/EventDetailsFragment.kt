@@ -63,7 +63,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_primary, toolbar_content, false)
         with (buttonEdit) {
-            (this as ImageButton).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pen))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pen))
             setOnClickListener {
                 findNavController().navigate(
                     (Navigation.Deeplink.toEventEdit(
@@ -85,20 +85,18 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
             addView(
-                buttonEdit, resources.getDimensionPixelSize(
-                    R.dimen.icon_size
-                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+                buttonMenu, resources.getDimensionPixelSize(
+                    R.dimen.action_clickable_size
+                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
             addView(
-                buttonMenu, resources.getDimensionPixelSize(
-                    R.dimen.icon_size
-                ), resources.getDimensionPixelSize(R.dimen.icon_size)
+                buttonEdit, resources.getDimensionPixelSize(
+                    R.dimen.action_clickable_size
+                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
-
         }
 
 

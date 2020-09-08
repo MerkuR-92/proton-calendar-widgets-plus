@@ -8,7 +8,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.visibleOrInvisible
 
 // TODO maybe remove DialogFragment whatsoever
@@ -77,12 +76,12 @@ abstract class BaseDialogFragment : DialogFragment() {
                     setTitle("")
                     // navigation
                     if (isTopLevel) {
-                        setNavigationIcon(R.drawable.ic_hamburger_nav)
+                        setNavigationIcon(R.drawable.ic_hamburger)
                     } else {
                         if (navigateUp) {
-                            setNavigationIcon(R.drawable.ic_arrow_left_nav)
+                            setNavigationIcon(R.drawable.ic_arrow_left)
                         } else {
-                            setNavigationIcon(R.drawable.ic_close_nav)
+                            setNavigationIcon(R.drawable.ic_close)
                         }
                     }
 

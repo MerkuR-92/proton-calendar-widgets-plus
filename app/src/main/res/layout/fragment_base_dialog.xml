@@ -30,7 +30,7 @@
                 android:divider="@drawable/toolbar_divider"
                 android:gravity="center_vertical|end"
                 android:orientation="horizontal"
-                android:paddingEnd="@dimen/spacing_page"
+                android:paddingEnd="@dimen/spacing_element"
                 android:showDividers="middle" />
 
                 <TextView
