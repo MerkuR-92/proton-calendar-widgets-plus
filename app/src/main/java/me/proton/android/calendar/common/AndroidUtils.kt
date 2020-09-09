@@ -641,12 +641,12 @@ class AndroidUtils(context: Context) {
             return maxWidth
         }
 
-        fun darkenEventColor(colorString: String): String {
+        fun darkenCalendarColor(colorString: String): String {
             val outHSL = FloatArray(3)
             ColorUtils.colorToHSL(Integer.valueOf(colorString.substringAfter("#"), 16), outHSL)
 
             // magic number, reducing lightness by 12
-            val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], outHSL[2] - 0.12f))
+            val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] - 0.12f, 1.0f))))
             return "#${color.toHexString()}"
         }
 

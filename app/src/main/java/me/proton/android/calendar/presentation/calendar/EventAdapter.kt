@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -25,8 +24,6 @@ import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
 
 class EventAdapter(
     private val timeZoneId: String,
@@ -139,7 +136,7 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenEventColor(event.calendar.color))) // TODO
+                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
 
                 if (event.isInThePast(timeZoneId)) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
