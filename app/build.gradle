@@ -32,14 +32,14 @@ detekt {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "29.0.3"
     ndkVersion "20.0.5594570"
     
     defaultConfig {
         applicationId "me.proton.android.calendar"
-        minSdkVersion 23
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 14
         versionName "0.5.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
