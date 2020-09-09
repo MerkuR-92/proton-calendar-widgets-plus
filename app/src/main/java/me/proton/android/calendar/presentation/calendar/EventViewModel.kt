@@ -22,6 +22,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -38,7 +39,8 @@ class EventViewModel(
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val gson: Gson
+    private val gson: Gson,
+    private val logger: Logger
 ) : ViewModel() {
 
 
@@ -509,9 +511,16 @@ class EventViewModel(
         TimberLogger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
             createEventUseCase.execute(TODOuserID, newEvent.calendar.id, newEvent)
+        }.await()
+
+        if (createEventResult is UseCase.Result.InvalidParams) {
+            logger.e("invalid params in create event: ${createEventResult.message}")
+        }
+        if (createEventResult is UseCase.Result.Error) {
+            logger.e("error in create event: ${createEventResult.message}")
         }
 
-        return createEventResult.await() == UseCase.Result.Success
+        return createEventResult == UseCase.Result.Success
 
     }
 

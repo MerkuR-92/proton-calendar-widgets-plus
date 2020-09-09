@@ -54,7 +54,11 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     // for this calendar at the same time, this will be sent in the event loop automatically
 
                     // extract passphrase for just saved Calendar
-                    cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
+                    val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
+                    when (cachePassphraseResult) {
+                        is UseCase.Result.InvalidParams -> logger.e("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
+                        is UseCase.Result.Error -> logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")
+                    }
 
                     // save User Settings
                     calendarsRepository.persistUserSettings(userId, userSettingsResponse.data.calendarUserSettings)
