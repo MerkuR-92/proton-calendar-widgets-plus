@@ -345,7 +345,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     attendees.add("Attendee ${count + 1}")
                 }
             }
-            if (attendees.isNotEmpty()) {
+            if (FeatureFlags.SHOW_ATTENDEES && attendees.isNotEmpty()) {
                 with(section_attendees) {
                     text_subheader.text = "4 yes, 3 maybe, 1 no, TODO"
                     text_header.text = resources.getString(

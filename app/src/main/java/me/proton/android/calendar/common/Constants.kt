@@ -18,7 +18,9 @@ const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="
 const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/create"
 
-
+object FeatureFlags {
+    const val SHOW_ATTENDEES = false
+}
 
 object FormValidation {
 
