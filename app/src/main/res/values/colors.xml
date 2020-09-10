@@ -13,6 +13,7 @@
     <color name="mischka">#DADCE3</color>
     <color name="pomegranate">#E84118</color>
     <color name="santas_gray">#9CA0AA</color>
+    <color name="san_marino">#5064B6</color>
 
     <!-- design color aliases -->
 
@@ -24,14 +25,17 @@
     <color name="shade_10">@color/whisper</color>
     <color name="shade_0">@color/white</color>
     <color name="brand_norm">@color/cornflower_blue</color>
+    <color name="brand_darken_20">@color/san_marino</color>
 
     <!-- colors to use in the app -->
 
     <color name="text_norm">@color/shade_100</color>
     <color name="text_weak">@color/storm_gray</color>
     <color name="text_hint">@color/shade_60</color>
+    <color name="text_inverted">@color/shade_0</color>
 
     <color name="interaction_norm">@color/brand_norm</color>
+    <color name="interaction_norm_pressed">@color/brand_darken_20</color>
     <color name="interaction_strong">@color/shade_100</color>
     <color name="interaction_strong_pressed">@color/shade_80</color>
     <color name="interaction_weak">@color/shade_20</color>

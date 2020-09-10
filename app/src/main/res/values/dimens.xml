@@ -12,6 +12,8 @@
 
     <dimen name="clickable_size">48dp</dimen>
 
+    <dimen name="calendar_item_day_spacing">1dp</dimen>
+
 
 
 

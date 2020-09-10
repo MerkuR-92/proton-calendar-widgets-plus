@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.domain.usecase.UseCase
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
@@ -30,6 +31,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
     }
 
     lateinit var timeZoneId: ZoneId //ZoneId.of(TimeZone.getDefault().id) // TODO get timezone from settings OR fallback to default
+    lateinit var startWeekOn: DayOfWeek
 
     val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
@@ -57,6 +59,11 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
 
                     timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
+                    startWeekOn = if (calendarsRepository.selectUserSettings(TODOuserID)?.weekStart == 7) {
+                        DayOfWeek.SUNDAY
+                    } else {
+                        DayOfWeek.MONDAY
+                    }
 
                     TestsLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 

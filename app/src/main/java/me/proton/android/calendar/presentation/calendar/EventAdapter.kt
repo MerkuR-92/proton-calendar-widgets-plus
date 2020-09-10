@@ -77,13 +77,13 @@ class EventAdapter(
                 }
 
                 if (event.isInThePast(timeZoneId)) {
-                    textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
-                    textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
-                    textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
+                    textViewHeader.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Weak)
+                    textViewSubheader.setTextAppearance(itemView.context, R.style.Text_Default_Weak)
+                    textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default_Weak)
                 } else {
-                    textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
-                    textViewSubheader.setTextAppearance(R.style.Text_Default)
-                    textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
+                    textViewHeader.setTextAppearance(itemView.context, R.style.Text_DefaultSmall)
+                    textViewSubheader.setTextAppearance(itemView.context, R.style.Text_Default)
+                    textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default)
                 }
 
                 if (event.status != null) {

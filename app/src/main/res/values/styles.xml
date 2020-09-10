@@ -58,6 +58,14 @@
         <item name="android:textColor">@color/text_weak</item>
     </style>
 
+    <style name="Text.DefaultSmall.Strong">
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Text.DefaultSmall.Strong.Inverted">
+        <item name="android:textColor">@color/text_inverted</item>
+    </style>
+
     <style name="Text.Caption">
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif</item>

@@ -48,7 +48,7 @@
                 android:id="@+id/toolbar_content"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:divider="@drawable/toolbar_divider"
+                android:divider="@drawable/divider_toolbar"
                 android:gravity="center_vertical|end"
                 android:orientation="horizontal"
                 android:paddingEnd="@dimen/spacing_element"

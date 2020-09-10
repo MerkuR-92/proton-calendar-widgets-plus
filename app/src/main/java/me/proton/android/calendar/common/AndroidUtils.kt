@@ -231,7 +231,7 @@ class AndroidUtils(context: Context) {
                             ?.mapIndexedNotNull { index, byDay ->
 
                                 val dayOfWeekAsWord =
-                                    context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal]
+                                    context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal] // TODO use date formatters
 
                                 if (recurrence.bySetPos.isNotEmpty()) {
                                     val setPos = recurrence.bySetPos[index]
@@ -291,7 +291,7 @@ class AndroidUtils(context: Context) {
                                     R.string.event_recurrence_occurs_on_day_of_week,
                                     repeat,
                                     if (onDaysOfWeek.isNullOrBlank()) context.resources.getStringArray(
-                                        R.array.days_of_week
+                                        R.array.days_of_week // TODO use date formatters
                                     )[dayOfWeekJavaTimeOrdinal] else onDaysOfWeek
                                 )
                             }
@@ -772,6 +772,13 @@ fun LocalDate.formatMonth(): String {
     return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
 }
 
+fun LocalDate.formatDayOfWeek(short: Boolean = false): String {
+    return this.dayOfWeek.getDisplayName(
+        if (short) TextStyle.SHORT_STANDALONE else TextStyle.FULL_STANDALONE,
+        Locale.getDefault()
+    )
+}
+
 /**
  * Returns "first Monday", "second Friday" etc.
  *
@@ -817,3 +824,8 @@ fun Context.getText(@StringRes id: Int, vararg args: Any?): CharSequence {
     val text = String.format(getString(id), *args)
     return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
+
+fun <T> concatenate(vararg lists: List<T>): List<T> {
+    return listOf(*lists).flatten()
+}
+

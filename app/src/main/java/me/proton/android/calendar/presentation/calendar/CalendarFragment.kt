@@ -6,11 +6,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
@@ -34,6 +31,7 @@ class CalendarFragment : BaseDialogFragment() {
     private val calendarViewModel: CalendarViewModel by inject()
 
     private val initialToday = LocalDate.now()
+    private lateinit var miniCalendarAdapter: MiniCalendarAdapter
     private lateinit var agendaAdapter: CalendarAgendaAdapter
 
     private lateinit var toolbarTitle: TextView
@@ -56,7 +54,7 @@ class CalendarFragment : BaseDialogFragment() {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
             setOnClickListener {
                 // each item in the adapter is one day
-                val currentDate = initialToday.plusDays((pager.currentItem - agendaAdapter.startingPosition).toLong())
+                val currentDate = initialToday.plusDays((agendaPager.currentItem - agendaAdapter.startingPosition).toLong())
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime()))
             }
         }
@@ -66,7 +64,7 @@ class CalendarFragment : BaseDialogFragment() {
 //            (this as ImageButton).setColorFilter(0) // this image is not one color, so we remove default tinting
             setOnClickListener {
                 val todayOffset = ChronoUnit.DAYS.between(initialToday, LocalDate.now()).toInt()
-                pager.setCurrentItem(agendaAdapter.startingPosition + todayOffset, true)
+                agendaPager.setCurrentItem(agendaAdapter.startingPosition + todayOffset, true)
             }
         }
 
@@ -111,48 +109,48 @@ class CalendarFragment : BaseDialogFragment() {
 //        setHasOptionsMenu(true)
     }
 
-    private inner class CalendarAgendaAdapter(activity: FragmentActivity, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
-
-        val startingPosition = itemCount / 2
-
-        override fun getItemCount(): Int {
-            return Int.MAX_VALUE
-        }
-
-        override fun createFragment(position: Int): Fragment {
-            return ItemCalendarAgendaFragment(calendarViewModel, position, startingDate.plusDays((position - startingPosition).toLong()))
-        }
-
-    }
-
-    var pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+    val miniCalendarPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             setToolbarTitle(position)
         }
     }
 
+    val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            //setToolbarTitle(position)
+        }
+    }
+
     private fun setToolbarTitle(position: Int) {
-        toolbarTitle.text = agendaAdapter.startingDate.plusDays((position - agendaAdapter.startingPosition).toLong()).formatMonth()
+        // TODO more pretty and reactive value from adapter
+        toolbarTitle.text = miniCalendarAdapter.startingDate.plusMonths((position - miniCalendarAdapter.startingPosition).toLong()).formatMonth()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        pager.unregisterOnPageChangeCallback(pageChangeCallback)
+        agendaPager.unregisterOnPageChangeCallback(agendaPageChangeCallback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        agendaAdapter = CalendarAgendaAdapter(requireActivity(), initialToday)
+        miniCalendarAdapter = MiniCalendarAdapter(requireActivity(), calendarViewModel, initialToday)
+        miniCalendarPager.apply{
+            adapter = miniCalendarAdapter
+            offscreenPageLimit = 1
+            setCurrentItem(miniCalendarAdapter.startingPosition, false)
+            setToolbarTitle(miniCalendarAdapter.startingPosition)
+        }
+        miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
 
-        pager.apply{
+        agendaAdapter = CalendarAgendaAdapter(requireActivity(), calendarViewModel, initialToday)
+        agendaPager.apply{
             adapter = agendaAdapter
             offscreenPageLimit = 3 // TODO
             setCurrentItem(agendaAdapter.startingPosition, false)
             setToolbarTitle(agendaAdapter.startingPosition)
         }
-
-        pager.registerOnPageChangeCallback(pageChangeCallback)
+        agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
 
         lifecycleScope.launch {
             calendarViewModel.fetchingState.collect {
@@ -180,42 +178,6 @@ class CalendarFragment : BaseDialogFragment() {
                 }
             }
         }
-
-
-        /*recyclerView.apply {
-            //            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(this@CalendarFragment.context)
-            adapter = EventAdapter {
-                TimberLogger.d("event clicked: $it")
-
-                findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id))
-
-                //findNavController().navigate(CalendarFragmentDirections.actionNavCalendarToNavEventDetails()) // TODO use deeplinking?
-
-        //                val modalBottomSheet = EventDetailsFragment()
-                // TODO pass arguments with userId and eventId
-        //                modalBottomSheet.show(parentFragmentManager, "TODO TAG")
-
-                // com.google.android.material.R.id.design_bottom_sheet
-
-
-            }
-            recyclerView.addItemDecoration(
-                DividerItemDecoration(
-                    this@CalendarFragment.context,
-                    LinearLayoutManager.VERTICAL
-                )
-            )
-
-//        view.findViewById<TextView>(R.id.textview_home_second).text =
-//                getString(R.string.hello_home_second, args.myArg)
-//
-//        view.findViewById<Button>(R.id.button_home_second).setOnClickListener {
-//            findNavController().navigate(R.id.action_HomeSecondFragment_to_HomeFragment)
-        }*/
-
-//        viewModel = ViewModelProvider(this, CalendarViewModel.ViewModelFactory(// TODO fix this!!!!
-//            FakeCalendarRepositoryRepository(activity?.applicationContext!!), activity?.application!!)).get(CalendarViewModel::class.java)
 
 
     }
