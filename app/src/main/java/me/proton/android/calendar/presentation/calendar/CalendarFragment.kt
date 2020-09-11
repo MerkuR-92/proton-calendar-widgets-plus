@@ -15,6 +15,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_calendar.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
+import kotlinx.android.synthetic.main.pager_mini_calendar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -126,6 +127,8 @@ class CalendarFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, appbar, false))
+
         miniCalendarAdapter = MiniCalendarAdapter(requireActivity(), calendarViewModel, initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
             adapter = miniCalendarAdapter
@@ -134,7 +137,9 @@ class CalendarFragment : BaseDialogFragment() {
         }
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
 
-        handleMiniCalendarPageSelected(miniCalendarAdapter.startingPosition)
+        miniCalendarPager.postDelayed({
+            handleMiniCalendarPageSelected(miniCalendarAdapter.startingPosition)
+        }, 1000)
 
         agendaAdapter = CalendarAgendaAdapter(requireActivity(), calendarViewModel, initialToday)
         agendaPager.apply{
@@ -170,7 +175,6 @@ class CalendarFragment : BaseDialogFragment() {
                 }
             }
         }
-
 
     }
 

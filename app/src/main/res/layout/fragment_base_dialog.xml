@@ -66,8 +66,6 @@
             </FrameLayout>
 
         </androidx.appcompat.widget.Toolbar>
-
-
         </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
