@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.time.LocalDate
 
+// TODO maybe remove "Calendar" from the name
 class CalendarAgendaAdapter(activity: FragmentActivity, private val calendarViewModel: CalendarViewModel, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
