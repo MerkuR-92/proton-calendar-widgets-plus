@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,8 @@ import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 class MiniCalendarItemAdapter(
     private val timeZoneId: String, // TODO MOVE TO INITIALISE
@@ -178,6 +181,29 @@ class MiniCalendarItemAdapter(
         override fun areContentsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {
             return oldItem.equals(newItem)
         }
+    }
+
+    companion object {
+
+        /**
+         * No need to measure the adapter view, we can calculate the height because item dimensions
+         * are constant.
+         */
+        fun calculateAdapterHeight(context: Context, firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {
+
+            val firstDayOfTheWeekNumber = firstDayOfMonth.dayOfWeek.value - startWeekOn.value
+            val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+
+            val dayCellsToShow = firstDayOfTheWeekOffset + firstDayOfMonth.month.length(firstDayOfMonth.isLeapYear)
+
+            val fullWeeksInMonth = ceil(dayCellsToShow / DAYS_IN_A_WEEK.toDouble()).toInt()
+
+            return context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
+                    fullWeeksInMonth * context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) +
+                    fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing)
+
+        }
+
     }
 
 }

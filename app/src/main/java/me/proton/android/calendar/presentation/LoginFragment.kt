@@ -88,6 +88,7 @@ class LoginFragment : Fragment() {
 
                                     val timeZoneId = calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!
 
+                                    // TODO this method never returns!!!
                                     calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId)
 
                                 }

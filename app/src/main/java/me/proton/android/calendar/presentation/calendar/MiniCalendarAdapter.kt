@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.time.LocalDate
 
-class MiniCalendarAdapter(activity: FragmentActivity, private val calendarViewModel: CalendarViewModel, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
+class MiniCalendarAdapter(activity: FragmentActivity, private val calendarViewModel: CalendarViewModel, val firstDayOfMonth: LocalDate) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
 
@@ -17,7 +17,7 @@ class MiniCalendarAdapter(activity: FragmentActivity, private val calendarViewMo
         return ItemMiniCalendarFragment(
             calendarViewModel,
             position,
-            startingDate.withDayOfMonth(1).plusMonths((position - startingPosition).toLong())
+            firstDayOfMonth.plusMonths((position - startingPosition).toLong())
         )
     }
 }

@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_calendar.*
+import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -29,6 +30,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.time.LocalDate
@@ -37,7 +39,7 @@ import java.util.*
 
 class RootFragment : BaseDialogFragment(), KoinComponent {
 
-    private val calendarViewModel: CalendarViewModel by inject()
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val valueStoreProvider: ValueStoreProvider by inject()
     private val mainViewModel: MainViewModel by viewModel()
 
@@ -53,12 +55,24 @@ class RootFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
-        if (userId != null) {
-            findNavController().navigate(Navigation.Deeplink.toCalendar())
+        // initialization routine
+        lifecycleScope.launch(Dispatchers.Default) {
+
+            calendarViewModel.init(this)
+
+            val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
+                if (userId != null) {
+                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                } else {
+
+                    withContext(Dispatchers.Main) {
+                        text_home.text = "PLEASE LOGIN"
+                    }
+
+                }
+
+
         }
-
-
     }
 
 }

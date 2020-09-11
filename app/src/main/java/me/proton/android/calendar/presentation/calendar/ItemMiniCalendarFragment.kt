@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -44,7 +45,7 @@ class ItemMiniCalendarFragment(
         TimberLogger.d("mini calendar onViewCreated: $date")
 
         rv_mini_calendar.apply {
-            setHasFixedSize(true) // TODO
+//            setHasFixedSize(true) // TODO
             layoutManager = GridLayoutManager(
                 this@ItemMiniCalendarFragment.context,
                 MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW /*TODO*/

@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -46,54 +47,36 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         return calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive }
     }
 
+    suspend fun init(coroutineScope: CoroutineScope) {
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+        if (TODOuserID != null) {
 
-    init {
-
-        viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-
-                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-                val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-                if (TODOuserID != null) {
-
-
-
-                    timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
-                    startWeekOn = if (calendarsRepository.selectUserSettings(TODOuserID)?.weekStart == 7) {
-                        DayOfWeek.SUNDAY
-                    } else {
-                        DayOfWeek.MONDAY
-                    }
-
-                    TestsLogger.d("viewmodel timeZoneId = ${timeZoneId}")
-
-                    //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
-
-                    // TODO get calendars that are selected from the sidebar
-                    val selectedCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
-
-                    calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId.id)
-
-                }
-
+            timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
+            startWeekOn = if (calendarsRepository.selectUserSettings(TODOuserID)?.weekStart == 7) {
+                DayOfWeek.SUNDAY
+            } else {
+                DayOfWeek.MONDAY
             }
+
+            TestsLogger.d("viewmodel timeZoneId = ${timeZoneId}")
+
+            //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
+
+
+
+
+            // TODO get calendars that are selected from the sidebar
+            val selectedCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
+
+
+            coroutineScope.async {
+                // TODO this method never returns
+                calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId.id)
+            }
+
+
         }
-
-
-
-//        viewModelScope.launch {
-//            calendarsRepository.persistCalendar(CalendarEntity("test_id", "test calendar from pojo", "", "ads", 1, 1))
-//        }
-        // we are launching a coroutine in UI scope because it affects the UI
-//        uiScope.launch {
-//            _calendars.value = withContext(Dispatchers.IO) {
-//
-//                calendarsRepository.selectCalendars()
-//            }
-//        }
-
-
-
     }
 
     suspend fun eventsFlow(date: LocalDate): Flow<List<Event>> {

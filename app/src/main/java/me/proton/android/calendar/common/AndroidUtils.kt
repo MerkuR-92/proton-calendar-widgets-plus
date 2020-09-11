@@ -1,5 +1,6 @@
 package me.proton.android.calendar.common
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -23,6 +24,7 @@ import biweekly.component.VAlarm
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import kotlinx.android.synthetic.main.fragment_calendar.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
@@ -695,6 +697,22 @@ fun View.visibleOrGone(visible: Boolean) {
 fun View.visibleOrInvisible(visible: Boolean) {
     this.visibility = if (visible) View.VISIBLE else View.INVISIBLE
 }
+
+fun View.animateHeightChange(toHeightPx: Int) {
+    if (this.measuredHeight != toHeightPx) {
+        val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
+        valueAnimator.duration = 500L
+        valueAnimator.addUpdateListener {
+            val animatedValue = valueAnimator.animatedValue as Int
+            val layoutParams = this.layoutParams.apply {
+                height = animatedValue
+            }
+            this.layoutParams = layoutParams
+        }
+        valueAnimator.start()
+    }
+}
+
 
 /**
  * Listens for changes in EditText, only propagates values within range or forces default when
