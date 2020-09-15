@@ -40,8 +40,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 14
-        versionName "0.5.0"
+        versionCode 15
+        versionName "0.6.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -94,7 +94,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.3.1'
 //    implementation 'androidx.appcompat:appcompat:1.1.0'
 //    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation "com.google.android.material:material:${rootProject.ext.version.material}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.version.constraint_layout}"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
     implementation "androidx.viewpager2:viewpager2:${rootProject.ext.version.viewpager2}"
@@ -149,10 +149,10 @@ dependencies {
     detektPlugins 'pm.algirdas.detekt:codeanalysis:0.3.3'
     detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
 
-    androidTestImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation "androidx.test:core:${rootProject.ext.version.androidx_test}"
+    androidTestImplementation "androidx.test:runner:${rootProject.ext.version.androidx_test}"
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.version.androidx_test}"
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     testImplementation 'com.willowtreeapps.assertk:assertk-jvm:0.21'
