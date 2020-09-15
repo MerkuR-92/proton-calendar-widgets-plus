@@ -160,7 +160,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         timeZoneId: String
     ) {
 
-        if (::selectedCalendarIds.isInitialized) {
+        if (::selectedCalendarIds.isInitialized) { // TODO
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
             // TODO add time buffer and some kind of debounce
             fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)

@@ -80,8 +80,10 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 
             lifecycleScope.launch(Dispatchers.Default) {
 
-                calendarViewModel.prefetchEvents(date, date, calendarViewModel.timeZoneId.id)
                 TimberLogger.d("requesting prefetch for date: $date timezone: ${calendarViewModel.timeZoneId.id}")
+                launch {
+                    calendarViewModel.prefetchEvents(date, date, calendarViewModel.timeZoneId.id)
+                }
 
                 calendarViewModel.eventsFlow(date).collect {
                     TimberLogger.d("observed events arrived in flow, item agenda fragment: ${it.size}")
