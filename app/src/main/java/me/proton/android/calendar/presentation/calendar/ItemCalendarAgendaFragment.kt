@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import biweekly.ICalendar
+import kotlinx.android.synthetic.main.fragment_calendar.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
@@ -78,6 +79,9 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 
 
 
+            list_view_status.visibleOrInvisible(true)
+            list_view_status.text = resources.getString(R.string.agenda_loading_events)
+
             lifecycleScope.launch(Dispatchers.Default) {
 
                 TimberLogger.d("requesting prefetch for date: $date timezone: ${calendarViewModel.timeZoneId.id}")
@@ -87,7 +91,14 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
 
                 calendarViewModel.eventsFlow(date).collect {
                     TimberLogger.d("observed events arrived in flow, item agenda fragment: ${it.size}")
+
                     withContext(Dispatchers.Main) {
+                        if (it.isEmpty()) {
+                            list_view_status.visibleOrInvisible(true)
+                            list_view_status.text = resources.getString(R.string.agenda_no_events)
+                        } else {
+                            list_view_status.visibleOrInvisible(false)
+                        }
                         (rv_agenda.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent).plus(it))
                     }
                 }

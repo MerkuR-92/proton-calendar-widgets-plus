@@ -17,4 +17,18 @@
         app:layout_constraintTop_toTopOf="parent"
         android:overScrollMode="never"/>
 
+    <TextView
+        android:id="@+id/list_view_status"
+        style="@style/Text.Default.Weak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/agenda_no_events"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

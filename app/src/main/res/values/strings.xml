@@ -20,6 +20,11 @@
     <string name="action_today">Today</string>
     <string name="action_create_event">Create event</string>
 
+    <!-- MONTH VIEW -->
+    <string name="agenda_no_events">No events</string>
+    <string name="agenda_loading_events">Loading events…</string>
+
+
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">All Day</string>
     <string name="event_time_period_spanning_single_day">%s \u2013 %s</string>
