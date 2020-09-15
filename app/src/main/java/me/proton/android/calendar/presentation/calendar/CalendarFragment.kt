@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_calendar.*
-import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.pager_mini_calendar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -26,15 +25,12 @@ import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 class CalendarFragment : BaseDialogFragment() {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
 
-    private val initialToday = LocalDate.now()
     private lateinit var miniCalendarAdapter: MiniCalendarAdapter
     private lateinit var agendaAdapter: CalendarAgendaAdapter
 
@@ -58,7 +54,7 @@ class CalendarFragment : BaseDialogFragment() {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
             setOnClickListener {
                 // each item in the adapter is one day
-                val currentDate = initialToday.plusDays((agendaPager.currentItem - agendaAdapter.startingPosition).toLong())
+                val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaAdapter.startingPosition).toLong())
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime()))
             }
         }
@@ -67,8 +63,8 @@ class CalendarFragment : BaseDialogFragment() {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
 //            (this as ImageButton).setColorFilter(0) // this image is not one color, so we remove default tinting
             setOnClickListener {
-                val todayOffset = ChronoUnit.DAYS.between(initialToday, LocalDate.now()).toInt()
-                agendaPager.setCurrentItem(agendaAdapter.startingPosition + todayOffset, true)
+                val todayDate = LocalDate.now(calendarViewModel.timeZoneId)
+                calendarViewModel.handleDaySelected(todayDate)
             }
         }
 
@@ -93,11 +89,17 @@ class CalendarFragment : BaseDialogFragment() {
     val miniCalendarPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            handleMiniCalendarPageSelected(position)
+
+            val firstDayOfMonth = miniCalendarAdapter.firstDayOfMonth.plusMonths((position - miniCalendarAdapter.startingPosition).toLong())
+            calendarViewModel.handleDaySelected(firstDayOfMonth)
+
+            toolbarTitle.text = firstDayOfMonth.formatMonth()
+
+            adjustMiniCalendarView(position)
         }
     }
 
-    private fun handleMiniCalendarPageSelected(position: Int) {
+    private fun adjustMiniCalendarView(position: Int) {
         // ViewPager will adjust its height to the largest item it contains and display empty space for
         //  smaller items, like months with fewer week lines. That's why we need to resize it every time we
         //  display a month.
@@ -109,13 +111,12 @@ class CalendarFragment : BaseDialogFragment() {
                 calendarViewModel.startWeekOn
             )
         )
-
-        toolbarTitle.text = firstDayOfMonth.formatMonth()
     }
 
     val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            //setToolbarTitle(position)
+            val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaAdapter.startingPosition).toLong())
+            calendarViewModel.handleDaySelected(currentDate)
         }
     }
 
@@ -129,7 +130,7 @@ class CalendarFragment : BaseDialogFragment() {
 
         appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, appbar, false))
 
-        miniCalendarAdapter = MiniCalendarAdapter(requireActivity(), calendarViewModel, initialToday.withDayOfMonth(1))
+        miniCalendarAdapter = MiniCalendarAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
             adapter = miniCalendarAdapter
             offscreenPageLimit = 1
@@ -138,16 +139,20 @@ class CalendarFragment : BaseDialogFragment() {
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
 
         miniCalendarPager.postDelayed({
-            handleMiniCalendarPageSelected(miniCalendarAdapter.startingPosition)
+            adjustMiniCalendarView(miniCalendarAdapter.startingPosition)
         }, 1000)
 
-        agendaAdapter = CalendarAgendaAdapter(requireActivity(), calendarViewModel, initialToday)
+        agendaAdapter = CalendarAgendaAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
         agendaPager.apply{
             adapter = agendaAdapter
-            offscreenPageLimit = 3 // TODO
+            offscreenPageLimit = 1
             setCurrentItem(agendaAdapter.startingPosition, false)
         }
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
+
+        calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
+        calendarViewModel.handleDaySelected(calendarViewModel.initialToday)
+
 
         lifecycleScope.launch {
             calendarViewModel.fetchingState.collect {

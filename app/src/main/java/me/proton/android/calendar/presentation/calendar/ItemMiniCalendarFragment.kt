@@ -1,15 +1,11 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.content.Context
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
@@ -24,7 +20,6 @@ class ItemMiniCalendarFragment(
 ) : Fragment(), KoinComponent {
 
 //    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
-
 
 
     override fun onCreateView(
@@ -55,10 +50,16 @@ class ItemMiniCalendarFragment(
                 date,
                 calendarViewModel.startWeekOn
             ) {
-                TimberLogger.d("calendar adapter clicked on: ${it}")
+                calendarViewModel.handleDaySelected(it)
             }
 
-            (rv_mini_calendar.adapter as? MiniCalendarItemAdapter)?.initialise()
+//            calendarViewModel.handleMiniCalendarDaySelected(calendarViewModel.selectedDate ?: date)
+
+            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise()
+        }
+
+        calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
+            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).markDayAsSelected(it)
         }
 
         try {

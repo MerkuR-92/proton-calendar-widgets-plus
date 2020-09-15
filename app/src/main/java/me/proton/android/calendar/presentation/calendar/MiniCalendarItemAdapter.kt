@@ -20,7 +20,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 class MiniCalendarItemAdapter(
     private val timeZoneId: String, // TODO MOVE TO INITIALISE
@@ -34,8 +33,6 @@ class MiniCalendarItemAdapter(
         const val WEEKDAYS_TO_SHOW = 7 // window might be narrower than 7, TODO
         //val FIRST_WEEKDAY = DayOfWeek.MONDAY
     }
-
-    private val selectedDate: LocalDate? = null
 
     fun initialise() {
 
@@ -52,7 +49,7 @@ class MiniCalendarItemAdapter(
         }
 
         val dayItems = (0 until firstDayOfTheMonth.month.length(firstDayOfTheMonth.isLeapYear)).map {
-            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), it % 2 == 0, listOf("#000000", "#E6984C"))
+            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), false, emptyList()/*listOf("#000000", "#E6984C")*/)
         }
 
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
@@ -105,25 +102,34 @@ class MiniCalendarItemAdapter(
                     }
                 }
 
-                itemView.setOnClickListener { if (item != null) clickListener?.invoke(item.date) }
+                itemView.setOnClickListener {
+
+                    if (item != null) {
+                        clickListener?.invoke(item.date)
+                    }
+                }
             }
         }
 
     }
 
+    fun markDayAsSelected(date: LocalDate) {
 
+        TimberLogger.d("handleMiniCalendarDayPicked markday as selected $date")
 
-    fun markAsSelected(date: LocalDate) {
+        val mutableList = currentList.toMutableList()
 
-//        if (selectedDate != null) {
-            val currentIndex = currentList.indexOfFirst { it.date == selectedDate }
-            notifyItemChanged(currentIndex)
+        // select last index, because header items contain valid date for first days of the month
+        val currentIndex = currentList.indexOfLast { it?.isSelected == true }
+        if (currentIndex != -1) {
+            mutableList[currentIndex] = mutableList[currentIndex].copy(isSelected = false)
+        }
+        val indexToSelect = currentList.indexOfLast { it?.date == date }
+        if (indexToSelect != -1) {
+            mutableList[indexToSelect] = mutableList[indexToSelect].copy(isSelected = true)
+        }
 
-//        }
-
-
-
-
+        submitList(mutableList)
     }
 
     private val ITEM_TYPE_HEADER = 0
@@ -166,9 +172,10 @@ class MiniCalendarItemAdapter(
         when (holder) {
             is MiniCalendarViewHolder.HeaderViewHolder -> holder.bind(getItem(position).date)
             is MiniCalendarViewHolder.DayViewHolder -> holder.bind(
-                getItem(position),
-                clickListener
-            )
+                getItem(position)
+            ) {
+                clickListener?.invoke(it)
+            }
         }
 
     }

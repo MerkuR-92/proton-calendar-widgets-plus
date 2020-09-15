@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation.calendar
 
 import androidx.lifecycle.*
+import androidx.viewpager2.widget.ViewPager2
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -16,7 +17,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
+import java.time.temporal.ChronoUnit
 
 class CalendarViewModel(private val calendarsRepository: CalendarsRepository, private val deleteEventUseCase: DeleteEventUseCase, private val createEventUseCase: EditCreateEventUseCase, private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
 
@@ -33,6 +34,12 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     lateinit var timeZoneId: ZoneId //ZoneId.of(TimeZone.getDefault().id) // TODO get timezone from settings OR fallback to default
     lateinit var startWeekOn: DayOfWeek
+
+    val initialToday = LocalDate.now()
+
+    private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
+    val selectedDate: LiveData<LocalDate> = _selectedDate
+
 
     val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
@@ -78,6 +85,40 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
         }
     }
+
+    private lateinit var miniCalendarPager: ViewPager2
+    private lateinit var agendaPager: ViewPager2
+
+    fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2) {
+        this.miniCalendarPager = miniCalendarPager
+        this.agendaPager = agendaPager
+    }
+
+    fun handleDaySelected(date: LocalDate) {
+
+        _selectedDate.postValue(date)
+
+        // adjust Mini Calendar
+        val monthsOffset = ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
+        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarAdapter).startingPosition + monthsOffset
+        if (miniCalendarPager.currentItem != miniCalendarIndex) {
+            // smooth-scroll only when switching between adjacent months
+            miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
+        }
+
+        // adjust Agenda
+        val agendaAdapter = (agendaPager.adapter as? CalendarAgendaAdapter)
+        if (agendaAdapter != null) {
+            val selectedDayOffset = ChronoUnit.DAYS.between(agendaAdapter.startingDate, date).toInt()
+            val agendaIndex = agendaAdapter.startingPosition + selectedDayOffset
+
+            if (agendaPager.currentItem != agendaIndex) {
+                agendaPager.setCurrentItem(agendaIndex, false)
+            }
+        }
+
+    }
+
 
     suspend fun eventsFlow(date: LocalDate): Flow<List<Event>> {
 
