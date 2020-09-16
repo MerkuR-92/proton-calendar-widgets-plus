@@ -38,35 +38,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/shape_calendar_circle_small"
-            android:tint="#E6984C"
+            app:tint="#E6984C"
             />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/shape_calendar_circle_small"
-            android:tint="#C3D261"
+            app:tint="#C3D261"
             />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/shape_calendar_circle_small"
-            android:tint="#69A9D1"
+            app:tint="#69A9D1"
             />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/shape_calendar_circle_small"
-            android:tint="#72BB75"
+            app:tint="#72BB75"
             />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/shape_calendar_circle_small"
-            android:tint="#CF5858"
+            app:tint="#CF5858"
             />
 
     </LinearLayout>

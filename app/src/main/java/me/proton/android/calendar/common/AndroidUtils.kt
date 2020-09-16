@@ -791,10 +791,8 @@ fun LocalDate.formatMonth(): String {
 }
 
 fun LocalDate.formatDayOfWeek(short: Boolean = false): String {
-    return this.dayOfWeek.getDisplayName(
-        if (short) TextStyle.SHORT_STANDALONE else TextStyle.FULL_STANDALONE,
-        Locale.getDefault()
-    )
+    val dateFormat = SimpleDateFormat(if (short) "E" else "EEEE", Locale.getDefault())
+    return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
 }
 
 /**

@@ -137,7 +137,9 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         TimberLogger.d("createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
         return events.map {
-            TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate} in $timeZoneId")
+
+            TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
+
             val filtered = it.filter {
                     it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
             }.groupBy { it.isAllDay() || !it.spansSingleDay() }

@@ -118,11 +118,14 @@ class EventAdapter(
 
 //                TODO if event is unanswered, add tiled backgrounds
 
-                // TODO ADD MULTI-DAY INDICATORS
-
                 if (!event.isAllDay() && !event.spansSingleDay()) {
-                    textViewHeader.visibleOrGone(true)
-                    textViewHeader.text = "${(event.getActualStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
+                    val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
+                    if (fullDayCounter.first == 1) { // this is the first day of an ongoing event
+                        textViewHeader.visibleOrGone(true)
+                        textViewHeader.text = "${(event.getActualStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
+                    } else { // this is second or later day of an ongoing event
+                        textViewHeader.visibleOrGone(false)
+                    }
                 } else {
                     textViewHeader.visibleOrGone(false)
                 }

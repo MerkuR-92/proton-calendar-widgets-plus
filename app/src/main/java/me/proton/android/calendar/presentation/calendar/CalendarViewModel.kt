@@ -9,10 +9,8 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.common.TestsLogger
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -39,6 +37,9 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
+
+    private val _calendarIndicators: MutableLiveData<LocalDate> = MutableLiveData()
+    val calendarIndicators: LiveData<LocalDate> = _calendarIndicators
 
 
     val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
@@ -77,7 +78,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
             val selectedCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
 
 
-            coroutineScope.async {
+            coroutineScope.launch {
                 // TODO this method never returns
                 calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId.id)
             }
@@ -100,14 +101,14 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
         // adjust Mini Calendar
         val monthsOffset = ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
-        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarAdapter).startingPosition + monthsOffset
+        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + monthsOffset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
             miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
         }
 
         // adjust Agenda
-        val agendaAdapter = (agendaPager.adapter as? CalendarAgendaAdapter)
+        val agendaAdapter = (agendaPager.adapter as? AgendaPagerAdapter)
         if (agendaAdapter != null) {
             val selectedDayOffset = ChronoUnit.DAYS.between(agendaAdapter.startingDate, date).toInt()
             val agendaIndex = agendaAdapter.startingPosition + selectedDayOffset
@@ -127,16 +128,6 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
             val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
             val TODOuserID = TODOvalueStore.getString("USERID") // TODO
             return if (TODOuserID != null) {
-                val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
-
-                val selectedCalendarIds = listOf<String>(
-                    //"EbnnK81_v-QVK1qxxV4xT1O3amvVcnD4pvW3mRuHnj1591KY3oFwQILTptr1_ZiWx_WKmBQhZXp9fWux83dM5w==",
-                    defaultCalendar!!) // TODO
-
-//            calendarsRepository.eventsFlow(selectedCalendarIds, date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
-//        emit(.first())
-
-//                timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
 
                 calendarsRepository.eventsFlow(date, date, timeZoneId.id)
             } else flowOf<List<Event>>()
@@ -145,6 +136,10 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 //        return calendarsRepository.eventsFlow(listOf("jnPU5bvPhktDV035mLlDyXjp6lUvBtVKEnnp--S8AWhZqvfFKNd7TkvFMtMcPZSs0lDpH2IqUthEfF8uHrncZg=="), date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
 
 
+    }
+
+    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>> {
+        return liveData<List<Event>> { emit(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).first()) }
     }
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState

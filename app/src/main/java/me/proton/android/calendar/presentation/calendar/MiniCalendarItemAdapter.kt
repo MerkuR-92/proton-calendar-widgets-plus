@@ -48,8 +48,8 @@ class MiniCalendarItemAdapter(
             null
         }
 
-        val dayItems = (0 until firstDayOfTheMonth.month.length(firstDayOfTheMonth.isLeapYear)).map {
-            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), false, emptyList()/*listOf("#000000", "#E6984C")*/)
+        val dayItems = (0 until firstDayOfTheMonth.lengthOfMonth()).map {
+            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), false, emptyList())
         }
 
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
@@ -132,6 +132,19 @@ class MiniCalendarItemAdapter(
         submitList(mutableList)
     }
 
+    fun submitCalendarIndicators(indicators: Map<Int, List<String>>) {
+
+        val mutableList = currentList.toMutableList()
+
+        mutableList.forEachIndexed { index, miniCalendarItem ->
+            if (miniCalendarItem != null) {
+                mutableList[index] = miniCalendarItem.copy(indicatorColors = indicators.getOrDefault(miniCalendarItem.date.dayOfMonth, emptyList()))
+            }
+        }
+
+        submitList(mutableList)
+    }
+
     private val ITEM_TYPE_HEADER = 0
     private val ITEM_TYPE_DAY = 1
 
@@ -201,7 +214,7 @@ class MiniCalendarItemAdapter(
             val firstDayOfTheWeekNumber = firstDayOfMonth.dayOfWeek.value - startWeekOn.value
             val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
 
-            val dayCellsToShow = firstDayOfTheWeekOffset + firstDayOfMonth.month.length(firstDayOfMonth.isLeapYear)
+            val dayCellsToShow = firstDayOfTheWeekOffset + firstDayOfMonth.lengthOfMonth()
 
             val fullWeeksInMonth = ceil(dayCellsToShow / DAYS_IN_A_WEEK.toDouble()).toInt()
 

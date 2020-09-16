@@ -101,14 +101,30 @@ data class Event(
         return (this.status != null) && (this.status as Status).isCancelled
     }
 
+    /**
+     * For given LocalDate and TimeZoneId, returns
+     * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
+     */
+    fun calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> {
+
+        return if (spansSingleDay()) {
+            Pair(1, 1)
+        } else {
+
+            val todayOffset = ChronoUnit.DAYS.between(getActualStart(timeZoneId)!!.toLocalDate(), date).toInt() + 1
+            val durationInDays = ChronoUnit.DAYS.between(getActualStart(timeZoneId)!!.toLocalDate(), getActualEnd(timeZoneId)!!.toLocalDate()).toInt() + (if (this.isAllDay()) 0 else 1)
+
+            Pair(todayOffset, durationInDays)
+        }
+    }
+
     fun formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
 
         if (spansSingleDay()) return null
 
-        val todayOffset = ChronoUnit.DAYS.between(getActualStart(timeZoneId)!!.toLocalDate(), date).toInt() + 1
-        val durationInDays = ChronoUnit.DAYS.between(getActualStart(timeZoneId)!!.toLocalDate(), getActualEnd(timeZoneId)!!.toLocalDate()).toInt() + (if (this.isAllDay()) 0 else 1)
+        val fullDayCounter = this.calculateFullDayCounter(date, timeZoneId)
 
-        return "(${todayOffset}/${durationInDays})"
+        return "(${fullDayCounter.first}/${fullDayCounter.second})"
     }
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)

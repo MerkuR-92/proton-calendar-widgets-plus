@@ -72,8 +72,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     )))
             }
         }
-        val buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_navigation, toolbar_content, false)
+        val buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonMenu) {
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_three_dots_vertical))
             setOnClickListener {
                 AndroidUtils.displayPopupMenu(
                     view = it,
@@ -88,12 +89,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
             addView(
-                buttonMenu, resources.getDimensionPixelSize(
+                buttonEdit, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
             addView(
-                buttonEdit, resources.getDimensionPixelSize(
+                buttonMenu, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )

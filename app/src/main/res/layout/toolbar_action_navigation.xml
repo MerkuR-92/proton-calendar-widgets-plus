@@ -11,7 +11,7 @@
     android:layout_gravity="center"
     android:background="@drawable/ripple_action_navigation_oval"
     android:tint="@color/icon_norm"
-    app:srcCompat="@drawable/ic_three_dots_vertical_nav"
+    app:srcCompat="@drawable/ic_three_dots_vertical"
     android:clickable="false"
     android:focusable="false"
     />

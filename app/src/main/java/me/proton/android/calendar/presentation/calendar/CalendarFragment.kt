@@ -31,8 +31,8 @@ class CalendarFragment : BaseDialogFragment() {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
 
-    private lateinit var miniCalendarAdapter: MiniCalendarAdapter
-    private lateinit var agendaAdapter: CalendarAgendaAdapter
+    private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
+    private lateinit var agendaPagerAdapter: AgendaPagerAdapter
 
     private lateinit var toolbarTitle: TextView
 
@@ -54,7 +54,7 @@ class CalendarFragment : BaseDialogFragment() {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
             setOnClickListener {
                 // each item in the adapter is one day
-                val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaAdapter.startingPosition).toLong())
+                val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime()))
             }
         }
@@ -90,7 +90,7 @@ class CalendarFragment : BaseDialogFragment() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
 
-            val firstDayOfMonth = miniCalendarAdapter.firstDayOfMonth.plusMonths((position - miniCalendarAdapter.startingPosition).toLong())
+            val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
             calendarViewModel.handleDaySelected(firstDayOfMonth)
 
             toolbarTitle.text = firstDayOfMonth.formatMonth()
@@ -103,7 +103,7 @@ class CalendarFragment : BaseDialogFragment() {
         // ViewPager will adjust its height to the largest item it contains and display empty space for
         //  smaller items, like months with fewer week lines. That's why we need to resize it every time we
         //  display a month.
-        val firstDayOfMonth = miniCalendarAdapter.firstDayOfMonth.plusMonths((position - miniCalendarAdapter.startingPosition).toLong())
+        val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
         miniCalendarPager.animateHeightChange(
             MiniCalendarItemAdapter.calculateAdapterHeight(
                 requireContext(),
@@ -115,7 +115,7 @@ class CalendarFragment : BaseDialogFragment() {
 
     val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaAdapter.startingPosition).toLong())
+            val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
             calendarViewModel.handleDaySelected(currentDate)
         }
     }
@@ -130,23 +130,23 @@ class CalendarFragment : BaseDialogFragment() {
 
         appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, appbar, false))
 
-        miniCalendarAdapter = MiniCalendarAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday.withDayOfMonth(1))
+        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
-            adapter = miniCalendarAdapter
+            adapter = miniCalendarPagerAdapter
             offscreenPageLimit = 1
-            setCurrentItem(miniCalendarAdapter.startingPosition, false)
+            setCurrentItem(miniCalendarPagerAdapter.startingPosition, false)
         }
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
 
         miniCalendarPager.postDelayed({
-            adjustMiniCalendarView(miniCalendarAdapter.startingPosition)
+            adjustMiniCalendarView(miniCalendarPagerAdapter.startingPosition)
         }, 1000)
 
-        agendaAdapter = CalendarAgendaAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
+        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
         agendaPager.apply{
-            adapter = agendaAdapter
+            adapter = agendaPagerAdapter
             offscreenPageLimit = 1
-            setCurrentItem(agendaAdapter.startingPosition, false)
+            setCurrentItem(agendaPagerAdapter.startingPosition, false)
         }
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
 

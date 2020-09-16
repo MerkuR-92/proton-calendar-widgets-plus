@@ -11,6 +11,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
 import org.koin.core.KoinComponent
 import java.time.LocalDate
+import java.util.Map
 
 
 class ItemMiniCalendarFragment(
@@ -60,6 +61,20 @@ class ItemMiniCalendarFragment(
 
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
             (rv_mini_calendar.adapter as MiniCalendarItemAdapter).markDayAsSelected(it)
+        }
+
+        calendarViewModel.eventsLiveData(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth())).observe(viewLifecycleOwner) { events ->
+
+            // TODO get all days, not only start
+            val groupedByDay = events.groupBy { it.getActualStart(calendarViewModel.timeZoneId.id)?.toLocalDate()?.dayOfMonth ?: 0 }
+
+            // we show distinct calendars, not distinct colors
+            val indicators = groupedByDay.mapValues { mapEntry ->
+                mapEntry.value.distinctBy { it.calendar.id }.map { it.calendar.color }.sorted()
+            }
+
+            //(rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(indicators)
+
         }
 
         try {
