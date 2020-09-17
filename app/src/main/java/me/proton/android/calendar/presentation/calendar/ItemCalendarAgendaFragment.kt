@@ -8,15 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.ICalendar
-import kotlinx.android.synthetic.main.fragment_calendar.*
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.visibleOrInvisible
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -25,7 +27,11 @@ import org.koin.core.inject
 import java.time.LocalDate
 
 
-class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val position: Int, val date: LocalDate) : Fragment(), KoinComponent {
+class ItemCalendarAgendaFragment(
+    val calendarViewModel: CalendarViewModel,
+    val position: Int,
+    val date: LocalDate
+) : Fragment(), KoinComponent {
 
 //    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
 
@@ -54,7 +60,12 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             adapter = EventAdapter(calendarViewModel.timeZoneId.id, date) {
-                findNavController().navigate(Navigation.Deeplink.toEventDetails(it.id, it.occurrence?.occurrenceNumber ?: 0))
+                findNavController().navigate(
+                    Navigation.Deeplink.toEventDetails(
+                        it.id,
+                        it.occurrence?.occurrenceNumber ?: 0
+                    )
+                )
             }
 
             /*rv_agenda.addItemDecoration(
@@ -63,7 +74,7 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
                     LinearLayoutManager.VERTICAL
                 )
             )*/
-            (rv_agenda.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
+            (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
 
         try {
@@ -99,7 +110,11 @@ class ItemCalendarAgendaFragment(val calendarViewModel: CalendarViewModel, val p
                         } else {
                             list_view_status.visibleOrInvisible(false)
                         }
-                        (rv_agenda.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent).plus(it))
+                        (rv_agenda.adapter as? EventAdapter)?.submitList(
+                            listOf(fakeHeaderEvent).plus(
+                                it
+                            )
+                        )
                     }
                 }
             }

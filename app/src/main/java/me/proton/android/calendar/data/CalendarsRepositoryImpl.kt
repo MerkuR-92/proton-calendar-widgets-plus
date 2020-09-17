@@ -32,12 +32,12 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
     override suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String) {
         selectedCalendarIds = calendarIds
-        logger.d("CalendarsRepository init()")
+        logger.v("zzz CalendarsRepository init()")
 
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-            logger.v("main events flow collect")
+            logger.v("zzz main events flow collect")
             val dbEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
 
             events.value = dbEvents.flatMap { event ->
@@ -134,11 +134,11 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
             }
         }
 
-        TimberLogger.d("createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
+        TimberLogger.v("zzz createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
         return events.map {
 
-            TimberLogger.d("flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
+            TimberLogger.v("zzz flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
 
             val filtered = it.filter {
                     it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)

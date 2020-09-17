@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -37,6 +38,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
     override val actionMenuResourceId = R.menu.fragment_event_create_edit
     override val navigateUp = false
+
+    private val logger: Logger by inject()
 
     override fun onNavigationIconClicked(): Boolean {
 //        findNavController().navigate(Navigation.Deeplink.toCalendar())
@@ -166,7 +169,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 attachActionHandlers()
             } else {
                 // TODO display error and close? for example when we can't decrypt event
-                TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                logger.e((viewModeInitStatus as UseCase.Result.Error).message)
                 if (navigationArguments.eventId != null) { // TODO FIXME
                     Toast.makeText(requireContext(), "Error opening event for edit", Toast.LENGTH_LONG).show()
                 } else {

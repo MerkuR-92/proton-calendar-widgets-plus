@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar
 
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
+import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -16,6 +17,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+
+private const val MAX_CALENDAR_INDICATORS = 5
 
 class CalendarViewModel(private val calendarsRepository: CalendarsRepository, private val deleteEventUseCase: DeleteEventUseCase, private val createEventUseCase: EditCreateEventUseCase, private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
 
@@ -122,18 +125,38 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
 
     suspend fun eventsFlow(date: LocalDate): Flow<List<Event>> {
+        return eventsFlow(date, date)
+    }
 
-//        return liveData<List<Event>>(Dispatchers.IO) {
+    suspend fun eventsFlow(fromDate: LocalDate, toDate: LocalDate): Flow<List<Event>> {
 
-            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-            val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-            return if (TODOuserID != null) {
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+        return if (TODOuserID != null) {
 
-                calendarsRepository.eventsFlow(date, date, timeZoneId.id)
-            } else flowOf<List<Event>>()
-//        }
+            calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id)
+        } else flowOf<List<Event>>()
 
-//        return calendarsRepository.eventsFlow(listOf("jnPU5bvPhktDV035mLlDyXjp6lUvBtVKEnnp--S8AWhZqvfFKNd7TkvFMtMcPZSs0lDpH2IqUthEfF8uHrncZg=="), date, date, timeZoneId.id).asLiveData(Dispatchers.Default)
+    }
+
+    fun calculateCalendarIndicators(events: List<Event>): Map<Int, List<String>> {
+
+        val indicators = mutableMapOf<Int, MutableSet<String>>().withDefault { mutableSetOf() }
+
+        events.forEach { event ->
+            val firstDayOfEvent = event.getActualStart(timeZoneId.id)!!.toLocalDate()
+            val days = event.calculateFullDayCounter(firstDayOfEvent, timeZoneId.id)
+
+            for (i in 0 until days.second) {
+                val current = indicators.getValue(firstDayOfEvent.dayOfMonth + i)
+                current.add(event.calendar.color)
+                indicators.put(firstDayOfEvent.dayOfMonth + i, current)
+            }
+        }
+
+        return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
+
+
 
 
     }

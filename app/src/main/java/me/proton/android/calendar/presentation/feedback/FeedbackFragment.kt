@@ -12,9 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
 import kotlinx.android.synthetic.main.fragment_home_second.*
+import me.proton.android.calendar.domain.Logger
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class FeedbackFragment : Fragment() {
+
+    val logger: Logger by inject()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -27,7 +31,8 @@ class FeedbackFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        logger.i("Sentry info test exception", java.lang.Exception("blabla"))
+        logger.e("Sentry error test exception", java.lang.Exception("blabla"))
         throw Exception("Sentry test exception")
     }
 }

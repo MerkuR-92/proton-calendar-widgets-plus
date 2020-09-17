@@ -6,6 +6,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.*
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
@@ -13,7 +14,7 @@ import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ValueStoreProvider
-import kotlinx.android.synthetic.main.fragment_calendar.*
+import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.pager_mini_calendar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -27,7 +28,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
-class CalendarFragment : BaseDialogFragment() {
+class MonthFragment : BaseDialogFragment() {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
 
@@ -42,7 +43,7 @@ class CalendarFragment : BaseDialogFragment() {
     override val TAG: String
         get() = "CalendarFragment"
     override val layoutResourceId: Int
-        get() = R.layout.fragment_calendar
+        get() = R.layout.fragment_month
 
     override val isTopLevel = true
     override val isScrollable = false
@@ -100,6 +101,9 @@ class CalendarFragment : BaseDialogFragment() {
     }
 
     private fun adjustMiniCalendarView(position: Int) {
+
+        miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+
         // ViewPager will adjust its height to the largest item it contains and display empty space for
         //  smaller items, like months with fewer week lines. That's why we need to resize it every time we
         //  display a month.
@@ -110,7 +114,9 @@ class CalendarFragment : BaseDialogFragment() {
                 firstDayOfMonth,
                 calendarViewModel.startWeekOn
             )
-        )
+        ) {
+            miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+        }
     }
 
     val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -138,9 +144,7 @@ class CalendarFragment : BaseDialogFragment() {
         }
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
 
-        miniCalendarPager.postDelayed({
-            adjustMiniCalendarView(miniCalendarPagerAdapter.startingPosition)
-        }, 1000)
+        miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
 
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
         agendaPager.apply{
@@ -152,7 +156,7 @@ class CalendarFragment : BaseDialogFragment() {
 
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
         calendarViewModel.handleDaySelected(calendarViewModel.initialToday)
-
+        toolbarTitle.text = calendarViewModel.initialToday.formatMonth()
 
         lifecycleScope.launch {
             calendarViewModel.fetchingState.collect {
@@ -179,6 +183,41 @@ class CalendarFragment : BaseDialogFragment() {
                     }
                 }
             }
+        }
+
+    }
+
+    /**
+     * Forces Mini Calendar Pager to have desired size for currently selected month,
+     * independent from other months present in Pager.
+     */
+    val miniCalendarPagerLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+
+            TimberLogger.d("ppp measured height=${miniCalendarPager.height}")
+
+            val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((miniCalendarPager.currentItem - miniCalendarPagerAdapter.startingPosition).toLong())
+            val desiredHeight = MiniCalendarItemAdapter.calculateAdapterHeight(
+                requireContext(),
+                firstDayOfMonth,
+                calendarViewModel.startWeekOn
+            )
+
+            TimberLogger.d("ppp desiredHeight =${desiredHeight}")
+
+            if (miniCalendarPager.height != desiredHeight) {
+
+//                miniCalendarPager.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+
+                val layoutParams = miniCalendarPager.layoutParams.apply {
+                    height = desiredHeight
+                }
+                miniCalendarPager.layoutParams = layoutParams
+
+//                miniCalendarPager.getViewTreeObserver().addOnGlobalLayoutListener(this)
+
+            }
+
         }
 
     }

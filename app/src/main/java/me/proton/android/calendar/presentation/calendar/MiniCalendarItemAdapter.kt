@@ -18,6 +18,7 @@ import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Month
 import java.time.ZoneId
 import kotlin.math.ceil
 
@@ -132,15 +133,21 @@ class MiniCalendarItemAdapter(
         submitList(mutableList)
     }
 
-    fun submitCalendarIndicators(indicators: Map<Int, List<String>>) {
+    fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
+
+        TimberLogger.d("zzz submitCalendarIndicators for ${month}: $indicators")
 
         val mutableList = currentList.toMutableList()
 
         mutableList.forEachIndexed { index, miniCalendarItem ->
-            if (miniCalendarItem != null) {
+            if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == month) {
+                TimberLogger.d("zzz index for non-null item $index -> ${miniCalendarItem}")
+
                 mutableList[index] = miniCalendarItem.copy(indicatorColors = indicators.getOrDefault(miniCalendarItem.date.dayOfMonth, emptyList()))
             }
         }
+
+        TimberLogger.d("zzz submitCalendarIndicators output size ${mutableList.size}")
 
         submitList(mutableList)
     }
@@ -195,7 +202,7 @@ class MiniCalendarItemAdapter(
 
     private class DiffCallback : DiffUtil.ItemCallback<MiniCalendarItem>() {
         override fun areItemsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {
-            return oldItem.date == newItem.date
+            return oldItem.equals(newItem) // we are piggybacking weekday names with LocalDate so we can't compare only "date" properties
         }
 
         override fun areContentsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {

@@ -366,7 +366,11 @@ class EventViewModel(
                 // TODO FIXME isRecurring OR isInChain?????????
                 if (event.isRecurring() || event.isFromRecurring()) {
 
-                    if (dbEventWithOccurrenceStartDate == null) return false
+
+                    if (dbEventWithOccurrenceStartDate == null) {
+                        logger.e("dbEventWithOccurrenceStartDate == null")
+                        return false
+                    }
 
                     val eventToCreate = event.copy( // TODO move to helper method?
                         id = ICalUtils.generateOfflineEventId(),
@@ -398,12 +402,21 @@ class EventViewModel(
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
                 // TODO THIS NEEDS TO BE FIXED, WE PROBABLY CAN'T FIND EVENTS IN DB
-                if (dbEvent == null) return false
-                if (dbEventWithOccurrenceStartDate == null) return false
+                if (dbEvent == null) {
+                    logger.e("dbEvent == null")
+                    return false
+                }
+                if (dbEventWithOccurrenceStartDate == null) {
+                    logger.e("dbEventWithOccurrenceStartDate == null")
+                    return false
+                }
 
                 // delete single edits starting with just edited occurrence
                 val deleteSingleEditsResult = deleteEventUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
-                if (deleteSingleEditsResult != UseCase.Result.Success ) return false
+                if (deleteSingleEditsResult != UseCase.Result.Success ) {
+                    logger.e("deleteSingleEditsResult != UseCase.Result.Success")
+                    return false
+                }
 
                 // update original event:
                 // - change COUNT to ((current occurrence number) - 1)
@@ -421,9 +434,11 @@ class EventViewModel(
                     val editOriginalEventResult = editCreateEventUseCase.execute(TODOuserID, dbEventToUpdate.calendar.id, dbEventToUpdate)
                     if (editOriginalEventResult != UseCase.Result.Success ) {
                         if (editOriginalEventResult is UseCase.Result.Error) {
-                            TimberLogger.e("error editing event: ${editOriginalEventResult.message}")
+                            logger.i("error editing event: ${editOriginalEventResult.message}")
+                            logger.e("error editing event: ${editOriginalEventResult.message}")
                         } else if (editOriginalEventResult is UseCase.Result.Error) {
-                            TimberLogger.e("error editing event: ${editOriginalEventResult.message}")
+                            logger.i("error editing event: ${editOriginalEventResult.message}")
+                            logger.e("error editing event: ${editOriginalEventResult.message}")
                         }
                         return false
                     }
@@ -463,7 +478,10 @@ class EventViewModel(
 
                 // delete all single edits
                 val deleteSingleEditsResult = deleteEventUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
-                if (deleteSingleEditsResult != UseCase.Result.Success ) return false
+                if (deleteSingleEditsResult != UseCase.Result.Success ) {
+                    logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
+                    return false
+                }
 
                 // delete all single deletions
                 event.iCalEvent.exceptionDates.clear()
@@ -514,9 +532,11 @@ class EventViewModel(
         }.await()
 
         if (createEventResult is UseCase.Result.InvalidParams) {
+            logger.i("invalid params in create event: ${createEventResult.message}")
             logger.e("invalid params in create event: ${createEventResult.message}")
         }
         if (createEventResult is UseCase.Result.Error) {
+            logger.i("error in create event: ${createEventResult.message}")
             logger.e("error in create event: ${createEventResult.message}")
         }
 

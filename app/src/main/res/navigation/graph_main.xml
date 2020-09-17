@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/nav_calendar"
-        android:name="me.proton.android.calendar.presentation.calendar.CalendarFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.MonthFragment"
         android:label=""
-        tools:layout="@layout/fragment_calendar">
+        tools:layout="@layout/fragment_month">
         <action
             android:id="@+id/action_nav_calendar_to_nav_contacts"
             app:destination="@id/nav_contacts" />
@@ -30,7 +30,7 @@
             app:destination="@id/nav_login" />
         <deepLink
             android:id="@+id/deepLink4"
-            app:uri="proton-calendar://protonmail.com/calendar" />
+            app:uri="proton-calendar://protonmail.com/month" />
     </fragment>
 
     <fragment

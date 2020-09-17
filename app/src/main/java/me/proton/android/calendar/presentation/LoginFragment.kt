@@ -1,25 +1,18 @@
 package me.proton.android.calendar.presentation
 
 import android.os.Bundle
-import android.renderscript.Sampler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.LoginUserUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import kotlinx.android.synthetic.main.fragment_home_second.*
 import kotlinx.android.synthetic.main.fragment_login_todo.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,9 +23,7 @@ import me.proton.android.calendar.common.hideKeyboard
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.LocalDate
-import java.util.*
 
 // TODO PROTOTYPE, NUKE THIS
 class LoginFragment : Fragment() {
@@ -99,7 +90,7 @@ class LoginFragment : Fragment() {
 
                             requireActivity().hideKeyboard()
 
-                            findNavController().navigate(Navigation.Deeplink.toCalendar())
+                            findNavController().navigate(Navigation.Deeplink.toMonth())
                             //Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()
 
                         } else {

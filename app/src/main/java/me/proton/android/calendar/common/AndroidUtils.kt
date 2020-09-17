@@ -16,6 +16,7 @@ import android.widget.*
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatCheckedTextView
+import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
 import androidx.core.text.HtmlCompat
 import androidx.core.view.children
@@ -24,7 +25,6 @@ import biweekly.component.VAlarm
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
-import kotlinx.android.synthetic.main.fragment_calendar.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
@@ -698,7 +698,7 @@ fun View.visibleOrInvisible(visible: Boolean) {
     this.visibility = if (visible) View.VISIBLE else View.INVISIBLE
 }
 
-fun View.animateHeightChange(toHeightPx: Int) {
+fun View.animateHeightChange(toHeightPx: Int, onAnimationEnd: () -> Unit) {
     if (this.measuredHeight != toHeightPx) {
         val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
         valueAnimator.duration = 500L
@@ -710,6 +710,7 @@ fun View.animateHeightChange(toHeightPx: Int) {
             this.layoutParams = layoutParams
         }
         valueAnimator.start()
+        valueAnimator.doOnEnd { onAnimationEnd.invoke() }
     }
 }
 
