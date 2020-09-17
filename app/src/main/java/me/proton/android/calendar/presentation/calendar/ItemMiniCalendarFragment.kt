@@ -49,6 +49,8 @@ class ItemMiniCalendarFragment(
 
         TimberLogger.d("mini calendar onViewCreated: $date")
 
+        TimberLogger.d("viewmodel timeZoneId (itemminicalendarfragment) = ${calendarViewModel.timeZoneId.id}")
+
         rv_mini_calendar.apply {
 //            setHasFixedSize(true) // TODO
             layoutManager = GridLayoutManager(
@@ -75,8 +77,15 @@ class ItemMiniCalendarFragment(
 
         lifecycleScope.launch(Dispatchers.Default) {
 
+            val fromDate = date.withDayOfMonth(1)
+            val toDate = date.withDayOfMonth(date.lengthOfMonth())
 
-            calendarViewModel.eventsFlow(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth())).collect { events ->
+            TimberLogger.d("requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
+            launch {
+                calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
+            }
+
+            calendarViewModel.eventsFlow(fromDate, toDate).collect { events ->
 
                 TimberLogger.d("sss events in flow ${date.month}: ${events.size}")
 
@@ -84,7 +93,9 @@ class ItemMiniCalendarFragment(
                 TimberLogger.d("zzz observed events arrived in flow FOR MINI CALENDAR ${date.month}: ${events.size}")
 
                 val indicators = calendarViewModel.calculateCalendarIndicators(events)
-                (rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(date.month, indicators)
+                withContext(Dispatchers.Main) {
+                    (rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(date.month, indicators)
+                }
 
             }
         }

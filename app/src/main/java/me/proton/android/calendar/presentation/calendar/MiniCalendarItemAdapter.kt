@@ -42,7 +42,7 @@ class MiniCalendarItemAdapter(
         val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
 
         val headerItems = (0 until WEEKDAYS_TO_SHOW).map {
-            MiniCalendarItem(firstDayOfTheMonth.plusDays(-firstDayOfTheWeekOffset + it.toLong()), false, emptyList())
+            MiniCalendarItem(firstDayOfTheMonth.plusDays(-firstDayOfTheWeekOffset + it.toLong()), false,false, emptyList())
         }
 
         val dummyItems = (0 until firstDayOfTheWeekOffset).map {
@@ -50,7 +50,7 @@ class MiniCalendarItemAdapter(
         }
 
         val dayItems = (0 until firstDayOfTheMonth.lengthOfMonth()).map {
-            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), false, emptyList())
+            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), false, true, emptyList())
         }
 
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
@@ -202,7 +202,7 @@ class MiniCalendarItemAdapter(
 
     private class DiffCallback : DiffUtil.ItemCallback<MiniCalendarItem>() {
         override fun areItemsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {
-            return oldItem.equals(newItem) // we are piggybacking weekday names with LocalDate so we can't compare only "date" properties
+            return oldItem.date == newItem.date && oldItem.isDay == newItem.isDay //  oldItem.equals(newItem) // we are piggybacking weekday names with LocalDate so we can't compare only "date" properties
         }
 
         override fun areContentsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {

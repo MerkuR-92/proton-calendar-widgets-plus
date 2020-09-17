@@ -25,6 +25,10 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
     private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
 
     private val events = MutableStateFlow<List<Event>>(emptyList())
+    private var dbEvents = listOf<Event>()
+    private var occurrencesExpandedUntil: LocalDate? = null
+    private var prefetchedFrom: LocalDate? = null
+    private var prefetchedTo: LocalDate? = null
 
     override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
@@ -38,7 +42,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
             logger.v("zzz main events flow collect")
-            val dbEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
+            dbEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
 
             events.value = dbEvents.flatMap { event ->
 
@@ -57,6 +61,8 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                 }
 
             }
+
+            occurrencesExpandedUntil = toDate
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
@@ -164,10 +170,51 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
         if (::selectedCalendarIds.isInitialized) { // TODO
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
-            // TODO add time buffer and some kind of debounce
-            fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)
+
+            // expand recurrences for locally stored events
+            expandLocalOccurrences(toDate, timeZoneId)
+
+            // fetch from API
+            if (prefetchedFrom == null || fromDate.isBefore(prefetchedFrom)) {
+                prefetchedFrom = fromDate
+                fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)
+            } else if (prefetchedTo == null || toDate.isAfter(prefetchedTo)) {
+                prefetchedTo = toDate
+                fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)
+            }
+
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
+
+    }
+
+    private suspend fun expandLocalOccurrences(toDate: LocalDate, timeZoneId: String) {
+
+        TimberLogger.d("expanding local occurrences until ${toDate}")
+
+        // TODO CODE DUPLICATION
+        if (occurrencesExpandedUntil != null && toDate.isAfter(occurrencesExpandedUntil)) {
+
+            occurrencesExpandedUntil = toDate
+
+            events.value = dbEvents.flatMap { event->
+                if (event.isRecurring()) {
+
+                    val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
+                    val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
+
+                    filteredByExdates
+
+                } else if (event.isFromRecurring()) {
+                    // Event that is "from recurring" has already been created when expading ^
+                    emptyList()
+                } else {
+                    listOf(event)
+                }
+            }
+        }
+
+
 
     }
 

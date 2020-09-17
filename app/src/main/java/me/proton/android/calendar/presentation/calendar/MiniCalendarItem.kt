@@ -5,5 +5,9 @@ import java.time.LocalDate
 data class MiniCalendarItem(
     val date: LocalDate,
     val isSelected: Boolean,
+    /**
+     * Item is an actual day indicator and not dummy helper
+     */
+    val isDay: Boolean,
     val indicatorColors: List<String>
 )

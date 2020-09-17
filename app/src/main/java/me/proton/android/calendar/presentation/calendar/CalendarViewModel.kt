@@ -12,6 +12,7 @@ import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -70,7 +71,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
                 DayOfWeek.MONDAY
             }
 
-            TestsLogger.d("viewmodel timeZoneId = ${timeZoneId}")
+            TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 
             //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
 
@@ -83,7 +84,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
             coroutineScope.launch {
                 // TODO this method never returns
-                calendarsRepository.init(selectedCalendarIds, LocalDate.now().plusMonths(10 /*TODO create more events when we switch between months*/), timeZoneId.id)
+                calendarsRepository.init(selectedCalendarIds, LocalDate.now(timeZoneId).plusMonths(2), timeZoneId.id)
             }
 
 

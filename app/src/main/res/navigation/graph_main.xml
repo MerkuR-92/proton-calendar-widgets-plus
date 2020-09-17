@@ -128,6 +128,9 @@
         android:id="@+id/rootFragment"
         android:name="me.proton.android.calendar.presentation.calendar.RootFragment"
         android:label="RootFragment" >
+        <deepLink
+            android:id="@+id/deepLink5"
+            app:uri="proton-calendar://protonmail.com/root" />
         <action
             android:id="@+id/action_rootFragment_to_nav_calendar"
             app:destination="@id/nav_calendar" />

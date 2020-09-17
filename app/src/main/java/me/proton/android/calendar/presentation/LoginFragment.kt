@@ -67,7 +67,7 @@ class LoginFragment : Fragment() {
 
                             GlobalScope.launch { // TODO
 
-                            withContext(Dispatchers.Default) {
+                            /*withContext(Dispatchers.Default) {
 
                                 val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
                                 val TODOuserID = TODOvalueStore.getString("USERID") // TODO
@@ -84,13 +84,13 @@ class LoginFragment : Fragment() {
 
                                 }
 
-                            }
+                            }*/
 
                             }
 
                             requireActivity().hideKeyboard()
 
-                            findNavController().navigate(Navigation.Deeplink.toMonth())
+                            findNavController().navigate(Navigation.Deeplink.toRoot())
                             //Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()
 
                         } else {
