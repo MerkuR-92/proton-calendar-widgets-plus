@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.pager_mini_calendar.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,7 +61,9 @@ class ItemMiniCalendarFragment(
             adapter = MiniCalendarItemAdapter(
                 calendarViewModel.timeZoneId.id,
                 date,
-                calendarViewModel.startWeekOn
+                calendarViewModel.startWeekOn,
+                calendarViewModel,
+                viewLifecycleOwner
             ) {
                 calendarViewModel.handleDaySelected(it)
             }
@@ -74,35 +77,34 @@ class ItemMiniCalendarFragment(
             (rv_mini_calendar.adapter as MiniCalendarItemAdapter).markDayAsSelected(it)
         }
 
-
-        lifecycleScope.launch(Dispatchers.Default) {
+        calendarViewModel.lifeCycleScope.launch {
 
             val fromDate = date.withDayOfMonth(1)
             val toDate = date.withDayOfMonth(date.lengthOfMonth())
 
-            TimberLogger.d("requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
-            launch {
-                calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
-            }
+            TimberLogger.d("zzz requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
+            calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
 
-            calendarViewModel.eventsFlow(fromDate, toDate).collect { events ->
+            /*calendarViewModel.eventsFlow(fromDate, toDate).collect { events ->
 
-                TimberLogger.d("sss events in flow ${date.month}: ${events.size}")
-
-
-                TimberLogger.d("zzz observed events arrived in flow FOR MINI CALENDAR ${date.month}: ${events.size}")
+                TimberLogger.d("xxx observed events arrived in flow FOR MINI CALENDAR ${date.month}: ${events.size}")
 
                 val indicators = calendarViewModel.calculateCalendarIndicators(events)
                 withContext(Dispatchers.Main) {
                     (rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(date.month, indicators)
                 }
 
-            }
+            }*/
         }
 
         calendarViewModel.eventsLiveData(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth())).observe(viewLifecycleOwner) { events ->
 //
-            TimberLogger.d("sss events in livedata ${date.month}: ${events.size}")
+            //TimberLogger.d("sss events in livedata for indicators ${date.month}: ${events.size}")
+//                val indicators = calendarViewModel.calculateCalendarIndicators(events)
+//            lifecycleScope.launch(Dispatchers.Main) {
+//            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(date.month, indicators)
+//            }
+
 //
         }
 

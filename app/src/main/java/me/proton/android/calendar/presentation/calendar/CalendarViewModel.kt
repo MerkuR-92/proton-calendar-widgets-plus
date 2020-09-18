@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Month
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
@@ -25,7 +26,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-    private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
+    val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
 //    private lateinit var selectedCalendarIds: List<String>
 
@@ -45,10 +46,12 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
     private val _calendarIndicators: MutableLiveData<LocalDate> = MutableLiveData()
     val calendarIndicators: LiveData<LocalDate> = _calendarIndicators
 
+    val lifeCycleScope: CoroutineScope = this.viewModelScope
 
     val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
 //    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
+
 
     suspend fun selectActiveCalendars(): List<CalendarEntity> {
 
@@ -84,7 +87,9 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
             coroutineScope.launch {
                 // TODO this method never returns
-                calendarsRepository.init(selectedCalendarIds, LocalDate.now(timeZoneId).plusMonths(2), timeZoneId.id)
+                val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
+                val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
+                calendarsRepository.init(selectedCalendarIds, toDate, timeZoneId.id)
             }
 
 
@@ -134,9 +139,11 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
         val TODOuserID = TODOvalueStore.getString("USERID") // TODO
         return if (TODOuserID != null) {
-
             calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id)
-        } else flowOf<List<Event>>()
+        } else {
+            TimberLogger.e("eventsFlow is returning empty!!!")
+            flowOf<List<Event>>()
+        }
 
     }
 
@@ -156,14 +163,19 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         }
 
         return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
-
-
-
-
     }
 
+    private val eventsLiveDataMap = mutableMapOf<Pair<LocalDate, LocalDate>, LiveData<List<Event>>>()
+
     fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>> {
-        return liveData<List<Event>> { emit(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).first()) }
+//        return eventsLiveDataMap.getOrDefault(Pair(fromDate, toDate), calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default))
+        return calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default)
+    }
+
+    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate): LiveData<Map<Int, List<String>>> {
+        return eventsLiveData(fromDate, toDate).map {
+            calculateCalendarIndicators(it)
+        }
     }
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState

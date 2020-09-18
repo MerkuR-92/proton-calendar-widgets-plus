@@ -1,6 +1,7 @@
 package me.proton.android.calendar.data
 
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import me.proton.android.calendar.data.db.AppDatabase
@@ -9,10 +10,13 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
+import org.koin.ext.getScopeId
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
@@ -24,9 +28,13 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
     private val daysToEvents = mutableMapOf<LocalDate, Event>()
     private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
 
+    // root events from database
+    //private val dbEvents = MutableStateFlow<List<Event>>(emptyList())
+    private val dbEvents = mutableListOf<Event>()
+    // all events including expanded
     private val events = MutableStateFlow<List<Event>>(emptyList())
-    private var dbEvents = listOf<Event>()
-    private var occurrencesExpandedUntil: LocalDate? = null
+
+    private var eventsExpandedUntil: LocalDate? = null
     private var prefetchedFrom: LocalDate? = null
     private var prefetchedTo: LocalDate? = null
 
@@ -41,10 +49,19 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-            logger.v("zzz main events flow collect")
-            dbEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
+            logger.v("xxx db events flow collect")
+            val transformedEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
 
-            events.value = dbEvents.flatMap { event ->
+            //dbEvents.value = transformedEvents
+            dbEvents.clear()
+            dbEvents.addAll(transformedEvents)
+
+            logger.v("xxx db events transformed")
+
+            expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
+
+            //events.value = transformedEvents /*TODO*/
+            /*.flatMap { event ->
 
                 if (event.isRecurring()) {
 
@@ -60,9 +77,9 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
                     listOf(event)
                 }
 
-            }
+            }*/
 
-            occurrencesExpandedUntil = toDate
+            //eventsExpandedUntil = toDate
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
@@ -105,7 +122,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         return selectCalendars(userId).filter { it.isActive }
     }
 
-    override suspend fun eventsFlow(
+    override fun eventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
@@ -144,7 +161,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
         return events.map {
 
-            TimberLogger.v("zzz flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
+            TimberLogger.v("xxx flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
 
             val filtered = it.filter {
                     it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
@@ -158,7 +175,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
             result
 
             //filtered.groupBy { it.isAllDay() || !it.spansSingleDay() }.flatMap { it.value.sortedWith(comparator) }//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
-        }.distinctUntilChanged()
+        } //.distinctUntilChanged()
 
     }
 
@@ -172,15 +189,18 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
             // expand recurrences for locally stored events
-            expandLocalOccurrences(toDate, timeZoneId)
+            expandDbEventsUntil(toDate, timeZoneId, false)
 
             // fetch from API
             if (prefetchedFrom == null || fromDate.isBefore(prefetchedFrom)) {
-                prefetchedFrom = fromDate
-                fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)
+                when (fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)) {
+                    UseCase.Result.Success -> prefetchedFrom = fromDate
+                }
             } else if (prefetchedTo == null || toDate.isAfter(prefetchedTo)) {
-                prefetchedTo = toDate
-                fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)
+
+                when (fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)) {
+                    UseCase.Result.Success -> prefetchedTo = toDate
+                }
             }
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
@@ -188,31 +208,38 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
     }
 
-    private suspend fun expandLocalOccurrences(toDate: LocalDate, timeZoneId: String) {
+    private suspend fun expandDbEventsUntil(toDate: LocalDate, timeZoneId: String, force: Boolean) {
 
-        TimberLogger.d("expanding local occurrences until ${toDate}")
+        synchronized(this) { // TODO
+            TimberLogger.v("xxx expanding local occurrences until ${toDate}")
 
-        // TODO CODE DUPLICATION
-        if (occurrencesExpandedUntil != null && toDate.isAfter(occurrencesExpandedUntil)) {
+            if (force || eventsExpandedUntil == null || (eventsExpandedUntil != null && toDate.isAfter(eventsExpandedUntil))) {
 
-            occurrencesExpandedUntil = toDate
+                events.value = dbEvents.flatMap {event ->
+                    if (event.isRecurring()) {
+                        val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
+                        val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
 
-            events.value = dbEvents.flatMap { event->
-                if (event.isRecurring()) {
-
-                    val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
-                    val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
-
-                    filteredByExdates
-
-                } else if (event.isFromRecurring()) {
-                    // Event that is "from recurring" has already been created when expading ^
-                    emptyList()
-                } else {
-                    listOf(event)
+                        filteredByExdates
+                    } else if (event.isFromRecurring()) {
+                        // Event that is "from recurring" has already been created when expading ^
+                        emptyList()
+                    } else {
+                        listOf(event)
+                    }
                 }
+
+                TimberLogger.v("xxx expanded local occurrences until ${toDate}: ${events.value.size}")
+
+                // first expand will happen on empty DB Events
+                if (dbEvents.isNotEmpty()) {
+                    eventsExpandedUntil = toDate
+                }
+
             }
         }
+
+
 
 
 

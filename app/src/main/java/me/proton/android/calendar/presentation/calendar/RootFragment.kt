@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
@@ -37,21 +38,25 @@ class RootFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // initialization routine
-        lifecycleScope.launch(Dispatchers.Default) {
-
+        GlobalScope.launch(Dispatchers.Default) {// TODO move to viewmodel
             calendarViewModel.init(this)
 
             val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
-                if (userId != null) {
-                    findNavController().navigate(Navigation.Deeplink.toMonth())
-                } else {
+            if (userId != null) {
+                findNavController().navigate(Navigation.Deeplink.toMonth())
+            } else {
 
-                    withContext(Dispatchers.Main) {
-                        text_home.text = "PLEASE LOGIN"
-                    }
-
+                withContext(Dispatchers.Main) {
+                    text_home.text = "PLEASE LOGIN"
                 }
+
+            }
+        }
+
+        // initialization routine
+        lifecycleScope.launch(Dispatchers.Default) {
+
+
 
 
         }

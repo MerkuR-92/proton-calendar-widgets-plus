@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.children
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,8 @@ class MiniCalendarItemAdapter(
     private val timeZoneId: String, // TODO MOVE TO INITIALISE
     private val forDate: LocalDate,
     private val startWeekOn: DayOfWeek,
+    private val calendarViewModel: CalendarViewModel,
+    private val lifecycleOwner: LifecycleOwner,
     private val clickListener: ((LocalDate) -> Unit)?
 ) : ListAdapter<MiniCalendarItem, MiniCalendarItemAdapter.MiniCalendarViewHolder>(DiffCallback()) {
 
@@ -55,7 +58,19 @@ class MiniCalendarItemAdapter(
 
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
 
+//        lifecycleOwner.lifecycle.addObserver(object: LifecycleObserver {
+//            @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+//            fun observeIndicators() {
+                calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())).observe(lifecycleOwner) {
+                    submitCalendarIndicators(forDate.month, it)
+                }
+//            }
+//        })
+
+
+
     }
+
 
     sealed class MiniCalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -135,21 +150,22 @@ class MiniCalendarItemAdapter(
 
     fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
 
-        TimberLogger.d("zzz submitCalendarIndicators for ${month}: $indicators")
-
         val mutableList = currentList.toMutableList()
+
+
+        TimberLogger.d("zzz submitCalendarIndicators for ${month} in ${lifecycleOwner.lifecycle.currentState}: $indicators ")
 
         mutableList.forEachIndexed { index, miniCalendarItem ->
             if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == month) {
-                TimberLogger.d("zzz index for non-null item $index -> ${miniCalendarItem}")
+                val colors = indicators.getOrDefault(miniCalendarItem.date.dayOfMonth, emptyList())
+                TimberLogger.d("zzz colors: $colors")
 
-                mutableList[index] = miniCalendarItem.copy(indicatorColors = indicators.getOrDefault(miniCalendarItem.date.dayOfMonth, emptyList()))
+                mutableList[index] = miniCalendarItem.copy(indicatorColors = colors)
             }
         }
 
-        TimberLogger.d("zzz submitCalendarIndicators output size ${mutableList.size}")
-
         submitList(mutableList)
+
     }
 
     private val ITEM_TYPE_HEADER = 0

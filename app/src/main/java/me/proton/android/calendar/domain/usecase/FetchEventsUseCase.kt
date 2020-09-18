@@ -77,6 +77,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                         UseCase.Result.Success
                     } else {
+                        logger.e("error fetching events for calendar: $eventsResponse")
                         UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
                     }
 

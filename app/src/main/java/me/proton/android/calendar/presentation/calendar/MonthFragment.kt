@@ -112,7 +112,7 @@ class MonthFragment : BaseDialogFragment() {
             MiniCalendarItemAdapter.calculateAdapterHeight(
                 requireContext(),
                 firstDayOfMonth,
-                calendarViewModel.startWeekOn
+                calendarViewModel.startWeekOn,
             )
         ) {
             miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
@@ -139,7 +139,7 @@ class MonthFragment : BaseDialogFragment() {
         miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
             adapter = miniCalendarPagerAdapter
-            offscreenPageLimit = 1
+            offscreenPageLimit = 2
             setCurrentItem(miniCalendarPagerAdapter.startingPosition, false)
         }
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
@@ -149,7 +149,7 @@ class MonthFragment : BaseDialogFragment() {
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
         agendaPager.apply{
             adapter = agendaPagerAdapter
-            offscreenPageLimit = 1
+            offscreenPageLimit = 2
             setCurrentItem(agendaPagerAdapter.startingPosition, false)
         }
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)

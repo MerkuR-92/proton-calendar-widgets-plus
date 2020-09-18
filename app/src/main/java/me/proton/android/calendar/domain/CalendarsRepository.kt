@@ -30,7 +30,7 @@ interface CalendarsRepository {
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
     // events
-    suspend fun eventsFlow(
+    fun eventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String

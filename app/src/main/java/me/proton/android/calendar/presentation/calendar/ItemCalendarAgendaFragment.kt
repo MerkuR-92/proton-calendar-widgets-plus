@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.liveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.ICalendar
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -93,10 +97,45 @@ class ItemCalendarAgendaFragment(
             list_view_status.visibleOrInvisible(true)
             list_view_status.text = resources.getString(R.string.agenda_loading_events)
 
+            calendarViewModel.eventsLiveData(date, date)
+
+            /*liveData<List<Event>> {
+                calendarViewModel.eventsFlow(date)
+            }*/.observe(viewLifecycleOwner) {
+                TimberLogger.d("xxx observed events arrived in LIVE DATA, item agenda fragment: $date -> ${it.size}")
+
+                //withContext(Dispatchers.Main) {
+                    if (it.isEmpty()) {
+                        list_view_status.visibleOrInvisible(true)
+                        list_view_status.text = resources.getString(R.string.agenda_no_events)
+                    } else {
+                        list_view_status.visibleOrInvisible(false)
+                    }
+                    (rv_agenda.adapter as? EventAdapter)?.submitList(
+                        listOf(fakeHeaderEvent).plus(
+                            it
+                        )
+                    )
+                //}
+            }
+
             lifecycleScope.launch(Dispatchers.Default) {
 
-                calendarViewModel.eventsFlow(date).collect {
-                    TimberLogger.d("observed events arrived in flow, item agenda fragment: ${it.size}")
+
+
+
+
+                /*test = calendarViewModel.eventsFlow(date)
+
+
+                TimberLogger.d("xxx flow: ${test}")
+                test.onCompletion { TimberLogger.d("xxx flow: ${test} COMPLETED") }
+
+
+
+
+                test.collect {
+                    TimberLogger.d("xxx observed events arrived in flow, item agenda fragment: $date -> ${it.size}")
 
                     withContext(Dispatchers.Main) {
                         if (it.isEmpty()) {
@@ -111,7 +150,7 @@ class ItemCalendarAgendaFragment(
                             )
                         )
                     }
-                }
+                }*/
             }
 
         } catch (e: Exception) {}

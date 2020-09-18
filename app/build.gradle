@@ -40,8 +40,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 15
-        versionName "0.6.0"
+        versionCode 16
+        versionName "0.7.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -152,7 +152,7 @@ dependencies {
     androidTestImplementation "androidx.test:core:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:runner:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.version.androidx_test}"
-    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+    androidTestImplementation "androidx.test.ext:junit:1.1.2"
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     testImplementation 'com.willowtreeapps.assertk:assertk-jvm:0.21'
