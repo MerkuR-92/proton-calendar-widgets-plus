@@ -366,6 +366,10 @@ class EventViewModel(
                 // TODO FIXME isRecurring OR isInChain?????????
                 if (event.isRecurring() || event.isFromRecurring()) {
 
+                    // TODO BUG:
+                    // 1. event is a regular event
+                    // 2. edit it and add rrule
+                    // 3. we get into this nullcheck here!
 
                     if (dbEventWithOccurrenceStartDate == null) {
                         logger.e("dbEventWithOccurrenceStartDate == null")

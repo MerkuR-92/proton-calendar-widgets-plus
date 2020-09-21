@@ -12,6 +12,8 @@
 
         <item name="android:colorControlHighlight">@color/interaction_weak_pressed</item>
 
+        <item name="android:windowBackground">@color/background_norm</item>
+
 <!--        <item name="android:actionOverflowMenuStyle-->
 
 
@@ -27,7 +29,7 @@
 
 <!--        <item name="actionMenuTextColor">@android:color/holo_green_light</item>-->
 <!--        <item name="colorAccent">#a24f22</item>-->
-        <item name="colorControlNormal">@color/icon_norm</item>
+<!--        <item name="colorControlNormal">@color/icon_norm</item>-->
 <!--        <item name="colorControlActivated">#f74f99</item>-->
 
         <!--        <item name="titleTextAppearance">@style/MyToolbartitleTextAppearance</item>-->

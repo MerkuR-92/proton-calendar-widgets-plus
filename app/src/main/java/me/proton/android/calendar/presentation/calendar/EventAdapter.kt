@@ -147,9 +147,9 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
 
                     if (event.isCancelled()) {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_cancelled_event))
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     } else {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_past_event))
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_secondary))
                     }
                 } else {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
@@ -164,7 +164,7 @@ class EventAdapter(
                         textViewSubheader.setTextAppearance(R.style.Text_Default)
                         textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
 
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_of_cancelled_event))
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     } else {
                         viewMainSurface.setTint(Color.parseColor(event.calendar.color))
                     }

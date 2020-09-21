@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
@@ -84,6 +85,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                             setNavigationIcon(R.drawable.ic_close)
                         }
                     }
+                    navigationIcon!!.setTint(ContextCompat.getColor(requireContext(), R.color.icon_norm))
 
                     setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
                         if (isTopLevel) {

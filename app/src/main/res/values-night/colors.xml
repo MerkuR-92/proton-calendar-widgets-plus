@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    TODO -->
+
+    <!-- design color aliases -->
+
+    <color name="shade_100">@color/white</color>
+    <color name="shade_80">@color/santas_gray</color>
+    <color name="shade_60">@color/storm_gray</color>
+    <color name="shade_40">@color/abbey</color>
+    <color name="shade_20">@color/tuna</color>
+    <color name="shade_10">@color/charade</color>
+    <color name="shade_0">@color/woodsmoke</color>
+
 </resources>

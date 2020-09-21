@@ -61,7 +61,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onToolbarCreated(toolbar: Toolbar) {
 
-        val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_primary, toolbar_content, false)
+        val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonEdit) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pen))
             setOnClickListener {

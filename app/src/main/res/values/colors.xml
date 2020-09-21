@@ -14,6 +14,9 @@
     <color name="pomegranate">#E84118</color>
     <color name="santas_gray">#9CA0AA</color>
     <color name="san_marino">#5064B6</color>
+    <color name="abbey">#494D55</color>
+    <color name="tuna">#303239</color>
+    <color name="charade">#262A33</color>
 
     <!-- design color aliases -->
 
@@ -26,6 +29,9 @@
     <color name="shade_0">@color/white</color>
     <color name="brand_norm">@color/cornflower_blue</color>
     <color name="brand_darken_20">@color/san_marino</color>
+
+    <!-- constant colors, do not change in dark mode -->
+    <color name="text_on_calendar_color">#FFFFFF</color>
 
     <!-- colors to use in the app -->
 
@@ -51,11 +57,7 @@
 
     <color name="notification_error">@color/pomegranate</color>
 
-    <!-- constant colors, do not change in dark mode -->
-    <!--    TODO-->
-    <color name="text_on_calendar_color">#FFFFFF</color>
-    <color name="background_of_past_event">#ECEFF1</color>
-    <color name="background_of_cancelled_event">#FFFFFF</color>
+
 
 
 

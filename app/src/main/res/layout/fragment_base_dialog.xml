@@ -10,7 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stateListAnimator="@animator/design_appbar_state_list_animator"
-        app:liftOnScroll="true">
+        app:liftOnScroll="true"
+        android:backgroundTint="@color/background_norm"
+        >
 
         <FrameLayout
             android:layout_width="match_parent"

@@ -12,7 +12,9 @@
         android:layout_height="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_map_marker" />
+        app:srcCompat="@drawable/ic_map_marker"
+        app:tint="@color/icon_norm"
+        />
 
     <TextView
         android:id="@+id/text_header"
