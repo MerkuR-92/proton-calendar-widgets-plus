@@ -138,9 +138,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         }
 
+        nav_view_version.text = getString(R.string.app_version_name, "${BuildConfig.VERSION_NAME}", BuildConfig.VERSION_CODE)
 
-        navView.getHeaderView(0).findViewById<TextView>(R.id.textView_version_number).setText("${BuildConfig.VERSION_NAME}")
-
+        nav_view_more_login_layout.setOnClickListener {
+            findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toLogin())
+        }
 
 //        mainViewModel.syncServerEvents().observe(this, Observer {
 //            it?.let { TimberLogger.d("local server event sync state: ${it}") } // TODO progress indicator

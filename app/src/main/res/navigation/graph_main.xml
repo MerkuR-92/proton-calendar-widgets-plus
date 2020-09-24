@@ -123,7 +123,11 @@
     <fragment
         android:id="@+id/nav_login"
         android:name="me.proton.android.calendar.presentation.LoginFragment"
-        android:label="LoginFragment" />
+        android:label="LoginFragment" >
+        <deepLink
+            android:id="@+id/deepLink6"
+            app:uri="proton-calendar://protonmail.com/login" />
+    </fragment>
     <fragment
         android:id="@+id/rootFragment"
         android:name="me.proton.android.calendar.presentation.calendar.RootFragment"
