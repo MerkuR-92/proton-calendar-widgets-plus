@@ -2,6 +2,8 @@ package me.proton.android.calendar.common
 
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.Resources
@@ -55,21 +57,15 @@ class AndroidUtils(context: Context) {
             is24Hour: Boolean,
             callback: (result: LocalTime) -> Unit
         ) {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            val customLayout: View =
-                LayoutInflater.from(context).inflate(R.layout.dialog_time_picker, null)
-            val timePicker = customLayout.findViewById<TimePicker>(R.id.time_picker)
-            timePicker.setIs24HourView(is24Hour)
-            initialTime?.let {
-                timePicker.hour = initialTime.hour
-                timePicker.minute = initialTime.minute
-            }
-            builder.setView(customLayout)
-            builder.setPositiveButton(R.string.dialog_button_set) { _, _ ->
-                callback(LocalTime.of(timePicker.hour, timePicker.minute))
-            }
-            builder.setNegativeButton(R.string.dialog_button_cancel, null)
-            builder.create().show()
+            val immutableInitialTime = initialTime?: LocalTime.now()
+            val timePickerDialog = TimePickerDialog(context, 0,
+                { view, hourOfDay, minute ->
+                    callback(LocalTime.of(hourOfDay, minute))
+                },
+                immutableInitialTime.hour,
+                immutableInitialTime.minute,
+                is24Hour)
+            timePickerDialog.show()
         }
 
         fun displayDatePicker(
@@ -79,25 +75,21 @@ class AndroidUtils(context: Context) {
             maxDate: LocalDate? = null,
             callback: (result: LocalDate) -> Unit
         ) {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            val customLayout: View =
-                LayoutInflater.from(context).inflate(R.layout.dialog_date_picker, null)
-            val datePicker = customLayout.findViewById<DatePicker>(R.id.date_picker)
-            initialDate?.let {
-                datePicker.init(it.year, it.monthValue - 1, it.dayOfMonth, null)
-            }
+            val immutableInitialDate = initialDate?: LocalDate.now()
+            val datePickerDialog = DatePickerDialog(context, 0,
+                { view, year, month, dayOfMonth ->
+                    callback(LocalDate.of(year, month + 1, dayOfMonth))
+                },
+                immutableInitialDate.year,
+                immutableInitialDate.monthValue - 1,
+                immutableInitialDate.dayOfMonth)
             minDate?.let {
-                datePicker.minDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                datePickerDialog.datePicker.minDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             }
             maxDate?.let {
-                datePicker.maxDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                datePickerDialog.datePicker.maxDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             }
-            builder.setView(customLayout)
-            builder.setPositiveButton(R.string.dialog_button_set) { _, _ ->
-                callback(LocalDate.of(datePicker.year, datePicker.month + 1, datePicker.dayOfMonth))
-            }
-            builder.setNegativeButton(R.string.dialog_button_cancel, null)
-            builder.create().show()
+            datePickerDialog.show()
         }
 
         fun displaySingleChoicePicker(
