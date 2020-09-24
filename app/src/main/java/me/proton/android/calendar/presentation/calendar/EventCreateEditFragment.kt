@@ -310,7 +310,13 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 val selectedIndex = calendars.indexOfFirst { it.id == eventViewModel.eventLiveData.value!!.calendar.id }
 
                 AndroidUtils.displayCalendarPicker(requireContext(), resources.getString(R.string.dialog_title_calendar_picker), calendars.toTypedArray(), selectedIndex) {
-                    eventViewModel.handleCalendar(calendars[it])
+
+                    lifecycleScope.launch {
+                        if (!eventViewModel.handleCalendar(calendars[it])) {
+                            Toast.makeText(requireContext(), "Error switching calendar", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
                 }
             }
         }

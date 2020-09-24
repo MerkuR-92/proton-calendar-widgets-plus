@@ -1,17 +1,15 @@
 package me.proton.android.calendar.presentation.calendar
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.*
-import biweekly.util.DayOfWeek
-import biweekly.util.Duration
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
@@ -26,8 +24,14 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.*
-import java.time.*
+import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
+import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -107,7 +111,7 @@ class EventViewModel(
 
         val defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId) ?: return UseCase.Result.Error("could not get default Calendar from DB")
 
-        this.calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendar.id) ?: return UseCase.Result.Error("could not get CalendarSettings")
+        if (!loadSettingsForCalendar(defaultCalendarId)) return UseCase.Result.Error("could not get CalendarSettings")
 
         event = if (eventId == null) {
 
@@ -219,6 +223,19 @@ class EventViewModel(
         _event.postValue(event)
 
         return UseCase.Result.Success
+    }
+
+    private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {
+        return withContext(Dispatchers.Default) {
+            val settings = calendarsRepository.selectCalendarSettings(calendarId)
+            if (settings != null) {
+                calendarSettings = settings
+                true
+            } else {
+                false
+            }
+        }
+
     }
 
     private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
@@ -538,10 +555,16 @@ class EventViewModel(
 
     }
 
-    fun handleCalendar(calendar: CalendarEntity) {
-        markEventAsEdited()
-        event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive))
-        _event.postValue(event)
+    suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
+        return if (loadSettingsForCalendar(calendar.id)) {
+            markEventAsEdited()
+            event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive))
+            setDefaultAlarms(event, calendarSettings)
+            _event.postValue(event)
+            true
+        } else {
+            false
+        }
     }
 
     fun handleTimeZone(timeZoneId: String) {
