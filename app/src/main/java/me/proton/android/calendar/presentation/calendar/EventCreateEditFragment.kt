@@ -320,42 +320,9 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.nav_event_create_edit_recurrence)
         }
 
-
-
-
-
-
-
-
-
-
-
-//eventViewModel.eventLiveData.value!!.iCalEvent.alarms[0]
-
-
-
-
-
-
-
-
-
-
-
-
-
         press_attendees.setOnClickListener {
             findNavController().navigate(R.id.nav_event_create_edit_attendees)
         }
-
-
-
-
-
-
-
-
-
 
     }
 

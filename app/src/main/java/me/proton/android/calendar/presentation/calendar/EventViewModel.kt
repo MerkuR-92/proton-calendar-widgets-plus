@@ -225,7 +225,6 @@ class EventViewModel(
         event.iCalEvent.alarms.clear()
 
         if (event.isAllDay()) {
-            if (calendarSettings.defaultFullDayNotifications.isNotEmpty()) {
                 calendarSettings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
                     alarm.parseTrigger()?.let {
                         if (alarm.type == "0") {
@@ -235,12 +234,7 @@ class EventViewModel(
                         }
                     }
                 }
-            } else {
-                val duration = Duration.builder().prior(true).hours(15).build() // 1 day before at 9:00
-                event.iCalEvent.addAlarm(VAlarm.display(Trigger(duration, Related.START), null))
-            }
         } else {
-            if (calendarSettings.defaultPartDayNotifications.isNotEmpty()) {
                 calendarSettings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
                     alarm.parseTrigger()?.let {
                         if (alarm.type == "0") {
@@ -250,10 +244,6 @@ class EventViewModel(
                         }
                     }
                 }
-            } else {
-                val duration = Duration.builder().prior(true).minutes(15).build()
-                event.iCalEvent.addAlarm(VAlarm.display(Trigger(duration, Related.START), null))
-            }
         }
 
     }
