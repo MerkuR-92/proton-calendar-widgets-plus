@@ -49,6 +49,7 @@
         app:layout_constraintStart_toEndOf="@+id/text_header"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_chevron_down"
+        app:tint="@color/icon_weak"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

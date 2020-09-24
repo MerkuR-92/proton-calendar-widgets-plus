@@ -63,7 +63,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonEdit) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pen))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pencil))
             setOnClickListener {
                 findNavController().navigate(
                     (Navigation.Deeplink.toEventEdit(

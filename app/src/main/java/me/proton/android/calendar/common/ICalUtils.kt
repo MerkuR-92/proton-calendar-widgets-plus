@@ -80,6 +80,8 @@ object ICalUtils {
                 val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
                 this.setDateEnd(endLocalDate.toDate(), false)
             }
+
+            // TODO maybe we should force DTEND+1 when dtstart=dtend
         }
 
         return true
@@ -402,7 +404,6 @@ object ICalUtils {
         } else {
             toDate
         }
-
         val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
