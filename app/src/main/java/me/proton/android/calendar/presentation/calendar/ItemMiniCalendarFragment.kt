@@ -68,9 +68,8 @@ class ItemMiniCalendarFragment(
                 calendarViewModel.handleDaySelected(it)
             }
 
-//            calendarViewModel.handleMiniCalendarDaySelected(calendarViewModel.selectedDate ?: date)
+            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise()
 
-            (this.adapter as MiniCalendarItemAdapter).initialise()
         }
 
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
@@ -85,56 +84,7 @@ class ItemMiniCalendarFragment(
             TimberLogger.d("zzz requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
             calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
 
-            /*calendarViewModel.eventsFlow(fromDate, toDate).collect { events ->
-
-                TimberLogger.d("xxx observed events arrived in flow FOR MINI CALENDAR ${date.month}: ${events.size}")
-
-                val indicators = calendarViewModel.calculateCalendarIndicators(events)
-                withContext(Dispatchers.Main) {
-                    (rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(date.month, indicators)
-                }
-
-            }*/
         }
-
-        calendarViewModel.eventsLiveData(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth())).observe(viewLifecycleOwner) { events ->
-//
-            //TimberLogger.d("sss events in livedata for indicators ${date.month}: ${events.size}")
-//                val indicators = calendarViewModel.calculateCalendarIndicators(events)
-//            lifecycleScope.launch(Dispatchers.Main) {
-//            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).submitCalendarIndicators(date.month, indicators)
-//            }
-
-//
-        }
-
-        try {
-//            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-//            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
-
-//            TimberLogger.d("binding live data for events from calendar $calendarId")
-//            calendarViewModel.eventsLiveData(date).observe(viewLifecycleOwner, Observer {
-//                TimberLogger.d("observed events arrived: $it")
-//                (recyclerView.adapter as? EventAdapter)?.submitList(it)
-//            })
-
-
-
-//            lifecycleScope.launch(Dispatchers.Default) {
-//
-//                calendarViewModel.prefetchEvents(date, date, calendarViewModel.timeZoneId.id)
-//                TimberLogger.d("requesting prefetch for date: $date timezone: ${calendarViewModel.timeZoneId.id}")
-//
-//                calendarViewModel.eventsFlow(date).collect {
-//                    TimberLogger.d("observed events arrived in flow, item agenda fragment: ${it.size}")
-//                    withContext(Dispatchers.Main) {
-//                        (rv_agenda.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent).plus(it))
-//                    }
-//                }
-//            }
-
-        } catch (e: Exception) {}
 
     }
 

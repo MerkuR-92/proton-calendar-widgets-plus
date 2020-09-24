@@ -50,7 +50,6 @@ class ItemCalendarAgendaFragment(
     ): View? {
 
         val rootView = inflater.inflate(R.layout.item_calendar_agenda_fragment, container, false)
-        //rootView.findViewById<TextView>(R.id.text_date_header).text = "${date.format(showDayOfWeek = true)}"
 
         return rootView
     }
@@ -72,36 +71,13 @@ class ItemCalendarAgendaFragment(
                 )
             }
 
-            /*rv_agenda.addItemDecoration(
-                DividerItemDecoration(
-                    this@ItemCalendarAgendaFragment.context,
-                    LinearLayoutManager.VERTICAL
-                )
-            )*/
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
-
-        try {
-//            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-//            val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
-
-//            TimberLogger.d("binding live data for events from calendar $calendarId")
-//            calendarViewModel.eventsLiveData(date).observe(viewLifecycleOwner, Observer {
-//                TimberLogger.d("observed events arrived: $it")
-//                (recyclerView.adapter as? EventAdapter)?.submitList(it)
-//            })
-
-
 
             list_view_status.visibleOrInvisible(true)
             list_view_status.text = resources.getString(R.string.agenda_loading_events)
 
-            calendarViewModel.eventsLiveData(date, date)
-
-            /*liveData<List<Event>> {
-                calendarViewModel.eventsFlow(date)
-            }*/.observe(viewLifecycleOwner) {
+            calendarViewModel.eventsLiveData(date, date).observe(viewLifecycleOwner) {
                 TimberLogger.d("xxx observed events arrived in LIVE DATA, item agenda fragment: $date -> ${it.size}")
 
                 //withContext(Dispatchers.Main) {
@@ -119,41 +95,8 @@ class ItemCalendarAgendaFragment(
                 //}
             }
 
-            lifecycleScope.launch(Dispatchers.Default) {
 
 
-
-
-
-                /*test = calendarViewModel.eventsFlow(date)
-
-
-                TimberLogger.d("xxx flow: ${test}")
-                test.onCompletion { TimberLogger.d("xxx flow: ${test} COMPLETED") }
-
-
-
-
-                test.collect {
-                    TimberLogger.d("xxx observed events arrived in flow, item agenda fragment: $date -> ${it.size}")
-
-                    withContext(Dispatchers.Main) {
-                        if (it.isEmpty()) {
-                            list_view_status.visibleOrInvisible(true)
-                            list_view_status.text = resources.getString(R.string.agenda_no_events)
-                        } else {
-                            list_view_status.visibleOrInvisible(false)
-                        }
-                        (rv_agenda.adapter as? EventAdapter)?.submitList(
-                            listOf(fakeHeaderEvent).plus(
-                                it
-                            )
-                        )
-                    }
-                }*/
-            }
-
-        } catch (e: Exception) {}
 
     }
 }

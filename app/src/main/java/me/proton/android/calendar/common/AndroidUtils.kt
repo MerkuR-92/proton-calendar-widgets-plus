@@ -693,7 +693,7 @@ fun View.visibleOrInvisible(visible: Boolean) {
 fun View.animateHeightChange(toHeightPx: Int, onAnimationEnd: () -> Unit) {
     if (this.measuredHeight != toHeightPx) {
         val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
-        valueAnimator.duration = 500L
+        valueAnimator.duration = 300L
         valueAnimator.addUpdateListener {
             val animatedValue = valueAnimator.animatedValue as Int
             val layoutParams = this.layoutParams.apply {

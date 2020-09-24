@@ -217,6 +217,7 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
                 events.value = dbEvents.flatMap {event ->
                     if (event.isRecurring()) {
+                        // TODO FIXME java.util.ConcurrentModificationException
                         val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDate, timeZoneId)!!
                         val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
 

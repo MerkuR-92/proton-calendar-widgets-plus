@@ -58,16 +58,9 @@ class MiniCalendarItemAdapter(
 
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
 
-//        lifecycleOwner.lifecycle.addObserver(object: LifecycleObserver {
-//            @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-//            fun observeIndicators() {
-                calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())).observe(lifecycleOwner) {
-                    submitCalendarIndicators(forDate.month, it)
-                }
-//            }
-//        })
-
-
+        calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())).observe(lifecycleOwner) {
+            submitCalendarIndicators(forDate.month, it)
+        }
 
     }
 

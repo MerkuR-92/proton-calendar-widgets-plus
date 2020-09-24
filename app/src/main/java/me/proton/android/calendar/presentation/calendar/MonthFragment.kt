@@ -100,13 +100,27 @@ class MonthFragment : BaseDialogFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // make sure currently selected month always has desired height, even if adjacent pages make
+        //  entire ViewPager to have different height
+        miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+    }
+
     private fun adjustMiniCalendarView(position: Int) {
 
-        miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+        miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
 
         // ViewPager will adjust its height to the largest item it contains and display empty space for
         //  smaller items, like months with fewer week lines. That's why we need to resize it every time we
-        //  display a month.
+        //  display a month
         val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
         miniCalendarPager.animateHeightChange(
             MiniCalendarItemAdapter.calculateAdapterHeight(
@@ -115,7 +129,7 @@ class MonthFragment : BaseDialogFragment() {
                 calendarViewModel.startWeekOn,
             )
         ) {
-            miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+            miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
         }
     }
 
@@ -128,6 +142,7 @@ class MonthFragment : BaseDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        miniCalendarPager.unregisterOnPageChangeCallback(miniCalendarPageChangeCallback)
         agendaPager.unregisterOnPageChangeCallback(agendaPageChangeCallback)
     }
 
@@ -139,17 +154,15 @@ class MonthFragment : BaseDialogFragment() {
         miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
             adapter = miniCalendarPagerAdapter
-            offscreenPageLimit = 2
+            offscreenPageLimit = 1
             setCurrentItem(miniCalendarPagerAdapter.startingPosition, false)
         }
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
 
-        miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
-
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
         agendaPager.apply{
             adapter = agendaPagerAdapter
-            offscreenPageLimit = 2
+            offscreenPageLimit = 1
             setCurrentItem(agendaPagerAdapter.startingPosition, false)
         }
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
@@ -190,6 +203,9 @@ class MonthFragment : BaseDialogFragment() {
     /**
      * Forces Mini Calendar Pager to have desired size for currently selected month,
      * independent from other months present in Pager.
+     *
+     * It is used only to make sure, the current month opened when you start the app
+     * has correct height. Upon pager scrolling we call another function to animate change.
      */
     val miniCalendarPagerLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
@@ -206,16 +222,13 @@ class MonthFragment : BaseDialogFragment() {
             TimberLogger.d("ppp desiredHeight =${desiredHeight}")
 
             if (miniCalendarPager.height != desiredHeight) {
-
-//                miniCalendarPager.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
                 val layoutParams = miniCalendarPager.layoutParams.apply {
                     height = desiredHeight
                 }
                 miniCalendarPager.layoutParams = layoutParams
-
-//                miniCalendarPager.getViewTreeObserver().addOnGlobalLayoutListener(this)
-
+                miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(this)
             }
 
         }
