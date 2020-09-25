@@ -72,14 +72,20 @@ class EventViewModel(
 
     val eventLiveData: LiveData<Event> = _event
 
-    /**
-     * Initial TimeZoneId for this event, default from Calendar Settings or taken from Event.
-     */
+    // TimeZone used when displaying event is taken from settings
     lateinit var displayTimeZoneId: String
+    // TimeZone for editing event is always event's own timezone, or default
+    lateinit var eventTimeZoneId: String
 
     lateinit var userSettings: UserSettingsEntity
 
-    suspend fun initialise(eventId: String?, occurrenceNumber: Int?, initStartDate: String?, initStartTime: String? /*TODO in the future also endDate for multi-day events*/): UseCase.Result /* TODO maybe use separate Result class */ {
+    suspend fun initialise(
+        editMode: Boolean,
+        eventId: String?,
+        occurrenceNumber: Int?,
+        initStartDate: String?,
+        initStartTime: String? /*TODO in the future also endDate for multi-day events*/
+    ): UseCase.Result /* TODO maybe use separate Result class */ {
 
         // reset backup values
         timeStartBackup = null
@@ -114,6 +120,8 @@ class EventViewModel(
         if (!loadSettingsForCalendar(defaultCalendarId)) return UseCase.Result.Error("could not get CalendarSettings")
 
         event = if (eventId == null) {
+
+            eventTimeZoneId = displayTimeZoneId
 
             val newICalendar = ICalUtils.createNewEvent().wrapInICalendar()
             val newVEvent = newICalendar.events.first()
@@ -198,24 +206,30 @@ class EventViewModel(
 
             val eventStartTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?: displayTimeZoneId
 
-            TimberLogger.d("timezone to generate occurrence: ${eventStartTimeZone}")
+            eventTimeZoneId = eventStartTimeZone
 
+            val timeZoneForOccurrence = if (editMode) {
+                eventTimeZoneId
+            } else {
+                displayTimeZoneId
+            }
 
             // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
-            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, eventStartTimeZone) ?: dbEvent)?.apply {
+            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, timeZoneForOccurrence) ?: dbEvent)?.apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
-                    this.iCalEvent.setEnd(this.getEnd(eventStartTimeZone)!!.toLocalDate().minusDays(1))
+                    this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
 
                     timeStartBackup = LocalTime.now()
                     timeEndBackup = LocalTime.now().plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())//.truncatedTo(ChronoUnit.HOURS)
                 } else {
-                    timeStartBackup = this.getStart(eventStartTimeZone)!!.toLocalTime()
-                    timeEndBackup = this.getEnd(eventStartTimeZone)!!.toLocalTime()
+                    timeStartBackup = this.getStart(timeZoneForOccurrence)!!.toLocalTime()
+                    timeEndBackup = this.getEnd(timeZoneForOccurrence)!!.toLocalTime()
                 }
 
                 // default timezone in iCalendar is used for GUI
-                this.iCalendar.setDefaultTimeZone(eventStartTimeZone)
+                this.iCalendar.setDefaultTimeZone(timeZoneForOccurrence)
+
 
             } ?: return UseCase.Result.Error("could not find event ${eventId}")
         }

@@ -217,10 +217,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             val viewModeInitStatus = withContext(Dispatchers.Default) {
                 eventViewModel.initialise(
+                    editMode = false,
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                     null,
-                    null
+                    null,
                 )
             }
 
@@ -312,7 +313,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     this.text_recurrence.text = AndroidUtils.formatRecurrence(
                         requireContext(),
                         event,
-                        eventViewModel.displayTimeZoneId
+                        eventViewModel.eventTimeZoneId
                     )
                 }
 

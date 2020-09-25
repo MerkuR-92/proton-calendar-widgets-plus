@@ -367,10 +367,8 @@ class AndroidUtils(context: Context) {
 
                 TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
 
-                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.getOffset(
-                        startJavaTime
-                    ) != startTimeZone.getOffset(startJavaTime)) {
-                    return "${label} (${startTimeZone.id})"
+                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.getOffset(startJavaTime) != startTimeZone.getOffset(startJavaTime)) {
+                    return "${label} (${formatTimeZone.id})"
                 } else {
                     return label
                 }

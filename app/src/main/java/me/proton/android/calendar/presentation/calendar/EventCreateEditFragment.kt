@@ -161,7 +161,13 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
             val viewModeInitStatus = withContext(Dispatchers.Default) {
-                eventViewModel.initialise(navigationArguments.eventId, if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber, navigationArguments.initStartDate, navigationArguments.initStartTime)
+                eventViewModel.initialise(
+                    editMode = true,
+                    navigationArguments.eventId,
+                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                    navigationArguments.initStartDate,
+                    navigationArguments.initStartTime,
+                )
             }
 
             if (viewModeInitStatus == UseCase.Result.Success) {
@@ -225,20 +231,20 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 tv_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
             }
 
-            val formattedStart = event.formatStart(eventViewModel.displayTimeZoneId)
+            val formattedStart = event.formatStart(eventViewModel.eventTimeZoneId)
             tv_start_date.text = formattedStart.first ?: ""
             tv_start_time.text = formattedStart.second ?: ""
 
-            val formattedEnd = event.formatEnd(eventViewModel.displayTimeZoneId)
+            val formattedEnd = event.formatEnd(eventViewModel.eventTimeZoneId)
             tv_end_date.text = formattedEnd.first ?: ""
             tv_end_time.text = formattedEnd.second ?: ""
 
-            tv_timezone_start.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
+            tv_timezone_start.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             tv_calendar.text = event.calendar.name
             tv_calendar.compoundDrawables.firstOrNull()?.setTint(Color.parseColor(event.calendar.color))
 
-            tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.displayTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+            tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
 
