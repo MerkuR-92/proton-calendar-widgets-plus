@@ -83,6 +83,12 @@
         <item name="android:textColor">@color/text_weak</item>
     </style>
 
+    <style name="Separator">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/separator_norm</item>
+    </style>
+
 
     <!--    <style name="AppThemeDEPRECATED" parent="Theme.MaterialComponents.DayNight">-->
 

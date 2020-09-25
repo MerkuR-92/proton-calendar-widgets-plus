@@ -22,7 +22,7 @@
 
     </style>
 
-<!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight" />-->
+    <!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight" />-->
 <!--   -->
 
     <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/woodsmoke"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <CheckBox
@@ -12,7 +11,6 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:checked="true"
-        android:button="@drawable/drawer_calendar_checkbox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/item_drawer_calendar_title"
         app:layout_constraintBottom_toBottomOf="@+id/item_drawer_calendar_title"/>
@@ -23,7 +21,6 @@
         android:layout_height="wrap_content"
         tools:text="Reminders"
         android:textAppearance="@style/Text.DefaultSmall"
-        android:textColor="@color/white"
         android:layout_marginStart="12dp"
         android:layout_marginTop="14dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -32,9 +29,7 @@
 
     <View
         android:id="@+id/item_drawer_calendar_divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/tuna"
+        style="@style/Separator"
         android:layout_marginTop="14dp"
         app:layout_constraintTop_toBottomOf="@+id/item_drawer_calendar_title"
         app:layout_constraintStart_toStartOf="@+id/item_drawer_calendar_title"
