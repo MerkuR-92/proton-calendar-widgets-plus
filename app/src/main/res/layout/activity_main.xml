@@ -52,13 +52,11 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        android:background="@color/woodsmoke"
-        app:headerLayout="@layout/nav_header_main">
+        android:background="@color/woodsmoke">
 
         <include
             android:id="@+id/nav_view_main_content"
             layout="@layout/nav_view_main"
-            android:layout_marginTop="@dimen/nav_header_height"
             android:layout_height="match_parent"
             android:layout_width="match_parent"/>
 

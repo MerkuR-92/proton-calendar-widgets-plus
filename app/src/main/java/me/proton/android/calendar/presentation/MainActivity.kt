@@ -14,13 +14,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.domain.ValueStoreProvider
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 
@@ -95,9 +95,24 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         }
 
+        //TODO Remove once login module implemented
+        nav_view_main_content.nav_view_user_name.text = "Proton Calendar Rocks"
+        nav_view_main_content.nav_view_user_mail.text = "protoncalendarrocks@pm.me"
+        nav_view_main_content.nav_view_user_initials.text = "PC"
+
         nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
             BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
+        //Navigation drawer items on click listeners
+        nav_view_main_content.nav_view_user_layout.setOnClickListener {
+            drawerLayout.close()
+        }
+        nav_view_main_content.nav_view_more_bug_layout.setOnClickListener {
+            drawerLayout.close()
+        }
+        nav_view_main_content.nav_view_more_logout_layout.setOnClickListener {
+            drawerLayout.close()
+        }
         nav_view_main_content.nav_view_more_login_layout.setOnClickListener {
             findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toLogin())
             drawerLayout.close()
