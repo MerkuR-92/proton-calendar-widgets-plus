@@ -227,22 +227,22 @@ class AndroidUtils(context: Context) {
                                 val dayOfWeekAsWord =
                                     context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal] // TODO use date formatters
 
-                                if (recurrence.bySetPos.isNotEmpty()) {
-                                    val setPos = recurrence.bySetPos[index]
+                                val dayNumber: Int? = if (recurrence.bySetPos.isNotEmpty()) {
+                                    recurrence.bySetPos[index]
+                                } else byDay.num
 
-                                    val ordinal = if (setPos > 0) {
-                                        context.resources.getStringArray(R.array.ordinals_as_words)
-                                            .getOrNull(setPos)
-                                    } else {
-                                        context.resources.getStringArray(R.array.ordinals_as_words_backwards)
-                                            .getOrNull(setPos * -1)
-                                    }
-
-                                    "${ordinal ?: recurrence.bySetPos[index]} $dayOfWeekAsWord"
-//                                }
+                                val dayOrdinal = if (dayNumber == null) {
+                                    null
+                                } else if (dayNumber > 0) {
+                                    context.resources.getStringArray(R.array.ordinals_as_words)
+                                        .getOrNull(dayNumber)
                                 } else {
-                                    dayOfWeekAsWord
+                                    context.resources.getStringArray(R.array.ordinals_as_words_backwards)
+                                        .getOrNull(dayNumber * -1)
                                 }
+
+                                "${if (dayOrdinal != null) "$dayOrdinal " else ""}$dayOfWeekAsWord"
+
                             }?.joinToString(separator = ", ")
                         // TODO handle .byMonthDay, .byYearDay when needed
 
