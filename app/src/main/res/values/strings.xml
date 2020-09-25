@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
-    <string name="app_version_name">ProtonCalendar %s (%d)</string>
 
     <string name="default_event_summary">(no title)</string>
 
@@ -108,6 +107,14 @@
     <string name="event_recurring_edit_this_and_future">This and future events</string>
     <string name="event_recurring_edit_all_events">All events</string>
 
+    <!-- NAVIGATION VIEW   -->
+    <string name="nav_view_calendars">Calendars</string>
+    <string name="nav_view_disabled_calendars">Disabled calendars</string>
+    <string name="nav_view_more">More</string>
+    <string name="nav_view_more_bug">Report bug</string>
+    <string name="nav_view_more_logout">Logout</string>
+    <string name="nav_view_more_login">Login</string>
+    <string name="nav_view_version_name">ProtonCalendar %s (%d)</string>
 
 
 

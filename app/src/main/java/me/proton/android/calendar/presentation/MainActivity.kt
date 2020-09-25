@@ -1,71 +1,28 @@
 package me.proton.android.calendar.presentation
 
-import android.content.Context
-import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.widget.Toolbar
-import androidx.core.app.AlarmManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.widget.NestedScrollView
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenResumed
 import androidx.lifecycle.whenStarted
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
-import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
-import me.proton.android.calendar.domain.usecase.LoginUserUseCase
-import me.proton.android.calendar.presentation.calendar.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.EventDetailsFragment
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
-import kotlinx.android.synthetic.main.nav_header_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.SYNC_EVENTS_REFRESH_MS
-import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.compat.SharedViewModelCompat.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
-import timber.log.Timber
-import java.time.LocalDate
-import java.time.LocalTime
-import java.util.*
-import kotlin.concurrent.fixedRateTimer
 
 
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -138,10 +95,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         }
 
-        nav_view_version.text = getString(R.string.app_version_name, "${BuildConfig.VERSION_NAME}", BuildConfig.VERSION_CODE)
+        nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
+            BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
-        nav_view_more_login_layout.setOnClickListener {
+        nav_view_main_content.nav_view_more_login_layout.setOnClickListener {
             findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toLogin())
+            drawerLayout.close()
         }
 
 //        mainViewModel.syncServerEvents().observe(this, Observer {
