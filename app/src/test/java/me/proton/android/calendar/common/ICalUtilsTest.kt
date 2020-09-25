@@ -777,7 +777,6 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        val displayRangeFrom = LocalDate.of(2020, 7, 1)
         val displayRangeTo = LocalDate.of(2020, 10, 1)
 
         val occurrences = event.generateOccurrencesUntil(displayRangeTo, displayTimeZoneId)
@@ -791,6 +790,52 @@ internal class ICalUtilsTest {
         assertThat(occurrences.last().occurrenceNumber).isEqualTo(3)
         assertThat(occurrences.last().startDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 22, 14, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
         assertThat(occurrences.last().endDateTime).isEqualTo(ZonedDateTime.of(2020, 9,  22, 14, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
+    fun `generate occurrences of part-day event with BYSETPOS within full-day range, different than system timezone`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Vilnius:20200904T073000
+    DTEND;TZID=Europe/Vilnius:20200904T080000
+    RRULE:FREQ=MONTHLY;BYDAY=FR;BYSETPOS=1
+    UID:rQ2fLVjx407UjHiYF272uJMxBerr@proton.me
+    DTSTAMP:20200925T070905Z
+    SUMMARY:monthly on first Friday
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        val displayRangeTo = LocalDate.of(2020, 12, 31)
+
+        val occurrences = event.generateOccurrencesUntil(displayRangeTo, displayTimeZoneId)
+
+        occurrences?.forEach {
+            TestsLogger.d("${it}")
+        }
+
+        assertThat(occurrences!!.size).isEqualTo(4)
+
+        assertThat(occurrences.first().occurrenceNumber).isEqualTo(1)
+        assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 4, 7, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 4, 8, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences.last().occurrenceNumber).isEqualTo(4)
+        assertThat(occurrences.last().startDateTime).isEqualTo(ZonedDateTime.of(2020, 12, 4, 7, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.last().endDateTime).isEqualTo(ZonedDateTime.of(2020, 12, 4, 8, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
     }
 

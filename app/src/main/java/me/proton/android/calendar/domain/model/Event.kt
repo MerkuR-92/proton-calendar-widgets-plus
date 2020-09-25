@@ -318,11 +318,11 @@ data class Event(
             //  1. first occurrence is skipped
             //  2. all the occurrences are returned as happening at 00:00 anyway, so we lose time of day
             //
-            //  we generate occurrences ignoring time of day and set it later manually, this will most likely
-            //  only work for FREQUENCY at least DAILY
+            //  we generate occurrences ignoring time of day & timezone and set it later manually,
+            //   this will most likely only work for FREQUENCY at least DAILY
             val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
             val startICalDate = ICalDate(iCalEvent.dateStart.value, false)
-            val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, iCalTimeZoneStart)
+            val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, TimeZone.getDefault())
 
             val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
 
