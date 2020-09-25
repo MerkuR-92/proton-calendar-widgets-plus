@@ -465,7 +465,7 @@ data class Event(
 
             val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
             val startICalDate = ICalDate(iCalEvent.dateStart.value, false)
-            val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, iCalTimeZoneStart)
+            val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, TimeZone.getDefault())
 
             val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
 

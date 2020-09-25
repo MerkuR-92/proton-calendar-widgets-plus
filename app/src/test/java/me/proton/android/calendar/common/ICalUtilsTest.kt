@@ -745,6 +745,45 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate occurrences of all-day event with BYDAY within full-day range`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200501
+    RRULE:FREQ=MONTHLY;BYDAY=1FR
+    SEQUENCE:0
+    UID:59rnikoltd7srebautub9lmhv2@google.com
+    DTSTAMP:20200514T130648Z
+    SUMMARY:Monthly 1st Friday
+    DTEND;VALUE=DATE:20200502
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Paris"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        val displayRangeTo = LocalDate.of(2020, 12, 31)
+
+        val occurrence5 = event.generateOccurrence(5, displayTimeZoneId)
+
+        assertThat(occurrence5!!).isNotNull()
+
+        assertThat(occurrence5.occurrenceNumber).isEqualTo(5)
+        assertThat(occurrence5.startDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 4, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrence5.endDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
     fun `generate occurrences of part-day event with BYSETPOS within full-day range`() {
 
         val iCalString = """
