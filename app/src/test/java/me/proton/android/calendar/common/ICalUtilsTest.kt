@@ -862,10 +862,6 @@ internal class ICalUtilsTest {
 
         val occurrences = event.generateOccurrencesUntil(displayRangeTo, displayTimeZoneId)
 
-        occurrences?.forEach {
-            TestsLogger.d("${it}")
-        }
-
         assertThat(occurrences!!.size).isEqualTo(4)
 
         assertThat(occurrences.first().occurrenceNumber).isEqualTo(1)
@@ -1558,6 +1554,158 @@ internal class ICalUtilsTest {
         assertThat(event.iCalEvent.recurrenceRule.value.frequency).isEqualTo(Frequency.DAILY)
         assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isFalse()
         assertThat(ZonedDateTime.ofInstant(event.iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.systemDefault()).toLocalDate()).isEqualTo(LocalDate.of(2020, 7, 10))
+
+    }
+
+    @Test
+    fun `generate occurrences of partial-day event with UNTIL`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20201001T163000
+    DTEND;TZID=Europe/Zurich:20201001T170000
+    RRULE:FREQ=DAILY;UNTIL=20201004T215959Z
+    UID:wK6IfGtwq4PX1x1qo9WY4dXxtDEU@proton.me
+    DTSTAMP:20200928T141234Z
+    SUMMARY:recur zh UNTIL Oct 4\, 16:30
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        // this should be happening on 1st, 2nd, 3rd and 4th in Zurich timezone
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Zurich"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)
+
+        assertThat(occurrences!!.size).isEqualTo(4)
+
+    }
+
+    @Test
+    fun `generate occurrences of partial-day event with UNTIL, GMT+11`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Antarctica/Macquarie:20201002T020000
+    DTEND;TZID=Antarctica/Macquarie:20201002T023000
+    RRULE:FREQ=DAILY;UNTIL=20201004T125959Z
+    UID:k8EOBVhcHvW73TBNBIbKxxbNf16T@proton.me
+    DTSTAMP:20200928T145841Z
+    SUMMARY:gmt+11 UNTIL Oct 4
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        // this should be happening on 1st, 2nd and 3rd in Vilnius timezone
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)!!
+
+        assertThat(occurrences.first()).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 1, 18, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 1, 18, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrences.last()).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 3, 18, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 3, 18, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            3))
+
+    }
+
+    @Test
+    fun `generate occurrences of partial-day event with UNTIL, GMT+11, displayed in GMT+12`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Antarctica/Macquarie:20201002T020000
+    DTEND;TZID=Antarctica/Macquarie:20201002T023000
+    RRULE:FREQ=DAILY;UNTIL=20201004T125959Z
+    UID:k8EOBVhcHvW73TBNBIbKxxbNf16T@proton.me
+    DTSTAMP:20200928T145841Z
+    SUMMARY:gmt+11 UNTIL Oct 4
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        // this should be happening on 2nd, 3rd and 4th in Pacific/Fiji timezone
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Pacific/Fiji"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)!!
+
+        assertThat(occurrences.first()).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 2, 3, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 2, 3, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrences.last()).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 4, 3, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 4, 3, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            3))
+
+    }
+
+    @Test
+    fun `generate occurrences of partial-day event with UNTIL, GMT-11`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Pacific/Pago_Pago:20201001T040000
+    DTEND;TZID=Pacific/Pago_Pago:20201001T043000
+    RRULE:FREQ=DAILY;UNTIL=20201005T105959Z
+    UID:VU06MoYMt_mNWMlWuN5cfRuC3ZAl@proton.me
+    DTSTAMP:20200928T145535Z
+    SUMMARY:gmt-11 recur daily UNTIL Oct 4\, 8:30
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        // this should be happening on 1st, 2nd, 3rd and 4th in Vilnius timezone
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true
+        ), iCal, null)
+
+        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)
+
+        assertThat(occurrences!!.size).isEqualTo(4)
 
     }
 
