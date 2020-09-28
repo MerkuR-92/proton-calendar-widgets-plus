@@ -62,6 +62,15 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         return calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive }
     }
 
+    suspend fun selectDisabledCalendars(): List<CalendarEntity> {
+
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!
+        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+
+        return calendarsRepository.getDisabledCalendars(TODOuserID).filter { it.isDisabled }
+    }
+
     suspend fun init(coroutineScope: CoroutineScope) {
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
         val TODOuserID = TODOvalueStore.getString("USERID") // TODO

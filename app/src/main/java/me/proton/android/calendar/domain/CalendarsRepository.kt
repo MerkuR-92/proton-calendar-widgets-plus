@@ -26,6 +26,7 @@ interface CalendarsRepository {
 
     suspend fun getActiveCalendars(userId: String): List<CalendarEntity>
 
+    suspend fun getDisabledCalendars(userId: String): List<CalendarEntity>
 
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 

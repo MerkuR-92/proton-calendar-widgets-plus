@@ -122,6 +122,10 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         return selectCalendars(userId).filter { it.isActive }
     }
 
+    override suspend fun getDisabledCalendars(userId: String): List<CalendarEntity> {
+        return selectCalendars(userId).filter { it.isDisabled }
+    }
+
     override fun eventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,

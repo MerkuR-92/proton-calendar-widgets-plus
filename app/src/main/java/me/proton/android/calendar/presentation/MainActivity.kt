@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,16 +14,23 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.core.KoinComponent
+import org.koin.core.parameter.parametersOf
 
 
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -33,6 +41,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var navController: NavController
 
     private val valueStoreProvider: ValueStoreProvider by inject()
+
+    private lateinit var calendarViewModel: CalendarViewModel
+    private lateinit var activeCalendarListAdapter: CalendarListAdapter
+    private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +61,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         ), drawerLayout)
         //setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        calendarViewModel =
+            getViewModel { parametersOf() }
 
         this.lifecycleScope.launch {
 //            val params = TextViewCompat.getTextMetricsParams(textView)
@@ -103,6 +118,37 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
             BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
+        initDrawerListeners()
+
+        initDrawerCalendarsList()
+
+//        mainViewModel.syncServerEvents().observe(this, Observer {
+//            it?.let { TimberLogger.d("local server event sync state: ${it}") } // TODO progress indicator
+//        })
+    }
+
+    private fun initDrawerListeners() {
+        drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener{
+            override fun onDrawerOpened(drawerView: View) {
+                lifecycleScope.launch {
+                    val activeCalendars = withContext(Dispatchers.Default) {
+                        calendarViewModel.selectActiveCalendars()
+                    }
+                    activeCalendarListAdapter.submitList(activeCalendars)
+                }
+
+                lifecycleScope.launch {
+                    val disabledCalendars = withContext(Dispatchers.Default) {
+                        calendarViewModel.selectDisabledCalendars()
+                    }
+                    disabledCalendarListAdapter.submitList(disabledCalendars)
+                }
+            }
+            override fun onDrawerClosed(drawerView: View) {}
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+            override fun onDrawerStateChanged(newState: Int) {}
+        })
+
         //Navigation drawer items on click listeners
         nav_view_main_content.nav_view_user_layout.setOnClickListener {
             drawerLayout.close()
@@ -117,12 +163,25 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toLogin())
             drawerLayout.close()
         }
-
-//        mainViewModel.syncServerEvents().observe(this, Observer {
-//            it?.let { TimberLogger.d("local server event sync state: ${it}") } // TODO progress indicator
-//        })
     }
 
+    private fun initDrawerCalendarsList() {
+        val activeCalendarListView = nav_view_main_content.nav_view_calendars_list
+        val activeCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        activeCalendarListView.layoutManager = activeCalendarsLayoutManager
+        activeCalendarListAdapter = CalendarListAdapter() {
+            //On Calendar click event
+        }
+        activeCalendarListView.adapter = activeCalendarListAdapter
+
+        val disabledCalendarListView = nav_view_main_content.nav_view_disabled_calendars_list
+        val disabledCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        disabledCalendarListView.layoutManager = disabledCalendarLayoutManager
+        disabledCalendarListAdapter = CalendarListAdapter() {
+            //On Calendar click event
+        }
+        disabledCalendarListView.adapter = disabledCalendarListAdapter
+    }
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
