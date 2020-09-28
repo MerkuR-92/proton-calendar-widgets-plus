@@ -296,6 +296,61 @@ data class Event(
             }
         }
 
+    /**
+     * Generates all occurrences of a recurring Event until given LocalDate in TimeZone
+     * or the first X occurrences, whatever comes first.
+     *
+     * Occurrences are in passed timezone, not in original Event's timezone.
+     *
+     * You need to provide at least [toDate] or [occurrenceCount]
+     */
+    fun generateOccurrencesUntilOrCount(timeZoneId: String, toDate: LocalDate?, occurrenceCount: Int?): List<Occurrence>? {
+
+        if (!isRecurring()) return null
+
+        if (toDate == null && occurrenceCount == null) return null
+
+        val occurences = mutableListOf<Occurrence>()
+
+        val toDateTime = toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
+
+        val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
+
+        // this is a workaround for bugs in generating occurrences for RRULE with BYSETPOS
+        //  when Event start date contains time different than 00:00, then:
+        //  1. first occurrence is skipped
+        //  2. all the occurrences are returned as happening at 00:00 anyway, so we lose time of day
+        //
+        //  we generate occurrences ignoring time of day & timezone and set it later manually,
+        //   this will most likely only work for FREQUENCY at least DAILY
+        val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+        val startICalDate = ICalDate(iCalEvent.dateStart.value, false)
+        val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, TimeZone.getDefault())
+
+        val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
+
+        var occurrenceNumber = 0
+        while (startIterator.hasNext()) {
+
+            occurrenceNumber++
+
+            val occurrenceStart = if (this.isAllDay()) { // we force the timezone to be the one we got in param
+                // unfortunately parser uses Calendar object with default timezone
+                ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
+            } else ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId)).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
+
+            val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+
+            if ((toDateTime != null && occurrenceStart.isAfter(toDateTime)) || (occurrenceCount != null && occurrenceNumber > occurrenceCount)) break
+
+            occurences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
+
+        }
+
+        return occurences
+
+    }
+
         // TODO merge this method with "generate occurrence x" to have something like "generate occurrences"
         //  until X date or until Y occurrence number
         /**
@@ -304,47 +359,7 @@ data class Event(
          * Occurrences are in passed timezone, not in original Event's timezone.
          */
         fun generateOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
-
-            if (!isRecurring()) return null
-
-            val occurences = mutableListOf<Occurrence>()
-
-            val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
-
-            val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
-
-            // this is a workaround for bugs in generating occurrences for RRULE with BYSETPOS
-            //  when Event start date contains time different than 00:00, then:
-            //  1. first occurrence is skipped
-            //  2. all the occurrences are returned as happening at 00:00 anyway, so we lose time of day
-            //
-            //  we generate occurrences ignoring time of day & timezone and set it later manually,
-            //   this will most likely only work for FREQUENCY at least DAILY
-            val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-            val startICalDate = ICalDate(iCalEvent.dateStart.value, false)
-            val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, TimeZone.getDefault())
-
-            val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
-
-            var occurrenceNumber = 0
-            while (startIterator.hasNext()) {
-
-                occurrenceNumber++
-
-                val occurrenceStart = if (this.isAllDay()) { // we force the timezone to be the one we got in param
-                    // unfortunately parser uses Calendar object with default timezone
-                    ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
-                } else ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId)).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
-
-                val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
-
-                if (occurrenceStart.isAfter(toDateTime)) break
-
-                occurences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
-
-            }
-
-            return occurences
+            return generateOccurrencesUntilOrCount(timeZoneId, toDate, null)
         }
 
         // TODO move all these helper methods to utils
@@ -456,40 +471,11 @@ data class Event(
 
         /**
          * Occurrence is generated using DTSTART/DTEND timezone, but formatted with passed param.
+         *
+         * @param occurrenceNumber has to be a positive number
          */
         fun generateOccurrence(occurrenceNumber: Int, timeZoneId: String): Occurrence? {
-
-            if (!isRecurring()) return null
-
-            val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
-
-            val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-            val startICalDate = ICalDate(iCalEvent.dateStart.value, false)
-            val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, TimeZone.getDefault())
-
-            val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
-
-            var counter = 1
-            while (startIterator.hasNext() && counter <= occurrenceNumber) {
-
-                if (counter == occurrenceNumber) {
-
-                    val occurrenceStart = if (this.isAllDay()) { // we force the timezone to be the one we got in param
-                        // unfortunately parser uses Calendar object with default timezone
-                        ZonedDateTime.of(ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
-                    } else ZonedDateTime.ofInstant(startIterator.next().toInstant(), ZoneId.of(timeZoneId)).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
-
-                    val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
-
-                    return Occurrence(occurrenceStart, occurrenceEnd, counter)
-
-                } else {
-                    counter++
-                    startIterator.next()
-                }
-            }
-
-            return null
+            return generateOccurrencesUntilOrCount(timeZoneId, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
         }
 
         fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
