@@ -67,6 +67,9 @@ class EventViewModel(
 //    }
 
     private lateinit var event: Event
+    // original event from database, from before it has been edited
+    var dbEvent: Event? = null
+
     private lateinit var calendarSettings: CalendarSettingsEntity
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
 
@@ -198,7 +201,7 @@ class EventViewModel(
 
             TimberLogger.v("event view model init with occurrence: $occurrenceNumber")
 
-            val dbEvent = viewModelScope.async(Dispatchers.IO) {
+            dbEvent = viewModelScope.async(Dispatchers.IO) {
                 calendarsRepository.eventFlow(eventId).first()
             }.await()
 
@@ -734,6 +737,8 @@ class EventViewModel(
     fun isEventNew() = !event.isSyncedWithApi()
 
     fun isEventRecurring() = event.isRecurring()
+
+    fun isEventPartOfChain() = event.isPartOfChain()
 
     fun isEventFirstOccurrence() = event.isFirstOccurrence()
 

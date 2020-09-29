@@ -56,7 +56,13 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
                     if (eventViewModel.hasEventBeenEdited()) {
 
-                        if (eventViewModel.isEventRecurring() && !eventViewModel.isEventNew()) { // edit recurring
+                        val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && (
+                                (eventViewModel.dbEvent?.isRecurring() == true)
+                                        ||
+                                (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())
+                        )
+                        
+                        if (shouldShowConfirmationPicker) {
 
                             AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                                 getString(R.string.event_recurring_edit_this),
