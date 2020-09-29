@@ -557,6 +557,10 @@ data class Event(
 
         }
 
+        // this event might be a single edit so it's technically a separate event in the database,
+        //  but it's still considered as a part of a chain of events
+        fun isPartOfChain(): Boolean = this.isRecurring() || this.isFromRecurring()
+
         fun withOccurrence(occurrenceNumber: Int, timeZoneId: String): Event? {
 
             val occurrence = generateOccurrence(occurrenceNumber, timeZoneId)

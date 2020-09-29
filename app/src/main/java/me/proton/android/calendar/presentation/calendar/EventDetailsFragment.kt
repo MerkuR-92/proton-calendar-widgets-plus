@@ -106,7 +106,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun handleDelete() {
         val event = eventViewModel.eventLiveData.value!!
 
-        if (event.isRecurring()/* || event.isFromRecurring()*/) {
+        if (event.isPartOfChain()) {
 
             AndroidUtils.displaySingleChoiceConfirmationPicker(
                 requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
