@@ -168,30 +168,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val activeCalendarListView = nav_view_main_content.nav_view_calendars_list
         val activeCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         activeCalendarListView.layoutManager = activeCalendarsLayoutManager
-        var job: Job? = null
         activeCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
             //On Calendar click event
-            job?.cancel()
-            job = lifecycleScope.launch {
-                calendarViewModel.handleUpdateCalendarDisplay(calendarEntity.id, display)
-            }
+            calendarViewModel.updateServerCalendarSettings(calendarEntity.id, display)
         }
         activeCalendarListView.adapter = activeCalendarListAdapter
 
         val disabledCalendarListView = nav_view_main_content.nav_view_disabled_calendars_list
         val disabledCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         disabledCalendarListView.layoutManager = disabledCalendarLayoutManager
-        var job2: Job? = null
         disabledCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
             //On Calendar click event
-            job2?.cancel()
-            job2 = lifecycleScope.launch {
-                calendarViewModel.handleUpdateCalendarDisplay(calendarEntity.id, display)
-            }
+            calendarViewModel.updateServerCalendarSettings(calendarEntity.id, display)
         }
         disabledCalendarListView.adapter = disabledCalendarListAdapter
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.

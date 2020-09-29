@@ -226,19 +226,7 @@ class CalendarViewModel(
         }.await()
     }
 
-    suspend fun handleUpdateCalendarDisplay(calendarId: String, display: Int): UseCase.Result {
-        return viewModelScope.async {
-            withContext(Dispatchers.IO) {
-
-                //Update server side
-                updateServerCalendarSettings(calendarId, display)
-
-                updateCalendarUseCase.executeDbUpdate(calendarId, display)
-            }
-        }.await()
-    }
-
-    private fun updateServerCalendarSettings(calendarId: String, display: Int) : LiveData<Operation.State> {
+    fun updateServerCalendarSettings(calendarId: String, display: Int) : LiveData<Operation.State> {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
