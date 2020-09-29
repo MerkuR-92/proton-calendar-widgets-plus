@@ -16,10 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import biweekly.property.Status
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.AndroidUtils
-import me.proton.android.calendar.common.format
-import me.proton.android.calendar.common.formatTime
-import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
@@ -257,17 +254,5 @@ class EventAdapter(
         }
 
     }
-
-    // TODO introduce necessary interface?
-    private class GenericDiffCallback<T : BaseModel> : DiffUtil.ItemCallback<T>() {
-        override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
-            return oldItem.equals(newItem) // TODO figure out generic way of determining if contents changed? timestamp?
-        }
-    }
-
 }
 

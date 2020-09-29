@@ -29,6 +29,9 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("DELETE FROM calendars WHERE id = :id")
     abstract fun deleteById(id: String)
 
+    @Query("SELECT * FROM calendars WHERE fkUserId = :userId AND calendars.display = 1")
+    abstract fun selectDisplayedCalendars(userId: String): List<CalendarEntity>
+
 
 
 // @Query("SELECT * from plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")

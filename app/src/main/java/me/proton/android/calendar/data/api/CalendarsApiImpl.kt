@@ -47,6 +47,9 @@ interface CalendarsApiService {
     @GET("calendar/$API_VERSION_CALENDAR/events")
     suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : Response<EventsByUidApiResponse>
 
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
+    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : Response<UpdateCalendarApiResponse>
+
 }
 
 class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, logger: Logger) : BaseApi(gson, logger), CalendarsApi {
@@ -86,6 +89,10 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
     override suspend fun syncEvents(calendarId: String, body: SyncEventsUpdateApiRequest): ApiResponse<SyncEventsApiResponse> = safeApiCall { service.syncEvents(calendarId, body) }
 
     override suspend fun getEventsByUid(eventUid: String, page: Int, pageSize: Int): ApiResponse<EventsByUidApiResponse> = safeApiCall { service.getEventsByUid(eventUid, page, pageSize) }
+
+    override suspend fun updateCalendar(calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<UpdateCalendarApiResponse> = safeApiCall{
+        service.updateCalendar(calendarId, body)
+    }
 
 }
 
@@ -137,6 +144,13 @@ data class CreateEventApiRequest(
 data class SyncEventsUpdateApiRequest(
     val memberId: String,
     val events: List<SyncEventContainer>
+)
+
+data class UpdateCalendarApiRequest(
+    val name: String? = null,
+    val description: String? = null,
+    val color: String? = null,
+    val display: Int? = null
 )
 
 // TODO container for CREATE LINKED by adding SharedEventID and UID
@@ -194,6 +208,10 @@ data class SyncResponse(
     @SerializedName("Event")
     val event: EventEntity?
     // TODO errors and other types of payload
+) : BaseApiResponse()
+
+data class UpdateCalendarApiResponse(
+    override val code: Int // TODO other fields
 ) : BaseApiResponse()
 
 //@Serializable

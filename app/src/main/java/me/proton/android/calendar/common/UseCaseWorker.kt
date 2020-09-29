@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.core.KoinComponent
 import org.koin.core.get
@@ -20,6 +21,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UseCaseId {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
+            const val UPDATE_SERVER_CALENDAR_SETTINGS = "UPDATE_SERVER_CALENDAR_SETTINGS"
         }
     }
 
@@ -30,6 +32,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USE_CASE_ID = "INPUT_USE_CASE_ID"
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
+        const val INPUT_DISPLAY_ID = "INPUT_DISPLAY_ID"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
     }
 
@@ -39,6 +42,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UniqueWorkNames {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
+            const val UPDATE_SERVER_CALENDAR_SETTINGS = "UPDATE_SERVER_CALENDAR_SETTINGS"
         }
     }
 
@@ -51,6 +55,12 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.SYNC_SERVER_EVENTS -> {
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
                 syncServerEventsUseCase.execute(inputData.getString(INPUT_USER_ID) ?: return Result.failure())
+            }
+            UseCaseId.UPDATE_SERVER_CALENDAR_SETTINGS -> {
+                val updateCalendarUseCase: UpdateCalendarUseCase = get()
+                updateCalendarUseCase.executeServerUpdate(
+                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
+                    inputData.getInt(INPUT_DISPLAY_ID, 1))
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

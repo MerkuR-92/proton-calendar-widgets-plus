@@ -16,21 +16,18 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Operation
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.parameter.parametersOf
 
 
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -42,7 +39,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private val valueStoreProvider: ValueStoreProvider by inject()
 
-    private lateinit var calendarViewModel: CalendarViewModel
+    private val calendarViewModel: CalendarViewModel by inject()
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
     private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
@@ -61,9 +58,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         ), drawerLayout)
         //setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        calendarViewModel =
-            getViewModel { parametersOf() }
 
         this.lifecycleScope.launch {
 //            val params = TextViewCompat.getTextMetricsParams(textView)
@@ -142,6 +136,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         calendarViewModel.selectDisabledCalendars()
                     }
                     disabledCalendarListAdapter.submitList(disabledCalendars)
+
+                    nav_view_main_content.nav_view_disabled_calendars.visibility =
+                        if (disabledCalendars.isEmpty()) View.GONE
+                        else View.VISIBLE
                 }
             }
             override fun onDrawerClosed(drawerView: View) {}
@@ -165,20 +163,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+
     private fun initDrawerCalendarsList() {
         val activeCalendarListView = nav_view_main_content.nav_view_calendars_list
         val activeCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         activeCalendarListView.layoutManager = activeCalendarsLayoutManager
-        activeCalendarListAdapter = CalendarListAdapter() {
+        var job: Job? = null
+        activeCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
             //On Calendar click event
+            job?.cancel()
+            job = lifecycleScope.launch {
+                calendarViewModel.handleUpdateCalendarDisplay(calendarEntity.id, display)
+            }
         }
         activeCalendarListView.adapter = activeCalendarListAdapter
 
         val disabledCalendarListView = nav_view_main_content.nav_view_disabled_calendars_list
         val disabledCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         disabledCalendarListView.layoutManager = disabledCalendarLayoutManager
-        disabledCalendarListAdapter = CalendarListAdapter() {
+        var job2: Job? = null
+        disabledCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
             //On Calendar click event
+            job2?.cancel()
+            job2 = lifecycleScope.launch {
+                calendarViewModel.handleUpdateCalendarDisplay(calendarEntity.id, display)
+            }
         }
         disabledCalendarListView.adapter = disabledCalendarListAdapter
     }

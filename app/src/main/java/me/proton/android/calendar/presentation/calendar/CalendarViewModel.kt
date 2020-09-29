@@ -1,28 +1,36 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Context
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
+import androidx.work.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import me.proton.android.calendar.common.TestsLogger
-import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.Month
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
-class CalendarViewModel(private val calendarsRepository: CalendarsRepository, private val deleteEventUseCase: DeleteEventUseCase, private val createEventUseCase: EditCreateEventUseCase, private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
+class CalendarViewModel(
+    private val context: Context,
+    private val calendarsRepository: CalendarsRepository,
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val createEventUseCase: EditCreateEventUseCase,
+    private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -57,18 +65,18 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!
-        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
 
-        return calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive }
+        return if (TODOuserID != null) calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive } else ArrayList()
     }
 
     suspend fun selectDisabledCalendars(): List<CalendarEntity> {
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!
-        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
 
-        return calendarsRepository.getDisabledCalendars(TODOuserID).filter { it.isDisabled }
+        return if (TODOuserID != null) calendarsRepository.getDisabledCalendars(TODOuserID).filter { it.isDisabled } else ArrayList()
     }
 
     suspend fun init(coroutineScope: CoroutineScope) {
@@ -98,7 +106,7 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
                 // TODO this method never returns
                 val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
                 val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-                calendarsRepository.init(selectedCalendarIds, toDate, timeZoneId.id)
+                calendarsRepository.init(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
             }
 
 
@@ -218,8 +226,36 @@ class CalendarViewModel(private val calendarsRepository: CalendarsRepository, pr
         }.await()
     }
 
+    suspend fun handleUpdateCalendarDisplay(calendarId: String, display: Int): UseCase.Result {
+        return viewModelScope.async {
+            withContext(Dispatchers.IO) {
 
+                //Update server side
+                updateServerCalendarSettings(calendarId, display)
 
+                updateCalendarUseCase.executeDbUpdate(calendarId, display)
+            }
+        }.await()
+    }
+
+    private fun updateServerCalendarSettings(calendarId: String, display: Int) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR_SETTINGS,
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
+                    UseCaseWorker.INPUT_DISPLAY_ID to display
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR_SETTINGS, ExistingWorkPolicy.REPLACE, work).state
+    }
 
 //    fun TEST_CREATE_EVENT_TODO() {
 //        ioScope.launch {

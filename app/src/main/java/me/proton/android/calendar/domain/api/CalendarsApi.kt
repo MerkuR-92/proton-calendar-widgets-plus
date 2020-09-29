@@ -49,5 +49,10 @@ interface CalendarsApi {
 
     suspend fun getEventsByUid(eventUid: String, page: Int, pageSize: Int) : ApiResponse<EventsByUidApiResponse>
 
+    /**
+     * Update calendar.
+     */
+    suspend fun updateCalendar(calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<UpdateCalendarApiResponse>
+
 }
 

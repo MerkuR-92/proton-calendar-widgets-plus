@@ -16,7 +16,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 
 class CalendarListAdapter(
-    val listener: (CalendarEntity) -> Unit
+    val listener: (CalendarEntity, Int) -> Unit
 ) : ListAdapter<CalendarEntity, CalendarListAdapter.ViewHolder>(CalendarEntityDiffCallback()) {
 
     class CalendarEntityDiffCallback : DiffUtil.ItemCallback<CalendarEntity>() {
@@ -51,10 +51,10 @@ class CalendarListAdapter(
 
             calendarEntityItemLayout.setOnClickListener {
                 calendarEntityItemCheckBox.isChecked = !calendarEntityItemCheckBox.isChecked
-                listener(calendarEntity)
+                listener(calendarEntity, if(calendarEntityItemCheckBox.isChecked) 1 else 0)
             }
             calendarEntityItemCheckBox.setOnClickListener {
-                listener(calendarEntity)
+                listener(calendarEntity, if(calendarEntityItemCheckBox.isChecked) 1 else 0)
             }
         }
     }

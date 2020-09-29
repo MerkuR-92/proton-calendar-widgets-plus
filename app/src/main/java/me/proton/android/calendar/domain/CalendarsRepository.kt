@@ -47,6 +47,8 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
+    suspend fun refreshEvents(calendarIds: List<String>, userId: String, toDate: LocalDate, timeZoneId: String)
+
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself
      * if there is only one event with this UID.
@@ -102,7 +104,7 @@ interface CalendarsRepository {
 
     suspend fun deleteEventAlarmById(id: String)
 
-    suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String)
+    suspend fun init(calendarIds: List<String>, userId: String, toDate: LocalDate, timeZoneId: String)
 //    suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String)
 
     val fetchingState: Flow<FetchingState>

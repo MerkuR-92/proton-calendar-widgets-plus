@@ -42,15 +42,18 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
     private lateinit var selectedCalendarIds: List<String>
 
-    override suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String) {
+    override suspend fun init(calendarIds: List<String>, userId: String, toDate: LocalDate, timeZoneId: String) {
         selectedCalendarIds = calendarIds
         logger.v("zzz CalendarsRepository init()")
 
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
+            val displayedCalendarsId = database.calendarsDao().selectDisplayedCalendars(userId).map { it.id }.toList()
+            val filteredEventEntities = eventEntities.filter { displayedCalendarsId.contains(it.calendarId) }
+
             logger.v("xxx db events flow collect")
-            val transformedEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
+            val transformedEvents = filteredEventEntities.mapNotNull { transformEventUseCase.execute(it) }
 
             //dbEvents.value = transformedEvents
             dbEvents.clear()
@@ -87,6 +90,18 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         // TODO launchIn coroutine scope?
         //}.flowOn(Dispatchers.Default).collect()*/
 
+    }
+
+    override suspend fun refreshEvents(displayedCalendarsId: List<String>, userId: String, toDate: LocalDate, timeZoneId: String) {
+        database.eventsDao().flowEvents(displayedCalendarsId).collect { events ->
+
+            val transformedEvents = events.mapNotNull { transformEventUseCase.execute(it) }
+
+            dbEvents.clear()
+            dbEvents.addAll(transformedEvents)
+
+            expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
+        }
     }
 
     // TODO add fetch(from, to)

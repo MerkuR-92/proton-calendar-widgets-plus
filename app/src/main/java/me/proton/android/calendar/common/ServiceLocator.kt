@@ -83,7 +83,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get()) }
+    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
             get(),
@@ -103,5 +103,6 @@ val useCaseModule = module {
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get()) }
 }
