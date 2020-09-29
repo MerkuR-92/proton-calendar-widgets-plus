@@ -387,8 +387,7 @@ class EventViewModel(
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
-                // TODO FIXME isRecurring OR isInChain?????????
-                if (event.isRecurring() || event.isFromRecurring()) {
+                if (event.isPartOfChain() || dbEvent?.isRecurring() == true) {
 
                     // TODO BUG:
                     // 1. event is a regular event
