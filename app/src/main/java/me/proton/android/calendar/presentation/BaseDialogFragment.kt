@@ -85,7 +85,6 @@ abstract class BaseDialogFragment : DialogFragment() {
                             setNavigationIcon(R.drawable.ic_close)
                         }
                     }
-                    navigationIcon!!.setTint(ContextCompat.getColor(requireContext(), R.color.icon_norm))
 
                     setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
                         if (isTopLevel) {

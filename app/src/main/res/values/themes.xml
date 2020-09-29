@@ -26,13 +26,7 @@
 <!--   -->
 
     <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-
-<!--        <item name="actionMenuTextColor">@android:color/holo_green_light</item>-->
-<!--        <item name="colorAccent">#a24f22</item>-->
-<!--        <item name="colorControlNormal">@color/icon_norm</item>-->
-<!--        <item name="colorControlActivated">#f74f99</item>-->
-
-        <!--        <item name="titleTextAppearance">@style/MyToolbartitleTextAppearance</item>-->
+        <item name="tint">@color/icon_norm</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
