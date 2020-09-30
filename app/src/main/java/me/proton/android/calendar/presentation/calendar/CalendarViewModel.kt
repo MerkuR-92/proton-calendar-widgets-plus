@@ -226,7 +226,12 @@ class CalendarViewModel(
         }.await()
     }
 
-    fun updateServerCalendarSettings(calendarId: String, display: Int) : LiveData<Operation.State> {
+    fun updateServerCalendar(
+        calendarId: String,
+        name: String? = null,
+        description: String? = null,
+        color: String? = null,
+        display: Int? = null) : LiveData<Operation.State> {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -235,14 +240,17 @@ class CalendarViewModel(
             .setConstraints(constraints)
             .setInputData(
                 workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR_SETTINGS,
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR,
                     UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_DISPLAY_ID to display
+                    UseCaseWorker.INPUT_CALENDAR_NAME to name,
+                    UseCaseWorker.INPUT_CALENDAR_DESCRIPTION to description,
+                    UseCaseWorker.INPUT_CALENDAR_COLOR to color,
+                    UseCaseWorker.INPUT_CALENDAR_DISPLAY to display
                 )
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR_SETTINGS, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
 
 //    fun TEST_CREATE_EVENT_TODO() {

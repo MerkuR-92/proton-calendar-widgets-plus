@@ -49,8 +49,8 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-            val displayedCalendarsId = database.calendarsDao().selectDisplayedCalendars(userId).map { it.id }.toList()
-            val filteredEventEntities = eventEntities.filter { displayedCalendarsId.contains(it.calendarId) }
+            val displayedCalendarsIds = database.calendarsDao().selectDisplayedCalendars(userId).map { it.id }.toList()
+            val filteredEventEntities = eventEntities.filter { displayedCalendarsIds.contains(it.calendarId) }
 
             logger.v("xxx db events flow collect")
             val transformedEvents = filteredEventEntities.mapNotNull { transformEventUseCase.execute(it) }

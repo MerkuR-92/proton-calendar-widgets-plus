@@ -21,7 +21,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UseCaseId {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
-            const val UPDATE_SERVER_CALENDAR_SETTINGS = "UPDATE_SERVER_CALENDAR_SETTINGS"
+            const val UPDATE_SERVER_CALENDAR = "UPDATE_SERVER_CALENDAR"
         }
     }
 
@@ -32,8 +32,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USE_CASE_ID = "INPUT_USE_CASE_ID"
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
-        const val INPUT_DISPLAY_ID = "INPUT_DISPLAY_ID"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
+
+        //Update Calendar
+        const val INPUT_CALENDAR_NAME = "INPUT_CALENDAR_NAME"
+        const val INPUT_CALENDAR_DESCRIPTION = "INPUT_CALENDAR_DESCRIPTION"
+        const val INPUT_CALENDAR_COLOR = "INPUT_CALENDAR_COLOR"
+        const val INPUT_CALENDAR_DISPLAY = "INPUT_CALENDAR_DISPLAY"
     }
 
     /**
@@ -42,7 +47,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UniqueWorkNames {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
-            const val UPDATE_SERVER_CALENDAR_SETTINGS = "UPDATE_SERVER_CALENDAR_SETTINGS"
+            const val UPDATE_SERVER_CALENDAR = "UPDATE_SERVER_CALENDAR"
         }
     }
 
@@ -56,11 +61,14 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
                 syncServerEventsUseCase.execute(inputData.getString(INPUT_USER_ID) ?: return Result.failure())
             }
-            UseCaseId.UPDATE_SERVER_CALENDAR_SETTINGS -> {
+            UseCaseId.UPDATE_SERVER_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
                 updateCalendarUseCase.executeServerUpdate(
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
-                    inputData.getInt(INPUT_DISPLAY_ID, 1))
+                    inputData.getString(INPUT_CALENDAR_NAME),
+                    inputData.getString(INPUT_CALENDAR_DESCRIPTION),
+                    inputData.getString(INPUT_CALENDAR_COLOR),
+                    inputData.getInt(INPUT_CALENDAR_DISPLAY, -1))
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

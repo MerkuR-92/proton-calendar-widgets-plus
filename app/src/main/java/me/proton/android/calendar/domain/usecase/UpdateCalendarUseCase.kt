@@ -22,23 +22,25 @@ class UpdateCalendarUseCase(
     //TODO Handle other Calendar parameters
 
     //Update Calendar Display on Server
-    suspend fun executeServerUpdate(calendarId: String, display: Int) : UseCase.Result {
+    suspend fun executeServerUpdate(calendarId: String, name: String?, description: String?, color: String?, displayValue: Int) : UseCase.Result {
+        val display = if (displayValue != -1) displayValue else null
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
-            display = display
-        )
+            name = name,
+            description = description,
+            color = color,
+            display = display)
 
         return when (val updateCalendarResponse = calendarsApi.updateCalendar(calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
                 //Update value in DB
                 val calendarEntity = calendarsRepository.selectCalendar(calendarId) ?: return UseCase.Result.InvalidParams("event $calendarId doesn't exist in DB")
 
-                val newCalendarEntity = CalendarEntity(
-                    calendarId,
-                    calendarEntity.name,
-                    calendarEntity.description,
-                    calendarEntity.color,
-                    display,
-                    calendarEntity.flags)
+                val newCalendarEntity = calendarEntity.copy(
+                    name = name?: calendarEntity.name,
+                    description = description?: calendarEntity.description,
+                    color = color?: calendarEntity.color,
+                    display = display?: calendarEntity.display)
+
                 newCalendarEntity.fkUserId = calendarEntity.fkUserId
 
                 database.calendarsDao().update(newCalendarEntity)

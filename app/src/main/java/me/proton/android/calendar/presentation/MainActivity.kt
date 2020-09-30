@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         activeCalendarListView.layoutManager = activeCalendarsLayoutManager
         activeCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
             //On Calendar click event
-            calendarViewModel.updateServerCalendarSettings(calendarEntity.id, display)
+            calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
         }
         activeCalendarListView.adapter = activeCalendarListAdapter
 
@@ -179,7 +179,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         disabledCalendarListView.layoutManager = disabledCalendarLayoutManager
         disabledCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
             //On Calendar click event
-            calendarViewModel.updateServerCalendarSettings(calendarEntity.id, display)
+            calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
         }
         disabledCalendarListView.adapter = disabledCalendarListAdapter
     }
