@@ -29,6 +29,10 @@ class UsersRepositoryImpl(
         database.usersDao().insert(user)
     }
 
+    override suspend fun selectUserById(userId: String): User? {
+        return database.usersDao().selectUserById(userId)?.toUser(gson)
+    }
+
     override fun addressesFlow(userId: String): Flow<List<Address>> {
         return database.addressesDao().selectFlow(userId).distinctUntilChanged().map {
             it.map { it.toAddress(gson) }

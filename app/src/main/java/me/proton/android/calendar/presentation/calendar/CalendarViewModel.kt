@@ -11,8 +11,10 @@ import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
@@ -27,6 +29,7 @@ private const val MAX_CALENDAR_INDICATORS = 5
 class CalendarViewModel(
     private val context: Context,
     private val calendarsRepository: CalendarsRepository,
+    private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val createEventUseCase: EditCreateEventUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
@@ -64,7 +67,6 @@ class CalendarViewModel(
     suspend fun selectActiveCalendars(): List<CalendarEntity> {
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!
         val TODOuserID = TODOvalueStore.getString("USERID") // TODO
 
         return if (TODOuserID != null) calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive } else ArrayList()
@@ -73,10 +75,17 @@ class CalendarViewModel(
     suspend fun selectDisabledCalendars(): List<CalendarEntity> {
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!
         val TODOuserID = TODOvalueStore.getString("USERID") // TODO
 
         return if (TODOuserID != null) calendarsRepository.getDisabledCalendars(TODOuserID).filter { it.isDisabled } else ArrayList()
+    }
+
+    suspend fun selectUser(): User? {
+
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+
+        return if (TODOuserID != null) usersRepository.selectUserById(TODOuserID) else null
     }
 
     suspend fun init(coroutineScope: CoroutineScope) {

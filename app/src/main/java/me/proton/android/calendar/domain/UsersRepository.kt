@@ -19,6 +19,8 @@ interface UsersRepository {
 
     suspend fun persistUser(user: UserEntity)
 
+    suspend fun selectUserById(userId: String): User?
+
     // addresses
     fun addressesFlow(userId: String): Flow<List<Address>>
 

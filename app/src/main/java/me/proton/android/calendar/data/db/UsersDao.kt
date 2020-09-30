@@ -13,4 +13,7 @@ abstract class UsersDao : BaseDao<UserEntity> {
     @Query("SELECT * FROM users")
     abstract fun selectUsers(): Flow<List<UserEntity>>
 
+    @Query("SELECT * FROM users WHERE id = :userId")
+    abstract fun selectUserById(userId: String): UserEntity?
+
 }

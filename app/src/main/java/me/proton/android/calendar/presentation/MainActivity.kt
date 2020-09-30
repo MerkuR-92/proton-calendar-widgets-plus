@@ -114,6 +114,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         initDrawerListeners()
 
+        initDrawerHeader()
+
         initDrawerCalendarsList()
 
 //        mainViewModel.syncServerEvents().observe(this, Observer {
@@ -163,6 +165,23 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    fun initDrawerHeader() {
+        lifecycleScope.launch {
+            val user = withContext(Dispatchers.Default) {
+                calendarViewModel.selectUser()
+            }
+            if (user != null) {
+                nav_view_main_content.nav_view_user_name.text = user.displayName
+                nav_view_main_content.nav_view_user_mail.text = user.email
+                var initials: String = user.displayName.toUpperCase().split(' ')
+                    .mapNotNull { it.firstOrNull()?.toString() }
+                    .reduce { acc, s -> acc + s }
+                //Keep only the first two initials
+                if (initials.length > 2) initials = initials.substring(0, 2)
+                nav_view_main_content.nav_view_user_initials.text = initials?: ""
+            }
+        }
+    }
 
     private fun initDrawerCalendarsList() {
         val activeCalendarListView = nav_view_main_content.nav_view_calendars_list

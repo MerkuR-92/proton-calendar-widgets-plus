@@ -89,6 +89,7 @@ class LoginFragment : Fragment() {
                             }
 
                             requireActivity().hideKeyboard()
+                            (requireActivity() as MainActivity).initDrawerHeader()
 
                             findNavController().navigate(Navigation.Deeplink.toRoot())
                             //Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()
