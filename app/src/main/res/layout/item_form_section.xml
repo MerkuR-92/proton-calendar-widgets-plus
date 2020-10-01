@@ -18,10 +18,12 @@
 
     <ImageView
         android:id="@+id/image_dot_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        app:layout_constraintStart_toStartOf="@+id/image_icon"
+        app:layout_constraintEnd_toEndOf="@+id/image_icon"
+        app:layout_constraintTop_toTopOf="@+id/image_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/image_icon"
         app:srcCompat="@drawable/shape_calendar_circle"
         app:tint="@color/brand_norm"
         android:visibility="gone"
@@ -40,11 +42,12 @@
 
     <TextView
         android:id="@+id/text_subheader"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="@style/Text.DefaultSmall.Weak"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/text_header"
+        app:layout_constraintEnd_toEndOf="@+id/text_header"
         app:layout_constraintTop_toBottomOf="@+id/text_header"
         tools:text="Subheader text, 123"
         tools:visibility="visible" />
@@ -55,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_element_small"
         android:background="?android:selectableItemBackgroundBorderless"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text_header"
         app:layout_constraintTop_toTopOf="parent"

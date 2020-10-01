@@ -334,7 +334,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                     image_icon.setImageResource(R.drawable.ic_map_marker)
                     image_button_action.setImageResource(R.drawable.ic_copy_clipboard)
-                    image_button_action.visibleOrGone(true)
+                    image_button_action.visibleOrInvisible(true)
                     visibleOrGone(true)
                 }
             }
@@ -366,7 +366,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     tv.text = it // TODO PROPER ITEM VIEW
                     section_attendees_container.addView(tv)
                 }
-                section_attendees.image_button_action.visibleOrGone(true)
+                section_attendees.image_button_action.visibleOrInvisible(true)
                 if (attendees.size > FormValidation.ATTENDEE_SHOW_TRESHOLD) {
                     section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_down)
                     section_attendees_container.visibleOrGone(false)
@@ -384,8 +384,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     requireContext().getText(R.string.event_calendar_disabled, event.calendar.name)
                 }
                 //Set icon view to Invisible to keep the text view constraints
-                image_icon.visibility = View.INVISIBLE
-                image_dot_icon.visibility = View.VISIBLE
+                image_icon.visibleOrInvisible(false)
+                image_dot_icon.visibleOrGone(true)
                 image_dot_icon.drawable.setTint(Color.parseColor(event.calendar.color))
                 visibleOrGone(true)
             }
