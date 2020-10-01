@@ -6,7 +6,9 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -63,8 +65,7 @@ class CalendarViewModel(
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
 //    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
-
-    suspend fun selectActiveCalendars(): List<CalendarEntity> {
+    suspend fun getActiveCalendars(): List<CalendarEntity> {
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
         val TODOuserID = TODOvalueStore.getString("USERID") // TODO
@@ -72,12 +73,22 @@ class CalendarViewModel(
         return if (TODOuserID != null) calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive } else ArrayList()
     }
 
-    suspend fun selectDisabledCalendars(): List<CalendarEntity> {
+    fun selectActiveCalendars(): LiveData<List<CalendarEntity>>? {
 
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
         val TODOuserID = TODOvalueStore.getString("USERID") // TODO
 
-        return if (TODOuserID != null) calendarsRepository.getDisabledCalendars(TODOuserID).filter { it.isDisabled } else ArrayList()
+        return if (TODOuserID != null) calendarsRepository.flowCalendars(TODOuserID).map { calendars -> calendars.filter { it.isActive } }.asLiveData(Dispatchers.Default)
+        else null
+    }
+
+    fun selectDisabledCalendars(): LiveData<List<CalendarEntity>>? {
+
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+
+        return if (TODOuserID != null) calendarsRepository.flowCalendars(TODOuserID).map { calendars -> calendars.filter { it.isDisabled } }.asLiveData(Dispatchers.Default)
+        else null
     }
 
     suspend fun selectUser(): User? {

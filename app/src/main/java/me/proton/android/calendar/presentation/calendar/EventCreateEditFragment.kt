@@ -316,7 +316,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         press_calendar.setOnClickListener {
             lifecycleScope.launch {
                 val calendars = withContext(Dispatchers.Default) {
-                    calendarViewModel.selectActiveCalendars()
+                    calendarViewModel.getActiveCalendars()
                 }
 
                 val selectedIndex = calendars.indexOfFirst { it.id == eventViewModel.eventLiveData.value!!.calendar.id }

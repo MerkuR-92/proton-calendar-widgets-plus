@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.lifecycle.whenStarted
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -126,16 +127,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initDrawerListeners() {
-        drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener {
-            override fun onDrawerOpened(drawerView: View) {
-                //Refresh content to check for changes
-                initDrawerCalendarsListContent()
-            }
-            override fun onDrawerClosed(drawerView: View) {}
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-            override fun onDrawerStateChanged(newState: Int) {}
-        })
-
         //Navigation drawer items on click listeners
         nav_view_main_content.nav_view_user_layout.setOnClickListener {
             drawerLayout.close()
@@ -197,23 +188,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     fun initDrawerCalendarsListContent() {
         lifecycleScope.launch {
-            val activeCalendars = withContext(Dispatchers.Default) {
-                calendarViewModel.selectActiveCalendars()
+            calendarViewModel.selectActiveCalendars()?.observe(this@MainActivity) { activeCalendars ->
+                activeCalendarListAdapter.submitList(activeCalendars)
+                nav_view_main_content.nav_view_calendars.visibility =
+                    if (activeCalendars.isEmpty()) View.GONE
+                    else View.VISIBLE
             }
-            activeCalendarListAdapter.submitList(activeCalendars)
-            nav_view_main_content.nav_view_calendars.visibility =
-                if (activeCalendars.isEmpty()) View.GONE
-                else View.VISIBLE
         }
 
         lifecycleScope.launch {
-            val disabledCalendars = withContext(Dispatchers.Default) {
-                calendarViewModel.selectDisabledCalendars()
+            calendarViewModel.selectDisabledCalendars()?.observe(this@MainActivity) { disabledCalendars ->
+                disabledCalendarListAdapter.submitList(disabledCalendars)
+                nav_view_main_content.nav_view_disabled_calendars.visibility =
+                    if (disabledCalendars.isEmpty()) View.GONE
+                    else View.VISIBLE
             }
-            disabledCalendarListAdapter.submitList(disabledCalendars)
-            nav_view_main_content.nav_view_disabled_calendars.visibility =
-                if (disabledCalendars.isEmpty()) View.GONE
-                else View.VISIBLE
         }
     }
 
