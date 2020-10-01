@@ -383,7 +383,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 } else {
                     requireContext().getText(R.string.event_calendar_disabled, event.calendar.name)
                 }
-                image_icon.setImageResource(R.drawable.ic_calendar)
+                //Set icon view to Invisible to keep the text view constraints
+                image_icon.visibility = View.INVISIBLE
+                image_dot_icon.visibility = View.VISIBLE
+                image_dot_icon.drawable.setTint(Color.parseColor(event.calendar.color))
                 visibleOrGone(true)
             }
 

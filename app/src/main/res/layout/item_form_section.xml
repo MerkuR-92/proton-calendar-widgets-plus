@@ -16,6 +16,17 @@
         app:tint="@color/icon_norm"
         />
 
+    <ImageView
+        android:id="@+id/image_dot_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/shape_calendar_circle"
+        app:tint="@color/brand_norm"
+        android:visibility="gone"
+        />
+
     <TextView
         android:id="@+id/text_header"
         style="@style/Text.Default"
