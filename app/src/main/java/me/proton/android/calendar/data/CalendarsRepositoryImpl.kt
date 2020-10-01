@@ -60,15 +60,8 @@ class CalendarsRepositoryImpl(
             val filteredEventEntities = eventEntities.filter { displayedCalendarsIds.contains(it.calendarId) }
 
             logger.v("xxx db events flow collect")
-            val transformedEvents = filteredEventEntities.mapNotNull { transformEventUseCase.execute(it) }
 
-            //dbEvents.value = transformedEvents
-            dbEvents.clear()
-            dbEvents.addAll(transformedEvents)
-
-            logger.v("xxx db events transformed")
-
-            expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
+            addEventsToDb(filteredEventEntities, toDate, timeZoneId)
 
             //events.value = transformedEvents /*TODO*/
             /*.flatMap { event ->
@@ -100,10 +93,14 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun refreshEvents(calendarIds: List<String>?) {
+        fetchingState.value = CalendarsRepository.FetchingState.Fetching
+
+        logger.v("xxx call to refresh events")
+
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
-        // TODO When optimizing : Only refresh a sepcific list of calendars and their events using calendarIds parameter
+        // TODO When optimizing : Only refresh a specific list of calendars and their events using calendarIds parameter
         val selectedCalendarIds = getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
 
         val events = database.eventsDao().selectEvents(selectedCalendarIds)
@@ -113,25 +110,20 @@ class CalendarsRepositoryImpl(
         val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
         val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
 
+        addEventsToDb(events, toDate, timeZoneId.id)
+
+        fetchingState.value = CalendarsRepository.FetchingState.Finished
+    }
+
+    private suspend fun addEventsToDb(events: List<EventEntity>, toDate: LocalDate, timeZoneId: String) {
         val transformedEvents = events.mapNotNull { transformEventUseCase.execute(it) }
 
         dbEvents.clear()
         dbEvents.addAll(transformedEvents)
 
-        expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId.id, force = true)
+        logger.v("xxx db events transformed")
 
-        /*database.eventsDao().flowEvents(selectedCalendarIds).collect { events ->
-            val timeZoneId = ZoneId.of(selectUserSettings(TODOuserID)?.primaryTimezone!!)
-            val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
-            val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-
-            val transformedEvents = events.mapNotNull { transformEventUseCase.execute(it) }
-
-            dbEvents.clear()
-            dbEvents.addAll(transformedEvents)
-
-            expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId.id, force = true)
-        }*/
+        expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
     }
 
     // TODO add fetch(from, to)
@@ -169,6 +161,11 @@ class CalendarsRepositoryImpl(
 
     override suspend fun getDisabledCalendars(userId: String): List<CalendarEntity> {
         return selectCalendars(userId).filter { it.isDisabled }
+    }
+
+    override suspend fun calendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
+        val calendar = selectCalendar(calendarId)
+        return if (calendar != null) calendar.display == newDisplay else false
     }
 
     override fun eventsFlow(
