@@ -16,11 +16,12 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.Operation
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
@@ -124,29 +125,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initDrawerListeners() {
-        drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener{
+        drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener {
             override fun onDrawerOpened(drawerView: View) {
-                lifecycleScope.launch {
-                    val activeCalendars = withContext(Dispatchers.Default) {
-                        calendarViewModel.selectActiveCalendars()
-                    }
-                    activeCalendarListAdapter.submitList(activeCalendars)
-
-                    nav_view_main_content.nav_view_calendars.visibility =
-                        if (activeCalendars.isEmpty()) View.GONE
-                        else View.VISIBLE
-                }
-
-                lifecycleScope.launch {
-                    val disabledCalendars = withContext(Dispatchers.Default) {
-                        calendarViewModel.selectDisabledCalendars()
-                    }
-                    disabledCalendarListAdapter.submitList(disabledCalendars)
-
-                    nav_view_main_content.nav_view_disabled_calendars.visibility =
-                        if (disabledCalendars.isEmpty()) View.GONE
-                        else View.VISIBLE
-                }
+                //Refresh content to check for changes
+                initDrawerCalendarsListContent()
             }
             override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
@@ -205,6 +187,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
         }
         disabledCalendarListView.adapter = disabledCalendarListAdapter
+
+        //Populate calendars list
+        initDrawerCalendarsListContent()
+    }
+
+    fun initDrawerCalendarsListContent() {
+        lifecycleScope.launch {
+            val activeCalendars = withContext(Dispatchers.Default) {
+                calendarViewModel.selectActiveCalendars()
+            }
+            activeCalendarListAdapter.submitList(activeCalendars)
+            nav_view_main_content.nav_view_calendars.visibility =
+                if (activeCalendars.isEmpty()) View.GONE
+                else View.VISIBLE
+        }
+
+        lifecycleScope.launch {
+            val disabledCalendars = withContext(Dispatchers.Default) {
+                calendarViewModel.selectDisabledCalendars()
+            }
+            disabledCalendarListAdapter.submitList(disabledCalendars)
+            nav_view_main_content.nav_view_disabled_calendars.visibility =
+                if (disabledCalendars.isEmpty()) View.GONE
+                else View.VISIBLE
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

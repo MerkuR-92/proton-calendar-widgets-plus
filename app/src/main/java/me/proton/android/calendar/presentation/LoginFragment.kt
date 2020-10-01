@@ -23,7 +23,6 @@ import me.proton.android.calendar.common.hideKeyboard
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import org.koin.android.ext.android.inject
-import java.time.LocalDate
 
 // TODO PROTOTYPE, NUKE THIS
 class LoginFragment : Fragment() {
@@ -89,7 +88,10 @@ class LoginFragment : Fragment() {
                             }
 
                             requireActivity().hideKeyboard()
+
+                            //Refresh drawer content now that we are logged in
                             (requireActivity() as MainActivity).initDrawerHeader()
+                            (requireActivity() as MainActivity).initDrawerCalendarsListContent()
 
                             findNavController().navigate(Navigation.Deeplink.toRoot())
                             //Toast.makeText(requireContext(), "NOW CLICK (FETCH EVENTS)", Toast.LENGTH_LONG).show()
