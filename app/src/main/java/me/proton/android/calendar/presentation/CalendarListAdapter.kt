@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -40,7 +39,7 @@ class CalendarListAdapter(
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val calendarEntityItemLayout: ConstraintLayout = view.item_drawer_calendar_layout
+        private val calendarEntityItemOverlay: View = view.item_drawer_calendar_press
         private val calendarEntityItemTitle: TextView = view.item_drawer_calendar_title
         private val calendarEntityItemCheckBox: CheckBox = view.item_drawer_calendar_checkbox
 
@@ -49,11 +48,8 @@ class CalendarListAdapter(
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
 
-            calendarEntityItemLayout.setOnClickListener {
+            calendarEntityItemOverlay.setOnClickListener {
                 calendarEntityItemCheckBox.isChecked = !calendarEntityItemCheckBox.isChecked
-                listener(calendarEntity, if(calendarEntityItemCheckBox.isChecked) 1 else 0)
-            }
-            calendarEntityItemCheckBox.setOnClickListener {
                 listener(calendarEntity, if(calendarEntityItemCheckBox.isChecked) 1 else 0)
             }
         }

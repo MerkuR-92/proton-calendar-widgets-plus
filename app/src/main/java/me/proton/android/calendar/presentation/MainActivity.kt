@@ -139,13 +139,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_main_content.nav_view_user_layout.setOnClickListener {
             drawerLayout.close()
         }
-        nav_view_main_content.nav_view_more_bug_layout.setOnClickListener {
+        nav_view_main_content.nav_view_more_bug_press.setOnClickListener {
             drawerLayout.close()
         }
-        nav_view_main_content.nav_view_more_logout_layout.setOnClickListener {
+        nav_view_main_content.nav_view_more_logout_press.setOnClickListener {
             drawerLayout.close()
         }
-        nav_view_main_content.nav_view_more_login_layout.setOnClickListener {
+        nav_view_main_content.nav_view_more_login_press.setOnClickListener {
             findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toLogin())
             drawerLayout.close()
         }
