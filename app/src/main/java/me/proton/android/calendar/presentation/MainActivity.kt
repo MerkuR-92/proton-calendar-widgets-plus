@@ -16,6 +16,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
@@ -177,6 +178,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             //On Calendar click event
             calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
         }
+        (activeCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         activeCalendarListView.adapter = activeCalendarListAdapter
 
         val disabledCalendarListView = nav_view_main_content.nav_view_disabled_calendars_list
@@ -186,6 +188,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             //On Calendar click event
             calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
         }
+        (disabledCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         disabledCalendarListView.adapter = disabledCalendarListAdapter
 
         //Populate calendars list
