@@ -47,7 +47,7 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
-    suspend fun refreshEvents(calendarIds: List<String>, userId: String, toDate: LocalDate, timeZoneId: String)
+    suspend fun refreshEvents(calendarIds: List<String>? = null): Boolean
 
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself

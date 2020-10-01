@@ -116,6 +116,11 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.persistCalendarSettings(it.calendarSettings!!) }
                 )
             }
+
+            // TODO Optimize to only refresh if the calendars display value has been changed
+            //Refresh events if calendar db has been updated but not events db
+            if (eventsResponse.calendars != null && eventsResponse.calendarEvents == null) calendarsRepository.refreshEvents(eventsResponse.calendars.map { it.id })
+
             UseCase.Result.Success
         } catch (e: Exception) {
             logger.e("Error in HandleServerEventsUseCase", e)

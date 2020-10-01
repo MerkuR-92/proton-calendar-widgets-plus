@@ -76,7 +76,7 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get()) }
+    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get()) }
     single<UsersRepository> { UsersRepositoryImpl(get(), get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
@@ -103,6 +103,6 @@ val useCaseModule = module {
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get()) }
-    factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get(), get()) }
+    factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get()) }
 }

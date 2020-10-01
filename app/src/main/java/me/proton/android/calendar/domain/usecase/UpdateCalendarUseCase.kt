@@ -15,8 +15,7 @@ class UpdateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
-    private val calendarsRepository: CalendarsRepository,
-    private val valueStoreProvider: ValueStoreProvider
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     //TODO Handle other Calendar parameters
@@ -45,15 +44,7 @@ class UpdateCalendarUseCase(
 
                 database.calendarsDao().update(newCalendarEntity)
 
-                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-                val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
-
-                //Refresh events
-                val timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
-                val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
-                val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-                val selectedCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
-                calendarsRepository.refreshEvents(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
+                calendarsRepository.refreshEvents(arrayListOf(calendarId))
 
                 UseCase.Result.Success
             }

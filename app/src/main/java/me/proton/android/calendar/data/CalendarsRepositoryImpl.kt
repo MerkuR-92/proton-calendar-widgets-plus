@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.ext.getScopeId
@@ -23,7 +24,13 @@ import java.time.ZoneId
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppDatabase, private val transformEventUseCase: TransformEventUseCase, private val logger: Logger, private val fetchEventsUseCase: FetchEventsUseCase) : CalendarsRepository {
+class CalendarsRepositoryImpl(
+    private val gson: Gson,
+    private val database: AppDatabase,
+    private val transformEventUseCase: TransformEventUseCase,
+    private val logger: Logger,
+    private val fetchEventsUseCase: FetchEventsUseCase,
+    private val valueStoreProvider: ValueStoreProvider) : CalendarsRepository {
 
     private val daysToEvents = mutableMapOf<LocalDate, Event>()
     private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
@@ -92,16 +99,27 @@ class CalendarsRepositoryImpl(private val gson: Gson, private val database: AppD
 
     }
 
-    override suspend fun refreshEvents(displayedCalendarsId: List<String>, userId: String, toDate: LocalDate, timeZoneId: String) {
-        database.eventsDao().flowEvents(displayedCalendarsId).collect { events ->
+    override suspend fun refreshEvents(calendarIds: List<String>?): Boolean {
+        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+
+        // TODO When optimizing : Only refresh a sepcific list of calendars and their events using calendarIds parameter
+        val selectedCalendarIds = getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
+
+        database.eventsDao().flowEvents(selectedCalendarIds).collect { events ->
+            val timeZoneId = ZoneId.of(selectUserSettings(TODOuserID)?.primaryTimezone!!)
+            val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
+            val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
 
             val transformedEvents = events.mapNotNull { transformEventUseCase.execute(it) }
 
             dbEvents.clear()
             dbEvents.addAll(transformedEvents)
 
-            expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
+            expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId.id, force = true)
         }
+
+        return true
     }
 
     // TODO add fetch(from, to)
