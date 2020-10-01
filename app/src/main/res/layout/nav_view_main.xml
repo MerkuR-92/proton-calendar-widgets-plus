@@ -65,6 +65,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/nav_view_calendars"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -102,9 +103,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/nav_view_disabled_calendars"
+            android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/nav_view_disabled_calendars_title"

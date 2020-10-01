@@ -131,6 +131,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         calendarViewModel.selectActiveCalendars()
                     }
                     activeCalendarListAdapter.submitList(activeCalendars)
+
+                    nav_view_main_content.nav_view_calendars.visibility =
+                        if (activeCalendars.isEmpty()) View.GONE
+                        else View.VISIBLE
                 }
 
                 lifecycleScope.launch {
