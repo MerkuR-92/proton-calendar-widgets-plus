@@ -76,7 +76,7 @@
             <TextView
                 android:id="@+id/event_create_edit_all_day_title"
                 style="@style/Text.Default.Form"
-                android:layout_marginBottom="@dimen/default_margin_text_top"
+                android:layout_marginTop="@dimen/default_margin_text_vertical"
                 android:text="@string/event_text_switch_all_day"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -115,6 +115,7 @@
             <TextView
                 android:id="@+id/event_create_edit_start_date"
                 style="@style/Text.Default.Form"
+                android:layout_marginTop="@dimen/default_margin_text_vertical"
                 tools:text="Friday, 12 February"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -170,6 +171,7 @@
             <TextView
                 android:id="@+id/event_create_edit_end_date"
                 style="@style/Text.Default.Form"
+                android:layout_marginTop="@dimen/default_margin_text_vertical"
                 tools:text="Saturday, 13 February"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -322,7 +324,7 @@
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_map_marker"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_location"
+                android:layout_marginTop="@dimen/default_margin_text_top"
                 app:layout_constraintTop_toTopOf="@+id/event_create_edit_location"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -337,8 +339,11 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="@string/event_hint_location"
-                android:inputType="textMultiLine|textCapSentences"
+                android:inputType="textPostalAddress|textCapSentences|textMultiLine"
+                android:scrollHorizontally="false"
                 android:maxLength="255"
+                android:singleLine="false"
+                android:maxLines="20"
                 android:background="@android:color/transparent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -466,7 +471,7 @@
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_text_align_left"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_description"
+                android:layout_marginTop="@dimen/default_margin_text_top"
                 app:layout_constraintTop_toTopOf="@+id/event_create_edit_description"
                 app:layout_constraintStart_toStartOf="parent" />
 
