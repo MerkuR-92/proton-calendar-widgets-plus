@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
@@ -190,18 +191,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         lifecycleScope.launch {
             calendarViewModel.selectActiveCalendars()?.observe(this@MainActivity) { activeCalendars ->
                 activeCalendarListAdapter.submitList(activeCalendars)
-                nav_view_main_content.nav_view_calendars.visibility =
-                    if (activeCalendars.isEmpty()) View.GONE
-                    else View.VISIBLE
+                nav_view_main_content.nav_view_calendars.visibleOrGone(!activeCalendars.isEmpty())
             }
         }
 
         lifecycleScope.launch {
             calendarViewModel.selectDisabledCalendars()?.observe(this@MainActivity) { disabledCalendars ->
                 disabledCalendarListAdapter.submitList(disabledCalendars)
-                nav_view_main_content.nav_view_disabled_calendars.visibility =
-                    if (disabledCalendars.isEmpty()) View.GONE
-                    else View.VISIBLE
+                nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(!disabledCalendars.isEmpty())
             }
         }
     }

@@ -390,7 +390,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     private fun displayAlarms() {
 
         event_create_edit_alarm_list.removeAllViews()
-        event_create_edit_alarm_icon.visibility = View.VISIBLE
+        event_create_edit_alarm_icon.visibleOrGone(true)
 
         val event = eventViewModel.eventLiveData.value!!
 
@@ -409,8 +409,8 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 isClickable = true
             }
             if (index == 0) {
-                alarmView.event_create_edit_alarm_icon.visibility = View.VISIBLE
-                event_create_edit_alarm_icon.visibility = View.GONE
+                alarmView.event_create_edit_alarm_icon.visibleOrGone(true)
+                event_create_edit_alarm_icon.visibleOrGone(false)
             }
             event_create_edit_alarm_list.addView(alarmView)
         }

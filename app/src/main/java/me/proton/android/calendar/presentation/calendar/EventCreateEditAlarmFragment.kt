@@ -2,18 +2,19 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
 import android.text.TextWatcher
-import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
-import me.proton.android.calendar.presentation.BaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
-import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.group_custom
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FormValidation
+import me.proton.android.calendar.common.doAfterFilteredIntValueChanged
+import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -31,24 +32,33 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
     override val actionMenuResourceId = R.menu.fragment_event_create_edit_dialog
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
-         if (menuItem.itemId == R.id.action_menu_done) {
-             Timber.d("notification create/edit done")
+        if (menuItem.itemId == R.id.action_menu_done) {
+            Timber.d("notification create/edit done")
 
-             val alarmTypeOption = rg_alarm.checkedRadioButtonId - rb_alarm_1.id
+            val alarmTypeOption = getCheckedRadioButtonIndex(event_create_edit_alarm_radio_group)
 
 //                 GET RADIO BUTTONS, IF == 1 then hardcode 9:00 in VM
 //             val customPeriod =
 //             val customCount = et_alarm_count.text.toString().toIntOrNull() ?: FormValidation.
 //                 val customTime = nullable
 
-             eventViewModel.handleAlarm(alarmTypeOption, count = et_alarm_count.text.toString().toIntOrNull(), countTypeOption = s_alarm_period.selectedItemPosition)
-             findNavController().navigateUp()
+            val option =
+                if (getCheckedRadioButtonIndex(event_create_edit_alarm_action_radio_group) == 0)
+                    EventViewModel.SendByOption.NOTIFICATION
+                else EventViewModel.SendByOption.EMAIL
+            eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
 
-             // TODO
-             // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
-             // notifications when switching between custom and canned ones
-         }
+            eventViewModel.handleAlarm(alarmTypeOption,
+                count = event_create_edit_alarm_custom_field.text.toString().toIntOrNull(),
+                countTypeOption = getCheckedRadioButtonIndex(event_create_edit_alarm_custom_radio_group))
+            findNavController().navigateUp()
+
+            // TODO
+            // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
+            // notifications when switching between custom and canned ones
+        }
     }
+    private lateinit var toolbarTitle: TextView
 
     private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
 
@@ -61,136 +71,135 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
      * Applies correct pluralisation to dropdown items.
      */
     private fun resetAlarmPeriodAdapter(count: Int) {
-
-        val adapter = if (isAllDay) {
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, arrayListOf(
-                getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count)),
-                getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count))
-            ))
+        if (isAllDay) {
+            event_create_edit_alarm_custom_1.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count))
+            event_create_edit_alarm_custom_2.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count))
         } else {
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, arrayListOf<String>(
-                getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_minute, count, count)),
-                getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_hour, count, count)),
-                getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count, count)),
-                getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count, count))
-            ))
+            event_create_edit_alarm_custom_1.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_minute, count, count))
+            event_create_edit_alarm_custom_2.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_hour, count, count))
+            event_create_edit_alarm_custom_3.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count, count))
+            event_create_edit_alarm_custom_4.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count, count))
         }
+    }
 
-        s_alarm_period.apply {
-            val selectedIndex = s_alarm_period.selectedItemPosition
-            setAdapter(adapter)
-            setSelection(selectedIndex)
-        }
-
+    private fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
+        //Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
+        return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
+        toolbarTitle.text = getString(R.string.event_alarms_title)
+        toolbar.setNavigationIcon(R.drawable.ic_close)
 
-        if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
-            rb_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            rb_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            rb_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            rb_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            rb_alarm_5.visibleOrGone(false)
-        } else {
-            rb_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
-            rb_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
-            rb_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
-            rb_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
-            rb_alarm_5.visibleOrGone(true)
-            rb_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
-        }
-
-        rg_alarm.check(rb_alarm_1.id) // TODO read from event alarm
-
-        rg_alarm.setOnCheckedChangeListener { radioGroup, index ->
-
-            group_custom.visibleOrGone(false)
-            group_custom_time.visibleOrGone(false)
-
-            when (index) {
-                R.id.rb_alarm_custom -> {
-                    if (isAllDay) {
-                        group_custom.visibleOrGone(true)
-                        group_custom_time.visibleOrGone(true)
-                    } else {
-                        group_custom.visibleOrGone(true)
-                        group_custom_time.visibleOrGone(false)
-                    }
+        toolbar.setNavigationOnClickListener {
+            if (getCheckedRadioButtonIndex(event_create_edit_alarm_radio_group) == 5) {
+                event_create_edit_alarm_radio_group.check(event_create_edit_alarm_1.id)
+                event_create_edit_alarm_radio_group.visibleOrGone(true)
+                event_create_edit_alarm_custom_layout.visibleOrGone(false)
+                toolbarTitle.text = getString(R.string.event_alarms_title)
+            } else {
+                if (!onNavigationIconClicked()) {
+                    dismiss()
                 }
             }
         }
 
-        s_alarm_period.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
+            event_create_edit_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
+                FormatStyle.SHORT)))
+            event_create_edit_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).format(DateTimeFormatter.ofLocalizedTime(
+                FormatStyle.SHORT)))
+            event_create_edit_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
+                FormatStyle.SHORT)))
+            event_create_edit_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
+                FormatStyle.SHORT)))
+            event_create_edit_alarm_5.visibleOrGone(false)
+        } else {
+            event_create_edit_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
+            event_create_edit_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
+            event_create_edit_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
+            event_create_edit_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
+            event_create_edit_alarm_5.visibleOrGone(true)
+            event_create_edit_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
+        }
+
+        event_create_edit_alarm_radio_group.check(event_create_edit_alarm_1.id) // TODO read from event alarm
+        event_create_edit_alarm_action_radio_group.check(event_create_edit_alarm_action_notification.id) // TODO read from event alarm
+
+        event_create_edit_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+
+            when (index) {
+                R.id.event_create_edit_alarm_custom -> {
+                    toolbarTitle.text = getString(R.string.event_custom_alarms_title)
+                    //TODO Change view
+                    event_create_edit_alarm_radio_group.visibleOrGone(false)
+                    event_create_edit_alarm_custom_layout.visibleOrGone(true)
+
+                    event_create_edit_alarm_custom_3.visibleOrGone(!isAllDay)
+                    event_create_edit_alarm_custom_4.visibleOrGone(!isAllDay)
+                }
+            }
+        }
+
+        event_create_edit_alarm_custom_radio_group.setOnCheckedChangeListener { radioGroup, index ->
 
             var lastSelectedIndex: Int? = null
 
-            override fun onItemSelected(parent: AdapterView<*>?,
-                                        view: View?,
-                                        position: Int,
-                                        id: Long) {
-
-                // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
-                if (lastSelectedIndex != null && lastSelectedIndex == position) {
-                    return
-                }
-                lastSelectedIndex = position
-
-                // all-day events have only days and weeks, partial-day events have minutes, hours, days and weeks
-                //  this is an offset for Alarm Count Validation reset
-                val positionAdjustedForEventType = position + (if (isAllDay) 2 else 0)
-
-                 when (positionAdjustedForEventType) {
-                                    0 -> { // minute
-                                        resetAlarmCountValidation(
-                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
-                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
-                                            FormValidation.ALARM_PERIOD_MAX_MINUTES
-                                        )
-                                    }
-                                    1 -> { // hour
-                                        resetAlarmCountValidation(
-                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
-                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
-                                            FormValidation.ALARM_PERIOD_MAX_HOURS
-                                        )
-                                    }
-                                    2 -> { // day
-                                        resetAlarmCountValidation(
-                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
-                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
-                                            FormValidation.ALARM_PERIOD_MAX_DAYS
-                                        )
-                                    }
-                                    3 -> { // week
-                                        resetAlarmCountValidation(
-                                            FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
-                                            FormValidation.ALARM_PERIOD_COUNT_MIN,
-                                            FormValidation.ALARM_PERIOD_MAX_WEEKS
-                                        )
-                                    }
-                                }
+            // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
+            if (lastSelectedIndex != null && lastSelectedIndex == index) {
+//                    return
             }
+            lastSelectedIndex = index
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
+            // all-day events have only days and weeks, partial-day events have minutes, hours, days and weeks
+            //  this is an offset for Alarm Count Validation reset
+            val positionAdjustedForEventType = index + (if (isAllDay) 2 else 0)
 
+            when (positionAdjustedForEventType) {
+                0 -> { // minute
+                    resetAlarmCountValidation(
+                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        FormValidation.ALARM_PERIOD_COUNT_MIN,
+                        FormValidation.ALARM_PERIOD_MAX_MINUTES
+                    )
+                }
+                1 -> { // hour
+                    resetAlarmCountValidation(
+                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        FormValidation.ALARM_PERIOD_COUNT_MIN,
+                        FormValidation.ALARM_PERIOD_MAX_HOURS
+                    )
+                }
+                2 -> { // day
+                    resetAlarmCountValidation(
+                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        FormValidation.ALARM_PERIOD_COUNT_MIN,
+                        FormValidation.ALARM_PERIOD_MAX_DAYS
+                    )
+                }
+                3 -> { // week
+                    resetAlarmCountValidation(
+                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        FormValidation.ALARM_PERIOD_COUNT_MIN,
+                        FormValidation.ALARM_PERIOD_MAX_WEEKS
+                    )
+                }
+            }
         }
 
         // init
         if (isAllDay) {
-            et_alarm_count.setText("1")
+            event_create_edit_alarm_custom_field.setText("1")
             resetAlarmPeriodAdapter(1)
-            s_alarm_period.setSelection(0)
-            tv_alarm_time.text = eventViewModel.tempAlarmTime.format()
+            event_create_edit_alarm_custom_radio_group.check(0)
+            //TODO alarm at xx:xx
+//            tv_alarm_time.text = eventViewModel.tempAlarmTime.format()
         } else {
-            et_alarm_count.setText("15")
+            event_create_edit_alarm_custom_field.setText("15")
             resetAlarmPeriodAdapter(15)
-            s_alarm_period.setSelection(0)
+            event_create_edit_alarm_custom_radio_group.check(0)
         }
 
 
@@ -200,26 +209,15 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
 
 
-        press_alarm_time.setOnClickListener {
-            val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
-
-            AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
-                eventViewModel.handleAlarmTime(it)
-                tv_alarm_time.text = it.format()
-            }
-        }
-
-        press_alarm_action.setOnClickListener {
-            val actions = arrayOf(resources.getString(R.string.event_alarm_action_notification), resources.getString(R.string.event_alarm_action_email))
-            AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.event_alarm_action), actions, eventViewModel.tempAlarmSendByOption.ordinal) {
-                val option = if (it == 0) EventViewModel.SendByOption.NOTIFICATION else EventViewModel.SendByOption.EMAIL
-
-                eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
-                tv_alarm_action.text = formatNotification(option)
-            }
-        }
-
-        tv_alarm_action.text = formatNotification(eventViewModel.tempAlarmSendByOption)
+        //TODO alarm at xx:xx
+//        press_alarm_time.setOnClickListener {
+//            val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
+//
+//            AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
+//                eventViewModel.handleAlarmTime(it)
+//              tv_alarm_time.text = it.format()
+//            }
+//        }
 
     }
 
@@ -229,16 +227,16 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
     private fun resetAlarmCountValidation(default: Int, min: Int, max: Int) {
 
         // remove current alarm count text watcher
-        etAlarmTextWatcher?.let { et_alarm_count.removeTextChangedListener(it) }
+        etAlarmTextWatcher?.let { event_create_edit_alarm_custom_field.removeTextChangedListener(it) }
 
         // set new text watcher with new config
         etAlarmTextWatcher =
-            et_alarm_count.doAfterFilteredIntValueChanged(default, min, max) {
+            event_create_edit_alarm_custom_field.doAfterFilteredIntValueChanged(default, min, max) {
                 resetAlarmPeriodAdapter(it)
             }
 
         // set current value again because it might be outside of newly set limits
-        et_alarm_count.setText(et_alarm_count.text)
+        event_create_edit_alarm_custom_field.setText(event_create_edit_alarm_custom_field.text)
     }
 
     private fun formatNotification(option: EventViewModel.SendByOption): String {
