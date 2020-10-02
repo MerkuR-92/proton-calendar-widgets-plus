@@ -6,12 +6,21 @@
 android:layout_width="wrap_content"
 android:layout_height="@dimen/clickable_size"
     android:background="@color/background_norm"
-    android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
     >
 
 <!--    TODO REMOVE THIS LAYOUT WHEN WE CREATE CUSTOM ADAPTER IN AndroidUtils.displayPopupMenu()-->
+
+    <include
+        android:id="@+id/press_popup"
+        layout="@layout/view_press_overlay_borderless"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_text"

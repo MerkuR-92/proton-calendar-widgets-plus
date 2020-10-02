@@ -27,6 +27,7 @@ import biweekly.component.VAlarm
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
@@ -578,7 +579,7 @@ class AndroidUtils(context: Context) {
             ) {
                 override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                     return super.getView(position, convertView, parent).apply {
-                        this.setOnClickListener {
+                        press_popup.setOnClickListener {
                             onItemClicked(position)
                             popupWindow.dismiss()
                         }
