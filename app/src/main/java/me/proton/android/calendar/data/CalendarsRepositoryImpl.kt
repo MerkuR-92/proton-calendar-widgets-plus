@@ -53,6 +53,9 @@ class CalendarsRepositoryImpl(
         selectedCalendarIds = calendarIds
         logger.v("zzz CalendarsRepository init()")
 
+        // TODO this selects all events from all active calendars and filters for visible calendars later
+        //  we should probably listen for all calendars separately and join the results according to currently
+        //  visible calendars
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
@@ -116,6 +119,8 @@ class CalendarsRepositoryImpl(
     }
 
     private suspend fun addEventsToDb(events: List<EventEntity>, toDate: LocalDate, timeZoneId: String) {
+        // TODO: when new visible calendar IDs is a subset of currently shown calendar IDs, don't
+        //  transform events again, just filter currently expanded ones
         val transformedEvents = events.mapNotNull { transformEventUseCase.execute(it) }
 
         dbEvents.clear()
@@ -163,7 +168,7 @@ class CalendarsRepositoryImpl(
         return selectCalendars(userId).filter { it.isDisabled }
     }
 
-    override suspend fun calendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
+    override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
         val calendar = selectCalendar(calendarId)
         return if (calendar != null) calendar.display == newDisplay else false
     }

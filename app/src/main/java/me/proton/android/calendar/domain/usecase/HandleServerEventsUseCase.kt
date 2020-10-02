@@ -7,9 +7,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.ServerEventsApi
 import java.lang.Exception
-import kotlin.math.log
 
 class HandleServerEventsUseCase(
     private val logger: Logger,
@@ -38,7 +36,7 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.persistCalendar(userId, it.calendar!!) },
                     {
                         //Refresh events if calendar db is not up to date on display value
-                        if (it.calendar != null && !calendarsRepository.calendarDisplayUpToDate(it.id, it.calendar.display))
+                        if (it.calendar != null && !calendarsRepository.isCalendarDisplayUpToDate(it.id, it.calendar.display))
                             calendarsToRefresh.add(it.id)
                         calendarsRepository.updateCalendar(userId, it.calendar!!)
                     }

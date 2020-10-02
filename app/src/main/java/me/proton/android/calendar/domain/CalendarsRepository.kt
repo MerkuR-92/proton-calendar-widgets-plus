@@ -28,7 +28,7 @@ interface CalendarsRepository {
 
     suspend fun getDisabledCalendars(userId: String): List<CalendarEntity>
 
-    suspend fun calendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
+    suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
