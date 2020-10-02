@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:padding="@dimen/default_inner_padding"
+    android:paddingStart="@dimen/default_inner_padding_start"
+    android:paddingEnd="@dimen/default_inner_padding_end"
     >
 
     <RadioGroup

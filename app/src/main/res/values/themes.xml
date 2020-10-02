@@ -3,6 +3,8 @@
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
+        <item name="colorAccent">@color/brand_norm</item>
+
         <item name="appBarLayoutStyle">@style/AppTheme.Toolbar</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
 

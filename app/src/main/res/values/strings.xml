@@ -57,8 +57,8 @@
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
     <string name="event_text_delete_event">Delete event</string>
-    <string name="event_hint_title">Title</string>
-    <string name="event_hint_location">Location</string>
+    <string name="event_hint_title">Add Title</string>
+    <string name="event_hint_location">Add location</string>
     <string name="event_text_switch_all_day">All day</string>
     <string name="event_text_date_start">Start</string>
     <string name="event_text_date_end">End</string>

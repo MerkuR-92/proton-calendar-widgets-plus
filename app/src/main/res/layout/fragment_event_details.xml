@@ -7,18 +7,18 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical"
     android:paddingStart="@dimen/spacing_page"
-    android:paddingEnd="@dimen/spacing_page"
     android:paddingTop="@dimen/spacing_large"
     tools:context=".presentation.calendar.EventDetailsFragment">
 
     <include
         android:id="@+id/section_event_info"
         layout="@layout/event_info"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/spacing_page"/>
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="@dimen/spacing_page"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <include
         android:id="@+id/section_location"
@@ -36,9 +36,9 @@
         android:id="@+id/section_attendees_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:visibility="gone"
-        tools:visibility="visible"
-        android:orientation="vertical" />
+        tools:visibility="visible" />
 
     <include
         android:id="@+id/section_calendar"

@@ -1,20 +1,23 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_event_create_edit.*
+import kotlinx.android.synthetic.main.item_alarm_text_button.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,9 +62,9 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                         val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && (
                                 (eventViewModel.dbEvent?.isRecurring() == true)
                                         ||
-                                (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())
-                        )
-                        
+                                        (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())
+                                )
+
                         if (shouldShowConfirmationPicker) {
 
                             AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
@@ -136,20 +139,20 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 //
 //            with (eventViewModel) {
 //                summary = et_summary.text.toString().ifBlank { null }
-//                location = et_location.text.toString().ifBlank { null }
-//                description = et_description.text.toString().ifBlank { null }
+//                location = event_create_edit_location.text.toString().ifBlank { null }
+//                description = event_create_edit_description.text.toString().ifBlank { null }
 //            }
 
 //            withContext(Dispatchers.Default) {
 //
-                eventViewModel.persistRecurrenceFormData(
-                    et_summary.text.toString().ifBlank { null },
-                    et_location.text.toString().ifBlank { null },
-                    et_description.text.toString().ifBlank { null }
-                )
+        eventViewModel.persistRecurrenceFormData(
+            event_create_edit_title.text.toString().ifBlank { null },
+            event_create_edit_location.text.toString().ifBlank { null },
+            event_create_edit_description.text.toString().ifBlank { null }
+        )
 //            }
 
-            // TODO CREATE EVENT WITHOUT SAVING BEFOREHAND? EXAMPLE CALL -> calendarViewModel.TEST_CREATE_EVENT_TODO()
+        // TODO CREATE EVENT WITHOUT SAVING BEFOREHAND? EXAMPLE CALL -> calendarViewModel.TEST_CREATE_EVENT_TODO()
 
 //        }
     }
@@ -214,43 +217,45 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     // TODO better name
     private fun refreshView() {
 //        et_summary.setText(eventViewModel.summary)
-//        et_location.setText(eventViewModel.location)
-//        et_description.setText(eventViewModel.description)
+//        event_create_edit_location.setText(eventViewModel.location)
+//        event_create_edit_description.setText(eventViewModel.description)
     }
 
     private fun observeEventLiveData() {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
 
-            event.summary?.let { et_summary.setText(it) }
-            event.location?.let { et_location.setText(it) }
-            event.description?.let { et_description.setText(it) }
+            event.summary?.let { event_create_edit_title.setText(it) }
+            event.location?.let { event_create_edit_location.setText(it) }
+            event.description?.let { event_create_edit_description.setText(it) }
 
-            switch_all_day.isChecked = event.isAllDay()
+            event_create_edit_all_day_switch.isChecked = event.isAllDay()
 
-            group_partial_day_event.visibleOrGone(!event.isAllDay())
+            event_create_edit_partial_day_start.visibleOrGone(!event.isAllDay())
+            event_create_edit_partial_day_end.visibleOrGone(!event.isAllDay())
+            event_create_edit_timezone_layout.visibleOrGone(!event.isAllDay())
 
             if (eventViewModel.validateDateTime()) {
-                tv_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorSecondary))
-                tv_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorSecondary))
+                event_create_edit_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                event_create_edit_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
             } else {
-                tv_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
-                tv_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+                event_create_edit_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+                event_create_edit_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
             }
 
             val formattedStart = event.formatStart(eventViewModel.eventTimeZoneId)
-            tv_start_date.text = formattedStart.first ?: ""
-            tv_start_time.text = formattedStart.second ?: ""
+            event_create_edit_start_date.text = formattedStart.first ?: ""
+            event_create_edit_start_time.text = formattedStart.second ?: ""
 
             val formattedEnd = event.formatEnd(eventViewModel.eventTimeZoneId)
-            tv_end_date.text = formattedEnd.first ?: ""
-            tv_end_time.text = formattedEnd.second ?: ""
+            event_create_edit_end_date.text = formattedEnd.first ?: ""
+            event_create_edit_end_time.text = formattedEnd.second ?: ""
 
-            tv_timezone_start.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
+            event_create_edit_timezone.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
-            tv_calendar.text = event.calendar.name
-            tv_calendar.compoundDrawables.firstOrNull()?.setTint(Color.parseColor(event.calendar.color))
+            event_create_edit_calendar.text = event.calendar.name
+            ImageViewCompat.setImageTintList(event_create_edit_calendar_icon, ColorStateList.valueOf(Color.parseColor(event.calendar.color)))
 
-            tv_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+            event_create_edit_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
 
@@ -259,22 +264,42 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun attachActionHandlers() {
 
-        et_summary.doAfterTextChanged { persistFormData() }
-        et_location.doAfterTextChanged { persistFormData() }
-        et_description.doAfterTextChanged { persistFormData() }
+        event_create_edit_title.doAfterTextChanged { persistFormData() }
+        event_create_edit_location.doAfterTextChanged { persistFormData() }
+        event_create_edit_description.doAfterTextChanged { persistFormData() }
 
-        switch_all_day.setOnCheckedChangeListener { _, checked ->
+        event_create_edit_location.doOnTextChanged { text, start, before, count ->
+            if (text.isNullOrEmpty()) {
+                ImageViewCompat.setImageTintList(event_create_edit_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
+            } else if (text.length == 1) {
+                //Don't update text on every change
+                ImageViewCompat.setImageTintList(event_create_edit_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+            }
+        }
+        event_create_edit_description.doOnTextChanged { text, start, before, count ->
+            if (text.isNullOrEmpty()) {
+                ImageViewCompat.setImageTintList(event_create_edit_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
+            } else if (text.length == 1) {
+                //Don't update text on every change
+                ImageViewCompat.setImageTintList(event_create_edit_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+            }
+        }
+
+        event_create_edit_all_day_press.setOnClickListener {
+            event_create_edit_all_day_switch.performClick()
+        }
+        event_create_edit_all_day_switch.setOnCheckedChangeListener { _, checked ->
             eventViewModel.handleAllDaySwitch(checked)
         }
 
-        press_timezone_start.setOnClickListener {
+        event_create_edit_timezone_press.setOnClickListener {
             val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
             AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
                 eventViewModel.handleTimeZone(allowedTimezoneIds[it])
             }
         }
 
-        press_start_date.setOnClickListener {
+        event_create_edit_start_date_press.setOnClickListener {
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
@@ -285,7 +310,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        press_end_date.setOnClickListener {
+        event_create_edit_end_date_press.setOnClickListener {
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
@@ -297,7 +322,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        press_start_time.setOnClickListener {
+        event_create_edit_start_time_press.setOnClickListener {
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
@@ -305,7 +330,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        press_end_time.setOnClickListener {
+        event_create_edit_end_time_press.setOnClickListener {
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
@@ -313,7 +338,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        press_calendar.setOnClickListener {
+        event_create_edit_calendar_press.setOnClickListener {
             lifecycleScope.launch {
                 val calendars = withContext(Dispatchers.Default) {
                     calendarViewModel.getActiveCalendars()
@@ -333,53 +358,51 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        press_recurrence.setOnClickListener {
+        event_create_edit_recurrence_press.setOnClickListener {
             eventViewModel.initialiseForRecurrence()
             findNavController().navigate(R.id.nav_event_create_edit_recurrence)
         }
 
-        press_attendees.setOnClickListener {
-            findNavController().navigate(R.id.nav_event_create_edit_attendees)
-        }
+        //TODO Attendees
+        //press_attendees.setOnClickListener {
+        //    findNavController().navigate(R.id.nav_event_create_edit_attendees)
+        //}
 
     }
 
     private fun displayAlarms() {
 
-        ll_alarms.removeAllViews()
+        event_create_edit_alarm_list.removeAllViews()
+        event_create_edit_alarm_icon.visibility = View.VISIBLE
 
         val event = eventViewModel.eventLiveData.value!!
 
         event.iCalEvent.alarms.forEachIndexed { index, alarm ->
 
-            val alarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
-            alarmView.findViewById<TextView>(R.id.tv_text).apply {
+            val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_create_edit_alarm_list, false)
+            alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
                 text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
                 isClickable = false
             }
-            alarmView.findViewById<ImageButton>(R.id.ib_cross).apply {
+            alarmView.findViewById<View>(R.id.item_simple_text_button_delete_press).apply {
                 setOnClickListener {
                     eventViewModel.handleAlarmDelete(index)
                 }
                 isClickable = true
             }
-            ll_alarms.addView(alarmView)
-
+            if (index == 0) {
+                alarmView.event_create_edit_alarm_icon.visibility = View.VISIBLE
+                event_create_edit_alarm_icon.visibility = View.GONE
+            }
+            event_create_edit_alarm_list.addView(alarmView)
         }
 
         // "add alarm" button
-        val addAlarmView = layoutInflater.inflate(R.layout.item_simple_text_button, ll_alarms, false)
-        addAlarmView.findViewById<TextView>(R.id.tv_text).apply {
-            text = resources.getString(R.string.event_text_add_alarm)
-            setOnClickListener {
-                eventViewModel.initialiseForAlarm()
-                findNavController().navigate(R.id.nav_event_create_edit_alarm)
-            }
+        event_create_edit_alarm_press.setOnClickListener {
+            eventViewModel.initialiseForAlarm()
+            findNavController().navigate(R.id.nav_event_create_edit_alarm)
         }
-        addAlarmView.findViewById<ImageButton>(R.id.ib_cross).visibleOrGone(false)
-        if (!eventViewModel.isAlarmLimitReached()) {
-            ll_alarms.addView(addAlarmView)
-        }
+        event_create_edit_alarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
 
     }
 
