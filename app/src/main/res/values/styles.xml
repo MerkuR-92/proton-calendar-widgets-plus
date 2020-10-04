@@ -37,6 +37,11 @@
         <item name="android:lineSpacingExtra">4sp</item>
     </style>
 
+    <style name="Text.Default.RadioButton">
+        <item name="android:paddingStart">@dimen/radio_button_inner_padding</item>
+        <item name="android:paddingEnd">@dimen/radio_button_inner_padding</item>
+    </style>
+
     <style name="Text.Default.Strong">
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>

@@ -22,7 +22,8 @@
     <dimen name="default_inner_padding_start">16dp</dimen>
     <dimen name="default_inner_padding_end">12dp</dimen>
 
-    <dimen name="radio_button_inner_padding_start">12dp</dimen>
+    <dimen name="radio_group_inner_padding">12dp</dimen>
+    <dimen name="radio_button_inner_padding">8dp</dimen>
 
     <dimen name="default_margin_text_vertical">12dp</dimen>
     <dimen name="default_margin_text_vertical_large">20dp</dimen>

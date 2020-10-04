@@ -50,8 +50,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:paddingStart="@dimen/radio_button_inner_padding_start"
-        android:paddingEnd="@dimen/default_inner_padding_end"
+        android:paddingStart="@dimen/radio_group_inner_padding"
+        android:paddingEnd="@dimen/radio_group_inner_padding"
         android:paddingBottom="@dimen/spacing_page"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,38 +59,30 @@
 
         <RadioButton
             android:id="@+id/alarm_custom_1"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="minutes before" />
 
         <RadioButton
             android:id="@+id/alarm_custom_2"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="hours" />
 
         <RadioButton
             android:id="@+id/alarm_custom_3"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="days" />
 
         <RadioButton
             android:id="@+id/alarm_custom_4"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="weeks" />
 
     </RadioGroup>

@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_large"
         android:paddingBottom="@dimen/spacing_page"
-        android:paddingStart="@dimen/radio_button_inner_padding_start"
-        android:paddingEnd="@dimen/default_inner_padding_end"
+        android:paddingStart="@dimen/radio_group_inner_padding"
+        android:paddingEnd="@dimen/radio_group_inner_padding"
         tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,56 +22,44 @@
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_1"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_1" />
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_2"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_2" />
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_3"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_3" />
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_4"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_4" />
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_5"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_5" />
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_custom"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:text="@string/event_text_custom" />
 
     </RadioGroup>
@@ -120,28 +108,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_element_small"
-        android:paddingStart="@dimen/radio_button_inner_padding_start"
-        android:paddingEnd="@dimen/default_inner_padding_end"
+        android:paddingStart="@dimen/radio_group_inner_padding"
+        android:paddingEnd="@dimen/radio_group_inner_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action">
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_action_notification"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:text="@string/event_alarm_action_notification" />
 
         <RadioButton
             android:id="@+id/event_create_edit_alarm_action_email"
-            style="@style/Text.Default"
+            style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:text="@string/event_alarm_action_email" />
 
     </RadioGroup>
