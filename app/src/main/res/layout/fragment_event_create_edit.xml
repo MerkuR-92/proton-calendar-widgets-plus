@@ -296,7 +296,7 @@
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_map_marker"
-                android:layout_marginTop="@dimen/default_margin_text_top"
+                android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="@+id/event_create_edit_location"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -305,8 +305,8 @@
                 style="@style/Text.Default"
                 android:paddingStart="@dimen/default_margin_text_start"
                 android:paddingEnd="@dimen/default_margin_text_end"
-                android:paddingTop="@dimen/default_margin_text_top"
-                android:paddingBottom="@dimen/default_margin_text_top"
+                android:paddingTop="@dimen/default_margin_text_vertical_large"
+                android:paddingBottom="@dimen/default_margin_text_vertical_large"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -443,7 +443,7 @@
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_text_align_left"
-                android:layout_marginTop="@dimen/default_margin_text_top"
+                android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="@+id/event_create_edit_description"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -454,8 +454,8 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/default_margin_text_start"
                 android:paddingEnd="@dimen/default_margin_text_end"
-                android:paddingTop="@dimen/default_margin_text_top"
-                android:paddingBottom="@dimen/default_margin_text_top"
+                android:paddingTop="@dimen/default_margin_text_vertical_large"
+                android:paddingBottom="@dimen/default_margin_text_vertical_large"
                 android:ems="10"
                 android:hint="@string/event_hint_description"
                 android:inputType="textMultiLine|textCapSentences"

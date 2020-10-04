@@ -420,20 +420,28 @@ class AndroidUtils(context: Context) {
 
                 TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
 
-                val onTheSameDay = !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
 
                 // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
                 var daysFormatted: Int? = if (trigger.days != null) { // (trigger.days?.toInt() ?: 0) + 1
-                        trigger.days + 1
+                    if (trigger.days == 0) trigger.days
+                    else trigger.days + 1
                 } else {
                     if (trigger.hours != null || trigger.minutes != null) {
                         1
                     } else null
                 }
 
-                if (onTheSameDay) daysFormatted = null
-
                 var weeksFormatted = trigger.weeks?.toInt()
+
+                val onTheSameDay =
+                    if ((weeksFormatted == 0 && daysFormatted == 0) || (weeksFormatted == null && daysFormatted == 0)) true
+                    else !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
+
+                if (onTheSameDay) {
+                    daysFormatted = null
+                    weeksFormatted = null
+                }
+
                 if (daysFormatted == 7) {
                     weeksFormatted = (weeksFormatted ?: 0) + 1
                     daysFormatted = null
@@ -722,7 +730,7 @@ fun EditText.doAfterFilteredIntValueChanged(
         if (!it.isNullOrBlank()) {
             val count = it.toString().toIntOrNull()
             when {
-                count == null || it.toString().startsWith("0") -> {
+                count == null || (min > 0 && it.toString().startsWith("0")) -> {
                     this.setText(default.toString())
                 }
                 count < min -> {

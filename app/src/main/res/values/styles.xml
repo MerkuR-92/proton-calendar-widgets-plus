@@ -50,7 +50,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginStart">@dimen/default_margin_text_start</item>
         <item name="android:layout_marginEnd">@dimen/default_margin_text_end</item>
-        <item name="android:layout_marginTop">@dimen/default_margin_text_top</item>
+        <item name="android:layout_marginTop">@dimen/default_margin_text_vertical_large</item>
         <item name="android:layout_marginBottom">@dimen/default_margin_text_vertical</item>
     </style>
 
@@ -108,6 +108,18 @@
         <item name="android:layout_marginStart">@dimen/default_inner_padding_start</item>
     </style>
 
+    <style name="InputText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/brand_norm</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="boxCornerRadiusTopStart">3dp</item>
+        <item name="boxCornerRadiusTopEnd">3dp</item>
+        <item name="boxCornerRadiusBottomStart">3dp</item>
+        <item name="boxCornerRadiusBottomEnd">3dp</item>
+        <item name="boxBackgroundColor">@color/background_secondary</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="endIconDrawable">@drawable/ic_clear</item>
+    </style>
 
 
 

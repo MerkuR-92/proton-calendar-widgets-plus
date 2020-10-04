@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="@dimen/radio_button_inner_padding_start"
-    android:paddingEnd="@dimen/default_inner_padding_end"
     android:animateLayoutChanges="true">
 
     <RadioGroup
@@ -13,8 +12,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_large"
-        tools:visibility="gone"
-        android:animateLayoutChanges="false"
+        android:paddingBottom="@dimen/spacing_page"
+        android:paddingStart="@dimen/radio_button_inner_padding_start"
+        android:paddingEnd="@dimen/default_inner_padding_end"
+        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,7 +25,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_1" />
 
@@ -33,7 +34,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_2" />
 
@@ -42,7 +43,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_3" />
 
@@ -51,7 +52,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_4" />
 
@@ -60,7 +61,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             tools:text="@string/event_alarm_partial_day_5" />
 
@@ -69,98 +70,23 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="@string/event_text_custom" />
 
     </RadioGroup>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <include
         android:id="@+id/event_create_edit_alarm_custom_layout"
+        layout="@layout/alarm_custom_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_large"
         android:visibility="gone"
-        android:animateLayoutChanges="false"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:layout_marginBottom="@dimen/default_margin_text_vertical_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/event_create_edit_alarm_custom_field_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Text.Caption.Strong"
-            android:text="@string/event_custom_alarms_field"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <EditText
-            android:id="@+id/event_create_edit_alarm_custom_field"
-            style="@style/Text.Default"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:inputType="number"
-            android:paddingTop="@dimen/default_margin_text_vertical"
-            android:paddingBottom="@dimen/default_margin_text_vertical"
-            android:paddingStart="@dimen/default_inner_padding_start"
-            android:paddingEnd="@dimen/default_inner_padding_end"
-            tools:text="15"
-            android:background="@drawable/shape_background_edit_text"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_custom_field_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <RadioGroup
-            android:id="@+id/event_create_edit_alarm_custom_radio_group"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_custom_field">
-
-            <RadioButton
-                android:id="@+id/event_create_edit_alarm_custom_1"
-                style="@style/Text.Default"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                tools:text="minutes before" />
-
-            <RadioButton
-                android:id="@+id/event_create_edit_alarm_custom_2"
-                style="@style/Text.Default"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                tools:text="hours" />
-
-            <RadioButton
-                android:id="@+id/event_create_edit_alarm_custom_3"
-                style="@style/Text.Default"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                tools:text="days" />
-
-            <RadioButton
-                android:id="@+id/event_create_edit_alarm_custom_4"
-                style="@style/Text.Default"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                tools:text="weeks" />
-
-        </RadioGroup>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/event_create_edit_alarm_action_barrier"
@@ -172,7 +98,6 @@
     <View
         android:id="@+id/event_create_edit_alarm_action_separator"
         style="@style/Separator"
-        android:layout_marginTop="@dimen/spacing_page"
         app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action_barrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -183,7 +108,9 @@
         android:layout_height="wrap_content"
         style="@style/Text.DefaultSmall.Weak"
         android:text="@string/event_alarm_action"
-        android:layout_marginTop="@dimen/spacing_page"
+        android:layout_marginStart="@dimen/spacing_page"
+        android:layout_marginEnd="@dimen/spacing_page"
+        android:layout_marginTop="@dimen/spacing_large"
         app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action_separator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -193,6 +120,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_element_small"
+        android:paddingStart="@dimen/radio_button_inner_padding_start"
+        android:paddingEnd="@dimen/default_inner_padding_end"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action">
@@ -202,7 +131,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="@string/event_alarm_action_notification" />
 
@@ -211,7 +140,7 @@
             style="@style/Text.Default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="14dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="@string/event_alarm_action_email" />
 
