@@ -6,13 +6,16 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.core.view.children
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
+import kotlinx.android.synthetic.main.alarm_custom_view.*
+import kotlinx.android.synthetic.main.chip_group_day_of_week.*
 import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -70,7 +73,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                     }
 
                     // "repeat X times"
-                    when (s_recurrence_period.selectedItemPosition) {
+                    when (getCheckedRadioButtonIndex(rg_recurrence_period)) {
                         0 -> { // days
                             val interval = et_recurrence_count.text.toString().toIntOrNull()
                                 ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
@@ -83,7 +86,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
 
                             // weekdays for occurence
                             val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
-                            val daysOfWeek = (ll_chips_day_of_week as ViewGroup).children.mapIndexedNotNull() { index, chip ->
+                            val daysOfWeek = (chip_group_day_of_week_layout as ViewGroup).children.mapIndexedNotNull() { index, chip ->
                                 if ((chip as Chip).isChecked) {
                                     biweekly.util.DayOfWeek.values()[(dayNamesStartingIndex + index) % 7]
                                 } else null
@@ -136,13 +139,14 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         // main recurrence type radio group
         rg_recurrence.setOnCheckedChangeListener { radioGroup, index ->
             group_custom.visibleOrGone(false)
-            tv_custom_occurrence.visibleOrGone(false)
+            rg_occurrence_time.visibleOrGone(false)
             group_custom_occurrence.visibleOrGone(false)
             ll_chips_day_of_week.visibleOrGone(false)
 
             if (index == R.id.rb_recurrence_custom) {
+                rg_recurrence.visibleOrGone(false)
                 group_custom.visibleOrGone(true)
-                showCustomRecurrenceForms(s_recurrence_period.selectedItemPosition)
+                showCustomRecurrenceForms(getCheckedRadioButtonIndex(rg_recurrence_period))
             }
         }
 
@@ -237,79 +241,78 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     }
 
     private fun setupCustomRecurrenceSpinnerComponent() {
-        s_recurrence_period.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        var lastSelectedIndex: Int? = null
 
-            var lastSelectedIndex: Int? = null
+        rg_recurrence_period.setOnCheckedChangeListener { radioGroup, index ->
 
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
+            val position = getCheckedRadioButtonIndex(rg_recurrence_period)
+            showCustomRecurrenceForms(position)
 
-                showCustomRecurrenceForms(position)
+            // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
+            if (lastSelectedIndex != null && lastSelectedIndex == position) {
+                return@setOnCheckedChangeListener
+            }
+            lastSelectedIndex = position
 
-                // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
-                if (lastSelectedIndex != null && lastSelectedIndex == position) {
-                    return
+            when (position) {
+                0 -> { // day
+                    resetRecurrenceCountValidation(
+                        FormValidation.INTERVAL_DAY_COUNT_DEFAULT,
+                        FormValidation.INTERVAL_DAY_COUNT_MIN,
+                        FormValidation.INTERVAL_DAY_COUNT_MAX
+                    )
                 }
-                lastSelectedIndex = position
-
-                when (position) {
-                    0 -> { // day
-                        resetRecurrenceCountValidation(
-                            FormValidation.INTERVAL_DAY_COUNT_DEFAULT,
-                            FormValidation.INTERVAL_DAY_COUNT_MIN,
-                            FormValidation.INTERVAL_DAY_COUNT_MAX
-                        )
-                    }
-                    1 -> { // week
-                        resetRecurrenceCountValidation(
-                            FormValidation.INTERVAL_WEEK_COUNT_DEFAULT,
-                            FormValidation.INTERVAL_WEEK_COUNT_MIN,
-                            FormValidation.INTERVAL_WEEK_COUNT_MAX
-                        )
-                    }
-                    2 -> { // month
-                        resetRecurrenceCountValidation(
-                            FormValidation.INTERVAL_MONTH_COUNT_DEFAULT,
-                            FormValidation.INTERVAL_MONTH_COUNT_MIN,
-                            FormValidation.INTERVAL_MONTH_COUNT_MAX
-                        )
-                    }
-                    3 -> { // year
-                        resetRecurrenceCountValidation(
-                            FormValidation.INTERVAL_YEAR_COUNT_DEFAULT,
-                            FormValidation.INTERVAL_YEAR_COUNT_MIN,
-                            FormValidation.INTERVAL_YEAR_COUNT_MAX
-                        )
-                    }
+                1 -> { // week
+                    resetRecurrenceCountValidation(
+                        FormValidation.INTERVAL_WEEK_COUNT_DEFAULT,
+                        FormValidation.INTERVAL_WEEK_COUNT_MIN,
+                        FormValidation.INTERVAL_WEEK_COUNT_MAX
+                    )
                 }
-
+                2 -> { // month
+                    resetRecurrenceCountValidation(
+                        FormValidation.INTERVAL_MONTH_COUNT_DEFAULT,
+                        FormValidation.INTERVAL_MONTH_COUNT_MIN,
+                        FormValidation.INTERVAL_MONTH_COUNT_MAX
+                    )
+                }
+                3 -> { // year
+                    resetRecurrenceCountValidation(
+                        FormValidation.INTERVAL_YEAR_COUNT_DEFAULT,
+                        FormValidation.INTERVAL_YEAR_COUNT_MIN,
+                        FormValidation.INTERVAL_YEAR_COUNT_MAX
+                    )
+                }
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
         // init with WEEK
         et_recurrence_count.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
         resetRecurrencePeriodAdapter(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
-        s_recurrence_period.setSelection(1)
+        rg_recurrence_period.check(rb_recurrence_period_2.id)
+
+        et_recurrence_count_layout.setEndIconOnClickListener {
+            et_recurrence_count.setText("0")
+        }
 
         val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
 
-        val byDayIndices = eventViewModel.eventLiveData.value!!.iCalEvent?.recurrenceRule?.value?.byDay?.map { (it.day.ordinal + 7 - dayNamesStartingIndex) % 7 } ?: emptyList()
+        val byDayIndices =
+            eventViewModel.eventLiveData.value!!.iCalEvent?.recurrenceRule?.value?.byDay?.map { (it.day.ordinal + 7 - dayNamesStartingIndex) % 7 }
+                ?: emptyList()
 
-        val indexOfEventStartDay = (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7
+        val indexOfEventStartDay =
+            (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7
         val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
         resources.getStringArray(R.array.days_of_week_letters)
             .slice(dayNamesStartingIndex..(dayNamesStartingIndex + 6))
             .forEachIndexed { index, dayName ->
-                ((ll_chips_day_of_week as ViewGroup).getChildAt(index) as Chip).apply {
+                ((chip_group_day_of_week_layout as ViewGroup).getChildAt(index) as Chip).apply {
                     text = dayName
-                    isClickable = (index != indexOfEventStartDay) // we disable and check by default the day of event's start
+                    isClickable =
+                        (index != indexOfEventStartDay) // we disable and check by default the day of event's start
                     isChecked = (index in checkedDayIndices)
                 }
             }
@@ -320,27 +323,34 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 .toLocalDate()
 
         // applies only to month
-        val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.tempMonthlyRepeatOption)
-        tv_occurrence_time.setText(monthlyRecurrenceOn)
-
-        press_recurrence_time.setOnClickListener {
-            val optionsRepeatOn = eventViewModel.calculateMonthlyRepeatOnOptions()
-
-            AndroidUtils.displaySingleChoicePicker(
-                requireContext(), getString(R.string.event_recurrence_occurs_on),
-                optionsRepeatOn.map {
-                    mapMonthlyRecurrenceOnToString(eventStartDate, it)
-                }.toTypedArray(), eventViewModel.calculateMonthlyRepeatOnOptionIndex()
-            ) {
-                eventViewModel.handleRecurrenceRepeatOn(it)
-                tv_occurrence_time.setText(
-                    mapMonthlyRecurrenceOnToString(
-                        eventStartDate,
-                        optionsRepeatOn[it]
-                    )
-                )
+        rg_occurrence_time.check(
+            when (eventViewModel.tempMonthlyRepeatOption) {
+                EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> rb_occurrence_time_1.id
+                EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> rb_occurrence_time_2.id
+                EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> rb_occurrence_time_3.id
             }
+        )
 
+        val optionsRepeatOn = eventViewModel.calculateMonthlyRepeatOnOptions()
+        optionsRepeatOn.forEach {
+            when (it) {
+                EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> {
+                    rb_occurrence_time_1.visibleOrGone(true)
+                    rb_occurrence_time_1.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                }
+                EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> {
+                    rb_occurrence_time_2.visibleOrGone(true)
+                    rb_occurrence_time_2.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                }
+                EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> {
+                    rb_occurrence_time_3.visibleOrGone(true)
+                    rb_occurrence_time_3.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                }
+            }
+        }
+
+        rg_occurrence_time.setOnCheckedChangeListener { group, checkedId ->
+            eventViewModel.handleRecurrenceRepeatOn(getCheckedRadioButtonIndex(rg_occurrence_time))
         }
     }
 
@@ -382,9 +392,6 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                         eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                             .toLocalDate()
 
-                    val monthlyRecurrenceOn = mapMonthlyRecurrenceOnToString(eventStartDate, eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()])
-                    tv_occurrence_time.setText(monthlyRecurrenceOn)
-
                     // ll_chips_day_of_week is initialised when populating spinner
 
                     customEndingRadioGroup.check(R.id.rb_recurrence_custom_1) // default
@@ -394,10 +401,10 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                         if (this.until != null) {
                             customEndingRadioGroup.check(R.id.rb_recurrence_custom_2)
                             rb_recurrence_custom_2.setText(getString(
-                                    R.string.event_recurrence_ends_on_date,
-                                    DateFormat.getDateInstance(
-                                        DateFormat.LONG
-                                    ).format(this.until))
+                                R.string.event_recurrence_ends_on_date,
+                                DateFormat.getDateInstance(
+                                    DateFormat.LONG
+                                ).format(this.until))
                             )
                         }
                         if (this.count != null) {
@@ -410,22 +417,22 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                             Frequency.WEEKLY -> {
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
-                                s_recurrence_period.setSelection(1)
+                                rg_recurrence_period.check(rb_recurrence_period_1.id)
                             }
                             Frequency.MONTHLY -> {
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT)
-                                s_recurrence_period.setSelection(2)
+                                rg_recurrence_period.check(rb_recurrence_period_2.id)
                             }
                             Frequency.YEARLY -> {
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_YEAR_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT)
-                                s_recurrence_period.setSelection(3)
+                                rg_recurrence_period.check(rb_recurrence_period_3.id)
                             }
                             else -> { // fallback to Frequency.DAILY
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_DAY_COUNT_DEFAULT)
-                                s_recurrence_period.setSelection(0)
+                                rg_recurrence_period.check(rb_recurrence_period_4.id)
                             }
                         }
 
@@ -443,22 +450,10 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
      * Applies correct pluralisation to dropdown items.
      */
     private fun resetRecurrencePeriodAdapter(count: Int) {
-
-        val adapter = ArrayAdapter(
-            requireContext(), android.R.layout.simple_spinner_dropdown_item, arrayListOf<String>(
-                resources.getQuantityString(R.plurals.plural_day, count, count),
-                resources.getQuantityString(R.plurals.plural_week, count, count),
-                resources.getQuantityString(R.plurals.plural_month, count, count),
-                resources.getQuantityString(R.plurals.plural_year, count, count)
-            )
-        )
-
-        s_recurrence_period.apply {
-            val selectedIndex = s_recurrence_period.selectedItemPosition
-            setAdapter(adapter)
-            setSelection(selectedIndex)
-        }
-
+        rb_recurrence_period_1.text = resources.getQuantityString(R.plurals.plural_day, count, count)
+        rb_recurrence_period_2.text = resources.getQuantityString(R.plurals.plural_week, count, count)
+        rb_recurrence_period_3.text = resources.getQuantityString(R.plurals.plural_month, count, count)
+        rb_recurrence_period_4.text = resources.getQuantityString(R.plurals.plural_year, count, count)
     }
 
     // we keep track of TextWatcher so we can remove it when resetting recurrence validation
@@ -485,22 +480,22 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
     private fun showCustomRecurrenceForms(recurrenceTypeIndex: Int) {
         when (recurrenceTypeIndex) {
             0 -> { // day
-                tv_custom_occurrence.visibleOrGone(false)
+                rg_occurrence_time.visibleOrGone(false)
                 group_custom_occurrence.visibleOrGone(false)
                 ll_chips_day_of_week.visibleOrGone(false)
             }
             1 -> { // week
-                tv_custom_occurrence.visibleOrGone(true)
+                rg_occurrence_time.visibleOrGone(true)
                 group_custom_occurrence.visibleOrGone(false)
                 ll_chips_day_of_week.visibleOrGone(true)
             }
             2 -> { // month
-                tv_custom_occurrence.visibleOrGone(true)
+                rg_occurrence_time.visibleOrGone(true)
                 group_custom_occurrence.visibleOrGone(true)
                 ll_chips_day_of_week.visibleOrGone(false)
             }
             3 -> { // year
-                tv_custom_occurrence.visibleOrGone(false)
+                rg_occurrence_time.visibleOrGone(false)
                 group_custom_occurrence.visibleOrGone(false)
                 ll_chips_day_of_week.visibleOrGone(false)
             }

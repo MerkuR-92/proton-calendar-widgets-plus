@@ -845,3 +845,8 @@ fun <T> concatenate(vararg lists: List<T>): List<T> {
     return listOf(*lists).flatten()
 }
 
+fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
+    //Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
+    return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
+}
+

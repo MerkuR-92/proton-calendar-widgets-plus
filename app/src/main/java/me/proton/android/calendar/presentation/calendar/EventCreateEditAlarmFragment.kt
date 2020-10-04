@@ -9,7 +9,6 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.alarm_custom_view.*
 import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
 import me.proton.android.calendar.R
@@ -17,7 +16,6 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import timber.log.Timber
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -69,18 +67,13 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
     /**
      * Applies correct pluralisation to dropdown items.
      */
-    private fun resetAlarmPeriodAdapter(count: Int) {
+    private fun resetAlarmCustomText(count: Int) {
         alarm_custom_3.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count, count))
         alarm_custom_4.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count, count))
         if (!isAllDay) {
             alarm_custom_1.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_minute, count, count))
             alarm_custom_2.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_hour, count, count))
         }
-    }
-
-    private fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
-        //Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
-        return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -172,12 +165,12 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
         alarm_custom_time_layout.visibleOrGone(isAllDay)
         if (isAllDay) {
             alarm_custom_field.setText("1")
-            resetAlarmPeriodAdapter(1)
+            resetAlarmCustomText(1)
             alarm_custom_radio_group.check(alarm_custom_3.id)
             alarm_custom_time.text = eventViewModel.tempAlarmTime.format()
         } else {
             alarm_custom_field.setText("15")
-            resetAlarmPeriodAdapter(15)
+            resetAlarmCustomText(15)
             alarm_custom_radio_group.check(alarm_custom_1.id)
         }
 
@@ -205,7 +198,7 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
         // set new text watcher with new config
         alarmCustomFieldTextWatcher =
             alarm_custom_field.doAfterFilteredIntValueChanged(default, min, max) {
-                resetAlarmPeriodAdapter(it)
+                resetAlarmCustomText(it)
             }
 
         // set current value again because it might be outside of newly set limits
