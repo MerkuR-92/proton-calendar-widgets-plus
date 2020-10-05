@@ -5,8 +5,6 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.alarm_custom_view.*
@@ -105,7 +103,6 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
         event_create_edit_alarm_action_radio_group.check(event_create_edit_alarm_action_notification.id) // TODO read from event alarm
 
         event_create_edit_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
-
             when (index) {
                 R.id.event_create_edit_alarm_custom -> {
                     toolbarTitle.text = getString(R.string.event_custom_alarms_title)
@@ -115,6 +112,9 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
                     event_create_edit_alarm_custom_layout.visibleOrGone(true)
                 }
             }
+        }
+        event_create_edit_alarm_action_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+            requireActivity().clearFocusAndHideKeyboard(view)
         }
 
         var lastSelectedIndex: Int? = null
@@ -126,6 +126,8 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 return@setOnCheckedChangeListener
             }
             lastSelectedIndex = index
+
+            requireActivity().clearFocusAndHideKeyboard(view)
 
             when (getCheckedRadioButtonIndex(alarm_custom_radio_group)) {
                 0 -> { // minute
@@ -179,6 +181,8 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         alarm_custom_time_press.setOnClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
 
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {

@@ -5,16 +5,12 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.core.view.children
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.alarm_custom_view.*
 import kotlinx.android.synthetic.main.chip_group_day_of_week.*
 import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
 import me.proton.android.calendar.R
@@ -150,6 +146,13 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
             }
         }
 
+        rb_recurrence_custom_1.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) requireActivity().clearFocusAndHideKeyboard(view)
+        }
+        rb_recurrence_custom_2.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) requireActivity().clearFocusAndHideKeyboard(view)
+        }
+
         // custom recurrence spinner ("repeats every X days/weeks/months...")
         setupCustomRecurrenceSpinnerComponent()
 
@@ -244,6 +247,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         var lastSelectedIndex: Int? = null
 
         rg_recurrence_period.setOnCheckedChangeListener { radioGroup, index ->
+            requireActivity().clearFocusAndHideKeyboard(view)
 
             val position = getCheckedRadioButtonIndex(rg_recurrence_period)
             showCustomRecurrenceForms(position)
@@ -350,6 +354,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         }
 
         rg_occurrence_time.setOnCheckedChangeListener { group, checkedId ->
+            requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.handleRecurrenceRepeatOn(getCheckedRadioButtonIndex(rg_occurrence_time))
         }
     }
@@ -392,6 +397,14 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                         eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                             .toLocalDate()
 
+                    rg_occurrence_time.check(
+                        when (eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()]) {
+                            EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> rb_occurrence_time_1.id
+                            EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> rb_occurrence_time_2.id
+                            EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> rb_occurrence_time_3.id
+                        }
+                    )
+
                     // ll_chips_day_of_week is initialised when populating spinner
 
                     customEndingRadioGroup.check(R.id.rb_recurrence_custom_1) // default
@@ -417,22 +430,22 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                             Frequency.WEEKLY -> {
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
-                                rg_recurrence_period.check(rb_recurrence_period_1.id)
+                                rg_recurrence_period.check(rb_recurrence_period_2.id)
                             }
                             Frequency.MONTHLY -> {
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT)
-                                rg_recurrence_period.check(rb_recurrence_period_2.id)
+                                rg_recurrence_period.check(rb_recurrence_period_3.id)
                             }
                             Frequency.YEARLY -> {
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_YEAR_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT)
-                                rg_recurrence_period.check(rb_recurrence_period_3.id)
+                                rg_recurrence_period.check(rb_recurrence_period_4.id)
                             }
                             else -> { // fallback to Frequency.DAILY
                                 et_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT}")
                                 resetRecurrencePeriodAdapter(FormValidation.INTERVAL_DAY_COUNT_DEFAULT)
-                                rg_recurrence_period.check(rb_recurrence_period_4.id)
+                                rg_recurrence_period.check(rb_recurrence_period_1.id)
                             }
                         }
 
@@ -485,7 +498,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
                 ll_chips_day_of_week.visibleOrGone(false)
             }
             1 -> { // week
-                rg_occurrence_time.visibleOrGone(true)
+                rg_occurrence_time.visibleOrGone(false)
                 group_custom_occurrence.visibleOrGone(false)
                 ll_chips_day_of_week.visibleOrGone(true)
             }

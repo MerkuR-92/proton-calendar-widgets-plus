@@ -1,13 +1,11 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -288,7 +286,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_all_day_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             event_create_edit_all_day_switch.performClick()
         }
         event_create_edit_all_day_switch.setOnCheckedChangeListener { _, checked ->
@@ -296,7 +294,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_timezone_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
             AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
                 eventViewModel.handleTimeZone(allowedTimezoneIds[it])
@@ -304,7 +302,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_start_date_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
@@ -316,7 +314,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_end_date_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
@@ -329,7 +327,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_start_time_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
@@ -338,7 +336,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_end_time_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
@@ -347,7 +345,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_calendar_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
                 val calendars = withContext(Dispatchers.Default) {
                     calendarViewModel.getActiveCalendars()
@@ -368,7 +366,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_create_edit_recurrence_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForRecurrence()
             findNavController().navigate(R.id.nav_event_create_edit_recurrence)
         }
@@ -378,13 +376,6 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
         //    findNavController().navigate(R.id.nav_event_create_edit_attendees)
         //}
 
-    }
-
-    private fun clearEditTextFocus() {
-        val windowToken = view?.rootView?.windowToken
-        val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(windowToken, 0)
-        view?.clearFocus()
     }
 
     private fun displayAlarms() {
@@ -403,7 +394,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete_press).apply {
                 setOnClickListener {
-                    clearEditTextFocus()
+                    requireActivity().clearFocusAndHideKeyboard(view)
                     eventViewModel.handleAlarmDelete(index)
                 }
                 isClickable = true
@@ -417,7 +408,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
         // "add alarm" button
         event_create_edit_alarm_press.setOnClickListener {
-            clearEditTextFocus()
+            requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForAlarm()
             findNavController().navigate(R.id.nav_event_create_edit_alarm)
         }

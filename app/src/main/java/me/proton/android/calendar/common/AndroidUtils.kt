@@ -850,3 +850,9 @@ fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
     return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
 }
 
+fun Activity.clearFocusAndHideKeyboard(view: View?) {
+    val windowToken = view?.rootView?.windowToken
+    val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    imm?.hideSoftInputFromWindow(windowToken, 0)
+    view?.clearFocus()
+}
