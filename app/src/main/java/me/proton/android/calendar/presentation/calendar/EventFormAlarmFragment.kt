@@ -7,9 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.alarm_custom_view.*
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -46,9 +45,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
 
             //We hide minutes and hours buttons so days and weeks have id 2 & 3
-            val countTypeOption = getCheckedRadioButtonIndex(alarm_custom_radio_group) - 2
+            val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group) - 2
             eventViewModel.handleAlarm(alarmTypeOption,
-                count = alarm_custom_field.text.toString().toIntOrNull(),
+                count = custom_alarm_field.text.toString().toIntOrNull(),
                 countTypeOption = countTypeOption)
             findNavController().navigateUp()
 
@@ -67,11 +66,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
      * Applies correct pluralisation to dropdown items.
      */
     private fun resetAlarmCustomText(count: Int) {
-        alarm_custom_3.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count, count))
-        alarm_custom_4.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count, count))
+        custom_alarm_3.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count, count))
+        custom_alarm_4.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count, count))
         if (!isAllDay) {
-            alarm_custom_1.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_minute, count, count))
-            alarm_custom_2.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_hour, count, count))
+            custom_alarm_1.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_minute, count, count))
+            custom_alarm_2.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_hour, count, count))
         }
     }
 
@@ -120,7 +119,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
         var lastSelectedIndex: Int? = null
 
-        alarm_custom_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        custom_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
 
             // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
             if (lastSelectedIndex != null && lastSelectedIndex == index) {
@@ -130,7 +129,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            when (getCheckedRadioButtonIndex(alarm_custom_radio_group)) {
+            when (getCheckedRadioButtonIndex(custom_alarm_radio_group)) {
                 0 -> { // minute
                     resetAlarmCountValidation(
                         FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
@@ -163,32 +162,32 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         // init
-        alarm_custom_1.visibleOrGone(!isAllDay)
-        alarm_custom_2.visibleOrGone(!isAllDay)
-        alarm_custom_time_layout.visibleOrGone(isAllDay)
+        custom_alarm_1.visibleOrGone(!isAllDay)
+        custom_alarm_2.visibleOrGone(!isAllDay)
+        custom_alarm_time_layout.visibleOrGone(isAllDay)
         if (isAllDay) {
-            alarm_custom_field.setText("1")
+            custom_alarm_field.setText("1")
             resetAlarmCustomText(1)
-            alarm_custom_radio_group.check(alarm_custom_3.id)
-            alarm_custom_time.text = eventViewModel.tempAlarmTime.format()
+            custom_alarm_radio_group.check(custom_alarm_3.id)
+            custom_alarm_time.text = eventViewModel.tempAlarmTime.format()
         } else {
-            alarm_custom_field.setText("15")
+            custom_alarm_field.setText("15")
             resetAlarmCustomText(15)
-            alarm_custom_radio_group.check(alarm_custom_1.id)
+            custom_alarm_radio_group.check(custom_alarm_1.id)
         }
 
-        alarm_custom_field_layout.setEndIconOnClickListener {
-            alarm_custom_field.setText(FormValidation.ALARM_PERIOD_COUNT_DEFAULT.toString())
+        custom_alarm_field_layout.setEndIconOnClickListener {
+            custom_alarm_field.setText(FormValidation.ALARM_PERIOD_COUNT_DEFAULT.toString())
         }
 
-        alarm_custom_time_press.setOnClickListener {
+        custom_alarm_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
 
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
                 eventViewModel.handleAlarmTime(it)
-                alarm_custom_time.text = it.format()
+                custom_alarm_time.text = it.format()
             }
         }
     }
@@ -198,15 +197,15 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun resetAlarmCountValidation(default: Int, min: Int, max: Int) {
         // remove current alarm count text watcher
-        alarmCustomFieldTextWatcher?.let { alarm_custom_field.removeTextChangedListener(it) }
+        alarmCustomFieldTextWatcher?.let { custom_alarm_field.removeTextChangedListener(it) }
 
         // set new text watcher with new config
         alarmCustomFieldTextWatcher =
-            alarm_custom_field.doAfterFilteredIntValueChanged(default, min, max) {
+            custom_alarm_field.doAfterFilteredIntValueChanged(default, min, max) {
                 resetAlarmCustomText(it)
             }
 
         // set current value again because it might be outside of newly set limits
-        alarm_custom_field.setText(alarm_custom_field.text)
+        custom_alarm_field.setText(custom_alarm_field.text)
     }
 }

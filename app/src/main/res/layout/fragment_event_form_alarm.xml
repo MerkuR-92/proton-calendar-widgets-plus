@@ -66,7 +66,7 @@
 
     <include
         android:id="@+id/event_form_alarm_custom_layout"
-        layout="@layout/alarm_custom_view"
+        layout="@layout/event_form_custom_alarm_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
