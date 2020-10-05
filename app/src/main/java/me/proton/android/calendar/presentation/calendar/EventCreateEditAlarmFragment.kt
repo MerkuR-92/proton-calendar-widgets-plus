@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.alarm_custom_view.*
 import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
+import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -147,14 +148,14 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 2 -> { // day
                     resetAlarmCountValidation(
                         FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
-                        if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_MIN_ALL_DAY else FormValidation.ALARM_PERIOD_COUNT_MIN,
+                        FormValidation.ALARM_PERIOD_COUNT_MIN,
                         FormValidation.ALARM_PERIOD_MAX_DAYS
                     )
                 }
                 3 -> { // week
                     resetAlarmCountValidation(
                         FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
-                        if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_MIN_ALL_DAY else FormValidation.ALARM_PERIOD_COUNT_MIN,
+                        FormValidation.ALARM_PERIOD_COUNT_MIN,
                         FormValidation.ALARM_PERIOD_MAX_WEEKS
                     )
                 }
@@ -177,7 +178,7 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         alarm_custom_field_layout.setEndIconOnClickListener {
-            alarm_custom_field.setText("0")
+            alarm_custom_field.setText(FormValidation.ALARM_PERIOD_COUNT_DEFAULT.toString())
         }
 
         alarm_custom_time_press.setOnClickListener {

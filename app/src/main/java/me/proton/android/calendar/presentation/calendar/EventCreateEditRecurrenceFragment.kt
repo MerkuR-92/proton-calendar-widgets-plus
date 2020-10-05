@@ -297,7 +297,16 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         rg_recurrence_period.check(rb_recurrence_period_2.id)
 
         et_recurrence_count_layout.setEndIconOnClickListener {
-            et_recurrence_count.setText("0")
+            when (getCheckedRadioButtonIndex(rg_recurrence_period)) {
+                // day
+                0 -> et_recurrence_count.setText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT.toString())
+                // week
+                1 -> et_recurrence_count.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
+                // month
+                2 -> et_recurrence_count.setText(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT.toString())
+                // year
+                3 -> et_recurrence_count.setText(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT.toString())
+            }
         }
 
         val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0

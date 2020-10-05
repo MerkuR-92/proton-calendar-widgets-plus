@@ -858,18 +858,15 @@ class EventViewModel(
 //                                    if (tempAlarmTime.hour == 0 && tempAlarmTime.minute == 0) {
 //                                        weeks(count)
 //                                    } else {
-                                        //if (count > 1)
-                                        val adjustedWeeks = count - 1
-                                        if (adjustedWeeks > 0) weeks(adjustedWeeks)
-                                        if (count == 0) {
-                                            weeks(count)
-                                            days(count)
-                                        } else days(7 - 1)
+                                    //if (count > 1)
+                                    val adjustedWeeks = count - 1
+                                    if (adjustedWeeks > 0) weeks(adjustedWeeks)
+                                    days(7 - 1)
 
                                     val negativeTimeOfDay = LocalTime.of(0, 0).minusHours(tempAlarmTime.hour.toLong()).minusMinutes(tempAlarmTime.minute.toLong())
 
-                                        if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
-                                        if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
+                                    if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
+                                    if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
 //                                    }
 
 

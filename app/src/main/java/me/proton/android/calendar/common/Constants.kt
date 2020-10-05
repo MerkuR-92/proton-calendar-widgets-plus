@@ -28,24 +28,24 @@ object FormValidation {
     val MAX_SUPPORTED_DATETIME = LocalDate.of(2038, 12, 31).atStartOfDay(ZoneId.of("UTC"))
 
     const val OCCURRENCE_COUNT_DEFAULT = 2
-    const val OCCURRENCE_COUNT_MIN = 0
-    const val OCCURRENCE_COUNT_MAX = 50
+    const val OCCURRENCE_COUNT_MIN = 1
+    const val OCCURRENCE_COUNT_MAX = 49
 
     const val INTERVAL_DAY_COUNT_DEFAULT = 1
-    const val INTERVAL_DAY_COUNT_MIN = 0
-    const val INTERVAL_DAY_COUNT_MAX = 1000
+    const val INTERVAL_DAY_COUNT_MIN = 1
+    const val INTERVAL_DAY_COUNT_MAX = 999
 
     const val INTERVAL_WEEK_COUNT_DEFAULT = 1
-    const val INTERVAL_WEEK_COUNT_MIN = 0
-    const val INTERVAL_WEEK_COUNT_MAX = 5000
+    const val INTERVAL_WEEK_COUNT_MIN = 1
+    const val INTERVAL_WEEK_COUNT_MAX = 4999
 
     const val INTERVAL_MONTH_COUNT_DEFAULT = 1
-    const val INTERVAL_MONTH_COUNT_MIN = 0
-    const val INTERVAL_MONTH_COUNT_MAX = 1000
+    const val INTERVAL_MONTH_COUNT_MIN = 1
+    const val INTERVAL_MONTH_COUNT_MAX = 999
 
     const val INTERVAL_YEAR_COUNT_DEFAULT = 1
-    const val INTERVAL_YEAR_COUNT_MIN = 0
-    const val INTERVAL_YEAR_COUNT_MAX = 100
+    const val INTERVAL_YEAR_COUNT_MIN = 1
+    const val INTERVAL_YEAR_COUNT_MAX = 99
 
     // TODO use this when saving/editing/IMPORTING Event
     const val EVENT_SUMMARY_MAX_LENGTH = 255
@@ -57,7 +57,6 @@ object FormValidation {
 
     const val ALARM_PERIOD_COUNT_DEFAULT = 1
     const val ALARM_PERIOD_COUNT_MIN = 1
-    const val ALARM_PERIOD_COUNT_MIN_ALL_DAY = 0
 
     const val ALARM_PERIOD_MAX_WEEKS = 999
     const val ALARM_PERIOD_MAX_DAYS = 6999
