@@ -16,7 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import kotlinx.android.synthetic.main.fragment_event_create_edit.*
+import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.item_alarm_text_button.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,12 +34,12 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 
-class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
-    override val TAG = "EventCreateEditFragment" // TODO
-    override val layoutResourceId = R.layout.fragment_event_create_edit
+    override val TAG = "EventFormFragment" // TODO
+    override val layoutResourceId = R.layout.fragment_event_form
 
-    override val actionMenuResourceId = R.menu.fragment_event_create_edit
+    override val actionMenuResourceId = R.menu.fragment_event_form
     override val navigateUp = false
 
     private val logger: Logger by inject()
@@ -139,16 +139,16 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 //
 //            with (eventViewModel) {
 //                summary = et_summary.text.toString().ifBlank { null }
-//                location = event_create_edit_location.text.toString().ifBlank { null }
-//                description = event_create_edit_description.text.toString().ifBlank { null }
+//                location = event_form_location.text.toString().ifBlank { null }
+//                description = event_form_description.text.toString().ifBlank { null }
 //            }
 
 //            withContext(Dispatchers.Default) {
 //
         eventViewModel.persistRecurrenceFormData(
-            event_create_edit_title.text.toString().ifBlank { null },
-            event_create_edit_location.text.toString().ifBlank { null },
-            event_create_edit_description.text.toString().ifBlank { null }
+            event_form_title.text.toString().ifBlank { null },
+            event_form_location.text.toString().ifBlank { null },
+            event_form_description.text.toString().ifBlank { null }
         )
 //            }
 
@@ -157,7 +157,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 //        }
     }
 
-    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
+    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by inject()
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
@@ -217,45 +217,45 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
     // TODO better name
     private fun refreshView() {
 //        et_summary.setText(eventViewModel.summary)
-//        event_create_edit_location.setText(eventViewModel.location)
-//        event_create_edit_description.setText(eventViewModel.description)
+//        event_form_location.setText(eventViewModel.location)
+//        event_form_description.setText(eventViewModel.description)
     }
 
     private fun observeEventLiveData() {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
 
-            event.summary?.let { event_create_edit_title.setText(it) }
-            event.location?.let { event_create_edit_location.setText(it) }
-            event.description?.let { event_create_edit_description.setText(it) }
+            event.summary?.let { event_form_title.setText(it) }
+            event.location?.let { event_form_location.setText(it) }
+            event.description?.let { event_form_description.setText(it) }
 
-            event_create_edit_all_day_switch.isChecked = event.isAllDay()
+            event_form_all_day_switch.isChecked = event.isAllDay()
 
-            event_create_edit_partial_day_start.visibleOrGone(!event.isAllDay())
-            event_create_edit_partial_day_end.visibleOrGone(!event.isAllDay())
-            event_create_edit_timezone_layout.visibleOrGone(!event.isAllDay())
+            event_form_partial_day_start.visibleOrGone(!event.isAllDay())
+            event_form_partial_day_end.visibleOrGone(!event.isAllDay())
+            event_form_timezone_layout.visibleOrGone(!event.isAllDay())
 
             if (eventViewModel.validateDateTime()) {
-                event_create_edit_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
-                event_create_edit_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                event_form_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                event_form_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
             } else {
-                event_create_edit_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
-                event_create_edit_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+                event_form_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+                event_form_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
             }
 
             val formattedStart = event.formatStart(eventViewModel.eventTimeZoneId)
-            event_create_edit_start_date.text = formattedStart.first ?: ""
-            event_create_edit_start_time.text = formattedStart.second ?: ""
+            event_form_start_date.text = formattedStart.first ?: ""
+            event_form_start_time.text = formattedStart.second ?: ""
 
             val formattedEnd = event.formatEnd(eventViewModel.eventTimeZoneId)
-            event_create_edit_end_date.text = formattedEnd.first ?: ""
-            event_create_edit_end_time.text = formattedEnd.second ?: ""
+            event_form_end_date.text = formattedEnd.first ?: ""
+            event_form_end_time.text = formattedEnd.second ?: ""
 
-            event_create_edit_timezone.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
+            event_form_timezone.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
-            event_create_edit_calendar.text = event.calendar.name
-            ImageViewCompat.setImageTintList(event_create_edit_calendar_icon, ColorStateList.valueOf(Color.parseColor(event.calendar.color)))
+            event_form_calendar.text = event.calendar.name
+            ImageViewCompat.setImageTintList(event_form_calendar_icon, ColorStateList.valueOf(Color.parseColor(event.calendar.color)))
 
-            event_create_edit_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+            event_form_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
 
@@ -264,36 +264,36 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun attachActionHandlers() {
 
-        event_create_edit_title.doAfterTextChanged { persistFormData() }
-        event_create_edit_location.doAfterTextChanged { persistFormData() }
-        event_create_edit_description.doAfterTextChanged { persistFormData() }
+        event_form_title.doAfterTextChanged { persistFormData() }
+        event_form_location.doAfterTextChanged { persistFormData() }
+        event_form_description.doAfterTextChanged { persistFormData() }
 
-        event_create_edit_location.doOnTextChanged { text, start, before, count ->
+        event_form_location.doOnTextChanged { text, start, before, count ->
             if (text.isNullOrEmpty()) {
-                ImageViewCompat.setImageTintList(event_create_edit_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
+                ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
             } else if (text.length == 1) {
                 //Don't update text on every change
-                ImageViewCompat.setImageTintList(event_create_edit_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+                ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
             }
         }
-        event_create_edit_description.doOnTextChanged { text, start, before, count ->
+        event_form_description.doOnTextChanged { text, start, before, count ->
             if (text.isNullOrEmpty()) {
-                ImageViewCompat.setImageTintList(event_create_edit_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
+                ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
             } else if (text.length == 1) {
                 //Don't update text on every change
-                ImageViewCompat.setImageTintList(event_create_edit_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+                ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
             }
         }
 
-        event_create_edit_all_day_press.setOnClickListener {
+        event_form_all_day_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            event_create_edit_all_day_switch.performClick()
+            event_form_all_day_switch.performClick()
         }
-        event_create_edit_all_day_switch.setOnCheckedChangeListener { _, checked ->
+        event_form_all_day_switch.setOnCheckedChangeListener { _, checked ->
             eventViewModel.handleAllDaySwitch(checked)
         }
 
-        event_create_edit_timezone_press.setOnClickListener {
+        event_form_timezone_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
             AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
@@ -301,7 +301,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_create_edit_start_date_press.setOnClickListener {
+        event_form_start_date_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
@@ -313,7 +313,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_create_edit_end_date_press.setOnClickListener {
+        event_form_end_date_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
@@ -326,7 +326,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_create_edit_start_time_press.setOnClickListener {
+        event_form_start_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalTime()
@@ -335,7 +335,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_create_edit_end_time_press.setOnClickListener {
+        event_form_end_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalTime()
@@ -344,7 +344,7 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_create_edit_calendar_press.setOnClickListener {
+        event_form_calendar_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
                 val calendars = withContext(Dispatchers.Default) {
@@ -365,29 +365,29 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_create_edit_recurrence_press.setOnClickListener {
+        event_form_recurrence_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForRecurrence()
-            findNavController().navigate(R.id.nav_event_create_edit_recurrence)
+            findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
         //TODO Attendees
         //press_attendees.setOnClickListener {
-        //    findNavController().navigate(R.id.nav_event_create_edit_attendees)
+        //    findNavController().navigate(R.id.nav_event_form_attendees)
         //}
 
     }
 
     private fun displayAlarms() {
 
-        event_create_edit_alarm_list.removeAllViews()
-        event_create_edit_alarm_icon.visibleOrGone(true)
+        event_form_alarm_list.removeAllViews()
+        event_form_alarm_icon.visibleOrGone(true)
 
         val event = eventViewModel.eventLiveData.value!!
 
         event.iCalEvent.alarms.forEachIndexed { index, alarm ->
 
-            val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_create_edit_alarm_list, false)
+            val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
                 text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
                 isClickable = false
@@ -400,19 +400,19 @@ class EventCreateEditFragment() : BaseDialogFragment(), KoinComponent {
                 isClickable = true
             }
             if (index == 0) {
-                alarmView.event_create_edit_alarm_icon.visibleOrGone(true)
-                event_create_edit_alarm_icon.visibleOrGone(false)
+                alarmView.event_form_alarm_icon.visibleOrGone(true)
+                event_form_alarm_icon.visibleOrGone(false)
             }
-            event_create_edit_alarm_list.addView(alarmView)
+            event_form_alarm_list.addView(alarmView)
         }
 
         // "add alarm" button
-        event_create_edit_alarm_press.setOnClickListener {
+        event_form_alarm_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForAlarm()
-            findNavController().navigate(R.id.nav_event_create_edit_alarm)
+            findNavController().navigate(R.id.nav_event_form_alarm)
         }
-        event_create_edit_alarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
+        event_form_alarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
 
     }
 

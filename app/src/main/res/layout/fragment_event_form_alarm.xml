@@ -8,7 +8,7 @@
     android:animateLayoutChanges="true">
 
     <RadioGroup
-        android:id="@+id/event_create_edit_alarm_radio_group"
+        android:id="@+id/event_form_alarm_radio_group"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_large"
@@ -21,42 +21,42 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_1"
+            android:id="@+id/event_form_alarm_1"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="@string/event_alarm_partial_day_1" />
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_2"
+            android:id="@+id/event_form_alarm_2"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="@string/event_alarm_partial_day_2" />
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_3"
+            android:id="@+id/event_form_alarm_3"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="@string/event_alarm_partial_day_3" />
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_4"
+            android:id="@+id/event_form_alarm_4"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="@string/event_alarm_partial_day_4" />
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_5"
+            android:id="@+id/event_form_alarm_5"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="@string/event_alarm_partial_day_5" />
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_custom"
+            android:id="@+id/event_form_alarm_custom"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
     </RadioGroup>
 
     <include
-        android:id="@+id/event_create_edit_alarm_custom_layout"
+        android:id="@+id/event_form_alarm_custom_layout"
         layout="@layout/alarm_custom_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -77,21 +77,21 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/event_create_edit_alarm_action_barrier"
+        android:id="@+id/event_form_alarm_action_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="event_create_edit_alarm_custom_layout,event_create_edit_alarm_radio_group" />
+        app:constraint_referenced_ids="event_form_alarm_custom_layout,event_form_alarm_radio_group" />
 
     <View
-        android:id="@+id/event_create_edit_alarm_action_separator"
+        android:id="@+id/event_form_alarm_action_separator"
         style="@style/Separator"
-        app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action_barrier"
+        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_barrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/event_create_edit_alarm_action"
+        android:id="@+id/event_form_alarm_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Text.DefaultSmall.Weak"
@@ -99,12 +99,12 @@
         android:layout_marginStart="@dimen/spacing_page"
         android:layout_marginEnd="@dimen/spacing_page"
         android:layout_marginTop="@dimen/spacing_large"
-        app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action_separator"
+        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_separator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <RadioGroup
-        android:id="@+id/event_create_edit_alarm_action_radio_group"
+        android:id="@+id/event_form_alarm_action_radio_group"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_element_small"
@@ -112,17 +112,17 @@
         android:paddingEnd="@dimen/radio_group_inner_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_action">
+        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action">
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_action_notification"
+            android:id="@+id/event_form_alarm_action_notification"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/event_alarm_action_notification" />
 
         <RadioButton
-            android:id="@+id/event_create_edit_alarm_action_email"
+            android:id="@+id/event_form_alarm_action_email"
             style="@style/Text.Default.RadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

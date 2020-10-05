@@ -9,11 +9,11 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 
-class EventCreateEditAttendeesFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
 
-    override val TAG = "EventCreateEditAttendeesFragment" // TODO
-    override val layoutResourceId = R.layout.fragment_event_create_edit_attendees
-    //    override val actionMenuResourceId = R.menu.fragment_event_create_edit
+    override val TAG = "EventFormAttendeesFragment" // TODO
+    override val layoutResourceId = R.layout.fragment_event_form_attendees
+    //    override val actionMenuResourceId = R.menu.fragment_event_form
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
 //         if (menuItem.itemId == R.id.action_menu_save) {
@@ -21,7 +21,7 @@ class EventCreateEditAttendeesFragment() : BaseDialogFragment(), KoinComponent {
 //         }
     }
 
-    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
+    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by inject()
 

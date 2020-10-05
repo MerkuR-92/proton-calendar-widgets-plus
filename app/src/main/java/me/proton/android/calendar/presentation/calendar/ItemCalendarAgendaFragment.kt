@@ -37,7 +37,7 @@ class ItemCalendarAgendaFragment(
     val date: LocalDate
 ) : Fragment(), KoinComponent {
 
-//    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
+//    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val valueStoreProvider: ValueStoreProvider by inject()
 

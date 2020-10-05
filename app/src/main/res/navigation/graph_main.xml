@@ -23,8 +23,8 @@
             android:id="@+id/action_nav_calendar_to_nav_event_details"
             app:destination="@id/nav_event_details" />
         <action
-            android:id="@+id/action_nav_calendar_to_nav_event_create_edit"
-            app:destination="@id/nav_event_create_edit" />
+            android:id="@+id/action_nav_calendar_to_nav_event_form"
+            app:destination="@id/nav_event_form" />
         <action
             android:id="@+id/action_nav_calendar_to_nav_login"
             app:destination="@id/nav_login" />
@@ -55,8 +55,8 @@
         android:label=""
         tools:layout="@layout/fragment_event_details_old">
         <action
-            android:id="@+id/action_nav_event_details_to_nav_event_create_edit"
-            app:destination="@id/nav_event_create_edit" />
+            android:id="@+id/action_nav_event_details_to_nav_event_form"
+            app:destination="@id/nav_event_form" />
         <deepLink
             android:id="@+id/deepLink"
             android:autoVerify="true"
@@ -71,9 +71,9 @@
     </dialog>
 
     <dialog
-        android:id="@+id/nav_event_create_edit"
-        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditFragment"
-        android:label="EventCreateEditFragment">
+        android:id="@+id/nav_event_form"
+        android:name="me.proton.android.calendar.presentation.calendar.EventFormFragment"
+        android:label="EventFormFragment">
         <deepLink
             android:id="@+id/deepLink2"
             android:autoVerify="true"
@@ -99,27 +99,27 @@
             app:argType="integer"
             android:defaultValue="0" />
         <action
-            android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_attendees"
-            app:destination="@id/nav_event_create_edit_attendees" />
+            android:id="@+id/action_nav_event_form_to_nav_event_form_attendees"
+            app:destination="@id/nav_event_form_attendees" />
         <action
-            android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_recurrence"
-            app:destination="@id/nav_event_create_edit_recurrence" />
+            android:id="@+id/action_nav_event_form_to_nav_event_form_recurrence"
+            app:destination="@id/nav_event_form_recurrence" />
         <action
-            android:id="@+id/action_nav_event_create_edit_to_nav_event_create_edit_alarm"
-            app:destination="@id/nav_event_create_edit_alarm" />
+            android:id="@+id/action_nav_event_form_to_nav_event_form_alarm"
+            app:destination="@id/nav_event_form_alarm" />
     </dialog>
     <dialog
-        android:id="@+id/nav_event_create_edit_attendees"
-        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditAttendeesFragment"
-        android:label="EventCreateEditAttendeesFragment" />
+        android:id="@+id/nav_event_form_attendees"
+        android:name="me.proton.android.calendar.presentation.calendar.EventFormAttendeesFragment"
+        android:label="EventFormAttendeesFragment" />
     <dialog
-        android:id="@+id/nav_event_create_edit_alarm"
-        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditAlarmFragment"
-        android:label="EventCreateEditAlarmFragment" />
+        android:id="@+id/nav_event_form_alarm"
+        android:name="me.proton.android.calendar.presentation.calendar.EventFormAlarmFragment"
+        android:label="EventFormAlarmFragment" />
     <dialog
-        android:id="@+id/nav_event_create_edit_recurrence"
-        android:name="me.proton.android.calendar.presentation.calendar.EventCreateEditRecurrenceFragment"
-        android:label="EventCreateEditRecurrenceFragment" />
+        android:id="@+id/nav_event_form_recurrence"
+        android:name="me.proton.android.calendar.presentation.calendar.EventFormRecurrenceFragment"
+        android:label="EventFormEditRecurrenceFragment" />
     <fragment
         android:id="@+id/nav_login"
         android:name="me.proton.android.calendar.presentation.LoginFragment"

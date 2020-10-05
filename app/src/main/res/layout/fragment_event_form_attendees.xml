@@ -15,7 +15,7 @@
 
 
     <EditText
-        android:id="@+id/event_create_edit_attendees_title"
+        android:id="@+id/event_form_attendees_title"
         android:layout_width="0dp"
         android:layout_height="92dp"
         android:gravity="start|top"

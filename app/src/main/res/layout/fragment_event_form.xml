@@ -13,7 +13,7 @@
         android:paddingBottom="@dimen/spacing_large">
 
         <EditText
-            android:id="@+id/event_create_edit_title"
+            android:id="@+id/event_form_title"
             style="@style/Text.Headline"
             android:background="@android:color/transparent"
             android:layout_width="0dp"
@@ -29,24 +29,24 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_all_day_layout"
+            android:id="@+id/event_form_all_day_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_title"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_all_day_icon"
+                android:id="@+id/event_form_all_day_icon"
                 style="@style/Icon.Form"
                 android:src="@drawable/ic_clock"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_all_day_title"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_all_day_title"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_all_day_title"
+                app:layout_constraintTop_toTopOf="@+id/event_form_all_day_title"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/event_create_edit_all_day_title"
+                android:id="@+id/event_form_all_day_title"
                 style="@style/Text.Default.Form"
                 android:layout_marginTop="@dimen/default_margin_text_vertical"
                 android:text="@string/event_text_switch_all_day"
@@ -56,16 +56,16 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <Switch
-                android:id="@+id/event_create_edit_all_day_switch"
+                android:id="@+id/event_form_all_day_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/default_icon_size"
                 android:layout_marginEnd="@dimen/default_inner_padding_end"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_all_day_title"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_all_day_title"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_all_day_title"
+                app:layout_constraintTop_toTopOf="@+id/event_form_all_day_title"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <include
-                android:id="@+id/event_create_edit_all_day_press"
+                android:id="@+id/event_form_all_day_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -77,15 +77,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_start_layout"
+            android:id="@+id/event_form_start_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_all_day_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_all_day_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
-                android:id="@+id/event_create_edit_start_date"
+                android:id="@+id/event_form_start_date"
                 style="@style/Text.Default.Form"
                 android:layout_marginTop="@dimen/default_margin_text_vertical"
                 tools:text="Friday, 12 February"
@@ -95,53 +95,53 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
-                android:id="@+id/event_create_edit_start_time"
+                android:id="@+id/event_form_start_time"
                 style="@style/Text.Default"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/default_inner_padding_end"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_start_date"
+                app:layout_constraintTop_toTopOf="@+id/event_form_start_date"
                 tools:text="13:37" />
 
             <include
-                android:id="@+id/event_create_edit_start_date_press"
+                android:id="@+id/event_form_start_date_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/event_create_edit_start_time_press"
+                app:layout_constraintEnd_toStartOf="@+id/event_form_start_time_press"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <include
-                android:id="@+id/event_create_edit_start_time_press"
+                android:id="@+id/event_form_start_time_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toEndOf="@+id/event_create_edit_start_date"
+                app:layout_constraintStart_toEndOf="@+id/event_form_start_date"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <androidx.constraintlayout.widget.Group
-                android:id="@+id/event_create_edit_partial_day_start"
+                android:id="@+id/event_form_partial_day_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="event_create_edit_start_time,event_create_edit_start_time_press"/>
+                app:constraint_referenced_ids="event_form_start_time,event_form_start_time_press"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_end_layout"
+            android:id="@+id/event_form_end_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_start_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_start_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
-                android:id="@+id/event_create_edit_end_date"
+                android:id="@+id/event_form_end_date"
                 style="@style/Text.Default.Form"
                 android:layout_marginTop="@dimen/default_margin_text_vertical"
                 tools:text="Saturday, 13 February"
@@ -150,69 +150,69 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
-                android:id="@+id/event_create_edit_end_time"
+                android:id="@+id/event_form_end_time"
                 style="@style/Text.Default"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/default_inner_padding_end"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_end_date"
+                app:layout_constraintTop_toTopOf="@+id/event_form_end_date"
                 tools:text="23:59" />
 
             <View
-                android:id="@+id/event_create_edit_end_separator"
+                android:id="@+id/event_form_end_separator"
                 style="@style/Separator"
                 android:layout_marginTop="@dimen/default_separator_margin_top"
-                app:layout_constraintTop_toBottomOf="@+id/event_create_edit_end_date"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_end_date"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <include
-                android:id="@+id/event_create_edit_end_date_press"
+                android:id="@+id/event_form_end_date_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/event_create_edit_end_time_press"
+                app:layout_constraintEnd_toStartOf="@+id/event_form_end_time_press"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_create_edit_end_separator"/>
+                app:layout_constraintBottom_toTopOf="@+id/event_form_end_separator"/>
 
             <include
-                android:id="@+id/event_create_edit_end_time_press"
+                android:id="@+id/event_form_end_time_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toEndOf="@+id/event_create_edit_end_date"
+                app:layout_constraintStart_toEndOf="@+id/event_form_end_date"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_end_separator"/>
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_end_separator"/>
 
             <androidx.constraintlayout.widget.Group
-                android:id="@+id/event_create_edit_partial_day_end"
+                android:id="@+id/event_form_partial_day_end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="event_create_edit_end_time,event_create_edit_end_time_press"/>
+                app:constraint_referenced_ids="event_form_end_time,event_form_end_time_press"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_timezone_layout"
+            android:id="@+id/event_form_timezone_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_end_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_end_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_timezone_icon"
+                android:id="@+id/event_form_timezone_icon"
                 style="@style/Icon.Form"
                 android:src="@drawable/ic_globe"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_timezone"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_timezone"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_timezone"
+                app:layout_constraintTop_toTopOf="@+id/event_form_timezone"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/event_create_edit_timezone"
+                android:id="@+id/event_form_timezone"
                 style="@style/Text.Default.Form"
                 tools:text="Europe/Zurich (GMT+2)"
                 app:layout_constraintTop_toTopOf="parent"
@@ -220,43 +220,43 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
-                android:id="@+id/event_create_edit_timezone_separator"
+                android:id="@+id/event_form_timezone_separator"
                 style="@style/Separator"
                 android:layout_marginTop="@dimen/default_separator_margin_top"
-                app:layout_constraintTop_toBottomOf="@+id/event_create_edit_timezone"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_timezone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <include
-                android:id="@+id/event_create_edit_timezone_press"
+                android:id="@+id/event_form_timezone_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_create_edit_timezone_separator"/>
+                app:layout_constraintBottom_toTopOf="@+id/event_form_timezone_separator"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_recurrence_layout"
+            android:id="@+id/event_form_recurrence_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_timezone_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_timezone_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_recurrence_icon"
+                android:id="@+id/event_form_recurrence_icon"
                 style="@style/Icon.Form"
                 android:src="@drawable/ic_arrows"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_recurrence"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_recurrence"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_recurrence"
+                app:layout_constraintTop_toTopOf="@+id/event_form_recurrence"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/event_create_edit_recurrence"
+                android:id="@+id/event_form_recurrence"
                 style="@style/Text.Default.Form"
                 tools:text="Does not repeat"
                 app:layout_constraintTop_toTopOf="parent"
@@ -264,44 +264,44 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
-                android:id="@+id/event_create_edit_recurrence_separator"
+                android:id="@+id/event_form_recurrence_separator"
                 style="@style/Separator"
                 android:layout_marginTop="@dimen/default_separator_margin_top"
-                app:layout_constraintTop_toBottomOf="@+id/event_create_edit_recurrence"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_recurrence"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <include
-                android:id="@+id/event_create_edit_recurrence_press"
+                android:id="@+id/event_form_recurrence_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_create_edit_recurrence_separator"/>
+                app:layout_constraintBottom_toTopOf="@+id/event_form_recurrence_separator"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_location_layout"
+            android:id="@+id/event_form_location_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_recurrence_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_recurrence_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_location_icon"
+                android:id="@+id/event_form_location_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_map_marker"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_location"
+                app:layout_constraintTop_toTopOf="@+id/event_form_location"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <EditText
-                android:id="@+id/event_create_edit_location"
+                android:id="@+id/event_form_location"
                 style="@style/Text.Default"
                 android:paddingStart="@dimen/default_margin_text_start"
                 android:paddingEnd="@dimen/default_margin_text_end"
@@ -322,32 +322,32 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
-                android:id="@+id/event_create_edit_location_separator"
+                android:id="@+id/event_form_location_separator"
                 style="@style/Separator"
-                app:layout_constraintTop_toBottomOf="@+id/event_create_edit_location"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_location"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_calendar_layout"
+            android:id="@+id/event_form_calendar_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_location_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_calendar_icon"
+                android:id="@+id/event_form_calendar_icon"
                 style="@style/Icon.Form"
                 android:src="@drawable/ic_dot"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_calendar"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_calendar"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_calendar"
+                app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/event_create_edit_calendar"
+                android:id="@+id/event_form_calendar"
                 style="@style/Text.Default.Form"
                 tools:text="Work"
                 app:layout_constraintTop_toTopOf="parent"
@@ -355,54 +355,54 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
-                android:id="@+id/event_create_edit_calendar_separator"
+                android:id="@+id/event_form_calendar_separator"
                 style="@style/Separator"
                 android:layout_marginTop="@dimen/default_separator_margin_top"
-                app:layout_constraintTop_toBottomOf="@+id/event_create_edit_calendar"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_calendar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <include
-                android:id="@+id/event_create_edit_calendar_press"
+                android:id="@+id/event_form_calendar_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_create_edit_calendar_separator"/>
+                app:layout_constraintBottom_toTopOf="@+id/event_form_calendar_separator"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
-            android:id="@+id/event_create_edit_alarm_list"
+            android:id="@+id/event_form_alarm_list"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_calendar_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_calendar_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_alarm_layout"
+            android:id="@+id/event_form_alarm_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_list"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_list"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_alarm_icon"
+                android:id="@+id/event_form_alarm_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_bell"
-                app:layout_constraintBottom_toBottomOf="@+id/event_create_edit_alarm"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_alarm"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_alarm"
+                app:layout_constraintTop_toTopOf="@+id/event_form_alarm"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/event_create_edit_alarm"
+                android:id="@+id/event_form_alarm"
                 style="@style/Text.Default.Form"
                 android:textColor="@color/text_weak"
                 android:text="@string/event_text_add_alarm"
@@ -411,44 +411,44 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
-                android:id="@+id/event_create_edit_alarm_separator"
+                android:id="@+id/event_form_alarm_separator"
                 style="@style/Separator"
                 android:layout_marginTop="@dimen/default_separator_margin_top"
-                app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_alarm"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <include
-                android:id="@+id/event_create_edit_alarm_press"
+                android:id="@+id/event_form_alarm_press"
                 layout="@layout/view_press_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_create_edit_alarm_separator"/>
+                app:layout_constraintBottom_toTopOf="@+id/event_form_alarm_separator"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_create_edit_description_layout"
+            android:id="@+id/event_form_description_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_create_edit_alarm_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:id="@+id/event_create_edit_description_icon"
+                android:id="@+id/event_form_description_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_weak"
                 android:src="@drawable/ic_text_align_left"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
-                app:layout_constraintTop_toTopOf="@+id/event_create_edit_description"
+                app:layout_constraintTop_toTopOf="@+id/event_form_description"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <EditText
-                android:id="@+id/event_create_edit_description"
+                android:id="@+id/event_form_description"
                 style="@style/Text.Default"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

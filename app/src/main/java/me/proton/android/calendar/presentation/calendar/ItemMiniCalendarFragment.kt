@@ -30,7 +30,7 @@ class ItemMiniCalendarFragment(
 ) : Fragment(), KoinComponent {
 
 
-//    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
+//    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
 
     override fun onCreateView(

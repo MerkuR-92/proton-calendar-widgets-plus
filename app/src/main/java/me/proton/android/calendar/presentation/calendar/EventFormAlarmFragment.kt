@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.alarm_custom_view.*
-import kotlinx.android.synthetic.main.fragment_event_create_edit_alarm.*
-import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -21,18 +21,18 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 
-class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
-    override val TAG = "EventCreateEditAlarmFragment" // TODO
-    override val layoutResourceId = R.layout.fragment_event_create_edit_alarm
+    override val TAG = "EventFormAlarmFragment" // TODO
+    override val layoutResourceId = R.layout.fragment_event_form_alarm
 
-    override val actionMenuResourceId = R.menu.fragment_event_create_edit_dialog
+    override val actionMenuResourceId = R.menu.fragment_event_form_dialog
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
         if (menuItem.itemId == R.id.action_menu_done) {
             Timber.d("notification create/edit done")
 
-            val alarmTypeOption = getCheckedRadioButtonIndex(event_create_edit_alarm_radio_group)
+            val alarmTypeOption = getCheckedRadioButtonIndex(event_form_alarm_radio_group)
 
 //                 GET RADIO BUTTONS, IF == 1 then hardcode 9:00 in VM
 //             val customPeriod =
@@ -40,7 +40,7 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
 //                 val customTime = nullable
 
             val option =
-                if (getCheckedRadioButtonIndex(event_create_edit_alarm_action_radio_group) == 0)
+                if (getCheckedRadioButtonIndex(event_form_alarm_action_radio_group) == 0)
                     EventViewModel.SendByOption.NOTIFICATION
                 else EventViewModel.SendByOption.EMAIL
             eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
@@ -82,39 +82,39 @@ class EventCreateEditAlarmFragment() : BaseDialogFragment(), KoinComponent {
         toolbar.setNavigationIcon(R.drawable.ic_close)
 
         if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
-            event_create_edit_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
+            event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
                 FormatStyle.SHORT)))
-            event_create_edit_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).format(DateTimeFormatter.ofLocalizedTime(
+            event_form_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).format(DateTimeFormatter.ofLocalizedTime(
                 FormatStyle.SHORT)))
-            event_create_edit_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
+            event_form_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
                 FormatStyle.SHORT)))
-            event_create_edit_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
+            event_form_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
                 FormatStyle.SHORT)))
-            event_create_edit_alarm_5.visibleOrGone(false)
+            event_form_alarm_5.visibleOrGone(false)
         } else {
-            event_create_edit_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
-            event_create_edit_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
-            event_create_edit_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
-            event_create_edit_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
-            event_create_edit_alarm_5.visibleOrGone(true)
-            event_create_edit_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
+            event_form_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
+            event_form_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
+            event_form_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
+            event_form_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
+            event_form_alarm_5.visibleOrGone(true)
+            event_form_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
         }
 
-        event_create_edit_alarm_radio_group.check(event_create_edit_alarm_1.id) // TODO read from event alarm
-        event_create_edit_alarm_action_radio_group.check(event_create_edit_alarm_action_notification.id) // TODO read from event alarm
+        event_form_alarm_radio_group.check(event_form_alarm_1.id) // TODO read from event alarm
+        event_form_alarm_action_radio_group.check(event_form_alarm_action_notification.id) // TODO read from event alarm
 
-        event_create_edit_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        event_form_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
             when (index) {
-                R.id.event_create_edit_alarm_custom -> {
+                R.id.event_form_alarm_custom -> {
                     toolbarTitle.text = getString(R.string.event_custom_alarms_title)
 
                     //Change view
-                    event_create_edit_alarm_radio_group.visibleOrGone(false)
-                    event_create_edit_alarm_custom_layout.visibleOrGone(true)
+                    event_form_alarm_radio_group.visibleOrGone(false)
+                    event_form_alarm_custom_layout.visibleOrGone(true)
                 }
             }
         }
-        event_create_edit_alarm_action_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        event_form_alarm_action_radio_group.setOnCheckedChangeListener { radioGroup, index ->
             requireActivity().clearFocusAndHideKeyboard(view)
         }
 

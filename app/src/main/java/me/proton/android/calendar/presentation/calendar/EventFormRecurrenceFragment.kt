@@ -12,7 +12,7 @@ import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.chip_group_day_of_week.*
-import kotlinx.android.synthetic.main.fragment_event_create_edit_recurrence.*
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -25,12 +25,12 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
-    override val TAG = "EventCreateEditRecurrenceFragment" // TODO
-    override val layoutResourceId = R.layout.fragment_event_create_edit_recurrence
+    override val TAG = "EventFormRecurrenceFragment" // TODO
+    override val layoutResourceId = R.layout.fragment_event_form_recurrence
 
-    override val actionMenuResourceId = R.menu.fragment_event_create_edit_recurrence
+    override val actionMenuResourceId = R.menu.fragment_event_form_recurrence
     override val navigateUp = false
 
     override fun onMenuItemClicked(menuItem: MenuItem) {
@@ -111,7 +111,7 @@ class EventCreateEditRecurrenceFragment() : BaseDialogFragment(), KoinComponent 
         }
     }
 
-    private val navigationArguments: EventCreateEditFragmentArgs by navArgs()
+    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by inject()
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
