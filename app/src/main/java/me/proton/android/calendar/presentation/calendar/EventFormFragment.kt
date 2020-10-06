@@ -409,7 +409,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
                 isClickable = false
             }
-            alarmView.findViewById<View>(R.id.item_simple_text_button_delete_press).apply {
+            alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
                 setOnClickListener {
                     requireActivity().clearFocusAndHideKeyboard(view)
                     eventViewModel.handleAlarmDelete(index)

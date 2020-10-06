@@ -37,6 +37,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <include
+                android:id="@+id/event_form_all_day_press"
+                layout="@layout/view_press_overlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
             <ImageView
                 android:id="@+id/event_form_all_day_icon"
                 style="@style/Icon.Form"
@@ -64,16 +74,6 @@
                 app:layout_constraintTop_toTopOf="@+id/event_form_all_day_title"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <include
-                android:id="@+id/event_form_all_day_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -83,6 +83,28 @@
             app:layout_constraintTop_toBottomOf="@+id/event_form_all_day_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                android:id="@+id/event_form_start_date_press"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/event_form_start_time_press"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <View
+                android:id="@+id/event_form_start_time_press"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toEndOf="@+id/event_form_start_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
                 android:id="@+id/event_form_start_date"
@@ -104,26 +126,6 @@
                 app:layout_constraintTop_toTopOf="@+id/event_form_start_date"
                 tools:text="13:37" />
 
-            <include
-                android:id="@+id/event_form_start_date_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/event_form_start_time_press"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <include
-                android:id="@+id/event_form_start_time_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toEndOf="@+id/event_form_start_date"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/event_form_partial_day_start"
                 android:layout_width="wrap_content"
@@ -139,6 +141,28 @@
             app:layout_constraintTop_toBottomOf="@+id/event_form_start_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                android:id="@+id/event_form_end_date_press"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/event_form_end_time_press"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/event_form_end_separator"/>
+
+            <View
+                android:id="@+id/event_form_end_time_press"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toEndOf="@+id/event_form_end_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_end_separator"/>
 
             <TextView
                 android:id="@+id/event_form_end_date"
@@ -167,26 +191,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <include
-                android:id="@+id/event_form_end_date_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/event_form_end_time_press"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_form_end_separator"/>
-
-            <include
-                android:id="@+id/event_form_end_time_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toEndOf="@+id/event_form_end_date"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@+id/event_form_end_separator"/>
-
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/event_form_partial_day_end"
                 android:layout_width="wrap_content"
@@ -202,6 +206,16 @@
             app:layout_constraintTop_toBottomOf="@+id/event_form_end_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/event_form_timezone_press"
+                layout="@layout/view_press_overlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/event_form_timezone_separator"/>
 
             <ImageView
                 android:id="@+id/event_form_timezone_icon"
@@ -227,16 +241,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <include
-                android:id="@+id/event_form_timezone_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_form_timezone_separator"/>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -246,6 +250,16 @@
             app:layout_constraintTop_toBottomOf="@+id/event_form_timezone_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/event_form_recurrence_press"
+                layout="@layout/view_press_overlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/event_form_recurrence_separator"/>
 
             <ImageView
                 android:id="@+id/event_form_recurrence_icon"
@@ -270,16 +284,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/event_form_recurrence"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
-
-            <include
-                android:id="@+id/event_form_recurrence_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_form_recurrence_separator"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -338,6 +342,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <include
+                android:id="@+id/event_form_calendar_press"
+                layout="@layout/view_press_overlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/event_form_calendar_separator"/>
+
             <ImageView
                 android:id="@+id/event_form_calendar_icon"
                 style="@style/Icon.Form"
@@ -362,16 +376,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <include
-                android:id="@+id/event_form_calendar_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_form_calendar_separator"/>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
@@ -391,6 +395,16 @@
             app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_list"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/event_form_alarm_press"
+                layout="@layout/view_press_overlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/event_form_alarm_separator"/>
 
             <ImageView
                 android:id="@+id/event_form_alarm_icon"
@@ -417,16 +431,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/event_form_alarm"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
-
-            <include
-                android:id="@+id/event_form_alarm_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_form_alarm_separator"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

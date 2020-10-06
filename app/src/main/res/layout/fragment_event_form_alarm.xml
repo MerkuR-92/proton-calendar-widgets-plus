@@ -83,14 +83,18 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="event_form_alarm_custom_layout,event_form_alarm_radio_group" />
 
+    <!-- TODO Display alarm sends by items once implemented-->
     <View
+        android:visibility="gone"
         android:id="@+id/event_form_alarm_action_separator"
         style="@style/Separator"
         app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_barrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- TODO Display alarm sends by items once implemented-->
     <TextView
+        android:visibility="gone"
         android:id="@+id/event_form_alarm_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -103,7 +107,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- TODO Display alarm sends by items once implemented-->
     <RadioGroup
+        android:visibility="gone"
         android:id="@+id/event_form_alarm_action_radio_group"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -16,7 +16,7 @@
         android:paddingStart="@dimen/spacing_page"
         android:paddingEnd="@dimen/spacing_page"
         tools:text="Done"
-        android:background="?attr/selectableItemBackground"
+        android:background="?android:selectableItemBackgroundBorderless"
         android:clickable="false"
         android:focusable="false"/>
 

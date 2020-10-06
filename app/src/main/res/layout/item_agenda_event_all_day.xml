@@ -5,9 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="1dp"
-    android:paddingTop="1dp"
-    android:background="?attr/selectableItemBackground"
-    >
+    android:paddingTop="1dp">
 
     <View
         android:id="@+id/view_background"
@@ -20,6 +18,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- TODO Make ripple so that it darken the all day item background, currently lighten -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:selectableItemBackground"
+        app:layout_constraintStart_toStartOf="@+id/view_background"
+        app:layout_constraintEnd_toEndOf="@+id/view_background"
+        app:layout_constraintTop_toTopOf="@+id/view_background"
+        app:layout_constraintBottom_toBottomOf="@+id/view_background"/>
 
     <TextView
         android:id="@+id/text_header"

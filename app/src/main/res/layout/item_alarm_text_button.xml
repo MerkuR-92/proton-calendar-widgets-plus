@@ -28,22 +28,15 @@
     <ImageButton
         android:id="@+id/item_simple_text_button_delete"
         style="@style/Icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:clickable="true"
+        android:focusable="true"
         app:tint="@color/icon_weak"
         android:background="?android:selectableItemBackgroundBorderless"
-        android:layout_marginEnd="@dimen/default_inner_padding_end"
         app:layout_constraintBottom_toBottomOf="@+id/item_simple_text_button_title"
         app:layout_constraintTop_toTopOf="@+id/item_simple_text_button_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_close" />
-
-    <include
-        android:id="@+id/item_simple_text_button_delete_press"
-        layout="@layout/view_press_overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toEndOf="@+id/item_simple_text_button_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
