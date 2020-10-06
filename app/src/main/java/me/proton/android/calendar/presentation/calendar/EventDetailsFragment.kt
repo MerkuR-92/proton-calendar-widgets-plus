@@ -42,25 +42,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val layoutResourceId = R.layout.fragment_event_details
 
     override val navigateUp = false
-    //override val actionMenuResourceId = R.menu.fragment_event_details
-
-    override fun onMenuItemClicked(menuItem: MenuItem) {
-        when (menuItem.itemId) {
-//            R.id.action_menu_edit ->
-//            )
-//            R.id.action_menu_delete -> {
-
-
-
-
-//                handleDelete()
-//            }
-        }
-    }
-
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-
         val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonEdit) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pencil))
@@ -93,14 +76,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
+            val layoutParams = LinearLayout.LayoutParams(
+                resources.getDimensionPixelSize(R.dimen.action_clickable_size),
+                resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+            layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.spacing_element_small)
             addView(
-                buttonMenu, resources.getDimensionPixelSize(
-                    R.dimen.action_clickable_size
-                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
+                buttonMenu, layoutParams
             )
         }
-
-
     }
 
     private fun handleDelete() {

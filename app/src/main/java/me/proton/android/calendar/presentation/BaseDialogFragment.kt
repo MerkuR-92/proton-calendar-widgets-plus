@@ -64,8 +64,6 @@ abstract class BaseDialogFragment : DialogFragment() {
         ): View? {
 //        isCancelable = false
 
-
-
                 val rootView = inflater.inflate(R.layout.fragment_base_dialog, container, false)
                 rootView.findViewById<ViewGroup>(if (isScrollable) R.id.container_scrollable else R.id.container).addView(
                     inflater.inflate(layoutResourceId, container, false)
@@ -96,22 +94,8 @@ abstract class BaseDialogFragment : DialogFragment() {
                             }
                         }
                     }
-                    // action menu TODO deprecated, use custom toolbar views
-                    actionMenuResourceId?.let {
-                        inflateMenu(it)
-                        setOnMenuItemClickListener {
-                            onMenuItemClicked(it)
-                            return@setOnMenuItemClickListener true
-                        }
-                    }
                     onToolbarCreated(this)
                 }
-
-
-
-
-
-
 
             //toolbar.setNavigationIcon(R.drawable.ic_good);
             //toolbar.setTitle("Title");

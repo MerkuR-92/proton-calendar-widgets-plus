@@ -5,6 +5,9 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -14,6 +17,7 @@ import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.chip_group_day_of_week.*
 import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.*
+import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -31,85 +35,98 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     override val TAG = "EventFormRecurrenceFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_recurrence
 
-    override val actionMenuResourceId = R.menu.fragment_event_form_recurrence
     override val navigateUp = false
 
-    override fun onMenuItemClicked(menuItem: MenuItem) {
-        if (menuItem.itemId == R.id.action_menu_done) {
-
-            when (event_form_recurrence_radio_group.checkedRadioButtonId) {
-                R.id.event_form_recurrence_1 -> {
-                    eventViewModel.handleRecurrence(null, untilDate = false)
-                }
-                R.id.event_form_recurrence_2 -> {
-                    eventViewModel.handleRecurrence(Frequency.DAILY, untilDate = false)
-                }
-                R.id.event_form_recurrence_3 -> {
-                    eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDate = false)
-                }
-                R.id.event_form_recurrence_4 -> {
-                    eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDate = false)
-                }
-                R.id.event_form_recurrence_5 -> {
-                    eventViewModel.handleRecurrence(Frequency.YEARLY, untilDate = false)
-                }
-                R.id.event_form_recurrence_custom -> {
-
-                    var untilDateChecked = false
-                    var thisManyRepeats: Int? = null
-
-                    // "repeat until" options, apply to all recurrence periods
-                    when (customEndingRadioGroup.getCheckedRadioButtonId()) {
-                        R.id.custom_recurrence_end_1 -> {} // ends: never
-                        R.id.custom_recurrence_end_2 -> { // ends: on specific Date
-                            untilDateChecked = true
-                        }
-                        R.id.custom_recurrence_end_3 -> { // ends: after X occurrences
-                            thisManyRepeats = custom_recurrence_end_count.text.toString().toIntOrNull() ?: FormValidation.OCCURRENCE_COUNT_DEFAULT // TODO force when null?
-                        }
-                    }
-
-                    // "repeat X times"
-                    when (getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)) {
-                        0 -> { // days
-                            val interval = custom_recurrence_count.text.toString().toIntOrNull()
-                                ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
-
-                            eventViewModel.handleRecurrence(Frequency.DAILY, untilDateChecked, interval, thisManyRepeats)
-                        }
-                        1 -> { // weeks
-                            val interval = custom_recurrence_count.text.toString().toIntOrNull()
-                                ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT
-
-                            // weekdays for occurence
-                            val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
-                            val daysOfWeek = (chip_group_day_of_week_layout as ViewGroup).children.mapIndexedNotNull() { index, chip ->
-                                if ((chip as Chip).isChecked) {
-                                    biweekly.util.DayOfWeek.values()[(dayNamesStartingIndex + index) % 7]
-                                } else null
-                            }.toList()
-
-                            eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = daysOfWeek, customMonthly = false)
-                        }
-                        2 -> { // months
-                            val interval = custom_recurrence_count.text.toString().toIntOrNull()
-                                ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT
-
-                            eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = null, customMonthly = true)
-                        }
-                        3 -> { // years
-                            val interval = custom_recurrence_count.text.toString().toIntOrNull()
-                                ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
-
-                            eventViewModel.handleRecurrence(Frequency.YEARLY, untilDateChecked, interval, thisManyRepeats)
-                        }
-                    }
-
-                }
+    override fun onToolbarCreated(toolbar: Toolbar) {
+        val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
+        with (buttonDone) {
+            (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_done)
+            setOnClickListener {
+                onDoneClick()
             }
-
-            findNavController().navigateUp()
         }
+
+        // TODO extract somewhere to remove boilerplate
+        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+            addView(
+                buttonDone, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            )
+        }
+    }
+
+    private fun onDoneClick() {
+        when (event_form_recurrence_radio_group.checkedRadioButtonId) {
+            R.id.event_form_recurrence_1 -> {
+                eventViewModel.handleRecurrence(null, untilDate = false)
+            }
+            R.id.event_form_recurrence_2 -> {
+                eventViewModel.handleRecurrence(Frequency.DAILY, untilDate = false)
+            }
+            R.id.event_form_recurrence_3 -> {
+                eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDate = false)
+            }
+            R.id.event_form_recurrence_4 -> {
+                eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDate = false)
+            }
+            R.id.event_form_recurrence_5 -> {
+                eventViewModel.handleRecurrence(Frequency.YEARLY, untilDate = false)
+            }
+            R.id.event_form_recurrence_custom -> {
+
+                var untilDateChecked = false
+                var thisManyRepeats: Int? = null
+
+                // "repeat until" options, apply to all recurrence periods
+                when (customEndingRadioGroup.getCheckedRadioButtonId()) {
+                    R.id.custom_recurrence_end_1 -> {} // ends: never
+                    R.id.custom_recurrence_end_2 -> { // ends: on specific Date
+                        untilDateChecked = true
+                    }
+                    R.id.custom_recurrence_end_3 -> { // ends: after X occurrences
+                        thisManyRepeats = custom_recurrence_end_count.text.toString().toIntOrNull() ?: FormValidation.OCCURRENCE_COUNT_DEFAULT // TODO force when null?
+                    }
+                }
+
+                // "repeat X times"
+                when (getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)) {
+                    0 -> { // days
+                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                            ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
+
+                        eventViewModel.handleRecurrence(Frequency.DAILY, untilDateChecked, interval, thisManyRepeats)
+                    }
+                    1 -> { // weeks
+                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                            ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT
+
+                        // weekdays for occurence
+                        val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
+                        val daysOfWeek = (chip_group_day_of_week_layout as ViewGroup).children.mapIndexedNotNull() { index, chip ->
+                            if ((chip as Chip).isChecked) {
+                                biweekly.util.DayOfWeek.values()[(dayNamesStartingIndex + index) % 7]
+                            } else null
+                        }.toList()
+
+                        eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = daysOfWeek, customMonthly = false)
+                    }
+                    2 -> { // months
+                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                            ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT
+
+                        eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = null, customMonthly = true)
+                    }
+                    3 -> { // years
+                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                            ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
+
+                        eventViewModel.handleRecurrence(Frequency.YEARLY, untilDateChecked, interval, thisManyRepeats)
+                    }
+                }
+
+            }
+        }
+
+        findNavController().navigateUp()
     }
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()

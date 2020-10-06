@@ -13,13 +13,6 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "EventFormAttendeesFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_attendees
-    //    override val actionMenuResourceId = R.menu.fragment_event_form
-
-    override fun onMenuItemClicked(menuItem: MenuItem) {
-//         if (menuItem.itemId == R.id.action_menu_save) {
-             // TODO
-//         }
-    }
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 

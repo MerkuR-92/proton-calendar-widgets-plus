@@ -11,12 +11,11 @@
         android:layout_height="wrap_content"
         android:stateListAnimator="@animator/design_appbar_state_list_animator"
         app:liftOnScroll="true"
-        android:backgroundTint="@color/background_norm"
-        >
+        android:backgroundTint="@color/background_norm">
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <ProgressBar
                 android:id="@+id/progress_bar"
@@ -29,46 +28,45 @@
                 android:indeterminateTint="@color/brand_norm"
                 android:indeterminateTintMode="src_in"
                 android:layout_gravity="bottom"
-                android:layout_marginBottom="-4dp"
-                />
+                android:layout_marginBottom="-4dp"/>
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:theme="@style/AppTheme.Toolbar"
-            app:contentInsetStartWithNavigation="0dp"
-            app:layout_scrollFlags="noScroll"
-            android:background="@null">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null"
-                >
-
-                <LinearLayout
-                android:id="@+id/toolbar_content"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:divider="@drawable/divider_toolbar"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal"
-                android:paddingEnd="@dimen/spacing_element"
-                android:showDividers="middle"
-                    android:background="@null"/>
+                android:theme="@style/AppTheme.Toolbar"
+                app:contentInsetStartWithNavigation="0dp"
+                app:layout_scrollFlags="noScroll"
+                android:background="@null">
 
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    style="@style/Text.Headline.Small"
-                    android:background="@null"/>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null">
 
-            </FrameLayout>
+                    <LinearLayout
+                        android:id="@+id/toolbar_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:divider="@drawable/divider_toolbar"
+                        android:gravity="center_vertical|end"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal"
+                        android:showDividers="middle"
+                        android:background="@null"/>
 
-        </androidx.appcompat.widget.Toolbar>
+                    <TextView
+                        android:id="@+id/toolbar_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        style="@style/Text.Headline.Small"
+                        android:background="@null"/>
+
+                </FrameLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
         </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>

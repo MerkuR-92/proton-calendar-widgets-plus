@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation.calendar
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -49,7 +50,6 @@ class MonthFragment : BaseDialogFragment() {
     override val isScrollable = false
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-
         val buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, toolbar_content, false)
         with (buttonCreate) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
@@ -62,7 +62,6 @@ class MonthFragment : BaseDialogFragment() {
         val buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonToday) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
-//            (this as ImageButton).setColorFilter(0) // this image is not one color, so we remove default tinting
             setOnClickListener {
                 val todayDate = LocalDate.now(calendarViewModel.timeZoneId)
                 calendarViewModel.handleDaySelected(todayDate)
@@ -76,10 +75,13 @@ class MonthFragment : BaseDialogFragment() {
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
             )
+
+            val layoutParams = LinearLayout.LayoutParams(
+            resources.getDimensionPixelSize(R.dimen.action_clickable_size),
+            resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+            layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.spacing_element_small)
             addView(
-                buttonCreate, resources.getDimensionPixelSize(
-                    R.dimen.action_clickable_size
-                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
+                buttonCreate, layoutParams
             )
         }
 

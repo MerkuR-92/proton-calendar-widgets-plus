@@ -5,9 +5,13 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
+import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -25,37 +29,51 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     override val TAG = "EventFormAlarmFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_alarm
 
-    override val actionMenuResourceId = R.menu.fragment_event_form_dialog
+    override fun onToolbarCreated(toolbar: Toolbar) {
+        val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
+        with (buttonDone) {
+            (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_done)
+            setOnClickListener {
+                onDoneClick()
+            }
+        }
 
-    override fun onMenuItemClicked(menuItem: MenuItem) {
-        if (menuItem.itemId == R.id.action_menu_done) {
-            Timber.d("notification create/edit done")
+        // TODO extract somewhere to remove boilerplate
+        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+            addView(
+                buttonDone, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            )
+        }
+    }
 
-            val alarmTypeOption = getCheckedRadioButtonIndex(event_form_alarm_radio_group)
+    private fun onDoneClick() {
+        Timber.d("notification create/edit done")
+
+        val alarmTypeOption = getCheckedRadioButtonIndex(event_form_alarm_radio_group)
 
 //                 GET RADIO BUTTONS, IF == 1 then hardcode 9:00 in VM
 //             val customPeriod =
 //             val customCount = et_alarm_count.text.toString().toIntOrNull() ?: FormValidation.
 //                 val customTime = nullable
 
-            val option =
-                if (getCheckedRadioButtonIndex(event_form_alarm_action_radio_group) == 0)
-                    EventViewModel.SendByOption.NOTIFICATION
-                else EventViewModel.SendByOption.EMAIL
-            eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
+        val option =
+            if (getCheckedRadioButtonIndex(event_form_alarm_action_radio_group) == 0)
+                EventViewModel.SendByOption.NOTIFICATION
+            else EventViewModel.SendByOption.EMAIL
+        eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
 
-            //We hide minutes and hours buttons so days and weeks have id 2 & 3
-            val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group) - 2
-            eventViewModel.handleAlarm(alarmTypeOption,
-                count = custom_alarm_field.text.toString().toIntOrNull(),
-                countTypeOption = countTypeOption)
-            findNavController().navigateUp()
+        //We hide minutes and hours buttons so days and weeks have id 2 & 3
+        val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group) - 2
+        eventViewModel.handleAlarm(alarmTypeOption,
+            count = custom_alarm_field.text.toString().toIntOrNull(),
+            countTypeOption = countTypeOption)
+        findNavController().navigateUp()
 
-            // TODO
-            // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
-            // notifications when switching between custom and canned ones
-        }
+        // TODO
+        // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
+        // notifications when switching between custom and canned ones
     }
+
     private lateinit var toolbarTitle: TextView
 
     private val eventViewModel: EventViewModel by sharedViewModel()
