@@ -49,5 +49,5 @@ data class CalendarEntity(
     //Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled
     val isActive: Boolean get() = !isDisabled && !isInactive && (flags and 1 == 1)
     val isInactive: Boolean get() = (flags and (0 + 2 + 4 + 8 + 16) >= 1)
-    val isDisabled: Boolean get() = (flags and (32 + 64) >= 1)
+    val isDisabled: Boolean get() = !isInactive && (flags and (32 + 64) >= 1)
 }

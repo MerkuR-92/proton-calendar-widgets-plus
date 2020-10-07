@@ -104,7 +104,9 @@ class CalendarsRepositoryImpl(
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
         // TODO When optimizing : Only refresh a specific list of calendars and their events using calendarIds parameter
-        val selectedCalendarIds = getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
+        val selectedActiveCalendarsId = getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
+        val selectedDisabledCalendarsId = getDisabledCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
+        val selectedCalendarIds = selectedActiveCalendarsId + selectedDisabledCalendarsId
 
         val events = database.eventsDao().selectEvents(selectedCalendarIds)
 

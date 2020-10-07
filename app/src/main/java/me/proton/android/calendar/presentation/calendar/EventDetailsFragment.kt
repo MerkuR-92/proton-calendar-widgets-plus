@@ -47,8 +47,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         findNavController().navigateUp()
     }
 
+    private lateinit var buttonEdit: View
+
     override fun onToolbarCreated(toolbar: Toolbar) {
-        val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
+
+        buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonEdit) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pencil))
             setOnClickListener {
@@ -275,6 +278,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
 
 //                text_event_title.text = "SIGNATURE VERIFICATION: ${event.verificationStatus}\n\n" + event.summary + "\n"
+
+            buttonEdit.visibleOrGone(event.calendar.isActive)
 
             with(section_event_info) {
 
