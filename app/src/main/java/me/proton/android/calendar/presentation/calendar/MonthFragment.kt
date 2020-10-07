@@ -245,7 +245,7 @@ class MonthFragment : BaseDialogFragment() {
         val month = SpannableString(localDate.formatMonth(true))
         val year = SpannableString(localDate.year.toString())
         year.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.text_hint)), 0, year.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        toolbarTitle.text = getString(R.string.toolbar_title_month_space, month)
+        toolbarTitle.text = "$month "
         toolbarTitle.append(year)
     }
 
