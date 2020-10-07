@@ -164,7 +164,8 @@ class TransformEventUseCase(
                     calendarEntity.id,
                     calendarEntity.name,
                     calendarEntity.color,
-                    calendarEntity.isActive
+                    calendarEntity.isActive,
+                    calendarEntity.display == 1
                 ),
                 iCalendar = iCalendar,
                 verificationStatus = if (verificationStatuses.all { it == Event.SignatureVerification.SUCCESS }) {

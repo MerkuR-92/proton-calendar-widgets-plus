@@ -191,7 +191,8 @@ class EventViewModel(
                 defaultCalendar.id,
                 defaultCalendar.name,
                 defaultCalendar.color,
-                defaultCalendar.isActive
+                defaultCalendar.isActive,
+                defaultCalendar.display == 1
             ), newICalendar)
 
             setDefaultAlarms(newEvent, this.calendarSettings)
@@ -574,7 +575,7 @@ class EventViewModel(
     suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
-            event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive))
+            event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive, calendar.display == 1))
             setDefaultAlarms(event, calendarSettings)
             _event.postValue(event)
             true

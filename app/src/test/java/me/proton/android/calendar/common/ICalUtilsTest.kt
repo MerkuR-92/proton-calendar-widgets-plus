@@ -210,6 +210,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -256,6 +257,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -321,6 +323,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -356,6 +359,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -477,6 +481,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
         val displayTimeZoneId = "Europe/Zurich"
@@ -534,6 +539,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
         val displayTimeZoneId = "Europe/Zurich"
@@ -597,6 +603,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
         val displayTimeZoneId = "Europe/Vilnius"
@@ -654,6 +661,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
         val displayTimeZoneId = "Europe/Vilnius"
@@ -729,6 +737,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -768,6 +777,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -813,6 +823,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -855,6 +866,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -901,6 +913,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -943,6 +956,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -992,6 +1006,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1076,6 +1091,7 @@ internal class ICalUtilsTest {
                 "id",
                 "calendar",
                 "",
+                true,
                 true
             ), ICalUtils.parseICalString(iCal)!!, null)
         }
@@ -1210,6 +1226,7 @@ internal class ICalUtilsTest {
                 "id",
                 "calendar",
                 "",
+                true,
                 true
             ), ICalUtils.parseICalString(iCal)!!, null)
         }
@@ -1265,6 +1282,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1314,6 +1332,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), calendar, null)
 
@@ -1356,6 +1375,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1389,6 +1409,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), calendar, null)
 
@@ -1427,6 +1448,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1460,6 +1482,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1497,6 +1520,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1538,6 +1562,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1582,6 +1607,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1616,6 +1642,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1658,6 +1685,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1700,6 +1728,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1736,6 +1765,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1784,6 +1814,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 
@@ -1832,6 +1863,7 @@ internal class ICalUtilsTest {
             "id",
             "calendar",
             "",
+            true,
             true
         ), iCal, null)
 

@@ -193,9 +193,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 activeCalendarListAdapter.submitList(activeCalendars)
                 nav_view_main_content.nav_view_calendars.visibleOrGone(!activeCalendars.isEmpty())
             }
-        }
 
-        lifecycleScope.launch {
             calendarViewModel.selectDisabledCalendars()?.observe(this@MainActivity) { disabledCalendars ->
                 disabledCalendarListAdapter.submitList(disabledCalendars)
                 nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(!disabledCalendars.isEmpty())

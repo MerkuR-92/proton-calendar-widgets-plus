@@ -41,7 +41,7 @@ class ItemCalendarAgendaFragment(
 
     private val valueStoreProvider: ValueStoreProvider by inject()
 
-    private val fakeHeaderEvent = Event("", Calendar("", "", "", true), ICalendar())
+    private val fakeHeaderEvent = Event("", Calendar("", "", "", true, true), ICalendar())
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -112,6 +112,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 }
 
                                 if (success) { // TODO remove duplicated code here and below
+                                    onSuccessEventUpdateCalendarDisplay()
                                     Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
                                     findNavController().popBackStack(R.id.nav_calendar, false)
                                 } else {
@@ -128,6 +129,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                         if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                             if (success) {
+                                onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
 //                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
                                 findNavController().popBackStack(R.id.nav_calendar, false)
@@ -136,6 +138,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             }
                         } else {
                             if (success) {
+                                onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
 //                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
                                 findNavController().popBackStack(R.id.nav_calendar, false)
@@ -153,6 +156,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         } else {
             AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.event_alert_invalid_start_end_date))
         }
+    }
+
+    private fun onSuccessEventUpdateCalendarDisplay() {
+        val display = eventViewModel.eventLiveData.value?.calendar?.display
+        if (display == null || display) return
+        val calendarId = eventViewModel.eventLiveData.value?.calendar?.id
+        if (calendarId != null) calendarViewModel.updateServerCalendar(calendarId, display = 1)
     }
 
     private fun persistFormData() {
