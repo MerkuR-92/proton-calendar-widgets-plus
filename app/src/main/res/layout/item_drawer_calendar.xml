@@ -24,6 +24,7 @@
         tools:text="Reminders"
         style="@style/Text.DefaultSmall.Dark"
         android:layout_marginTop="14dp"
+        android:layout_marginEnd="@dimen/spacing_element"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/item_drawer_calendar_checkbox"
         app:layout_constraintEnd_toEndOf="parent"/>
