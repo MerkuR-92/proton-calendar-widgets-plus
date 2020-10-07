@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_main_content.nav_view_user_initials.text = "PC"
 
         nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
-            BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+            BuildConfig.VERSION_NAME)
 
         initDrawerListeners()
 

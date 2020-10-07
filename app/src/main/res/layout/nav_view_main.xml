@@ -1,338 +1,349 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/woodsmoke"
-    android:overScrollMode="never"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/nav_view_user_margin_top"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/nav_view_user_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/nav_view_user_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/ripple_nav_header_dark"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="@dimen/nav_view_user_margin_top">
-
-            <TextView
-                android:id="@+id/nav_view_user_initials"
-                android:layout_width="@dimen/nav_view_user_initials_box_size"
-                android:layout_height="@dimen/nav_view_user_initials_box_size"
-                tools:text="AS"
-                style="@style/Text.DefaultSmall.Dark"
-                android:background="@drawable/shape_background_square_rounded_dark"
-                android:layout_marginStart="10dp"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/nav_view_user_name"
-                app:layout_constraintBottom_toBottomOf="@+id/nav_view_user_mail"/>
-
-            <TextView
-                android:id="@+id/nav_view_user_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                tools:text="Adam Smith"
-                style="@style/Text.DefaultSmall.Dark"
-                android:layout_marginStart="14dp"
-                android:layout_marginTop="7dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/nav_view_user_mail"
-                app:layout_constraintStart_toEndOf="@+id/nav_view_user_initials"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <TextView
-                android:id="@+id/nav_view_user_mail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                tools:text="adam@protonmail.com"
-                style="@style/Text.Caption.Weak.Dark"
-                android:layout_marginBottom="7dp"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_user_name"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/nav_view_user_name"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/nav_view_calendars"
-            android:visibility="visible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/nav_view_calendars_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/nav_view_calendars"
-                style="@style/Text.Caption.Weak.Dark"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <View
-                android:id="@+id/nav_view_calendars_separator"
-                style="@style/Separator.Dark"
-                android:layout_marginTop="7dp"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_title"
-                app:layout_constraintStart_toStartOf="@+id/nav_view_calendars_title"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/nav_view_calendars_list"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/item_drawer_calendar"
-                tools:itemCount="3"
-                android:overScrollMode="never"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_separator"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/nav_view_disabled_calendars"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/nav_view_disabled_calendars_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/nav_view_disabled_calendars"
-                style="@style/Text.Caption.Weak.Dark"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <View
-                android:id="@+id/nav_view_disabled_calendars_separator"
-                style="@style/Separator.Dark"
-                android:layout_marginTop="7dp"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_disabled_calendars_title"
-                app:layout_constraintStart_toStartOf="@+id/nav_view_disabled_calendars_title"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/nav_view_disabled_calendars_list"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/item_drawer_calendar"
-                tools:itemCount="1"
-                android:overScrollMode="never"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_disabled_calendars_separator"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/nav_view_more"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/nav_view_more_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/nav_view_more"
-                style="@style/Text.Caption.Weak.Dark"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <View
-                android:id="@+id/nav_view_more_separator"
-                style="@style/Separator.Dark"
-                android:layout_marginTop="7dp"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_more_title"
-                app:layout_constraintStart_toStartOf="@+id/nav_view_more_title"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/nav_view_more_bug_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_more_separator">
-
-                <ImageView
-                    android:id="@+id/nav_view_more_bug_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_bug"
-                    style="@style/AppImageViewIcon.Dark"
-                    android:layout_marginStart="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/nav_view_more_bug_title"
-                    app:layout_constraintBottom_toBottomOf="@+id/nav_view_more_bug_title"/>
-
-                <TextView
-                    android:id="@+id/nav_view_more_bug_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/nav_view_more_bug"
-                    style="@style/Text.DefaultSmall.Dark"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="14dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/nav_view_more_bug_icon"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <View
-                    android:id="@+id/nav_view_more_bug_separator"
-                    style="@style/Separator.Dark"
-                    android:layout_marginTop="14dp"
-                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_bug_title"
-                    app:layout_constraintStart_toStartOf="@+id/nav_view_more_bug_title"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <include
-                    android:id="@+id/nav_view_more_bug_press"
-                    layout="@layout/view_press_overlay"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/nav_view_more_bug_separator"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/nav_view_more_logout_layout"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_more_bug_layout">
-
-                <ImageView
-                    android:id="@+id/nav_view_more_logout_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_sign_out"
-                    style="@style/AppImageViewIcon.Dark"
-                    android:layout_marginStart="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/nav_view_more_logout_title"
-                    app:layout_constraintBottom_toBottomOf="@+id/nav_view_more_logout_title"/>
-
-                <TextView
-                    android:id="@+id/nav_view_more_logout_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/nav_view_more_logout"
-                    style="@style/Text.DefaultSmall.Dark"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="14dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/nav_view_more_logout_icon"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <View
-                    android:id="@+id/nav_view_more_logout_separator"
-                    style="@style/Separator.Dark"
-                    android:layout_marginTop="14dp"
-                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_logout_title"
-                    app:layout_constraintStart_toStartOf="@+id/nav_view_more_logout_title"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <include
-                    android:id="@+id/nav_view_more_logout_press"
-                    layout="@layout/view_press_overlay"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/nav_view_more_logout_separator"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/nav_view_more_login_layout"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/nav_view_more_logout_layout">
-
-                <ImageView
-                    android:id="@+id/nav_view_more_login_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_sign_out"
-                    style="@style/AppImageViewIcon.Dark"
-                    android:rotation="180"
-                    android:layout_marginStart="16dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/nav_view_more_login_title"
-                    app:layout_constraintBottom_toBottomOf="@+id/nav_view_more_login_title"/>
-
-                <TextView
-                    android:id="@+id/nav_view_more_login_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/nav_view_more_login"
-                    style="@style/Text.DefaultSmall.Dark"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="14dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/nav_view_more_login_icon"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <View
-                    android:id="@+id/nav_view_more_login_separator"
-                    style="@style/Separator.Dark"
-                    android:layout_marginTop="14dp"
-                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_login_title"
-                    app:layout_constraintStart_toStartOf="@+id/nav_view_more_login_title"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <include
-                    android:id="@+id/nav_view_more_login_press"
-                    layout="@layout/view_press_overlay"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/nav_view_more_login_separator"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/ripple_nav_header_dark"
+        android:layout_marginStart="@dimen/spacing_element_small"
+        android:layout_marginEnd="@dimen/spacing_element_small"
+        android:layout_marginBottom="@dimen/spacing_element_small">
 
         <TextView
-            android:id="@+id/nav_view_version"
-            android:layout_width="wrap_content"
+            android:id="@+id/nav_view_user_initials"
+            android:layout_width="@dimen/nav_view_user_initials_box_size"
+            android:layout_height="@dimen/nav_view_user_initials_box_size"
+            tools:text="AS"
+            style="@style/Text.DefaultSmall.Dark"
+            android:background="@drawable/shape_background_square_rounded_dark"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/nav_view_user_name"
+            app:layout_constraintBottom_toBottomOf="@+id/nav_view_user_mail"/>
+
+        <TextView
+            android:id="@+id/nav_view_user_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            tools:text="Adam Smith"
+            style="@style/Text.DefaultSmall.Dark"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="7dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/nav_view_user_mail"
+            app:layout_constraintStart_toEndOf="@+id/nav_view_user_initials"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/nav_view_user_mail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:text="adam@protonmail.com"
             style="@style/Text.Caption.Weak.Dark"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="@dimen/spacing_element"
-            android:layout_gravity="center_horizontal"
-            tools:text="ProtonCalendar 2.0.0 (4099)"/>
+            android:layout_marginBottom="7dp"
+            app:layout_constraintTop_toBottomOf="@+id/nav_view_user_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/nav_view_user_name"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</ScrollView>
+    <ScrollView
+        android:overScrollMode="never"
+        android:nestedScrollingEnabled="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nav_view_calendars"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/nav_view_calendars_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nav_view_calendars"
+                    style="@style/Text.Caption.Weak.Dark"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:id="@+id/nav_view_calendars_separator"
+                    style="@style/Separator.Dark"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_title"
+                    app:layout_constraintStart_toStartOf="@+id/nav_view_calendars_title"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/nav_view_calendars_list"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_drawer_calendar"
+                    tools:itemCount="3"
+                    android:overScrollMode="never"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_separator"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nav_view_disabled_calendars"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/nav_view_disabled_calendars_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nav_view_disabled_calendars"
+                    style="@style/Text.Caption.Weak.Dark"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:id="@+id/nav_view_disabled_calendars_separator"
+                    style="@style/Separator.Dark"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_disabled_calendars_title"
+                    app:layout_constraintStart_toStartOf="@+id/nav_view_disabled_calendars_title"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/nav_view_disabled_calendars_list"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_drawer_calendar"
+                    tools:itemCount="1"
+                    android:overScrollMode="never"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_disabled_calendars_separator"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nav_view_more"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/nav_view_more_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nav_view_more"
+                    style="@style/Text.Caption.Weak.Dark"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:id="@+id/nav_view_more_separator"
+                    style="@style/Separator.Dark"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_title"
+                    app:layout_constraintStart_toStartOf="@+id/nav_view_more_title"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_more_bug_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_separator">
+
+                    <ImageView
+                        android:id="@+id/nav_view_more_bug_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_bug"
+                        style="@style/AppImageViewIcon.Dark"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_more_bug_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_more_bug_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_more_bug_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_view_more_bug"
+                        style="@style/Text.DefaultSmall.Dark"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_more_bug_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_more_bug_separator"
+                        style="@style/Separator.Dark"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_more_bug_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_more_bug_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <include
+                        android:id="@+id/nav_view_more_bug_press"
+                        layout="@layout/view_press_overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_more_bug_separator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_more_logout_layout"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_bug_layout">
+
+                    <ImageView
+                        android:id="@+id/nav_view_more_logout_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_sign_out"
+                        style="@style/AppImageViewIcon.Dark"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_more_logout_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_more_logout_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_more_logout_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_view_more_logout"
+                        style="@style/Text.DefaultSmall.Dark"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_more_logout_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_more_logout_separator"
+                        style="@style/Separator.Dark"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_more_logout_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_more_logout_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <include
+                        android:id="@+id/nav_view_more_logout_press"
+                        layout="@layout/view_press_overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_more_logout_separator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_more_login_layout"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_more_logout_layout">
+
+                    <ImageView
+                        android:id="@+id/nav_view_more_login_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_sign_out"
+                        style="@style/AppImageViewIcon.Dark"
+                        android:rotation="180"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_more_login_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_more_login_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_more_login_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_view_more_login"
+                        style="@style/Text.DefaultSmall.Dark"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_more_login_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_more_login_separator"
+                        style="@style/Separator.Dark"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_more_login_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_more_login_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <include
+                        android:id="@+id/nav_view_more_login_press"
+                        layout="@layout/view_press_overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_more_login_separator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/nav_view_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Text.Caption.Weak.Dark"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="@dimen/spacing_element"
+                android:layout_gravity="center_horizontal"
+                tools:text="ProtonCalendar 2.0.0"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

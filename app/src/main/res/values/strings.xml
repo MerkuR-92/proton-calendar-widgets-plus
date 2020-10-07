@@ -118,7 +118,7 @@
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Logout</string>
     <string name="nav_view_more_login">Login</string>
-    <string name="nav_view_version_name">ProtonCalendar %s (%d)</string>
+    <string name="nav_view_version_name">ProtonCalendar %s</string>
 
 
 
