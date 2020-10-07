@@ -23,6 +23,7 @@
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">No events</string>
     <string name="agenda_loading_events">Loading events…</string>
+    <string name="toolbar_title_month_space">%s </string>
 
 
     <!-- EVENT DETAILS   -->

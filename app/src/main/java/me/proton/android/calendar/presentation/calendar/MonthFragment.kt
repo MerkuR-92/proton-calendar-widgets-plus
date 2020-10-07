@@ -1,6 +1,9 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -96,8 +99,7 @@ class MonthFragment : BaseDialogFragment() {
             val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
             calendarViewModel.handleDaySelected(firstDayOfMonth)
 
-            val formattedMonth = firstDayOfMonth.formatMonth(true)
-            toolbarTitle.text = formattedMonth
+            setToolbarMonthYearTitle(firstDayOfMonth)
 
             adjustMiniCalendarView(position)
         }
@@ -173,8 +175,7 @@ class MonthFragment : BaseDialogFragment() {
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
         calendarViewModel.handleDaySelected(calendarViewModel.initialToday)
 
-        val formattedMonth = calendarViewModel.initialToday.formatMonth(true)
-        toolbarTitle.text = formattedMonth
+        setToolbarMonthYearTitle(calendarViewModel.initialToday)
 
         lifecycleScope.launch {
             calendarViewModel.fetchingState.collect {
@@ -238,6 +239,14 @@ class MonthFragment : BaseDialogFragment() {
 
         }
 
+    }
+
+    private fun setToolbarMonthYearTitle(localDate: LocalDate) {
+        val month = SpannableString(localDate.formatMonth(true))
+        val year = SpannableString(localDate.year.toString())
+        year.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.text_hint)), 0, year.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        toolbarTitle.text = getString(R.string.toolbar_title_month_space, month)
+        toolbarTitle.append(year)
     }
 
 }
