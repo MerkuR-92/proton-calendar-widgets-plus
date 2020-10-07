@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -37,6 +38,44 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = false
 
+    private lateinit var toolbarTitle: TextView
+
+    private val navigationArguments: EventFormFragmentArgs by navArgs()
+
+    private val calendarViewModel: CalendarViewModel by inject()
+    private val eventViewModel: EventViewModel by sharedViewModel() //inject()
+
+    // index of the day of the week of Event start, used for forcing weekday picker to have it always picked
+    //private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
+
+    lateinit var customEndingRadioGroup: NoLayoutRadioGroup
+    private var lastSelectedRadioButtonId: Int = -1
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
+        toolbarTitle.text = getString(R.string.event_recurrence_title)
+
+        attachActionHandlers()
+        observeEventLiveData() // TODO maybe this could be removed if this form is not reactive
+
+    }
+
+    override fun onBackPressedCustom() {
+        if (event_form_recurrence_radio_group.checkedRadioButtonId == R.id.event_form_recurrence_custom
+            && event_form_recurrence_custom_layout.isVisible) {
+            //TODO set to last selected before clicking custom radio button ?
+            if (lastSelectedRadioButtonId != -1) event_form_recurrence_radio_group.check(lastSelectedRadioButtonId)
+            else event_form_recurrence_radio_group.clearCheck()
+            event_form_recurrence_radio_group.visibleOrGone(true)
+            event_form_recurrence_custom_layout.visibleOrGone(false)
+            toolbarTitle.text = getString(R.string.event_recurrence_title)
+        } else {
+            findNavController().navigateUp()
+        }
+    }
+
     override fun onToolbarCreated(toolbar: Toolbar) {
         val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
         with (buttonDone) {
@@ -56,6 +95,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun onDoneClick() {
         when (event_form_recurrence_radio_group.checkedRadioButtonId) {
+            R.id.event_form_recurrence_custom_edit -> {
+                //Do nothing, we don't need to update recurrence and keep the custom one
+            }
             R.id.event_form_recurrence_1 -> {
                 eventViewModel.handleRecurrence(null, untilDate = false)
             }
@@ -78,11 +120,11 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
                 // "repeat until" options, apply to all recurrence periods
                 when (customEndingRadioGroup.getCheckedRadioButtonId()) {
-                    R.id.custom_recurrence_end_1 -> {} // ends: never
-                    R.id.custom_recurrence_end_2 -> { // ends: on specific Date
+                    custom_recurrence_end_1.id -> {} // ends: never
+                    custom_recurrence_end_2.id -> { // ends: on specific Date
                         untilDateChecked = true
                     }
-                    R.id.custom_recurrence_end_3 -> { // ends: after X occurrences
+                    custom_recurrence_end_3.id -> { // ends: after X occurrences
                         thisManyRepeats = custom_recurrence_end_count.text.toString().toIntOrNull() ?: FormValidation.OCCURRENCE_COUNT_DEFAULT // TODO force when null?
                     }
                 }
@@ -129,38 +171,17 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         findNavController().navigateUp()
     }
 
-    private val navigationArguments: EventFormFragmentArgs by navArgs()
-
-    private val calendarViewModel: CalendarViewModel by inject()
-    private val eventViewModel: EventViewModel by sharedViewModel() //inject()
-
-    // index of the day of the week of Event start, used for forcing weekday picker to have it always picked
-//    private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
-
-    lateinit var customEndingRadioGroup: NoLayoutRadioGroup
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        attachActionHandlers()
-        observeEventLiveData() // TODO maybe this could be removed if this form is not reactive
-
-    }
-
     private fun attachActionHandlers() {
 
         // main recurrence type radio group
         event_form_recurrence_radio_group.setOnCheckedChangeListener { radioGroup, index ->
-            event_form_recurrence_custom_layout.visibleOrGone(false)
-            custom_recurrence_occurrence_time_radio_group.visibleOrGone(false)
-            custom_recurrence_occurrence_group.visibleOrGone(false)
-            custom_recurrence_chips_layout.visibleOrGone(false)
-
             if (index == R.id.event_form_recurrence_custom) {
                 event_form_recurrence_radio_group.visibleOrGone(false)
                 event_form_recurrence_custom_layout.visibleOrGone(true)
                 showCustomRecurrenceForms(getCheckedRadioButtonIndex(custom_recurrence_period_radio_group))
+                toolbarTitle.text = getString(R.string.event_recurrence_custom_title)
+            } else {
+                lastSelectedRadioButtonId = index
             }
         }
 
@@ -416,71 +437,68 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 else -> R.id.event_form_recurrence_1
             }
 
-            event_form_recurrence_radio_group.check(
-                if (it.isCustomRecurring()) { // handle custom recurrence rule
+            if (it.isCustomRecurring()) {
+                //Set custom edit radio button text
+                event_form_recurrence_custom_edit.visibleOrGone(true)
+                event_form_recurrence_custom_edit.text = AndroidUtils.formatRecurrence(requireContext(), it, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
-                    // TODO get this from VM
-                    val eventStartDate =
-                        eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
-                            .toLocalDate()
+                // handle custom recurrence rule
+                custom_recurrence_occurrence_time_radio_group.check(
+                    when (eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()]) {
+                        EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
+                        EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
+                        EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
+                    }
+                )
 
-                    custom_recurrence_occurrence_time_radio_group.check(
-                        when (eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()]) {
-                            EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
-                            EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
-                            EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
-                        }
-                    )
+                customEndingRadioGroup.check(R.id.custom_recurrence_end_1) // default
 
-                    customEndingRadioGroup.check(R.id.custom_recurrence_end_1) // default
-
-                    eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.run {
-                        // "ends" section
-                        if (this.until != null) {
-                            customEndingRadioGroup.check(R.id.custom_recurrence_end_2)
-                            custom_recurrence_end_2.setText(getString(
-                                R.string.event_recurrence_ends_on_date,
-                                DateFormat.getDateInstance(
-                                    DateFormat.LONG
-                                ).format(this.until))
-                            )
-                        }
-                        if (this.count != null) {
-                            customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
-                            custom_recurrence_end_count.setText("${this.count}")
-                        }
-
-                        // "repeats every" section
-                        when (this.frequency) {
-                            Frequency.WEEKLY -> {
-                                custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT}")
-                                resetRecurrencePeriodText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
-                                custom_recurrence_period_radio_group.check(custom_recurrence_period_2.id)
-                            }
-                            Frequency.MONTHLY -> {
-                                custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT}")
-                                resetRecurrencePeriodText(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT)
-                                custom_recurrence_period_radio_group.check(custom_recurrence_period_3.id)
-                            }
-                            Frequency.YEARLY -> {
-                                custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_YEAR_COUNT_DEFAULT}")
-                                resetRecurrencePeriodText(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT)
-                                custom_recurrence_period_radio_group.check(custom_recurrence_period_4.id)
-                            }
-                            else -> { // fallback to Frequency.DAILY
-                                custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT}")
-                                resetRecurrencePeriodText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT)
-                                custom_recurrence_period_radio_group.check(custom_recurrence_period_1.id)
-                            }
-                        }
-
+                eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.run {
+                    // "ends" section
+                    if (this.until != null) {
+                        customEndingRadioGroup.check(R.id.custom_recurrence_end_2)
+                        custom_recurrence_end_2.setText(getString(
+                            R.string.event_recurrence_ends_on_date,
+                            DateFormat.getDateInstance(
+                                DateFormat.LONG
+                            ).format(this.until))
+                        )
+                    }
+                    if (this.count != null) {
+                        customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
+                        custom_recurrence_end_count.setText("${this.count}")
                     }
 
-                    // return radio button to check
-                    R.id.event_form_recurrence_custom
-                } else radioButtonId
-            )
+                    // "repeats every" section
+                    when (this.frequency) {
+                        Frequency.WEEKLY -> {
+                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT}")
+                            resetRecurrencePeriodText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
+                            custom_recurrence_period_radio_group.check(custom_recurrence_period_2.id)
+                        }
+                        Frequency.MONTHLY -> {
+                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT}")
+                            resetRecurrencePeriodText(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT)
+                            custom_recurrence_period_radio_group.check(custom_recurrence_period_3.id)
+                        }
+                        Frequency.YEARLY -> {
+                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_YEAR_COUNT_DEFAULT}")
+                            resetRecurrencePeriodText(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT)
+                            custom_recurrence_period_radio_group.check(custom_recurrence_period_4.id)
+                        }
+                        else -> { // fallback to Frequency.DAILY
+                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT}")
+                            resetRecurrencePeriodText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT)
+                            custom_recurrence_period_radio_group.check(custom_recurrence_period_1.id)
+                        }
+                    }
+                }
+            }
 
+            event_form_recurrence_radio_group.check(
+                if (it.isCustomRecurring()) R.id.event_form_recurrence_custom_edit
+                else radioButtonId
+            )
         })
     }
 
@@ -539,5 +557,4 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
     }
-
 }

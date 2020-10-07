@@ -94,6 +94,8 @@
     <string name="event_recurrence_3">Every week</string>
     <string name="event_recurrence_4">Every month</string>
     <string name="event_recurrence_5">Every year</string>
+    <string name="event_recurrence_title">Frequency</string>
+    <string name="event_recurrence_custom_title">Custom frequency</string>
 
     <string name="event_recurrence_occurs_every">Repeats every</string>
     <string name="event_recurrence_occurs_on">Repeats on</string>

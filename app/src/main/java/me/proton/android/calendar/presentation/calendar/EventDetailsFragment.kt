@@ -43,6 +43,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = false
 
+    override fun onBackPressedCustom() {
+        findNavController().navigateUp()
+    }
+
     override fun onToolbarCreated(toolbar: Toolbar) {
         val buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonEdit) {

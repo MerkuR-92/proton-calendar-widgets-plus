@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="false">
 
     <RadioGroup
         android:id="@+id/event_form_recurrence_radio_group"
@@ -17,6 +17,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/event_form_recurrence_custom_edit"
+            style="@style/Text.Default.RadioButton"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Weekly on Wednesday, until 21 Aug 2020" />
 
         <RadioButton
             android:id="@+id/event_form_recurrence_1"

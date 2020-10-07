@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -28,6 +30,29 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "EventFormAlarmFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_alarm
+
+    private lateinit var toolbarTitle: TextView
+
+    private val eventViewModel: EventViewModel by sharedViewModel()
+
+    private val isAllDay by lazy { eventViewModel.eventLiveData.value!!.isAllDay() }
+
+    private var lastSelectedRadioButtonId: Int = -1
+
+    override fun onBackPressedCustom() {
+        if (event_form_alarm_radio_group.checkedRadioButtonId == R.id.event_form_alarm_custom
+            && event_form_alarm_custom_layout.isVisible) {
+            //Change view
+            //TODO set to last selected before clicking custom radio button ?
+            if (lastSelectedRadioButtonId != -1) event_form_alarm_radio_group.check(lastSelectedRadioButtonId)
+            else event_form_alarm_radio_group.clearCheck()
+            event_form_alarm_radio_group.visibleOrGone(true)
+            event_form_alarm_custom_layout.visibleOrGone(false)
+            toolbarTitle.text = getString(R.string.event_alarms_title)
+        } else {
+            findNavController().navigateUp()
+        }
+    }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
@@ -48,6 +73,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun onDoneClick() {
         Timber.d("notification create/edit done")
+
+        //If no selection navigate up
+        if (event_form_alarm_action_radio_group.checkedRadioButtonId == -1) findNavController().navigateUp()
 
         val alarmTypeOption = getCheckedRadioButtonIndex(event_form_alarm_radio_group)
 
@@ -73,12 +101,6 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
         // notifications when switching between custom and canned ones
     }
-
-    private lateinit var toolbarTitle: TextView
-
-    private val eventViewModel: EventViewModel by sharedViewModel()
-
-    private val isAllDay by lazy { eventViewModel.eventLiveData.value!!.isAllDay() }
 
     /**
      * Applies correct pluralisation to dropdown items.
@@ -117,9 +139,6 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             event_form_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
         }
 
-        event_form_alarm_radio_group.check(event_form_alarm_1.id) // TODO read from event alarm
-        event_form_alarm_action_radio_group.check(event_form_alarm_action_notification.id) // TODO read from event alarm
-
         event_form_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
             when (index) {
                 R.id.event_form_alarm_custom -> {
@@ -128,12 +147,15 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                     //Change view
                     event_form_alarm_radio_group.visibleOrGone(false)
                     event_form_alarm_custom_layout.visibleOrGone(true)
-                }
+                } else -> lastSelectedRadioButtonId = index
             }
         }
         event_form_alarm_action_radio_group.setOnCheckedChangeListener { radioGroup, index ->
             requireActivity().clearFocusAndHideKeyboard(view)
         }
+
+        event_form_alarm_radio_group.check(event_form_alarm_1.id) // TODO read from event alarm
+        event_form_alarm_action_radio_group.check(event_form_alarm_action_notification.id) // TODO read from event alarm
 
         var lastSelectedIndex: Int? = null
 

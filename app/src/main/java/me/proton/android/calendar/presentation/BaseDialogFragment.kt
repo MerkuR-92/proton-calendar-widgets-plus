@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar
@@ -36,6 +37,9 @@ abstract class BaseDialogFragment : DialogFragment() {
     protected open val actionMenuResourceId: Int? = null
     protected open fun onMenuItemClicked(menuItem: MenuItem) {}
     protected open fun onToolbarCreated(toolbar: Toolbar) {}
+
+    //TODO Remove once we get rid of DialogFragment
+    protected open fun onBackPressedCustom() {}
 
     /**
      * Override this to customise action on "close/arrow back" click.
@@ -115,11 +119,13 @@ abstract class BaseDialogFragment : DialogFragment() {
             return rootView
         }
 
-        //    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//        val dialog = super.onCreateDialog(savedInstanceState)
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        return super.onCreateDialog(savedInstanceState)
-//    }
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return object : Dialog(requireActivity(), theme) {
+                override fun onBackPressed() {
+                    onBackPressedCustom()
+                }
+            }
+        }
 
         fun setToolbarTitle(title: String) {
             toolbar.title = title

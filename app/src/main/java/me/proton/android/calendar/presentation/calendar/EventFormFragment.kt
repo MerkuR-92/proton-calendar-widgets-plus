@@ -48,6 +48,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private val logger: Logger by inject()
 
+    override fun onBackPressedCustom() {
+        findNavController().navigateUp()
+    }
+
     override fun onNavigationIconClicked(): Boolean {
 //        findNavController().navigate(Navigation.Deeplink.toCalendar())
         findNavController().popBackStack(R.id.nav_calendar, false)
