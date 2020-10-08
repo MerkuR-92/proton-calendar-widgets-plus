@@ -292,7 +292,8 @@ class EventViewModel(
      */
     fun initialiseForRecurrence() {
         this.tempMonthlyRepeatOption = MonthlyRepatOnOption.ON_DAY_X
-        this.tempRecurrenceUntilLocalDate = null
+        val tempUntil: LocalDate? = event.iCalEvent.recurrenceRule?.value?.until?.toInstant()?.atZone(ZoneId.of(displayTimeZoneId))?.toLocalDate()
+        this.tempRecurrenceUntilLocalDate = tempUntil
     }
 
     /**

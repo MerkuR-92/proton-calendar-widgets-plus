@@ -776,10 +776,10 @@ fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
 /**
  * Returns "January", etc.
  */
-fun LocalDate.formatMonth(capitalize: Boolean?): String {
+fun LocalDate.formatMonth(capitalize: Boolean = false): String {
     val dateFormat = SimpleDateFormat("LLLL", Locale.getDefault())
     val formattedMonth = dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-    if (capitalize != null && capitalize)
+    if (capitalize)
         return formattedMonth.substring(0, 1).toUpperCase(Locale.getDefault()) +
                 formattedMonth.substring(1).toLowerCase(Locale.getDefault())
     return formattedMonth
