@@ -8,8 +8,12 @@ package me.proton.android.calendar.domain
 interface ValueStore {
     fun putString(key: String, value: String)
     fun getString(key: String): String?
+    fun putLong(key: String, value: Long)
+    fun getLong(key: String): Long?
     fun putStringInSet(setName: String, key: String, value: String)
     fun getStringFromSet(setName: String, key: String): String?
+    fun putLongInSet(setName: String, key: String, value: Long)
+    fun getLongFromSet(setName: String, key: String): Long?
 }
 
 interface ValueStoreProvider {

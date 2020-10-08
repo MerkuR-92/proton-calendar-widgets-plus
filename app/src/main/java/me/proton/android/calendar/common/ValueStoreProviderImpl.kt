@@ -13,23 +13,37 @@ class ValueStoreProviderImpl(private val sharedPreferencesProvider: SharedPrefer
     private val valueStores = mutableMapOf<String, ValueStore>()
 
     inner class ValueStoreImpl(private val sharedPreferences: SharedPreferences) : ValueStore {
+
         @Synchronized
         override fun putString(key: String, value: String) = sharedPreferences.edit().putString(
             key,
             value
         ).apply()
+
         @Synchronized
         override fun getString(key: String): String? = sharedPreferences.getString(key, null)
+
         @Synchronized
-        override fun putStringInSet(setName: String, key: String, value: String) = sharedPreferences.edit().putString(
-            "$setName~$key",
+        override fun putLong(key: String, value: Long) = sharedPreferences.edit().putLong(
+            key,
             value
         ).apply()
+
         @Synchronized
-        override fun getStringFromSet(setName: String, key: String): String? = sharedPreferences.getString(
-            "$setName~$key",
-            null
-        )
+        override fun getLong(key: String): Long? =
+            if (sharedPreferences.contains(key)) sharedPreferences.getLong(key, 0L) else null
+
+        @Synchronized
+        override fun putStringInSet(setName: String, key: String, value: String) = putString("$setName~$key", value)
+
+        @Synchronized
+        override fun getStringFromSet(setName: String, key: String): String? = getString("$setName~$key")
+
+        @Synchronized
+        override fun putLongInSet(setName: String, key: String, value: Long) = putLong("$setName~$key", value)
+
+        @Synchronized
+        override fun getLongFromSet(setName: String, key: String): Long? = getLong("$setName~$key")
     }
 
     @Synchronized
