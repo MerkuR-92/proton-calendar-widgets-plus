@@ -2,15 +2,9 @@ package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueKey
-import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.temporal.ChronoUnit
 
 
@@ -25,6 +19,7 @@ class SyncAlarmsUseCase(
         const val WORKER_ID = "SYNC_ALARMS"
     }
 
+    private val ALARMS_CACHE_OVERLAP_WINDOW_SIZE = Duration.ofDays(3) // minimum time that has to pass after last sync
     private val ALARMS_CACHE_WINDOW_SIZE = Duration.ofDays(14)
     private val ALARMS_CACHE_STEP_SIZE = Duration.ofDays(5)
     private val ALARMS_REQUEST_PAGE_SIZE = 100 // server supports maximum 100
@@ -34,11 +29,28 @@ class SyncAlarmsUseCase(
         logger.v("executing SyncAlarmsUseCase")
 
         val calendarIds = calendarsRepository.selectCalendars(userId)
-
-//        val syncStart = ZonedDateTime.now().toEpochSecond()
+        val valueStore = valueStoreProvider.provideValueStore(userId)
 
         val results = calendarIds.map {
-            handleCalendarAlarms(it)
+
+            val syncStartDate = ZonedDateTime.now()
+
+            // skip sync for this calendar if last successful sync happend recently
+            val lastSuccessfulSyncTimestamp = valueStore.getLongFromSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id)
+            val lastSuccessfulSyncDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastSuccessfulSyncTimestamp ?: 0L), ZoneId.of("UTC"))
+            if (lastSuccessfulSyncDate.plus(ALARMS_CACHE_OVERLAP_WINDOW_SIZE).isBefore(syncStartDate)) {
+                logger.v("have to sync alarms calendar ${it.name}, at $syncStartDate")
+                val result = handleCalendarAlarms(it)
+                if (result == UseCase.Result.Success) {
+                    logger.v("success syncing alarms for calendar ${it.name}, writing timestamp $syncStartDate")
+                    valueStore.putLongInSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id, syncStartDate.toEpochSecond())
+                }
+
+                result
+            } else {
+                logger.v("no need for sync of calendar ${it.name} at $syncStartDate")
+                UseCase.Result.Success
+            }
         }
 
         val success = results.all { it is UseCase.Result.Success }
@@ -46,10 +58,6 @@ class SyncAlarmsUseCase(
         logger.v("syncing alarms result = $results")
 
         return if (success) {
-
-//            val valueStore = valueStoreProvider.provideValueStore(userId)
-//            valueStore.putLong(ValueKey.LAST_ALARM_SYNC_SUCCESS, syncStart)
-
             UseCase.Result.Success
         } else {
             results.firstOrNull { it !is UseCase.Result.Success } ?: UseCase.Result.Error("error getting result from SyncAlarmsUseCase")

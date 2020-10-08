@@ -72,10 +72,29 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             ))
             .build()
 
+        // TODO work is unique per user-id, make sure different inputdata => different unique work
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS, ExistingWorkPolicy.REPLACE, work).state
 
     }
 
+    fun syncAlarms(userId: String) : LiveData<Operation.State> {
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
+                UseCaseWorker.INPUT_USER_ID to userId
+            ))
+            .build()
+
+        // TODO work is unique per user-id, make sure different inputdata => different unique work
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_ALARMS, ExistingWorkPolicy.REPLACE, work).state
+
+    }
 
 
 

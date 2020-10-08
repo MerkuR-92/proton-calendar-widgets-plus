@@ -4,27 +4,28 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.view.*
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import me.proton.android.calendar.R
-import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.pager_mini_calendar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.ext.android.inject
@@ -188,10 +189,27 @@ class MonthFragment : BaseDialogFragment() {
         }
 
         lifecycleScope.launchWhenStarted {
-            while(true) {
-                delay(SYNC_EVENTS_REFRESH_MS)
 
-                val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
+            val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
+
+            if (userId != null) {
+
+                delay(10_000L) // TODO delay so after first event sync, most of the events is already in DB
+
+                // TODO schedule repeating worker job
+                mainViewModel.syncAlarms(userId).observe(viewLifecycleOwner) {
+                    if (it is Operation.State.IN_PROGRESS) {
+                        setProgressBarVisibility(true)
+                    } else {
+                        setProgressBarVisibility(false)
+                    }
+                }
+            }
+
+            while(true) {
+                delay(SYNC_EVENTS_REFRESH_MS) // TODO schedule repeating worker job
+
+
                 if (userId != null) {
                     mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
                         if (it is Operation.State.IN_PROGRESS) {
