@@ -649,12 +649,11 @@ class AndroidUtils(context: Context) {
 
 }
 
-fun Activity.hideKeyboard() {
-    val view = this.currentFocus
-    if (view != null ) {
-        val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(view.windowToken, 0)
-    }
+fun Activity.clearFocusAndHideKeyboard(view: View?) {
+    val windowToken = view?.rootView?.windowToken
+    val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    imm?.hideSoftInputFromWindow(windowToken, 0)
+    view?.clearFocus()
 }
 
 data class TimePickerData(
@@ -777,9 +776,13 @@ fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
 /**
  * Returns "January", etc.
  */
-fun LocalDate.formatMonth(): String {
+fun LocalDate.formatMonth(capitalize: Boolean?): String {
     val dateFormat = SimpleDateFormat("LLLL", Locale.getDefault())
-    return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+    val formattedMonth = dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+    if (capitalize != null && capitalize)
+        return formattedMonth.substring(0, 1).toUpperCase(Locale.getDefault()) +
+                formattedMonth.substring(1).toLowerCase(Locale.getDefault())
+    return formattedMonth
 }
 
 fun LocalDate.formatDayOfWeek(short: Boolean = false): String {
@@ -838,13 +841,6 @@ fun <T> concatenate(vararg lists: List<T>): List<T> {
 }
 
 fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
-    //Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
+    // Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
     return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
-}
-
-fun Activity.clearFocusAndHideKeyboard(view: View?) {
-    val windowToken = view?.rootView?.windowToken
-    val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-    imm?.hideSoftInputFromWindow(windowToken, 0)
-    view?.clearFocus()
 }

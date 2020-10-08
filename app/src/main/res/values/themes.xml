@@ -19,7 +19,11 @@
 
         <item name="android:windowBackground">@color/background_norm</item>
 
-<!--        <item name="android:actionOverflowMenuStyle-->
+        <item name="alertDialogTheme">@style/AlertDialog</item>
+        <item name="android:datePickerDialogTheme">@style/PickerDialog</item>
+        <item name="android:timePickerDialogTheme">@style/PickerDialog</item>
+
+        <!--        <item name="android:actionOverflowMenuStyle-->
 
         <!--        in case we need custom font-->
 <!--        <item name="android:fontFamily">@font/space_mono</item>-->

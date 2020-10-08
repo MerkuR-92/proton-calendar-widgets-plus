@@ -96,9 +96,8 @@ class MonthFragment : BaseDialogFragment() {
             val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
             calendarViewModel.handleDaySelected(firstDayOfMonth)
 
-            val formattedMonth = firstDayOfMonth.formatMonth()
-            //First letter not always capital
-            toolbarTitle.text = formattedMonth.substring(0, 1).toUpperCase() + formattedMonth.substring(1).toLowerCase()
+            val formattedMonth = firstDayOfMonth.formatMonth(true)
+            toolbarTitle.text = formattedMonth
 
             adjustMiniCalendarView(position)
         }
@@ -174,9 +173,8 @@ class MonthFragment : BaseDialogFragment() {
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
         calendarViewModel.handleDaySelected(calendarViewModel.initialToday)
 
-        val formattedMonth = calendarViewModel.initialToday.formatMonth()
-        //First letter not always capital
-        toolbarTitle.text = formattedMonth.substring(0, 1).toUpperCase() + formattedMonth.substring(1).toLowerCase()
+        val formattedMonth = calendarViewModel.initialToday.formatMonth(true)
+        toolbarTitle.text = formattedMonth
 
         lifecycleScope.launch {
             calendarViewModel.fetchingState.collect {

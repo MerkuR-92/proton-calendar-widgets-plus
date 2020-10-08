@@ -19,7 +19,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.hideKeyboard
+import me.proton.android.calendar.common.clearFocusAndHideKeyboard
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import org.koin.android.ext.android.inject
@@ -87,7 +87,7 @@ class LoginFragment : Fragment() {
 
                             }
 
-                            requireActivity().hideKeyboard()
+                            requireActivity().clearFocusAndHideKeyboard(view)
 
                             //Refresh drawer content now that we are logged in
                             (requireActivity() as MainActivity).initDrawerHeader()
