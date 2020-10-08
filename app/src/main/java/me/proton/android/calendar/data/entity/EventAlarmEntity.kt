@@ -6,10 +6,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import me.proton.android.calendar.data.db.AppDatabase
 
-// TODO
-// when inserting this, we need to already have event, member and calendar in local DB
-//  maybe set foreign keys?
-
 @Entity(
     tableName = AppDatabase.TABLE_EVENT_ALARMS,
     foreignKeys = [ForeignKey(

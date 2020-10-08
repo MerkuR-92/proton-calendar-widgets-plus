@@ -319,6 +319,7 @@ class CalendarsRepositoryImpl(
                         filteredByExdates
                     } else if (event.isSingleEdit()) {
                         // Event that is "from recurring" has already been created when expading ^
+                        // TODO handle orphan single-edits, we have single-edit but there is no parent "root event"
                         emptyList()
                     } else {
                         listOf(event)

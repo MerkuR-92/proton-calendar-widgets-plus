@@ -36,7 +36,7 @@ interface CalendarsApiService {
     suspend fun getBootstrap(@Path("calendarId") calendarId: String): Response<BootstrapApiResponse>
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/alarms")
-    suspend fun getAlarms(@Path("calendarId") calendarId: String) : Response<AlarmsApiResponse>
+    suspend fun getAlarms(@Path("calendarId") calendarId: String, @Query("Start") startTimestamp: Long, @Query("End") endTimestamp: Long, @Query("PageSize") pageSize: Int) : Response<AlarmsApiResponse>
 
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : Response<StatusCodeApiResponse>
@@ -82,7 +82,7 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
 
     override suspend fun getBootstrap(calendarId: String): ApiResponse<BootstrapApiResponse> = safeApiCall { service.getBootstrap(calendarId) }
 
-    override suspend fun getAlarms(calendarId: String): ApiResponse<AlarmsApiResponse> = safeApiCall { service.getAlarms(calendarId) }
+    override suspend fun getAlarms(calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int): ApiResponse<AlarmsApiResponse> = safeApiCall { service.getAlarms(calendarId, startTimestamp, endTimestamp, pageSize) }
 
     override suspend fun deleteEvent(calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse>  = safeApiCall { service.deleteEvent(calendarId, eventId) }
 
@@ -225,7 +225,7 @@ data class UpdateCalendarApiResponse(
 
 data class AlarmsApiResponse(
     override val code: Int,
-    val eventAlarms: List<EventAlarmEntity>
+    val alarms: List<EventAlarmEntity>
 ) : BaseApiResponse()
 
 data class EventsByUidApiResponse(

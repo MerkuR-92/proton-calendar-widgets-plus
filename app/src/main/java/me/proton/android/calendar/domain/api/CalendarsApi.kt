@@ -38,7 +38,7 @@ interface CalendarsApi {
     /**
      * Gets all "active" (occuring in the future) alarms of type "DISPLAY" for given calendar.
      */
-    suspend fun getAlarms(calendarId: String) : ApiResponse<AlarmsApiResponse>
+    suspend fun getAlarms(calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int) : ApiResponse<AlarmsApiResponse>
 
     /**
      * Delete an event.

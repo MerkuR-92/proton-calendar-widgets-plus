@@ -18,6 +18,10 @@ class UpdateCalendarUseCase(
     private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
+    companion object {
+        const val WORKER_ID = "UPDATE_SERVER_CALENDAR"
+    }
+
     //TODO Handle other Calendar parameters
 
     //Update Calendar Display on Server

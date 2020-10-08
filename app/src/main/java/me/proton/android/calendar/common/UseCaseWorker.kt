@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -20,8 +21,9 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
      */
     class UseCaseId {
         companion object {
-            const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
-            const val UPDATE_SERVER_CALENDAR = "UPDATE_SERVER_CALENDAR"
+            const val SYNC_SERVER_EVENTS = SyncServerEventsUseCase.WORKER_ID
+            const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
+            const val UPDATE_SERVER_CALENDAR = UpdateCalendarUseCase.WORKER_ID
         }
     }
 
@@ -47,6 +49,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UniqueWorkNames {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
+            const val SYNC_ALARMS = "SYNC_ALARMS"
             const val UPDATE_SERVER_CALENDAR = "UPDATE_SERVER_CALENDAR"
         }
     }
@@ -60,6 +63,10 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.SYNC_SERVER_EVENTS -> {
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
                 syncServerEventsUseCase.execute(inputData.getString(INPUT_USER_ID) ?: return Result.failure())
+            }
+            UseCaseId.SYNC_ALARMS -> {
+                val syncAlarmsUseCase: SyncAlarmsUseCase = get()
+                syncAlarmsUseCase.execute(inputData.getString(INPUT_USER_ID) ?: return Result.failure())
             }
             UseCaseId.UPDATE_SERVER_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
