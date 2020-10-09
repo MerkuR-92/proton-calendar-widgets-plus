@@ -32,6 +32,7 @@
     <string name="event_alarm_label_at_event_time">At time of event</string>
     <string name="event_alarm_label_on_the_same_day">On the same day</string>
     <string name="event_alarm_label_before">%s before</string>
+    <string name="event_alarm_label">%s</string>
     <string name="event_alarm_label_before_by_email">%s before by email</string>
     <string name="event_alarm_label_not_before_with_time">%s at %s</string>
     <string name="event_alarm_label_not_before_with_time_by_email">%s at %s by email</string> <!--"1 day before at 9:00 by email"-->
@@ -77,10 +78,10 @@
     <string name="event_custom_alarms_field">Notify</string>
     <string name="event_custom_alarms_title">Custom notifications</string>
     <string name="event_alarm_partial_day_1">at time of event</string>
-    <string name="event_alarm_partial_day_2">10 minutes before</string>
-    <string name="event_alarm_partial_day_3">30 minutes before</string>
-    <string name="event_alarm_partial_day_4">1 hour before</string>
-    <string name="event_alarm_partial_day_5">1 week before</string>
+    <string name="event_alarm_partial_day_2">10 minutes</string>
+    <string name="event_alarm_partial_day_3">30 minutes</string>
+    <string name="event_alarm_partial_day_4">1 hour</string>
+    <string name="event_alarm_partial_day_5">1 week</string>
     <string name="event_alarm_all_day_1">on the same day at %s</string>
     <string name="event_alarm_all_day_2">1 day before at %s</string>
     <string name="event_alarm_all_day_3">1 week before at %s</string>
@@ -89,6 +90,7 @@
     <string name="event_alarm_action">Send by</string>
     <string name="event_alarm_action_notification">notification</string>
     <string name="event_alarm_action_email">email</string>
+    <string name="event_alarm_same_day">on the day</string>
     <string name="event_recurrence_1">do not repeat</string>
     <string name="event_recurrence_2">every day</string>
     <string name="event_recurrence_3">every week</string>

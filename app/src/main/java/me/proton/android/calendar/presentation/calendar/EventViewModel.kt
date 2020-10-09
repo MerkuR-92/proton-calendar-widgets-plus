@@ -260,25 +260,25 @@ class EventViewModel(
         event.iCalEvent.alarms.clear()
 
         if (event.isAllDay()) {
-                calendarSettings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
-                    alarm.parseTrigger()?.let {
-                        if (alarm.type == "0") {
-                            event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
-                        } else {
-                            event.iCalEvent.addAlarm(VAlarm.display(it, null))
-                        }
+            calendarSettings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+                alarm.parseTrigger()?.let {
+                    if (alarm.type == "0") {
+                        event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
+                    } else {
+                        event.iCalEvent.addAlarm(VAlarm.display(it, null))
                     }
                 }
+            }
         } else {
-                calendarSettings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
-                    alarm.parseTrigger()?.let {
-                        if (alarm.type == "0") {
-                            event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
-                        } else {
-                            event.iCalEvent.addAlarm(VAlarm.display(it, null))
-                        }
+            calendarSettings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+                alarm.parseTrigger()?.let {
+                    if (alarm.type == "0") {
+                        event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
+                    } else {
+                        event.iCalEvent.addAlarm(VAlarm.display(it, null))
                     }
                 }
+            }
         }
 
     }
@@ -774,24 +774,24 @@ class EventViewModel(
 
         val repeatOptions = calculateMonthlyRepeatOnOptions()
 
-            event.iCalEvent.recurrenceRule?.value?.run {
+        event.iCalEvent.recurrenceRule?.value?.run {
 
             if (this.frequency != Frequency.MONTHLY) return 0
 
-                val eventStartDate = event.getStart(displayTimeZoneId)!!.toLocalDate()
+            val eventStartDate = event.getStart(displayTimeZoneId)!!.toLocalDate()
 
-                val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
-                val weekInMonth = eventStartDate.weekInMonth()
+            val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
+            val weekInMonth = eventStartDate.weekInMonth()
 
-                val eventDaySetPos = this.bySetPos.getOrNull(this.byDay.indexOfFirst { it.day == iCalDayOfWeek })
+            val eventDaySetPos = this.bySetPos.getOrNull(this.byDay.indexOfFirst { it.day == iCalDayOfWeek })
 
-                if (eventDaySetPos != null) {
-                    if (eventDaySetPos in 1..4) {
-                        return 1
-                    } else if (eventDaySetPos == -1) {
-                        return repeatOptions.lastIndex
-                    }
+            if (eventDaySetPos != null) {
+                if (eventDaySetPos in 1..4) {
+                    return 1
+                } else if (eventDaySetPos == -1) {
+                    return repeatOptions.lastIndex
                 }
+            }
         }
 
         return 0 // default: Recurrence Rule never ends
@@ -839,28 +839,21 @@ class EventViewModel(
 
                     if (count != null && countTypeOption != null) {
                         Duration.builder().apply {
-                            prior(true)
+                            // We hide minutes and hours buttons and use same radio group so days and weeks have id 2 & 3
                             when (countTypeOption) {
-                                0 -> {
-//                                    if (tempAlarmTime.hour == 0 && tempAlarmTime.minute == 0) {
-//                                        days(count)
-//                                    } else {
-                                        //if (count > 1)
-                                        val adjustedDays = count - 1
-                                        if (adjustedDays > 0) days(adjustedDays)
-                                        if (count == 0) days(count)
+                                2 -> {
+                                    prior(true)
+                                    val adjustedDays = count - 1
+                                    if (adjustedDays > 0) days(adjustedDays)
+                                    if (count == 0) days(count)
 
-                                        val negativeTimeOfDay = LocalTime.of(0, 0).minusHours(tempAlarmTime.hour.toLong()).minusMinutes(tempAlarmTime.minute.toLong())
+                                    val negativeTimeOfDay = LocalTime.of(0, 0).minusHours(tempAlarmTime.hour.toLong()).minusMinutes(tempAlarmTime.minute.toLong())
 
-                                        if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
-                                        if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
-//                                    }
+                                    if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
+                                    if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
                                 }
-                                1 -> {
-//                                    if (tempAlarmTime.hour == 0 && tempAlarmTime.minute == 0) {
-//                                        weeks(count)
-//                                    } else {
-                                    //if (count > 1)
+                                3 -> {
+                                    prior(true)
                                     val adjustedWeeks = count - 1
                                     if (adjustedWeeks > 0) weeks(adjustedWeeks)
                                     days(7 - 1)
@@ -869,11 +862,15 @@ class EventViewModel(
 
                                     if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
                                     if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
-//                                    }
-
-
                                     // TODO
+                                }
+                                // On the day at x
+                                4 -> {
+                                    prior(false)
+                                    val positiveTimeOfDay = LocalTime.of(0, 0).plusHours(tempAlarmTime.hour.toLong()).plusMinutes(tempAlarmTime.minute.toLong())
 
+                                    if (positiveTimeOfDay.hour > 0) hours(positiveTimeOfDay.hour)
+                                    if (positiveTimeOfDay.minute > 0) minutes(positiveTimeOfDay.minute)
                                 }
                             }
                         }.build()
@@ -915,7 +912,6 @@ class EventViewModel(
             event.iCalEvent.addAlarm(alarm)
             _event.postValue(event)
         }
-
     }
 
     fun handleAlarmDelete(index: Int) {
@@ -923,7 +919,4 @@ class EventViewModel(
         event.iCalEvent.alarms.removeAt(index)
         _event.postValue(event)
     }
-
-
-
 }

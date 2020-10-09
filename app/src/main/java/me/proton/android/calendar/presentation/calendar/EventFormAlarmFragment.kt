@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -74,15 +75,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     private fun onDoneClick() {
         Timber.d("notification create/edit done")
 
-        //If no selection navigate up
-        if (event_form_alarm_action_radio_group.checkedRadioButtonId == -1) findNavController().navigateUp()
-
         val alarmTypeOption = getCheckedRadioButtonIndex(event_form_alarm_radio_group)
-
-//                 GET RADIO BUTTONS, IF == 1 then hardcode 9:00 in VM
-//             val customPeriod =
-//             val customCount = et_alarm_count.text.toString().toIntOrNull() ?: FormValidation.
-//                 val customTime = nullable
 
         val option =
             if (getCheckedRadioButtonIndex(event_form_alarm_action_radio_group) == 0)
@@ -90,11 +83,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             else EventViewModel.SendByOption.EMAIL
         eventViewModel.handleAlarmSendBy(option) // 0 -- notification (default), 1 -- email
 
-        //We hide minutes and hours buttons so days and weeks have id 2 & 3
-        val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group) - 2
+        val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group)
+        // countTypeOption with value at 4 is used for "on the day" option
         eventViewModel.handleAlarm(alarmTypeOption,
             count = custom_alarm_field.text.toString().toIntOrNull(),
-            countTypeOption = countTypeOption)
+            countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption)
         findNavController().navigateUp()
 
         // TODO
@@ -106,20 +99,19 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
      * Applies correct pluralisation to dropdown items.
      */
     private fun resetAlarmCustomText(count: Int) {
-        custom_alarm_3.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_day, count, count))
-        custom_alarm_4.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_week, count, count))
+        val selectedIndex = getCheckedRadioButtonIndex(custom_alarm_radio_group)
+        val label = R.string.event_alarm_label
+        val labelSelected = R.string.event_alarm_label_before
+
+        custom_alarm_3.text = getString(if (selectedIndex == 2) labelSelected else label, resources.getQuantityString(R.plurals.plural_day, count, count))
+        custom_alarm_4.text = getString(if (selectedIndex == 3) labelSelected else label, resources.getQuantityString(R.plurals.plural_week, count, count))
         if (!isAllDay) {
-            custom_alarm_1.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_minute, count, count))
-            custom_alarm_2.text = getString(R.string.event_alarm_label_before, resources.getQuantityString(R.plurals.plural_hour, count, count))
+            custom_alarm_1.text = getString(if (selectedIndex == 0) labelSelected else label, resources.getQuantityString(R.plurals.plural_minute, count, count))
+            custom_alarm_2.text = getString(if (selectedIndex == 1) labelSelected else label, resources.getQuantityString(R.plurals.plural_hour, count, count))
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
-        toolbarTitle.text = getString(R.string.event_alarms_title)
-        toolbar.setNavigationIcon(R.drawable.ic_close)
-
+    private fun resetAlarmText(selectedIndex: Int) {
         if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
             event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
                 FormatStyle.SHORT)))
@@ -129,17 +121,30 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 FormatStyle.SHORT)))
             event_form_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
                 FormatStyle.SHORT)))
-            event_form_alarm_5.visibleOrGone(false)
         } else {
             event_form_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
             event_form_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
             event_form_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
             event_form_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
-            event_form_alarm_5.visibleOrGone(true)
             event_form_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
+            if (selectedIndex != -1 && selectedIndex != R.id.event_form_alarm_1) {
+                val radioButton = event_form_alarm_radio_group.findViewById<RadioButton>(selectedIndex)
+                radioButton.text = getString(R.string.event_alarm_label_before, radioButton.text)
+            }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
+        toolbarTitle.text = getString(R.string.event_alarms_title)
+        toolbar.setNavigationIcon(R.drawable.ic_close)
+
+        event_form_alarm_5.visibleOrGone(!isAllDay)
+        resetAlarmText(-1)
 
         event_form_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+            event_form_alarm_radio_group.jumpDrawablesToCurrentState()
             when (index) {
                 R.id.event_form_alarm_custom -> {
                     toolbarTitle.text = getString(R.string.event_custom_alarms_title)
@@ -147,7 +152,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                     //Change view
                     event_form_alarm_radio_group.visibleOrGone(false)
                     event_form_alarm_custom_layout.visibleOrGone(true)
-                } else -> lastSelectedRadioButtonId = index
+                }
+                else -> {
+                    resetAlarmText(index)
+                    lastSelectedRadioButtonId = index
+                }
             }
         }
         event_form_alarm_action_radio_group.setOnCheckedChangeListener { radioGroup, index ->
@@ -166,6 +175,8 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 return@setOnCheckedChangeListener
             }
             lastSelectedIndex = index
+
+            if (index != -1) custom_alarm_same_day.isChecked = false
 
             requireActivity().clearFocusAndHideKeyboard(view)
 
@@ -201,19 +212,24 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        custom_alarm_same_day.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) custom_alarm_radio_group.clearCheck()
+        }
+
         // init
         custom_alarm_1.visibleOrGone(!isAllDay)
         custom_alarm_2.visibleOrGone(!isAllDay)
         custom_alarm_time_layout.visibleOrGone(isAllDay)
+        custom_alarm_same_day_layout.visibleOrGone(isAllDay)
         if (isAllDay) {
             custom_alarm_field.setText("1")
-            resetAlarmCustomText(1)
             custom_alarm_radio_group.check(custom_alarm_3.id)
+            resetAlarmCustomText(1)
             custom_alarm_time.text = getString(R.string.event_alarm_at_time, eventViewModel.tempAlarmTime.format())
         } else {
             custom_alarm_field.setText("15")
-            resetAlarmCustomText(15)
             custom_alarm_radio_group.check(custom_alarm_1.id)
+            resetAlarmCustomText(15)
         }
 
         custom_alarm_field_layout.setEndIconOnClickListener {
