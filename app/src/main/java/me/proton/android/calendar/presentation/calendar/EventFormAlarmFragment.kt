@@ -209,7 +209,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             custom_alarm_field.setText("1")
             resetAlarmCustomText(1)
             custom_alarm_radio_group.check(custom_alarm_3.id)
-            custom_alarm_time.text = eventViewModel.tempAlarmTime.format()
+            custom_alarm_time.text = getString(R.string.event_alarm_at_time, eventViewModel.tempAlarmTime.format())
         } else {
             custom_alarm_field.setText("15")
             resetAlarmCustomText(15)
@@ -227,7 +227,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
                 eventViewModel.handleAlarmTime(it)
-                custom_alarm_time.text = it.format()
+                custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.format())
             }
         }
     }

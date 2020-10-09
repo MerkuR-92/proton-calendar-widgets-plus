@@ -149,6 +149,7 @@
         <item name="colorAccent">@color/brand_norm</item>
         <item name="colorControlActivated">@color/brand_norm</item>
         <item name="colorControlHighlight">@color/brand_norm</item>
+        <item name="android:windowBackground">@color/background_norm</item>
         <item name="android:buttonBarPositiveButtonStyle">@style/PickerDialogButtonStyle</item>
         <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
     </style>
@@ -160,6 +161,7 @@
     </style>
 
     <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="colorAccent">@color/brand_norm</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
     </style>
