@@ -797,9 +797,9 @@ class EventViewModel(
         return 0 // default: Recurrence Rule never ends
     }
 
-    fun handleRecurrenceRepeatOn(selectedIndex: Int) {
+    fun handleRecurrenceRepeatOn(monthlyRepeatOnOption: MonthlyRepatOnOption) {
         markEventAsEdited(bumpSequence = true)
-        this.tempMonthlyRepeatOption = calculateMonthlyRepeatOnOptions()[selectedIndex]
+        this.tempMonthlyRepeatOption = monthlyRepeatOnOption
     }
 
     enum class SendByOption {

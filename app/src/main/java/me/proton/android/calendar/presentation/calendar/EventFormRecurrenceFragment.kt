@@ -44,6 +44,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by inject()
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
+    private lateinit var monthlyRecurrenceOnMap: HashMap<Int, EventViewModel.MonthlyRepatOnOption>
 
     // index of the day of the week of Event start, used for forcing weekday picker to have it always picked
     //private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
@@ -384,26 +385,31 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         )
 
         val optionsRepeatOn = eventViewModel.calculateMonthlyRepeatOnOptions()
+        monthlyRecurrenceOnMap = HashMap()
         optionsRepeatOn.forEach {
             when (it) {
                 EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> {
                     custom_recurrence_occurrence_time_1.visibleOrGone(true)
                     custom_recurrence_occurrence_time_1.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                    monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_1] = it
                 }
                 EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> {
                     custom_recurrence_occurrence_time_2.visibleOrGone(true)
                     custom_recurrence_occurrence_time_2.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                    monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_2] = it
                 }
                 EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> {
                     custom_recurrence_occurrence_time_3.visibleOrGone(true)
                     custom_recurrence_occurrence_time_3.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                    monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_3] = it
                 }
             }
         }
 
-        custom_recurrence_occurrence_time_radio_group.setOnCheckedChangeListener { group, checkedId ->
+        custom_recurrence_occurrence_time_radio_group.setOnCheckedChangeListener { _, checkedId ->
             requireActivity().clearFocusAndHideKeyboard(view)
-            eventViewModel.handleRecurrenceRepeatOn(getCheckedRadioButtonIndex(custom_recurrence_occurrence_time_radio_group))
+            val monthlyRepeatOnOption = monthlyRecurrenceOnMap[checkedId]
+            if (monthlyRepeatOnOption != null) eventViewModel.handleRecurrenceRepeatOn(monthlyRepeatOnOption)
         }
     }
 
