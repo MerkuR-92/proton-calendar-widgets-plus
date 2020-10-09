@@ -119,9 +119,9 @@ class CalendarViewModel(
 
 
             // TODO get calendars that are selected from the sidebar
-            val selectedActiveCalendarsId = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
-            val selectedDisabledCalendarsId = calendarsRepository.getDisabledCalendars(TODOuserID).map { it.id }.toList()
-            val selectedCalendarIds = selectedActiveCalendarsId + selectedDisabledCalendarsId
+            val selectedActiveCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
+            val selectedDisabledCalendarIds = calendarsRepository.getDisabledCalendars(TODOuserID).map { it.id }.toList()
+            val selectedCalendarIds = selectedActiveCalendarIds + selectedDisabledCalendarIds
 
 
             coroutineScope.launch {

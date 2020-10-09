@@ -59,8 +59,8 @@ class CalendarsRepositoryImpl(
         database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-            val displayedCalendarsIds = database.calendarsDao().selectDisplayedCalendars(userId).map { it.id }.toList()
-            val filteredEventEntities = eventEntities.filter { displayedCalendarsIds.contains(it.calendarId) }
+            val displayedCalendarIds = database.calendarsDao().selectDisplayedCalendars(userId).map { it.id }.toList()
+            val filteredEventEntities = eventEntities.filter { displayedCalendarIds.contains(it.calendarId) }
 
             logger.v("xxx db events flow collect")
 
@@ -104,9 +104,9 @@ class CalendarsRepositoryImpl(
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
 
         // TODO When optimizing : Only refresh a specific list of calendars and their events using calendarIds parameter
-        val selectedActiveCalendarsId = getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
-        val selectedDisabledCalendarsId = getDisabledCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
-        val selectedCalendarIds = selectedActiveCalendarsId + selectedDisabledCalendarsId
+        val selectedActiveCalendarIds = getActiveCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
+        val selectedDisabledCalendarIds = getDisabledCalendars(TODOuserID).filter { it.display == 1 }.map { it.id }.toList()
+        val selectedCalendarIds = selectedActiveCalendarIds + selectedDisabledCalendarIds
 
         val events = database.eventsDao().selectEvents(selectedCalendarIds)
 

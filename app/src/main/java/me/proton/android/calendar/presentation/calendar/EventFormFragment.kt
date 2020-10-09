@@ -18,6 +18,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
@@ -53,7 +54,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onNavigationIconClicked(): Boolean {
-//        findNavController().navigate(Navigation.Deeplink.toCalendar())
         findNavController().popBackStack(R.id.nav_calendar, false)
         return true
     }
@@ -166,26 +166,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun persistFormData() {
-//        lifecycleScope.launch {
-//
-//            with (eventViewModel) {
-//                summary = et_summary.text.toString().ifBlank { null }
-//                location = event_form_location.text.toString().ifBlank { null }
-//                description = event_form_description.text.toString().ifBlank { null }
-//            }
-
-//            withContext(Dispatchers.Default) {
-//
         eventViewModel.persistRecurrenceFormData(
             event_form_title.text.toString().ifBlank { null },
             event_form_location.text.toString().ifBlank { null },
             event_form_description.text.toString().ifBlank { null }
         )
-//            }
 
         // TODO CREATE EVENT WITHOUT SAVING BEFOREHAND? EXAMPLE CALL -> calendarViewModel.TEST_CREATE_EVENT_TODO()
-
-//        }
     }
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
@@ -211,6 +198,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
 
             if (viewModeInitStatus == UseCase.Result.Success) {
+                if (navigationArguments.eventId == null) event_form_title.requestFocus()
                 observeEventLiveData()
                 attachActionHandlers()
             } else {
@@ -223,33 +211,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 }
                 findNavController().navigateUp()
             }
-
         }
-
-
-
-
-
-
-
-        // if we need to go back to specific destination, like escaping from editing an event
-        //findNavController().popBackStack(123, true)
-
-//        setToolbarTitle(getString(R.string.title_create_event))
-
-//        button.setOnClickListener {
-//
-//
-//
-//        }
-
-    }
-
-    // TODO better name
-    private fun refreshView() {
-//        et_summary.setText(eventViewModel.summary)
-//        event_form_location.setText(eventViewModel.location)
-//        event_form_description.setText(eventViewModel.description)
     }
 
     private fun observeEventLiveData() {
@@ -294,7 +256,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun attachActionHandlers() {
-
         event_form_title.doAfterTextChanged { persistFormData() }
         event_form_location.doAfterTextChanged { persistFormData() }
         event_form_description.doAfterTextChanged { persistFormData() }
@@ -406,11 +367,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         //press_attendees.setOnClickListener {
         //    findNavController().navigate(R.id.nav_event_form_attendees)
         //}
-
     }
 
     private fun displayAlarms() {
-
         event_form_alarm_list.removeAllViews()
         event_form_alarm_icon.visibleOrGone(true)
 
@@ -444,8 +403,5 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.nav_event_form_alarm)
         }
         event_form_alarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
-
     }
-
-
 }
