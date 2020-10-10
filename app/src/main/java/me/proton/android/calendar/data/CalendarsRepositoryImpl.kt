@@ -303,6 +303,10 @@ class CalendarsRepositoryImpl(
 
     }
 
+    override fun hasEvent(eventId: String, calendarId: String, ): Boolean = database.eventsDao().hasEvent(eventId, calendarId)
+
+    override fun hasCalendar(calendarId: String, ): Boolean = database.calendarsDao().hasCalendar(calendarId)
+
     private suspend fun expandDbEventsUntil(toDate: LocalDate, timeZoneId: String, force: Boolean) {
 
         synchronized(this) { // TODO

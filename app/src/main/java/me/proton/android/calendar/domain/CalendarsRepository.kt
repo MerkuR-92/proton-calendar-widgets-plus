@@ -45,6 +45,10 @@ interface CalendarsRepository {
         timeZoneId: String
     )
 
+    fun hasEvent(eventId: String, calendarId: String, ): Boolean
+
+    fun hasCalendar(calendarId: String, ): Boolean
+
     fun eventFlow(eventId: String): Flow<Event?> // TODO separate Flow<> from normal DB queries?
 
     suspend fun selectEventEntity(eventId: String): EventEntity?

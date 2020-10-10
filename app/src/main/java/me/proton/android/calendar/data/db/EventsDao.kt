@@ -28,6 +28,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
     abstract suspend fun selectByUid(uid: String): List<EventEntity>
 
+    @Query("SELECT EXISTS(SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId)")
+    abstract fun hasEvent(eventId: String, calendarId: String): Boolean
+
     @Query("DELETE FROM events WHERE id = :id")
     abstract fun deleteById(id: String)
 

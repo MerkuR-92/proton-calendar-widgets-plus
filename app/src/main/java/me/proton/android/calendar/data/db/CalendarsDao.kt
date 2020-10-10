@@ -26,6 +26,9 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("SELECT * FROM calendars WHERE id = :id")
     abstract fun selectById(id: String): CalendarEntity?
 
+    @Query("SELECT EXISTS(SELECT * FROM calendars WHERE id = :calendarId)")
+    abstract fun hasCalendar(calendarId: String): Boolean
+
     @Query("DELETE FROM calendars WHERE id = :id")
     abstract fun deleteById(id: String)
 

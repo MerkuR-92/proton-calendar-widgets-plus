@@ -71,8 +71,6 @@ class SyncAlarmsUseCase(
         var windowStart = start
         var windowEnd = windowStart.plus(ALARMS_CACHE_STEP_SIZE)
 
-        val processedAlarmIds = mutableSetOf<String>()
-
         do {
             var hasMore = false
 
@@ -104,12 +102,29 @@ class SyncAlarmsUseCase(
 
                     alarmsResponse.data.alarms.forEach { alarmEntity ->
                         logger.v("alarm: ${alarmEntity}")
-                        calendarsRepository.persistEventAlarm(alarmEntity)
 
-                        processedAlarmIds.add(alarmEntity.id)
-
-                        // TODO FETCH EVENT IF IT DOESN'T EXIST IN LOCAL DATABASE
-
+                        if (!calendarsRepository.hasCalendar(alarmEntity.calendarId))           {
+                            // Calendar doesn't exist locally, silently fail
+                            logger.e("calendar ${alarmEntity.calendarId} doesn't exist in DB, can't insert alarm")
+                        } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
+                            logger.v("event ${alarmEntity.eventId} for alarm doesn't exist in DB")
+                            // event doen's exist locally, fetch and save it before inserting alarm
+                            when (val event = calendarsApi.getEvent(alarmEntity.calendarId, alarmEntity.eventId)) {
+                                is ApiResponse.Success -> {
+                                    logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
+                                    calendarsRepository.persistEvents(event.data.event)
+                                    calendarsRepository.persistEventAlarm(alarmEntity)
+                                }
+                                // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
+                                is ApiResponse.Error -> {
+                                    logger.e("couldn't fetch event ${alarmEntity.eventId} for alarm: ${event.errorCode}, ${event.error}")
+                                    return UseCase.Result.Error("could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
+                                }
+                                is ApiResponse.Exception -> return UseCase.Result.Error("could not fetch missing event for alarm: ${event.exception}k")
+                            }
+                        } else {
+                            calendarsRepository.persistEventAlarm(alarmEntity)
+                        }
                     }
 
                     logger.v("alarm window before adjusting => ${windowStart}-${windowEnd}, end = $end")
