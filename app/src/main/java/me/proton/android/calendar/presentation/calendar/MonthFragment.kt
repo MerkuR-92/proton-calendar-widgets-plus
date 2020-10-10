@@ -26,6 +26,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.ext.android.inject
@@ -36,6 +37,7 @@ import java.time.LocalDate
 class MonthFragment : BaseDialogFragment() {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
     private lateinit var agendaPagerAdapter: AgendaPagerAdapter
@@ -193,6 +195,9 @@ class MonthFragment : BaseDialogFragment() {
             val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
 
             if (userId != null) {
+
+                // TODO schedule this from some global periodic scheduler
+                handleAlarmsUseCase.execute(userId)
 
                 delay(10_000L) // TODO delay so after first event sync, most of the events is already in DB
 
