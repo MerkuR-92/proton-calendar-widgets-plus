@@ -11,6 +11,9 @@ abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
     @Query("SELECT * FROM event_alarms WHERE eventId = :eventId")
     abstract fun select(eventId: String): Flow<List<EventAlarmEntity>>
 
+    @Query("SELECT * FROM event_alarms WHERE occurrence = (SELECT MIN(occurrence) FROM event_alarms WHERE occurrence >= :timestampSeconds)")
+    abstract fun selectUpcoming(timestampSeconds: Long): List<EventAlarmEntity>
+
     @Query("DELETE FROM event_alarms WHERE id = :id")
     abstract fun deleteById(id: String)
 

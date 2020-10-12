@@ -3,6 +3,7 @@ package me.proton.android.calendar
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -35,12 +36,12 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
         when (intent.action) {
             // Intent.ACTION_LOCKED_BOOT_COMPLETED is probably not needed
             Intent.ACTION_BOOT_COMPLETED -> {
-                runBlocking {
+                runBlocking(Dispatchers.Default) {
                     handleAlarmsUseCase.execute(userId)
                 }
             }
             INTENT_ACTION_EVENT_ALARM -> {
-                runBlocking {
+                runBlocking(Dispatchers.Default) {
                     handleAlarmsUseCase.execute(
                         userId,
                         if (intent.hasExtra(INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS)) intent.getLongExtra(

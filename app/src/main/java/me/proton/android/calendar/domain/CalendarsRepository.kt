@@ -108,6 +108,11 @@ interface CalendarsRepository {
     // event alarms
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>
 
+    /**
+     * Selects upcoming EventAlarms that should be shown at [timestampSeconds] or the nearest possible timestamp.
+     */
+    suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity>
+
     suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) // eventId is already there
 
     suspend fun deleteEventAlarmById(id: String)

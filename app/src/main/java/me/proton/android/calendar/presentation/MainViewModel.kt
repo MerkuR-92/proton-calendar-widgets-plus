@@ -1,19 +1,19 @@
 package me.proton.android.calendar.presentation
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.*
 import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.work.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.UseCaseWorker
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import kotlin.Exception
 
 
