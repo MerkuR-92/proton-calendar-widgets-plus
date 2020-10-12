@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme.DayNight" parent="AppTheme">
+        <!-- Styling specific to light mode -->
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="android:navigationBarColor">@color/background_norm</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>
