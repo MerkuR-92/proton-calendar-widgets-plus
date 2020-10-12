@@ -29,6 +29,14 @@ class UsersRepositoryImpl(
         database.usersDao().insert(user)
     }
 
+    override suspend fun updateUser(user: UserEntity) {
+        database.usersDao().update(user)
+    }
+
+    override suspend fun deleteUserById(userId: String) {
+        database.usersDao().deleteById(userId)
+    }
+
     override suspend fun selectUserById(userId: String): User? {
         return database.usersDao().selectUserById(userId)?.toUser(gson)
     }
@@ -47,6 +55,11 @@ class UsersRepositoryImpl(
         Timber.d("persisting address entity for user ${userId} -> ${address}")
         address.fkUserId = userId // TODO if we scope repository with userId, this will not be needed
         database.addressesDao().insert(address)
+    }
+
+    override suspend fun updateAddress(userId: String, address: AddressEntity) {
+        address.fkUserId = userId // TODO if we scope repository with userId, this will not be needed
+        database.addressesDao().update(address)
     }
 
     override suspend fun deleteAddressById(id: String) {

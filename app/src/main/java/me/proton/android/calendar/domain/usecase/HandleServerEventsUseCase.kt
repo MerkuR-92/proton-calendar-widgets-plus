@@ -23,7 +23,7 @@ class HandleServerEventsUseCase(
 
         return try {
             eventsResponse.user?.let {
-                usersRepository.persistUser(it)
+                usersRepository.updateUser(it)
             }
             eventsResponse.calendarUserSettings?.let {
                 calendarsRepository.persistUserSettings(userId, it)
@@ -47,7 +47,11 @@ class HandleServerEventsUseCase(
             eventsResponse.addresses?.forEach {
                 it.handleAction(
                     { usersRepository.deleteAddressById(it.id) },
-                    { usersRepository.persistAddress(userId, it.address!!) }
+                    { usersRepository.persistAddress(userId, it.address!!) },
+                    {
+                        usersRepository.updateAddress(userId, it.address!!)
+                        calendarsRepository.refreshCalendarsForAddress(it.address.email, it.address.status, userId)
+                    }
                 )
             }
             eventsResponse.calendarEvents?.forEach {

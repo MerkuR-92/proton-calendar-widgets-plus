@@ -133,6 +133,29 @@ class CalendarsRepositoryImpl(
         expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
     }
 
+    override suspend fun refreshCalendarsForAddress(address: String, status: Int, userId: String) {
+        val members = database.membersDao().selectByAddress(address)
+        val calendarIds = ArrayList<String>()
+        members.forEach { calendarIds.add(it.calendarId) }
+        calendarIds.forEach {
+            val dbCalendar = selectCalendar(it)
+            if (dbCalendar != null) {
+                var flags = dbCalendar.flags
+                if (status == 0 && !dbCalendar.isDisabled) {
+                    if (dbCalendar.isInactive) flags += 32
+                    else flags = 32
+                } else if (status == 1 && dbCalendar.isDisabled) {
+                    if (dbCalendar.isInactive && flags < 64) flags -= 32
+                    else if (dbCalendar.isInactive && flags >= 64) flags -= 64
+                    else flags = 1
+                }
+                val calendar = dbCalendar.copy(flags = flags)
+                calendar.fkUserId = dbCalendar.fkUserId
+                database.calendarsDao().update(calendar)
+            }
+        }
+    }
+
     // TODO add fetch(from, to)
 
     override suspend fun selectCalendar(calendarId: String): CalendarEntity? {

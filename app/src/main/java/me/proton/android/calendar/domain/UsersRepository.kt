@@ -19,6 +19,10 @@ interface UsersRepository {
 
     suspend fun persistUser(user: UserEntity)
 
+    suspend fun updateUser(user: UserEntity)
+
+    suspend fun deleteUserById(userId: String)
+
     suspend fun selectUserById(userId: String): User?
 
     // addresses
@@ -27,6 +31,8 @@ interface UsersRepository {
     suspend fun selectAddresses(userId: String): List<Address>
 
     suspend fun persistAddress(userId: String, address: AddressEntity)
+
+    suspend fun updateAddress(userId: String, address: AddressEntity)
 
     suspend fun deleteAddressById(id: String)
 

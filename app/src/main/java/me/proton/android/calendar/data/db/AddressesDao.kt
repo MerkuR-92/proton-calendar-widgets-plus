@@ -20,7 +20,9 @@ abstract class AddressesDao : BaseDao<AddressEntity> {
     @Query("SELECT * FROM addresses WHERE fkUserId = :userId")
     abstract fun select(userId: String): List<AddressEntity>
 
+    @Query("SELECT * FROM addresses WHERE id = :id")
+    abstract fun selectById(id: String): AddressEntity?
+
     @Query("DELETE FROM addresses WHERE id = :id")
     abstract fun deleteById(id: String)
-
 }

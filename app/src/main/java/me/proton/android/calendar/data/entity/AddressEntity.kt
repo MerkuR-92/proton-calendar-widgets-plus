@@ -26,6 +26,7 @@ data class AddressEntity(
     @PrimaryKey
     val id: String,
     val email: String,
+    val status: Int,
     val keys: List<JsonElement>
 ) {
 

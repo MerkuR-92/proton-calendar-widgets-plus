@@ -16,4 +16,7 @@ abstract class UsersDao : BaseDao<UserEntity> {
     @Query("SELECT * FROM users WHERE id = :userId")
     abstract fun selectUserById(userId: String): UserEntity?
 
+    @Query("DELETE FROM users WHERE id = :userId")
+    abstract fun deleteById(userId: String)
+
 }
