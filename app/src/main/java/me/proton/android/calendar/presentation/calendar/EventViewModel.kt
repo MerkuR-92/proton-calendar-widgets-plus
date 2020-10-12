@@ -35,6 +35,7 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.collections.ArrayList
 
 class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
@@ -69,6 +70,8 @@ class EventViewModel(
     private lateinit var event: Event
     // original event from database, from before it has been edited
     var dbEvent: Event? = null
+
+    private val eventCustomAlarmsSave = ArrayList<VAlarm>()
 
     private lateinit var calendarSettings: CalendarSettingsEntity
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
@@ -256,31 +259,26 @@ class EventViewModel(
 
     }
 
-    private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
-        event.iCalEvent.alarms.clear()
-
-        if (event.isAllDay()) {
-            calendarSettings.defaultFullDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
-                alarm.parseTrigger()?.let {
-                    if (alarm.type == "0") {
-                        event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
-                    } else {
-                        event.iCalEvent.addAlarm(VAlarm.display(it, null))
-                    }
-                }
-            }
-        } else {
-            calendarSettings.defaultPartDayNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
-                alarm.parseTrigger()?.let {
-                    if (alarm.type == "0") {
-                        event.iCalEvent.addAlarm(VAlarm.email(it, null, null))
-                    } else {
-                        event.iCalEvent.addAlarm(VAlarm.display(it, null))
-                    }
+    private fun getDefaultAlarms(calendarSettings: CalendarSettingsEntity, isAllDay: Boolean): List<VAlarm> {
+        val alarms = ArrayList<VAlarm>()
+        val defaultNotifications = if (isAllDay) calendarSettings.defaultFullDayNotifications else calendarSettings.defaultPartDayNotifications
+        defaultNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+            alarm.parseTrigger()?.let {
+                if (alarm.type == "0") {
+                    alarms.add(VAlarm.email(it, null, null))
+                } else {
+                    alarms.add(VAlarm.display(it, null))
                 }
             }
         }
+        return alarms
+    }
 
+    private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
+        event.iCalEvent.alarms.clear()
+        getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
+            event.iCalEvent.addAlarm(it)
+        }
     }
 
     // recurrence temp values
@@ -574,10 +572,14 @@ class EventViewModel(
     }
 
     suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
+        val alarmsEdited = getDefaultAlarms(calendarSettings, event.isAllDay()) != event.iCalEvent.alarms
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
+            // Clear saved alarms for all day / partial day change
+            eventCustomAlarmsSave.clear()
+            // Check if current alarms are default ones
             event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive, calendar.display == 1))
-            setDefaultAlarms(event, calendarSettings)
+            if (!alarmsEdited || event.iCalEvent.alarms.isNullOrEmpty()) setDefaultAlarms(event, calendarSettings)
             _event.postValue(event)
             true
         } else {
@@ -633,6 +635,16 @@ class EventViewModel(
     fun handleAllDaySwitch(isAllDay: Boolean) {
         markEventAsEdited()
 
+        val currentEventAlarms = event.iCalEvent.alarms.toList()
+        val savedAlarms = eventCustomAlarmsSave.toList()
+
+        // Only save if alarms were custom
+        if (currentEventAlarms.isNullOrEmpty() ||
+            currentEventAlarms == getDefaultAlarms(calendarSettings, event.isAllDay()))
+            eventCustomAlarmsSave.clear()
+        else
+            eventCustomAlarmsSave.addAll(currentEventAlarms)
+
         if (isAllDay) {
             // persist backup of timezone & start/end times
             //eventStartTimeZoneIdBackup = event.startTimeZoneId
@@ -664,7 +676,13 @@ class EventViewModel(
 //            event.iCalendar.setEndTimeZone(eventStartTimeZoneIdBackup)
         }
 
-        setDefaultAlarms(event, calendarSettings)
+        if (savedAlarms.isEmpty()) setDefaultAlarms(event, calendarSettings)
+        else {
+            event.iCalEvent.alarms.clear()
+            savedAlarms.forEach {
+                event.iCalEvent.addAlarm(it)
+            }
+        }
 
         event.iCalendar.adjustRRuleToStartDate()
 
