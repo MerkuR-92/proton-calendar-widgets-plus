@@ -57,7 +57,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                         TimberLogger.v("more: ${eventsResponse.data.more}")
 
-                        database.eventsDao().insert(*eventsResponse.data.events.toTypedArray())
+                        database.eventsDao().updateOrInsert(*eventsResponse.data.events.toTypedArray())
 
                         logger.v("persisted ${eventsResponse.data.events.size} events for calendar ${calendarId}")
 

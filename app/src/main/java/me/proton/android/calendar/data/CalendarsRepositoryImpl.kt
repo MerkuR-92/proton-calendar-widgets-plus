@@ -364,7 +364,7 @@ class CalendarsRepositoryImpl(
 
     override suspend fun persistEvents(vararg events: EventEntity) {
         TimberLogger.v("persist Event: ${events.map { it.id + " for calendar " + it.calendarId }}")
-        database.eventsDao().insert(*events)
+        database.eventsDao().updateOrInsert(*events)
     }
 
     override suspend fun deleteEventById(id: String) {

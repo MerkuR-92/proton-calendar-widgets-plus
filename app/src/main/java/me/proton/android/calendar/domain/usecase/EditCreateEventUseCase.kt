@@ -213,7 +213,7 @@ class EditCreateEventUseCase(
                     }
                 }
 
-                database.eventsDao().insert(*eventsToInsertOrUpdate.toTypedArray())
+                database.eventsDao().updateOrInsert(*eventsToInsertOrUpdate.toTypedArray())
 
                 // TODO collect and handle multiple errors
                 if (syncResponse.data.responses.any { !it.response.isSuccessful }) {
