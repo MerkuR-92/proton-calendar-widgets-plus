@@ -444,6 +444,13 @@ class CalendarsRepositoryImpl(
         return database.eventAlarmsDao().select(eventId)
     }
 
+    override suspend fun selectEventAlarms(
+        timestampSecondsStart: Long,
+        timestampSecondsEnd: Long
+    ): List<EventAlarmEntity> {
+        return database.eventAlarmsDao().select(timestampSecondsStart, timestampSecondsEnd)
+    }
+
     override suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity> {
         return database.eventAlarmsDao().selectUpcoming(timestampSeconds)
     }

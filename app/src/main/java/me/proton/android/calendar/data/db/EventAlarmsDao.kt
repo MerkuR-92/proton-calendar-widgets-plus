@@ -14,9 +14,10 @@ abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
     @Query("SELECT * FROM event_alarms WHERE occurrence = (SELECT MIN(occurrence) FROM event_alarms WHERE occurrence >= :timestampSeconds)")
     abstract fun selectUpcoming(timestampSeconds: Long): List<EventAlarmEntity>
 
+    @Query("SELECT * FROM event_alarms WHERE occurrence >= :timestampSecondsStart AND occurrence <= :timestampSecondsEnd")
+    abstract fun select(timestampSecondsStart: Long, timestampSecondsEnd: Long): List<EventAlarmEntity>
+
     @Query("DELETE FROM event_alarms WHERE id = :id")
     abstract fun deleteById(id: String)
-
-    // TODO select upcoming event to create system alarm?
 
 }

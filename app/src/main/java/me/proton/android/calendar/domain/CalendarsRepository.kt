@@ -113,6 +113,8 @@ interface CalendarsRepository {
      */
     suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity>
 
+    suspend fun selectEventAlarms(timestampSecondsStart: Long, timestampSecondsEnd: Long): List<EventAlarmEntity>
+
     suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) // eventId is already there
 
     suspend fun deleteEventAlarmById(id: String)

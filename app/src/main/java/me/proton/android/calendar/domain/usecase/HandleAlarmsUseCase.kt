@@ -9,7 +9,9 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
+import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 
 class HandleAlarmsUseCase(
@@ -26,27 +28,45 @@ class HandleAlarmsUseCase(
     suspend fun execute(userId: String, alarmEpochSeconds: Long? = null) {
         logger.v("executing HandleAlarmsUseCase, alarmEpochSeconds: $alarmEpochSeconds")
 
-        // TODO CANCEL ALARM?
+        val nowInstant = Instant.now()
 
-        // get event alarms we were supposed to show for this timestamp and show them
-        if (alarmEpochSeconds != null) {
+        val maxHandledAlarmOccurrenceSeconds = if (alarmEpochSeconds != null) { // handle only event alarms we were supposed to show for this timestamp
 
-            // TODO
-            // get event alarms to show
+            logger.v("alarms to display at alarmEpochSeconds ${alarmEpochSeconds}")
 
-            // TODO
-            showNotificationUseCase.execute()
+            // get only those alarms that we were supposed to show for this use case execution
+            val alarmsToDisplayNow = calendarsRepository.selectUpcomingEventAlarms(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds }
 
-            // TODO after reboot we need to fire all alarms that were not displayed during power-off
+            if (alarmsToDisplayNow.isNotEmpty()) {
+                showNotificationUseCase.execute(alarmsToDisplayNow)
+            }
+
             valueStoreProvider.provideValueStore(userId).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, alarmEpochSeconds)
+
+            alarmEpochSeconds
+
+        } else { // no timestamp provided, show missed alarms up until now
+
+            val lastHandledTimestamp = valueStoreProvider.provideValueStore(userId).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP) ?: nowInstant.epochSecond
+
+            // if no alarms were ever shown, this will return empty result
+            val alarmsToDisplayNow = calendarsRepository.selectEventAlarms(lastHandledTimestamp + 1, nowInstant.epochSecond)
+
+            logger.v("missed alarms to display at ${nowInstant}: ${alarmsToDisplayNow}")
+            showNotificationUseCase.execute(alarmsToDisplayNow)
+
+            val maxAlarmOccurrenceSeconds = alarmsToDisplayNow.maxByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
+            valueStoreProvider.provideValueStore(userId).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)
+
+            maxAlarmOccurrenceSeconds
 
         }
 
-        // get upcoming event alarm and reschedule system alarm for its timestamp
-
-        // TODO
-        //val nextEventAlarm = //calendarsRepository
-        //rescheduleSystemAlarm(nextEventAlarm.)
+        // get next event alarms after currently shown and set system alarm to fire at that timestamp
+        val alarmsToDisplayNext = calendarsRepository.selectUpcomingEventAlarms(maxHandledAlarmOccurrenceSeconds + 1)
+        alarmsToDisplayNext.firstOrNull()?.let {
+            rescheduleSystemAlarm(Instant.ofEpochSecond(it.occurrence))
+        }
 
     }
 

@@ -19,9 +19,11 @@ import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.pager_mini_calendar.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -197,7 +199,9 @@ class MonthFragment : BaseDialogFragment() {
             if (userId != null) {
 
                 // TODO schedule this from some global periodic scheduler
-                handleAlarmsUseCase.execute(userId)
+                withContext(Dispatchers.Default) {
+                    handleAlarmsUseCase.execute(userId)
+                }
 
                 delay(10_000L) // TODO delay so after first event sync, most of the events is already in DB
 
