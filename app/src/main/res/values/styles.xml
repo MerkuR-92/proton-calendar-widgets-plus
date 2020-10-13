@@ -122,8 +122,6 @@
         <item name="boxCornerRadiusBottomStart">3dp</item>
         <item name="boxCornerRadiusBottomEnd">3dp</item>
         <item name="boxBackgroundColor">@color/background_secondary</item>
-        <item name="endIconMode">clear_text</item>
-        <item name="endIconDrawable">@drawable/ic_clear</item>
     </style>
 
     <style name="Chip" parent="@style/Widget.MaterialComponents.Chip.Choice">
