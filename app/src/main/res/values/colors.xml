@@ -49,6 +49,7 @@
 
     <color name="icon_norm">@color/shade_100</color>
     <color name="icon_weak">@color/shade_80</color>
+    <color name="icon_hint">@color/shade_60</color>
     <color name="icon_inverted">@color/shade_0</color>
 
     <color name="separator_norm">@color/shade_20</color>

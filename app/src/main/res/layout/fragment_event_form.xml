@@ -305,7 +305,7 @@
             <ImageView
                 android:id="@+id/event_form_location_icon"
                 style="@style/Icon.Form"
-                app:tint="@color/icon_weak"
+                app:tint="@color/icon_hint"
                 android:src="@drawable/ic_map_marker"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="@+id/event_form_location"
@@ -416,7 +416,7 @@
             <ImageView
                 android:id="@+id/event_form_alarm_icon"
                 style="@style/Icon.Form"
-                app:tint="@color/icon_weak"
+                app:tint="@color/icon_hint"
                 android:src="@drawable/ic_bell"
                 app:layout_constraintBottom_toBottomOf="@+id/event_form_alarm"
                 app:layout_constraintTop_toTopOf="@+id/event_form_alarm"
@@ -425,7 +425,7 @@
             <TextView
                 android:id="@+id/event_form_alarm"
                 style="@style/Text.Default.Form"
-                android:textColor="@color/text_weak"
+                android:textColor="@color/text_hint"
                 android:text="@string/event_text_add_alarm"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -452,7 +452,7 @@
             <ImageView
                 android:id="@+id/event_form_description_icon"
                 style="@style/Icon.Form"
-                app:tint="@color/icon_weak"
+                app:tint="@color/icon_hint"
                 android:src="@drawable/ic_text_align_left"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="@+id/event_form_description"
