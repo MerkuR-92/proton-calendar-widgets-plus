@@ -55,7 +55,8 @@ object FormValidation {
 
     const val ALARM_COUNT_MAX = 10
 
-    const val ALARM_PERIOD_COUNT_DEFAULT = 1
+    const val ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT = 1
+    const val ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT = 15
     const val ALARM_PERIOD_COUNT_MIN = 1
 
     const val ALARM_PERIOD_MAX_WEEKS = 999

@@ -89,7 +89,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group)
         // countTypeOption with value at 4 is used for "on the day" option
         eventViewModel.handleAlarm(alarmTypeOption,
-            count = custom_alarm_field.text.toString().toIntOrNull(),
+            count = custom_alarm_field.text.toString().toIntOrNull() ?:
+            if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
+            else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
             countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption)
         findNavController().navigateUp()
 
@@ -186,28 +188,32 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             when (getCheckedRadioButtonIndex(custom_alarm_radio_group)) {
                 0 -> { // minute
                     resetAlarmCountValidation(
-                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
+                        else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
                         FormValidation.ALARM_PERIOD_COUNT_MIN,
                         FormValidation.ALARM_PERIOD_MAX_MINUTES
                     )
                 }
                 1 -> { // hour
                     resetAlarmCountValidation(
-                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
+                        else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
                         FormValidation.ALARM_PERIOD_COUNT_MIN,
                         FormValidation.ALARM_PERIOD_MAX_HOURS
                     )
                 }
                 2 -> { // day
                     resetAlarmCountValidation(
-                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
+                        else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
                         FormValidation.ALARM_PERIOD_COUNT_MIN,
                         FormValidation.ALARM_PERIOD_MAX_DAYS
                     )
                 }
                 3 -> { // week
                     resetAlarmCountValidation(
-                        FormValidation.ALARM_PERIOD_COUNT_DEFAULT,
+                        if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
+                        else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
                         FormValidation.ALARM_PERIOD_COUNT_MIN,
                         FormValidation.ALARM_PERIOD_MAX_WEEKS
                     )
@@ -244,7 +250,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
         custom_alarm_field_layout.setEndIconOnClickListener {
-            custom_alarm_field.setText(FormValidation.ALARM_PERIOD_COUNT_DEFAULT.toString())
+            custom_alarm_field.setText(
+                if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT.toString()
+                else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT.toString())
         }
 
         custom_alarm_time_press.setOnClickListener {
