@@ -390,10 +390,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 }
                 isClickable = true
             }
-            if (index == 0) {
-                alarmView.event_form_alarm_icon.visibleOrGone(true)
-                event_form_alarm_icon.visibleOrGone(false)
-            }
+            if (index == 0) event_form_alarm_icon.visibleOrGone(false)
             event_form_alarm_list.addView(alarmView)
         }
 
