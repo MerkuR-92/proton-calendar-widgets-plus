@@ -96,7 +96,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun handleDelete() {
         val event = eventViewModel.eventLiveData.value!!
 
-        if (event.isPartOfChain()) {
+        if (event.isPartOfChain() && !event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)) {
 
             AndroidUtils.displaySingleChoiceConfirmationPicker(
                 requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
@@ -159,11 +159,18 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
                     lifecycleScope.launch { // TODO
                         val deleteResult = withContext(Dispatchers.Default) {
-                            calendarViewModel.handleDeleteEvent(
-                                event.id,
-                                EventEditDeleteOption.THIS_EVENT,
-                                navigationArguments.occurrenceNumber
-                            )
+                            if (event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)) {
+                                calendarViewModel.handleDeleteEvent(
+                                    event.id,
+                                    EventEditDeleteOption.ALL_EVENTS
+                                )
+                            } else {
+                                calendarViewModel.handleDeleteEvent(
+                                    event.id,
+                                    EventEditDeleteOption.THIS_EVENT,
+                                    navigationArguments.occurrenceNumber
+                                )
+                            }
                         }
                         if (deleteResult == UseCase.Result.Success) {
                             Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_LONG).show()

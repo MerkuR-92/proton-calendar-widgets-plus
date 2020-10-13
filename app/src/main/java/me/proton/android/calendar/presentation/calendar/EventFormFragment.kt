@@ -82,11 +82,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                 if (eventViewModel.hasEventBeenEdited()) {
 
-                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && (
-                            (eventViewModel.dbEvent?.isRecurring() == true)
-                                    ||
-                                    (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())
-                            )
+                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && ((eventViewModel.dbEvent?.isRecurring() == true) ||
+                                    (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())) &&
+                            (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
 
                     if (shouldShowConfirmationPicker) {
 
@@ -124,7 +122,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                     } else { // TODO merge this with code above
                         val success = withContext(Dispatchers.IO) {
-                            eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
+                            if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true)
+                                eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
+                            else
+                                eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
                         }
 
                         if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {

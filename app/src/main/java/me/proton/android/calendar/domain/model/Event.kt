@@ -540,6 +540,20 @@ data class Event(
 
         fun isFromRecurring(): Boolean = this.iCalEvent.recurrenceId != null
 
+        fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
+            this.iCalEvent.recurrenceRule != null
+                    && (this.iCalEvent.recurrenceRule.value.count == 1
+                    || isRecurringUntilSameDay(timeZoneId))
+
+        private fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
+            if (iCalEvent.recurrenceRule.value.until == null) return false
+            val untilZonedDateTime =
+                ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))
+            val dateEnd = ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+            val dateStart = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+            return ChronoUnit.DAYS.between(dateEnd, untilZonedDateTime).toInt() == 0 || ChronoUnit.DAYS.between(dateStart, untilZonedDateTime).toInt() == 0
+        }
+
         fun isCustomRecurring(): Boolean {
 
             // no Recurrence Rule
