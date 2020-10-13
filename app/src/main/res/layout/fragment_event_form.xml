@@ -80,6 +80,7 @@
             android:id="@+id/event_form_start_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_element_small"
             app:layout_constraintTop_toBottomOf="@+id/event_form_all_day_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
