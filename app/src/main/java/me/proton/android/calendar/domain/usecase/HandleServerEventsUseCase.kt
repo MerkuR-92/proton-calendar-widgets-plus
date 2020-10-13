@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import android.database.sqlite.SQLiteConstraintException
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
@@ -94,7 +95,16 @@ class HandleServerEventsUseCase(
             eventsResponse.calendarAlarms?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteEventAlarmById(it.id) },
-                    { calendarsRepository.persistEventAlarm(it.alarm!!) }
+                    {
+                        try {
+                            calendarsRepository.persistEventAlarm(it.alarm!!)
+                        } catch (e: SQLiteConstraintException) {
+                            // if this fails with `787 SQLITE_CONSTRAINT_FOREIGNKEY` it means CalendarEvent no longer exists
+                            //  and we're trying to insert its Alarm to the database or something failed when inserting
+                            //  that CalendarEvent into database, either way there's nothing we can do here
+                            logger.i("exception persisting event alarm", e)
+                        }
+                    }
                 )
             }
             eventsResponse.calendarKeys?.forEach {
