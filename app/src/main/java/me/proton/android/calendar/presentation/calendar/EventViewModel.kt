@@ -8,6 +8,8 @@ import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.*
+import biweekly.util.DayOfWeek
+import biweekly.util.Duration
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -28,10 +30,7 @@ import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -596,6 +595,14 @@ class EventViewModel(
     fun handleStartDate(newDate: LocalDate) {
         markEventAsEdited(bumpSequence = true)
         val old = event.getStart(displayTimeZoneId)!!
+        val endDate = event.getEnd(displayTimeZoneId)!!
+        val unit = ChronoUnit.DAYS
+        val diff = unit.between(old, endDate)
+        when {
+            diff > 0 -> handleEndDate(newDate.plusDays(diff))
+            diff < 0 -> handleEndDate(newDate.minusDays(diff))
+            else -> handleEndDate(newDate)
+        }
         if (event.isAllDay()) {
             event.iCalEvent.setStart(newDate)
         } else {
@@ -619,6 +626,14 @@ class EventViewModel(
     fun handleStartTime(newTime: LocalTime) {
         markEventAsEdited(bumpSequence = true)
         val old = event.getStart(displayTimeZoneId)!!
+        val endTime = event.getEnd(displayTimeZoneId)!!
+        val newDate = LocalDateTime.of(old.toLocalDate(), newTime.truncatedTo(ChronoUnit.MINUTES))
+        val unit = ChronoUnit.MINUTES
+        val diff = unit.between(old, endTime)
+        val newEndTime = newDate.plusMinutes(diff)
+        if (newEndTime.dayOfWeek != endTime.dayOfWeek)
+            handleEndDate(newEndTime.toLocalDate())
+        handleEndTime(newEndTime.toLocalTime())
         event.iCalEvent.setStart(old.toLocalDate(), newTime, displayTimeZoneId)
         timeStartBackup = newTime
         _event.postValue(event)
