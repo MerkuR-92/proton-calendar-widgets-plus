@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Proton Calendar</string>
+    <string name="app_name">ProtonCalendar</string>
 
     <string name="default_event_summary">(no title)</string>
 
@@ -127,8 +127,8 @@
 
 
 
-
-
+    <!-- NOTIFICATIONS -->
+    <string name="notification_channel_alarms">ProtonCalendar Event Notifications</string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

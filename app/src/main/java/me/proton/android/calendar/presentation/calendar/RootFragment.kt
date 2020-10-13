@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -53,13 +55,22 @@ class RootFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        // initialization routine
-        lifecycleScope.launch(Dispatchers.Default) {
+    }
 
+    override fun onStart() {
+        super.onStart()
 
+        val intent = activity?.intent
 
+        // if MainActivity was started from clicking on system notification, handle that and show Event details
+        if (intent != null && intent.action == MainActivity.INTENT_ACTION_SHOW_EVENT_DETAILS) {
+
+            TimberLogger.v("handling intent for event details ${intent.getStringExtra(MainActivity.INTENT_EXTRA_EVENT_ID)}, ${intent.getIntExtra(
+                MainActivity.INTENT_EXTRA_EVENT_OCCURRENCE, 0)}")
+
+            findNavController().navigate(Navigation.Deeplink.toEventDetails(intent.getStringExtra(MainActivity.INTENT_EXTRA_EVENT_ID)!!, intent.getIntExtra(
+                MainActivity.INTENT_EXTRA_EVENT_OCCURRENCE, 0)))
 
         }
     }
-
 }

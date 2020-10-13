@@ -1,8 +1,9 @@
 package me.proton.android.calendar.presentation
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -27,6 +28,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
@@ -233,5 +235,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 //    }
 //
 //
+
+    companion object {
+        const val INTENT_ACTION_SHOW_EVENT_DETAILS = "INTENT_ACTION_SHOW_EVENT_DETAILS"
+
+        const val INTENT_EXTRA_EVENT_ID = "INTENT_EXTRA_EVENT_ID"
+        const val INTENT_EXTRA_EVENT_OCCURRENCE = "INTENT_EXTRA_EVENT_OCCURRENCE"
+
+        fun createIntentToShowEventDetails(context: Context, eventId: String, occurrenceNumber: Int?): Intent {
+            return Intent(context, MainActivity::class.java).apply {
+                action = INTENT_ACTION_SHOW_EVENT_DETAILS
+                putExtra(INTENT_EXTRA_EVENT_ID, eventId)
+                putExtra(INTENT_EXTRA_EVENT_OCCURRENCE, occurrenceNumber)
+                // flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        }
+    }
 
 }

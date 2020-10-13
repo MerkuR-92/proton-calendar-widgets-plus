@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.database.sqlite.SQLiteConstraintException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
@@ -15,6 +17,7 @@ class HandleServerEventsUseCase(
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
 
@@ -92,6 +95,7 @@ class HandleServerEventsUseCase(
                     }
                 )
             }
+
             eventsResponse.calendarAlarms?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteEventAlarmById(it.id) },
@@ -107,6 +111,10 @@ class HandleServerEventsUseCase(
                     }
                 )
             }
+
+            // if alarms changed, we need to reschedule them
+            if (eventsResponse.calendarAlarms?.isNotEmpty() == true) handleAlarmsUseCase.execute(userId)
+
             eventsResponse.calendarKeys?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarKeyById(it.id) },

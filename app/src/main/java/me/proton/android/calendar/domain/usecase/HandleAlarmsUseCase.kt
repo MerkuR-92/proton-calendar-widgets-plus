@@ -52,6 +52,8 @@ class HandleAlarmsUseCase(
             // if no alarms were ever shown, this will return empty result
             val alarmsToDisplayNow = calendarsRepository.selectEventAlarms(lastHandledTimestamp + 1, nowInstant.epochSecond)
 
+            // TODO get most X recent alarms so we don't bombard user with obsolete alarms if they haven't used the app for a while
+
             logger.v("missed alarms to display at ${nowInstant}: ${alarmsToDisplayNow}")
             showNotificationUseCase.execute(alarmsToDisplayNow)
 

@@ -4,6 +4,7 @@ import android.app.Application
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -25,6 +26,8 @@ class ProtonCalendarApplication : Application() {
             Sentry.init(BuildConfig.SENTRY_DSN, AndroidSentryClientFactory(this))
             Timber.plant(SentryTree())
         }
+
+        ShowNotificationUseCase.createNotificationChannels(this)
     }
 
 }
