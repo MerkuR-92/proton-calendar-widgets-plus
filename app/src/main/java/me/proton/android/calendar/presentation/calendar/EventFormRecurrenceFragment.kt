@@ -1,14 +1,18 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Context
 import android.os.Bundle
 import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
@@ -285,6 +289,14 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         custom_recurrence_end_count_suffix.setOnClickListener {
             customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
             custom_recurrence_end_count.requestFocus()
+        }
+
+        custom_recurrence_end_count.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                custom_recurrence_end_count.setSelection(custom_recurrence_end_count.length())
+                (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            }
         }
     }
 

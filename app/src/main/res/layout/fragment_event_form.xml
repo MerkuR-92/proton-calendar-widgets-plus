@@ -273,7 +273,6 @@
                 android:id="@+id/event_form_recurrence_icon"
                 style="@style/Icon.Form"
                 android:src="@drawable/ic_arrows"
-                app:layout_constraintBottom_toBottomOf="@+id/event_form_recurrence"
                 app:layout_constraintTop_toTopOf="@+id/event_form_recurrence"
                 app:layout_constraintStart_toStartOf="parent" />
 
