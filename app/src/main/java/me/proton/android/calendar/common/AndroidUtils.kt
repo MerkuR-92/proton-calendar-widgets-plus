@@ -656,6 +656,11 @@ fun Activity.clearFocusAndHideKeyboard(view: View?) {
     view?.clearFocus()
 }
 
+fun Context.showKeyboard() {
+    (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+        .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+}
+
 data class TimePickerData(
     /**
      * 0-23

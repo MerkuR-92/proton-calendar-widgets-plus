@@ -50,7 +50,7 @@ class HandleServerEventsUseCase(
                     { usersRepository.persistAddress(userId, it.address!!) },
                     {
                         usersRepository.updateAddress(userId, it.address!!)
-                        calendarsRepository.refreshCalendarsForAddress(it.address.email, it.address.status, userId)
+                        calendarsRepository.refreshCalendarsFlagsForAddress(it.address.email, it.address.status, userId)
                     }
                 )
             }

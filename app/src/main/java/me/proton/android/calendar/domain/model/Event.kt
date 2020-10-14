@@ -541,9 +541,7 @@ data class Event(
         fun isFromRecurring(): Boolean = this.iCalEvent.recurrenceId != null
 
         fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
-            this.iCalEvent.recurrenceRule != null
-                    && (this.iCalEvent.recurrenceRule.value.count == 1
-                    || isRecurringUntilSameDay(timeZoneId))
+            isRecurring() && (this.iCalEvent.recurrenceRule.value.count == 1 || isRecurringUntilSameDay(timeZoneId))
 
         private fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
             if (iCalEvent.recurrenceRule.value.until == null) return false

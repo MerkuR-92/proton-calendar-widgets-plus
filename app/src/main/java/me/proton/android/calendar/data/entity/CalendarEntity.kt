@@ -26,19 +26,9 @@ data class CalendarEntity(
     val color: String,
     val display: Int, // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
     val flags: Int //
-    // 0 - Inactive: the calendar keys are not accessible and the current user cannot fix it
-    // 1 - Active: the calendar is all good!
-    // 2 - Update passphrase: a deactivated passphrase is again accessible, you should re-encrypt the linked calendar key using the primary passphrase
-    // 4 - Reset needed: the calendar needs to be reset
-    // 8 - Incomplete setup: the calendar setup was not completed, need to setup the key and passphrase
-    // 16 - Lost access: the user lost access to the calendar but an admin can re-invite him
-    // 32 - Disabled calendar: the calendar is disabled for the current user only (all the addresses linked to the current user's members are disabled)
-    // 64 - Super-owner disabled calendar: the calendar is disabled because the super-owner disabled his address. Possibility to transfer super-ownership to reactive the calendar.
-
 
     // local database fields
 //    val fkUserId: String
-
 
     // @ColumnInfo, @Ignore
 ) {
@@ -50,4 +40,24 @@ data class CalendarEntity(
     val isActive: Boolean get() = !isDisabled && !isInactive && (flags and 1 == 1)
     val isInactive: Boolean get() = (flags and (0 + 2 + 4 + 8 + 16) >= 1)
     val isDisabled: Boolean get() = !isInactive && (flags and (32 + 64) >= 1)
+    val isSuperOwnerDisabled: Boolean get() = flags and 64 >= 1
+}
+
+enum class CalendarFlags(val value: Int) {
+    /** 0 - Inactive: the calendar keys are not accessible and the current user cannot fix it */
+    INACTIVE(0),
+    /** 1 - Active: the calendar is all good! */
+    ACTIVE(1),
+    /** 2 - Update passphrase: a deactivated passphrase is again accessible, you should re-encrypt the linked calendar key using the primary passphrase */
+    UPDATE_PASSPHRASE(2),
+    /** 4 - Reset needed: the calendar needs to be reset */
+    RESET_NEEDED(4),
+    /** 8 - Incomplete setup: the calendar setup was not completed, need to setup the key and passphrase */
+    INCOMPLETE_SETUP(8),
+    /** 16 - Lost access: the user lost access to the calendar but an admin can re-invite him */
+    LOST_ACCESS(16),
+    /** 32 - Disabled calendar: the calendar is disabled for the current user only (all the addresses linked to the current user's members are disabled) */
+    DISABLED(32),
+    /** 64 - Super-owner disabled calendar: the calendar is disabled because the super-owner disabled his address. Possibility to transfer super-ownership to reactive the calendar. */
+    SUPER_OWNER_DISABLED(64)
 }

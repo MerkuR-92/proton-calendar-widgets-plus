@@ -42,7 +42,13 @@ data class AddressEntity(
             }
         )
     }
+}
 
+enum class AddressStatus(val value: Int) {
+    /** 0 - The address disabled, calendars can be updated but events are read-only */
+    DISABLED(0),
+    /** 1 - The address is enabled */
+    ENABLED(1)
 }
 
 

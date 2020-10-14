@@ -278,12 +278,6 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     )
                 )
             }
-
-            setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
-                }
-            }
         }
 
         custom_recurrence_end_count_suffix.setOnClickListener {
@@ -293,9 +287,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         custom_recurrence_end_count.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
                 custom_recurrence_end_count.setSelection(custom_recurrence_end_count.length())
-                (requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-                    .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+                requireContext().showKeyboard()
             }
         }
     }

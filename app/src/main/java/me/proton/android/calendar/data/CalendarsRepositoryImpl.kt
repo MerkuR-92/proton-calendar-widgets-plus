@@ -1,7 +1,6 @@
 package me.proton.android.calendar.data
 
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import me.proton.android.calendar.data.db.AppDatabase
@@ -10,14 +9,12 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import org.koin.ext.getScopeId
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
@@ -133,7 +130,8 @@ class CalendarsRepositoryImpl(
         expandDbEventsUntil(eventsExpandedUntil ?: toDate, timeZoneId, force = true)
     }
 
-    override suspend fun refreshCalendarsForAddress(address: String, status: Int, userId: String) {
+    override suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String) {
+        // Members objects are used to link an Address and the Calendars that are part of it
         val members = database.membersDao().selectByAddress(address)
         val calendarIds = ArrayList<String>()
         members.forEach { calendarIds.add(it.calendarId) }
@@ -141,17 +139,31 @@ class CalendarsRepositoryImpl(
             val dbCalendar = selectCalendar(it)
             if (dbCalendar != null) {
                 var flags = dbCalendar.flags
-                if (status == 0 && !dbCalendar.isDisabled) {
-                    if (dbCalendar.isInactive) flags += 32
-                    else flags = 32
-                } else if (status == 1 && dbCalendar.isDisabled) {
-                    if (dbCalendar.isInactive && flags < 64) flags -= 32
-                    else if (dbCalendar.isInactive && flags >= 64) flags -= 64
-                    else flags = 1
+                if (status == AddressStatus.DISABLED.value && !dbCalendar.isDisabled) {
+                    // status at 0 means the address is disabled
+
+                    // if the calendar is inactive we keep the same flags but add the disabled flag
+                    if (dbCalendar.isInactive)  {
+                        flags += CalendarFlags.DISABLED.value
+                    } else  {
+                        // if the calendar is simply active we set the flags at disabled
+                        flags = CalendarFlags.DISABLED.value
+                    }
+                } else if (status == AddressStatus.ENABLED.value && dbCalendar.isDisabled) {
+                    // status at 1 means the address is active
+
+                    // if the calendar is inactive we keep the same flags but remove the disabled flag
+                    // we also check if the calendar is simply disabled or super owner disabled to correctly update it
+                    if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
+                        flags -= CalendarFlags.DISABLED.value
+                    } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
+                        flags -= CalendarFlags.SUPER_OWNER_DISABLED.value
+                    } else {
+                        // if the calendar is simply disabled we set the flags at active
+                        flags = CalendarFlags.ACTIVE.value
+                    }
                 }
-                val calendar = dbCalendar.copy(flags = flags)
-                calendar.fkUserId = dbCalendar.fkUserId
-                database.calendarsDao().update(calendar)
+                database.calendarsDao().updateCalendarFlags(dbCalendar.id, flags)
             }
         }
     }
@@ -240,14 +252,14 @@ class CalendarsRepositoryImpl(
             TimberLogger.v("xxx flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
 
             val filtered = it.filter {
-                    it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+                it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
             }.groupBy { it.isAllDay() || !it.spansSingleDay() }
 
 //            (filtered.get(true)?.sortedWith(comparator) ?: emptyList())
 
             val result = mutableListOf<Event>()
-                result.addAll(filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
-                result.addAll(filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
+            result.addAll(filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
+            result.addAll(filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
             result
 
             //filtered.groupBy { it.isAllDay() || !it.spansSingleDay() }.flatMap { it.value.sortedWith(comparator) }//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))

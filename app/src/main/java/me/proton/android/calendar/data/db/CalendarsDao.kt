@@ -32,6 +32,8 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId AND calendars.display = 1")
     abstract fun selectDisplayedCalendars(userId: String): List<CalendarEntity>
 
+    @Query("UPDATE calendars SET flags = :flags WHERE id = :calendarId")
+    abstract fun updateCalendarFlags(calendarId: String, flags: Int)
 
 
 // @Query("SELECT * from plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")
