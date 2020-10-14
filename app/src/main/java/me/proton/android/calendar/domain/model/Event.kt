@@ -543,7 +543,7 @@ data class Event(
         fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
             isRecurring() && (this.iCalEvent.recurrenceRule.value.count == 1 || isRecurringUntilSameDay(timeZoneId))
 
-        private fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
+        fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
             if (iCalEvent.recurrenceRule.value.until == null) return false
             val untilZonedDateTime =
                 ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))

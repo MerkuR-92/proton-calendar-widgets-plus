@@ -1959,5 +1959,131 @@ internal class ICalUtilsTest {
 
     }
 
+    @Test
+    fun `recurring event ends after one occurrence`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTAMP:20201014T164542Z
+    UID:MPguUggfUmij1uQgo5SHDWa0I492@proton.me
+    STATUS:CONFIRMED
+    SEQUENCE:0
+    DTSTART;TZID=Europe/Paris:20210103T190000
+    DTEND;TZID=Europe/Paris:20210103T193000
+    RRULE:FREQ=DAILY;COUNT=1
+    SUMMARY:Single
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
 
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
+    }
+
+    @Test
+    fun `recurring event ends after two occurrences`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTAMP:20201014T164542Z
+    UID:MPguUggfUmij1uQgo5SHDWa0I492@proton.me
+    STATUS:CONFIRMED
+    SEQUENCE:0
+    DTSTART;TZID=Europe/Paris:20210103T190000
+    DTEND;TZID=Europe/Paris:20210103T193000
+    RRULE:FREQ=DAILY;COUNT=2
+    SUMMARY:Single
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
+    }
+
+    @Test
+    fun `recurring event ends on the same day`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTAMP:20201014T164542Z
+    UID:MPguUggfUmij1uQgo5SHDWa0I492@proton.me
+    STATUS:CONFIRMED
+    SEQUENCE:0
+    DTSTART;TZID=Europe/Paris:20210103T190000
+    DTEND;TZID=Europe/Paris:20210103T193000
+    RRULE:FREQ=DAILY;UNTIL=20210103T225959Z
+    SUMMARY:Single
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        assertThat(event.isRecurringUntilSameDay(timeZoneId)).isTrue()
+    }
+
+    @Test
+    fun `recurring event ends on the next day`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    SEQUENCE:1
+    DTSTAMP:20201014T170339Z
+    UID:oT8hagmb4v0xNIo8xC0Fk8LLllsN@proton.me
+    STATUS:CONFIRMED
+    RRULE:FREQ=DAILY;UNTIL=20210104T225959Z
+    SUMMARY:Double
+    DTEND;TZID=Europe/Paris:20210103T190000
+    DTSTART;TZID=Europe/Paris:20210103T183000
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        assertThat(event.isRecurringUntilSameDay(timeZoneId)).isFalse()
+    }
 }
