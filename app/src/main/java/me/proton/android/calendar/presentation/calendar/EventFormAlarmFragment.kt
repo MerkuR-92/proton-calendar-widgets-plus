@@ -217,7 +217,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                     )
                 }
                 // Hide before label if no button is checked
-                else -> resetAlarmCustomText(custom_alarm_field.text.toString().toInt())
+                else ->
+                    resetAlarmCustomText(
+                        if (custom_alarm_field.text.isNullOrEmpty()) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
+                        else custom_alarm_field.text.toString().toInt()
+                    )
             }
         }
 
