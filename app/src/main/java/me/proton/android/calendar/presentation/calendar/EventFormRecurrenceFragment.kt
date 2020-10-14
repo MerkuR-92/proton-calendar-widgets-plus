@@ -184,7 +184,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun attachActionHandlers() {
 
         // main recurrence type radio group
-        event_form_recurrence_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        event_form_recurrence_radio_group.setCustomOnCheckedChangeListener { radioGroup, index ->
             if (index == R.id.event_form_recurrence_custom) {
                 event_form_recurrence_radio_group.visibleOrGone(false)
                 event_form_recurrence_custom_layout.visibleOrGone(true)
@@ -292,12 +292,16 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 requireContext().showKeyboard()
             }
         }
+
+        custom_recurrence_end_1.setOnCheckedChangeListener { button, isChecked -> if (!isChecked) button.jumpDrawablesToCurrentState() }
+        custom_recurrence_end_2.setOnCheckedChangeListener { button, isChecked -> if (!isChecked) button.jumpDrawablesToCurrentState() }
+        custom_recurrence_end_3.setOnCheckedChangeListener { button, isChecked -> if (!isChecked) button.jumpDrawablesToCurrentState() }
     }
 
     private fun setupCustomRecurrenceSpinnerComponent() {
         var lastSelectedIndex: Int? = null
 
-        custom_recurrence_period_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        custom_recurrence_period_radio_group.setCustomOnCheckedChangeListener { radioGroup, index ->
             requireActivity().clearFocusAndHideKeyboard(view)
 
             val position = getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)
@@ -305,7 +309,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
             // prevent infinite loop when resetting adapters by EditText changes and Radio group selection
             if (lastSelectedIndex != null && lastSelectedIndex == position) {
-                return@setOnCheckedChangeListener
+                return@setCustomOnCheckedChangeListener
             }
             lastSelectedIndex = position
 
@@ -426,7 +430,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        custom_recurrence_occurrence_time_radio_group.setOnCheckedChangeListener { _, checkedId ->
+        custom_recurrence_occurrence_time_radio_group.setCustomOnCheckedChangeListener { _, checkedId ->
             requireActivity().clearFocusAndHideKeyboard(view)
             val monthlyRepeatOnOption = monthlyRecurrenceOnMap[checkedId]
             if (monthlyRepeatOnOption != null) eventViewModel.handleRecurrenceRepeatOn(monthlyRepeatOnOption)

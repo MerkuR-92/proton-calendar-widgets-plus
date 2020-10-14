@@ -3,7 +3,6 @@ package me.proton.android.calendar.presentation.calendar
 import android.os.Bundle
 import android.text.TextWatcher
 import android.text.format.DateFormat
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -148,8 +147,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         event_form_alarm_5.visibleOrGone(!isAllDay)
         resetAlarmText(-1)
 
-        event_form_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
-            event_form_alarm_radio_group.jumpDrawablesToCurrentState()
+        event_form_alarm_radio_group.setCustomOnCheckedChangeListener { _, index ->
             when (index) {
                 R.id.event_form_alarm_custom -> {
                     toolbarTitle.text = getString(R.string.event_custom_alarms_title)
@@ -164,7 +162,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 }
             }
         }
-        event_form_alarm_action_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        event_form_alarm_action_radio_group.setCustomOnCheckedChangeListener { radioGroup, index ->
             requireActivity().clearFocusAndHideKeyboard(view)
         }
 
@@ -173,11 +171,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
         var lastSelectedIndex: Int? = null
 
-        custom_alarm_radio_group.setOnCheckedChangeListener { radioGroup, index ->
+        custom_alarm_radio_group.setCustomOnCheckedChangeListener { radioGroup, index ->
 
             // prevent infinite loop when resetting adapters by EditText changes and Spinner selection
             if (lastSelectedIndex != null && lastSelectedIndex == index) {
-                return@setOnCheckedChangeListener
+                return@setCustomOnCheckedChangeListener
             }
             lastSelectedIndex = index
 
@@ -218,11 +216,14 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                         FormValidation.ALARM_PERIOD_MAX_WEEKS
                     )
                 }
+                // Hide before label if no button is checked
+                else -> resetAlarmCustomText(custom_alarm_field.text.toString().toInt())
             }
         }
 
-        custom_alarm_same_day.setOnCheckedChangeListener { _, isChecked ->
+        custom_alarm_same_day.setOnCheckedChangeListener { button, isChecked ->
             if (isChecked) custom_alarm_radio_group.clearCheck()
+            else button.jumpDrawablesToCurrentState()
         }
 
         // init

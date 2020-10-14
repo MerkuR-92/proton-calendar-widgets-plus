@@ -849,3 +849,20 @@ fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
     // Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
     return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
 }
+
+class CustomOnCheckedChangeListener(private val onCustomOnCheckedChange: (RadioGroup, Int) -> Unit) : RadioGroup.OnCheckedChangeListener {
+    override fun onCheckedChanged(radioGroup: RadioGroup, checkedId: Int) {
+        radioGroup.children.forEach {
+            if (getCheckedRadioButtonIndex(radioGroup) != radioGroup.indexOfChild(it))
+                it.jumpDrawablesToCurrentState()
+        }
+        onCustomOnCheckedChange(radioGroup, checkedId)
+    }
+}
+
+fun RadioGroup.setCustomOnCheckedChangeListener(onCustomOnCheckedChange: (RadioGroup, Int) -> Unit) {
+    val customOnCheckedChangeListener = CustomOnCheckedChangeListener { radioGroup, index ->
+        onCustomOnCheckedChange(radioGroup, index)
+    }
+    setOnCheckedChangeListener(customOnCheckedChangeListener)
+}
