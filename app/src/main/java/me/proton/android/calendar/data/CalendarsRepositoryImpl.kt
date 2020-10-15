@@ -136,35 +136,42 @@ class CalendarsRepositoryImpl(
         val calendarIds = ArrayList<String>()
         members.forEach { calendarIds.add(it.calendarId) }
         calendarIds.forEach {
-            val dbCalendar = selectCalendar(it)
-            if (dbCalendar != null) {
+            selectCalendar(it)?.let { dbCalendar ->
                 var flags = dbCalendar.flags
                 if (status == AddressStatus.DISABLED.value && !dbCalendar.isDisabled) {
-                    // status at 0 means the address is disabled
-
-                    // if the calendar is inactive we keep the same flags but add the disabled flag
-                    if (dbCalendar.isInactive)  {
-                        flags += CalendarFlags.DISABLED.value
-                    } else  {
-                        // if the calendar is simply active we set the flags at disabled
-                        flags = CalendarFlags.DISABLED.value
-                    }
+                    flags = addDisabledFlag(flags, dbCalendar)
                 } else if (status == AddressStatus.ENABLED.value && dbCalendar.isDisabled) {
-                    // status at 1 means the address is active
-
-                    // if the calendar is inactive we keep the same flags but remove the disabled flag
-                    // we also check if the calendar is simply disabled or super owner disabled to correctly update it
-                    if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
-                        flags -= CalendarFlags.DISABLED.value
-                    } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
-                        flags -= CalendarFlags.SUPER_OWNER_DISABLED.value
-                    } else {
-                        // if the calendar is simply disabled we set the flags at active
-                        flags = CalendarFlags.ACTIVE.value
-                    }
+                    flags = removeDisabledFlag(flags, dbCalendar)
                 }
                 database.calendarsDao().updateCalendarFlags(dbCalendar.id, flags)
             }
+        }
+    }
+
+    private fun removeDisabledFlag(flags: Int, dbCalendar: CalendarEntity): Int {
+        // status at 1 means the address is active
+
+        // if the calendar is inactive we keep the same flags but remove the disabled flag
+        // we also check if the calendar is simply disabled or super owner disabled to correctly update it
+        return if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
+            flags - CalendarFlags.DISABLED.value
+        } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
+            flags - CalendarFlags.SUPER_OWNER_DISABLED.value
+        } else {
+            // if the calendar is simply disabled we set the flags at active
+            CalendarFlags.ACTIVE.value
+        }
+    }
+
+    private fun addDisabledFlag(flags: Int, dbCalendar: CalendarEntity): Int {
+        // status at 0 means the address is disabled
+
+        // if the calendar is inactive we keep the same flags but add the disabled flag
+        return if (dbCalendar.isInactive)  {
+            flags + CalendarFlags.DISABLED.value
+        } else  {
+            // if the calendar is simply active we set the flags at disabled
+            CalendarFlags.DISABLED.value
         }
     }
 

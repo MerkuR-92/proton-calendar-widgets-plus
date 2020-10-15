@@ -1,18 +1,12 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.content.Context
 import android.os.Bundle
 import android.text.TextWatcher
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
@@ -20,14 +14,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
-import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
-import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 import kotlinx.android.synthetic.main.chip_group_day_of_week.*
-import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -351,15 +341,6 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         resetRecurrencePeriodText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
         custom_recurrence_period_radio_group.check(custom_recurrence_period_2.id)
 
-        custom_recurrence_count.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                custom_recurrence_count_layout.endIconMode = END_ICON_CLEAR_TEXT
-                custom_recurrence_count_layout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
-            } else {
-                custom_recurrence_count_layout.endIconMode = END_ICON_NONE
-                custom_recurrence_count_layout.endIconDrawable = null
-            }
-        }
         custom_recurrence_count_layout.setEndIconOnClickListener {
             when (getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)) {
                 // day

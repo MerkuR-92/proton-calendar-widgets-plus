@@ -9,15 +9,11 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -244,15 +240,6 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             custom_alarm_field.setText("15")
             custom_alarm_radio_group.check(custom_alarm_1.id)
             resetAlarmCustomText(15)
-        }
-        custom_alarm_field.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                custom_alarm_field_layout.endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
-                custom_alarm_field_layout.endIconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
-            } else {
-                custom_alarm_field_layout.endIconMode = TextInputLayout.END_ICON_NONE
-                custom_alarm_field_layout.endIconDrawable = null
-            }
         }
         custom_alarm_field_layout.setEndIconOnClickListener {
             custom_alarm_field.setText(
