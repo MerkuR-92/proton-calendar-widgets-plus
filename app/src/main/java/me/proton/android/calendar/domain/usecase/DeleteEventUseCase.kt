@@ -1,8 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -42,7 +40,7 @@ class DeleteEventUseCase( // TODO TESTS
                     event.addExceptionDate(occurrenceNumber!!) // TODO
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 }
-                else if (event.isFromRecurring()) {
+                else if (event.isSingleEdit()) {
 
                     val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
 

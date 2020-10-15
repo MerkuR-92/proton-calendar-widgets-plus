@@ -79,13 +79,13 @@ data class Event(
     }
 
     fun getActualStart(timeZoneId: String): ZonedDateTime? {
-        return if (this.isFromRecurring()) {
+        return if (this.isSingleEdit()) {
             iCalEvent.getStart(timeZoneId)
         } else occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
     }
 
     fun getActualEnd(timeZoneId: String): ZonedDateTime? {
-        return if (this.isFromRecurring()) {
+        return if (this.isSingleEdit()) {
             iCalEvent.getEnd(timeZoneId)
         } else occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
     }
@@ -538,7 +538,7 @@ data class Event(
 
         fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
 
-        fun isFromRecurring(): Boolean = this.iCalEvent.recurrenceId != null
+        fun isSingleEdit(): Boolean = this.iCalEvent.recurrenceId != null
 
         fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
             isRecurring() && (this.iCalEvent.recurrenceRule.value.count == 1 || isRecurringUntilSameDay(timeZoneId))
@@ -571,7 +571,7 @@ data class Event(
 
         // this event might be a single edit so it's technically a separate event in the database,
         //  but it's still considered as a part of a chain of events
-        fun isPartOfChain(): Boolean = this.isRecurring() || this.isFromRecurring()
+        fun isPartOfChain(): Boolean = this.isRecurring() || this.isSingleEdit()
 
         fun withOccurrence(occurrenceNumber: Int, timeZoneId: String): Event? {
 

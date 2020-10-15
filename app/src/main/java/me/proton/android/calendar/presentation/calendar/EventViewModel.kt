@@ -137,14 +137,14 @@ class EventViewModel(
             val startTime = if (initStartTime != null) LocalTime.parse(initStartTime) else LocalTime.now().plusMinutes(
                 this.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS)
             // end Zoned Date Time according to default event duration
-            val endZonedDateTime = ZonedDateTime.of(startDate, startTime, ZoneId.of(displayTimeZoneId)).plusMinutes(
+            val endZonedDateTime = ZonedDateTime.of(startDate, startTime, ZoneId.of(eventTimeZoneId)).plusMinutes(
                 this.calendarSettings.defaultEventDuration.toLong())
 
             timeStartBackup = startTime
             timeEndBackup = endZonedDateTime.toLocalTime() // this time can be before timeStartBackup at this point
 
             // TODO GUI takes timezone from iCalendar's "default timezone", maybe this should be moved to "Event" model?
-            newICalendar.setDefaultTimeZone(displayTimeZoneId)
+            newICalendar.setDefaultTimeZone(eventTimeZoneId)
 
             if (initStartTime == null) { // create new all-day event
 
@@ -159,10 +159,10 @@ class EventViewModel(
                 }
 
             } else { // create new all-day event
-                newVEvent.setStart(startDate, startTime, displayTimeZoneId)
-                newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), displayTimeZoneId)
-                newICalendar.setStartTimeZone(displayTimeZoneId)
-                newICalendar.setEndTimeZone(displayTimeZoneId)
+                newVEvent.setStart(startDate, startTime, eventTimeZoneId)
+                newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), eventTimeZoneId)
+                newICalendar.setStartTimeZone(eventTimeZoneId)
+                newICalendar.setEndTimeZone(eventTimeZoneId)
             }
 
 
@@ -289,7 +289,7 @@ class EventViewModel(
      */
     fun initialiseForRecurrence() {
         this.tempMonthlyRepeatOption = MonthlyRepatOnOption.ON_DAY_X
-        val tempUntil: LocalDate? = event.iCalEvent.recurrenceRule?.value?.until?.toInstant()?.atZone(ZoneId.of(displayTimeZoneId))?.toLocalDate()
+        val tempUntil: LocalDate? = event.iCalEvent.recurrenceRule?.value?.until?.toInstant()?.atZone(ZoneId.of(eventTimeZoneId))?.toLocalDate()
         this.tempRecurrenceUntilLocalDate = tempUntil
     }
 
@@ -317,9 +317,9 @@ class EventViewModel(
     fun validateDateTime(): Boolean {
         // TODO this works only as long as we have the same timezone for start and end
         return if (event.isAllDay()) {
-            !(event.getStart(displayTimeZoneId)?.isAfter(event.getEnd(displayTimeZoneId)) ?: false)
+            !(event.getStart(eventTimeZoneId)?.isAfter(event.getEnd(eventTimeZoneId)) ?: false)
         } else {
-            event.getStart(displayTimeZoneId)?.isBefore(event.getEnd(displayTimeZoneId)) ?: false
+            event.getStart(eventTimeZoneId)?.isBefore(event.getEnd(eventTimeZoneId)) ?: false
         }
     }
 
@@ -350,11 +350,9 @@ class EventViewModel(
 
         if (event.isAllDay()) {
             event.iCalendar.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
-            displayTimeZoneId = event.defaultTimeZone!!
             TimberLogger.d("calendar for all-day: " + event.iCalendar.printToString())
         } else {
-            event.iCalendar.adjustStartEndTimeZones(displayTimeZoneId, event.defaultTimeZone!!)
-            displayTimeZoneId = event.defaultTimeZone!!
+            event.iCalendar.adjustStartEndTimeZones(eventTimeZoneId, event.defaultTimeZone!!)
             TimberLogger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
 
@@ -386,7 +384,7 @@ class EventViewModel(
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
-                if (event.isPartOfChain() || dbEvent?.isRecurring() == true) {
+                if (dbEvent?.isRecurring() == true) {
 
                     // TODO BUG:
                     // 1. event is a regular event
@@ -594,8 +592,8 @@ class EventViewModel(
 
     fun handleStartDate(newDate: LocalDate) {
         markEventAsEdited(bumpSequence = true)
-        val old = event.getStart(displayTimeZoneId)!!
-        val endDate = event.getEnd(displayTimeZoneId)!!
+        val old = event.getStart(eventTimeZoneId)!!
+        val endDate = event.getEnd(eventTimeZoneId)!!
         val unit = ChronoUnit.DAYS
         val diff = unit.between(old, endDate)
         when {
@@ -606,7 +604,7 @@ class EventViewModel(
         if (event.isAllDay()) {
             event.iCalEvent.setStart(newDate)
         } else {
-            event.iCalEvent.setStart(newDate, old.toLocalTime(), displayTimeZoneId)
+            event.iCalEvent.setStart(newDate, old.toLocalTime(), eventTimeZoneId)
         }
         event.iCalendar.adjustRRuleToStartDate()
         _event.postValue(event)
@@ -614,19 +612,19 @@ class EventViewModel(
 
     fun handleEndDate(newDate: LocalDate) {
         markEventAsEdited(bumpSequence = true)
-        val old = event.getEnd(displayTimeZoneId)!!
+        val old = event.getEnd(eventTimeZoneId)!!
         if (event.isAllDay()) {
             event.iCalEvent.setEnd(newDate)
         } else {
-            event.iCalEvent.setEnd(newDate, old.toLocalTime(), displayTimeZoneId)
+            event.iCalEvent.setEnd(newDate, old.toLocalTime(), eventTimeZoneId)
         }
         _event.postValue(event)
     }
 
     fun handleStartTime(newTime: LocalTime) {
         markEventAsEdited(bumpSequence = true)
-        val old = event.getStart(displayTimeZoneId)!!
-        val endTime = event.getEnd(displayTimeZoneId)!!
+        val old = event.getStart(eventTimeZoneId)!!
+        val endTime = event.getEnd(eventTimeZoneId)!!
         val newDate = LocalDateTime.of(old.toLocalDate(), newTime.truncatedTo(ChronoUnit.MINUTES))
         val unit = ChronoUnit.MINUTES
         val diff = unit.between(old, endTime)
@@ -634,21 +632,21 @@ class EventViewModel(
         if (newEndTime.dayOfWeek != endTime.dayOfWeek)
             handleEndDate(newEndTime.toLocalDate())
         handleEndTime(newEndTime.toLocalTime())
-        event.iCalEvent.setStart(old.toLocalDate(), newTime, displayTimeZoneId)
+        event.iCalEvent.setStart(old.toLocalDate(), newTime, eventTimeZoneId)
         timeStartBackup = newTime
         _event.postValue(event)
     }
 
     fun handleEndTime(newTime: LocalTime) {
         markEventAsEdited(bumpSequence = true)
-        val old = event.getEnd(displayTimeZoneId)!!
-        event.iCalEvent.setEnd(old.toLocalDate(), newTime, displayTimeZoneId)
+        val old = event.getEnd(eventTimeZoneId)!!
+        event.iCalEvent.setEnd(old.toLocalDate(), newTime, eventTimeZoneId)
         timeEndBackup = newTime
         _event.postValue(event)
     }
 
     fun handleAllDaySwitch(isAllDay: Boolean) {
-        markEventAsEdited()
+        markEventAsEdited(bumpSequence = true)
 
         val currentEventAlarms = event.iCalEvent.alarms.toList()
         val savedAlarms = eventCustomAlarmsSave.toList()
@@ -668,23 +666,23 @@ class EventViewModel(
             //TimberLogger.d("saving backup: $timeStartBackup, ${timeEndBackup}")
 
             // remove time part and timezone from start/end
-            event.iCalEvent.setStart(event.getStart(displayTimeZoneId)!!.toLocalDate())
-            event.iCalEvent.setEnd(event.getEnd(displayTimeZoneId)!!.toLocalDate())
+            event.iCalEvent.setStart(event.getStart(eventTimeZoneId)!!.toLocalDate())
+            event.iCalEvent.setEnd(event.getEnd(eventTimeZoneId)!!.toLocalDate())
 
 //            event.iCalendar.setStartTimeZone(null)
 //            event.iCalendar.setEndTimeZone(null)
         } else {
             // get times & timezone from backup, but date from current event date
             event.iCalEvent.setStart(
-                event.getStart(displayTimeZoneId)!!.toLocalDate(),
+                event.getStart(eventTimeZoneId)!!.toLocalDate(),
                 timeStartBackup!!,
-                displayTimeZoneId
+                eventTimeZoneId
             )
 
             event.iCalEvent.setEnd(
-                event.getEnd(displayTimeZoneId)!!.toLocalDate(),
+                event.getEnd(eventTimeZoneId)!!.toLocalDate(),
                 timeEndBackup!!,
-                displayTimeZoneId
+                eventTimeZoneId
             )
 
 //            event.iCalendar.setStartTimeZone(defaultTimeZoneId)
@@ -728,7 +726,7 @@ class EventViewModel(
                 val until = if (event.isAllDay()) {
                     ICalDate(tempRecurrenceUntilLocalDate!!.toDate("UTC"), false)
                 } else {
-                    ICalDate(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(displayTimeZoneId)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
+                    ICalDate(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(eventTimeZoneId)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
                 }
                 builder.until(until)
             }
@@ -736,7 +734,7 @@ class EventViewModel(
                 builder.byDay(daysOfWeek)
             }
             if (customMonthly) {
-                val eventStartDate = event.getStart(displayTimeZoneId)!!.toLocalDate()
+                val eventStartDate = event.getStart(eventTimeZoneId)!!.toLocalDate()
                 val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
                 val weekInMonth = eventStartDate.weekInMonth()
 
@@ -791,7 +789,7 @@ class EventViewModel(
      * Complicated logic for displaying monthly recurrence options is calculated by ViewModel.
      */
     fun calculateMonthlyRepeatOnOptions(): List<MonthlyRepatOnOption> {
-        val eventStartDate = event.getStart(displayTimeZoneId)!!.toLocalDate()
+        val eventStartDate = event.getStart(eventTimeZoneId)!!.toLocalDate()
 
         val options = mutableListOf(MonthlyRepatOnOption.ON_DAY_X)
         if (eventStartDate.weekInMonth() <= 4) options.add(MonthlyRepatOnOption.ON_X_WEEKDAY)
@@ -811,7 +809,7 @@ class EventViewModel(
 
             if (this.frequency != Frequency.MONTHLY) return 0
 
-            val eventStartDate = event.getStart(displayTimeZoneId)!!.toLocalDate()
+            val eventStartDate = event.getStart(eventTimeZoneId)!!.toLocalDate()
 
             val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
             val weekInMonth = eventStartDate.weekInMonth()

@@ -317,7 +317,7 @@ class CalendarsRepositoryImpl(
                         val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
 
                         filteredByExdates
-                    } else if (event.isFromRecurring()) {
+                    } else if (event.isSingleEdit()) {
                         // Event that is "from recurring" has already been created when expading ^
                         emptyList()
                     } else {

@@ -122,10 +122,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                     } else { // TODO merge this with code above
                         val success = withContext(Dispatchers.IO) {
-                            if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true)
-                                eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
-                            else
-                                eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
+                            eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
                         }
 
                         if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
@@ -222,6 +219,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event.location?.let { event_form_location.setText(it) }
             event.description?.let { event_form_description.setText(it) }
 
+            if (event_form_location.text.isEmpty())
+                ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
+            if (event_form_description.text.isEmpty())
+                ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
+
             event_form_all_day_switch.isChecked = event.isAllDay()
 
             event_form_partial_day_start.visibleOrGone(!event.isAllDay())
@@ -261,20 +263,24 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_location.doAfterTextChanged { persistFormData() }
         event_form_description.doAfterTextChanged { persistFormData() }
 
-        event_form_location.doOnTextChanged { text, start, before, count ->
-            if (text.isNullOrEmpty()) {
-                ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
-            } else if (text.length == 1) {
-                //Don't update text on every change
-                ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+        event_form_location.setOnFocusChangeListener { _, hasFocus ->
+            when {
+                hasFocus ->
+                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.interaction_norm)))
+                event_form_location.text.isNotEmpty() ->
+                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+                else ->
+                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
             }
         }
-        event_form_description.doOnTextChanged { text, start, before, count ->
-            if (text.isNullOrEmpty()) {
-                ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
-            } else if (text.length == 1) {
-                //Don't update text on every change
-                ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+        event_form_description.setOnFocusChangeListener { _, hasFocus ->
+            when {
+                hasFocus ->
+                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.interaction_norm)))
+                event_form_description.text.isNotEmpty() ->
+                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+                else ->
+                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
             }
         }
 
@@ -296,24 +302,24 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         event_form_start_date_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()
+            val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
                 initialDate = date,
-                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate(),
-                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()) {
+                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate(),
+                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()) {
                 eventViewModel.handleStartDate(it)
             }
         }
 
         event_form_end_date_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalDate()
+            val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
                 initialDate = date,
-                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate(),
-                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
+                minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate(),
+                maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()
             ) {
                 eventViewModel.handleEndDate(it)
             }
@@ -322,7 +328,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_start_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
-            val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalTime()
+            val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
                 eventViewModel.handleStartTime(it)
             }
@@ -331,7 +337,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_end_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
-            val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.displayTimeZoneId)?.toLocalTime()
+            val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
                 eventViewModel.handleEndTime(it)
             }
