@@ -41,16 +41,11 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
                     val intent = MainActivity.createIntentToShowEventDetails(context, dbEvent.id, dbEvent.occurrence?.occurrenceNumber)
                     val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0/* TODO */, intent, 0)
 
-                    val eventStart = dbEvent.getStart(TimeZone.getDefault().id)
-                    val text = if (dbEvent.isAllDay()) {
-                        "TODO FORMAT: $eventStart"
-                    } else {
-                        "TODO FORMAT: $eventStart"
-                    }
+                    val text = dbEvent.formatStartForNotification(TimeZone.getDefault().id, context.resources) // formatting in phone's timezone
 
                     notificationBuilder
                         .setSmallIcon(R.drawable.ic_calendar_today)
-                        .setContentTitle(dbEvent.summary)
+                        .setContentTitle(dbEvent.summary ?: context.getString(R.string.default_event_summary))
                         .setContentText(text)
                         .setContentIntent(pendingIntent)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)

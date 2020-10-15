@@ -128,6 +128,39 @@ data class Event(
 
     fun formatStart(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
 
+    fun formatStartForNotification(timeZoneId: String, resources: Resources) : String {
+
+        val startDate = this.getStart(timeZoneId)?.toLocalDate()
+        val today = LocalDate.now(ZoneId.of(timeZoneId))
+
+        if (startDate == null) return ""
+
+        val formattedDateTime = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId)
+
+        return if (this.isAllDay()) {
+
+            if (startDate == today) {
+                resources.getString(R.string.notification_text_today)
+            } else if (startDate == today.plusDays(1)) {
+                resources.getString(R.string.notification_text_tomorrow)
+            } else {
+                formattedDateTime.first ?: ""
+            }
+
+        } else {
+
+            if (startDate == today) {
+                resources.getString(R.string.notification_text_today_part_time, formattedDateTime.second)
+            } else if (startDate == today.plusDays(1)) {
+                resources.getString(R.string.notification_text_tomorrow_part_time, formattedDateTime.second)
+            } else {
+                resources.getString(R.string.notification_text_part_time, formattedDateTime.first, formattedDateTime.second)
+            }
+
+        }
+
+    }
+
     fun formatEnd(timeZoneId: String) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId)
 
     fun formatStartEndForActualEndDate(timeZoneId: String, resources: Resources): String {

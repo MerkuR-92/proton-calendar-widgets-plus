@@ -129,6 +129,11 @@
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">ProtonCalendar Event Notifications</string>
+    <string name="notification_text_today">Today</string>
+    <string name="notification_text_today_part_time">Today at %s</string>
+    <string name="notification_text_tomorrow">Tomorrow</string>
+    <string name="notification_text_tomorrow_part_time">Tomorrow at %s</string>
+    <string name="notification_text_part_time">%s at %s</string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
