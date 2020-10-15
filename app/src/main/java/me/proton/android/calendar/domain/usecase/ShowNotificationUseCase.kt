@@ -8,17 +8,38 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.MainActivity
+import java.time.Duration
+import java.time.Instant
+import java.time.Year
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
+import javax.xml.datatype.DatatypeConstants.YEARS
 
 class ShowNotificationUseCase(private val logger: Logger, private val context: Context, private val calendarsRepository: CalendarsRepository, private val transformEventUseCase: TransformEventUseCase) {
 
 
 
     suspend fun execute(eventAlarms: List<EventAlarmEntity>) {
+
+        // Alarm's occurrence timestamp can be identical for multiple Alarms, but notification IDs
+        //  have to be distinct for each one of them
+        fun generateNotificationId(notificationManager: NotificationManager, alarmEntity: EventAlarmEntity): Int {
+
+            val activeNotifications = notificationManager.activeNotifications
+            var notificationId = alarmEntity.occurrence
+            while (activeNotifications.find { it.id == notificationId.toInt() } != null) {
+                notificationId++
+            }
+
+            return notificationId.toInt()
+        }
+
         logger.v("executing ShowNotificationUseCase, showing: ${eventAlarms}")
 
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -51,12 +72,14 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .setAutoCancel(true)
 
-                    notificationManager.notify(it.occurrence.toInt() /*TODO*/, notificationBuilder.build())
+                    notificationManager.notify(generateNotificationId(notificationManager, it), notificationBuilder.build())
                 }
             }
         }
 
     }
+
+
 
     companion object {
 
