@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.ActivityNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.property.Status
@@ -44,7 +45,21 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val navigateUp = false
 
     override fun onBackPressedCustom() {
-        findNavController().navigateUp()
+
+        // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
+        //  1. see if nested graphs work when we get rid of dialogs in favor of fragments
+        //  2. see if handling deeplink straight from notification (not indirectly from MainActivity and navigating manually)
+        //  fixes this
+        if (findNavController().previousBackStackEntry?.destination?.id != R.id.nav_calendar) {
+            findNavController().navigate(Navigation.Deeplink.toMonth())
+        } else {
+            findNavController().navigateUp()
+        }
+    }
+
+    override fun onNavigationIconClicked(): Boolean {
+        onBackPressedCustom()
+        return true
     }
 
     private lateinit var buttonEdit: View
