@@ -1,7 +1,5 @@
 package me.proton.android.calendar.presentation
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
@@ -28,11 +26,11 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 
 
@@ -45,12 +43,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private val valueStoreProvider: ValueStoreProvider by inject()
 
-    private val calendarViewModel: CalendarViewModel by inject()
+    private val calendarViewModel: CalendarViewModel by viewModel()
+    private val mainViewModel: MainViewModel by viewModel()
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
     private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null && intent != null) {
+            mainViewModel.handleIntent(intent)
+        }
+
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -235,21 +239,5 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 //    }
 //
 //
-
-    companion object {
-        const val INTENT_ACTION_SHOW_EVENT_DETAILS = "INTENT_ACTION_SHOW_EVENT_DETAILS"
-
-        const val INTENT_EXTRA_EVENT_ID = "INTENT_EXTRA_EVENT_ID"
-        const val INTENT_EXTRA_EVENT_OCCURRENCE = "INTENT_EXTRA_EVENT_OCCURRENCE"
-
-        fun createIntentToShowEventDetails(context: Context, eventId: String, occurrenceNumber: Int?): Intent {
-            return Intent(context, MainActivity::class.java).apply {
-                action = INTENT_ACTION_SHOW_EVENT_DETAILS
-                putExtra(INTENT_EXTRA_EVENT_ID, eventId)
-                putExtra(INTENT_EXTRA_EVENT_OCCURRENCE, occurrenceNumber)
-                // flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-        }
-    }
 
 }

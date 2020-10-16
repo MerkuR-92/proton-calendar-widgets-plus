@@ -14,6 +14,7 @@ import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.domain.CalendarsRepository
 import kotlinx.coroutines.Job
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
+import me.proton.android.calendar.common.Navigation
 import kotlin.Exception
 
 
@@ -21,6 +22,8 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
     // TODO list of users for navbar
     // TODO list of calendars for navbar
+
+    private val intents = mutableMapOf<String, Intent>()
 
     /**
      * Try to open maps with event location.
@@ -180,5 +183,36 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
     }
 
+    /**
+     * Stores intent with given [action] in a map for clients to [consumeIntent] later.
+     */
+    fun handleIntent(intent: Intent) {
+        if (intent.action != null) {
+            intents.put(intent.action!!, intent)
+        }
+    }
+
+    /**
+     * Returns and deletes intent with given [action], if it has been handled previously.
+     */
+    fun consumeIntent(action: String): Intent? {
+        return intents.remove(action)
+    }
+
+    companion object {
+        const val INTENT_ACTION_SHOW_EVENT_DETAILS = "INTENT_ACTION_SHOW_EVENT_DETAILS"
+
+        const val INTENT_EXTRA_EVENT_ID = "INTENT_EXTRA_EVENT_ID"
+        const val INTENT_EXTRA_EVENT_OCCURRENCE = "INTENT_EXTRA_EVENT_OCCURRENCE"
+
+        fun createIntentToShowEventDetails(context: Context, eventId: String, occurrenceNumber: Int?): Intent {
+            return Intent(context, MainActivity::class.java).apply {
+                action = INTENT_ACTION_SHOW_EVENT_DETAILS
+                putExtra(INTENT_EXTRA_EVENT_ID, eventId)
+                putExtra(INTENT_EXTRA_EVENT_OCCURRENCE, occurrenceNumber)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        }
+    }
 
 }

@@ -4,22 +4,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.presentation.MainActivity
-import java.time.Duration
-import java.time.Instant
-import java.time.Year
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
+import me.proton.android.calendar.presentation.MainViewModel
 import java.util.*
-import javax.xml.datatype.DatatypeConstants.YEARS
 
 class ShowNotificationUseCase(private val logger: Logger, private val context: Context, private val calendarsRepository: CalendarsRepository, private val transformEventUseCase: TransformEventUseCase) {
 
@@ -59,7 +51,7 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
                     // TODO GENERATE OCCURRENCE IF NEEDED!!!!!!!!!!!!!!!!!!
 
 
-                    val intent = MainActivity.createIntentToShowEventDetails(context, dbEvent.id, dbEvent.occurrence?.occurrenceNumber)
+                    val intent = MainViewModel.createIntentToShowEventDetails(context, dbEvent.id, dbEvent.occurrence?.occurrenceNumber)
                     val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0/* TODO */, intent, 0)
 
                     val text = dbEvent.formatStartForNotification(TimeZone.getDefault().id, context.resources) // formatting in phone's timezone
