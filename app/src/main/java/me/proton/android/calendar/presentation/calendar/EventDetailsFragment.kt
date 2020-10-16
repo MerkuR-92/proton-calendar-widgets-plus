@@ -17,12 +17,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.property.Status
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.event_info.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_details.*
+import kotlinx.android.synthetic.main.item_attendee.view.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
+import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,6 +38,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.CalendarListAdapter
 import me.proton.android.calendar.presentation.MainViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -64,6 +72,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private lateinit var buttonEdit: View
+    private lateinit var attendeeListAdapter: AttendeeListAdapter
 
     override fun onToolbarCreated(toolbar: Toolbar) {
 
@@ -264,14 +273,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)
             }
         }
-        section_attendees.image_button_action.setOnClickListener {
-            section_attendees_container.visibleOrGone(!section_attendees_container.isVisible)
-            if (section_attendees_container.isVisible) {
-                section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_up)
-            } else {
-                section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_down)
-            }
-        }
     }
 
     private fun observeEventLiveData() {
@@ -280,7 +281,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
-
 
             TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $event")
             TimberLogger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
@@ -355,44 +355,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            // TODO attendees dummy data
-            val attendees = mutableListOf<String>()
-            val attendeeCount = (-1..10).random()
-            if (attendeeCount > 0) {
-                for (count in 0..attendeeCount) {
-                    attendees.add("Attendee ${count + 1}")
-                }
-            }
-            if (FeatureFlags.SHOW_ATTENDEES && attendees.isNotEmpty()) {
-                with(section_attendees) {
-                    text_subheader.text = "4 yes, 3 maybe, 1 no, TODO"
-                    text_header.text = resources.getString(
-                        R.string.event_attendee_count, attendees.size, resources.getQuantityString(
-                            R.plurals.plural_participant_uppercase,
-                            attendees.size,
-                            attendees.size
-                        )
-                    )
-                    image_icon.setImageResource(R.drawable.ic_contact_groups)
-                    visibleOrGone(true)
-                }
-                section_attendees_container.removeAllViews()
-                attendees.forEach {
-                    val tv = TextView(requireContext())
-                    tv.text = it // TODO PROPER ITEM VIEW
-                    section_attendees_container.addView(tv)
-                }
-                section_attendees.image_button_action.visibleOrInvisible(true)
-                if (attendees.size > FormValidation.ATTENDEE_SHOW_TRESHOLD) {
-                    section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_down)
-                    section_attendees_container.visibleOrGone(false)
-                } else {
-                    section_attendees.image_button_action.setImageResource(R.drawable.ic_chevron_up)
-                    section_attendees_container.visibleOrGone(true)
-                }
-
-            }
-
             with(section_calendar) {
                 text_header.text = if (event.calendar.isActive) {
                     event.calendar.name
@@ -437,6 +399,35 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
+            val attendeeList = event.iCalEvent.attendees
+            section_attendees.visibleOrGone(event.iCalEvent.organizer != null)
+            event_attendees_title.text = "${event.iCalEvent.attendees.size} Participants"
+            event_attendees_description.text = "2 unanswered"
+
+            TimberLogger.d("Attendees : organizer ${event.iCalEvent.organizer.email} /// ${event.iCalEvent.organizer.commonName}")
+
+            val organizer = event.iCalEvent.organizer
+            event_attendee_organizer_layout.item_attendee_title.text = organizer.email
+            event_attendee_organizer_layout.item_attendee_description.text = "Organizer"
+            event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email)
+
+            attendeeList.forEach {event.iCalEvent.attendees
+                TimberLogger.d("Attendees : attendee ${it.email} /// ${it.commonName}")
+            }
+            val attendeeListView = event_attendee_list
+            val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+            attendeeListView.layoutManager = attendeesLayoutManager
+            attendeeListAdapter = AttendeeListAdapter() { attendee ->
+                //On Attendee click event
+            }
+            (attendeeListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            attendeeListView.adapter = attendeeListAdapter
+            if (attendeeList.isNotEmpty()) {
+                attendeeListAdapter.submitList(attendeeList)
+                attendeeListView.visibleOrGone(true)
+            } else {
+                attendeeListView.visibleOrGone(false)
+            }
 
 //                text_event_all_day_pill.visibleOrGone(event.isAllDay())
 //

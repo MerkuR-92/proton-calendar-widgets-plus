@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <include
+        android:id="@+id/event_attendees_press"
+        layout="@layout/view_press_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/event_attendees_description"/>
+
+    <ImageView
+        android:id="@+id/event_attendees_icon"
+        style="@style/Icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/event_attendees_title"
+        android:layout_marginStart="@dimen/spacing_page"
+        app:srcCompat="@drawable/ic_contact_groups" />
+
+    <TextView
+        android:id="@+id/event_attendees_title"
+        style="@style/Text.Default"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_element"
+        android:layout_marginStart="@dimen/spacing_element"
+        app:layout_constraintEnd_toStartOf="@+id/event_attendees_button"
+        app:layout_constraintStart_toEndOf="@+id/event_attendees_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="8 Participants" />
+
+    <TextView
+        android:id="@+id/event_attendees_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Text.DefaultSmall.Weak"
+        android:paddingBottom="@dimen/spacing_element"
+        app:layout_constraintStart_toStartOf="@+id/event_attendees_title"
+        app:layout_constraintEnd_toEndOf="@+id/event_attendees_title"
+        app:layout_constraintTop_toBottomOf="@+id/event_attendees_title"
+        tools:text="4 yes, 3 maybe, 1 no" />
+
+    <ImageButton
+        android:id="@+id/event_attendees_button"
+        style="@style/Icon"
+        app:tint="@color/icon_weak"
+        android:layout_marginEnd="@dimen/spacing_element"
+        android:layout_marginStart="@dimen/spacing_element_small"
+        android:background="?android:selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/event_attendees_title"
+        app:layout_constraintTop_toTopOf="@id/event_attendees_title"
+        app:srcCompat="@drawable/ic_chevron_down" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/event_attendee_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/event_attendees_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginStart="@dimen/spacing_page"
+        android:layout_marginEnd="@dimen/spacing_page"
+        tools:listitem="@layout/item_attendee"
+        tools:itemCount="4" />
+
+    <include
+        android:id="@+id/event_attendee_organizer_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_page"
+        android:layout_marginEnd="@dimen/spacing_page"
+        app:layout_constraintTop_toBottomOf="@+id/event_attendee_list"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        layout="@layout/item_attendee" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

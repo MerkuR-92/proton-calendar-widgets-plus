@@ -28,15 +28,7 @@
 
     <include
         android:id="@+id/section_attendees"
-        layout="@layout/item_form_section"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <LinearLayout
-        android:id="@+id/section_attendees_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        layout="@layout/event_attendees_view"
         android:visibility="gone"
         tools:visibility="visible" />
 

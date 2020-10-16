@@ -34,6 +34,8 @@
 
     <dimen name="default_separator_margin_top">20dp</dimen>
 
+    <dimen name="attendee_avatar_size">32dp</dimen>
+    <dimen name="attendee_status_size">16dp</dimen>
 
 
 

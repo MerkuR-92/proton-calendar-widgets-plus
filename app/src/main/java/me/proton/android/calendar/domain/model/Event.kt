@@ -656,7 +656,17 @@ data class Event(
 //        val isSigned: Boolean get() = type and 2 > 0
         }
 
-        enum class SignatureVerification {
+        data class AttendeeEvent(
+            val type: Int, // 2 for SIGNED 3 for encrypted + signed
+            val data: String,
+            val signature: String,
+            val author: String
+        ) {
+            val isEncrypted: Boolean get() = type and 1 > 0
+//            val isSigned: Boolean get() = type and 2 > 0
+        }
+
+    enum class SignatureVerification {
             SUCCESS,
             FAILURE,
             NO_KEYS

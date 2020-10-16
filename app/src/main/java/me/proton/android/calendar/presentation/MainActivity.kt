@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
@@ -162,11 +163,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             if (user != null) {
                 nav_view_main_content.nav_view_user_name.text = user.displayName
                 nav_view_main_content.nav_view_user_mail.text = user.email
-                var initials: String = user.displayName.toUpperCase().split(' ')
-                    .mapNotNull { it.firstOrNull()?.toString() }
-                    .reduce { acc, s -> acc + s }
-                //Keep only the first two initials
-                if (initials.length > 2) initials = initials.substring(0, 2)
+                var initials: String = getInitials(user.displayName)
                 nav_view_main_content.nav_view_user_initials.text = initials?: ""
             }
         }

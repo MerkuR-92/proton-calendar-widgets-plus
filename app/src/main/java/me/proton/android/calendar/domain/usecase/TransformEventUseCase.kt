@@ -136,6 +136,49 @@ class TransformEventUseCase(
             calendarParts.add(it.data)
         }
 
+        // process Attendees Events
+        val attendeesEvents = eventEntity.attendeesEvents.map {
+            gson.fromJson(it, Event.AttendeeEvent::class.java)
+        }
+
+        attendeesEvents.forEach {
+            //logger.v("shared event ${it}")
+
+            val decryptedText = if (it.isEncrypted) {
+                val cipherText = Ciphertext.from(eventEntity.sharedKeyPacket, it.data)
+                crypto.decryptText(cipherText.asArmoredPGPMessage(), calendarKey.privateKey, keyPassphrase.toByteArray())
+            } else null
+
+            // TODO consider creating flag for disabling verification, OR maybe when we create repository cache,
+            //  too many open cursors won't be a problem anymore
+            val verificationKeys = database.publicKeysDao().select(it.author).map { it.publicKey }
+            if (verificationKeys.isEmpty()) {
+                verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
+            } else {
+                val signatureOk = if (decryptedText != null) {
+                    crypto.verifyTextDetached(decryptedText, it.signature, verificationKeys)
+                } else {
+                    crypto.verifyTextDetached(it.data, it.signature, verificationKeys)
+                }
+
+                if (signatureOk) {
+                    verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+                } else {
+                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                    logger.v("signature not okay for ${decryptedText}")
+                }
+            }
+
+            calendarParts.add(decryptedText ?: it.data)
+
+            if (decryptedText != null) {
+                logger.v("decrypted attendee event: " + decryptedText)
+            } else {
+                logger.v("not-decrypted attendee event: " + it.data)
+            }
+
+        }
+
         if (calendarParts.isEmpty()) return null
 
         val iCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts)

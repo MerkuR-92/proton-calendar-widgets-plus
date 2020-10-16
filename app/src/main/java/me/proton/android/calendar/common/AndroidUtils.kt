@@ -871,3 +871,11 @@ fun RadioGroup.setCustomOnCheckedChangeListener(onCustomOnCheckedChange: (RadioG
     }
     setOnCheckedChangeListener(customOnCheckedChangeListener)
 }
+
+fun getInitials(name: String): String {
+    val initials = name.toUpperCase().split(' ')
+        .mapNotNull { it.firstOrNull()?.toString() }
+        .reduce { acc, s -> acc + s }
+    //Keep only the first two initials
+    return if (initials.length > 2) initials.substring(0, 2) else initials
+}

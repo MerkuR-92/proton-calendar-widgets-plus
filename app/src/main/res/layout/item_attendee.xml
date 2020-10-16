@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/item_attendee_press"
+            layout="@layout/view_press_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/item_attendee_description"/>
+
+        <ImageView
+            android:id="@+id/item_attendee_photo"
+            android:layout_width="@dimen/attendee_avatar_size"
+            android:layout_height="@dimen/attendee_avatar_size"
+            android:layout_marginStart="38dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/item_attendee_title"
+            app:layout_constraintBottom_toBottomOf="@+id/item_attendee_description"
+            app:layout_constraintEnd_toStartOf="@+id/item_attendee_title"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/item_attendee_initials"
+            style="@style/Text.Default"
+            android:layout_width="@dimen/attendee_avatar_size"
+            android:layout_height="@dimen/attendee_avatar_size"
+            app:layout_constraintStart_toStartOf="@+id/item_attendee_photo"
+            app:layout_constraintTop_toTopOf="@+id/item_attendee_photo"
+            app:layout_constraintBottom_toBottomOf="@+id/item_attendee_photo"
+            app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"
+            android:gravity="center"
+            android:visibility="visible"
+            android:background="@drawable/shape_background_square_rounded_outlined"
+            tools:text="JD" />
+
+        <ImageView
+            android:id="@+id/item_attendee_status"
+            android:layout_width="@dimen/attendee_status_size"
+            android:layout_height="@dimen/attendee_status_size"
+            android:background="@drawable/shape_attendee_status_circle"
+            android:backgroundTint="@color/notification_success"
+            app:srcCompat="@drawable/ic_check"
+            app:tint="@color/background_norm"
+            android:visibility="visible"
+            tools:visibility="visible"
+            app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
+            app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"
+            app:layout_constraintTop_toBottomOf="@+id/item_attendee_photo"
+            app:layout_constraintBottom_toBottomOf="@+id/item_attendee_photo" />
+
+        <TextView
+            android:id="@+id/item_attendee_title"
+            style="@style/Text.Default"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_element"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="@dimen/spacing_element_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="John Doe" />
+
+        <TextView
+            android:id="@+id/item_attendee_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/Text.DefaultSmall.Weak"
+            android:layout_marginBottom="@dimen/spacing_element"
+            app:layout_constraintStart_toStartOf="@+id/item_attendee_title"
+            app:layout_constraintEnd_toEndOf="@+id/item_attendee_title"
+            app:layout_constraintTop_toBottomOf="@+id/item_attendee_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="johndoe@pm.me" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
