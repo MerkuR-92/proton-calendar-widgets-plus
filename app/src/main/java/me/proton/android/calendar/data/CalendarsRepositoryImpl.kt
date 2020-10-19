@@ -327,8 +327,14 @@ class CalendarsRepositoryImpl(
 
                         filteredByExdates
                     } else if (event.isSingleEdit()) {
-                        // Event that is "from recurring" has already been created when expading ^
-                        emptyList()
+                        // single edits are already generated when expanding above ^
+                        //  however, orphaned single edits (without original recurring event)
+                        //  have to be added to the list manually
+                        if (dbEvents.find { it.uid == event.uid && it.isRecurring() } != null) {
+                            emptyList()
+                        } else {
+                            listOf(event)
+                        }
                     } else {
                         listOf(event)
                     }
