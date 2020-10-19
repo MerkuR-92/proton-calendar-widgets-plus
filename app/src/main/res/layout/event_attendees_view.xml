@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -46,13 +47,12 @@
         app:layout_constraintTop_toBottomOf="@+id/event_attendees_title"
         tools:text="4 yes, 3 maybe, 1 no" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/event_attendees_button"
         style="@style/Icon"
         app:tint="@color/icon_weak"
-        android:layout_marginEnd="@dimen/spacing_element"
+        android:layout_marginEnd="@dimen/spacing_page"
         android:layout_marginStart="@dimen/spacing_element_small"
-        android:background="?android:selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/event_attendees_title"
         app:layout_constraintTop_toTopOf="@id/event_attendees_title"
@@ -62,6 +62,7 @@
         android:id="@+id/event_attendee_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@+id/event_attendees_description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

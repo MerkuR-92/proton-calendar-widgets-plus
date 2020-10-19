@@ -6,6 +6,7 @@ import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
+import biweekly.property.Attendee
 import biweekly.property.ICalProperty
 import biweekly.property.RecurrenceRule
 import biweekly.property.Status
@@ -324,23 +325,22 @@ object ICalUtils {
 //        TimberLogger.v("merging right: ${right.printToString()}")
 
         // copy components and properties from the only event there is
-        right.events.first().components.forEach {
-            val components = it.value
-            components.forEach {
-                if (it is VAlarm) {
-                    left.events.first().addComponent(it)
+        right.events.first().components.forEach { components ->
+            components.value.forEach { iCalComponent ->
+                if (iCalComponent is VAlarm) {
+                    left.events.first().addComponent(iCalComponent)
                 } else {
-                    if (it !in left.events.first().components.values()) {
-                        left.events.first().addComponent(it)
+                    if (iCalComponent !in left.events.first().components.values()) {
+                        left.events.first().addComponent(iCalComponent)
                     }
                 }
             }
         }
-        right.events.first().properties.forEach {
-            val properties = it.value
-            properties.forEach {
-                left.events.first().setProperty(it)
-                left.timezoneInfo.setTimezone(it, right.timezoneInfo.getTimezone(it))
+        right.events.first().properties.forEach { properties ->
+            properties.value.forEach { iCalProperty ->
+                if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
+                else left.events.first().setProperty(iCalProperty)
+                left.timezoneInfo.setTimezone(iCalProperty, right.timezoneInfo.getTimezone(iCalProperty))
             }
         }
 

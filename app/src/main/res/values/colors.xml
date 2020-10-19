@@ -13,6 +13,7 @@
     <color name="mischka">#DADCE3</color>
     <color name="pomegranate">#E84118</color>
     <color name="lime_green">#44BD32</color>
+    <color name="saffron">#FBC531</color>
     <color name="santas_gray">#9CA0AA</color>
     <color name="san_marino">#5064B6</color>
     <color name="abbey">#494D55</color>
@@ -60,8 +61,7 @@
 
     <color name="notification_error">@color/pomegranate</color>
     <color name="notification_success">@color/lime_green</color>
-
-
+    <color name="notification_warning">@color/saffron</color>
 
 
 

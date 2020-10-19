@@ -48,7 +48,7 @@
             android:backgroundTint="@color/notification_success"
             app:srcCompat="@drawable/ic_check"
             app:tint="@color/background_norm"
-            android:visibility="visible"
+            android:visibility="gone"
             tools:visibility="visible"
             app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"

@@ -20,6 +20,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import biweekly.parameter.ParticipationStatus
 import biweekly.property.Status
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -399,36 +400,52 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            val attendeeList = event.iCalEvent.attendees
-            section_attendees.visibleOrGone(event.iCalEvent.organizer != null)
-            event_attendees_title.text = "${event.iCalEvent.attendees.size} Participants"
-            event_attendees_description.text = "2 unanswered"
-
             TimberLogger.d("Attendees : organizer ${event.iCalEvent.organizer.email} /// ${event.iCalEvent.organizer.commonName}")
 
-            val organizer = event.iCalEvent.organizer
-            event_attendee_organizer_layout.item_attendee_title.text = organizer.email
-            event_attendee_organizer_layout.item_attendee_description.text = "Organizer"
-            event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email)
-
+            val attendeeList = event.iCalEvent.attendees
+            section_attendees.visibleOrGone(event.iCalEvent.organizer != null)
+            event_attendees_title.text = resources.getString(R.string.event_attendee_title, event.iCalEvent.attendees.size)
+            val statusMap = HashMap<ParticipationStatus, Int>()
             attendeeList.forEach {event.iCalEvent.attendees
                 TimberLogger.d("Attendees : attendee ${it.email} /// ${it.commonName}")
+                if (it.participationStatus != null) statusMap[it.participationStatus] = 1 + (statusMap[it.participationStatus] ?: 0)
+                else statusMap[ParticipationStatus.NEEDS_ACTION] = 1 + (statusMap[ParticipationStatus.NEEDS_ACTION] ?: 0)
             }
-            val attendeeListView = event_attendee_list
+            var attendeesStatusDescription = buildAttendeesStatusesDescription(statusMap[ParticipationStatus.ACCEPTED], R.string.event_attendee_yes, "")
+            attendeesStatusDescription = buildAttendeesStatusesDescription(statusMap[ParticipationStatus.TENTATIVE], R.string.event_attendee_maybe, attendeesStatusDescription)
+            attendeesStatusDescription = buildAttendeesStatusesDescription(statusMap[ParticipationStatus.DECLINED], R.string.event_attendee_no, attendeesStatusDescription)
+            attendeesStatusDescription = buildAttendeesStatusesDescription(statusMap[ParticipationStatus.NEEDS_ACTION], R.string.event_attendee_unanswered, attendeesStatusDescription)
+            event_attendees_description.text = attendeesStatusDescription
+
+            lifecycleScope.launch {
+                val user = withContext(Dispatchers.Default) {
+                    calendarViewModel.selectUser()
+                }
+                val organizer = event.iCalEvent.organizer
+                if (user?.email == organizer.email) {
+                    event_attendee_organizer_layout.item_attendee_title.text = resources.getString(R.string.event_attendee_is_organizer)
+                    event_attendee_organizer_layout.item_attendee_description.text = organizer.email
+                } else {
+                    event_attendee_organizer_layout.item_attendee_title.text = organizer.email
+                    event_attendee_organizer_layout.item_attendee_description.text = resources.getString(R.string.event_attendee_organizer)
+                }
+                event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email)
+            }
+
             val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            attendeeListView.layoutManager = attendeesLayoutManager
+            event_attendee_list.layoutManager = attendeesLayoutManager
             attendeeListAdapter = AttendeeListAdapter() { attendee ->
                 //On Attendee click event
             }
-            (attendeeListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            attendeeListView.adapter = attendeeListAdapter
+            (event_attendee_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            event_attendee_list.adapter = attendeeListAdapter
             if (attendeeList.isNotEmpty()) {
                 attendeeListAdapter.submitList(attendeeList)
-                attendeeListView.visibleOrGone(true)
-            } else {
-                attendeeListView.visibleOrGone(false)
+                event_attendees_press.setOnClickListener {
+                    event_attendee_list.visibleOrGone(!event_attendee_list.isVisible)
+                    event_attendees_button.rotation = if (event_attendee_list.isVisible) 180f else 0f
+                }
             }
-
 //                text_event_all_day_pill.visibleOrGone(event.isAllDay())
 //
 
@@ -442,6 +459,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
 
         })
+    }
+
+    private fun buildAttendeesStatusesDescription(statusCount: Int?, statusStringId: Int, previousStatusString: String): String {
+        return if (statusCount != null && previousStatusString.isNotEmpty())
+            resources.getString(R.string.event_attendee_status_separator,
+                previousStatusString,
+                resources.getString(statusStringId, statusCount))
+        else if (statusCount != null && previousStatusString.isEmpty())
+            resources.getString(statusStringId, statusCount)
+        else ""
     }
 
 

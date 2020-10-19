@@ -54,6 +54,14 @@
     <string name="event_attendee_count">%d %s</string>
     <string name="event_status_cancelled">Cancelled</string>
     <string name="event_calendar_disabled"><![CDATA[%s <i>(Disabled)</i>]]></string>
+    <string name="event_attendee_title">%d Participants</string>
+    <string name="event_attendee_status_separator">%s, %s</string>
+    <string name="event_attendee_yes">%d yes</string>
+    <string name="event_attendee_maybe">%d maybe</string>
+    <string name="event_attendee_no">%d no</string>
+    <string name="event_attendee_unanswered">%d unanswered</string>
+    <string name="event_attendee_is_organizer">You are the organizer</string>
+    <string name="event_attendee_organizer">Organizer</string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
