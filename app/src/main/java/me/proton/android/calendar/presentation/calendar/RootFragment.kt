@@ -14,11 +14,8 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.MainViewModel.Companion.INTENT_ACTION_SHOW_EVENT_DETAILS
-import me.proton.android.calendar.presentation.MainViewModel.Companion.INTENT_EXTRA_EVENT_ID
-import me.proton.android.calendar.presentation.MainViewModel.Companion.INTENT_EXTRA_EVENT_OCCURRENCE
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 
 class RootFragment : BaseDialogFragment(), KoinComponent {
@@ -48,9 +45,8 @@ class RootFragment : BaseDialogFragment(), KoinComponent {
                 val notificationIntent = mainViewModel.consumeIntent(INTENT_ACTION_SHOW_EVENT_DETAILS)
                 if (notificationIntent != null) {
 
-                    TimberLogger.v("root fragment navigating with notification intent")
-                    findNavController().navigate(Navigation.Deeplink.toEventDetails(notificationIntent.getStringExtra(INTENT_EXTRA_EVENT_ID)!!, notificationIntent.getIntExtra(
-                        INTENT_EXTRA_EVENT_OCCURRENCE, 0)))
+                    TimberLogger.v("root fragment navigating with notification intent: ${notificationIntent.data.toString()}")
+                    findNavController().navigate(notificationIntent.data!!)
                     
                 } else {
 

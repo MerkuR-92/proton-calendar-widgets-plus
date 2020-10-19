@@ -11,7 +11,9 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.MainViewModel
-import java.util.*
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class ShowNotificationUseCase(private val logger: Logger, private val context: Context, private val calendarsRepository: CalendarsRepository, private val transformEventUseCase: TransformEventUseCase) {
 
@@ -36,6 +38,7 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
 
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID_EVENT_ALARMS)
+        val systemDefaultZoneId = ZoneId.systemDefault()
 
         eventAlarms.forEach {
 
@@ -48,13 +51,26 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
                     logger.e("could not transform EventEntity to show notification")
                 } else {
 
-                    // TODO GENERATE OCCURRENCE IF NEEDED!!!!!!!!!!!!!!!!!!
+                    val eventWithOccurrence = if (dbEvent.isRecurring()) {
 
+                        val occurrences = dbEvent.generateOccurrencesUntil(
+                            ZonedDateTime.ofInstant(Instant.ofEpochSecond(it.occurrence), systemDefaultZoneId).toLocalDate(),
+                            systemDefaultZoneId.id)
 
-                    val intent = MainViewModel.createIntentToShowEventDetails(context, dbEvent.id, dbEvent.occurrence?.occurrenceNumber)
-                    val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0/* TODO */, intent, 0)
+                        if (occurrences == null || occurrences.isEmpty()) {
+                            logger.e("could not generate occurrences for notification of recurring event")
+                            null
+                        } else {
+                            dbEvent.withOccurrence(occurrences.last())
+                        }
 
-                    val text = dbEvent.formatStartForNotification(TimeZone.getDefault().id, context.resources) // formatting in phone's timezone
+                    } else null
+
+                    val intent = MainViewModel.createIntentToShowEventDetails(context, dbEvent.id, eventWithOccurrence?.occurrence?.occurrenceNumber)
+                    /* FLAG_ONE_SHOT cancels pending intent after it's sent */
+                    val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+
+                    val text = (eventWithOccurrence ?: dbEvent).formatStartForNotification(systemDefaultZoneId.id, context.resources) // formatting in phone's timezone
 
                     notificationBuilder
                         .setSmallIcon(R.drawable.ic_calendar_today)
@@ -70,8 +86,6 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
         }
 
     }
-
-
 
     companion object {
 

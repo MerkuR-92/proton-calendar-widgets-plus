@@ -627,6 +627,7 @@ data class Event(
                     this.iCalendar.setStartTimeZone(occurrence.startDateTime.zone.id)
                     this.iCalendar.setEndTimeZone(occurrence.endDateTime.zone.id)
                 }
+                this.occurrence = occurrence
             }
         }
 

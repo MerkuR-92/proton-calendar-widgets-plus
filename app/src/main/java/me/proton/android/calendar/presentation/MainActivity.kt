@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
@@ -51,9 +52,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null && intent != null) {
-            mainViewModel.handleIntent(intent)
-        }
+        intent?.let { mainViewModel.handleIntent(intent) }
 
         setContentView(R.layout.activity_main)
 
@@ -131,6 +130,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 //        mainViewModel.syncServerEvents().observe(this, Observer {
 //            it?.let { TimberLogger.d("local server event sync state: ${it}") } // TODO progress indicator
 //        })
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let { mainViewModel.handleIntent(intent) }
     }
 
     private fun initDrawerListeners() {

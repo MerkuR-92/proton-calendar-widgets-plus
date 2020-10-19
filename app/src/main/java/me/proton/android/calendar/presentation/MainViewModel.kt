@@ -1,7 +1,5 @@
 package me.proton.android.calendar.presentation
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.*
 import android.net.Uri
 import android.widget.Toast
@@ -13,7 +11,6 @@ import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.domain.CalendarsRepository
 import kotlinx.coroutines.Job
-import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.Navigation
 import kotlin.Exception
 
@@ -202,14 +199,10 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
     companion object {
         const val INTENT_ACTION_SHOW_EVENT_DETAILS = "INTENT_ACTION_SHOW_EVENT_DETAILS"
 
-        const val INTENT_EXTRA_EVENT_ID = "INTENT_EXTRA_EVENT_ID"
-        const val INTENT_EXTRA_EVENT_OCCURRENCE = "INTENT_EXTRA_EVENT_OCCURRENCE"
-
         fun createIntentToShowEventDetails(context: Context, eventId: String, occurrenceNumber: Int?): Intent {
             return Intent(context, MainActivity::class.java).apply {
                 action = INTENT_ACTION_SHOW_EVENT_DETAILS
-                putExtra(INTENT_EXTRA_EVENT_ID, eventId)
-                putExtra(INTENT_EXTRA_EVENT_OCCURRENCE, occurrenceNumber)
+                data = Navigation.Deeplink.toEventDetails(eventId, occurrenceNumber ?: 0)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
         }

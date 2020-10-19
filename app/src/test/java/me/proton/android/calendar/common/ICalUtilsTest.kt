@@ -1876,12 +1876,15 @@ internal class ICalUtilsTest {
 
         assertThat(eventWithOccurrence1.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 8, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
         assertThat(eventWithOccurrence1.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 9, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(eventWithOccurrence1.occurrence!!.occurrenceNumber).isEqualTo(1)
 
         assertThat(eventWithOccurrence2.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 15, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
         assertThat(eventWithOccurrence2.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 7, 16, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(eventWithOccurrence2.occurrence!!.occurrenceNumber).isEqualTo(2)
 
         assertThat(eventWithOccurrence5.getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 8, 5, 15, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
         assertThat(eventWithOccurrence5.getEnd(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2020, 8, 6, 15, 30, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(eventWithOccurrence5.occurrence!!.occurrenceNumber).isEqualTo(5)
 
     }
 
