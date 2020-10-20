@@ -26,7 +26,7 @@ class UsersRepositoryImpl(
 
     override suspend fun persistUser(user: UserEntity) {
         Timber.d("persisting user entity ${user}")
-        database.usersDao().insert(user)
+        database.usersDao().updateOrInsert(user)
     }
 
     override suspend fun updateUser(user: UserEntity) {

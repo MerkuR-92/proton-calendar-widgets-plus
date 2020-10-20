@@ -54,8 +54,18 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onNavigationIconClicked(): Boolean {
-        findNavController().popBackStack(R.id.nav_calendar, false)
+        jumpToMonthView()
         return true
+    }
+
+    private fun jumpToMonthView() {
+        if (!findNavController().popBackStack(R.id.nav_calendar, false)) {
+            // TODO this is a workaround for navigating back to month view after opening EventForm from EventDetails
+            //  that was opened from system notification
+            //  R.id.nav_calendar is not in the hierarchy so popping backstack will fail and we need
+            //  to navigate manually
+            findNavController().navigate(Navigation.Deeplink.toMonth())
+        }
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
@@ -112,7 +122,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 if (success) { // TODO remove duplicated code here and below
                                     onSuccessEventUpdateCalendarDisplay()
                                     Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-                                    findNavController().popBackStack(R.id.nav_calendar, false)
+                                    jumpToMonthView()
                                 } else {
                                     Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                                 }
@@ -130,7 +140,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
 //                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
-                                findNavController().popBackStack(R.id.nav_calendar, false)
+                                jumpToMonthView()
                             } else {
                                 Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                             }
@@ -139,7 +149,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
 //                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
-                                findNavController().popBackStack(R.id.nav_calendar, false)
+                                jumpToMonthView()
                             } else {
                                 Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
                             }
