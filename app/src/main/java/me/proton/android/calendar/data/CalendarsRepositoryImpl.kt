@@ -1,14 +1,15 @@
 package me.proton.android.calendar.data
 
 import com.google.gson.Gson
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.Logger
@@ -45,6 +46,8 @@ class CalendarsRepositoryImpl(
     override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
     private lateinit var selectedCalendarIds: List<String>
+
+    private val expandEventsMutex = Mutex()
 
     override suspend fun init(calendarIds: List<String>, userId: String, toDate: LocalDate, timeZoneId: String) {
         selectedCalendarIds = calendarIds
@@ -309,7 +312,9 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDate: LocalDate, timeZoneId: String, force: Boolean) {
 
-        synchronized(this) { // TODO
+        TimberLogger.v("expandDbEventsUntil ${this}")
+
+        expandEventsMutex.withLock {
             TimberLogger.v("xxx expanding local occurrences until ${toDate}")
 
             if (force || eventsExpandedUntil == null || (eventsExpandedUntil != null && toDate.isAfter(eventsExpandedUntil))) {
