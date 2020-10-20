@@ -3,9 +3,12 @@ package me.proton.android.calendar.presentation.calendar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,9 +20,7 @@ import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.presentation.MainActivity
 
-class AttendeeListAdapter(
-    val listener: (Attendee) -> Unit
-) : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
+class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
 
     class AttendeeDiffCallback : DiffUtil.ItemCallback<Attendee>() {
         override fun areItemsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
@@ -42,7 +43,7 @@ class AttendeeListAdapter(
     }
 
     inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        private val attendeeItemOverlay: View = view.item_attendee_press
+        private val attendeeItemTextLayout: LinearLayout = view.item_attendee_text_layout
         private val attendeeItemTitle: TextView = view.item_attendee_title
         private val attendeeItemDescription: TextView = view.item_attendee_description
         private val attendeeItemInitials: TextView = view.item_attendee_initials
@@ -52,13 +53,21 @@ class AttendeeListAdapter(
             val description = if (!attendee.commonName.isNullOrEmpty()) attendee.email else ""
             val title = if (description.isEmpty()) attendee.email else attendee.commonName
             attendeeItemTitle.text = title
+
             if (description.isNotEmpty()) attendeeItemDescription.text = description
+            else attendeeItemDescription.visibleOrGone(false)
+
+            // TODO Handle common name and picture when contacts are implemented
+            attendeeItemDescription.visibleOrGone(false)
             attendeeItemInitials.text = getInitials(title)
 
-            /*
-            android:backgroundTint="@color/notification_success"
-            app:srcCompat="@drawable/ic_check"
-             */
+            if (!attendeeItemDescription.isVisible) {
+                val params = attendeeItemTextLayout.layoutParams as ViewGroup.MarginLayoutParams
+                params.topMargin = view.context.resources.getDimensionPixelSize(R.dimen.spacing_page)
+                params.bottomMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_single_title_bottom_margin)
+                attendeeItemTextLayout.layoutParams = params
+            }
+
             when (attendee.participationStatus) {
                 ParticipationStatus.ACCEPTED -> {
                     attendeeItemStatus.visibleOrGone(true)
@@ -76,10 +85,6 @@ class AttendeeListAdapter(
                     attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_question))
                 }
                 else ->  attendeeItemStatus.visibleOrGone(false)
-            }
-
-            attendeeItemOverlay.setOnClickListener {
-                listener(attendee)
             }
         }
     }

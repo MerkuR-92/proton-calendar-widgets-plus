@@ -5,25 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-        <include
-            android:id="@+id/item_attendee_press"
-            layout="@layout/view_press_overlay"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/item_attendee_description"/>
-
         <ImageView
             android:id="@+id/item_attendee_photo"
             android:layout_width="@dimen/attendee_avatar_size"
             android:layout_height="@dimen/attendee_avatar_size"
             android:layout_marginStart="38dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/item_attendee_title"
-            app:layout_constraintBottom_toBottomOf="@+id/item_attendee_description"
-            app:layout_constraintEnd_toStartOf="@+id/item_attendee_title"
+            app:layout_constraintTop_toTopOf="@id/item_attendee_text_layout"
+            app:layout_constraintBottom_toBottomOf="@+id/item_attendee_text_layout"
+            app:layout_constraintEnd_toStartOf="@+id/item_attendee_text_layout"
             android:visibility="invisible"/>
 
         <TextView
@@ -55,29 +45,35 @@
             app:layout_constraintTop_toBottomOf="@+id/item_attendee_photo"
             app:layout_constraintBottom_toBottomOf="@+id/item_attendee_photo" />
 
-        <TextView
-            android:id="@+id/item_attendee_title"
-            style="@style/Text.Default"
+        <LinearLayout
+            android:id="@+id/item_attendee_text_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginTop="@dimen/spacing_element"
             android:layout_marginStart="14dp"
             android:layout_marginEnd="@dimen/spacing_element_small"
+            android:layout_marginBottom="@dimen/spacing_element"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="John Doe" />
-
-        <TextView
-            android:id="@+id/item_attendee_description"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            style="@style/Text.DefaultSmall.Weak"
-            android:layout_marginBottom="@dimen/spacing_element"
-            app:layout_constraintStart_toStartOf="@+id/item_attendee_title"
-            app:layout_constraintEnd_toEndOf="@+id/item_attendee_title"
-            app:layout_constraintTop_toBottomOf="@+id/item_attendee_title"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="johndoe@pm.me" />
+            app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/item_attendee_title"
+                    style="@style/Text.Default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="John Doe" />
+
+                <TextView
+                    android:id="@+id/item_attendee_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    style="@style/Text.DefaultSmall.Weak"
+                    tools:text="johndoe@pm.me" />
+
+        </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

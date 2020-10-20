@@ -36,6 +36,7 @@
 
     <dimen name="attendee_avatar_size">32dp</dimen>
     <dimen name="attendee_status_size">16dp</dimen>
+    <dimen name="attendee_single_title_bottom_margin">22dp</dimen>
 
 
 

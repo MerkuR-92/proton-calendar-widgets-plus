@@ -13,6 +13,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
+import android.view.animation.Transformation
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.StringRes
@@ -27,6 +31,7 @@ import biweekly.component.VAlarm
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -878,4 +883,90 @@ fun getInitials(name: String): String {
         .reduce { acc, s -> acc + s }
     //Keep only the first two initials
     return if (initials.length > 2) initials.substring(0, 2) else initials
+}
+
+fun expand(v: View) {
+    val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
+    val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+    v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
+    val targetHeight = v.measuredHeight
+    TimberLogger.d("expand : targetHeight = ${targetHeight}")
+
+    // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+    v.layoutParams.height = 1
+    v.visibility = View.VISIBLE
+    val animation = object : Animation() {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+            v.layoutParams.height =
+                if (interpolatedTime == 1f) targetHeight else (targetHeight * interpolatedTime).toInt()
+            TimberLogger.d("expand : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+            v.requestLayout()
+        }
+
+        override fun willChangeBounds(): Boolean {
+            return true
+        }
+    }
+
+    // Expansion speed of 1dp/ms
+    animation.duration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
+    TimberLogger.d("expand : duration = ${animation.duration}")
+    v.startAnimation(animation)
+}
+
+fun collapse(v: View) {
+    val initialHeight = v.measuredHeight
+    TimberLogger.d("collapse : initialHeight = ${initialHeight}")
+    val animation = object : Animation() {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+            if (interpolatedTime == 1f) {
+                v.visibility = View.GONE
+            } else {
+                v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
+                v.requestLayout()
+            }
+            TimberLogger.d("collapse : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+        }
+
+        override fun willChangeBounds(): Boolean {
+            return true
+        }
+    }
+
+    // Collapse speed of 1dp/ms
+    animation.duration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
+    TimberLogger.d("collapse : duration = ${animation.duration}")
+    v.startAnimation(animation)
+}
+
+fun rotateArrowDownward(v: View) {
+    val rotate =
+        RotateAnimation(
+            180F,
+            0F,
+            Animation.RELATIVE_TO_SELF,
+            0.5f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f
+        )
+    rotate.interpolator = LinearInterpolator()
+    rotate.fillAfter = true
+    rotate.duration = 100
+    v.startAnimation(rotate)
+}
+
+fun rotateArrowUpward(v: View) {
+    val rotate =
+        RotateAnimation(
+            0F,
+            180F,
+            Animation.RELATIVE_TO_SELF,
+            0.5f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f
+        )
+    rotate.interpolator = LinearInterpolator()
+    rotate.fillAfter = true
+    rotate.duration = 100
+    v.startAnimation(rotate)
 }
