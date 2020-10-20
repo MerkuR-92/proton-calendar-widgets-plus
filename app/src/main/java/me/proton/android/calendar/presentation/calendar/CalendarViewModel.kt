@@ -41,6 +41,8 @@ class CalendarViewModel(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
+    private var initialised = false
+
 //    private lateinit var selectedCalendarIds: List<String>
 
     override fun onCleared() {
@@ -100,39 +102,43 @@ class CalendarViewModel(
     }
 
     suspend fun init(coroutineScope: CoroutineScope) {
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-        if (TODOuserID != null) {
 
-            timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
-            startWeekOn = if (calendarsRepository.selectUserSettings(TODOuserID)?.weekStart == 7) {
-                DayOfWeek.SUNDAY
-            } else {
-                DayOfWeek.MONDAY
+        if (!initialised) {
+            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+            val TODOuserID = TODOvalueStore.getString("USERID") // TODO
+            if (TODOuserID != null) {
+
+                timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
+                startWeekOn = if (calendarsRepository.selectUserSettings(TODOuserID)?.weekStart == 7) {
+                    DayOfWeek.SUNDAY
+                } else {
+                    DayOfWeek.MONDAY
+                }
+
+                TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
+
+                //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
+
+
+
+
+                // TODO get calendars that are selected from the sidebar
+                val selectedActiveCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
+                val selectedDisabledCalendarIds = calendarsRepository.getDisabledCalendars(TODOuserID).map { it.id }.toList()
+                val selectedCalendarIds = selectedActiveCalendarIds + selectedDisabledCalendarIds
+
+
+                coroutineScope.launch {
+                    // TODO this method never returns
+                    val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
+                    val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
+                    calendarsRepository.init(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
+                }
+
+                initialised = true
             }
-
-            TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
-
-            //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
-
-
-
-
-            // TODO get calendars that are selected from the sidebar
-            val selectedActiveCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
-            val selectedDisabledCalendarIds = calendarsRepository.getDisabledCalendars(TODOuserID).map { it.id }.toList()
-            val selectedCalendarIds = selectedActiveCalendarIds + selectedDisabledCalendarIds
-
-
-            coroutineScope.launch {
-                // TODO this method never returns
-                val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
-                val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-                calendarsRepository.init(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
-            }
-
-
         }
+
     }
 
     private lateinit var miniCalendarPager: ViewPager2
