@@ -405,80 +405,110 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            val attendeeList = event.iCalEvent.attendees
-            section_attendees.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
-            if (attendeeList.isNotEmpty()) {
-                event_attendees_title.text =
-                    resources.getString(R.string.event_attendee_title, event.iCalEvent.attendees.size)
-                val statusMap = hashMapOf<ParticipationStatus, Int>()
-                attendeeList.forEach {
-                    TimberLogger.d("Attendees : attendee ${it.email} /// ${it.commonName}")
-                    if (it.participationStatus != null) {
-                        statusMap[it.participationStatus] =
-                            1 + (statusMap[it.participationStatus] ?: 0)
-                    } else {
-                        statusMap[ParticipationStatus.NEEDS_ACTION] =
-                            1 + (statusMap[ParticipationStatus.NEEDS_ACTION] ?: 0)
-                    }
-                }
-                var attendeesStatusDescription = buildAttendeesStatusesDescription(
-                    statusMap[ParticipationStatus.ACCEPTED],
-                    R.string.event_attendee_yes,
-                    ""
-                )
-                attendeesStatusDescription = buildAttendeesStatusesDescription(
-                    statusMap[ParticipationStatus.TENTATIVE],
-                    R.string.event_attendee_maybe,
-                    attendeesStatusDescription
-                )
-                attendeesStatusDescription = buildAttendeesStatusesDescription(
-                    statusMap[ParticipationStatus.DECLINED],
-                    R.string.event_attendee_no,
-                    attendeesStatusDescription
-                )
-                attendeesStatusDescription = buildAttendeesStatusesDescription(
-                    statusMap[ParticipationStatus.NEEDS_ACTION],
-                    R.string.event_attendee_unanswered,
-                    attendeesStatusDescription
-                )
-                event_attendees_description.text = attendeesStatusDescription
-
-                val organizer = event.iCalEvent.organizer
-                if (organizer != null) {
-                    lifecycleScope.launch {
-                        val user = withContext(Dispatchers.Default) {
-                            calendarViewModel.selectUser()
-                        }
-                        if (user?.email == organizer.email) {
-                            event_attendee_organizer_layout.item_attendee_title.text =
-                                resources.getString(R.string.event_attendee_is_organizer)
-                            event_attendee_organizer_layout.item_attendee_description.text = organizer.email
+            if (FeatureFlags.SHOW_ATTENDEES) {
+                val attendeeList = event.iCalEvent.attendees
+                section_attendees.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
+                if (attendeeList.isNotEmpty()) {
+                    val organizerAttendee = attendeeList.find { it.email == event.iCalEvent.organizer.email }
+                    if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
+                    event_attendees_title.text =
+                        resources.getString(R.string.event_attendee_title, event.iCalEvent.attendees.size)
+                    val statusMap = hashMapOf<ParticipationStatus, Int>()
+                    attendeeList.forEach {
+                        TimberLogger.d("Attendees : attendee ${it.email} /// ${it.commonName}")
+                        if (it.participationStatus != null) {
+                            statusMap[it.participationStatus] =
+                                1 + (statusMap[it.participationStatus] ?: 0)
                         } else {
-                            event_attendee_organizer_layout.item_attendee_title.text = organizer.email
-                            event_attendee_organizer_layout.item_attendee_description.text =
-                                resources.getString(R.string.event_attendee_organizer)
+                            statusMap[ParticipationStatus.NEEDS_ACTION] =
+                                1 + (statusMap[ParticipationStatus.NEEDS_ACTION] ?: 0)
                         }
-                        event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email)
                     }
-                }
+                    var attendeesStatusDescription = buildAttendeesStatusesDescription(
+                        statusMap[ParticipationStatus.ACCEPTED],
+                        R.string.event_attendee_yes,
+                        ""
+                    )
+                    attendeesStatusDescription = buildAttendeesStatusesDescription(
+                        statusMap[ParticipationStatus.TENTATIVE],
+                        R.string.event_attendee_maybe,
+                        attendeesStatusDescription
+                    )
+                    attendeesStatusDescription = buildAttendeesStatusesDescription(
+                        statusMap[ParticipationStatus.DECLINED],
+                        R.string.event_attendee_no,
+                        attendeesStatusDescription
+                    )
+                    attendeesStatusDescription = buildAttendeesStatusesDescription(
+                        statusMap[ParticipationStatus.NEEDS_ACTION],
+                        R.string.event_attendee_unanswered,
+                        attendeesStatusDescription
+                    )
+                    event_attendees_description.text = attendeesStatusDescription
 
-                val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-                event_attendee_list.layoutManager = attendeesLayoutManager
-                attendeeListAdapter = AttendeeListAdapter()
-                (event_attendee_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                event_attendee_list.adapter = attendeeListAdapter
-                attendeeListAdapter.submitList(attendeeList)
+                    val organizer = event.iCalEvent.organizer
+                    if (organizer != null) {
+                        lifecycleScope.launch {
+                            val user = withContext(Dispatchers.Default) {
+                                calendarViewModel.selectUser()
+                            }
+                            if (user?.email == organizer.email) {
+                                event_attendee_organizer_layout.item_attendee_title.text =
+                                    resources.getString(R.string.event_attendee_is_organizer)
+                                event_attendee_organizer_layout.item_attendee_description.text = organizer.email
+                            } else {
+                                event_attendee_organizer_layout.item_attendee_title.text = organizer.email
+                                event_attendee_organizer_layout.item_attendee_description.text =
+                                    resources.getString(R.string.event_attendee_organizer)
+                            }
+                            event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email)
 
-                event_attendees_press.setOnClickListener {
-                    if (event_attendee_list.isVisible) {
-                        collapse(event_attendee_list)
-                        rotateArrowDownward(event_attendees_button)
-                    } else {
-                        expand(event_attendee_list)
-                        rotateArrowUpward(event_attendees_button)
+                            if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
+                                val organizerStatus = event_attendee_organizer_layout.item_attendee_status
+                                organizerStatus.visibleOrGone(true)
+                                when (organizerAttendee.participationStatus) {
+                                    ParticipationStatus.ACCEPTED -> {
+                                        organizerStatus.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.notification_success)
+                                        organizerStatus.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_check))
+                                    }
+                                    ParticipationStatus.DECLINED -> {
+                                        organizerStatus.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.notification_error)
+                                        organizerStatus.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_close))
+                                    }
+                                    ParticipationStatus.TENTATIVE -> {
+                                        organizerStatus.backgroundTintList = ContextCompat.getColorStateList(requireContext(), R.color.notification_warning)
+                                        organizerStatus.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_question))
+                                    }
+                                    else ->  organizerStatus.visibleOrGone(false)
+                                }
+                            }
+                        }
+                    }
+
+                    val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                    event_attendee_list.layoutManager = attendeesLayoutManager
+                    attendeeListAdapter = AttendeeListAdapter()
+                    (event_attendee_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                    event_attendee_list.adapter = attendeeListAdapter
+                    attendeeListAdapter.submitList(attendeeList)
+
+                    if (attendeeList.size <= 5) {
+                        event_attendee_list.visibleOrGone(true)
+                        rotateArrowUpward(event_attendees_button, 0)
+                    }
+
+                    event_attendees_press.setOnClickListener {
+                        if (event_attendee_list.isVisible) {
+                            collapse(event_attendee_list)
+                            rotateArrowDownward(event_attendees_button)
+                        } else {
+                            expand(event_attendee_list)
+                            rotateArrowUpward(event_attendees_button)
+                        }
                     }
                 }
             }
+
         })
     }
 
@@ -489,7 +519,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 resources.getString(statusStringId, statusCount))
         else if (statusCount != null && previousStatusString.isEmpty())
             resources.getString(statusStringId, statusCount)
-        else ""
+        else previousStatusString
     }
 
 

@@ -38,7 +38,8 @@ data class EventEntity(
     val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar // TODO nullable?
 //    @SerializedName("PersonalEvent") // TODO change this to PersonalEvents when api fixes naming
     val personalEvents: List<JsonElement>, // specific to a member // TODO nullable?
-    val attendeesEvents: List<JsonElement> // shared between all calendars // TODO nullable?
+    val attendeesEvents: List<JsonElement>, // shared between all calendars // TODO nullable?
+    val attendees: List<JsonElement>
 
     /** AttendeesEvent & Attendees: shared between all calendars
      *

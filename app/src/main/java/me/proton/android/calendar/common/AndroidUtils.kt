@@ -885,7 +885,7 @@ fun getInitials(name: String): String {
     return if (initials.length > 2) initials.substring(0, 2) else initials
 }
 
-fun expand(v: View) {
+fun expand(v: View, duration: Long? = null) {
     val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
     val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
     v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
@@ -909,12 +909,12 @@ fun expand(v: View) {
     }
 
     // Expansion speed of 1dp/ms
-    animation.duration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
+    animation.duration = duration ?: (targetHeight / v.context.resources.displayMetrics.density).toLong()
     TimberLogger.d("expand : duration = ${animation.duration}")
     v.startAnimation(animation)
 }
 
-fun collapse(v: View) {
+fun collapse(v: View, duration: Long? = null) {
     val initialHeight = v.measuredHeight
     TimberLogger.d("collapse : initialHeight = ${initialHeight}")
     val animation = object : Animation() {
@@ -934,12 +934,12 @@ fun collapse(v: View) {
     }
 
     // Collapse speed of 1dp/ms
-    animation.duration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
+    animation.duration = duration ?: (initialHeight / v.context.resources.displayMetrics.density).toLong()
     TimberLogger.d("collapse : duration = ${animation.duration}")
     v.startAnimation(animation)
 }
 
-fun rotateArrowDownward(v: View) {
+fun rotateArrowDownward(v: View, duration: Long = 100) {
     val rotate =
         RotateAnimation(
             180F,
@@ -951,11 +951,11 @@ fun rotateArrowDownward(v: View) {
         )
     rotate.interpolator = LinearInterpolator()
     rotate.fillAfter = true
-    rotate.duration = 100
+    rotate.duration = duration
     v.startAnimation(rotate)
 }
 
-fun rotateArrowUpward(v: View) {
+fun rotateArrowUpward(v: View, duration: Long = 100) {
     val rotate =
         RotateAnimation(
             0F,
@@ -967,6 +967,6 @@ fun rotateArrowUpward(v: View) {
         )
     rotate.interpolator = LinearInterpolator()
     rotate.fillAfter = true
-    rotate.duration = 100
+    rotate.duration = duration
     v.startAnimation(rotate)
 }

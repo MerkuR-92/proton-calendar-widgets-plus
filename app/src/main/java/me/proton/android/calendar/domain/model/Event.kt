@@ -5,6 +5,7 @@ import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
+import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.RecurrenceId
@@ -664,6 +665,19 @@ data class Event(
         ) {
             val isEncrypted: Boolean get() = type and 1 > 0
 //            val isSigned: Boolean get() = type and 2 > 0
+        }
+
+        data class AttendeeStatusEvent(
+            val id: String,
+            val token: String,
+            val status: Int
+        ) {
+            val participationStatus: ParticipationStatus get() = when (status) {
+                1 -> ParticipationStatus.TENTATIVE
+                2 -> ParticipationStatus.DECLINED
+                3 -> ParticipationStatus.ACCEPTED
+                else ->  ParticipationStatus.NEEDS_ACTION
+            }
         }
 
     enum class SignatureVerification {

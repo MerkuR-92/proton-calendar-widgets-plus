@@ -120,8 +120,9 @@ internal class SyncServerEventsUseCaseTest {
                     "sharedKeyPacket",
                     emptyList(),
                     emptyList(),
-                    emptyList()
-                ))
+                    emptyList(),
+                    emptyList(),
+                    emptyList()))
             )
 
             val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarsApi)

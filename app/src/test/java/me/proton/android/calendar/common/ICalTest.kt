@@ -67,6 +67,15 @@ internal class ICalTest {
     ACTION:DISPLAY
     END:VALARM
     END:VEVENT
+    END:VCALENDAR""".trimIndent(),
+    """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    UID:kkeK2lGET6ZyVpnHrOAJoXLAWwSO@proton.me
+    ATTENDEE;CN=calendarsingle8@protonmail.com;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-TOKEN=fc2ea86750f1d0ce99c2350dd37066f995397ddd:mailto:calendarsingle8@protonmail.com
+    ATTENDEE;CN=benjaminlovestesting@pm.me;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-TOKEN=0a1d59494c1192807b52008cf4f2ae8ae6e62a25:mailto:benjaminlovestesting@pm.me
+    END:VEVENT
     END:VCALENDAR""".trimIndent()
         )
 
@@ -79,6 +88,9 @@ internal class ICalTest {
         assertThat(mergedEvent.alarms).hasSize(5)
         assertThat(mergedCalendar.events).hasSize(1)
         assertThat(mergedCalendar.productId.value).isEqualTo("-//Proton Technologies//AndroidCalendar 1.0//EN")
+        assertThat(mergedCalendar.events.first().attendees).hasSize(2)
+        assertThat(mergedCalendar.events.first().attendees[0].email).isEqualTo("calendarsingle8@protonmail.com")
+        assertThat(mergedCalendar.events.first().attendees[1].email).isEqualTo("benjaminlovestesting@pm.me")
 
     }
 

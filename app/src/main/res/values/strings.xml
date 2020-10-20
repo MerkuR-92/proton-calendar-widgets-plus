@@ -62,6 +62,7 @@
     <string name="event_attendee_unanswered">%d unanswered</string>
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
+    <string name="event_attendee_optional">Optional</string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>

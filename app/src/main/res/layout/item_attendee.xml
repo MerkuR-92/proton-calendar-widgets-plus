@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_attendee_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -39,7 +40,6 @@
             app:srcCompat="@drawable/ic_check"
             app:tint="@color/background_norm"
             android:visibility="gone"
-            tools:visibility="visible"
             app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintTop_toBottomOf="@+id/item_attendee_photo"
@@ -75,5 +75,18 @@
                     tools:text="johndoe@pm.me" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/item_attendee_optional"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginBottom="@dimen/spacing_element"
+            app:layout_constraintTop_toBottomOf="@+id/item_attendee_text_layout"
+            app:layout_constraintStart_toStartOf="@+id/item_attendee_text_layout"
+            app:layout_constraintEnd_toEndOf="@+id/item_attendee_text_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/Text.DefaultSmall.Weak"
+            android:text="@string/event_attendee_optional" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
