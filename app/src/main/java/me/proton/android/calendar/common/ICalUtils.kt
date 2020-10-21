@@ -338,6 +338,8 @@ object ICalUtils {
         }
         right.events.first().properties.forEach { properties ->
             properties.value.forEach { iCalProperty ->
+                // We use setProperty to avoid having duplicates, but we need to use addProperty for Attendees
+                // to properly add multiple ones
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
                 else left.events.first().setProperty(iCalProperty)
                 left.timezoneInfo.setTimezone(iCalProperty, right.timezoneInfo.getTimezone(iCalProperty))

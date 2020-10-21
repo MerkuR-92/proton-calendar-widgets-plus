@@ -40,27 +40,6 @@ data class EventEntity(
     val personalEvents: List<JsonElement>, // specific to a member // TODO nullable?
     val attendeesEvents: List<JsonElement>, // shared between all calendars // TODO nullable?
     val attendees: List<JsonElement>
-
-    /** AttendeesEvent & Attendees: shared between all calendars
-     *
-     * "AttendeesEvents": {
-    "Type": 3,
-    "Data": "0sFQAWfo2r7cEhfZ94HhRlYsP4r...",
-    "Signature": "-----BEGIN PGP SIGNATURE..."
-    },
-    "Attendees": [{
-    "ID": "ziWi-ZOb28XR4sCGFCEpqPDMHGU699fw==",
-    "Token": "f04e8fd97e117dbfb6eef8aea85890c3dc62ea9e",
-    "Status": 0,
-    "Permissions": 2
-    }]
-     */
-
 ) {
-
-
-
-
-
 
 }

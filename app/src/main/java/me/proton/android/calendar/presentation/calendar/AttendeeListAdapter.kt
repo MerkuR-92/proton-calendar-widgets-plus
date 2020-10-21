@@ -1,9 +1,9 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.item_attendee.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
-import me.proton.android.calendar.presentation.MainActivity
 
 class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
 
@@ -82,24 +81,26 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
                 constraintSet.applyTo(attendeeItemLayout)
             }
 
-            when (attendee.participationStatus) {
-                ParticipationStatus.ACCEPTED -> {
-                    attendeeItemStatus.visibleOrGone(true)
-                    attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(view.context, R.color.notification_success)
-                    attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_check))
-                }
-                ParticipationStatus.DECLINED -> {
-                    attendeeItemStatus.visibleOrGone(true)
-                    attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(view.context, R.color.notification_error)
-                    attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_close))
-                }
-                ParticipationStatus.TENTATIVE -> {
-                    attendeeItemStatus.visibleOrGone(true)
-                    attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(view.context, R.color.notification_warning)
-                    attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_question))
-                }
-                else ->  attendeeItemStatus.visibleOrGone(false)
-            }
+            initAttendeeStatus(attendeeItemStatus, attendee.participationStatus, view.context)
         }
+    }
+}
+
+fun initAttendeeStatus(attendeeItemStatus: ImageView, participationStatus: ParticipationStatus, context: Context) {
+    attendeeItemStatus.visibleOrGone(true)
+    when (participationStatus) {
+        ParticipationStatus.ACCEPTED -> {
+            attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(context, R.color.notification_success)
+            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_check_small))
+        }
+        ParticipationStatus.DECLINED -> {
+            attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(context, R.color.notification_error)
+            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_close_small))
+        }
+        ParticipationStatus.TENTATIVE -> {
+            attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(context, R.color.notification_warning)
+            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_question_small))
+        }
+        else ->  attendeeItemStatus.visibleOrGone(false)
     }
 }

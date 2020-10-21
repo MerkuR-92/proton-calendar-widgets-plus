@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
     private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
+    private lateinit var userEmail: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -161,6 +163,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.selectUser()
             }
             if (user != null) {
+                userEmail = user.email
                 nav_view_main_content.nav_view_user_name.text = user.displayName
                 nav_view_main_content.nav_view_user_mail.text = user.email
                 var initials: String = getInitials(user.displayName)
@@ -206,6 +209,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(!disabledCalendars.isEmpty())
             }
         }
+    }
+
+    fun getUserEmail(): String? {
+        return if (this::userEmail.isInitialized) userEmail else ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
