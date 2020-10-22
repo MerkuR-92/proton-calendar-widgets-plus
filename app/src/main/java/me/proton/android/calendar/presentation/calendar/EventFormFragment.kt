@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -21,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.item_alarm_text_button.view.*
@@ -50,11 +52,19 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private val logger: Logger by inject()
 
     override fun onBackPressedCustom() {
-        findNavController().navigateUp()
+        if (eventViewModel.hasEventBeenEdited()) {
+            displayDiscardChangesConfirmationDialog { _, _ ->
+                findNavController().navigateUp()
+            }
+        } else findNavController().navigateUp()
     }
 
     override fun onNavigationIconClicked(): Boolean {
-        jumpToMonthView()
+        if (eventViewModel.hasEventBeenEdited()) {
+            displayDiscardChangesConfirmationDialog { _, _ ->
+                jumpToMonthView()
+            }
+        } else jumpToMonthView()
         return true
     }
 
@@ -66,6 +76,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             //  to navigate manually
             findNavController().navigate(Navigation.Deeplink.toMonth())
         }
+    }
+
+    private fun displayDiscardChangesConfirmationDialog(callback: DialogInterface.OnClickListener) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.event_discard_changes_title)
+            .setMessage(R.string.event_discard_changes_description)
+            .setPositiveButton(R.string.event_discard_changes_confirm, callback)
+            .setNegativeButton(R.string.event_discard_changes_cancel) { _, _ -> }
+            .show()
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
@@ -93,7 +112,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 if (eventViewModel.hasEventBeenEdited()) {
 
                     val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && ((eventViewModel.dbEvent?.isRecurring() == true) ||
-                                    (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())) &&
+                            (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())) &&
                             (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
 
                     if (shouldShowConfirmationPicker) {

@@ -18,9 +18,11 @@
 
         <item name="android:windowBackground">@color/background_norm</item>
 
-        <item name="alertDialogTheme">@style/AlertDialog</item>
         <item name="android:datePickerDialogTheme">@style/PickerDialog</item>
         <item name="android:timePickerDialogTheme">@style/PickerDialog</item>
+
+        <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
 
         <!--        <item name="android:actionOverflowMenuStyle-->
 
@@ -45,8 +47,22 @@
         <!--        <item name="titleTextAppearance">@style/MyTextAppearance</item>-->
     </style>
 
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorAccent">@color/brand_norm</item>
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.App.Body.Text</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialDialogButtonStyle</item>
+    </style>
 
-
-
+    <style name="PickerDialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorAccent">@color/brand_norm</item>
+        <item name="colorControlActivated">@color/brand_norm</item>
+        <item name="colorControlHighlight">@color/brand_norm</item>
+        <item name="android:windowBackground">@color/background_norm</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PickerDialogButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
+    </style>
 
 </resources>

@@ -170,7 +170,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         } else { // TODO unify showing dialog
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.dialog_title_delete_event)
-                .setMessage(event.summary)
+                .setMessage(R.string.dialog_description_delete_event)
                 .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
                     lifecycleScope.launch { // TODO
                         val deleteResult = withContext(Dispatchers.Default) {

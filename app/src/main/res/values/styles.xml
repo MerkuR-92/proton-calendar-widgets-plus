@@ -143,31 +143,45 @@
         <item name="textEndPadding">0dp</item>
     </style>
 
-    <style name="PickerDialog" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorAccent">@color/brand_norm</item>
-        <item name="colorControlActivated">@color/brand_norm</item>
-        <item name="colorControlHighlight">@color/brand_norm</item>
-        <item name="android:windowBackground">@color/background_norm</item>
-        <item name="android:buttonBarPositiveButtonStyle">@style/PickerDialogButtonStyle</item>
-        <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
-    </style>
+    <!-- PICKER DIALOG -->
 
     <style name="PickerDialogButtonStyle" parent="Base.Widget.AppCompat.Button.Borderless">
+        <item name="android:textAppearance">@style/Text.Default.Strong</item>
         <item name="android:textColor">@color/brand_norm</item>
+        <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textAppearance">@style/Text.Default</item>
     </style>
 
-    <style name="AlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="colorAccent">@color/brand_norm</item>
-        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
+    <!-- MATERIAL ALERT DIALOG -->
+
+    <style name="MaterialAlertDialog.App" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.MediumComponent</item>
     </style>
 
-    <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+    <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">@style/Text.Headline</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="MaterialAlertDialog.App.Body.Text" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_norm</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="MaterialDialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textAppearance">@style/Text.Default.Strong</item>
         <item name="android:textColor">@color/brand_norm</item>
+        <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textAppearance">@style/Text.Default</item>
+    </style>
+
+    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6dp</item>
     </style>
 
     <!--    <style name="AppThemeDEPRECATED" parent="Theme.MaterialComponents.DayNight">-->

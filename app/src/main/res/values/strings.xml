@@ -5,7 +5,8 @@
 
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
 
-    <string name="dialog_title_delete_event">Delete event?</string>
+    <string name="dialog_title_delete_event">Delete event</string>
+    <string name="dialog_description_delete_event">Would you like to delete this event?</string>
     <string name="dialog_title_calendar_picker">Calendar</string>
 
     <string name="dialog_button_delete">Delete</string>
@@ -112,6 +113,11 @@
     <string name="event_recurring_edit_this">This event</string>
     <string name="event_recurring_edit_this_and_future">This and future events</string>
     <string name="event_recurring_edit_all_events">All events</string>
+
+    <string name="event_discard_changes_title">Discard changes?</string>
+    <string name="event_discard_changes_description">You will lose all unsaved changes.</string>
+    <string name="event_discard_changes_cancel">Keep editing</string>
+    <string name="event_discard_changes_confirm">Discard</string>
 
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendars</string>
