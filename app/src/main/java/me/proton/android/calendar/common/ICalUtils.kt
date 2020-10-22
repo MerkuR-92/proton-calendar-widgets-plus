@@ -454,7 +454,7 @@ fun ICalendar.printToString() : String {
 
     fun ZonedDateTime.formatDate(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
 
-    fun ZonedDateTime.formatTime(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+    fun ZonedDateTime.formatTime(timeZoneId: String, is24Hour: Boolean): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(is24Hour)
 
     /**
      * @param excludeTo will exclude exact toDateTime from rightmost range value

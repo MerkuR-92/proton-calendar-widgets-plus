@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.text.util.Linkify
 import android.util.TypedValue
 import android.view.MenuItem
@@ -319,7 +320,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 this.text_date_time.text = event.formatStartEndForActualEndDate(
                     eventViewModel.displayTimeZoneId,
-                    resources
+                    resources,
+                    eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
                 )
 
                 if (event.isRecurring()) {
@@ -409,6 +411,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     AndroidUtils.formatAlarm(
                         resources,
                         event.isAllDay(),
+                        calendarViewModel.timeFormatIs24Hour,
                         ZonedDateTime.ofInstant(
                             event.iCalEvent.dateStart.value.toInstant(),
                             ZoneId.of(eventViewModel.displayTimeZoneId)

@@ -62,7 +62,7 @@ class ItemCalendarAgendaFragment(
         rv_agenda.apply {
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
-            adapter = EventAdapter(calendarViewModel.timeZoneId.id, date) {
+            adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, date) {
                 findNavController().navigate(
                     Navigation.Deeplink.toEventDetails(
                         it.id,

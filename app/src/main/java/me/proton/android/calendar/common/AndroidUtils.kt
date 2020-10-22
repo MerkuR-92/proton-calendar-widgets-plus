@@ -71,6 +71,7 @@ class AndroidUtils(context: Context) {
 
         fun displayDatePicker(
             context: Context,
+            firstDayOfWeek: java.time.DayOfWeek,
             initialDate: LocalDate?,
             minDate: LocalDate? = null,
             maxDate: LocalDate? = null,
@@ -90,6 +91,7 @@ class AndroidUtils(context: Context) {
             maxDate?.let {
                 datePickerDialog.datePicker.maxDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             }
+            datePickerDialog.datePicker.firstDayOfWeek = firstDayOfWeek.toBiweeklyDayOfWeek().calendarConstant
             datePickerDialog.show()
         }
 
@@ -397,6 +399,7 @@ class AndroidUtils(context: Context) {
         fun formatAlarm(
             resources: Resources,
             isAllDay: Boolean,
+            is24Hour: Boolean,
             startZonedDateTime: ZonedDateTime,
             alarm: VAlarm
         ): String? {
@@ -463,11 +466,7 @@ class AndroidUtils(context: Context) {
                     }
                 ).joinToString(separator = ", ")
 
-                val alarmTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(
-                    Date.from(
-                        startDate.toInstant()
-                    )
-                )
+                val alarmTime = startDate.toLocalTime().format(is24Hour)
 
                 if (label.isBlank()) {
                     null
@@ -752,8 +751,14 @@ fun RadioGroup.checkIndex(index: Int) {
     }
 }
 
-fun LocalTime.format(/* force AM/PM */): String {
-    return this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+fun LocalTime.format(is24Hour: Boolean?): String {
+    return if (is24Hour == true) {
+        this.format(DateTimeFormatter.ofPattern("HH:mm"))
+    } else if (is24Hour == false) {
+        this.format(DateTimeFormatter.ofPattern("hh:mm a"))
+    } else {
+        this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+    }
 }
 
 // TODO add and change parameters for customisation

@@ -24,6 +24,7 @@ import java.time.LocalDate
 
 class EventAdapter(
     private val timeZoneId: String,
+    private val is24Hour: Boolean,
     private val date: LocalDate,
     private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
 ) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
@@ -36,7 +37,7 @@ class EventAdapter(
             }
         }
 
-        class PartialDayEventViewHolder(private val itemView: View, private val timeZoneId: String) : EventViewHolder(
+        class PartialDayEventViewHolder(private val itemView: View, private val timeZoneId: String, private val is24Hour: Boolean) : EventViewHolder(
             itemView
         ) {
 
@@ -59,9 +60,9 @@ class EventAdapter(
                 textViewHeader.text =
                     "${(event.getActualStart(
                         timeZoneId
-                    ))?.formatTime(timeZoneId)} ‐ ${(event.getActualEnd(
+                    ))?.formatTime(timeZoneId, is24Hour)} ‐ ${(event.getActualEnd(
                         timeZoneId
-                    ))?.formatTime(timeZoneId)}" // TODO
+                    ))?.formatTime(timeZoneId, is24Hour)}" // TODO
 
                 textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
 
@@ -98,7 +99,7 @@ class EventAdapter(
         }
 
         // TODO this viewholder can actually is used also for partial-day events, that span more than one day
-        class AllDayEventViewHolder(itemView: View, private val timeZoneId: String) : EventViewHolder(itemView) {
+        class AllDayEventViewHolder(itemView: View, private val timeZoneId: String, private val is24Hour: Boolean) : EventViewHolder(itemView) {
 
 //            private val ivBackground: ImageView = itemView.findViewById(R.id.background)
 
@@ -119,7 +120,7 @@ class EventAdapter(
                     val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
                     if (fullDayCounter.first == 1) { // this is the first day of an ongoing event
                         textViewHeader.visibleOrGone(true)
-                        textViewHeader.text = "${(event.getActualStart(timeZoneId))?.formatTime(timeZoneId)}" // TODO
+                        textViewHeader.text = "${(event.getActualStart(timeZoneId))?.formatTime(timeZoneId, is24Hour)}" // TODO
                     } else { // this is second or later day of an ongoing event
                         textViewHeader.visibleOrGone(false)
                     }
@@ -223,7 +224,8 @@ class EventAdapter(
                         parent,
                         false
                     ),
-                    timeZoneId
+                    timeZoneId,
+                    is24Hour
                 )
             } else {
                 EventViewHolder.AllDayEventViewHolder(
@@ -232,7 +234,8 @@ class EventAdapter(
                         parent,
                         false
                     ),
-                    timeZoneId
+                    timeZoneId,
+                    is24Hour
                 )
             }
         }

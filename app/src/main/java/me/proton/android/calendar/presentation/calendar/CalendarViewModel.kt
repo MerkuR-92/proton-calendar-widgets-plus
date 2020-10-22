@@ -1,6 +1,8 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.content.Context
+import android.text.format.DateFormat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
@@ -49,8 +51,9 @@ class CalendarViewModel(
         viewModelJob.cancel()
     }
 
-    lateinit var timeZoneId: ZoneId //ZoneId.of(TimeZone.getDefault().id) // TODO get timezone from settings OR fallback to default
+    lateinit var timeZoneId: ZoneId
     lateinit var startWeekOn: DayOfWeek
+    var timeFormatIs24Hour: Boolean = false // TODO maybe use settings directly
 
     val initialToday = LocalDate.now()
 
@@ -109,6 +112,7 @@ class CalendarViewModel(
 
                 timeZoneId = ZoneId.of(calendarsRepository.selectCalendarUserSettings(TODOuserID)?.primaryTimezone!!)
                 startWeekOn = usersRepository.selectUserSettings(TODOuserID)?.weekStartDayOfWeek()!!
+                timeFormatIs24Hour = usersRepository.selectUserSettings(TODOuserID)?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
 
                 TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 

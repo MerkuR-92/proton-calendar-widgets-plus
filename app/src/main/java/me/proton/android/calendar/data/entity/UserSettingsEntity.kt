@@ -34,11 +34,17 @@ data class UserSettingsEntity(
     @PrimaryKey
     lateinit var fkUserId: String
 
-    fun weekStartDayOfWeek(): DayOfWeek  = when (weekStart) {
+    fun weekStartDayOfWeek(): DayOfWeek = when (weekStart) {
         1 -> DayOfWeek.MONDAY
         6 -> DayOfWeek.SATURDAY
         7 -> DayOfWeek.SUNDAY
         else -> WeekFields.of(Locale.getDefault()).firstDayOfWeek
+    }
+
+    fun timeFormatIs24Hour(default: Boolean): Boolean = when (timeFormat) {
+        1 -> true
+        2 -> false
+        else -> default
     }
 
 }

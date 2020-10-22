@@ -112,15 +112,14 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun resetAlarmText(selectedIndex: Int) {
+
+        val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+
         if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
-            event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            event_form_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            event_form_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
-            event_form_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(DateTimeFormatter.ofLocalizedTime(
-                FormatStyle.SHORT)))
+            event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).format(is24Hour))
+            event_form_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).format(is24Hour))
+            event_form_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).format(is24Hour))
+            event_form_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).format(is24Hour))
         } else {
             event_form_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
             event_form_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
@@ -226,6 +225,8 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             else button.jumpDrawablesToCurrentState()
         }
 
+        val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+
         // init
         custom_alarm_1.visibleOrGone(!isAllDay)
         custom_alarm_2.visibleOrGone(!isAllDay)
@@ -235,7 +236,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             custom_alarm_field.setText("1")
             custom_alarm_radio_group.check(custom_alarm_3.id)
             resetAlarmCustomText(1)
-            custom_alarm_time.text = getString(R.string.event_alarm_at_time, eventViewModel.tempAlarmTime.format())
+            custom_alarm_time.text = getString(R.string.event_alarm_at_time, eventViewModel.tempAlarmTime.format(is24Hour))
         } else {
             custom_alarm_field.setText("15")
             custom_alarm_radio_group.check(custom_alarm_1.id)
@@ -250,11 +251,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         custom_alarm_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
-
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
                 eventViewModel.handleAlarmTime(it)
-                custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.format())
+                custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.format(is24Hour))
             }
         }
     }

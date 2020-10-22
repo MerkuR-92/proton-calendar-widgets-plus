@@ -222,6 +222,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             if (it == R.id.custom_recurrence_end_2) {
                 AndroidUtils.displayDatePicker(
                     requireContext(),
+                    eventViewModel.userSettings.weekStartDayOfWeek(),
                     untilDate,
                     eventStartDate,
                     FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()

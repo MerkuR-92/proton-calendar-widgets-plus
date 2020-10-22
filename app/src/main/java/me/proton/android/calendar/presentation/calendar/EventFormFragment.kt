@@ -267,11 +267,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 event_form_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
             }
 
-            val formattedStart = event.formatStart(eventViewModel.eventTimeZoneId)
+            val formattedStart = event.formatStart(eventViewModel.eventTimeZoneId, eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())))
             event_form_start_date.text = formattedStart.first ?: ""
             event_form_start_time.text = formattedStart.second ?: ""
 
-            val formattedEnd = event.formatEnd(eventViewModel.eventTimeZoneId)
+            val formattedEnd = event.formatEnd(eventViewModel.eventTimeZoneId, eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())))
             event_form_end_date.text = formattedEnd.first ?: ""
             event_form_end_time.text = formattedEnd.second ?: ""
 
@@ -334,6 +334,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
+                firstDayOfWeek = eventViewModel.userSettings.weekStartDayOfWeek(),
                 initialDate = date,
                 minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate(),
                 maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()) {
@@ -346,6 +347,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
+                firstDayOfWeek = eventViewModel.userSettings.weekStartDayOfWeek(),
                 initialDate = date,
                 minDate = FormValidation.MIN_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate(),
                 maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()
@@ -356,7 +358,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         event_form_start_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
+            val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
                 eventViewModel.handleStartTime(it)
@@ -365,7 +367,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         event_form_end_time_press.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            val is24Hour = DateFormat.is24HourFormat(requireContext()) // TODO this is default, take it from settings in the future
+            val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalTime()
             AndroidUtils.displayTimePicker(requireContext(), time, is24Hour) {
                 eventViewModel.handleEndTime(it)
@@ -415,7 +417,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
-                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
+                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
                 isClickable = false
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
