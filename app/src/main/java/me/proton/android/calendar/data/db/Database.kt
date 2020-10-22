@@ -10,8 +10,8 @@ import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.data.entity.*
 
 @Database(
-    entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class],
-    version = 20
+    entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
+    version = 21
 )
 @TypeConverters(DatabaseTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -22,6 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun addressesDao(): AddressesDao
     abstract fun calendarSettingsDao(): CalendarSettingsDao
     abstract fun calendarUserSettingsDao(): CalendarUserSettingsDao
+    abstract fun userSettingsDao(): UserSettingsDao
     abstract fun calendarKeysDao(): CalendarKeysDao
     abstract fun eventAlarmsDao(): EventAlarmsDao
     abstract fun membersDao(): MembersDao
@@ -42,6 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
         const val TABLE_ADDRESSES = "addresses"
         const val TABLE_CALENDAR_SETTINGS = "calendar_settings"
         const val TABLE_CALENDAR_USER_SETTINGS = "calendar_user_settings"
+        const val TABLE_USER_SETTINGS = "user_settings"
         const val TABLE_EVENT_ALARMS = "event_alarms"
         const val TABLE_CALENDAR_KEYS = "calendar_keys"
         const val TABLE_PUBLIC_KEYS = "public_keys"

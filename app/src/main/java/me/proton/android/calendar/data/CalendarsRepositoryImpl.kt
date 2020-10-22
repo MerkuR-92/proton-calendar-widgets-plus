@@ -450,6 +450,15 @@ class CalendarsRepositoryImpl(
         return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
     }
 
+    override suspend fun selectUserSettings(userId: String): UserSettingsEntity? {
+        return database.userSettingsDao().select(userId)
+    }
+
+    override suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity) {
+        userSettings.fkUserId = userId
+        database.userSettingsDao().updateOrInsert(userSettings)
+    }
+
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {
         return database.eventAlarmsDao().select(eventId)
     }

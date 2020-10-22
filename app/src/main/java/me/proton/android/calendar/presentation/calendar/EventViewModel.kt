@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -84,6 +85,7 @@ class EventViewModel(
     lateinit var eventTimeZoneId: String
 
     lateinit var calendarUserSettings: CalendarUserSettingsEntity
+    lateinit var userSettings: UserSettingsEntity
 
     suspend fun initialise(
         editMode: Boolean,
@@ -112,6 +114,7 @@ class EventViewModel(
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId) ?: return UseCase.Result.Error("could not get default calendar ID")
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId) ?: return UseCase.Result.Error("could not get Calendar User Settings")
+        userSettings = calendarsRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
 
 //        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 
@@ -359,7 +362,7 @@ class EventViewModel(
             TimberLogger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
 
-        event.iCalEvent.recurrenceRule?.adjustToWeekStart(calendarUserSettings.weekStart)
+        event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
 
         if (eventBumpSequence) {
             event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO conflict resolution

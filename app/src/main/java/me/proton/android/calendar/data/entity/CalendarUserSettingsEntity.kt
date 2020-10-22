@@ -22,11 +22,8 @@ import java.util.*
 )
 data class CalendarUserSettingsEntity(
 
-    val weekStart: Int, // 1 - Monday, 7 - Sunday
     val weekLength: Int, // 0 - 7 days, 1 - 5 days
     val displayWeekNumber: Int, // 0 off, 1 on
-    val dateFormat: Int, // 0 (number) - DD/MM/YYYY, 1 (number) - DD/MM/YYYY , 2 (number) - YYYY/MM/DD
-    val timeFormat: Int, // 0 (number) - 24h, 1 (number) - 12h
     val autoDetectPrimaryTimezone: Int, // 0 off, 1 on
     val primaryTimezone: String, // "Europe/Budapest", NO LONGER NULL AFTER 12/06/2020: "Can be null if AutoDetectPrimaryTimezone is 0"
     val displaySecondaryTimezone: Int, // 0 off, 1 on

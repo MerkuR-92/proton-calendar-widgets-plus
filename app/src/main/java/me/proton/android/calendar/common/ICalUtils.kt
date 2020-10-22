@@ -177,10 +177,7 @@ object ICalUtils {
         
     }
 
-    /**
-     * @param settingsWeekStart taken from UserSettings, 1 - Monday, 7 - Sunday
-     */
-    fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: Int /*TODO switch to DayOfWeek*/) {
+    fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: DayOfWeek) {
 
         val addWkst = when (this.value.frequency) {
             Frequency.WEEKLY -> {
@@ -193,7 +190,7 @@ object ICalUtils {
         }
 
         if (addWkst) {
-            this.value = this.value.clone(workweekStarts = if (settingsWeekStart == 1) biweekly.util.DayOfWeek.MONDAY else if (settingsWeekStart == 7) biweekly.util.DayOfWeek.SUNDAY else null)
+            this.value = this.value.clone(workweekStarts = settingsWeekStart.toBiweeklyDayOfWeek())
         }
 
     }

@@ -32,6 +32,11 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
 
+        val userSettingsResponse = settingsApi.getUserSettings()
+        if (userSettingsResponse !is ApiResponse.Success) {
+            return UseCase.Result.Error("error getting user settings from API: $userSettingsResponse")
+        }
+
         val failedCalendarIds = mutableListOf<String>()
 
         calendarsResponse.data.calendars.forEach { calendarEntity ->
@@ -57,8 +62,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
                         is UseCase.Result.Error -> logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")
                     }
 
-                    // save User Settings
                     calendarsRepository.persistCalendarUserSettings(userId, calendarUserSettingsResponse.data.calendarUserSettings)
+                    calendarsRepository.persistUserSettings(userId, userSettingsResponse.data.userSettings)
 
                 }
                 is ApiResponse.Error -> {

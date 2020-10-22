@@ -380,7 +380,7 @@ internal class ICalUtilsTest {
 
         val eventWeekly = createNewEvent()
         eventWeekly.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.WEEKLY).interval(2).byDay(DayOfWeek.FRIDAY).build())
-        eventWeekly.recurrenceRule.adjustToWeekStart(7) // Sunday
+        eventWeekly.recurrenceRule.adjustToWeekStart(java.time.DayOfWeek.SUNDAY)
 
         TestsLogger.d("${eventWeekly.wrapInICalendar().printToString()}")
 
@@ -388,7 +388,7 @@ internal class ICalUtilsTest {
 
         val eventYearly = createNewEvent()
         eventYearly.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.YEARLY).byWeekNo(10).build())
-        eventYearly.recurrenceRule.adjustToWeekStart(1) // Monday
+        eventYearly.recurrenceRule.adjustToWeekStart(java.time.DayOfWeek.MONDAY)
 
         TestsLogger.d("${eventYearly.wrapInICalendar().printToString()}")
 
