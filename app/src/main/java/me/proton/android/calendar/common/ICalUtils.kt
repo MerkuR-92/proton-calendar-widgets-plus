@@ -180,7 +180,7 @@ object ICalUtils {
     /**
      * @param settingsWeekStart taken from UserSettings, 1 - Monday, 7 - Sunday
      */
-    fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: Int) {
+    fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: Int /*TODO switch to DayOfWeek*/) {
 
         val addWkst = when (this.value.frequency) {
             Frequency.WEEKLY -> {

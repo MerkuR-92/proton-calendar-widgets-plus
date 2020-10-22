@@ -1,12 +1,9 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.common.GsonCommon
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueKey.USER_CALENDAR_SETTINGS
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.SettingsApi
 
@@ -30,9 +27,9 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         }
 
-        val userSettingsResponse = settingsApi.getUserSettings() // TODO this will have a value if we have at least 1 calendar
-        if (userSettingsResponse !is ApiResponse.Success) {
-            return UseCase.Result.Error("error getting user settings from API: $userSettingsResponse")
+        val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings() // TODO this will have a value if we have at least 1 calendar
+        if (calendarUserSettingsResponse !is ApiResponse.Success) {
+            return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
 
         val failedCalendarIds = mutableListOf<String>()
@@ -61,7 +58,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     }
 
                     // save User Settings
-                    calendarsRepository.persistUserSettings(userId, userSettingsResponse.data.calendarUserSettings)
+                    calendarsRepository.persistCalendarUserSettings(userId, calendarUserSettingsResponse.data.calendarUserSettings)
 
                 }
                 is ApiResponse.Error -> {

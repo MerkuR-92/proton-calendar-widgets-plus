@@ -6,7 +6,6 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.common.TimberLogger
@@ -108,8 +107,8 @@ class CalendarViewModel(
             val TODOuserID = TODOvalueStore.getString("USERID") // TODO
             if (TODOuserID != null) {
 
-                timeZoneId = ZoneId.of(calendarsRepository.selectUserSettings(TODOuserID)?.primaryTimezone!!)
-                startWeekOn = if (calendarsRepository.selectUserSettings(TODOuserID)?.weekStart == 7) {
+                timeZoneId = ZoneId.of(calendarsRepository.selectCalendarUserSettings(TODOuserID)?.primaryTimezone!!)
+                startWeekOn = if (calendarsRepository.selectCalendarUserSettings(TODOuserID)?.weekStart == 7) {
                     DayOfWeek.SUNDAY
                 } else {
                     DayOfWeek.MONDAY

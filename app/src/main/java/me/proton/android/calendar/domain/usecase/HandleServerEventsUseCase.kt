@@ -1,8 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.database.sqlite.SQLiteConstraintException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
@@ -30,7 +28,7 @@ class HandleServerEventsUseCase(
                 usersRepository.updateUser(it)
             }
             eventsResponse.calendarUserSettings?.let {
-                calendarsRepository.persistUserSettings(userId, it)
+                calendarsRepository.persistCalendarUserSettings(userId, it)
             }
 
             val calendarsToRefresh = ArrayList<String>()

@@ -4,15 +4,14 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import biweekly.parameter.Related
-import biweekly.property.Trigger
-import biweekly.util.Duration
-import com.google.gson.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
+import java.time.DayOfWeek
+import java.time.temporal.WeekFields
+import java.util.*
 
-// settings specific to User
+// User settings specific to Calendar
 
-@Entity(tableName = AppDatabase.TABLE_USER_SETTINGS,
+@Entity(tableName = AppDatabase.TABLE_CALENDAR_USER_SETTINGS,
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
         parentColumns = ["id"],
@@ -21,7 +20,7 @@ import me.proton.android.calendar.data.db.AppDatabase
     )],
     indices = [Index(value = ["fkUserId"])]
 )
-data class UserSettingsEntity(
+data class CalendarUserSettingsEntity(
 
     val weekStart: Int, // 1 - Monday, 7 - Sunday
     val weekLength: Int, // 0 - 7 days, 1 - 5 days

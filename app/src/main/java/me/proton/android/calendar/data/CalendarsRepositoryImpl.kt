@@ -111,7 +111,7 @@ class CalendarsRepositoryImpl(
         val events = database.eventsDao().selectEvents(selectedCalendarIds)
 
         // TODO get rid of this date calculation by guaranteeing `eventsExpandedUntil` is non-empty
-        val timeZoneId = ZoneId.of(selectUserSettings(TODOuserID)?.primaryTimezone!!)
+        val timeZoneId = ZoneId.of(selectCalendarUserSettings(TODOuserID)?.primaryTimezone!!)
         val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
         val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
 
@@ -430,24 +430,24 @@ class CalendarsRepositoryImpl(
         database.calendarSettingsDao().deleteById(id)
     }
 
-    override suspend fun selectUserSettings(userId: String): UserSettingsEntity? {
-        return database.userSettingsDao().select(userId)
+    override suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity? {
+        return database.calendarUserSettingsDao().select(userId)
     }
 
-    override suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity) {
-        userSettings.fkUserId = userId
-        database.userSettingsDao().insert(userSettings)
+    override suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity) {
+        calendarUserSettings.fkUserId = userId
+        database.calendarUserSettingsDao().updateOrInsert(calendarUserSettings)
     }
 
-    override suspend fun deleteUserSettingsByUserId(userId: String) {
-        database.userSettingsDao().deleteByUserId(userId)
+    override suspend fun deleteCalendarUserSettingsByUserId(userId: String) {
+        database.calendarUserSettingsDao().deleteByUserId(userId)
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {
         logger.d("getting default calendars, user ID: ${userId}")
-        logger.d("getting default calendars, user settings: ${selectUserSettings(userId)}")
+        logger.d("getting default calendars, calendar user settings: ${selectCalendarUserSettings(userId)}")
         logger.d("getting default calendars, active calendars: ${getActiveCalendars(userId)}")
-        return selectUserSettings(userId)?.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
+        return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

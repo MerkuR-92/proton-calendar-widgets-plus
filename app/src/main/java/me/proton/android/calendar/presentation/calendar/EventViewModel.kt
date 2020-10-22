@@ -20,7 +20,7 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
-import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -83,7 +83,7 @@ class EventViewModel(
     // TimeZone for editing event is always event's own timezone, or default
     lateinit var eventTimeZoneId: String
 
-    lateinit var userSettings: UserSettingsEntity
+    lateinit var calendarUserSettings: CalendarUserSettingsEntity
 
     suspend fun initialise(
         editMode: Boolean,
@@ -111,11 +111,11 @@ class EventViewModel(
 
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId) ?: return UseCase.Result.Error("could not get default calendar ID")
 
-        userSettings = calendarsRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
+        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId) ?: return UseCase.Result.Error("could not get Calendar User Settings")
 
 //        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 
-        displayTimeZoneId = userSettings.primaryTimezone // TimeZone.getDefault().id // TODO get it from settings
+        displayTimeZoneId = calendarUserSettings.primaryTimezone
 
         TimberLogger.d("displayTimezoneid = ${displayTimeZoneId}")
 
@@ -359,7 +359,7 @@ class EventViewModel(
             TimberLogger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
 
-        event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStart)
+        event.iCalEvent.recurrenceRule?.adjustToWeekStart(calendarUserSettings.weekStart)
 
         if (eventBumpSequence) {
             event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO conflict resolution

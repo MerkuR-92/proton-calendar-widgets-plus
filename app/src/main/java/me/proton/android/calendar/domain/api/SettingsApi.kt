@@ -1,8 +1,8 @@
 package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.UserSettingsApiResponse
+import me.proton.android.calendar.data.api.CalendarUserSettingsApiResponse
 
 interface SettingsApi {
-    suspend fun getUserSettings(): ApiResponse<UserSettingsApiResponse>
+    suspend fun getCalendarUserSettings(): ApiResponse<CalendarUserSettingsApiResponse>
 }

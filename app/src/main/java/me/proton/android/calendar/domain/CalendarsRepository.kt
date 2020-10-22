@@ -96,14 +96,16 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarSettingsById(id: String)
 
-    // user settings
-    suspend fun selectUserSettings(userId: String): UserSettingsEntity?
+    // calendar user settings
+    suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity?
 
-    suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity)
+    suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity)
 
-    suspend fun deleteUserSettingsByUserId(id: String)
+    suspend fun deleteCalendarUserSettingsByUserId(id: String)
 
     suspend fun getDefaultCalendarId(userId: String): String?
+
+    // TODO new user settings
 
     // event alarms
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>

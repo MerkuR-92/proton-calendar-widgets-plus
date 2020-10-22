@@ -10,7 +10,7 @@ import biweekly.util.Duration
 import com.google.gson.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 
-// settings specific to Calendar
+// settings specific to Calendar, shared by all Calendar Members
 
 @Entity(tableName = AppDatabase.TABLE_CALENDAR_SETTINGS,
     foreignKeys = [ForeignKey(
