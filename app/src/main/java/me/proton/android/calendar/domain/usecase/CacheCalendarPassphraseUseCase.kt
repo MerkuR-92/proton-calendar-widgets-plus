@@ -54,10 +54,10 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
                 if (crypto.verifyTextDetached(
                         it,
                         memberPassphrase.signature,
-                        listOf(crypto.getArmoredPublicKey(address.primaryKey!!.privateKey) ?: ""))) {
+                        listOf(crypto.getArmoredPublicKey(addressKey.publicKey) ?: ""))) {
                     decryptedPassphrase = it
                     return@forEach
-                }        
+                }
             }
 
         }
