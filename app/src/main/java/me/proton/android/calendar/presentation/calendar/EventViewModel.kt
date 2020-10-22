@@ -70,7 +70,8 @@ class EventViewModel(
     // original event from database, from before it has been edited
     var dbEvent: Event? = null
 
-    private val eventCustomAlarmsSave = ArrayList<VAlarm>()
+    private var eventCustomPartialDayAlarmsSave: ArrayList<VAlarm>? = null
+    private var eventCustomAllDayAlarmsSave: ArrayList<VAlarm>? = null
 
     private lateinit var calendarSettings: CalendarSettingsEntity
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
@@ -97,6 +98,8 @@ class EventViewModel(
         timeEndBackup = null
         eventEdited = false
         eventBumpSequence = false
+        eventCustomPartialDayAlarmsSave = null
+        eventCustomAllDayAlarmsSave = null
 
 //            calendarUserSettings.defaultCalendarId // TODO we still can't rely on this, it can be null in API!!!
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
@@ -569,14 +572,13 @@ class EventViewModel(
     }
 
     suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
-        val alarmsEdited = getDefaultAlarms(calendarSettings, event.isAllDay()) != event.iCalEvent.alarms
+        // If user choice has been saved then we don't set calendar's default alarms
+        val alarmsEdited = (event.isAllDay() && eventCustomAllDayAlarmsSave != null) ||
+                (!event.isAllDay() && eventCustomPartialDayAlarmsSave != null)
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
-            // Clear saved alarms for all day / partial day change
-            eventCustomAlarmsSave.clear()
-            // Check if current alarms are default ones
             event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive, calendar.display == 1))
-            if (!alarmsEdited || event.iCalEvent.alarms.isNullOrEmpty()) setDefaultAlarms(event, calendarSettings)
+            if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)
             _event.postValue(event)
             true
         } else {
@@ -648,29 +650,10 @@ class EventViewModel(
     fun handleAllDaySwitch(isAllDay: Boolean) {
         markEventAsEdited(bumpSequence = true)
 
-        val currentEventAlarms = event.iCalEvent.alarms.toList()
-        val savedAlarms = eventCustomAlarmsSave.toList()
-
-        // Only save if alarms were custom
-        if (currentEventAlarms.isNullOrEmpty() ||
-            currentEventAlarms == getDefaultAlarms(calendarSettings, event.isAllDay()))
-            eventCustomAlarmsSave.clear()
-        else
-            eventCustomAlarmsSave.addAll(currentEventAlarms)
-
         if (isAllDay) {
-            // persist backup of timezone & start/end times
-            //eventStartTimeZoneIdBackup = event.startTimeZoneId
-//            timeStartBackup = ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(initialTimeZoneId)).toLocalTime()
-//            timeEndBackup = ZonedDateTime.ofInstant(event.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(initialTimeZoneId)).toLocalTime()
-            //TimberLogger.d("saving backup: $timeStartBackup, ${timeEndBackup}")
-
             // remove time part and timezone from start/end
             event.iCalEvent.setStart(event.getStart(eventTimeZoneId)!!.toLocalDate())
             event.iCalEvent.setEnd(event.getEnd(eventTimeZoneId)!!.toLocalDate())
-
-//            event.iCalendar.setStartTimeZone(null)
-//            event.iCalendar.setEndTimeZone(null)
         } else {
             // get times & timezone from backup, but date from current event date
             event.iCalEvent.setStart(
@@ -684,15 +667,17 @@ class EventViewModel(
                 timeEndBackup!!,
                 eventTimeZoneId
             )
-
-//            event.iCalendar.setStartTimeZone(defaultTimeZoneId)
-//            event.iCalendar.setEndTimeZone(eventStartTimeZoneIdBackup)
         }
 
-        if (savedAlarms.isEmpty()) setDefaultAlarms(event, calendarSettings)
-        else {
+        // If user choice has been saved then we don't set calendar's default alarms
+        if ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
+            (!isAllDay && eventCustomPartialDayAlarmsSave == null)) {
+            setDefaultAlarms(event, calendarSettings)
+        } else {
             event.iCalEvent.alarms.clear()
-            savedAlarms.forEach {
+            // If user choice has been saved then use it even if alarm list is empty
+            val savedAlarms = if (isAllDay) eventCustomAllDayAlarmsSave?.toList() else eventCustomPartialDayAlarmsSave?.toList()
+            savedAlarms?.forEach {
                 event.iCalEvent.addAlarm(it)
             }
         }
@@ -941,6 +926,7 @@ class EventViewModel(
             }
 
             event.iCalEvent.addAlarm(alarm)
+            saveUserEditedAlarms()
             _event.postValue(event)
         }
     }
@@ -948,6 +934,13 @@ class EventViewModel(
     fun handleAlarmDelete(index: Int) {
         markEventAsEdited()
         event.iCalEvent.alarms.removeAt(index)
+        saveUserEditedAlarms()
         _event.postValue(event)
+    }
+
+    private fun saveUserEditedAlarms() {
+        // If an action is done on alarms we go into edited alarm mode and save the user choice over default alarms
+        if (event.isAllDay()) eventCustomAllDayAlarmsSave = ArrayList(event.iCalEvent.alarms)
+        else eventCustomPartialDayAlarmsSave = ArrayList(event.iCalEvent.alarms)
     }
 }
