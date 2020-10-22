@@ -4,6 +4,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.SettingsApi
 
@@ -14,7 +15,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val settingsApi: SettingsApi,
-    private val valueStoreProvider: ValueStoreProvider,
+    private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase): UseCase {
 
@@ -63,7 +64,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     }
 
                     calendarsRepository.persistCalendarUserSettings(userId, calendarUserSettingsResponse.data.calendarUserSettings)
-                    calendarsRepository.persistUserSettings(userId, userSettingsResponse.data.userSettings)
+                    usersRepository.persistUserSettings(userId, userSettingsResponse.data.userSettings)
 
                 }
                 is ApiResponse.Error -> {

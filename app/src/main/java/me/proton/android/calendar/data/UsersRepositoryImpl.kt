@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import me.proton.android.calendar.data.entity.UserSettingsEntity
 import timber.log.Timber
 
 // TODO better name? move to separate package?
@@ -64,6 +65,15 @@ class UsersRepositoryImpl(
 
     override suspend fun deleteAddressById(id: String) {
         database.addressesDao().deleteById(id)
+    }
+
+    override suspend fun selectUserSettings(userId: String): UserSettingsEntity? {
+        return database.userSettingsDao().select(userId)
+    }
+
+    override suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity) {
+        userSettings.fkUserId = userId
+        database.userSettingsDao().updateOrInsert(userSettings)
     }
 
 

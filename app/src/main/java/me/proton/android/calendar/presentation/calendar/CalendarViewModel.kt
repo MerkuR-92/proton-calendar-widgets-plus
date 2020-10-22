@@ -108,7 +108,7 @@ class CalendarViewModel(
             if (TODOuserID != null) {
 
                 timeZoneId = ZoneId.of(calendarsRepository.selectCalendarUserSettings(TODOuserID)?.primaryTimezone!!)
-                startWeekOn = calendarsRepository.selectUserSettings(TODOuserID)?.weekStartDayOfWeek()!!
+                startWeekOn = usersRepository.selectUserSettings(TODOuserID)?.weekStartDayOfWeek()!!
 
                 TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 

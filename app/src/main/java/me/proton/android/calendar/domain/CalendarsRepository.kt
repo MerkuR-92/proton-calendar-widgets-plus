@@ -105,11 +105,6 @@ interface CalendarsRepository {
 
     suspend fun getDefaultCalendarId(userId: String): String?
 
-    // user settings
-    suspend fun selectUserSettings(userId: String): UserSettingsEntity?
-
-    suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity)
-
     // event alarms
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>
 

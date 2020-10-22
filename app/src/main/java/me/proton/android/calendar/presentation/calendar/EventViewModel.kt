@@ -24,6 +24,7 @@ import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -39,6 +40,7 @@ import kotlin.collections.ArrayList
 
 class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
+    private val usersRepository: UsersRepository,
     private val createEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
@@ -114,7 +116,7 @@ class EventViewModel(
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId) ?: return UseCase.Result.Error("could not get default calendar ID")
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId) ?: return UseCase.Result.Error("could not get Calendar User Settings")
-        userSettings = calendarsRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
+        userSettings = usersRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
 
 //        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 

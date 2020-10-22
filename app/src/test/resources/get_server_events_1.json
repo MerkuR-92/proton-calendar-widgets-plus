@@ -28,6 +28,7 @@
         "Email": "adamtst@protonmail.blue",
         "DisplayName": "display name for adamtst"
     },
+    "UserSettings": {"Email":{"Value":null,"Status":0,"Notify":1,"Reset":1},"Phone":{"Value":null,"Status":0,"Notify":0,"Reset":0},"Password":{"Mode":1,"ExpirationTime":null},"PasswordMode":1,"2FA":{"Enabled":0,"Allowed":3,"ExpirationTime":null,"U2FKeys":[]},"TOTP":0,"News":239,"Locale":"en_US","LogAuth":2,"InvoiceText":"","Density":0,"Theme":null,"ThemeType":0,"WeekStart":7,"DateFormat":0,"TimeFormat":1,"U2FKeys":[],"TwoFactor":0,"WelcomeFlag":0},
     "Calendars": [
         {
             "ID": "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==",

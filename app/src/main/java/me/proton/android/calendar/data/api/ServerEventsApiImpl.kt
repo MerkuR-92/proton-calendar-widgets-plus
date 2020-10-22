@@ -42,7 +42,7 @@ data class ServerEventsApiResponse(
 // contacts
 //    @SerializedName("blabla")
     val user: UserEntity?, // doesn't contain "Action", I think it's always "update"
-// userSettings
+    val userSettings: UserSettingsEntity?,
     val addresses: List<ServerEvent.AddressesApiResponse>?,
     val calendars: List<ServerEvent.CalendarsApiResponse>?,
     val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>?, // TODO can't test it for now

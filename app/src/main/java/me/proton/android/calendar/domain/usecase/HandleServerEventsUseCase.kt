@@ -27,6 +27,9 @@ class HandleServerEventsUseCase(
             eventsResponse.user?.let {
                 usersRepository.updateUser(it)
             }
+            eventsResponse.userSettings?.let {
+                usersRepository.persistUserSettings(userId, it)
+            }
             eventsResponse.calendarUserSettings?.let {
                 calendarsRepository.persistCalendarUserSettings(userId, it)
             }

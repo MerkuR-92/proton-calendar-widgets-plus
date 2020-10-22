@@ -94,8 +94,12 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistCalendar(userId, any()) } just Runs
             coEvery { calendarsRepositoryMock.updateCalendar(userId, any()) } just Runs
             coEvery { calendarsRepositoryMock.persistEvents(any()) } just Runs
+            coEvery { calendarsRepositoryMock.refreshCalendarsFlagsForAddress(any(), any(), any()) } just Runs
             coEvery { usersRepositoryMock.persistAddress(userId, any()) } just Runs
             coEvery { usersRepositoryMock.persistUser(any()) } just Runs
+            coEvery { usersRepositoryMock.updateUser(any()) } just Runs
+            coEvery { usersRepositoryMock.persistUserSettings(any(), any()) } just Runs
+            coEvery { usersRepositoryMock.updateAddress(any(), any()) } just Runs
             coEvery { calendarsRepositoryMock.persistEventAlarm(any()) } just Runs
             coEvery { calendarsRepositoryMock.deleteEventAlarmById(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistCalendarKey(any()) } just Runs
@@ -148,10 +152,13 @@ internal class SyncServerEventsUseCaseTest {
                 calendarsRepositoryMock.persistEvents(any())
             }
             coVerify(exactly = 2) {
-                usersRepositoryMock.persistAddress(userId, any())
+                usersRepositoryMock.updateAddress(userId, any())
             }
             coVerify(exactly = 1) {
-                usersRepositoryMock.persistUser(any())
+                usersRepositoryMock.persistUserSettings(userId, any())
+            }
+            coVerify(exactly = 1) {
+                usersRepositoryMock.updateUser(any())
             }
             coVerify(exactly = 5) {
                 calendarsRepositoryMock.persistEventAlarm(any())
