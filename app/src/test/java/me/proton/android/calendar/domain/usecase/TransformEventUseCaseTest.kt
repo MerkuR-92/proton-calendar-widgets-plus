@@ -22,6 +22,7 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -40,6 +41,11 @@ internal class TransformEventUseCaseTest {
         mockkStatic(Log::class)
         coEvery { Log.isLoggable(any(), any()) } returns true
         database = mockk()
+    }
+
+    @AfterEach
+    fun `after each`() {
+        unmockkStatic(Log::class)
     }
 
     @Test

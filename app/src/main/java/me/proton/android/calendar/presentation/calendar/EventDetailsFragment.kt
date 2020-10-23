@@ -467,6 +467,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
+        // TODO stop using field from Activity once we have actual user management
         val userEmail = (requireActivity() as MainActivity).getUserEmail()
         if (userEmail == organizer.email) {
             event_attendee_organizer_layout.item_attendee_title.text =
@@ -496,7 +497,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
         attendeeListAdapter.submitList(attendeeList)
 
-        if (attendeeList.size <= 5) {
+        if (attendeeList.size <= ATTENDEE_AUTO_EXPAND_LIMIT) {
             event_attendee_list.visibleOrGone(true)
             rotateArrowUpward(event_attendees_button, 0)
         }

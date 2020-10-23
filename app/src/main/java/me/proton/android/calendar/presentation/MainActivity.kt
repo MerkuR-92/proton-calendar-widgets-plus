@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
     private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
+    // TODO move to MainViewModel once we have proper user management
     private lateinit var userEmail: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
