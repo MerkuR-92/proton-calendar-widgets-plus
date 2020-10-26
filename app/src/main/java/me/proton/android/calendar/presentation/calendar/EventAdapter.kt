@@ -9,15 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import biweekly.property.Status
+import biweekly.parameter.ParticipationStatus
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.domain.model.BaseModel
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
 import java.time.LocalDate
@@ -26,6 +25,7 @@ class EventAdapter(
     private val timeZoneId: String,
     private val is24Hour: Boolean,
     private val date: LocalDate,
+    private val userEmail: String?,
     private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
 ) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
@@ -47,14 +47,15 @@ class EventAdapter(
             private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
 
             // TODO consider databinding
-            fun bind(event: Event, date: LocalDate, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
 
-//                if (/*TODO if event is unanswered*/ true) {
-//                    imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_event_unanswered_circle))
-//                } else {
+                val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
+
+                if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                    imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_event_unanswered_circle))
+                } else {
                     imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.shape_calendar_circle))
-//                }
-
+                }
                 imageViewIcon.drawable.setTint(Color.parseColor(event.calendar.color))
 
                 textViewHeader.text =
@@ -84,14 +85,12 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default)
                 }
 
-                if (event.status != null) {
-                    if ((event.status as Status).isCancelled) {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    } else {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                    }
+                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                    textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
@@ -111,10 +110,13 @@ class EventAdapter(
             private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
             private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
 
-            // TODO consider databinding
-            fun bind(event: Event, date: LocalDate, clickListener: ((Event) -> Unit)?) {
+            private val viewBackgroundStripedLayout: CardView = itemView.findViewById(R.id.view_background_striped_layout)
+            private val viewBackgroundStriped: View = itemView.findViewById(R.id.view_background_striped)
 
-//                TODO if event is unanswered, add tiled backgrounds
+            // TODO consider databinding
+            fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
+
+                val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
 
                 if (!event.isAllDay() && !event.spansSingleDay()) {
                     val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
@@ -144,37 +146,51 @@ class EventAdapter(
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
 
-                    if (event.isCancelled()) {
+                    if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                    } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                        viewBackgroundStripedLayout.visibleOrGone(true)
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                        setStripedBackground(
+                            viewBackgroundStriped,
+                            itemView.context,
+                            ContextCompat.getColor(itemView.context, R.color.shade_60)
+                        ) // striped background with 20% opacity for unanswered all day events
                     } else {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_secondary))
                     }
                 } else {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
-                    textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
                     textViewSubheader.setTextAppearance(R.style.Text_Default)
-                    textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
-                    textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
 
-                    if (event.isCancelled()) {
-                        textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
-                        textViewSubheader.setTextAppearance(R.style.Text_Default)
-                        textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
-
+                    if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                    } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                        viewBackgroundStripedLayout.visibleOrGone(true)
+                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                        textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                        textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                        textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                        setStripedBackground(
+                            viewBackgroundStriped,
+                            itemView.context,
+                            Color.parseColor(event.calendar.color)
+                        ) // striped background with 20% opacity for unanswered all day events
                     } else {
                         viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                        textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                        textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                        textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
                     }
-
                 }
 
-                if (event.isCancelled()) {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    } else {
-                        textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                        textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                    textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    textViewHeader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
                 itemView.setOnClickListener { clickListener?.invoke(event) }
@@ -218,27 +234,27 @@ class EventAdapter(
                 )
             )
         } else if (viewType == ITEM_TYPE_EVENT_PARTIAL_DAY) {
-                EventViewHolder.PartialDayEventViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.item_agenda_event_partial_day,
-                        parent,
-                        false
-                    ),
-                    timeZoneId,
-                    is24Hour
-                )
-            } else {
-                EventViewHolder.AllDayEventViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.item_agenda_event_all_day,
-                        parent,
-                        false
-                    ),
-                    timeZoneId,
-                    is24Hour
-                )
-            }
+            EventViewHolder.PartialDayEventViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.item_agenda_event_partial_day,
+                    parent,
+                    false
+                ),
+                timeZoneId,
+                is24Hour
+            )
+        } else {
+            EventViewHolder.AllDayEventViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.item_agenda_event_all_day,
+                    parent,
+                    false
+                ),
+                timeZoneId,
+                is24Hour
+            )
         }
+    }
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
 
@@ -247,11 +263,13 @@ class EventAdapter(
             is EventViewHolder.PartialDayEventViewHolder -> holder.bind(
                 getItem(position),
                 date,
+                userEmail,
                 clickListener
             )
             is EventViewHolder.AllDayEventViewHolder -> holder.bind(
                 getItem(position),
                 date,
+                userEmail,
                 clickListener
             )
         }

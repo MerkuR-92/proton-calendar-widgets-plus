@@ -7,7 +7,13 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Shader
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -21,8 +27,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckedTextView
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.text.HtmlCompat
 import androidx.core.view.children
@@ -31,7 +39,6 @@ import biweekly.component.VAlarm
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
-import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -45,7 +52,6 @@ import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
-
 
 class AndroidUtils(context: Context) {
 
@@ -969,4 +975,25 @@ fun rotateArrowUpward(v: View, duration: Long = 100) {
     rotate.fillAfter = true
     rotate.duration = duration
     v.startAnimation(rotate)
+}
+
+fun setStripedBackground(view: View, context: Context, stripeColor: Int) {
+    val colorDrawable = ColorDrawable(ContextCompat.getColor(context, R.color.background_norm)) // bg color3
+    val vDrawable = AppCompatResources.getDrawable(context, R.drawable.vector_stripes) // vector drawable
+    vDrawable?.setTint(stripeColor)
+    vDrawable?.alpha = 51 // decimal value for 20% opacity
+
+    if (vDrawable != null) {
+        val bitmap = Bitmap.createBitmap(
+            vDrawable.intrinsicWidth, vDrawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        vDrawable.setBounds(0, 0, canvas.width, canvas.height)
+        vDrawable.draw(canvas)
+        val bitmapDrawable = BitmapDrawable(context.resources, bitmap)
+        bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT) // set repeat
+        val drawable = LayerDrawable(arrayOf(colorDrawable, bitmapDrawable))
+        view.background = drawable
+    }
 }

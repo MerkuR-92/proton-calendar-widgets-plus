@@ -44,6 +44,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.*
 
 
 class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
@@ -406,7 +407,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 initParticipantsItem(attendeeList)
 
                 // Check if organizer is also an attendee to display its status
-                val organizerAttendee = attendeeList.find { it.email == event.iCalEvent.organizer.email }
+                val organizerAttendee = attendeeList.find { it.email.toLowerCase(Locale.getDefault()) == event.iCalEvent.organizer.email.toLowerCase(Locale.getDefault()) }
                 val organizer = event.iCalEvent.organizer
                 if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
 
@@ -497,9 +498,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
         attendeeListAdapter.submitList(attendeeList)
 
-        if (attendeeList.size <= ATTENDEE_AUTO_EXPAND_LIMIT) {
+        if (attendeeList.size <= ATTENDEE_AUTO_EXPAND_LIMIT && attendeeList.isNotEmpty()) {
             event_attendee_list.visibleOrGone(true)
             rotateArrowUpward(event_attendees_button, 0)
+        } else if (attendeeList.isEmpty() && organizerAttendee != null) {
+            event_attendee_list.visibleOrGone(false)
+            event_attendees_button.visibleOrGone(false)
+            event_attendees_press.visibleOrGone(false)
+            return
         }
 
         event_attendees_press.setOnClickListener {
