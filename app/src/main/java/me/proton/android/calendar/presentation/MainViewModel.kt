@@ -6,14 +6,16 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.UseCaseWorker
-import me.proton.android.calendar.domain.CalendarsRepository
 import kotlinx.coroutines.Job
+import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.common.Navigation
 import me.proton.core.domain.entity.UserId
 import kotlin.Exception
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 
 
 class MainViewModel(private val context: Context, calendarsRepository: CalendarsRepository) : ViewModel() {
@@ -22,6 +24,10 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
     // TODO list of calendars for navbar
 
     private val intents = mutableMapOf<String, Intent>()
+
+    init {
+        setupPeriodicServerEventsSync()
+    }
 
     /**
      * Try to open maps with event location.
@@ -78,6 +84,30 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
     }
 
+    private fun setupPeriodicServerEventsSync() : LiveData<Operation.State> {
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(!BuildConfig.DEBUG)
+            .setRequiresDeviceIdle(!BuildConfig.DEBUG)
+            .build()
+
+        val work = PeriodicWorkRequestBuilder<UseCaseWorker>(SYNC_EVENTS_PERIODIC_REFRESH_PERIOD)
+            .setConstraints(constraints)
+            .setInitialDelay(if (BuildConfig.DEBUG) 0L else SYNC_EVENTS_PERIODIC_DELAY_START.get(ChronoUnit.SECONDS), TimeUnit.SECONDS)
+            .setInputData(workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_SERVER_EVENTS_PERIODIC,
+            ))
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS_PERIODIC,
+            if (BuildConfig.DEBUG) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
+            work
+        ).state
+    }
+
+    // TODO run only after bootstrap & successful "cold fetch" of events for the first required period
     fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
 
         val constraints = Constraints.Builder()

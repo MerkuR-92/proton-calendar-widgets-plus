@@ -103,7 +103,7 @@ interface CalendarsRepository {
 
     suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity)
 
-    suspend fun deleteCalendarUserSettingsByUserId(id: String)
+    suspend fun deleteCalendarUserSettingsByUserId(userId: String)
 
     suspend fun getDefaultCalendarId(userId: String): String?
 

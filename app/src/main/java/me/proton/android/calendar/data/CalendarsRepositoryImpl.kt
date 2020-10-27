@@ -60,7 +60,7 @@ class CalendarsRepositoryImpl(
         // TODO this selects all events from all active calendars and filters for visible calendars later
         //  we should probably listen for all calendars separately and join the results according to currently
         //  visible calendars
-        database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE_MS).collect { eventEntities ->
+        database.eventsDao().flowEvents(calendarIds).distinctUntilChanged().debounce(DB_FLOW_DEBOUNCE.toMillis()).collect { eventEntities ->
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
             val displayedCalendarIds = database.calendarsDao().selectDisplayedCalendars(userId).map { it.id }.toList()

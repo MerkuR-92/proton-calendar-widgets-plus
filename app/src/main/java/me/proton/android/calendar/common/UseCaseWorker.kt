@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
@@ -16,6 +17,7 @@ import org.koin.core.inject
 class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
     private val logger: Logger by inject()
+    private val valueStoreProvider: ValueStoreProvider by inject()
 
     /**
      * Used to inject and execute different usecases from this Worker
@@ -23,6 +25,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UseCaseId {
         companion object {
             const val SYNC_SERVER_EVENTS = SyncServerEventsUseCase.WORKER_ID
+            const val SYNC_SERVER_EVENTS_PERIODIC = SyncServerEventsUseCase.WORKER_PERIODIC_ID
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
             const val UPDATE_SERVER_CALENDAR = UpdateCalendarUseCase.WORKER_ID
         }
@@ -50,6 +53,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UniqueWorkNames {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
+            const val SYNC_SERVER_EVENTS_PERIODIC = "SYNC_SERVER_EVENTS_PERIODIC"
             const val SYNC_ALARMS = "SYNC_ALARMS"
             const val UPDATE_SERVER_CALENDAR = "UPDATE_SERVER_CALENDAR"
         }
@@ -57,7 +61,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
 
     override suspend fun doWork(): Result {
 
-        logger.v("inside UseCaseWorker doWork()")
+        logger.e("inside UseCaseWorker doWork(), usecaseid: ${inputData.getString(INPUT_USE_CASE_ID)}")
 
         val userId = inputData.getString(INPUT_USER_ID)?.let { UserId(it) } ?: return Result.failure()
         val useCaseId = inputData.getString(INPUT_USE_CASE_ID)
@@ -65,6 +69,24 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.SYNC_SERVER_EVENTS -> {
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
                 syncServerEventsUseCase.execute(userId)
+            }
+            UseCaseId.SYNC_SERVER_EVENTS_PERIODIC -> {
+                val syncServerEventsUseCase: SyncServerEventsUseCase = get()
+
+                // TODO remove when we have an actual user management
+                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+                val TODOuserID = TODOvalueStore.getString("USERID")
+
+                val userIds = if (TODOuserID != null) arrayOf(TODOuserID) else emptyArray()
+                if (userIds.isNotEmpty()) {
+                    val results = userIds.map {
+                        syncServerEventsUseCase.execute(it)
+                    }
+
+                    results.firstOrNull { it is UseCase.Result.Error } ?: results.firstOrNull { it is UseCase.Result.InvalidParams } ?: UseCase.Result.Success
+                } else {
+                    UseCase.Result.Success
+                }
             }
             UseCaseId.SYNC_ALARMS -> {
                 val syncAlarmsUseCase: SyncAlarmsUseCase = get()

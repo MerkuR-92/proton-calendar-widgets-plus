@@ -16,11 +16,12 @@ class SyncServerEventsUseCase(
 
     companion object {
         const val WORKER_ID = "SYNC_SERVER_EVENTS"
+        const val WORKER_PERIODIC_ID = "SYNC_SERVER_EVENTS_PERIODIC"
     }
 
     suspend fun execute(userId: UserId): UseCase.Result {
 
-        logger.v("executing SyncServerEventsUseCase")
+        logger.e("executing SyncServerEventsUseCase for $userId")
 
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         var lastProtonEventId = valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)

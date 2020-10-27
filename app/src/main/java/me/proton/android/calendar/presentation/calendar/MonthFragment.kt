@@ -204,8 +204,6 @@ class MonthFragment : BaseDialogFragment() {
                     handleAlarmsUseCase.execute(userId)
                 }
 
-                delay(10_000L) // TODO delay so after first event sync, most of the events is already in DB
-
                 // TODO schedule repeating worker job
                 mainViewModel.syncAlarms(userId).observe(viewLifecycleOwner) {
                     if (it is Operation.State.IN_PROGRESS) {
@@ -217,8 +215,7 @@ class MonthFragment : BaseDialogFragment() {
             }
 
             while(true) {
-                delay(SYNC_EVENTS_REFRESH_MS) // TODO schedule repeating worker job
-
+                delay(SYNC_EVENTS_IN_APP_REFRESH.toMillis())
 
                 if (userId != null) {
                     mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
