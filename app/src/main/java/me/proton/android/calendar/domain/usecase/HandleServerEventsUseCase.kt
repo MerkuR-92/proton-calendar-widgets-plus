@@ -37,20 +37,13 @@ class HandleServerEventsUseCase(
                 calendarsRepository.persistCalendarUserSettings(userId.id, it)
             }
 
-            val calendarsToRefresh = ArrayList<String>()
             eventsResponse.calendars?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarById(it.id) },
                     { calendarsRepository.persistCalendar(userId.id, it.calendar!!) },
-                    {
-                        //Refresh events if calendar db is not up to date on display value
-                        if (it.calendar != null && !calendarsRepository.isCalendarDisplayUpToDate(it.id, it.calendar.display))
-                            calendarsToRefresh.add(it.id)
-                        calendarsRepository.updateCalendar(userId.id, it.calendar!!)
-                    }
+                    { calendarsRepository.updateCalendar(userId.id, it.calendar!!) }
                 )
             }
-            if (calendarsToRefresh.isNotEmpty()) calendarsRepository.refreshEvents(calendarsToRefresh)
 
             eventsResponse.addresses?.forEach {
                 it.handleAction(

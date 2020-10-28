@@ -2,7 +2,6 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
@@ -135,7 +134,7 @@ class CalendarViewModel(
                     // TODO this method never returns
                     val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
                     val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-                    calendarsRepository.init(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
+                    //calendarsRepository.init(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
                 }
 
                 initialised = true
@@ -228,12 +227,12 @@ class CalendarViewModel(
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState
 
-    suspend fun prefetchEvents(fromDate: LocalDate,
-                               toDate: LocalDate,
-                               timeZoneId: String) {
+    suspend fun fetchEvents(fromDate: LocalDate,
+                            toDate: LocalDate,
+                            timeZoneId: String) {
 
         withContext(Dispatchers.IO) {
-            calendarsRepository.prefetchEvents(userId!!, fromDate, toDate, timeZoneId) // TODO UserId
+            calendarsRepository.fetchEvents(userId!!, fromDate, toDate, timeZoneId) // TODO UserId
         }
 
     }

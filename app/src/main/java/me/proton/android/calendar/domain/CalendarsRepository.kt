@@ -40,7 +40,10 @@ interface CalendarsRepository {
         timeZoneId: String
     ): Flow<List<Event>>
 
-    suspend fun prefetchEvents(
+    /**
+     * Request Events to be pushed to observers and also fetched from API if possible.
+     */
+    suspend fun fetchEvents(
         userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
@@ -55,7 +58,8 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
-    suspend fun refreshEvents(calendarIds: List<String>? = null)
+//    @Deprecated("stop forcing events refresh, do it reactively from DB listener")
+//    suspend fun refreshEvents(calendarIds: List<String>? = null)
 
     suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String)
 
@@ -120,9 +124,6 @@ interface CalendarsRepository {
     suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) // eventId is already there
 
     suspend fun deleteEventAlarmById(id: String)
-
-    suspend fun init(calendarIds: List<String>, userId: String, toDate: LocalDate, timeZoneId: String)
-//    suspend fun init(calendarIds: List<String>, toDate: LocalDate, timeZoneId: String)
 
     val fetchingState: Flow<FetchingState>
 

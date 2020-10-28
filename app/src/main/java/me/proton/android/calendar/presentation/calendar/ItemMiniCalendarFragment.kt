@@ -5,21 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
-import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
-import kotlinx.android.synthetic.main.pager_mini_calendar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.visibleOrInvisible
-import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 
@@ -83,7 +73,7 @@ class ItemMiniCalendarFragment(
             val toDate = date.withDayOfMonth(date.lengthOfMonth())
 
             TimberLogger.d("zzz requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
-            calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
+            calendarViewModel.fetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
 
         }
 

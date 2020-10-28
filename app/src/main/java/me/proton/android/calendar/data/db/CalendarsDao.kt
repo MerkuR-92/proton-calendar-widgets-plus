@@ -17,6 +17,12 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
     abstract fun flowCalendars(userId: String): Flow<List<CalendarEntity>>
 
+    @Query("SELECT * FROM calendars")
+    abstract fun flowCalendars(): Flow<List<CalendarEntity>>
+
+    @Query("SELECT * FROM calendars")
+    abstract fun selectCalendars(): List<CalendarEntity>
+
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
     abstract suspend fun selectCalendars(userId: String): List<CalendarEntity>
 

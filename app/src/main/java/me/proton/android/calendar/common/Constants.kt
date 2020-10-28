@@ -15,8 +15,6 @@ const val USER_AGENT_NAME = "ProtonCalendar"
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"
 const val ATTENDEE_AUTO_EXPAND_LIMIT = 5
 
-val DB_FLOW_DEBOUNCE = Duration.ofMillis(1000)
-
 val SYNC_EVENTS_IN_APP_REFRESH = Duration.ofSeconds(30)
 val SYNC_EVENTS_PERIODIC_REFRESH_PERIOD = Duration.ofHours(1)
 val SYNC_EVENTS_PERIODIC_DELAY_START = Duration.ofMinutes(1)

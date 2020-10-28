@@ -49,8 +49,6 @@ class UpdateCalendarUseCase(
 
                 database.calendarsDao().update(newCalendarEntity)
 
-                calendarsRepository.refreshEvents(arrayListOf(calendarId))
-
                 UseCase.Result.Success
             }
             is ApiResponse.Error -> UseCase.Result.Error(updateCalendarResponse.error)
