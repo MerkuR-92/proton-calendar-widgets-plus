@@ -2,14 +2,23 @@ package me.proton.android.calendar.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
 
+@Serializable
 data class AddressKey(
+    @SerialName("ID")
     override val id: String,
+    @SerialName("Version")
     val version: Int, // TODO how to handle this?
+    @SerialName("Primary")
     val primary: Int, // 1 -- primary
+    @SerialName("Flags")
     val flags: Int,
+    @SerialName("PrivateKey")
     val privateKey: String,
+    @SerialName("PublicKey")
     val publicKey: String
 //    val token: String?,
 //    val signature: String?

@@ -1,6 +1,8 @@
 package me.proton.android.calendar.data.api
 
 import com.google.gson.Gson
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.android.calendar.domain.Logger
 import retrofit2.Response
@@ -16,7 +18,6 @@ interface KeysApiService {
     @GET("keys/salts")
     suspend fun getKeySalts(): Response<KeySaltsApiResponse>
 
-    // TODO test response is for adamtst@protonmail.blue
     @GET("keys")
     suspend fun getPublicKeys(@Query("Email") email: String): Response<PublicKeysApiResponse>
 
@@ -29,23 +30,35 @@ class KeysApiImpl(private val service: KeysApiService, gson: Gson, logger: Logge
 
 }
 
+@Serializable
 data class KeySaltsApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("KeySalts")
     val keySalts: List<KeySalt>
 ) : BaseApiResponse()
 
+@Serializable
 data class KeySalt(
+    @SerialName("ID")
     val id: String, // this ID is actually the ID of PrivateKey this Salt corresponds to
+    @SerialName("KeySalt")
     val keySalt: String
 )
 
+@Serializable
 data class PublicKeysApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Keys")
     val keys: List<PublicKeyApiEntity>
 ) : BaseApiResponse()
 
+@Serializable
 data class PublicKeyApiEntity(
+    @SerialName("Flags")
     val flags: Int,
+    @SerialName("PublicKey")
     val publicKey: String
 )
 

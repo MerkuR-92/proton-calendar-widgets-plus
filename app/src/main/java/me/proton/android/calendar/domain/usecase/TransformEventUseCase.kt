@@ -2,6 +2,8 @@ package me.proton.android.calendar.domain.usecase
 
 import biweekly.parameter.ParticipationStatus
 import com.google.gson.Gson
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.data.db.AppDatabase
@@ -36,7 +38,8 @@ class TransformEventUseCase(
 
         // process Shared Events
         eventEntity.sharedEvents.map {
-            gson.fromJson(it, Event.SharedEvent::class.java)
+            Json.decodeFromJsonElement<Event.SharedEvent>(it)
+//            gson.fromJson(it, Event.SharedEvent::class.java)
         }.forEach { sharedEvent ->
             calendarParts.add(
                 getDecryptedText(
@@ -51,7 +54,8 @@ class TransformEventUseCase(
 
         // process Calendar Events
         eventEntity.calendarEvents.map {
-            gson.fromJson(it, Event.CalendarEvent::class.java)
+            Json.decodeFromJsonElement<Event.CalendarEvent>(it)
+//            gson.fromJson(it, Event.CalendarEvent::class.java)
         }.forEach { calendarEvent ->
             calendarParts.add(
                 getDecryptedText(
@@ -66,7 +70,8 @@ class TransformEventUseCase(
 
         // process Personal Events, those are only signed
         eventEntity.personalEvents.map {
-            gson.fromJson(it, Event.PersonalEvent::class.java)
+            Json.decodeFromJsonElement<Event.PersonalEvent>(it)
+//            gson.fromJson(it, Event.PersonalEvent::class.java)
         }.forEach { personalEvent ->
             val verificationKeys = database.publicKeysDao().select(personalEvent.author).map { it.publicKey }
             if (verificationKeys.isEmpty()) {
@@ -87,7 +92,8 @@ class TransformEventUseCase(
 
         // process Attendees Events
         eventEntity.attendeesEvents.map {
-            gson.fromJson(it, Event.AttendeeEvent::class.java)
+            Json.decodeFromJsonElement<Event.AttendeeEvent>(it)
+//            gson.fromJson(it, Event.AttendeeEvent::class.java)
         }.forEach { attendeeEvent ->
             calendarParts.add(
                 getDecryptedText(
@@ -109,7 +115,8 @@ class TransformEventUseCase(
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
             val attendees = eventEntity.attendees.map {
-                gson.fromJson(it, Event.AttendeeStatusEvent::class.java)
+                Json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
+//                gson.fromJson(it, Event.AttendeeStatusEvent::class.java)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter("X-PM-TOKEN")

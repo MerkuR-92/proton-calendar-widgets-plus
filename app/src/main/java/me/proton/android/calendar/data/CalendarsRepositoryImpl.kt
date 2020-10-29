@@ -10,6 +10,9 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.Logger
@@ -369,7 +372,7 @@ class CalendarsRepositoryImpl(
     override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
 
     override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
-        return database.eventsDao().selectByUid(eventUid).find { it.sharedEvents.any { if (it.isJsonObject) (it.asJsonObject.get("Data").asString.contains("RRULE:")) else false } }
+        return database.eventsDao().selectByUid(eventUid).find { it.sharedEvents.any { if ((it as? JsonObject) != null) (it.jsonObject.get("Data")?.jsonPrimitive?.content?.contains("RRULE:") == true) else false } }
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

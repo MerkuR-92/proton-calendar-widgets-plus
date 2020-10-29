@@ -1,6 +1,10 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
@@ -64,10 +68,10 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                         // TODO collect all emails and move this to worker
                         try {
                             val emails = eventsResponse.data.events.flatMap {
-                                it.sharedEvents.map { it.asJsonObject.get("Author").asString } +
-                                        it.calendarEvents.map { it.asJsonObject.get("Author").asString } +
-                                        it.personalEvents.map { it.asJsonObject.get("Author").asString }
-                            }
+                                it.sharedEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
+                                        it.calendarEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
+                                        it.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content }
+                            }.filterNotNull()
                             emails.distinct().forEach {
                                 fetchPublicKeysUseCase.execute(it)
                             }

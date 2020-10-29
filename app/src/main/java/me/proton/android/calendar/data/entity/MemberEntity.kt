@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
 
 /**
@@ -17,11 +19,16 @@ import me.proton.android.calendar.data.db.AppDatabase
         onDelete = ForeignKey.CASCADE
     )],
     indices = [Index(value = ["calendarId"])])
+@Serializable
 data class MemberEntity(
     @PrimaryKey
+    @SerialName("ID")
     val id: String,
+    @SerialName("Permissions")
     val permissions: Int, // bitmap
+    @SerialName("Email")
     val email: String, // plaintext email address
+    @SerialName("CalendarID")
     val calendarId: String
 ) {
     enum class Permission(val value: Int) { // TODO see if this is even deserialized

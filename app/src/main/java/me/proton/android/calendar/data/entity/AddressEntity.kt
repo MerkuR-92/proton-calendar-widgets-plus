@@ -6,8 +6,12 @@ import androidx.room.ForeignKey.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.AddressKey
@@ -22,15 +26,21 @@ import me.proton.android.calendar.domain.model.AddressKey
     )],
     indices = [Index(value = ["fkUserId"])]
 )
+@Serializable
 data class AddressEntity(
+    @SerialName("ID")
     @PrimaryKey
     val id: String,
+    @SerialName("Email")
     val email: String,
+    @SerialName("Status")
     val status: Int,
+    @SerialName("Keys")
     val keys: List<JsonElement>
 ) {
 
     //@Expose(serialize = false, deserialize = false)
+    @kotlinx.serialization.Transient
     lateinit var fkUserId: String
 
     fun toAddress(gson: Gson): Address {
@@ -38,7 +48,8 @@ data class AddressEntity(
             id = this.id,
             email = this.email,
             keys = this.keys.map {
-                gson.fromJson(it, AddressKey::class.java)
+                Json { this.ignoreUnknownKeys = true } .decodeFromJsonElement<AddressKey>(it)
+//                gson.fromJson(it, AddressKey::class.java)
             }
         )
     }

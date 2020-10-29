@@ -1,3 +1,8 @@
+plugins {
+//    id 'org.jetbrains.kotlin.multiplatform' version '1.4.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.10"
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -119,7 +124,7 @@ dependencies {
     implementation "org.koin:koin-android:${rootProject.ext.version.koin}"
     implementation "org.koin:koin-android-viewmodel:${rootProject.ext.version.koin}"
 
-//    implementation 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0'
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.version.retrofit}"
     implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
@@ -129,6 +134,9 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.4.0'
 
     implementation "com.jakewharton.timber:timber:${rootProject.ext.version.timber}"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${rootProject.ext.version.serialization}"
+//    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${rootProject.ext.version.serialization}"
 
 
 //    implementation "com.google.dagger:dagger-android:${rootProject.ext.dagger_version}"

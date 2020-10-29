@@ -1,6 +1,8 @@
 package me.proton.android.calendar.data.entity
 
 import androidx.room.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
 
 // = calendar key
@@ -13,12 +15,18 @@ import me.proton.android.calendar.data.db.AppDatabase
         onDelete = ForeignKey.CASCADE
     )],
     indices = [Index(value = ["calendarId"])])
+@Serializable
 data class CalendarKeyEntity(
     @PrimaryKey
-    val id: String, //
+    @SerialName("ID")
+    val id: String,
+    @SerialName("Flags")
     val flags: Int, // bitmap 1: Primary, 2: Active
-    val privateKey: String, // The private key, encrypted with a passphrase
-    val passphraseId: String, // "ARy95iNxhniEgYJrRrGvagmzRdnmv==",
+    @SerialName("PrivateKey")
+    val privateKey: String, // encrypted with a passphrase
+    @SerialName("PassphraseID")
+    val passphraseId: String,
+    @SerialName("CalendarID")
     val calendarId: String
 ) {
     val isPrimary: Boolean get() = flags and 1 > 0

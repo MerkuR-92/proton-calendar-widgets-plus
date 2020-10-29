@@ -1,6 +1,8 @@
 package me.proton.android.calendar.data.api
 
 import com.google.gson.Gson
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.entity.AddressEntity
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.Logger
@@ -19,8 +21,11 @@ class AddressesApiImpl(private val service: AddressesApiService, gson: Gson, log
 
 }
 
+@Serializable
 data class AddressesApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Addresses")
     val addresses: List<AddressEntity>
 ) : BaseApiResponse()
 

@@ -16,6 +16,7 @@ class FetchPublicKeysUseCase(
 
     suspend fun execute(email: String): UseCase.Result {
 
+        // TODO verify this is working
         logger.v("executing FetchPublicKeysUseCase for $email")
 
         if (database.publicKeysDao().select(email).isEmpty()) {

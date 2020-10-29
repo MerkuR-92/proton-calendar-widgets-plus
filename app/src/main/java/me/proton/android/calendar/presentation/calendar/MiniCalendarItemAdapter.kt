@@ -145,13 +145,11 @@ class MiniCalendarItemAdapter(
 
         val mutableList = currentList.toMutableList()
 
-
-        TimberLogger.d("zzz submitCalendarIndicators for ${month} in ${lifecycleOwner.lifecycle.currentState}: $indicators ")
+        TimberLogger.v("submitCalendarIndicators for ${month} in ${lifecycleOwner.lifecycle.currentState}: $indicators ")
 
         mutableList.forEachIndexed { index, miniCalendarItem ->
             if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == month) {
                 val colors = indicators.getOrDefault(miniCalendarItem.date.dayOfMonth, emptyList())
-                TimberLogger.d("zzz colors: $colors")
 
                 mutableList[index] = miniCalendarItem.copy(indicatorColors = colors)
             }

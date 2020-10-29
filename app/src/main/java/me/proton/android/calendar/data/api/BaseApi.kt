@@ -3,6 +3,8 @@ package me.proton.android.calendar.data.api
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.domain.Logger
 import retrofit2.Response
 
@@ -18,10 +20,14 @@ sealed class ApiResponse<out T : Any> {
 /**
  * Base class for all responses from API.
  */
+@Serializable
 abstract class BaseApiResponse {
+    @SerialName("Code")
     abstract val code: Int
 
+    @SerialName("Error")
     val error: String? = null
+    @SerialName("ErrorDescription")
     val errorDescription: String? = null
 
     val isSuccessful: Boolean get() = code == 1000 || code == 1001 // single- and multiple-success

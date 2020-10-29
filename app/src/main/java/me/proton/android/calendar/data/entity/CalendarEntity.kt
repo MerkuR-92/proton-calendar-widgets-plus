@@ -6,6 +6,8 @@ import androidx.room.ForeignKey.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
 
 @Entity(
@@ -18,22 +20,25 @@ import me.proton.android.calendar.data.db.AppDatabase
     )],
     indices = [Index(value = ["fkUserId"])]
 )
+@Serializable
 data class CalendarEntity(
+    @SerialName("ID")
     @PrimaryKey
     val id: String,
+    @SerialName("Name")
     val name: String,
+    @SerialName("Description")
     val description: String,
+    @SerialName("Color")
     val color: String,
+    @SerialName("Display")
     val display: Int, // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
-    val flags: Int //
-
-    // local database fields
-//    val fkUserId: String
-
-    // @ColumnInfo, @Ignore
+    @SerialName("Flags")
+    val flags: Int
 ) {
 
     //@Expose(serialize = false, deserialize = false)
+    @kotlinx.serialization.Transient
     lateinit var fkUserId: String
 
     //Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled

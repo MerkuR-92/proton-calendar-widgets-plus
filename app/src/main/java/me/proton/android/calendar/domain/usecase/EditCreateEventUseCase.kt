@@ -2,6 +2,8 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
 import com.proton.gopenpgp.crypto.SessionKey
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.printToString

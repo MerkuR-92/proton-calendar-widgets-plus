@@ -13,6 +13,9 @@ import biweekly.util.Duration
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
@@ -269,9 +272,9 @@ class EventViewModel(
     private fun getDefaultAlarms(calendarSettings: CalendarSettingsEntity, isAllDay: Boolean): List<VAlarm> {
         val alarms = ArrayList<VAlarm>()
         val defaultNotifications = if (isAllDay) calendarSettings.defaultFullDayNotifications else calendarSettings.defaultPartDayNotifications
-        defaultNotifications.mapNotNull { if (it.isJsonObject) gson.fromJson(it, CalendarSettingsEntity.AlarmEntity::class.java) else null }.forEach { alarm ->
+        defaultNotifications.mapNotNull { if ((it as? JsonObject) != null) Json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(it) else null }.forEach { alarm ->
             alarm.parseTrigger()?.let {
-                if (alarm.type == "0") {
+                if (alarm.type == 0) {
                     alarms.add(VAlarm.email(it, null, null))
                 } else {
                     alarms.add(VAlarm.display(it, null))

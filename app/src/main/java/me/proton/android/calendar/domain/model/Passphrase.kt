@@ -1,10 +1,7 @@
 package me.proton.android.calendar.domain.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.google.gson.JsonElement
-import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.PassphraseEntity
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 data class Passphrase(
     override val id: String,
@@ -15,10 +12,14 @@ data class Passphrase(
     val isActive = flags == 1
 }
 
-    data class MemberPassphrase(
-        val memberId: String, // TODO this is probably the same as User's AddressID
-        val passphrase: String, // encrypted passphrase, can be decrypted using the primary AddressKey linked to the member’s address.
-        val signature: String // signature of plaintext passphrase, needs to be validated TODO!
-    )
+@Serializable
+data class MemberPassphrase(
+    @SerialName("MemberID")
+    val memberId: String, // TODO this is probably the same as User's AddressID
+    @SerialName("Passphrase")
+    val passphrase: String, // encrypted passphrase, can be decrypted using the primary AddressKey linked to the member’s address.
+    @SerialName("Signature")
+    val signature: String // signature of plaintext passphrase, needs to be validated TODO!
+)
 
 

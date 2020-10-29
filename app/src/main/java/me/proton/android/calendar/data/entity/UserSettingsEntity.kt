@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
 import java.time.DayOfWeek
 import java.time.temporal.WeekFields
@@ -20,10 +22,14 @@ import java.util.*
     )],
     indices = [Index(value = ["fkUserId"])]
 )
+@Serializable
 data class UserSettingsEntity(
 
+    @SerialName("WeekStart")
     val weekStart: Int, // 0: Locale default, 1: Monday, 6: Saturday 7: Sunday
+    @SerialName("DateFormat")
     val dateFormat: Int, // 0: Locale default, 1: DD_MM_YYYY, 2: MM_DD_YYYY, 3: YYYY_MM_DD
+    @SerialName("TimeFormat")
     val timeFormat: Int, // 0: Locale default, 1: 24H, 2: 12H
 
 ) {
@@ -32,6 +38,7 @@ data class UserSettingsEntity(
 //    var _id: Int = 0
 
     @PrimaryKey
+    @kotlinx.serialization.Transient
     lateinit var fkUserId: String
 
     fun weekStartDayOfWeek(): DayOfWeek = when (weekStart) {

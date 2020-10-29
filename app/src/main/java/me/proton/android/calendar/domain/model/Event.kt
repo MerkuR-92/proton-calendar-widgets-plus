@@ -9,6 +9,8 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
@@ -628,57 +630,81 @@ data class Event(
             }
         }
 
-
+        @Serializable
         data class SharedEvent( // TODO maybe this could be named "SharedPart" or "SharedSplit", the same for others
+            @SerialName("Type")
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
+            @SerialName("Data")
             val data: String,
+            @SerialName("Signature")
             val signature: String,
+            @SerialName("Author")
             val author: String
         ) {
             val isEncrypted: Boolean get() = type and 1 > 0
 //        val isSigned: Boolean get() = type and 2 > 0
         }
 
+        @Serializable
         data class CalendarEvent(
+            @SerialName("Type")
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
+            @SerialName("Data")
             val data: String,
+            @SerialName("Signature")
             val signature: String,
+            @SerialName("Author")
             val author: String
         ) {
             val isEncrypted: Boolean get() = type and 1 > 0
 //        val isSigned: Boolean get() = type and 2 > 0
         }
 
+        @Serializable
         data class PersonalEvent(
+            @SerialName("Type")
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
+            @SerialName("Data")
             val data: String,
+            @SerialName("Signature")
             val signature: String,
+            @SerialName("Author")
             val author: String,
+            @SerialName("MemberID")
             val memberId: String
         ) {
 //        val isSigned: Boolean get() = type and 2 > 0
         }
 
+        @Serializable
         data class AttendeeEvent(
+            @SerialName("Type")
             val type: Int, // 2 for SIGNED 3 for encrypted + signed
+            @SerialName("Data")
             val data: String,
+            @SerialName("Signature")
             val signature: String,
+            @SerialName("Author")
             val author: String
         ) {
             val isEncrypted: Boolean get() = type and 1 > 0
 //            val isSigned: Boolean get() = type and 2 > 0
         }
 
+        @Serializable
         data class AttendeeStatusEvent(
+            @SerialName("ID")
             val id: String,
+            @SerialName("Token")
             val token: String,
+            @SerialName("Status")
             val status: Int
         ) {
             val participationStatus: ParticipationStatus get() = when (status) {
                 1 -> ParticipationStatus.TENTATIVE
                 2 -> ParticipationStatus.DECLINED
                 3 -> ParticipationStatus.ACCEPTED
-                else ->  ParticipationStatus.NEEDS_ACTION
+                else -> ParticipationStatus.NEEDS_ACTION
             }
         }
 

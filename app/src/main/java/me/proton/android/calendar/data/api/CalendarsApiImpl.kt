@@ -2,6 +2,8 @@ package me.proton.android.calendar.data.api
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.Logger
@@ -12,14 +14,11 @@ import retrofit2.http.*
 
 interface CalendarsApiService {
 
-//    @GET("calendars")
     @GET("calendar/$API_VERSION_CALENDAR")
     suspend fun getCalendars(@Query("Page") page: Int = 0, @Query("PageSize") pageSize: Int = 100): Response<CalendarsApiResponse>
 
-//        calendars/{{Calendar.CalendarID}}/events?Start=1580515200&End=1583020800&Timezone=Europe/Paris
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
     suspend fun getEvents(
-//        @Tag retrofitTag: RetrofitTag,
         @Path("calendarId") calendarId: String,
         @Query("Start") startTimestamp: Long,
         @Query("End") endTimestamp: Long,
@@ -96,146 +95,157 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
 
 }
 
-
+@Serializable
 data class CalendarsApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Calendars")
     val calendars: List<CalendarEntity>
 ) : BaseApiResponse()
 
+@Serializable
 data class EventsApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Events")
     val events: List<EventEntity>,
+    @SerialName("More")
     val more: Int
 ) : BaseApiResponse()
 
+@Serializable
 data class EventApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Event")
     val event: EventEntity
 ) : BaseApiResponse()
 
-//"MemberID": "{{Calendar.MemberID}}",
-//  "Permissions": 1,
-//  "CalendarKeyPacket": null,
-//  "CalendarEventContent": [],
-//  "SharedKeyPacket": "wV4DcC\/2yqTc1AkSAQdA\/z7Qyp8XfBvSPgiQ4ndlbu\/viJ2nfB+XXPvj\/zmIQVUwgmXPs\/ELe0cGAiOIunrTwVXQ7+KAzf6WC8sAXkDOu290HQrjbhjy7WZocQ+ZKEvm",
-//  "SharedEventContent": [
-//    {
-//      "Type": 2,
-//      "Data": "BEGIN:VCALENDAR\nPRODID:-\/\/CALENDARSERVER.ORG\/\/NONSGML Version 1\/\/EN\nVERSION:2.0\nBEGIN:VEVENT\nDTSTAMP:20190905T120251Z\nTZID:Europe\/Zurich\nUID:7E018059-2165-4170-B32F-6936E88E61E5295\nDTSTART;TZID=Europe\/Zurich:20190910T120000\nDTEND;TZID=Europe\/Zurich:20190910T130000\nEND:VEVENT\nEND:VCALENDAR",
-//      "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.5.5\r\nComment: https:\/\/openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJdcN1MAAoJELdKNH+ugJvYpeYH\/iMFhM7MIBokI+m8fv5z\r\nHykTkXfCkK6nZGfS6SaIs7hp8ktSLoh2z3e5iKfkjCukzxlEKkhiooZFY6DF\r\nCUqPI5pUwPE45k95PWK76vVsonovj9kDw2aLrFeQCJaEhGOSMmn2GlyJtOP0\r\nWC\/yFuPR\/pEobHIzffCMv2Mn62iYRf7+d+sFHqMqCwLomUI9VFBK9VU8ll9z\r\nUtQbLq0h4\/k2d7BQlOnx\/KIN5oLVLSg2k9GhOFmdm4panAs6srePPEfw8lv3\r\nt5xTQ7+Dbo15E5Y+6MNVyoRZoHx5\/ciyljexyTf+Q3rYc3KsSiUQ7BmHj69W\r\nSyLWOpubQW9gE\/znJCnl9Ck=\r\n=Ve+v\r\n-----END PGP SIGNATURE-----\r\n"
-//    },
-//    {
-//      "Type": 3,
-//      "Data": "0sA4ATgechqLZ42IQt48nZL9h+ToZWrbShNNlnH1FnT\/QeMRmEeaDJWiugzNZKshhON+9izXngD49NtmFZmdi0c5mS3NvSfcSERLV3A\/oSs6sRZRYt9ro2Q1pCh4EOZqhtajlIoqyaUWAOZrmtlUgejNRGhoThWH\/LXaFE7BWpTJuRqYNGGNIigChMipDTjXHqAD1sVJPBHABW5O6sg75jV\/Lloqfv5xNDRbZK5dnyKbAZk3y+14q\/pVoDJCXQTH87Npz7rzDMTMCMMDhV+MR9nShnv1UmMSfgsH8403A4ukoIbiBRf9oCtX2i2yut6sFGTYQyJ0Zy1qY2c=",
-//      "Signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.5.5\r\nComment: https:\/\/openpgpjs.org\r\n\r\nwsBcBAEBCAAGBQJdcN1MAAoJELdKNH+ugJvYujQH\/1I9DvCLqeYVocupHch5\r\n6zUxebE\/OSIz0FgTTaR00tQKhCHmT\/lLEUinQumAsUGrKh5HU+RPM4M1rhKL\r\n\/sXu3069vi2eFw2jx6yZzZBVAGXOG8zoyDxQoIQysnfxJM8iIomh9lhE7M44\r\nTjNSwmIKLeOWiINpr\/zfaFMDncWEmGpE+wu62hzdMEl+33Wt1x8jzzZHlDCE\r\ngiypcXKFAosaC3ewz1O1q3WwyqggDuw4+tDhI6JSF5pJmUbOy1IBfLX4e3f4\r\nWIwD1N88Z5Q37xuXOi1e5fer4\/Xy\/Kvcy14ldIHDhT2XMJB3iOfH0NdOn6R3\r\n5MqQzOylGmwBNhvl+ZaqicM=\r\n=tEbj\r\n-----END PGP SIGNATURE-----\r\n"
-//    }
-data class CreateEventApiRequest(
-    val memberId: String,
-    val permissions: Int,
-    val calendarKeyPacket: String?, // TODO for now, for simple example, but it can/must (sometimes) be empty
-    val calendarEventContent: List<Event.CalendarEvent>?, // TODO empty for now
-    val sharedKeyPacket: String, // TODO I think it always has to be there
-    val sharedEventContent: List<Event.SharedEvent>,
-    val personalEventContent: Event.PersonalEvent?
-    // TODO AttendeesEventContent, Attendees
-    )
-
-
+@Serializable
 data class SyncEventsUpdateApiRequest(
+    @SerialName("MemberID")
     val memberId: String,
+    @SerialName("Events")
     val events: List<SyncEventContainer>
 )
 
+@Serializable
 data class UpdateCalendarApiRequest(
+    @SerialName("Name")
     val name: String? = null,
+    @SerialName("Description")
     val description: String? = null,
+    @SerialName("Color")
     val color: String? = null,
+    @SerialName("Display")
     val display: Int? = null
 )
 
 // TODO container for CREATE LINKED by adding SharedEventID and UID
 
-interface SyncEventContainer
+@Serializable
+sealed class SyncEventContainer
 
+@Serializable
 data class SyncEventCreateContainer(
+    @SerialName("Event")
     val event: SyncEvent
-) : SyncEventContainer
+) : SyncEventContainer()
 
+@Serializable
 data class SyncEventUpdateContainer(
+    @SerialName("ID")
     val id: String,
+    @SerialName("Event")
     val event: SyncEvent
-) : SyncEventContainer
+) : SyncEventContainer()
 
+@Serializable
 data class SyncEventDeleteContainer(
+    @SerialName("ID")
     val id: String
-) : SyncEventContainer
+) : SyncEventContainer()
 
+@Serializable
 data class SyncEvent(
+    @SerialName("Permissions")
     val permissions: Int,
+    @SerialName("CalendarKeyPacket")
     val calendarKeyPacket: String?,
+    @SerialName("CalendarEventContent")
     val calendarEventContent: List<Event.CalendarEvent>?,
-    val sharedKeyPacket: String?,
+    @SerialName("SharedKeyPacket")
+    val sharedKeyPacket: String? = null,
+    @SerialName("SharedEventContent")
     val sharedEventContent: List<Event.SharedEvent>,
+    @SerialName("PersonalEventContent")
     val personalEventContent: Event.PersonalEvent?
 )
 
+@Serializable
 data class BootstrapApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Keys")
     val keys: List<CalendarKeyEntity>,
+    @SerialName("Passphrase")
     val passphrase: PassphraseEntity,
+    @SerialName("Members")
     val members: List<MemberEntity>,
+    @SerialName("CalendarSettings")
     val calendarSettings: CalendarSettingsEntity // settings specific to calendar, not user
 ) : BaseApiResponse()
 
+@Serializable
 data class CreateEventApiResponse(
-    override val code: Int // TODO other fields
+    @SerialName("code")
+    override val code: Int
 ) : BaseApiResponse()
 
+@Serializable
 data class SyncEventsApiResponse(
-    override val code: Int, // TODO other fields
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("Responses")
     val responses: List<SyncResponseWrapper>
 ) : BaseApiResponse()
 
+@Serializable
 data class SyncResponseWrapper(
+    @SerialName("Index")
     val index: Int,
+    @SerialName("Response")
     val response: SyncResponse
     // TODO errors and other types of payload
 )
 
+@Serializable
 data class SyncResponse(
-    @SerializedName("Code") // workaround for obfuscated members in release builds
+    @SerialName("Code")
     override val code: Int,
-    @SerializedName("Event")
-    val event: EventEntity?
+    @SerialName("Event")
+    val event: EventEntity? = null
     // TODO errors and other types of payload
 ) : BaseApiResponse()
 
+@Serializable
 data class UpdateCalendarApiResponse(
-    override val code: Int // TODO other fields
+    @SerialName("Code")
+    override val code: Int
 ) : BaseApiResponse()
 
-//@Serializable
-
-//enum class CalendarDisplay(val display: Int) {
-//    @SerializedName("0")
-//    HIDE(0),
-//    @SerializedName("1")
-//    SHOW(1)
-//}
-
+@Serializable
 data class AlarmsApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Alarms")
     val alarms: List<EventAlarmEntity>
 ) : BaseApiResponse()
 
+@Serializable
 data class EventsByUidApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("Events")
     val events: List<EventEntity>
 ) : BaseApiResponse()
-
-//{
-//  "UID": "d79b258a-a428-4a9c-bd80-da8cd20f35aa@proton.me",
-//  "RecurrenceID": 1564141942,
-//  "Page": 1,
-//  "PageSize": 100
-//}

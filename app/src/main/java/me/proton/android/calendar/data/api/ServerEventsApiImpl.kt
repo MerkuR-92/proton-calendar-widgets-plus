@@ -3,6 +3,8 @@ package me.proton.android.calendar.data.api
 import com.google.gson.*
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.ServerEventsApi
@@ -29,31 +31,46 @@ class ServerEventsApiImpl(private val service: ServerEventsApiService, gson: Gso
 
 }
 
+@Serializable
 data class LatestServerEventApiResponse(
+    @SerialName("Code")
     override val code: Int,
+    @SerialName("EventID")
     val eventId: String
 ) : BaseApiResponse()
 
+@Serializable
 data class ServerEventsApiResponse(
-    override val code: Int, // new eventId to send with next request
-    val eventId: String, // next event Id which should be persisted in client
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("EventID")
+    val eventId: String, // new eventId to send with next request
+    @SerialName("Refresh")
     val refresh: Int, // bitmap, 255 means throw out client cache and reload everything from server, 1 is mail, 2 is contacts
+    @SerialName("More")
     val more: Int, // 0 or 1 if more events exist and should be fetched
-// contacts
-//    @SerializedName("blabla")
-    val user: UserEntity?, // doesn't contain "Action", I think it's always "update"
-    val userSettings: UserSettingsEntity?,
-    val addresses: List<ServerEvent.AddressesApiResponse>?,
-    val calendars: List<ServerEvent.CalendarsApiResponse>?,
-    val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>?, // TODO can't test it for now
-    val calendarPassphrases: List<ServerEvent.PassphrasesApiResponse>?,  // TODO can't test it for now
-    val calendarMembers: List<ServerEvent.MembersApiResponse>?,  // TODO can't test it for now
-    val calendarEvents: List<ServerEvent.EventsApiResponse>?,
-//    TODO: CalendarAttendees
-//    TODO:    val calendarUserSettings
-    val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>?,
-    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>?,
-    val calendarUserSettings: CalendarUserSettingsEntity?
+    @SerialName("User")
+    val user: UserEntity? = null, // doesn't contain "Action", it's always "update"
+    @SerialName("UserSettings")
+    val userSettings: UserSettingsEntity? = null,
+    @SerialName("Addresses")
+    val addresses: List<ServerEvent.AddressesApiResponse>? = null,
+    @SerialName("Calendars")
+    val calendars: List<ServerEvent.CalendarsApiResponse>? = null,
+    @SerialName("CalendarKeys")
+    val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>? = null,
+    @SerialName("CalendarPassphrases")
+    val calendarPassphrases: List<ServerEvent.PassphrasesApiResponse>? = null,
+    @SerialName("CalendarMembers")
+    val calendarMembers: List<ServerEvent.MembersApiResponse>? = null,
+    @SerialName("CalendarEvents")
+    val calendarEvents: List<ServerEvent.EventsApiResponse>? = null,
+    @SerialName("CalendarSettings")
+    val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null,
+    @SerialName("CalendarAlarms")
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
+    @SerialName("CalendarUserSettings")
+    val calendarUserSettings: CalendarUserSettingsEntity? = null
 ) : BaseApiResponse()
 
 // TODO HANDLE ACTIONS AND CREATE TESTS FOR THAT!!!!!!!!!!!!!!!!!!
@@ -102,59 +119,117 @@ class ServerEvent {
 //        }
     }
 
-
+    @Serializable
     data class AddressesApiResponse(
+        @SerialName("ID")
         override val id: String,
+        @SerialName("Action")
         override val action: Int,
-        val address: AddressEntity? // all the payloads here are nullable, because action = 0 (delete) sends no payload
+        @SerialName("Address")
+        val address: AddressEntity? = null // all the payloads here are nullable, because action = 0 (delete) sends no payload
     ) : BaseServerEventApiResponse()
 
+    @Serializable
     data class CalendarsApiResponse(
+        @SerialName("ID")
         override val id: String,
+        @SerialName("Action")
         override val action: Int,
-        val calendar: CalendarEntity? // TODO in /events it looks like there's no "flags" field
+        @SerialName("Calendar")
+        val calendar: CalendarEntity? = null
     ) : BaseServerEventApiResponse()
 
+    @Serializable
     data class CalendarKeysApiResponse(
+        @SerialName("ID")
         override val id: String,
+        @SerialName("Action")
         override val action: Int,
-        val key: CalendarKeyEntity?
+        @SerialName("Key")
+        val key: CalendarKeyEntity? = null
     ) : BaseServerEventApiResponse()
 
+    @Serializable
     data class PassphrasesApiResponse(
+        @SerialName("ID")
         override val id: String,
+        @SerialName("Action")
         override val action: Int,
-        val passphrase: PassphraseEntity?
+        @SerialName("Passphrase")
+        val passphrase: PassphraseEntity? = null
     ) : BaseServerEventApiResponse()
 
+    @Serializable
     data class MembersApiResponse(
-            override val id: String,
-            override val action: Int,
-            val member: MemberEntity?
+        @SerialName("ID")
+        override val id: String,
+        @SerialName("Action")
+        override val action: Int,
+        @SerialName("Member")
+        val member: MemberEntity? = null
     ) : BaseServerEventApiResponse()
 
+    @Serializable
     data class EventsApiResponse(
-            override val id: String,
-            override val action: Int,
-            val event: EventEntity?
+        @SerialName("ID")
+        override val id: String,
+        @SerialName("Action")
+        override val action: Int,
+        @SerialName("Event")
+        val event: EventEntityMetadata? = null
     ) : BaseServerEventApiResponse()
 
+    // this class is not persisted in the database
+    @Serializable
+    data class EventEntityMetadata(
+        @SerialName("ID")
+        val id: String,
+        @SerialName("CalendarID")
+        val calendarId: String,
+        @SerialName("StartTime")
+        val startTime: Long,
+        @SerialName("StartTimezone")
+        val startTimeZone: String,
+        @SerialName("EndTime")
+        val endTime: Long,
+        @SerialName("EndTimezone")
+        val endTimeZone: String,
+        @SerialName("FullDay")
+        val fullDay: Int,
+        @SerialName("UID")
+        val uid: String,
+        @SerialName("RecurrenceID")
+        val recurrenceID: Long?,
+        @SerialName("Exdates")
+        val exDates: List<Long>,
+        @SerialName("RRule")
+        val rRule: String?,
+        @SerialName("CreateTime")
+        val createTime: Long, // unix timestamps
+        @SerialName("ModifyTime")
+        val modifyTime: Long,
+        @SerialName("IsOrganizer")
+        val isOrganizer: Int
+    )
+
+    @Serializable
     class CalendarSettingsApiResponse(
+        @SerialName("ID")
         override val id: String,
+        @SerialName("Action")
         override val action: Int,
-        val calendarSettings: CalendarSettingsEntity?
+        @SerialName("CalendarSettings")
+        val calendarSettings: CalendarSettingsEntity? = null
     ) : BaseServerEventApiResponse()
 
-    class UserSettingsApiResponse(
-        override val id: String,
-        override val action: Int,
-        val calendarUserSettings: CalendarUserSettingsEntity?
-    ) : BaseServerEventApiResponse()
-
+    @Serializable
     class AlarmsApiResponse(
-            override val id: String,
-            override val action: Int,
-            val alarm: EventAlarmEntity?
+        @SerialName("ID")
+        override val id: String,
+        @SerialName("Action")
+        override val action: Int,
+        @SerialName("Alarm")
+        val alarm: EventAlarmEntity? = null
     ) : BaseServerEventApiResponse()
 
 }

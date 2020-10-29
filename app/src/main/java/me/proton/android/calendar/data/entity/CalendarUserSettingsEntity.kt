@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
 import java.time.DayOfWeek
 import java.time.temporal.WeekFields
@@ -20,15 +22,24 @@ import java.util.*
     )],
     indices = [Index(value = ["fkUserId"])]
 )
+@Serializable
 data class CalendarUserSettingsEntity(
 
+    @SerialName("WeekLength")
     val weekLength: Int, // 0 - 7 days, 1 - 5 days
+    @SerialName("DisplayWeekNumber")
     val displayWeekNumber: Int, // 0 off, 1 on
+    @SerialName("AutoDetectPrimaryTimezone")
     val autoDetectPrimaryTimezone: Int, // 0 off, 1 on
+    @SerialName("PrimaryTimezone")
     val primaryTimezone: String, // "Europe/Budapest", NO LONGER NULL AFTER 12/06/2020: "Can be null if AutoDetectPrimaryTimezone is 0"
+    @SerialName("DisplaySecondaryTimezone")
     val displaySecondaryTimezone: Int, // 0 off, 1 on
+    @SerialName("SecondaryTimezone")
     val secondaryTimezone: String?, // Can be null if DisplaySecondaryTimezone is 0
+    @SerialName("ViewPreference")
     val viewPreference: Int, /* 0 - DAILY, 1 - WEEKLY, 2 - MONTHLY, 3 - YEARLY, 4 - PLANNING */
+    @SerialName("DefaultCalendarID")
     val defaultCalendarId: String? // TODO we still get null for old accounts (even when web says there is default calendar)
 
 ) {
@@ -37,6 +48,7 @@ data class CalendarUserSettingsEntity(
 //    var _id: Int = 0
 
     @PrimaryKey
+    @kotlinx.serialization.Transient
     lateinit var fkUserId: String
 
 }

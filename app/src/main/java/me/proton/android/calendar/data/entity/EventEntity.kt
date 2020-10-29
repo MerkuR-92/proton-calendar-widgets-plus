@@ -4,11 +4,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
-import com.google.gson.JsonElement
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.domain.model.Event
 
 @Entity(tableName = AppDatabase.TABLE_EVENTS,
     foreignKeys = [ForeignKey(
@@ -19,26 +18,35 @@ import me.proton.android.calendar.domain.model.Event
     )],
     indices = [Index(value = ["calendarId"])]
 )
+@Serializable
 data class EventEntity(
+    @SerialName("ID")
     @PrimaryKey
     val id: String,
+    @SerialName("CalendarID")
     val calendarId: String,
+    @SerialName("CalendarKeyPacket")
     val calendarKeyPacket: String?, // keypackets used to decrypt Type 3 CalendarEventData, to be armored with Data packets, base64
+    @SerialName("CreateTime")
     val createTime: Long, // unix timestamps
-    val lastEditTime: Long,
+    @SerialName("ModifyTime")
+    val modifyTime: Long,
+    @SerialName("Permissions")
     val permissions: Int, // Permissions of the attendees (bitmap)
     // 1 (number) - Can invite
     //2 (number) - Can modify event
     //4 (number) - Can see attendees list
+    @SerialName("SharedKeyPacket")
     val sharedKeyPacket: String, // base64
-
-    // TODO all these JsonElements are probably "CalendarEventData", PersonalEvent will have memberId additionally (maybe ignore, because it's always myself, right? Valentin)
-    // TODO ??? add type converters for Dao to serialize those as strings
-    val sharedEvents: List<JsonElement>, // shared between all calendars // TODO nullable?
-    val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar // TODO nullable?
-//    @SerializedName("PersonalEvent") // TODO change this to PersonalEvents when api fixes naming
-    val personalEvents: List<JsonElement>, // specific to a member // TODO nullable?
-    val attendeesEvents: List<JsonElement>, // shared between all calendars // TODO nullable?
+    @SerialName("SharedEvents")
+    val sharedEvents: List<JsonElement>, // shared between all calendars
+    @SerialName("CalendarEvents")
+    val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar
+    @SerialName("PersonalEvents")
+    val personalEvents: List<JsonElement>, // specific to a member
+    @SerialName("AttendeesEvents")
+    val attendeesEvents: List<JsonElement>, // shared between all calendars
+    @SerialName("Attendees")
     val attendees: List<JsonElement>
 ) {
 

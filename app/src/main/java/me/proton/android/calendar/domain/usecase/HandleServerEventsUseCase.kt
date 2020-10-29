@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.database.sqlite.SQLiteConstraintException
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
@@ -66,33 +68,35 @@ class HandleServerEventsUseCase(
                     {
 
                         // TODO optimise this so we don't fetch unnecessary events outside of desired window
+                        // https://jira.protontech.ch/browse/CALAND-463
 
                         // after "event metadata migration", we need to fetch events separately
                         val singleEventResponse = calendarsApi.getEvent(it.event!!.calendarId, it.event!!.id)
-//                        logger.e("single event = ${singleEventResponse}")
 
                         // TODO MOVE THIS TO SEPARATE USECASE
                         when (singleEventResponse) {
-                            is ApiResponse.Success -> calendarsRepository.persistEvents(singleEventResponse.data.event)
+                            is ApiResponse.Success -> {
+                                calendarsRepository.persistEvents(singleEventResponse.data.event)
+
+                                // TODO move this to worker, remove duplicated code
+                                try {
+                                    val emails =
+                                        (singleEventResponse.data.event.sharedEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
+                                                singleEventResponse.data.event.calendarEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
+                                                singleEventResponse.data.event.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content })
+                                            .filterNotNull()
+                                    emails.distinct().forEach {
+                                        fetchPublicKeysUseCase.execute(it)
+                                    }
+
+                                } catch (e: IllegalStateException) {
+                                    logger.e("error getting event's author from JSON")
+                                }
+                            }
                             is ApiResponse.Error -> throw Exception(singleEventResponse.error)
                             is ApiResponse.Exception -> throw Exception(singleEventResponse.exception)
                         }
 
-//                        calendarsRepository.persistEvents(it.event!!)
-
-                        // TODO move this to worker
-                        try {
-                            val emails = /* TODO GSON is causing trouble here, make this pretty*/
-                                (if (it.event.sharedEvents?.isNotEmpty() == true) it.event.sharedEvents.map { it.asJsonObject.get("Author").asString } else emptyList()) +
-                                (if (it.event.calendarEvents?.isNotEmpty() == true) it.event.calendarEvents.map { it.asJsonObject.get("Author").asString } else emptyList()) +
-                                (if (it.event.personalEvents?.isNotEmpty() == true) it.event.personalEvents.map { it.asJsonObject.get("Author").asString } else emptyList())
-
-                            emails.distinct().forEach {
-                                fetchPublicKeysUseCase.execute(it)
-                            }
-                        } catch (e: IllegalStateException) {
-                            logger.e("error getting event's author from JSON")
-                        }
                     }
                 )
             }

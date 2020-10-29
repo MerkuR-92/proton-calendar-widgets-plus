@@ -5,13 +5,18 @@ import android.util.Log
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.google.gson.JsonElement
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.domain.model.AddressKey
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
-    version = 21
+    version = 22
 )
 @TypeConverters(DatabaseTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -76,27 +81,28 @@ abstract class AppDatabase : RoomDatabase() {
  */
 private class DatabaseTypeConverters { // TODO inject GSON, but it seems to be unsupported
 
+    // TODO REMOVE THIS
     @TypeConverter
-    fun toListOfJsonElements(value: String): List<JsonElement> { // TODO if GSON passes null here, there be dragons
+    fun toListOfGSONJsonElements(value: String): List<com.google.gson.JsonElement> { // TODO if GSON passes null here, there be dragons
         return GsonCommon.gson.fromJson(value, GsonCommon.jsonElementListType)
     }
 
+    // TODO REMOVE THIS
     @TypeConverter
-    fun fromListOfJsonElement(json: List<JsonElement>): String { // TODO if GSON passes null here, there be dragons
+    fun fromListOfGSONJsonElement(json: List<com.google.gson.JsonElement>): String { // TODO if GSON passes null here, there be dragons
         return GsonCommon.gson.toJson(json)
     }
 
-//    @TypeConverter
-//    fun toJsonElement(value: String): JsonElement {
-//        val type: Type = object : TypeToken<JsonElement>() {}.type // TODO inject GSON
-//        return Gson().fromJson(value, type)
-//    }
-//
-//    @TypeConverter
-//    fun fromJsonElement(json: JsonElement): String {
-//        val gson = Gson() // TODO inject GSON
-//        return gson.toJson(json)
-//    }
+    @TypeConverter
+    fun toListOfJsonElements(value: String): List<JsonElement> {
+        return Json.decodeFromString<List<JsonElement>>(value)
+    }
+
+    @TypeConverter
+    fun fromListOfJsonElement(json: List<JsonElement>): String {
+        return Json.encodeToString(json)
+    }
+
 }
 
 private class Migration1To2 : Migration(1, 2) {

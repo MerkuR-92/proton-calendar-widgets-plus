@@ -5,7 +5,11 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
-import com.google.gson.JsonElement
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.model.MemberPassphrase
 import me.proton.android.calendar.domain.model.Passphrase
@@ -19,11 +23,16 @@ import me.proton.android.calendar.domain.model.Passphrase
         onDelete = ForeignKey.CASCADE
     )],
     indices = [Index(value = ["calendarId"])])
+@Serializable
 data class PassphraseEntity(
     @PrimaryKey
-    val id: String, // "ARy95iNxhniEgYJrRrGvagmzRdnmv==",
+    @SerialName("ID")
+    val id: String,
+    @SerialName("Flags")
     val flags: Int, // 0: Inactive, 1: Active
+    @SerialName("MemberPassphrases")
     val memberPassphrases: List<JsonElement>,
+    @SerialName("CalendarID")
     val calendarId: String
 ) {
 
@@ -34,7 +43,8 @@ data class PassphraseEntity(
             id = this.id,
             flags = this.flags,
             memberPassphrases = this.memberPassphrases.map {
-                gson.fromJson(it, MemberPassphrase::class.java)
+                Json.decodeFromJsonElement<MemberPassphrase>(it)
+//                gson.fromJson(it, MemberPassphrase::class.java)
             },
             calendarId = this.calendarId
         )

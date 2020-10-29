@@ -62,3 +62,14 @@
 #-dontwarn retrofit2.Platform$Java8
 -if interface * { @retrofit2.http.* <methods>; }
 -keep,allowobfuscation interface <1>
+
+# kotlinx.serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class me.proton.android.calendar.**$$serializer { *; }
+-keepclassmembers class me.proton.android.calendar.** {
+    *** Companion;
+}
+-keepclasseswithmembers class me.proton.android.calendar.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

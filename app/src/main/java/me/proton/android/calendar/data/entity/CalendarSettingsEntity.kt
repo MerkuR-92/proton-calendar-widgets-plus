@@ -7,7 +7,9 @@ import androidx.room.PrimaryKey
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.Duration
-import com.google.gson.JsonElement
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 
 // settings specific to Calendar, shared by all Calendar Members
@@ -20,18 +22,27 @@ import me.proton.android.calendar.data.db.AppDatabase
         onDelete = ForeignKey.CASCADE
     )],
     indices = [Index(value = ["calendarId"])])
+@Serializable
 data class CalendarSettingsEntity(
     @PrimaryKey
+    @SerialName("ID")
     val id: String,
+    @SerialName("CalendarID")
     val calendarId: String,
+    @SerialName("DefaultEventDuration")
     val defaultEventDuration: Int, // Default event duration in minutes
+    @SerialName("DefaultPartDayNotifications")
     val defaultPartDayNotifications: List<JsonElement>,
+    @SerialName("DefaultFullDayNotifications")
     val defaultFullDayNotifications: List<JsonElement>
 
 ) {
 
+    @Serializable
     data class AlarmEntity(
-        val type: String, // 0: Email reminder, 1: Desktop reminder
+        @SerialName("Type")
+        val type: Int, // 0: Email reminder, 1: Desktop reminder
+        @SerialName("Trigger")
         val trigger: String // RFC5545 encoded trigger
     ) {
         fun parseTrigger(): Trigger? {
