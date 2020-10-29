@@ -12,8 +12,8 @@ import retrofit2.http.*
 
 interface CalendarsApiService {
 
-//    @GET("calendars/")
-    @GET("calendar/$API_VERSION_CALENDAR/")
+//    @GET("calendars")
+    @GET("calendar/$API_VERSION_CALENDAR")
     suspend fun getCalendars(@Query("Page") page: Int = 0, @Query("PageSize") pageSize: Int = 100): Response<CalendarsApiResponse>
 
 //        calendars/{{Calendar.CalendarID}}/events?Start=1580515200&End=1583020800&Timezone=Europe/Paris

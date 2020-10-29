@@ -6,7 +6,7 @@ import java.util.*
 
 const val API_VERSION_CALENDAR = "v1"
 //const val API_BASE_URL = "https://protonmail.blue/api/"
-const val API_BASE_URL = "https://beta.protonmail.com/api/"
+const val API_BASE_URL = "https://api.protonmail.ch/api/"
 const val API_APPLICATION_NAME = "AndroidCalendar"
 
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"
