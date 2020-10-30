@@ -6,10 +6,12 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import biweekly.parameter.ParticipationStatus
-import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.TestsLogger
@@ -97,7 +99,7 @@ internal class TransformEventUseCaseTest {
             val passPhraseEntity = PassphraseEntity(
                 "id",
                 1,
-                listOf(JsonParser.parseString(gson.toJson(memberPassphrase))),
+                listOf(Json.decodeFromString<JsonElement>(gson.toJson(memberPassphrase))),
                 "calendarId")
             every {
                 database.passphrasesDao().select(any())
@@ -141,34 +143,34 @@ internal class TransformEventUseCaseTest {
 
     private fun getMockedAttendees(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
-        list.add(JsonParser.parseString("{\"ID\":\"6C5v4OC-Jhs8syzxmNwhyjZi1YG4USc2DLI7i_mnj6Mm6p6CK8s1mHn5RBb4tJ0XFACjVB-c4qXltm1ErQRY8w==\",\"Token\":\"905eb4e54055cdb47d9edf7e8f6a778bca369a97\",\"Status\":1}\n"))
-        list.add(JsonParser.parseString("{\"ID\":\"1dPOFXdenTUVKinAVwaoxfHFVuJYO6VF58YzI6Xn7RZJV208mN5ZZUZj_oG-A4h3q6O6QnH5HibkEymNuROiGg==\",\"Token\":\"5651702a13a167b23fc30583c230d3dfd272a966\",\"Status\":2}\n"))
-        list.add(JsonParser.parseString("{\"ID\":\"8TjWIH0KrE_-9271lO0tPNn8T6UF-0SBCtzuK-31IUp_3y6eOuM_Ysi7Gp78nlM0hmhHrQha51FFwxk2CBORXA==\",\"Token\":\"cfc28ea87394a21df6456bbe059b3805bfc09fb8\",\"Status\":0}\n"))
+        list.add(Json.decodeFromString<JsonElement>("{\"ID\":\"6C5v4OC-Jhs8syzxmNwhyjZi1YG4USc2DLI7i_mnj6Mm6p6CK8s1mHn5RBb4tJ0XFACjVB-c4qXltm1ErQRY8w==\",\"Token\":\"905eb4e54055cdb47d9edf7e8f6a778bca369a97\",\"Status\":1}\n"))
+        list.add(Json.decodeFromString<JsonElement>("{\"ID\":\"1dPOFXdenTUVKinAVwaoxfHFVuJYO6VF58YzI6Xn7RZJV208mN5ZZUZj_oG-A4h3q6O6QnH5HibkEymNuROiGg==\",\"Token\":\"5651702a13a167b23fc30583c230d3dfd272a966\",\"Status\":2}\n"))
+        list.add(Json.decodeFromString<JsonElement>("{\"ID\":\"8TjWIH0KrE_-9271lO0tPNn8T6UF-0SBCtzuK-31IUp_3y6eOuM_Ysi7Gp78nlM0hmhHrQha51FFwxk2CBORXA==\",\"Token\":\"cfc28ea87394a21df6456bbe059b3805bfc09fb8\",\"Status\":0}\n"))
         return list
     }
 
     private fun getMockedNonEncryptedAttendeesEvents(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
-        list.add(JsonParser.parseString("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nATTENDEE;CN=calendarsingle9@proton.dev;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-\\r\\n TOKEN=905eb4e54055cdb47d9edf7e8f6a778bca369a97:mailto:calendarsingle9@proto\\r\\n n.dev\\r\\nATTENDEE;CN=adamprotonmail@gmail.com;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-TO\\r\\n KEN=5651702a13a167b23fc30583c230d3dfd272a966:mailto:adamprotonmail@gmail.co\\r\\n m\\r\\nATTENDEE;CN=adamtst@protonmail.com;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-TOKE\\r\\n N=cfc28ea87394a21df6456bbe059b3805bfc09fb8:mailto:adamtst@protonmail.com\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za8a+AQDA/zlaCVvaSnlRv6HBLyScDTgUhbUE1ArnLaY0G2ot9wD/XGPE\\r\\nB9Ou63paO4mHQJOzBw9LQe6k2HA24doWDD8cfQA=\\r\\n=/tFw\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nATTENDEE;CN=calendarsingle9@proton.dev;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-\\r\\n TOKEN=905eb4e54055cdb47d9edf7e8f6a778bca369a97:mailto:calendarsingle9@proto\\r\\n n.dev\\r\\nATTENDEE;CN=adamprotonmail@gmail.com;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-TO\\r\\n KEN=5651702a13a167b23fc30583c230d3dfd272a966:mailto:adamprotonmail@gmail.co\\r\\n m\\r\\nATTENDEE;CN=adamtst@protonmail.com;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-TOKE\\r\\n N=cfc28ea87394a21df6456bbe059b3805bfc09fb8:mailto:adamtst@protonmail.com\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za8a+AQDA/zlaCVvaSnlRv6HBLyScDTgUhbUE1ArnLaY0G2ot9wD/XGPE\\r\\nB9Ou63paO4mHQJOzBw9LQe6k2HA24doWDD8cfQA=\\r\\n=/tFw\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
         return list
     }
 
     private fun getMockedNonEncryptedCalendarEvents(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
-        list.add(JsonParser.parseString("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nSTATUS:CONFIRMED\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za6lgAQCzed5ovcz9WykC5+wSFxDCAToI8D5i+p3q0OVPrbIEVAEAvOe6\\r\\nEChxa70XES8QIhF4ddaC5XcU1uiUxNW/zIcTnwA=\\r\\n=pZlu\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nSTATUS:CONFIRMED\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za6lgAQCzed5ovcz9WykC5+wSFxDCAToI8D5i+p3q0OVPrbIEVAEAvOe6\\r\\nEChxa70XES8QIhF4ddaC5XcU1uiUxNW/zIcTnwA=\\r\\n=pZlu\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
         return list
     }
 
     private fun getMockedPersonalEvents(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
-        list.add(JsonParser.parseString("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nBEGIN:VALARM\\r\\nTRIGGER:-PT15M\\r\\nACTION:DISPLAY\\r\\nEND:VALARM\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za+0BAQDXHpVzCj6vvV7uRRMoVOe+/YSyn8PS66b/A3Cqp0QDrAD/XI2u\\r\\nlP9dOR9rxR54GBHeGLhZqiGHW/VEIvSF7ru9IAU=\\r\\n=D+sP\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\",\"MemberID\":\"uMjs3RbhmCfyC6d1w-xjPzjvji-PjVbL8YST3eBzr5I0-3UKmZv9Q9l_sGUf422xNkLtlsh7ZHoYS1poeYsRVQ==\"}"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nBEGIN:VALARM\\r\\nTRIGGER:-PT15M\\r\\nACTION:DISPLAY\\r\\nEND:VALARM\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za+0BAQDXHpVzCj6vvV7uRRMoVOe+/YSyn8PS66b/A3Cqp0QDrAD/XI2u\\r\\nlP9dOR9rxR54GBHeGLhZqiGHW/VEIvSF7ru9IAU=\\r\\n=D+sP\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\",\"MemberID\":\"uMjs3RbhmCfyC6d1w-xjPzjvji-PjVbL8YST3eBzr5I0-3UKmZv9Q9l_sGUf422xNkLtlsh7ZHoYS1poeYsRVQ==\"}"))
         return list
     }
 
     private fun getMockedNonEncryptedSharedEvents(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
-        list.add(JsonParser.parseString("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nDTSTART:20201020T161500Z\\r\\nDTEND:20201020T171500Z\\r\\nORGANIZER;CN=adamprotonmail@gmail.com:mailto:adamprotonmail@gmail.com\\r\\nSEQUENCE:1\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Zaz7vAP4pe2r4gIvwZq4HXEkyulH4JjNdSY0+v2vj9UZ3G39QIQD6A1+G\\r\\nCzdqvtZuXpPddMR/8SUH4+V+04CbkFHIngoM8wc=\\r\\n=aOeb\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
-        list.add(JsonParser.parseString("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nDESCRIPTION:Great description from gcal gitlab\\r\\nSUMMARY:Über-cool event, edited from gmail\\r\\nLOCATION:Geneva, Switzerland\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za+jhAP9F5KqDGwcZdEZsora6BzptoenPn6cCmRNIbI3LAHQTAQD9GxOG\\r\\nlGgtndyaD4rx1xNI5RFLoiNtss1VgtQV9SgWNQs=\\r\\n=rG5S\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nDTSTART:20201020T161500Z\\r\\nDTEND:20201020T171500Z\\r\\nORGANIZER;CN=adamprotonmail@gmail.com:mailto:adamprotonmail@gmail.com\\r\\nSEQUENCE:1\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Zaz7vAP4pe2r4gIvwZq4HXEkyulH4JjNdSY0+v2vj9UZ3G39QIQD6A1+G\\r\\nCzdqvtZuXpPddMR/8SUH4+V+04CbkFHIngoM8wc=\\r\\n=aOeb\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nDESCRIPTION:Great description from gcal gitlab\\r\\nSUMMARY:Über-cool event, edited from gmail\\r\\nLOCATION:Geneva, Switzerland\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za+jhAP9F5KqDGwcZdEZsora6BzptoenPn6cCmRNIbI3LAHQTAQD9GxOG\\r\\nlGgtndyaD4rx1xNI5RFLoiNtss1VgtQV9SgWNQs=\\r\\n=rG5S\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
         return list
     }
 }

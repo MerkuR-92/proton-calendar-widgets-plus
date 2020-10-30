@@ -14,9 +14,6 @@ import java.sql.Date
 
 internal class EventTest {
 
-    private val gson = GsonCommon.gson
-    private val testsLogger = TestsLogger
-
     @Test
     fun `empty event sanity check`() {
         val calendarWithEmptyEvent = VEvent().wrapInICalendar()

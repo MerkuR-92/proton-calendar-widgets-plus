@@ -38,7 +38,8 @@
                 "Name": "My calendar (edited)",
                 "Description": "Description edited",
                 "Color": "#CF5858",
-                "Display": 1
+                "Display": 1,
+                "Flags": 0
             }
         }
     ],
