@@ -1791,6 +1791,56 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate n-th occurrence of partial-day recurring event with byday, display in a timezone that make it happen the next day`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=America/Noronha:20201004T230000
+    DTEND;TZID=America/Noronha:20201004T233000
+    RRULE:FREQ=WEEKLY;BYDAY=SU
+    SEQUENCE:1
+    SUMMARY:Test event
+    STATUS:CONFIRMED
+    DTSTAMP:20201029T152822Z
+    UID:ph5aTJJKGwKURIwnXh9CN0jW4isD@proton.me
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT5H
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Paris"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
+        val occurrence3 = event.generateOccurrence(3, displayTimeZoneId)
+        val occurrence4 = event.generateOccurrence(4, displayTimeZoneId)
+
+        assertThat(occurrence1).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 5, 3, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 5, 3, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrence3).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 19, 3, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 19, 3, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            3))
+
+        assertThat(occurrence4).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2020, 10, 26, 2, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2020, 10, 26, 2, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            4))
+    }
+
+    @Test
     fun `generate n-th occurrence of partial-day multi-day event with BYDAY, display in different timezone`() {
 
         val iCalString = """

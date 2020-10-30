@@ -117,6 +117,7 @@ class EventAdapter(
             fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
 
                 val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
+                viewBackgroundStripedLayout.visibleOrGone(participationStatus == ParticipationStatus.NEEDS_ACTION)
 
                 if (!event.isAllDay() && !event.spansSingleDay()) {
                     val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
@@ -149,7 +150,6 @@ class EventAdapter(
                     if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
-                        viewBackgroundStripedLayout.visibleOrGone(true)
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                         setStripedBackground(
                             viewBackgroundStriped,
@@ -167,7 +167,6 @@ class EventAdapter(
                     if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
-                        viewBackgroundStripedLayout.visibleOrGone(true)
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                         textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                         textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))

@@ -216,9 +216,9 @@ class EventViewModel(
 
             TimberLogger.v("event view model init with occurrence: $occurrenceNumber")
 
-            dbEvent = viewModelScope.async(Dispatchers.IO) {
-                calendarsRepository.eventFlow(eventId).first()
-            }.await()
+            val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
+            dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
+            else null
 
             TimberLogger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 
