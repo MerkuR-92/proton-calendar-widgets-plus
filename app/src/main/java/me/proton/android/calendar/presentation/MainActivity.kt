@@ -22,6 +22,8 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
@@ -31,6 +33,8 @@ import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.auth.presentation.AuthOrchestrator
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
@@ -53,8 +57,17 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     // TODO move to MainViewModel once we have proper user management
     private lateinit var userEmail: String
 
+    private val accountManager: AccountManager by inject()
+    private val authOrchestrator: AuthOrchestrator by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        authOrchestrator.register(this)
+        accountManager.getAccounts().onEach { accounts->
+            // TODO: Fix Hilt first.
+            // if (accounts.isEmpty()) authOrchestrator.startLoginWorkflow()
+        }.launchIn(lifecycleScope)
 
         intent?.let { mainViewModel.handleIntent(intent) }
 

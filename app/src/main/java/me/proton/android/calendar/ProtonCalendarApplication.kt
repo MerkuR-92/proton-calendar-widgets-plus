@@ -17,7 +17,7 @@ class ProtonCalendarApplication : Application() {
 
         startKoin {
             androidContext(this@ProtonCalendarApplication)
-            modules(commonModule, viewModelModule, repositoryModule, networkModule, useCaseModule)
+            modules(commonModule, viewModelModule, repositoryModule, networkModule, useCaseModule, coreModule)
         }
 
         if (BuildConfig.DEBUG) {

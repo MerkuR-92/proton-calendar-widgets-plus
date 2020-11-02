@@ -17,13 +17,23 @@ buildscript {
                 "viewpager2": "1.1.0-alpha01",
                 "material": "1.2.1",
                 "androidx_test": "1.3.0",
-                "serialization": "1.0.1"
+                "serialization": "1.0.1",
+
+                "proton_core_account": "0.1.1",
+                "proton_core_account_manager": "0.1.1",
+                "proton_core_auth": "0.1.1",
+                "proton_core_human_verification": "0.2.1",
+                "proton_core_data": "0.1.1",
+                "proton_core_domain": "0.2.1",
+                "proton_core_presentation": "0.4.2",
+                "proton_core_networking": "0.3.1",
+                "proton_core_util_kotlin": "0.2.1"
         ]
     }
 
     repositories {
         google()
-        jcenter() 
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.0'
@@ -39,6 +49,8 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url = "https://kotlin.bintray.com/kotlinx" }
+        maven { url = "https://dl.bintray.com/proton/Core-publishing" }
     }
 }
 
