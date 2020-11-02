@@ -90,16 +90,13 @@ fun initAttendeeStatus(attendeeItemStatus: ImageView, participationStatus: Parti
     attendeeItemStatus.visibleOrGone(true)
     when (participationStatus) {
         ParticipationStatus.ACCEPTED -> {
-            attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(context, R.color.notification_success)
-            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_check_small))
+            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_check_circle_filled))
         }
         ParticipationStatus.DECLINED -> {
-            attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(context, R.color.notification_error)
-            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_close_small))
+            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_clear_circle_filled))
         }
         ParticipationStatus.TENTATIVE -> {
-            attendeeItemStatus.backgroundTintList = ContextCompat.getColorStateList(context, R.color.notification_warning)
-            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_question_small))
+            attendeeItemStatus.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_question_circle_filled))
         }
         else ->  attendeeItemStatus.visibleOrGone(false)
     }

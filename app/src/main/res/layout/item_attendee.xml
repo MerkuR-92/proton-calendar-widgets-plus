@@ -33,15 +33,11 @@
 
         <ImageView
             android:id="@+id/item_attendee_status"
-            android:layout_width="@dimen/attendee_status_size"
-            android:layout_height="@dimen/attendee_status_size"
-            android:background="@drawable/shape_attendee_status_circle"
-            android:backgroundTint="@color/notification_success"
-            app:srcCompat="@drawable/ic_check_small"
-            app:tint="@color/background_norm"
+            android:layout_width="@dimen/small_icon_size"
+            android:layout_height="@dimen/small_icon_size"
+            app:srcCompat="@drawable/ic_check_circle_filled"
             android:visibility="gone"
             tools:visibility="visible"
-            android:padding="1dp"
             app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintTop_toBottomOf="@+id/item_attendee_photo"

@@ -31,6 +31,7 @@
     <dimen name="default_margin_text_end">64dp</dimen>
 
     <dimen name="default_icon_size">24dp</dimen>
+    <dimen name="small_icon_size">20dp</dimen>
 
     <dimen name="default_separator_margin_top">20dp</dimen>
 
