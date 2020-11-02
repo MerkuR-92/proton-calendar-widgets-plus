@@ -9,10 +9,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.decodeFromJsonElement
-import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.model.AddressKey
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
@@ -79,19 +76,7 @@ abstract class AppDatabase : RoomDatabase() {
 /**
  * Custom Type Converters for Room.
  */
-private class DatabaseTypeConverters { // TODO inject GSON, but it seems to be unsupported
-
-    // TODO REMOVE THIS
-    @TypeConverter
-    fun toListOfGSONJsonElements(value: String): List<com.google.gson.JsonElement> { // TODO if GSON passes null here, there be dragons
-        return GsonCommon.gson.fromJson(value, GsonCommon.jsonElementListType)
-    }
-
-    // TODO REMOVE THIS
-    @TypeConverter
-    fun fromListOfGSONJsonElement(json: List<com.google.gson.JsonElement>): String { // TODO if GSON passes null here, there be dragons
-        return GsonCommon.gson.toJson(json)
-    }
+private class DatabaseTypeConverters {
 
     @TypeConverter
     fun toListOfJsonElements(value: String): List<JsonElement> {

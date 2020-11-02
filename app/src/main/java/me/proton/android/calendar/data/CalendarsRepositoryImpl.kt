@@ -372,7 +372,16 @@ class CalendarsRepositoryImpl(
     override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
 
     override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
-        return database.eventsDao().selectByUid(eventUid).find { it.sharedEvents.any { if ((it as? JsonObject) != null) (it.jsonObject.get("Data")?.jsonPrimitive?.content?.contains("RRULE:") == true) else false } }
+        return database.eventsDao().selectByUid(eventUid).find { eventEntity ->
+            eventEntity.sharedEvents.any {
+                try {
+                    // only root event contains RRULE
+                    it.jsonObject.get("Data")?.jsonPrimitive?.content?.contains("RRULE:") == true
+                } catch (e: IllegalArgumentException) {
+                    false
+                }
+            }
+        }
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

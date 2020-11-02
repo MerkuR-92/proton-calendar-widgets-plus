@@ -65,7 +65,15 @@
 
 # kotlinx.serialization
 -keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.SerializationKt
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
 -keep,includedescriptorclasses class me.proton.android.calendar.**$$serializer { *; }
 -keepclassmembers class me.proton.android.calendar.** {
     *** Companion;
