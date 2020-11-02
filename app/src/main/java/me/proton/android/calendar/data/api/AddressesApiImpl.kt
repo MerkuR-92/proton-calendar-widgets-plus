@@ -1,32 +1,30 @@
 package me.proton.android.calendar.data.api
 
-import com.google.gson.Gson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.entity.AddressEntity
 import me.proton.android.calendar.domain.api.AddressesApi
-import me.proton.android.calendar.domain.Logger
-import retrofit2.Response
+import me.proton.core.domain.entity.UserId
+import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.GET
 
-interface AddressesApiService {
+interface AddressesApiService : BaseRetrofitApi {
     @GET("addresses")
-    suspend fun getAddresses(): Response<AddressesApiResponse>
+    suspend fun getAddresses(): AddressesApiResponse
 }
 
-class AddressesApiImpl(private val service: AddressesApiService, gson: Gson, logger: Logger) : BaseApi(gson, logger), AddressesApi {
+class AddressesApiImpl(private val apiProvider: ApiProvider) : AddressesApi {
 
-    override suspend fun getAddresses(): ApiResponse<AddressesApiResponse> =
-        safeApiCall { service.getAddresses() }
+    override suspend fun getAddresses(userId: UserId): ApiResponse<AddressesApiResponse> =
+        apiProvider.get<AddressesApiService>(userId).invoke {
+            getAddresses()
+        }.toApiResponse()
 
 }
 
 @Serializable
 data class AddressesApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Addresses")
     val addresses: List<AddressEntity>
-) : BaseApiResponse()
-
-
+)

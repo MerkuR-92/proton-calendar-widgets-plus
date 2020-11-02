@@ -172,8 +172,7 @@ class LoginUserUseCase(
 
 
 
-        val userId = loginResponse.data.userId
-        val valueStore = valueStoreProvider.provideValueStore(userId)
+        val valueStore = valueStoreProvider.provideValueStore(loginResponse.data.userId)
 
         with (valueStore) {
             putString(ValueKey.AUTH_ACCESS_TOKEN, loginResponse.data.accessToken)
@@ -182,22 +181,24 @@ class LoginUserUseCase(
             putString(ValueKey.LAST_SERVER_EVENT_ID, loginResponse.data.eventID)
         }
 
-        TimberLogger.d("eventId = userid ${userId}")
+        TimberLogger.d("eventId = userid ${loginResponse.data.userId}")
         TimberLogger.d("eventId = ${loginResponse.data.eventID}")
 
         // Workaround to add account/session (needed to do an api call).
         // Extract data from loginResponse and create/add an Account.
+        val userId = UserId(loginResponse.data.userId)
+        val sessionId = SessionId(loginResponse.data.uid)
         accountManager.addAccount(
             account = Account(
-                userId = UserId(loginResponse.data.userId),
+                userId = userId,
                 username = username,
                 email = null,
                 state = AccountState.Ready,
-                sessionId = SessionId(loginResponse.data.uid),
+                sessionId = sessionId,
                 sessionState = SessionState.Authenticated
             ),
             session = Session(
-                sessionId = SessionId(loginResponse.data.uid),
+                sessionId = sessionId,
                 accessToken = loginResponse.data.accessToken,
                 refreshToken = loginResponse.data.refreshToken,
                 headers = null,
@@ -205,7 +206,7 @@ class LoginUserUseCase(
             )
         )
 
-        val userResponse = usersApi.getUser(UserId(userId))
+        val userResponse = usersApi.getUser(userId)
         if (userResponse is ApiResponse.Success) {
             usersRepository.persistUser(userResponse.data.user)
         } else return UseCase.Result.Error("user request failed: $userResponse")
@@ -225,10 +226,10 @@ class LoginUserUseCase(
 
         if (!crypto.checkPassphrase(user.primaryKey.privateKey, generatedUserPassphrase)) return UseCase.Result.Error("no passphrase matching user's primary key")
 
-        val addressesResponse = addressesApi.getAddresses()
+        val addressesResponse = addressesApi.getAddresses(userId)
         if (addressesResponse is ApiResponse.Success) {
             addressesResponse.data.addresses.forEach {
-                usersRepository.persistAddress(userId, it)
+                usersRepository.persistAddress(userId.id, it)
             }
         } else return UseCase.Result.Error("addresses request failed: $addressesResponse")
 
