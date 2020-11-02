@@ -97,7 +97,7 @@ val networkModule = module {
 
 
     single<CalendarsApi> { CalendarsApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
-    single<UsersApi> { UsersApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
+    single<UsersApi> { UsersApiImpl(get()) }
     single<KeysApi> { KeysApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
     single<AddressesApi> { AddressesApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
     single<AuthenticationApi> { AuthenticationApiImpl(get()) }
@@ -125,7 +125,7 @@ val viewModelModule = module {
 
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
-    factory<LoginUserUseCase> { LoginUserUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<LoginUserUseCase> { LoginUserUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get()) }

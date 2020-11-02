@@ -8,6 +8,13 @@ import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.AuthenticationApi
 import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.android.calendar.domain.api.UsersApi
+import me.proton.core.account.domain.entity.Account
+import me.proton.core.account.domain.entity.AccountState
+import me.proton.core.account.domain.entity.SessionState
+import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.domain.entity.UserId
+import me.proton.core.network.domain.session.Session
+import me.proton.core.network.domain.session.SessionId
 
 /**
  * After this UseCase succeeds, we have correct credentials, User and Addresses saved in database.
@@ -23,7 +30,9 @@ class LoginUserUseCase(
     private val keysApi: KeysApi,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
-    private val usersRepository: UsersRepository): UseCase {
+    private val usersRepository: UsersRepository,
+    private val accountManager: AccountManager
+): UseCase {
 
 
     /*
@@ -176,7 +185,27 @@ class LoginUserUseCase(
         TimberLogger.d("eventId = userid ${userId}")
         TimberLogger.d("eventId = ${loginResponse.data.eventID}")
 
-        val userResponse = usersApi.getUser()
+        // Workaround to add account/session (needed to do an api call).
+        // Extract data from loginResponse and create/add an Account.
+        accountManager.addAccount(
+            account = Account(
+                userId = UserId(loginResponse.data.userId),
+                username = username,
+                email = null,
+                state = AccountState.Ready,
+                sessionId = SessionId(loginResponse.data.uid),
+                sessionState = SessionState.Authenticated
+            ),
+            session = Session(
+                sessionId = SessionId(loginResponse.data.uid),
+                accessToken = loginResponse.data.accessToken,
+                refreshToken = loginResponse.data.refreshToken,
+                headers = null,
+                scopes = listOf()
+            )
+        )
+
+        val userResponse = usersApi.getUser(UserId(userId))
         if (userResponse is ApiResponse.Success) {
             usersRepository.persistUser(userResponse.data.user)
         } else return UseCase.Result.Error("user request failed: $userResponse")
