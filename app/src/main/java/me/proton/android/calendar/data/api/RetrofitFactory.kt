@@ -24,6 +24,7 @@ object RetrofitFactory {
         //.addConverterFactory(gsonConverterFactory)
         .addConverterFactory(Json {
             this.ignoreUnknownKeys = true
+            this.classDiscriminator = "android_kotlin_class"
         }.asConverterFactory(contentType))
         .addCallAdapterFactory(coroutineCallAdapterFactory)
         .build()

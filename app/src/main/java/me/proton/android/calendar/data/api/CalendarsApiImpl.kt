@@ -171,15 +171,15 @@ data class SyncEvent(
     @SerialName("Permissions")
     val permissions: Int,
     @SerialName("CalendarKeyPacket")
-    val calendarKeyPacket: String?,
+    val calendarKeyPacket: String? = null,
     @SerialName("CalendarEventContent")
-    val calendarEventContent: List<Event.CalendarEvent>?,
+    val calendarEventContent: List<Event.CalendarEvent>? = null,
     @SerialName("SharedKeyPacket")
     val sharedKeyPacket: String? = null,
     @SerialName("SharedEventContent")
     val sharedEventContent: List<Event.SharedEvent>,
     @SerialName("PersonalEventContent")
-    val personalEventContent: Event.PersonalEvent?
+    val personalEventContent: Event.PersonalEvent? = null
 )
 
 @Serializable
