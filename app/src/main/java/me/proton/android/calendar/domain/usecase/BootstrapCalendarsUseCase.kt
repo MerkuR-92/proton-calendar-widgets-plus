@@ -23,7 +23,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
         logger.v("executing BootstrapCalendarsUseCase")
 
-        val calendarsResponse = calendarsApi.getCalendars()
+        val calendarsResponse = calendarsApi.getCalendars(userId)
         if (calendarsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         }
@@ -41,7 +41,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
         val failedCalendarIds = mutableListOf<String>()
 
         calendarsResponse.data.calendars.forEach { calendarEntity ->
-            when (val bootstrapResponse = calendarsApi.getBootstrap(calendarEntity.id)) {
+            when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
                 is ApiResponse.Success -> {
                     logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
                     calendarsRepository.apply {
@@ -57,7 +57,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     // for this calendar at the same time, this will be sent in the event loop automatically
 
                     // extract passphrase for just saved Calendar
-                    val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId.id, calendarEntity.id)
+                    val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
                     when (cachePassphraseResult) {
                         is UseCase.Result.InvalidParams -> logger.e("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
                         is UseCase.Result.Error -> logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")

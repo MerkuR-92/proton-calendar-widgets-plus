@@ -22,7 +22,7 @@ class HandleServerEventsUseCase(
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
 
-    suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: String) : UseCase.Result {
+    suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: UserId) : UseCase.Result {
 
         logger.v("handling server events in usecase")
 
@@ -31,22 +31,22 @@ class HandleServerEventsUseCase(
                 usersRepository.updateUser(it)
             }
             eventsResponse.userSettings?.let {
-                usersRepository.persistUserSettings(userId, it)
+                usersRepository.persistUserSettings(userId.id, it)
             }
             eventsResponse.calendarUserSettings?.let {
-                calendarsRepository.persistCalendarUserSettings(userId, it)
+                calendarsRepository.persistCalendarUserSettings(userId.id, it)
             }
 
             val calendarsToRefresh = ArrayList<String>()
             eventsResponse.calendars?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarById(it.id) },
-                    { calendarsRepository.persistCalendar(userId, it.calendar!!) },
+                    { calendarsRepository.persistCalendar(userId.id, it.calendar!!) },
                     {
                         //Refresh events if calendar db is not up to date on display value
                         if (it.calendar != null && !calendarsRepository.isCalendarDisplayUpToDate(it.id, it.calendar.display))
                             calendarsToRefresh.add(it.id)
-                        calendarsRepository.updateCalendar(userId, it.calendar!!)
+                        calendarsRepository.updateCalendar(userId.id, it.calendar!!)
                     }
                 )
             }
@@ -55,10 +55,10 @@ class HandleServerEventsUseCase(
             eventsResponse.addresses?.forEach {
                 it.handleAction(
                     { usersRepository.deleteAddressById(it.id) },
-                    { usersRepository.persistAddress(userId, it.address!!) },
+                    { usersRepository.persistAddress(userId.id, it.address!!) },
                     {
-                        usersRepository.updateAddress(userId, it.address!!)
-                        calendarsRepository.refreshCalendarsFlagsForAddress(it.address.email, it.address.status, userId)
+                        usersRepository.updateAddress(userId.id, it.address!!)
+                        calendarsRepository.refreshCalendarsFlagsForAddress(it.address.email, it.address.status, userId.id)
                     }
                 )
             }
@@ -72,7 +72,7 @@ class HandleServerEventsUseCase(
                         // https://jira.protontech.ch/browse/CALAND-463
 
                         // after "event metadata migration", we need to fetch events separately
-                        val singleEventResponse = calendarsApi.getEvent(it.event!!.calendarId, it.event!!.id)
+                        val singleEventResponse = calendarsApi.getEvent(userId, it.event!!.calendarId, it.event!!.id)
 
                         // TODO MOVE THIS TO SEPARATE USECASE
                         when (singleEventResponse) {
@@ -87,7 +87,7 @@ class HandleServerEventsUseCase(
                                                 singleEventResponse.data.event.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content })
                                             .filterNotNull()
                                     emails.distinct().forEach {
-                                        fetchPublicKeysUseCase.execute(UserId(userId), it)
+                                        fetchPublicKeysUseCase.execute(userId, it)
                                     }
 
                                 } catch (e: IllegalStateException) {

@@ -1,21 +1,21 @@
 package me.proton.android.calendar.data.api
 
-import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.*
 import me.proton.android.calendar.domain.model.Event
-import retrofit2.Response
+import me.proton.core.domain.entity.UserId
+import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.data.protonApi.BaseRetrofitApi
+import me.proton.core.network.data.protonApi.GenericResponse
 import retrofit2.http.*
 
-interface CalendarsApiService {
+interface CalendarsApiService : BaseRetrofitApi {
 
     @GET("calendar/$API_VERSION_CALENDAR")
-    suspend fun getCalendars(@Query("Page") page: Int = 0, @Query("PageSize") pageSize: Int = 100): Response<CalendarsApiResponse>
+    suspend fun getCalendars(@Query("Page") page: Int = 0, @Query("PageSize") pageSize: Int = 100): CalendarsApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
     suspend fun getEvents(
@@ -26,37 +26,40 @@ interface CalendarsApiService {
         @Query("Type") type: Int,
         @Query("Page") page: Int,
         @Query("PageSize") pageSize: Int
-    ): Response<EventsApiResponse>
+    ): EventsApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
-    suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : Response<EventApiResponse>
+    suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : EventApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/bootstrap")
-    suspend fun getBootstrap(@Path("calendarId") calendarId: String): Response<BootstrapApiResponse>
+    suspend fun getBootstrap(@Path("calendarId") calendarId: String): BootstrapApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/alarms")
-    suspend fun getAlarms(@Path("calendarId") calendarId: String, @Query("Start") startTimestamp: Long, @Query("End") endTimestamp: Long, @Query("PageSize") pageSize: Int) : Response<AlarmsApiResponse>
+    suspend fun getAlarms(@Path("calendarId") calendarId: String, @Query("Start") startTimestamp: Long, @Query("End") endTimestamp: Long, @Query("PageSize") pageSize: Int) : AlarmsApiResponse
 
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
-    suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : Response<StatusCodeApiResponse>
+    suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : StatusCodeApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/sync")
-    suspend fun syncEvents(@Path("calendarId") calendarId: String, @Body body: SyncEventsUpdateApiRequest) : Response<SyncEventsApiResponse>
+    suspend fun syncEvents(@Path("calendarId") calendarId: String, @Body body: SyncEventsUpdateApiRequest) : SyncEventsApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/events")
-    suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : Response<EventsByUidApiResponse>
+    suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : EventsByUidApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
-    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : Response<UpdateCalendarApiResponse>
+    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : GenericResponse
 
 }
 
-class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, logger: Logger) : BaseApi(gson, logger), CalendarsApi {
+class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
 
-    override suspend fun getCalendars(): ApiResponse<CalendarsApiResponse> = safeApiCall { service.getCalendars() }
+    override suspend fun getCalendars(userId: UserId): ApiResponse<CalendarsApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getCalendars()
+        }.toApiResponse()
 
     override suspend fun getEvents(
-        //userId: String,
+        userId: UserId,
         calendarId: String,
         startTimestamp: Long,
         endTimestamp: Long,
@@ -64,62 +67,77 @@ class CalendarsApiImpl(private val service: CalendarsApiService, gson: Gson, log
         type: Int,
         page: Int,
         pageSize: Int
-    ): ApiResponse<EventsApiResponse> = safeApiCall { service.getEvents(/*RetrofitTag(userId), */
-        calendarId,
-        startTimestamp,
-        endTimestamp,
-        timezone,
-        type,
-        page,
-        pageSize
-    ) }
+    ): ApiResponse<EventsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEvents(
+            calendarId,
+            startTimestamp,
+            endTimestamp,
+            timezone,
+            type,
+            page,
+            pageSize
+        )
+    }.toApiResponse()
 
     override suspend fun getEvent(
+        userId: UserId,
         calendarId: String,
         eventId: String
-    ): ApiResponse<EventApiResponse> = safeApiCall { service.getEvent(calendarId, eventId) }
+    ): ApiResponse<EventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEvent(calendarId, eventId)
+    }.toApiResponse()
 
-    override suspend fun getBootstrap(calendarId: String): ApiResponse<BootstrapApiResponse> = safeApiCall { service.getBootstrap(calendarId) }
+    override suspend fun getBootstrap(userId: UserId, calendarId: String): ApiResponse<BootstrapApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getBootstrap(calendarId)
+        }.toApiResponse()
 
-    override suspend fun getAlarms(calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int): ApiResponse<AlarmsApiResponse> = safeApiCall { service.getAlarms(calendarId, startTimestamp, endTimestamp, pageSize) }
+    override suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int): ApiResponse<AlarmsApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getAlarms(calendarId, startTimestamp, endTimestamp, pageSize)
+        }.toApiResponse()
 
-    override suspend fun deleteEvent(calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse>  = safeApiCall { service.deleteEvent(calendarId, eventId) }
+    override suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            deleteEvent(calendarId, eventId)
+        }.toApiResponse()
 
-    override suspend fun syncEvents(calendarId: String, body: SyncEventsUpdateApiRequest): ApiResponse<SyncEventsApiResponse> = safeApiCall { service.syncEvents(calendarId, body) }
+    override suspend fun syncEvents(userId: UserId, calendarId: String, body: SyncEventsUpdateApiRequest): ApiResponse<SyncEventsApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            syncEvents(calendarId, body)
+        }.toApiResponse()
 
-    override suspend fun getEventsByUid(eventUid: String, page: Int, pageSize: Int): ApiResponse<EventsByUidApiResponse> = safeApiCall { service.getEventsByUid(eventUid, page, pageSize) }
+    override suspend fun getEventsByUid(userId: UserId, eventUid: String, page: Int, pageSize: Int): ApiResponse<EventsByUidApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getEventsByUid(eventUid, page, pageSize)
+        }.toApiResponse()
 
-    override suspend fun updateCalendar(calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<UpdateCalendarApiResponse> = safeApiCall{
-        service.updateCalendar(calendarId, body)
-    }
+    override suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<GenericResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            updateCalendar(calendarId, body)
+        }.toApiResponse()
 
 }
 
 @Serializable
 data class CalendarsApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Calendars")
     val calendars: List<CalendarEntity>
-) : BaseApiResponse()
+)
 
 @Serializable
 data class EventsApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Events")
     val events: List<EventEntity>,
     @SerialName("More")
     val more: Int
-) : BaseApiResponse()
+)
 
 @Serializable
 data class EventApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Event")
     val event: EventEntity
-) : BaseApiResponse()
+)
 
 @Serializable
 data class SyncEventsUpdateApiRequest(
@@ -197,18 +215,10 @@ data class BootstrapApiResponse(
 ) : BaseApiResponse()
 
 @Serializable
-data class CreateEventApiResponse(
-    @SerialName("code")
-    override val code: Int
-) : BaseApiResponse()
-
-@Serializable
 data class SyncEventsApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Responses")
     val responses: List<SyncResponseWrapper>
-) : BaseApiResponse()
+)
 
 @Serializable
 data class SyncResponseWrapper(
@@ -229,23 +239,13 @@ data class SyncResponse(
 ) : BaseApiResponse()
 
 @Serializable
-data class UpdateCalendarApiResponse(
-    @SerialName("Code")
-    override val code: Int
-) : BaseApiResponse()
-
-@Serializable
 data class AlarmsApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Alarms")
     val alarms: List<EventAlarmEntity>
-) : BaseApiResponse()
+)
 
 @Serializable
 data class EventsByUidApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Events")
     val events: List<EventEntity>
-) : BaseApiResponse()
+)

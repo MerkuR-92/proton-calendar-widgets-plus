@@ -6,6 +6,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
+import me.proton.core.domain.entity.UserId
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -18,7 +19,7 @@ class DeleteEventUseCase( // TODO TESTS
     private val transformEventUseCase: TransformEventUseCase,
     private val calendarsRepository: CalendarsRepository): UseCase {
 
-    suspend fun execute(userId: String, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
+    suspend fun execute(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -49,10 +50,10 @@ class DeleteEventUseCase( // TODO TESTS
                     editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
 
                     // delete the single edit
-                    deleteEvents(listOf(event.id), event.calendar.id, member.id)
+                    deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
                 } else {
                     // delete the non-recurring event
-                    deleteEvents(listOf(event.id), event.calendar.id, member.id)
+                    deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
                 }
 
             }
@@ -75,7 +76,7 @@ class DeleteEventUseCase( // TODO TESTS
 
                 // TODO maybe merge this into one request
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, event.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
-                val deleteResult = deleteEvents(listOf(event.id), event.calendar.id, member.id)
+                val deleteResult = deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
 
                 if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >all< events")
             }
@@ -84,19 +85,19 @@ class DeleteEventUseCase( // TODO TESTS
         return result
     }
 
-    private suspend fun deleteEvents(eventIds: List<String>, calendarId: String, memberId: String): UseCase.Result  {
+    private suspend fun deleteEvents(userId: UserId, eventIds: List<String>, calendarId: String, memberId: String): UseCase.Result  {
         val syncRequestBody = SyncEventsUpdateApiRequest(
             memberId = memberId,
             events = eventIds.map { SyncEventDeleteContainer(it) }
         )
 
-        return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
+        return when (val syncResponse = calendarsApi.syncEvents(userId, calendarId, syncRequestBody)) {
             is ApiResponse.Success -> {
 
                 // TODO check .isSuccessful on Proton Responses, this will still crash in case of malformed request etc.
 
                 syncResponse.data.responses.forEach {
-                    logger.e("error deleting event on server: ${it.response.code} ${it.response.error}")
+                    //logger.e("error deleting event on server: ${it.response.code} ${it.response.error}")
                 }
 
                 val errorEventIds = syncResponse.data.responses.map { eventIds[it.index] }
@@ -115,18 +116,18 @@ class DeleteEventUseCase( // TODO TESTS
     }
 
     // TODO maybe use UseCase.Params instead of overloaded methods
-    suspend fun execute(userId: String, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+    suspend fun execute(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
         return deleteSingleEditsAfter(userId, eventId, recurrenceIdIsAfter)
     }
 
-    private suspend fun deleteSingleEditsAfter(userId: String, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+    private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
         val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("event $eventId doesn't exist in DB")
         val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("event $eventId could not be transformed")
 
         val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
 
-        val eventsSharingUidResponse = calendarsApi.getEventsByUid(event.uid,0,100) // TODO paging
+        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, event.uid, 0, 100) // TODO paging
         val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return UseCase.Result.Error("error fetching events sharing UID")
 
         // we need to manually delete all "single-edited" events with RecurrenceID after just-deleted occurrence
@@ -136,7 +137,7 @@ class DeleteEventUseCase( // TODO TESTS
         }
 
         val deleteResult = if (eventsToDelete.isNotEmpty()) {
-            deleteEvents(eventsToDelete.map { it.id }, event.calendar.id, member.id)
+            deleteEvents(userId, eventsToDelete.map { it.id }, event.calendar.id, member.id)
         } else UseCase.Result.Success
 
         return deleteResult

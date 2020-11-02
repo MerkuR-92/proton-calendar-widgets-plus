@@ -35,6 +35,7 @@ import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.domain.entity.UserId
 import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -391,6 +392,7 @@ class EventViewModel(
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
         val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+        val userId = UserId(TODOuserID)
 
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
@@ -447,7 +449,7 @@ class EventViewModel(
                 }
 
                 // delete single edits starting with just edited occurrence
-                val deleteSingleEditsResult = deleteEventUseCase.execute(TODOuserID, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
+                val deleteSingleEditsResult = deleteEventUseCase.execute(userId, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
                 if (deleteSingleEditsResult != UseCase.Result.Success ) {
                     logger.e("deleteSingleEditsResult != UseCase.Result.Success")
                     return false
@@ -466,7 +468,7 @@ class EventViewModel(
                         .until(Date.from(dbEvent.generateOccurrence(occurrenceNumber - 1, event.defaultTimeZone!!)!!.endDateTime.plusDays(1).with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()), true)
                         .build())
 
-                    val editOriginalEventResult = editCreateEventUseCase.execute(TODOuserID, dbEventToUpdate.calendar.id, dbEventToUpdate)
+                    val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
                     if (editOriginalEventResult != UseCase.Result.Success ) {
                         if (editOriginalEventResult is UseCase.Result.Error) {
                             logger.i("error editing event: ${editOriginalEventResult.message}")
@@ -512,7 +514,7 @@ class EventViewModel(
             EventEditDeleteOption.ALL_EVENTS -> {
 
                 // delete all single edits
-                val deleteSingleEditsResult = deleteEventUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
+                val deleteSingleEditsResult = deleteEventUseCase.execute(userId, event.id, dbEventStartDate!!.minusNanos(1))
                 if (deleteSingleEditsResult != UseCase.Result.Success ) {
                     logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
                     return false
@@ -563,7 +565,7 @@ class EventViewModel(
         // TODO run work manager
         TimberLogger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
-            createEventUseCase.execute(TODOuserID, newEvent.calendar.id, newEvent)
+            createEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
         }.await()
 
         if (createEventResult is UseCase.Result.InvalidParams) {

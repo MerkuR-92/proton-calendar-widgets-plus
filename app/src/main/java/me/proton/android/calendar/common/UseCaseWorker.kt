@@ -8,6 +8,7 @@ import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import org.koin.core.inject
@@ -58,19 +59,21 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
 
         logger.v("inside UseCaseWorker doWork()")
 
+        val userId = inputData.getString(INPUT_USER_ID)?.let { UserId(it) } ?: return Result.failure()
         val useCaseId = inputData.getString(INPUT_USE_CASE_ID)
         val useCaseResult = when (useCaseId) {
             UseCaseId.SYNC_SERVER_EVENTS -> {
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
-                syncServerEventsUseCase.execute(inputData.getString(INPUT_USER_ID) ?: return Result.failure())
+                syncServerEventsUseCase.execute(userId)
             }
             UseCaseId.SYNC_ALARMS -> {
                 val syncAlarmsUseCase: SyncAlarmsUseCase = get()
-                syncAlarmsUseCase.execute(inputData.getString(INPUT_USER_ID) ?: return Result.failure())
+                syncAlarmsUseCase.execute(userId)
             }
             UseCaseId.UPDATE_SERVER_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
                 updateCalendarUseCase.executeServerUpdate(
+                    userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
                     inputData.getString(INPUT_CALENDAR_NAME),
                     inputData.getString(INPUT_CALENDAR_DESCRIPTION),

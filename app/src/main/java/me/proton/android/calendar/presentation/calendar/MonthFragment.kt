@@ -31,6 +31,7 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
+import me.proton.core.domain.entity.UserId
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -194,7 +195,7 @@ class MonthFragment : BaseDialogFragment() {
 
         lifecycleScope.launchWhenStarted {
 
-            val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
+            val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")?.let { UserId(it) }
 
             if (userId != null) {
 

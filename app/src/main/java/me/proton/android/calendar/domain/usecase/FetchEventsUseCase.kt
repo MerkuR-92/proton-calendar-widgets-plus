@@ -49,7 +49,8 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                 do {
 
-                    val eventsResponse = calendarsApi.getEvents(/*userId,*/
+                    val eventsResponse = calendarsApi.getEvents(
+                        userId,
                         calendarId,
                         fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
                         toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),

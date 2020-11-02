@@ -248,9 +248,9 @@ class CalendarViewModel(
                 val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
 //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
                 val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
+                val userId = UserId(TODOuserID)
 
-
-                deleteEventUseCase.execute(TODOuserID, eventId, deleteOption, occurrenceNumber)
+                deleteEventUseCase.execute(userId, eventId, deleteOption, occurrenceNumber)
             }
         }.await()
     }

@@ -14,6 +14,7 @@ import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.domain.entity.UserId
 
 class EditCreateEventUseCase(
     private val logger: Logger,
@@ -25,11 +26,11 @@ class EditCreateEventUseCase(
     private val valueStoreProvider: ValueStoreProvider,
     private val database: AppDatabase): UseCase {
 
-    suspend fun execute(userId: String, calendarId: String, newEvent: Event) : UseCase.Result {
+    suspend fun execute(userId: UserId, calendarId: String, newEvent: Event) : UseCase.Result {
 
         // TODO figure out member-id, it's hardcoded below
         // TODO userId
-        val valueStore = valueStoreProvider.provideValueStore(userId)
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
         logger.d("executing EditCreateEventUseCase from newEvent: ${newEvent}")
         logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
@@ -43,13 +44,13 @@ class EditCreateEventUseCase(
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).first()
-        val userAddresses = database.addressesDao().select(userId, member.email).map { it.toAddress(gson) } // TODO in the future we will have dropdown with memberID, but now we take first
+        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(gson) } // TODO in the future we will have dropdown with memberID, but now we take first
         val memberAddressKey = userAddresses.first().primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO Valentin how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
         val calendarKey = database.calendarKeysDao().select(calendarId).first { it.isActive && it.isPrimary }
         val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("there is no valid cached Calendar Passphrase")
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("there is no valid cached Calendar Passphrase")
 
         // 4. get Session Keys if they were already present in old Event
         var oldSharedSessionKey: SessionKey? = null
@@ -203,7 +204,7 @@ class EditCreateEventUseCase(
             )
         }
 
-        return when (val syncResponse = calendarsApi.syncEvents(calendarId, syncRequestBody)) {
+        return when (val syncResponse = calendarsApi.syncEvents(userId, calendarId, syncRequestBody)) {
             is ApiResponse.Success -> {
                 val eventsToInsertOrUpdate = syncResponse.data.responses.mapNotNull {
                     if (it.response.isSuccessful) {

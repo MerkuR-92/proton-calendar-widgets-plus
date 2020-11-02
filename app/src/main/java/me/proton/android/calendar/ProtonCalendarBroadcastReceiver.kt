@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -25,7 +26,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
         }
 
         // TODO for all users
-        val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
+        val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")?.let { UserId(it) }
         if (userId == null) {
             logger.e("userId null in ProtonCalendarBroadcastReceiver")
             return

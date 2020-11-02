@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import com.google.gson.Gson
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
+import me.proton.core.domain.entity.UserId
 
 /**
  * We can decrypt and cache CalendarPassphrase locally, but we need to update it whenever
@@ -17,13 +18,13 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
 ): UseCase {
 
     // userid: "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
-    suspend fun execute(userId: String, calendarId: String) : UseCase.Result {
+    suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
 
         logger.v("executing CacheCalendarPassphraseUseCase, user $userId, calendar $calendarId")
 
         // TODO ADD MORE INVALID-PARAM UseCaseResults
 
-        val valueStore = valueStoreProvider.provideValueStore(userId)
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
         val calendarMembers = database.membersDao().select(calendarId)
         val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
@@ -34,7 +35,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         // you can join a calendar using Address1 and Address2
         // you can have more than one member
 
-        val userAddresses = database.addressesDao().select(userId, member.email).map { it.toAddress(gson) }
+        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(gson) }
 
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
 

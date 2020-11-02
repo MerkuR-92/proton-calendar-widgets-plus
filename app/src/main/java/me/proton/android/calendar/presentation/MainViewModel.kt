@@ -12,6 +12,7 @@ import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.domain.CalendarsRepository
 import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.Navigation
+import me.proton.core.domain.entity.UserId
 import kotlin.Exception
 
 
@@ -58,7 +59,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
     }
 
     // TODO sync all "active" accounts
-    fun syncServerEvents(userId: String) : LiveData<Operation.State> {
+    fun syncServerEvents(userId: UserId) : LiveData<Operation.State> {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -68,7 +69,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             .setConstraints(constraints)
             .setInputData(workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_SERVER_EVENTS,
-                UseCaseWorker.INPUT_USER_ID to userId
+                UseCaseWorker.INPUT_USER_ID to userId.id
             ))
             .build()
 
@@ -77,7 +78,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
     }
 
-    fun syncAlarms(userId: String) : LiveData<Operation.State> {
+    fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -87,7 +88,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             .setConstraints(constraints)
             .setInputData(workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to userId
+                UseCaseWorker.INPUT_USER_ID to userId.id
             ))
             .build()
 

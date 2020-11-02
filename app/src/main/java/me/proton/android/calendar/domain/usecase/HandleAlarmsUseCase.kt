@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.core.domain.entity.UserId
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -25,7 +26,7 @@ class HandleAlarmsUseCase(
     /**
      * @param alarmEpochSeconds if present, show notifications for alarms at this timestamp
      */
-    suspend fun execute(userId: String, alarmEpochSeconds: Long? = null) {
+    suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null) {
         logger.v("executing HandleAlarmsUseCase, alarmEpochSeconds: $alarmEpochSeconds")
 
         val nowInstant = Instant.now()
@@ -41,13 +42,13 @@ class HandleAlarmsUseCase(
                 showNotificationUseCase.execute(alarmsToDisplayNow)
             }
 
-            valueStoreProvider.provideValueStore(userId).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, alarmEpochSeconds)
+            valueStoreProvider.provideValueStore(userId.id).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, alarmEpochSeconds)
 
             alarmEpochSeconds
 
         } else { // no timestamp provided, show missed alarms up until now
 
-            val lastHandledTimestamp = valueStoreProvider.provideValueStore(userId).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP) ?: nowInstant.epochSecond
+            val lastHandledTimestamp = valueStoreProvider.provideValueStore(userId.id).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP) ?: nowInstant.epochSecond
 
             // if no alarms were ever shown, this will return empty result
             val alarmsToDisplayNow = calendarsRepository.selectEventAlarms(lastHandledTimestamp + 1, nowInstant.epochSecond)
@@ -58,7 +59,7 @@ class HandleAlarmsUseCase(
             showNotificationUseCase.execute(alarmsToDisplayNow)
 
             val maxAlarmOccurrenceSeconds = alarmsToDisplayNow.maxByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
-            valueStoreProvider.provideValueStore(userId).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)
+            valueStoreProvider.provideValueStore(userId.id).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)
 
             maxAlarmOccurrenceSeconds
 

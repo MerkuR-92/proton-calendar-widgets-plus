@@ -4,6 +4,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.core.domain.entity.UserId
 import java.time.*
 import java.time.temporal.ChronoUnit
 
@@ -24,12 +25,12 @@ class SyncAlarmsUseCase(
     private val ALARMS_CACHE_STEP_SIZE = Duration.ofDays(5)
     private val ALARMS_REQUEST_PAGE_SIZE = 100 // server supports maximum 100
 
-    suspend fun execute(userId: String): UseCase.Result {
+    suspend fun execute(userId: UserId): UseCase.Result {
 
         logger.v("executing SyncAlarmsUseCase")
 
-        val calendarIds = calendarsRepository.selectCalendars(userId)
-        val valueStore = valueStoreProvider.provideValueStore(userId)
+        val calendarIds = calendarsRepository.selectCalendars(userId.id)
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
         val results = calendarIds.map {
 
@@ -40,7 +41,7 @@ class SyncAlarmsUseCase(
             val lastSuccessfulSyncDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastSuccessfulSyncTimestamp ?: 0L), ZoneId.of("UTC"))
             if (lastSuccessfulSyncDate.plus(ALARMS_CACHE_OVERLAP_WINDOW_SIZE).isBefore(syncStartDate)) {
                 logger.v("have to sync alarms calendar ${it.name}, at $syncStartDate")
-                val result = handleCalendarAlarms(it)
+                val result = handleCalendarAlarms(userId, it)
                 if (result == UseCase.Result.Success) {
                     logger.v("success syncing alarms for calendar ${it.name}, writing timestamp $syncStartDate")
                     valueStore.putLongInSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id, syncStartDate.toEpochSecond())
@@ -64,7 +65,7 @@ class SyncAlarmsUseCase(
         }
     }
 
-    private suspend fun handleCalendarAlarms(calendarEntity: CalendarEntity): UseCase.Result {
+    private suspend fun handleCalendarAlarms(userId: UserId, calendarEntity: CalendarEntity): UseCase.Result {
 
         val start = LocalDateTime.now().minusHours(1) // magic number for local time drift
         val end = start.plus(ALARMS_CACHE_WINDOW_SIZE)
@@ -74,7 +75,7 @@ class SyncAlarmsUseCase(
         do {
             var hasMore = false
 
-            when (val alarmsResponse = calendarsApi.getAlarms(calendarEntity.id, windowStart.toEpochSecond(ZoneOffset.UTC), windowEnd.toEpochSecond(ZoneOffset.UTC), ALARMS_REQUEST_PAGE_SIZE)) {
+            when (val alarmsResponse = calendarsApi.getAlarms(userId, calendarEntity.id, windowStart.toEpochSecond(ZoneOffset.UTC), windowEnd.toEpochSecond(ZoneOffset.UTC), ALARMS_REQUEST_PAGE_SIZE)) {
                 is ApiResponse.Success -> {
                     logger.v("fetched alarms for: ${calendarEntity.name}")
                     logger.v("alarms response: ${alarmsResponse.data}")
@@ -109,7 +110,7 @@ class SyncAlarmsUseCase(
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
                             logger.v("event ${alarmEntity.eventId} for alarm doesn't exist in DB")
                             // event doen's exist locally, fetch and save it before inserting alarm
-                            when (val event = calendarsApi.getEvent(alarmEntity.calendarId, alarmEntity.eventId)) {
+                            when (val event = calendarsApi.getEvent(userId, alarmEntity.calendarId, alarmEntity.eventId)) {
                                 is ApiResponse.Success -> {
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
                                     calendarsRepository.persistEvents(event.data.event)

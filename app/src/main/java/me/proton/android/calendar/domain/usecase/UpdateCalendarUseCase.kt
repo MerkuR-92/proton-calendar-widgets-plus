@@ -8,6 +8,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -25,7 +26,7 @@ class UpdateCalendarUseCase(
     //TODO Handle other Calendar parameters
 
     //Update Calendar Display on Server
-    suspend fun executeServerUpdate(calendarId: String, name: String?, description: String?, color: String?, displayValue: Int) : UseCase.Result {
+    suspend fun executeServerUpdate(userId: UserId, calendarId: String, name: String?, description: String?, color: String?, displayValue: Int) : UseCase.Result {
         val display = if (displayValue != -1) displayValue else null
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
             name = name,
@@ -33,7 +34,7 @@ class UpdateCalendarUseCase(
             color = color,
             display = display)
 
-        return when (val updateCalendarResponse = calendarsApi.updateCalendar(calendarId, updateCalendarApiRequest)) {
+        return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
                 //Update value in DB
                 val calendarEntity = calendarsRepository.selectCalendar(calendarId) ?: return UseCase.Result.InvalidParams("event $calendarId doesn't exist in DB")

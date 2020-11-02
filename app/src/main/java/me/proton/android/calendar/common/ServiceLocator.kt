@@ -96,7 +96,7 @@ val networkModule = module {
 
 
 
-    single<CalendarsApi> { CalendarsApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
+    single<CalendarsApi> { CalendarsApiImpl(get()) }
     single<UsersApi> { UsersApiImpl(get()) }
     single<KeysApi> { KeysApiImpl(get()) }
     single<AddressesApi> { AddressesApiImpl(get()) }

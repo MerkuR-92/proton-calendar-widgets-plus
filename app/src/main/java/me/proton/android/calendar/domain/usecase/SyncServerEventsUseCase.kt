@@ -18,11 +18,11 @@ class SyncServerEventsUseCase(
         const val WORKER_ID = "SYNC_SERVER_EVENTS"
     }
 
-    suspend fun execute(userId: String): UseCase.Result {
+    suspend fun execute(userId: UserId): UseCase.Result {
 
         logger.v("executing SyncServerEventsUseCase")
 
-        val valueStore = valueStoreProvider.provideValueStore(userId)
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
         var lastProtonEventId = valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)
             ?: return UseCase.Result.InvalidParams("no last server event id")
 
@@ -30,7 +30,7 @@ class SyncServerEventsUseCase(
             var moreEvents = false
 
             // TODO we need to properly authorize all API requests for specific users!!!
-            when (val eventsReponse = serverEventsApi.getServerEvents(UserId(userId), lastProtonEventId)) {
+            when (val eventsReponse = serverEventsApi.getServerEvents(userId, lastProtonEventId)) {
                 is ApiResponse.Success -> {
                     logger.v("fetched Server Events for ID: $lastProtonEventId")
                     // TODO handle eventsReponse.data.refresh, I think it's "force wipe database"?????
