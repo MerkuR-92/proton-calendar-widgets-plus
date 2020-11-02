@@ -109,74 +109,68 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 persistFormData()
 
-                if (eventViewModel.hasEventBeenEdited()) {
+                val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && ((eventViewModel.dbEvent?.isRecurring() == true) ||
+                        (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())) &&
+                        (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
 
-                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && ((eventViewModel.dbEvent?.isRecurring() == true) ||
-                            (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())) &&
-                            (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
+                if (shouldShowConfirmationPicker) {
 
-                    if (shouldShowConfirmationPicker) {
+                    AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                        getString(R.string.event_recurring_edit_this),
+                        if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
+                        getString(R.string.event_recurring_edit_all_events)
+                    ).toTypedArray(), 0) {
 
-                        AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
-                            getString(R.string.event_recurring_edit_this),
-                            if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
-                            getString(R.string.event_recurring_edit_all_events)
-                        ).toTypedArray(), 0) {
-
-                            lifecycleScope.launch {
-                                val success = withContext(Dispatchers.IO) {
-                                    if (it == 0) {
-                                        eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
-                                    } else if (it == 1) {
-                                        if (navigationArguments.occurrenceNumber == 1) {
-                                            eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
-                                        } else {
-                                            eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FUTURE, navigationArguments.occurrenceNumber)
-                                        }
-                                    } else { // it == 2
+                        lifecycleScope.launch {
+                            val success = withContext(Dispatchers.IO) {
+                                if (it == 0) {
+                                    eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
+                                } else if (it == 1) {
+                                    if (navigationArguments.occurrenceNumber == 1) {
                                         eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
+                                    } else {
+                                        eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FUTURE, navigationArguments.occurrenceNumber)
                                     }
+                                } else { // it == 2
+                                    eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
                                 }
-
-                                if (success) { // TODO remove duplicated code here and below
-                                    onSuccessEventUpdateCalendarDisplay()
-                                    Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-                                    jumpToMonthView()
-                                } else {
-                                    Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
-                                }
-
                             }
-                        }
 
-                    } else { // TODO merge this with code above
-                        val success = withContext(Dispatchers.IO) {
-                            eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
-                        }
-
-                        if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
-                            if (success) {
+                            if (success) { // TODO remove duplicated code here and below
                                 onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
                                 jumpToMonthView()
                             } else {
                                 Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                             }
-                        } else {
-                            if (success) {
-                                onSuccessEventUpdateCalendarDisplay()
-                                Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
-                                jumpToMonthView()
-                            } else {
-                                Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
-                            }
+
                         }
                     }
 
-                } else {
-                    findNavController().navigateUp()
+                } else { // TODO merge this with code above
+                    val success = withContext(Dispatchers.IO) {
+                        eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
+                    }
+
+                    if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
+                        if (success) {
+                            onSuccessEventUpdateCalendarDisplay()
+                            Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                            jumpToMonthView()
+                        } else {
+                            Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        if (success) {
+                            onSuccessEventUpdateCalendarDisplay()
+                            Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
+//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                            jumpToMonthView()
+                        } else {
+                            Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
 
             }
