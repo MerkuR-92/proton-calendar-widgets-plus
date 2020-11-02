@@ -100,7 +100,7 @@ val networkModule = module {
     single<UsersApi> { UsersApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
     single<KeysApi> { KeysApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
     single<AddressesApi> { AddressesApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
-    single<AuthenticationApi> { AuthenticationApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
+    single<AuthenticationApi> { AuthenticationApiImpl(get()) }
     single<ServerEventsApi> { ServerEventsApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
     single<SettingsApi> { SettingsApiImpl(RetrofitFactory.createService(get(), get(), get()), get(), get()) }
 }

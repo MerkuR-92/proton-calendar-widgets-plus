@@ -1,46 +1,47 @@
 package me.proton.android.calendar.data.api
 
-import com.google.gson.Gson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.domain.api.AuthenticationApi
-import me.proton.android.calendar.domain.Logger
-import okhttp3.MediaType
+import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.data.protonApi.BaseRetrofitApi
+import me.proton.core.network.domain.session.SessionId
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface AuthenticationApiService {
+interface AuthenticationApiService: BaseRetrofitApi {
 
     @POST("auth")
-    suspend fun login(@Body requestBody: RequestBody): Response<LoginApiResponse>
+    suspend fun login(@Body requestBody: RequestBody): LoginApiResponse
 
     @POST("auth/info")
-    suspend fun fetchLoginInfo(@Body requestBody: RequestBody): Response<LoginInfoApiResponse>
+    suspend fun fetchLoginInfo(@Body requestBody: RequestBody): LoginInfoApiResponse
 
     @POST("auth/refresh")
-    suspend fun refreshAccessToken(@Body body: RefreshAccessTokenApiBody): Response<RefreshAccessTokenApiResponse>
+    suspend fun refreshAccessToken(@Body body: RefreshAccessTokenApiBody): RefreshAccessTokenApiResponse
 
 }
 
-class AuthenticationApiImpl(private val service: AuthenticationApiService, gson: Gson, logger: Logger) : BaseApi(gson, logger), AuthenticationApi {
+class AuthenticationApiImpl(private val apiProvider: ApiProvider) : AuthenticationApi {
 
     @Deprecated("needs fixing")
-    override suspend fun refreshAccessToken(refreshToken: String): ApiResponse<RefreshAccessTokenApiResponse> = safeApiCall {
-        service.refreshAccessToken(RefreshAccessTokenApiBody(refreshToken)) // TODO FIX THIS
-    }
+    override suspend fun refreshAccessToken(sessionId: SessionId, refreshToken: String): ApiResponse<RefreshAccessTokenApiResponse> =
+        apiProvider.get<AuthenticationApiService>(sessionId).invoke {
+            refreshAccessToken(RefreshAccessTokenApiBody(refreshToken)) // TODO FIX THIS
+        }.toApiResponse()
 
-    override suspend fun fetchLoginInfo(username: String): ApiResponse<LoginInfoApiResponse> = safeApiCall {
-        service.fetchLoginInfo(LoginInfoApiBody(username).toRetrofitRequestBody())
-    }
+    override suspend fun fetchLoginInfo(username: String): ApiResponse<LoginInfoApiResponse> =
+        apiProvider.get<AuthenticationApiService>().invoke {
+            fetchLoginInfo(LoginInfoApiBody(username).toRetrofitRequestBody())
+        }.toApiResponse()
 
-    override suspend fun login(username: String, srpSession: String, clientEphemeral: String, clientProof: String): ApiResponse<LoginApiResponse> = safeApiCall {
-        service.login(LoginApiBody(username, srpSession, clientEphemeral, clientProof).toRetrofitRequestBody())
-    }
-
+    override suspend fun login(username: String, srpSession: String, clientEphemeral: String, clientProof: String): ApiResponse<LoginApiResponse> =
+        apiProvider.get<AuthenticationApiService>().invoke {
+            login(LoginApiBody(username, srpSession, clientEphemeral, clientProof).toRetrofitRequestBody())
+        }.toApiResponse()
 }
 
 data class RefreshAccessTokenApiBody(
@@ -57,13 +58,12 @@ data class RefreshAccessTokenApiBody(
 }
 
 data class RefreshAccessTokenApiResponse(
-    override val code: Int,
     val accessToken: String
 //    "ExpiresIn": 360000,
 //    "TokenType": "Bearer",
 //"Scope": "full other_scopes",
 //"RefreshToken": "b894b4c4f20003f12d486900d8b88c7d68e67235"
-): BaseApiResponse()
+)
 
 data class LoginInfoApiBody(
     val username: String
@@ -75,8 +75,6 @@ data class LoginInfoApiBody(
 
 @Serializable
 data class LoginInfoApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Modulus")
     val modulus: String,
     @SerialName("ServerEphemeral")
@@ -87,7 +85,7 @@ data class LoginInfoApiResponse(
     val salt: String,
     @SerialName("SRPSession")
     val srpSession: String
-): BaseApiResponse()
+)
 
 data class LoginApiBody(
     val username: String,
@@ -110,8 +108,6 @@ data class LoginApiBody(
 
 @Serializable
 data class LoginApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("AccessToken")
     val accessToken: String,
     @SerialName("UID")
@@ -122,4 +118,4 @@ data class LoginApiResponse(
     val refreshToken: String,
     @SerialName("EventID")
     val eventID: String
-): BaseApiResponse()
+)
