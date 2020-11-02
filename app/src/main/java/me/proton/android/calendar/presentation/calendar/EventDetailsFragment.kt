@@ -487,6 +487,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    private var attendeesListHeight: Int? = null
     private fun initAttendeeList(attendeeList: MutableList<Attendee>, organizerAttendee: Attendee?) {
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         event_attendee_list.layoutManager = attendeesLayoutManager
@@ -497,8 +498,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         // Remove organizer attendee from the list if it exists to avoid duplicates
         if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
         attendeeListAdapter.submitList(attendeeList)
+        // Reset view height
+        attendeesListHeight = null
 
-        if (attendeeList.size <= ATTENDEE_AUTO_EXPAND_LIMIT && attendeeList.isNotEmpty()) {
+        if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && attendeeList.isNotEmpty()) {
             event_attendee_list.visibleOrGone(true)
             rotateArrowUpward(event_attendees_button, 0)
         } else if (attendeeList.isEmpty() && organizerAttendee != null) {
@@ -510,10 +513,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         event_attendees_press.setOnClickListener {
             if (event_attendee_list.isVisible) {
-                collapse(event_attendee_list)
+                // Save expanded view height only once
+                val height = collapse(event_attendee_list)
+                if (attendeesListHeight == null) attendeesListHeight = height
                 rotateArrowDownward(event_attendees_button)
             } else {
-                expand(event_attendee_list)
+                // TODO: Workaround for special case where desired height is not properly calculated.
+                //  Passing 0 skips the animation.
+                //  It means that List with more than 5 items will not have expand animation on first expand.
+                expand(event_attendee_list, height = attendeesListHeight?: 0)
                 rotateArrowUpward(event_attendees_button)
             }
         }

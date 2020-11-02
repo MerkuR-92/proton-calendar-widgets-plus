@@ -64,13 +64,6 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
             attendeeItemDescription.visibleOrGone(false)
             attendeeItemInitials.text = getInitials(title)
 
-            if (!attendeeItemDescription.isVisible) {
-                val params = attendeeItemTextLayout.layoutParams as ViewGroup.MarginLayoutParams
-                params.topMargin = view.context.resources.getDimensionPixelSize(R.dimen.spacing_page)
-                params.bottomMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_single_title_bottom_margin)
-                attendeeItemTextLayout.layoutParams = params
-            }
-
             if (attendee.rsvp != null && !attendee.rsvp) {
                 attendeeItemOptional.visibleOrGone(true)
                 // If has Optional label, we need to clear LinearLayout constraint

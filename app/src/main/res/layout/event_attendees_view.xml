@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/spacing_element">
 
     <include
         android:id="@+id/event_attendees_press"
@@ -40,7 +41,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/Text.DefaultSmall.Weak"
-        android:paddingBottom="@dimen/spacing_element"
         app:layout_constraintStart_toStartOf="@+id/event_attendees_title"
         app:layout_constraintEnd_toEndOf="@+id/event_attendees_title"
         app:layout_constraintTop_toBottomOf="@+id/event_attendees_title"
@@ -61,6 +61,7 @@
         android:id="@+id/event_attendee_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
         android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@+id/event_attendees_description"
         app:layout_constraintStart_toStartOf="parent"

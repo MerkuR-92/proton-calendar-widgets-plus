@@ -36,8 +36,7 @@
             android:layout_width="@dimen/small_icon_size"
             android:layout_height="@dimen/small_icon_size"
             app:srcCompat="@drawable/ic_check_circle_filled"
-            android:visibility="gone"
-            tools:visibility="visible"
+            android:visibility="visible"
             app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"
             app:layout_constraintTop_toBottomOf="@+id/item_attendee_photo"
@@ -48,13 +47,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/spacing_element"
+            android:layout_marginTop="@dimen/spacing_large"
             android:layout_marginStart="14dp"
             android:layout_marginEnd="@dimen/spacing_element_small"
-            android:layout_marginBottom="@dimen/spacing_element"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -68,7 +65,8 @@
                     android:id="@+id/item_attendee_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
+                    android:visibility="gone"
+                    tools:visibility="visible"
                     style="@style/Text.DefaultSmall.Weak"
                     tools:text="johndoe@pm.me" />
 
@@ -79,7 +77,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            android:layout_marginBottom="@dimen/spacing_element"
+            tools:visibility="visible"
             app:layout_constraintTop_toBottomOf="@+id/item_attendee_text_layout"
             app:layout_constraintStart_toStartOf="@+id/item_attendee_text_layout"
             app:layout_constraintEnd_toEndOf="@+id/item_attendee_text_layout"

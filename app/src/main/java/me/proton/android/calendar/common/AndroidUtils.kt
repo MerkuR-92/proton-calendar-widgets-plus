@@ -891,21 +891,27 @@ fun getInitials(name: String): String {
     return if (initials.length > 2) initials.substring(0, 2) else initials
 }
 
-fun expand(v: View, duration: Long? = null) {
+fun expand(v: View, duration: Long? = null, height: Int? = null) {
     val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
     val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
     v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
-    val targetHeight = v.measuredHeight
-    TimberLogger.d("expand : targetHeight = ${targetHeight}")
+    val targetHeight = height?: v.measuredHeight
+    if (targetHeight == 0) {
+        TimberLogger.d("animation expand skipped")
+        v.visibility = View.VISIBLE
+        return
+    }
+    TimberLogger.d("animation expand : targetHeight = ${targetHeight}")
 
     // Older versions of android (pre API 21) cancel animations for views with a height of 0.
     v.layoutParams.height = 1
     v.visibility = View.VISIBLE
     val animation = object : Animation() {
         override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+            // We make sure height cannot be set to 0 to avoid UI glitch when starting expand animation
             v.layoutParams.height =
-                if (interpolatedTime == 1f) targetHeight else (targetHeight * interpolatedTime).toInt()
-            TimberLogger.d("expand : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+                if (targetHeight == 0 || interpolatedTime == 0f) 1 else if (interpolatedTime == 1f) targetHeight else (targetHeight * interpolatedTime).toInt()
+            TimberLogger.d("animation expand : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
             v.requestLayout()
         }
 
@@ -916,13 +922,13 @@ fun expand(v: View, duration: Long? = null) {
 
     // Expansion speed of 1dp/ms
     animation.duration = duration ?: (targetHeight / v.context.resources.displayMetrics.density).toLong()
-    TimberLogger.d("expand : duration = ${animation.duration}")
+    TimberLogger.d("animation expand : duration = ${animation.duration}")
     v.startAnimation(animation)
 }
 
-fun collapse(v: View, duration: Long? = null) {
+fun collapse(v: View, duration: Long? = null): Int {
     val initialHeight = v.measuredHeight
-    TimberLogger.d("collapse : initialHeight = ${initialHeight}")
+    TimberLogger.d("animation collapse : initialHeight = ${initialHeight}")
     val animation = object : Animation() {
         override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
             if (interpolatedTime == 1f) {
@@ -931,7 +937,7 @@ fun collapse(v: View, duration: Long? = null) {
                 v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
                 v.requestLayout()
             }
-            TimberLogger.d("collapse : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+            TimberLogger.d("animation collapse : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
         }
 
         override fun willChangeBounds(): Boolean {
@@ -941,8 +947,9 @@ fun collapse(v: View, duration: Long? = null) {
 
     // Collapse speed of 1dp/ms
     animation.duration = duration ?: (initialHeight / v.context.resources.displayMetrics.density).toLong()
-    TimberLogger.d("collapse : duration = ${animation.duration}")
+    TimberLogger.d("animation collapse : duration = ${animation.duration}")
     v.startAnimation(animation)
+    return initialHeight
 }
 
 fun rotateArrowDownward(v: View, duration: Long = 100) {
