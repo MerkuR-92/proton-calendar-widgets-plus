@@ -12,6 +12,7 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.KeysApi
+import me.proton.core.domain.entity.UserId
 import java.time.*
 
 class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
@@ -25,6 +26,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val database: AppDatabase): UseCase {
 
     suspend fun execute(
+        userId: UserId,
         calendarIds: List<String>,
         fromDate: LocalDate,
         toDate: LocalDate,
@@ -73,7 +75,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                                         it.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content }
                             }.filterNotNull()
                             emails.distinct().forEach {
-                                fetchPublicKeysUseCase.execute(it)
+                                fetchPublicKeysUseCase.execute(userId, it)
                             }
                         } catch (e: IllegalStateException) {
                             logger.e("error getting event's author from JSON")

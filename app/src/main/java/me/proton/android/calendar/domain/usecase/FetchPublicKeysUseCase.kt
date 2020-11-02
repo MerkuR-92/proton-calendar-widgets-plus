@@ -3,9 +3,9 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.PublicKeyEntity
-import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.KeysApi
+import me.proton.core.domain.entity.UserId
 
 class FetchPublicKeysUseCase(
     private val logger: Logger,
@@ -14,14 +14,14 @@ class FetchPublicKeysUseCase(
 
 ) : UseCase {
 
-    suspend fun execute(email: String): UseCase.Result {
+    suspend fun execute(userId: UserId, email: String): UseCase.Result {
 
         // TODO verify this is working
         logger.v("executing FetchPublicKeysUseCase for $email")
 
         if (database.publicKeysDao().select(email).isEmpty()) {
 
-            val keysResponse = keysApi.getPublicKeys(email)
+            val keysResponse = keysApi.getPublicKeys(userId, email)
             return if (keysResponse is ApiResponse.Success) {
                 database.publicKeysDao().insert(*keysResponse.data.keys.map { PublicKeyEntity(email, it.flags, it.publicKey) }.toTypedArray())
                 logger.v("persisted keys for $email -> ${keysResponse.data}")

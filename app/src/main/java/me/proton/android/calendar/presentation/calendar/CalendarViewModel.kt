@@ -22,6 +22,7 @@ import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.domain.entity.UserId
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
@@ -224,12 +225,13 @@ class CalendarViewModel(
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState
 
-    suspend fun prefetchEvents(fromDate: LocalDate,
+    suspend fun prefetchEvents(userId: UserId,
+                               fromDate: LocalDate,
                                toDate: LocalDate,
                                timeZoneId: String) {
 
         withContext(Dispatchers.IO) {
-            calendarsRepository.prefetchEvents(fromDate, toDate, timeZoneId)
+            calendarsRepository.prefetchEvents(userId, fromDate, toDate, timeZoneId)
         }
 
     }

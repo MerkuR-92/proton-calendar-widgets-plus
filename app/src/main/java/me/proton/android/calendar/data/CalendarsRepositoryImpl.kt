@@ -19,6 +19,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.domain.entity.UserId
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
@@ -281,6 +282,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun prefetchEvents(
+        userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
@@ -294,12 +296,12 @@ class CalendarsRepositoryImpl(
 
             // fetch from API
             if (prefetchedFrom == null || fromDate.isBefore(prefetchedFrom)) {
-                when (fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)) {
+                when (fetchEventsUseCase.execute(userId, selectedCalendarIds, fromDate, toDate, timeZoneId)) {
                     UseCase.Result.Success -> prefetchedFrom = fromDate
                 }
             } else if (prefetchedTo == null || toDate.isAfter(prefetchedTo)) {
 
-                when (fetchEventsUseCase.execute(selectedCalendarIds, fromDate, toDate, timeZoneId)) {
+                when (fetchEventsUseCase.execute(userId, selectedCalendarIds, fromDate, toDate, timeZoneId)) {
                     UseCase.Result.Success -> prefetchedTo = toDate
                 }
             }

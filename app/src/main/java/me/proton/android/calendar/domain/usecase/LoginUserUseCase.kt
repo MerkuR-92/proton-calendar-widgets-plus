@@ -215,7 +215,7 @@ class LoginUserUseCase(
         user.primaryKey ?: return UseCase.Result.Error("user has no primary key")
 
         // get keysalts
-        val keySaltsResponse = keysApi.getKeySalts()
+        val keySaltsResponse = keysApi.getKeySalts(userId)
         val keySalt = if (keySaltsResponse is ApiResponse.Success) {
             keySaltsResponse.data.keySalts.find { it.id == user.primaryKey.id } ?: return UseCase.Result.Error("no matching keysalt found")
         } else return UseCase.Result.Error("key salts request failed: $keySaltsResponse")

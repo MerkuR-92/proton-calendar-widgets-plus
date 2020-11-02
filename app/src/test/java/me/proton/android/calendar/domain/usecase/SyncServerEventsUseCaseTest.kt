@@ -99,7 +99,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
             coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
-            coEvery { fetchPublicKeysUseCaseMock.execute(any()) } returns UseCase.Result.Success
+            coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
             coEvery { calendarsApi.getEvent(any(), any()) } returns ApiResponse.Success(
                 EventApiResponse(1000, EventEntity(

@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.visibleOrInvisible
+import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 
@@ -82,7 +83,8 @@ class ItemMiniCalendarFragment(
             val toDate = date.withDayOfMonth(date.lengthOfMonth())
 
             TimberLogger.d("zzz requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
-            calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
+            val userId = UserId(calendarViewModel.TODOvalueStore.getString("USERID")!!) // TODO
+            calendarViewModel.prefetchEvents(userId, fromDate, toDate, calendarViewModel.timeZoneId.id)
 
         }
 

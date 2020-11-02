@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.core.domain.entity.UserId
 import java.lang.Exception
 
 class HandleServerEventsUseCase(
@@ -86,7 +87,7 @@ class HandleServerEventsUseCase(
                                                 singleEventResponse.data.event.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content })
                                             .filterNotNull()
                                     emails.distinct().forEach {
-                                        fetchPublicKeysUseCase.execute(it)
+                                        fetchPublicKeysUseCase.execute(UserId(userId), it)
                                     }
 
                                 } catch (e: IllegalStateException) {

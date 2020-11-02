@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
+import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 
 /**
@@ -40,6 +41,7 @@ interface CalendarsRepository {
     ): Flow<List<Event>>
 
     suspend fun prefetchEvents(
+        userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
