@@ -5,8 +5,8 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.SettingsApi
+import me.proton.core.domain.entity.UserId
 
 /**
  * Sets up all the user's calendars, call this only once after successful login.
@@ -19,7 +19,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase): UseCase {
 
-    suspend fun execute(userId: String) : UseCase.Result {
+    suspend fun execute(userId: UserId) : UseCase.Result {
 
         logger.v("executing BootstrapCalendarsUseCase")
 
@@ -28,12 +28,12 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         }
 
-        val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings() // TODO this will have a value if we have at least 1 calendar
+        val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId) // TODO this will have a value if we have at least 1 calendar
         if (calendarUserSettingsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
 
-        val userSettingsResponse = settingsApi.getUserSettings()
+        val userSettingsResponse = settingsApi.getUserSettings(userId)
         if (userSettingsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting user settings from API: $userSettingsResponse")
         }
@@ -45,7 +45,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 is ApiResponse.Success -> {
                     logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
                     calendarsRepository.apply {
-                        persistCalendar(userId, calendarEntity)
+                        persistCalendar(userId.id, calendarEntity)
                         persistCalendarSettings(bootstrapResponse.data.calendarSettings)
                         persistPassphrase(bootstrapResponse.data.passphrase)
                         bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }
@@ -57,14 +57,14 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     // for this calendar at the same time, this will be sent in the event loop automatically
 
                     // extract passphrase for just saved Calendar
-                    val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
+                    val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId.id, calendarEntity.id)
                     when (cachePassphraseResult) {
                         is UseCase.Result.InvalidParams -> logger.e("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
                         is UseCase.Result.Error -> logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")
                     }
 
-                    calendarsRepository.persistCalendarUserSettings(userId, calendarUserSettingsResponse.data.calendarUserSettings)
-                    usersRepository.persistUserSettings(userId, userSettingsResponse.data.userSettings)
+                    calendarsRepository.persistCalendarUserSettings(userId.id, calendarUserSettingsResponse.data.calendarUserSettings)
+                    usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
 
                 }
                 is ApiResponse.Error -> {

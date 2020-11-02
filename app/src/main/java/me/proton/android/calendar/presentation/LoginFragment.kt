@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.clearFocusAndHideKeyboard
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.core.domain.entity.UserId
 import org.koin.android.ext.android.inject
 
 // TODO PROTOTYPE, NUKE THIS
@@ -60,7 +61,8 @@ class LoginFragment : Fragment() {
                         Toast.makeText(requireContext(), "fetching calendars", Toast.LENGTH_SHORT).show()
 
                     val bootstrap = withContext(Dispatchers.IO) {
-                        bootstrapUseCase.execute(TODOvalueStore.getString("USERID")!!)
+                        val userId = UserId(TODOvalueStore.getString("USERID")!!)
+                        bootstrapUseCase.execute(userId)
                     }
                         if (bootstrap == UseCase.Result.Success) {
 
