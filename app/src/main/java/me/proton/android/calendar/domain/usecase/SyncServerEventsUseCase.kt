@@ -5,6 +5,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.ServerEventsApi
+import me.proton.core.domain.entity.UserId
 
 class SyncServerEventsUseCase(
     private val logger: Logger,
@@ -29,7 +30,7 @@ class SyncServerEventsUseCase(
             var moreEvents = false
 
             // TODO we need to properly authorize all API requests for specific users!!!
-            when (val eventsReponse = serverEventsApi.getServerEvents(lastProtonEventId)) {
+            when (val eventsReponse = serverEventsApi.getServerEvents(UserId(userId), lastProtonEventId)) {
                 is ApiResponse.Success -> {
                     logger.v("fetched Server Events for ID: $lastProtonEventId")
                     // TODO handle eventsReponse.data.refresh, I think it's "force wipe database"?????

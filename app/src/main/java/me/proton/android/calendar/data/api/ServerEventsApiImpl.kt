@@ -6,43 +6,46 @@ import com.google.gson.stream.JsonWriter
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.ServerEventsApi
-import retrofit2.Response
+import me.proton.core.domain.entity.UserId
+import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.GET
 import retrofit2.http.Path
 
 // ServerEvent is an Event happening in Event Loop
 
-interface ServerEventsApiService {
+interface ServerEventsApiService : BaseRetrofitApi {
 
     @GET("events/latest")
-    suspend fun getLatestProtonEvent(): Response<LatestServerEventApiResponse>
+    suspend fun getLatestProtonEvent(): LatestServerEventApiResponse
 
     @GET("events/{eventId}")
-    suspend fun getProtonEvents(@Path("eventId") sinceProtonEventId: String): Response<ServerEventsApiResponse>
+    suspend fun getProtonEvents(@Path("eventId") sinceProtonEventId: String): ServerEventsApiResponse
 }
 
-class ServerEventsApiImpl(private val service: ServerEventsApiService, gson: Gson, logger: Logger) : BaseApi(gson, logger), ServerEventsApi {
+class ServerEventsApiImpl(private val apiProvider: ApiProvider) : ServerEventsApi {
 
-    override suspend fun getLatestServerEvent(): ApiResponse<LatestServerEventApiResponse> = safeApiCall { service.getLatestProtonEvent() }
+    override suspend fun getLatestServerEvent(userId: UserId): ApiResponse<LatestServerEventApiResponse> =
+        apiProvider.get<ServerEventsApiService>(userId).invoke {
+            getLatestProtonEvent()
+        }.toApiResponse()
 
-    override suspend fun getServerEvents(sinceServerEventId: String): ApiResponse<ServerEventsApiResponse> = safeApiCall { service.getProtonEvents(sinceServerEventId) }
+    override suspend fun getServerEvents(userId: UserId, sinceServerEventId: String): ApiResponse<ServerEventsApiResponse> =
+        apiProvider.get<ServerEventsApiService>(userId).invoke {
+            getProtonEvents(sinceServerEventId)
+        }.toApiResponse()
 
 }
 
 @Serializable
 data class LatestServerEventApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("EventID")
     val eventId: String
-) : BaseApiResponse()
+)
 
 @Serializable
 data class ServerEventsApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("EventID")
     val eventId: String, // new eventId to send with next request
     @SerialName("Refresh")
@@ -71,7 +74,7 @@ data class ServerEventsApiResponse(
     val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
     @SerialName("CalendarUserSettings")
     val calendarUserSettings: CalendarUserSettingsEntity? = null
-) : BaseApiResponse()
+)
 
 // TODO HANDLE ACTIONS AND CREATE TESTS FOR THAT!!!!!!!!!!!!!!!!!!
 

@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.common.TestsLogger
-import me.proton.android.calendar.common.readLocalResourceTestFile
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
 import me.proton.android.calendar.domain.*
@@ -16,6 +15,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -58,25 +58,25 @@ internal class SyncServerEventsUseCaseTest {
             //  separately, by calling CalendarsApi
 
             coEvery {
-                serverEventsApiMock.getServerEvents("l_o7TdJpH3UCfYn-0xBWaJVlZ633baHNvjyZFvuX7TD6lFPaOzy-3YkSorWafW5nKivpxfZ1YaU66_d25R58-Q==")
+                serverEventsApiMock.getServerEvents(UserId(userId), "l_o7TdJpH3UCfYn-0xBWaJVlZ633baHNvjyZFvuX7TD6lFPaOzy-3YkSorWafW5nKivpxfZ1YaU66_d25R58-Q==")
             } returns ApiResponse.Success(
                 json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_1.json").readText())
             )
 
             coEvery {
-                serverEventsApiMock.getServerEvents("KiQ9JV0gXPgyz5wA0T8dFOzHIzD-fFVLEnog3En_ySlO3JjwlsPOn7zJHbbqkUh81kYofB14MuhrbCtMXNSEDQ==")
+                serverEventsApiMock.getServerEvents(UserId(userId), "KiQ9JV0gXPgyz5wA0T8dFOzHIzD-fFVLEnog3En_ySlO3JjwlsPOn7zJHbbqkUh81kYofB14MuhrbCtMXNSEDQ==")
             } returns ApiResponse.Success(
                 json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_2.json").readText())
             )
 
             coEvery {
-                serverEventsApiMock.getServerEvents("deZCqTHUuob80ZGgsyTwXxhJka4LD0soPisUvyeTcXKej5UnbTqI_0Qp3bUZfNjcI1gVZs2tZqqcnHCj5zXVYQ==")
+                serverEventsApiMock.getServerEvents(UserId(userId), "deZCqTHUuob80ZGgsyTwXxhJka4LD0soPisUvyeTcXKej5UnbTqI_0Qp3bUZfNjcI1gVZs2tZqqcnHCj5zXVYQ==")
             } returns ApiResponse.Success(
                 json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_3_after_creating_calendar.json").readText())
             )
 
             coEvery {
-                serverEventsApiMock.getServerEvents("OYludcH6yhRe9X4Hgsxa9yeEOD-yMAsQVzehHyOxOgEf2owoLdVmWD1v_yzq_WuPWf3CX0fqpmIpqg-7PYxhIg==")
+                serverEventsApiMock.getServerEvents(UserId(userId), "OYludcH6yhRe9X4Hgsxa9yeEOD-yMAsQVzehHyOxOgEf2owoLdVmWD1v_yzq_WuPWf3CX0fqpmIpqg-7PYxhIg==")
             } returns ApiResponse.Success(
                 json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_4.json").readText())
             )
