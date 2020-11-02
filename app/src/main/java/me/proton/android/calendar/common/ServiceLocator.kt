@@ -69,33 +69,6 @@ val commonModule = module {
 }
 
 val networkModule = module {
-    single<GsonConverterFactory> { GsonConverterFactory.create(get()) }
-    single<CoroutineCallAdapterFactory> { CoroutineCallAdapterFactory() }
-    single<OkHttpClient>() {/*qualifier = named("no_request_interceptor")*/
-        OkHttpClient.Builder().apply {
-            addInterceptor(RequestInterceptor(get(), get())) // qualifier = named("no_request_interceptor")
-            if (BuildConfig.DEBUG) {
-                this.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
-            }
-        }.build()
-    }
-    /*single<OkHttpClient> { OkHttpClient.Builder().apply {
-            addInterceptor(RequestInterceptor(get(), get(qualifier = named("no_request_interceptor")), get()))
-            if (BuildConfig.DEBUG) {
-                this.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
-            }
-        }.build()
-    }*/
-
-//    single(named("special logger"))<OkHttpClient> { OkHttpClient.Builder().apply {
-//        if (BuildConfig.DEBUG) {
-//            this.addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
-//        }
-//        }.build()
-//    }
-
-
-
     single<CalendarsApi> { CalendarsApiImpl(get()) }
     single<UsersApi> { UsersApiImpl(get()) }
     single<KeysApi> { KeysApiImpl(get()) }

@@ -1,12 +1,7 @@
 package me.proton.android.calendar.data.api
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import me.proton.android.calendar.domain.Logger
-import retrofit2.Response
 
 /**
  * Wrapper for calling Retrofit in a safe way.
@@ -34,28 +29,3 @@ abstract class BaseApiResponse {
 }
 
 class StatusCodeApiResponse(override val code: Int) : BaseApiResponse()
-
-/**
- * Base implementation of Retrofit Service.
- */
-abstract class BaseApi(private val gson: Gson, private val logger: Logger) {
-
-    protected suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>): ApiResponse<T> = try {
-        val response = call.invoke()
-        if (response.isSuccessful) {
-            ApiResponse.Success(response.body()!!)
-        } else {
-            val errorApiResponse: ErrorApiResponse = gson.fromJson(response.errorBody()!!.charStream(), errorApiResponseBodyType)
-            logger.i("Error in Api request [${response.code()}, ${errorApiResponse.code}, ${errorApiResponse.error}]")
-            ApiResponse.Error(response.code(), errorApiResponse.code, errorApiResponse.error)
-        }
-    } catch (e: Exception) {
-        logger.i("Exception in Api request", e)
-        ApiResponse.Exception(e)
-    }
-
-    private data class ErrorApiResponse(val code: Int, val error: String)
-
-    private val errorApiResponseBodyType = object : TypeToken<ErrorApiResponse>() {}.type
-}
-

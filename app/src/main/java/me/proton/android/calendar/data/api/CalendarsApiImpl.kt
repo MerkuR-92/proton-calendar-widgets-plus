@@ -202,8 +202,6 @@ data class SyncEvent(
 
 @Serializable
 data class BootstrapApiResponse(
-    @SerialName("Code")
-    override val code: Int,
     @SerialName("Keys")
     val keys: List<CalendarKeyEntity>,
     @SerialName("Passphrase")
@@ -212,7 +210,7 @@ data class BootstrapApiResponse(
     val members: List<MemberEntity>,
     @SerialName("CalendarSettings")
     val calendarSettings: CalendarSettingsEntity // settings specific to calendar, not user
-) : BaseApiResponse()
+)
 
 @Serializable
 data class SyncEventsApiResponse(
