@@ -602,6 +602,7 @@ class EventViewModel(
     fun handleTimeZone(timeZoneId: String) {
         markEventAsEdited(bumpSequence = true)
         event.iCalendar.setDefaultTimeZone(timeZoneId)
+        eventTimeZoneId = timeZoneId
         _event.postValue(event)
     }
 
