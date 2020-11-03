@@ -6,9 +6,10 @@ plugins {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'io.gitlab.arturbosch.detekt'
+apply plugin: 'dagger.hilt.android.plugin'
 
 def sentryDsn = project.hasProperty("sentryDsn") ? sentryDsn : "https://abc@sentry.com/666"
 def storeFilePath = project.hasProperty('keyStoreFilePath') ? keyStoreFilePath : "protonkey.jks"
@@ -92,6 +93,13 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    dataBinding {
+        enabled = true
+    }
+}
+
+kapt {
+    correctErrorTypes true
 }
 
 tasks.withType(Test) {
@@ -106,9 +114,10 @@ dependencies {
 
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
 
-    // Proton Core libraries
+    // Proton Core libraries.
     implementation "me.proton.core:account:${rootProject.ext.version.proton_core_account}"
     implementation "me.proton.core:account-manager:${rootProject.ext.version.proton_core_account_manager}"
+    implementation "me.proton.core:account-manager-dagger:${rootProject.ext.version.proton_core_account_manager}"
     implementation "me.proton.core:auth:${rootProject.ext.version.proton_core_auth}"
     implementation "me.proton.core:human-verification:${rootProject.ext.version.proton_core_human_verification}"
     implementation "me.proton.core:data:${rootProject.ext.version.proton_core_data}"
@@ -116,6 +125,19 @@ dependencies {
     implementation "me.proton.core:presentation:${rootProject.ext.version.proton_core_presentation}"
     implementation "me.proton.core:network:${rootProject.ext.version.proton_core_networking}"
     implementation "me.proton.core:util-kotlin:${rootProject.ext.version.proton_core_util_kotlin}"
+
+    // Assisted Inject.
+    compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:${rootProject.ext.version.assisted_inject}"
+    kapt "com.squareup.inject:assisted-inject-processor-dagger2:${rootProject.ext.version.assisted_inject}"
+
+    // Hilt AndroidX (JetPack Integration).
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:${rootProject.ext.version.hilt_androidx}"
+    implementation "androidx.hilt:hilt-work:${rootProject.ext.version.hilt_androidx}"
+    kapt "androidx.hilt:hilt-compiler:${rootProject.ext.version.hilt_androidx}"
+
+    // Hilt Android.
+    implementation "com.google.dagger:hilt-android:${rootProject.ext.version.hilt_android}"
+    kapt "com.google.dagger:hilt-android-compiler:${rootProject.ext.version.hilt_android}"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.version.kotlin}"
     implementation 'androidx.core:core-ktx:1.3.1'

@@ -5,11 +5,12 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.API_APPLICATION_NAME
 import me.proton.android.calendar.common.USER_AGENT_NAME
 import me.proton.core.network.domain.ApiClient
+import javax.inject.Inject
 
 /**
  * Implementation of ApiClient for ProtonCore.
  */
-class CalendarApiClient : ApiClient {
+class CalendarApiClient @Inject constructor() : ApiClient {
 
     override val appVersionHeader = "${API_APPLICATION_NAME}_${BuildConfig.VERSION_NAME}"
     override val enableDebugLogging = BuildConfig.DEBUG

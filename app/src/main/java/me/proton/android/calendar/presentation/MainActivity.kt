@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -38,8 +39,9 @@ import me.proton.core.auth.presentation.AuthOrchestrator
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -57,8 +59,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     // TODO move to MainViewModel once we have proper user management
     private lateinit var userEmail: String
 
-    private val accountManager: AccountManager by inject()
-    private val authOrchestrator: AuthOrchestrator by inject()
+    @Inject
+    lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var authOrchestrator: AuthOrchestrator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
