@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data
 
+import androidx.room.Entity
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -57,21 +58,20 @@ class CalendarsRepositoryImpl(
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
     private val expandEventsMutex = Mutex()
-    private val expandEventsChannel = Channel<ZonedDateTime>(5)
     private val expandEventsToDate = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
 
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
-    private val DB_FLOW_DEBOUNCE = Duration.ofMillis(100)
-
+    private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
+    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(500)
 
     init {
 
         // cold init, fetch all needed entities straight from database
         coroutineScope.launch {
-//            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+            fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
             // Events
             val eventEntities = database.eventsDao().selectEvents()
@@ -79,34 +79,30 @@ class CalendarsRepositoryImpl(
             dbEvents.addAll(transformedEvents)
 
             // Calendars
-            visibleCalendars.value = database.calendarsDao().selectCalendars().filter { it.display == 1 }
+            visibleCalendars.value = database.calendarsDao().selectCalendars().filterVisible()
 
             // force expanding Events after cold init is done
             expandEventsMutex.withLock {
                 expandEventsToDate.value = ZonedDateTime.now().plusMonths(1)
             }
 
-//            fetchingState.value = CalendarsRepository.FetchingState.Finished
+            fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
 
         coroutineScope.launch {
-            expandEventsToDate.collect {
-                logger.e("collected & expanding until: ${it}")
-                if (it.isAfter(eventsExpandedUntil)) {
-
-                    // expand occurrences for locally stored events
-                    expandDbEventsUntil(it)
-
-                    // TODO queue and discard obsolete requests, maybe even debounce
-
-                }
-
+            expandEventsToDate.debounce(DEBOUNCE_EXPANDING_EVENTS_ON_FETCH.toMillis()).collect {
+                expandDbEventsUntil(it)
             }
         }
 
         coroutineScope.launch {
-            database.calendarsDao().flowCalendars().collect { calendarEntities ->
-                visibleCalendars.value = calendarEntities.filter { it.display == 1 }
+            database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).collect { calendarEntities ->
+                visibleCalendars.value = calendarEntities.filterVisible()
+            }
+        }
+
+        coroutineScope.launch {
+            visibleCalendars.collect {
                 showEventsInVisibleCalendars()
             }
         }
@@ -118,6 +114,12 @@ class CalendarsRepositoryImpl(
         }
     }
 
+    private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
+        return this.filter {
+            it.display == 1 && (it.isActive || it.isDisabled)
+        }
+    }
+
     private suspend fun showEventsInVisibleCalendars() {
         displayedEvents.value = displayedEventsMutex.withLock {
             allEvents.value.filter { event ->
@@ -125,7 +127,7 @@ class CalendarsRepositoryImpl(
             }
         }
     }
-    
+
     override suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String) {
         // Members objects are used to link an Address and the Calendars that are part of it
         val members = database.membersDao().selectByAddress(address)
@@ -277,17 +279,15 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ) {
 
-
-//        val selectedActiveCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
-//        val selectedDisabledCalendarIds = calendarsRepository.getDisabledCalendars(TODOuserID).map { it.id }.toList()
-//        val selectedCalendarIds = selectedActiveCalendarIds + selectedDisabledCalendarIds
-
         val expandUntilDateTime = ZonedDateTime.of(LocalDateTime.of(toDate, LocalTime.MIDNIGHT), ZoneId.of(timeZoneId))
         expandEventsMutex.withLock {
-            expandEventsToDate.value = expandUntilDateTime
+            if (expandUntilDateTime.isAfter(eventsExpandedUntil)) {
+                expandEventsToDate.value = expandUntilDateTime
+            }
         }
 
         if (::selectedCalendarIds.isInitialized) { // TODO
+            // TODO FIXME WE DONT INITIALIZE THIS SO WE DON'T FETCH
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
 
@@ -316,12 +316,8 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
 
-        TimberLogger.e("expandDbEventsUntil ${this}")
-
         expandEventsMutex.withLock {
-            TimberLogger.e("expanding local occurrences until ${toDateTime.toLocalDate()}")
-
-//            if (force || eventsExpandedUntil == null || (eventsExpandedUntil != null && toDate.isAfter(eventsExpandedUntil))) {
+            TimberLogger.v("expanding local occurrences until ${toDateTime.toLocalDate()}")
 
                 allEvents.value = dbEvents.flatMap { event ->
                     if (event.isRecurring()) {
@@ -344,14 +340,12 @@ class CalendarsRepositoryImpl(
                     }
                 }
 
-                TimberLogger.e("expanded local occurrences until ${toDateTime}: ${allEvents.value.size}")
+                TimberLogger.v("expanded local occurrences until ${toDateTime}: ${allEvents.value.size}")
 
-                // first expand will happen on empty DB Events
                 if (dbEvents.isNotEmpty()) {
                     eventsExpandedUntil = toDateTime
                 }
 
-//            }
         }
 
 
