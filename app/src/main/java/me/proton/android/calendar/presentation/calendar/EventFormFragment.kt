@@ -104,8 +104,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 persistFormData()
 
-                val shouldShowConfirmationPicker = !eventViewModel.isEventNew() && ((eventViewModel.dbEvent?.isRecurring() == true) ||
-                        (eventViewModel.dbEvent?.isPartOfChain() == true || eventViewModel.isEventPartOfChain())) &&
+                val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
+                        (eventViewModel.dbEvent?.isRecurring() == true || eventViewModel.dbEvent?.isPartOfChain() == true) &&
                         (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
 
                 if (shouldShowConfirmationPicker) {

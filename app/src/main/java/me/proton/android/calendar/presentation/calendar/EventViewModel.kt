@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Trigger
@@ -235,7 +236,7 @@ class EventViewModel(
             }
 
             // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
-            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, timeZoneForOccurrence) ?: dbEvent)?.apply {
+            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, timeZoneForOccurrence) ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.copy() as ICalendar))?.apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
