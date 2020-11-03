@@ -73,11 +73,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.SYNC_SERVER_EVENTS_PERIODIC -> {
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
 
-                // TODO remove when we have an actual user management
-                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-                val TODOuserID = TODOvalueStore.getString("USERID")
-
-                val userIds = if (TODOuserID != null) arrayOf(TODOuserID) else emptyArray()
+                // TODO support more users
+                val userIds = arrayOf(userId)
                 if (userIds.isNotEmpty()) {
                     val results = userIds.map {
                         syncServerEventsUseCase.execute(it)

@@ -7,8 +7,8 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import java.lang.Exception
@@ -100,7 +100,30 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.deleteEventAlarmById(it.id) },
                     {
                         try {
-                            calendarsRepository.persistEventAlarm(it.alarm!!)
+
+                            if (!calendarsRepository.hasEvent(it.alarm!!.eventId, it.alarm.calendarId)) {
+
+                                logger.v("event ${it.alarm.eventId} for alarm doesn't exist in DB")
+                                // event doesn't exist locally, fetch and save it before inserting alarm
+                                when (val event = calendarsApi.getEvent(userId, it.alarm.calendarId, it.alarm.eventId)) {
+                                    is ApiResponse.Success -> {
+                                        logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
+                                        calendarsRepository.persistEvents(event.data.event)
+                                        calendarsRepository.persistEventAlarm(it.alarm)
+                                    }
+                                    // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
+                                    is ApiResponse.Error -> {
+                                        logger.e("couldn't fetch event ${it.alarm.eventId} for alarm: ${event.errorCode}, ${event.error}")
+                                    }
+                                    is ApiResponse.Exception -> {
+                                        logger.e("couldn't fetch event ${it.alarm.eventId} for alarm: ${event.exception}")
+                                    }
+                                }
+
+                            } else {
+                                calendarsRepository.persistEventAlarm(it.alarm)
+                            }
+
                         } catch (e: SQLiteConstraintException) {
                             // if this fails with `787 SQLITE_CONSTRAINT_FOREIGNKEY` it means CalendarEvent no longer exists
                             //  and we're trying to insert its Alarm to the database or something failed when inserting

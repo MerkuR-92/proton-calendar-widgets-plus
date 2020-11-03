@@ -109,7 +109,7 @@ class SyncAlarmsUseCase(
                             logger.e("calendar ${alarmEntity.calendarId} doesn't exist in DB, can't insert alarm")
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
                             logger.v("event ${alarmEntity.eventId} for alarm doesn't exist in DB")
-                            // event doen's exist locally, fetch and save it before inserting alarm
+                            // event doesn't exist locally, fetch and save it before inserting alarm
                             when (val event = calendarsApi.getEvent(userId, alarmEntity.calendarId, alarmEntity.eventId)) {
                                 is ApiResponse.Success -> {
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")

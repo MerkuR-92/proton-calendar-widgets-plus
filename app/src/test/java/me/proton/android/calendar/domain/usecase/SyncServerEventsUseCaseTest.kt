@@ -86,6 +86,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistCalendar(userId.id, any()) } just Runs
             coEvery { calendarsRepositoryMock.updateCalendar(userId.id, any()) } just Runs
             coEvery { calendarsRepositoryMock.persistEvents(any()) } just Runs
+            coEvery { calendarsRepositoryMock.hasEvent(any(), any()) } returns true
             coEvery { calendarsRepositoryMock.refreshCalendarsFlagsForAddress(any(), any(), any()) } just Runs
             coEvery { usersRepositoryMock.persistAddress(userId.id, any()) } just Runs
             coEvery { usersRepositoryMock.persistUser(any()) } just Runs
