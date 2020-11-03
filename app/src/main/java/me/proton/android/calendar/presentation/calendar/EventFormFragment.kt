@@ -5,10 +5,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -16,16 +14,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
-import kotlinx.android.synthetic.main.item_alarm_text_button.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -248,6 +243,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
 
             event_form_all_day_switch.isChecked = event.isAllDay()
+            event_form_all_day_switch.jumpDrawablesToCurrentState()
 
             event_form_partial_day_start.visibleOrGone(!event.isAllDay())
             event_form_partial_day_end.visibleOrGone(!event.isAllDay())

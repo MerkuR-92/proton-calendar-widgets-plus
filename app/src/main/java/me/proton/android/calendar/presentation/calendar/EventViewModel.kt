@@ -93,6 +93,8 @@ class EventViewModel(
     lateinit var calendarUserSettings: CalendarUserSettingsEntity
     lateinit var userSettings: UserSettingsEntity
 
+    // TODO: Initialise is called a second time for same eventId if we open event form from event details
+    //  Check if any case require us to pass through it again or if we keep the init data we had from details
     suspend fun initialise(
         editMode: Boolean,
         eventId: String?,

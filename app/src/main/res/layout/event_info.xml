@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="48dp" />
+        app:layout_constraintGuide_begin="@dimen/default_margin_text_start" />
 
     <TextView
         android:id="@+id/text_status"
