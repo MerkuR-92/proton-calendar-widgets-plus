@@ -1,24 +1,17 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.drm.DrmStore
 import assertk.assertThat
 import assertk.assertions.*
 import assertk.fail
 import biweekly.Biweekly
 import biweekly.component.VAlarm
 import biweekly.component.VEvent
-import biweekly.component.VTimezone
-import biweekly.io.TimezoneAssignment
 import biweekly.parameter.Related
 import biweekly.property.*
 import biweekly.util.Duration
 import me.proton.android.calendar.common.*
 import org.junit.jupiter.api.Test
-import timber.log.Timber
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
+import java.time.*
 import java.util.*
 
 internal class EditCreateEventUseCaseTest {
@@ -26,47 +19,12 @@ internal class EditCreateEventUseCaseTest {
     @Test
     fun `split iCalendar according to the matrix`() {
 
-        // TODO create all day event: event.setDateStart(start, false); don't specify end-date
-
-        // not-decrypted shared event: BEGIN:VCALENDAR
-        //    VERSION:2.0
-        //    BEGIN:VEVENT
-        //    UID:proton-calendar-11667b13-2041-adde-3bc8-34952f4c0578
-        //    DTSTAMP:20200330T155327Z
-        //    DTSTART;VALUE=DATE:20200402
-        //    DTEND;VALUE=DATE:20200403
-        //    END:VEVENT
-        //    END:VCALENDAR
-        //V/TimberLogger: decrypted shared event: BEGIN:VCALENDAR
-        //    VERSION:2.0
-        //    BEGIN:VEVENT
-        //    UID:proton-calendar-11667b13-2041-adde-3bc8-34952f4c0578
-        //    DTSTAMP:20200330T155327Z
-        //    SUMMARY:All-day event on 2nd April
-        //    END:VEVENT
-        //    END:VCALENDAR
-        //V/TimberLogger: signature ok for personal event: true
-        //V/TimberLogger: not-decrypted personal event: BEGIN:VCALENDAR
-        //    VERSION:2.0
-        //    BEGIN:VEVENT
-        //    UID:proton-calendar-11667b13-2041-adde-3bc8-34952f4c0578
-        //    DTSTAMP:20200330T155327Z
-        //    BEGIN:VALARM
-        //    TRIGGER:-PT15H
-        //    ACTION:DISPLAY
-        //    END:VALARM
-        //    END:VEVENT
-        //    END:VCALENDAR
-
-        //[MemberEntity(id=m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==, permissions=127, email=adamtst@protonmail.blue, calendarId=m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==)]}
-
-
         val event = VEvent().apply {
             setUid(ICalUtils.generateProtonUid())
             setCreated(Date())
             setLastModified(getCreated().value)
-            setDateStart(Date.from(LocalDate.of(2020, 4, 2).atStartOfDay(ZoneId.systemDefault()).toInstant()), false)
-            setDateEnd(Date.from(LocalDate.of(2020, 4, 3).atStartOfDay(ZoneId.systemDefault()).toInstant()), false)
+            setDateStart(Date.from(ZonedDateTime.of(LocalDate.of(2020, 4, 2), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toInstant()), false)
+            setDateEnd(Date.from(ZonedDateTime.of(LocalDate.of(2020, 4, 3), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toInstant()), false)
             //setDateTimeStamp() this is added by default
             setSummary("All-day event on 2nd April")
             setDescription("2 alarms, 30 minutes (display) and 2 hours (email) before")
@@ -91,13 +49,11 @@ internal class EditCreateEventUseCaseTest {
         with (calendarSplit.sharedPart.events[0]) {
             assertThat(this.uid).isEqualTo(event.uid)
             assertThat(this.created).isEqualTo(event.created)
-            TestsLogger.d("created = ${this.created}")
-            TestsLogger.d("last modified = ${this.lastModified}")
             assertThat(this.lastModified).isEqualTo(event.lastModified)
-//            assertThat(this.dateStart.value.time).isEqualTo(1585778400000) // TODO fix this, it doesn't work on CI
+            assertThat(this.dateStart.value.time).isEqualTo(ZonedDateTime.of(LocalDate.of(2020, 4, 2), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toEpochSecond() * 1000)
             assertThat(this.dateStart.value.hasTime()).isFalse()
             assertThat(calendarSplit.sharedPart.timezoneInfo.getTimezone(this.dateStart)).isNull()
-//            assertThat(this.dateEnd.value.time).isEqualTo(1585864800000) // TODO fix this, it doesn't work on CI
+            assertThat(this.dateEnd.value.time).isEqualTo(ZonedDateTime.of(LocalDate.of(2020, 4, 3), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toEpochSecond() * 1000)
             assertThat(this.dateEnd.value.hasTime()).isFalse()
             assertThat(calendarSplit.sharedPart.timezoneInfo.getTimezone(this.dateEnd)).isNull()
             // TODO rrule, recurrence-id, sequence, exdate
