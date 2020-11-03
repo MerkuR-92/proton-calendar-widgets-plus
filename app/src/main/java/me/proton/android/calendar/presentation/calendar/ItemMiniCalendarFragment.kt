@@ -83,8 +83,7 @@ class ItemMiniCalendarFragment(
             val toDate = date.withDayOfMonth(date.lengthOfMonth())
 
             TimberLogger.d("zzz requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
-            val userId = UserId(calendarViewModel.TODOvalueStore.getString("USERID")!!) // TODO
-            calendarViewModel.prefetchEvents(userId, fromDate, toDate, calendarViewModel.timeZoneId.id)
+            calendarViewModel.prefetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
 
         }
 

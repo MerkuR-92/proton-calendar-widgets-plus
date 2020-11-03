@@ -67,6 +67,8 @@ class CalendarViewModel(
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
     val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
+    private var userId: UserId? = null
+
     //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
 //    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
 
@@ -110,6 +112,7 @@ class CalendarViewModel(
             val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
             val TODOuserID = TODOvalueStore.getString("USERID") // TODO
             if (TODOuserID != null) {
+                userId = UserId(TODOuserID)
 
                 timeZoneId = ZoneId.of(calendarsRepository.selectCalendarUserSettings(TODOuserID)?.primaryTimezone!!)
                 startWeekOn = usersRepository.selectUserSettings(TODOuserID)?.weekStartDayOfWeek()!!
@@ -225,13 +228,12 @@ class CalendarViewModel(
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState
 
-    suspend fun prefetchEvents(userId: UserId,
-                               fromDate: LocalDate,
+    suspend fun prefetchEvents(fromDate: LocalDate,
                                toDate: LocalDate,
                                timeZoneId: String) {
 
         withContext(Dispatchers.IO) {
-            calendarsRepository.prefetchEvents(userId, fromDate, toDate, timeZoneId)
+            calendarsRepository.prefetchEvents(userId!!, fromDate, toDate, timeZoneId) // TODO UserId
         }
 
     }
@@ -243,14 +245,7 @@ class CalendarViewModel(
 
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-
-
-                val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-                val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
-                val userId = UserId(TODOuserID)
-
-                deleteEventUseCase.execute(userId, eventId, deleteOption, occurrenceNumber)
+                deleteEventUseCase.execute(userId!!, eventId, deleteOption, occurrenceNumber) // TODO UserId
             }
         }.await()
     }
@@ -270,6 +265,7 @@ class CalendarViewModel(
             .setInputData(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR,
+                    UseCaseWorker.INPUT_USER_ID to userId?.id, // TODO UserId
                     UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
                     UseCaseWorker.INPUT_CALENDAR_NAME to name,
                     UseCaseWorker.INPUT_CALENDAR_DESCRIPTION to description,
@@ -281,14 +277,4 @@ class CalendarViewModel(
 
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
-
-//    fun TEST_CREATE_EVENT_TODO() {
-//        ioScope.launch {
-//
-//            createEventUseCase.execute("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==", "m-dPNuHcP8N4xfv6iapVg2wHifktAD1A1pFDU95qo5f14Vaw8I9gEHq-3GACk6ef3O12C3piRviy_D43Wh7xxQ==")
-//
-//        }
-//    }
-
-
 }
