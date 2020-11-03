@@ -11,8 +11,7 @@ import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
-import me.proton.android.calendar.domain.usecase.LoginUserUseCase
-import kotlinx.android.synthetic.main.fragment_month.*
+import me.proton.android.calendar.domain.usecase.FetchUserUseCase
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -23,7 +22,7 @@ class CalendarFragmentOld : Fragment() {
 
 
     // TODO only for testing now vvvvvv
-    private val loginUserUseCase: LoginUserUseCase by inject()
+    private val fetchUserUseCase: FetchUserUseCase by inject()
     private val bootstrapUseCase: BootstrapCalendarsUseCase by inject()
     // TODO ^^^^^
     private val fetchEventsUseCase: FetchEventsUseCase by inject()

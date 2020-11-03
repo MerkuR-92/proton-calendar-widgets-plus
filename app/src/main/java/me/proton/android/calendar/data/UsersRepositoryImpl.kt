@@ -39,7 +39,7 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun selectUserById(userId: String): User? {
-        return database.usersDao().selectUserById(userId)?.toUser(gson)
+        return database.usersDao().selectUserById(userId)?.toUser()
     }
 
     override fun addressesFlow(userId: String): Flow<List<Address>> {

@@ -9,9 +9,11 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.MainViewModel
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.network.data.ApiProvider
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
@@ -61,11 +63,12 @@ val viewModelModule = module {
         )
     }
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
-    factory<LoginUserUseCase> { LoginUserUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<FetchUserUseCase> { FetchUserUseCase(get(), get(), get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
@@ -82,10 +85,13 @@ val useCaseModule = module {
 
 fun coreModule(
     apiProvider: ApiProvider,
-    accountManager: AccountManager
+    accountManager: AccountManager,
+    authOrchestrator: AuthOrchestrator
 ) = module {
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
     single<ApiProvider> { apiProvider }
     // TODO: Remove when all *ViewModel/*UseCase will be provided by a Dagger module.
     single<AccountManager> { accountManager }
+    // TODO: Remove when AccountViewModel will be provided by a Dagger module.
+    single<AuthOrchestrator> { authOrchestrator }
 }

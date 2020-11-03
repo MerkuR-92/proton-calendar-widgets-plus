@@ -25,9 +25,6 @@
         <action
             android:id="@+id/action_nav_calendar_to_nav_event_form"
             app:destination="@id/nav_event_form" />
-        <action
-            android:id="@+id/action_nav_calendar_to_nav_login"
-            app:destination="@id/nav_login" />
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />
@@ -120,14 +117,6 @@
         android:id="@+id/nav_event_form_recurrence"
         android:name="me.proton.android.calendar.presentation.calendar.EventFormRecurrenceFragment"
         android:label="EventFormEditRecurrenceFragment" />
-    <fragment
-        android:id="@+id/nav_login"
-        android:name="me.proton.android.calendar.presentation.LoginFragment"
-        android:label="LoginFragment" >
-        <deepLink
-            android:id="@+id/deepLink6"
-            app:uri="proton-calendar://protonmail.com/login" />
-    </fragment>
     <fragment
         android:id="@+id/rootFragment"
         android:name="me.proton.android.calendar.presentation.calendar.RootFragment"

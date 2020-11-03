@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.lifecycle.whenStarted
@@ -23,23 +26,21 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
-import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.auth.presentation.AuthOrchestrator
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -53,26 +54,38 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by viewModel()
     private val mainViewModel: MainViewModel by viewModel()
+    private val accountViewModel: AccountViewModel by viewModel()
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
     private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
     // TODO move to MainViewModel once we have proper user management
     private lateinit var userEmail: String
 
-    @Inject
-    lateinit var accountManager: AccountManager
+    private fun navigateToMonth() {
+        lifecycleScope.launch(Dispatchers.Default) {
+            calendarViewModel.init(this)
 
-    @Inject
-    lateinit var authOrchestrator: AuthOrchestrator
+            // Refresh drawer content now that we are logged in.
+            initDrawerHeader()
+            initDrawerCalendarsListContent()
+
+            findNavController(R.id.nav_host_fragment_container_view)
+                .navigate(Navigation.Deeplink.toMonth())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        authOrchestrator.register(this)
-        accountManager.getAccounts().onEach { accounts->
-            // TODO: Fix Hilt first.
-            // if (accounts.isEmpty()) authOrchestrator.startLoginWorkflow()
-        }.launchIn(lifecycleScope)
+        with(accountViewModel) {
+            init(this@MainActivity)
+            state.observe(this@MainActivity, Observer { state ->
+                when (state) {
+                    is AccountViewModel.State.LoginNeeded -> startLoginWorkflow()
+                    is AccountViewModel.State.Ready -> navigateToMonth()
+                }
+            })
+        }
 
         intent?.let { mainViewModel.handleIntent(intent) }
 
@@ -167,11 +180,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_main_content.nav_view_more_bug_press.setOnClickListener {
             drawerLayout.close()
         }
+        accountViewModel.hasPrimary {
+            nav_view_main_content.nav_view_more_logout_layout.isVisible = it
+            nav_view_main_content.nav_view_more_login_layout.isGone = it
+        }
         nav_view_main_content.nav_view_more_logout_press.setOnClickListener {
+            accountViewModel.logoutPrimary()
             drawerLayout.close()
         }
         nav_view_main_content.nav_view_more_login_press.setOnClickListener {
-            findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toLogin())
+            accountViewModel.startLoginWorkflow()
             drawerLayout.close()
         }
     }

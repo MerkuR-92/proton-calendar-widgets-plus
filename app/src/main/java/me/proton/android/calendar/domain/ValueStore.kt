@@ -14,6 +14,7 @@ interface ValueStore {
     fun getStringFromSet(setName: String, key: String): String?
     fun putLongInSet(setName: String, key: String, value: Long)
     fun getLongFromSet(setName: String, key: String): Long?
+    fun clearAll()
 }
 
 interface ValueStoreProvider {
@@ -21,16 +22,10 @@ interface ValueStoreProvider {
 }
 
 object ValueKey {
-    const val LAST_SERVER_EVENT_ID = "LAST_SERVER_EVENT_ID"
-    const val AUTH_ACCESS_TOKEN = "AUTH_ACCESS_TOKEN"
-    const val AUTH_REFRESH_TOKEN = "AUTH_REFRESH_TOKEN"
-    const val AUTH_UID = "AUTH_UID"
+    const val USER_ID = "USERID"
     const val USER_PASSPHRASE = "USER_PASSPHRASE"
-    const val USER_CALENDAR_SETTINGS = "USER_CALENDAR_SETTINGS"
     const val LAST_EVENT_ALARM_HANDLED_TIMESTAMP = "LAST_EVENT_ALARM_HANDLED_TIMESTAMP"
-//    const val PRIMARY_USER_KEY = "PRIMARY_USER_KEY"
-//    const val PRIMARY_USER_KEY_ID = "PRIMARY_USER_KEY_ID"
-//    const val PRIMARY_USER_KEY_SALT = "PRIMARY_USER_KEY_SALT"
+    const val LAST_SERVER_EVENT_ID = "LAST_SERVER_EVENT_ID"
 }
 
 object ValueSet {

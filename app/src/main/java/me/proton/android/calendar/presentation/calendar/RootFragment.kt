@@ -1,16 +1,17 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import androidx.navigation.fragment.findNavController
-import me.proton.android.calendar.R
-import me.proton.android.calendar.domain.ValueStoreProvider
 import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.MainViewModel.Companion.INTENT_ACTION_SHOW_EVENT_DETAILS
@@ -32,6 +33,10 @@ class RootFragment : BaseDialogFragment(), KoinComponent {
     override val isTopLevel = true
     override val isScrollable = false
 
+    private fun navigateToNotification(notificationIntent: Intent) {
+        TimberLogger.v("root fragment navigating with notification intent: ${notificationIntent.data.toString()}")
+        findNavController().navigate(notificationIntent.data!!)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,29 +46,9 @@ class RootFragment : BaseDialogFragment(), KoinComponent {
 
             val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")
             if (userId != null) {
-
                 val notificationIntent = mainViewModel.consumeIntent(INTENT_ACTION_SHOW_EVENT_DETAILS)
-                if (notificationIntent != null) {
-
-                    TimberLogger.v("root fragment navigating with notification intent: ${notificationIntent.data.toString()}")
-                    findNavController().navigate(notificationIntent.data!!)
-                    
-                } else {
-
-                    TimberLogger.v("root fragment navigating to month")
-                    findNavController().navigate(Navigation.Deeplink.toMonth())
-
-                }
-
-            } else {
-
-                withContext(Dispatchers.Main) {
-                    text_home.text = "PLEASE LOGIN"
-                }
-
+                notificationIntent?.let { navigateToNotification(notificationIntent) }
             }
         }
-
     }
-
 }

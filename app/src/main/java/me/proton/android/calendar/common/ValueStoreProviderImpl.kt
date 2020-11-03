@@ -44,6 +44,9 @@ class ValueStoreProviderImpl(private val sharedPreferencesProvider: SharedPrefer
 
         @Synchronized
         override fun getLongFromSet(setName: String, key: String): Long? = getLong("$setName~$key")
+
+        @Synchronized
+        override fun clearAll() = sharedPreferences.edit().clear().apply()
     }
 
     @Synchronized

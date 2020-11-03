@@ -24,11 +24,11 @@ buildscript {
 
                 "proton_core_account": "0.1.1",
                 "proton_core_account_manager": "0.1.1",
-                "proton_core_auth": "0.1.1",
+                "proton_core_auth": "0.1.2",
                 "proton_core_human_verification": "0.2.1",
                 "proton_core_data": "0.1.1",
-                "proton_core_domain": "0.2.1",
-                "proton_core_presentation": "0.4.2",
+                "proton_core_domain": "0.2.2",
+                "proton_core_presentation": "0.4.3",
                 "proton_core_networking": "0.3.1",
                 "proton_core_util_kotlin": "0.2.1"
         ]

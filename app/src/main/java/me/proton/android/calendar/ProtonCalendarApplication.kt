@@ -7,6 +7,7 @@ import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.network.data.ApiProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -23,6 +24,9 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var accountManager: AccountManager
 
+    @Inject
+    lateinit var authOrchestrator: AuthOrchestrator
+
     override fun onCreate() {
         super.onCreate()
 
@@ -30,7 +34,7 @@ class ProtonCalendarApplication : Application() {
             androidContext(this@ProtonCalendarApplication)
             modules(
                 commonModule, viewModelModule, repositoryModule, networkModule, useCaseModule,
-                coreModule(apiProvider, accountManager)
+                coreModule(apiProvider, accountManager, authOrchestrator)
             )
         }
 
