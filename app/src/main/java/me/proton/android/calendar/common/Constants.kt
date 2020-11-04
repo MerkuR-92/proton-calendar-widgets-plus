@@ -9,6 +9,8 @@ const val API_VERSION_CALENDAR = "v1"
 const val API_BASE_URL = "https://api.protonmail.ch/api/"
 const val API_APPLICATION_NAME = "AndroidCalendar"
 
+const val USER_AGENT_NAME = "ProtonCalendar"
+
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"
 const val DB_FLOW_DEBOUNCE_MS = 1_000L
 const val SYNC_EVENTS_REFRESH_MS = 10_000L
