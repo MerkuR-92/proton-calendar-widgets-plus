@@ -14,7 +14,7 @@ abstract class EventsDao : BaseDao<EventEntity> {
     abstract fun flowEvents(calendarIds: List<String>): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")
-    abstract fun selectEvents(calendarIds: List<String>): List<EventEntity>
+    abstract suspend fun selectEvents(calendarIds: List<String>): List<EventEntity>
 
     @Query("SELECT * FROM events WHERE calendarId = :calendarId")
     abstract fun selectEvents(calendarId: String): Flow<List<EventEntity>>
@@ -29,13 +29,13 @@ abstract class EventsDao : BaseDao<EventEntity> {
     abstract suspend fun selectByUid(uid: String): List<EventEntity>
 
     @Query("SELECT EXISTS(SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId)")
-    abstract fun hasEvent(eventId: String, calendarId: String): Boolean
+    abstract suspend fun hasEvent(eventId: String, calendarId: String): Boolean
 
     @Query("DELETE FROM events WHERE id = :id")
-    abstract fun deleteById(id: String)
+    abstract suspend fun deleteById(id: String)
 
     @Query("DELETE FROM events WHERE id IN (:ids)")
-    abstract fun deleteByIds(ids: List<String>)
+    abstract suspend fun deleteByIds(ids: List<String>)
 
     // TODO select for given timespan
 

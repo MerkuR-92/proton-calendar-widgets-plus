@@ -11,9 +11,9 @@ abstract class CalendarSettingsDao : BaseDao<CalendarSettingsEntity> {
 //    lateinit var userId: String
 
     @Query("SELECT * FROM calendar_settings WHERE calendarId = :calendarId")
-    abstract fun select(calendarId: String): CalendarSettingsEntity?
+    abstract suspend fun select(calendarId: String): CalendarSettingsEntity?
 
     @Query("DELETE FROM calendar_settings WHERE id = :id")
-    abstract fun deleteById(id: String)
+    abstract suspend fun deleteById(id: String)
 
 }

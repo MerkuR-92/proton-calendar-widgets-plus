@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.Flow
 abstract class PassphrasesDao : BaseDao<PassphraseEntity> {
 
     @Query("SELECT * FROM passphrases WHERE calendarId = :calendarId")
-    abstract fun select(calendarId: String): List<PassphraseEntity>
+    abstract suspend fun select(calendarId: String): List<PassphraseEntity>
 
     @Query("DELETE FROM passphrases WHERE id = :id")
-    abstract fun deleteById(id: String)
+    abstract suspend fun deleteById(id: String)
 
 }

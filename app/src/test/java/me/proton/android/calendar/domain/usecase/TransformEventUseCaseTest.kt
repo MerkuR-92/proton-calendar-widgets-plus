@@ -78,7 +78,7 @@ internal class TransformEventUseCaseTest {
                 1,
                 1)
             calendarEntity.fkUserId = "fkUserId"
-            every { database.calendarsDao().selectById(any()) } returns calendarEntity
+            coEvery { database.calendarsDao().selectById(any()) } returns calendarEntity
 
             // calendarKey
             val calendarKeyEntity = CalendarKeyEntity(
@@ -87,7 +87,7 @@ internal class TransformEventUseCaseTest {
                 "privateKey",
                 "passphraseId",
                 "calendarId")
-            every {
+            coEvery {
                 database.calendarKeysDao().select(any())
             } returns listOf(calendarKeyEntity)
 
@@ -101,7 +101,7 @@ internal class TransformEventUseCaseTest {
                 1,
                 listOf(Json.decodeFromString<JsonElement>(gson.toJson(memberPassphrase))),
                 "calendarId")
-            every {
+            coEvery {
                 database.passphrasesDao().select(any())
             } returns listOf(passPhraseEntity)
 
@@ -111,7 +111,7 @@ internal class TransformEventUseCaseTest {
             } returns "keyPassphrase"
 
             // verificationKeys =
-            every {
+            coEvery {
                 database.publicKeysDao().select(any())
             } returns listOf()
 

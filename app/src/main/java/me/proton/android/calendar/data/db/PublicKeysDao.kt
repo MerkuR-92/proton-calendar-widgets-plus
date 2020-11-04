@@ -14,6 +14,6 @@ import me.proton.android.calendar.data.entity.PublicKeyEntity
 abstract class PublicKeysDao : BaseDao<PublicKeyEntity> {
 
     @Query("SELECT * FROM public_keys WHERE email = :email")
-    abstract fun select(email: String): List<PublicKeyEntity>
+    abstract suspend fun select(email: String): List<PublicKeyEntity>
 
 }

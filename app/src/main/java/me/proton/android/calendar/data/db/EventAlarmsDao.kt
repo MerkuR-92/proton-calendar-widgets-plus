@@ -12,12 +12,12 @@ abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
     abstract fun select(eventId: String): Flow<List<EventAlarmEntity>>
 
     @Query("SELECT * FROM event_alarms WHERE occurrence = (SELECT MIN(occurrence) FROM event_alarms WHERE occurrence >= :timestampSeconds)")
-    abstract fun selectUpcoming(timestampSeconds: Long): List<EventAlarmEntity>
+    abstract suspend fun selectUpcoming(timestampSeconds: Long): List<EventAlarmEntity>
 
     @Query("SELECT * FROM event_alarms WHERE occurrence >= :timestampSecondsStart AND occurrence <= :timestampSecondsEnd")
-    abstract fun select(timestampSecondsStart: Long, timestampSecondsEnd: Long): List<EventAlarmEntity>
+    abstract suspend fun select(timestampSecondsStart: Long, timestampSecondsEnd: Long): List<EventAlarmEntity>
 
     @Query("DELETE FROM event_alarms WHERE id = :id")
-    abstract fun deleteById(id: String)
+    abstract suspend fun deleteById(id: String)
 
 }

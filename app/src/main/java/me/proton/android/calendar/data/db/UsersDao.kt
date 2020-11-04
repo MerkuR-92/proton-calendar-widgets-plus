@@ -14,9 +14,9 @@ abstract class UsersDao : BaseDao<UserEntity> {
     abstract fun selectUsers(): Flow<List<UserEntity>>
 
     @Query("SELECT * FROM users WHERE id = :userId")
-    abstract fun selectUserById(userId: String): UserEntity?
+    abstract suspend fun selectUserById(userId: String): UserEntity?
 
     @Query("DELETE FROM users WHERE id = :userId")
-    abstract fun deleteById(userId: String)
+    abstract suspend  fun deleteById(userId: String)
 
 }

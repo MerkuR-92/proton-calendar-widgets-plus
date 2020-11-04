@@ -18,25 +18,25 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     abstract fun flowCalendars(userId: String): Flow<List<CalendarEntity>>
 
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
-    abstract fun selectCalendars(userId: String): List<CalendarEntity>
+    abstract suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
     @Query("SELECT fkUserId FROM calendars WHERE id = :calendarId")
-    abstract fun selectCalendarUserId(calendarId: String): String?
+    abstract suspend fun selectCalendarUserId(calendarId: String): String?
 
     @Query("SELECT * FROM calendars WHERE id = :id")
-    abstract fun selectById(id: String): CalendarEntity?
+    abstract suspend fun selectById(id: String): CalendarEntity?
 
     @Query("SELECT EXISTS(SELECT * FROM calendars WHERE id = :calendarId)")
-    abstract fun hasCalendar(calendarId: String): Boolean
+    abstract suspend fun hasCalendar(calendarId: String): Boolean
 
     @Query("DELETE FROM calendars WHERE id = :id")
-    abstract fun deleteById(id: String)
+    abstract suspend fun deleteById(id: String)
 
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId AND calendars.display = 1")
-    abstract fun selectDisplayedCalendars(userId: String): List<CalendarEntity>
+    abstract suspend fun selectDisplayedCalendars(userId: String): List<CalendarEntity>
 
     @Query("UPDATE calendars SET flags = :flags WHERE id = :calendarId")
-    abstract fun updateCalendarFlags(calendarId: String, flags: Int)
+    abstract suspend fun updateCalendarFlags(calendarId: String, flags: Int)
 
 
 // @Query("SELECT * from plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")
@@ -94,7 +94,7 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
 //    }
 //
 //    @Query("DELETE FROM users")
-//    abstract fun deleteUser(user: User)
+//    abstract suspend fun deleteUser(user: User)
 //
 //    @Insert
 //    abstract suspend fun insertUser(user: User)

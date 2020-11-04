@@ -151,7 +151,7 @@ class TransformEventUseCase(
 
     }
 
-    private fun getDecryptedText(keyPacket: String?,
+    private suspend fun getDecryptedText(keyPacket: String?,
                                  privateKey: String,
                                  keyPassphrase: String,
                                  isEncrypted: Boolean,

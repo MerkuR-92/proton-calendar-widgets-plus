@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 abstract class MembersDao : BaseDao<MemberEntity> {
 
     @Query("SELECT * FROM members WHERE calendarId = :calendarId")
-    abstract fun select(calendarId: String): List<MemberEntity>
+    abstract suspend fun select(calendarId: String): List<MemberEntity>
 
     @Query("SELECT * FROM members WHERE email = :address")
-    abstract fun selectByAddress(address: String): List<MemberEntity>
+    abstract suspend fun selectByAddress(address: String): List<MemberEntity>
 
     @Query("DELETE FROM members WHERE id = :id")
-    abstract fun deleteById(id: String)
+    abstract suspend fun deleteById(id: String)
 
 }
