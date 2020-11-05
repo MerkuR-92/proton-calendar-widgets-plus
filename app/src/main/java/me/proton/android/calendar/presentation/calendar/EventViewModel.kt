@@ -694,7 +694,7 @@ class EventViewModel(
         } else {
             event.iCalEvent.setStart(newDate, old.toLocalTime(), eventTimeZoneId)
         }
-        event.iCalendar.adjustRRuleToStartDate()
+        event.iCalendar.adjustRRuleToStartDate(old)
         _event.postValue(event)
     }
 

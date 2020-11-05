@@ -219,16 +219,18 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
+        var oldStartDate = event.iCalEvent.getStart(displayTimeZoneId)
         event.iCalEvent.setStart(LocalDate.of(2020, 7, 30), LocalTime.of(13, 0), "Europe/Zurich")
         event.iCalendar.setStartTimeZone("Europe/Zurich")
-        event.iCalendar.adjustRRuleToStartDate()
-        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(4)
+        event.iCalendar.adjustRRuleToStartDate(oldStartDate)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(3)
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.FRIDAY))).isTrue()
 
+        oldStartDate = event.iCalEvent.getStart(displayTimeZoneId)
         event.iCalEvent.setStart(LocalDate.of(2020, 7, 27), LocalTime.of(13, 0), "Europe/Zurich")
         event.iCalendar.setStartTimeZone("Europe/Zurich")
-        event.iCalendar.adjustRRuleToStartDate()
-        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(5)
+        event.iCalendar.adjustRRuleToStartDate(oldStartDate)
+        assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(3)
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.MONDAY))).isTrue()
 
     }
