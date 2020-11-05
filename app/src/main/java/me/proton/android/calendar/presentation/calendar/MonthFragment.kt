@@ -241,16 +241,12 @@ class MonthFragment : BaseDialogFragment() {
     val miniCalendarPagerLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
 
-            TimberLogger.d("ppp measured height=${miniCalendarPager.height}")
-
             val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((miniCalendarPager.currentItem - miniCalendarPagerAdapter.startingPosition).toLong())
             val desiredHeight = MiniCalendarItemAdapter.calculateAdapterHeight(
                 requireContext(),
                 firstDayOfMonth,
                 calendarViewModel.startWeekOn
             )
-
-            TimberLogger.d("ppp desiredHeight =${desiredHeight}")
 
             if (miniCalendarPager.height != desiredHeight) {
                 miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(this)

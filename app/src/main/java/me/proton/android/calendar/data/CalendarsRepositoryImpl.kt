@@ -1,29 +1,31 @@
 package me.proton.android.calendar.data
 
-import androidx.room.Entity
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
 import timber.log.Timber
 import java.time.*
+import kotlin.Comparator
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -54,12 +56,16 @@ class CalendarsRepositoryImpl(
 
     override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
+    private var fetchedWindows = mutableSetOf<FetchWindow>()
+    private val fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
     private lateinit var selectedCalendarIds: List<String>
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
     private val expandEventsMutex = Mutex()
     private val expandEventsToDate = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
 
+    private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
@@ -79,7 +85,8 @@ class CalendarsRepositoryImpl(
             dbEvents.addAll(transformedEvents)
 
             // Calendars
-            visibleCalendars.value = database.calendarsDao().selectCalendars().filterVisible()
+            dbCalendars.value = database.calendarsDao().selectCalendars()
+            visibleCalendars.value = dbCalendars.value.filterVisible()
 
             // force expanding Events after cold init is done
             expandEventsMutex.withLock {
@@ -97,6 +104,7 @@ class CalendarsRepositoryImpl(
 
         coroutineScope.launch {
             database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).collect { calendarEntities ->
+                dbCalendars.value = calendarEntities
                 visibleCalendars.value = calendarEntities.filterVisible()
             }
         }
@@ -108,8 +116,43 @@ class CalendarsRepositoryImpl(
         }
 
         coroutineScope.launch {
+            dbCalendars.collect {
+
+            }
+        }
+
+        coroutineScope.launch {
             allEvents.collect { calendarEntities ->
                 showEventsInVisibleCalendars()
+            }
+        }
+
+        coroutineScope.launch {
+            fetchEventsChannel.consumeEach { fetchWindow ->
+
+                if (!fetchedWindows.contains(fetchWindow)) {
+                    logger.v("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+
+                    fetchingState.value = CalendarsRepository.FetchingState.Fetching
+
+                    // fetch from API
+                    when (fetchEventsUseCase.execute(
+                        fetchWindow.userId,
+                        fetchWindow.calendarIds,
+                        fetchWindow.fromDate,
+                        fetchWindow.toDate,
+                        fetchWindow.timeZoneId
+                    )) {
+                        UseCase.Result.Success -> {
+                            fetchedWindows.add(fetchWindow)
+                        }
+                    }
+
+                    fetchingState.value = CalendarsRepository.FetchingState.Finished
+
+                } else {
+                    logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+                }
             }
         }
     }
@@ -272,6 +315,15 @@ class CalendarsRepositoryImpl(
 
     }
 
+    private data class FetchWindow(
+        val userId: UserId,
+        val calendarIds: List<String>,
+        val fromDate: LocalDate,
+        val toDate: LocalDate,
+        val timeZoneId: String
+    )
+
+
     override suspend fun fetchEvents(
         userId: UserId,
         fromDate: LocalDate,
@@ -286,27 +338,9 @@ class CalendarsRepositoryImpl(
             }
         }
 
-        if (::selectedCalendarIds.isInitialized) { // TODO
-            // TODO FIXME WE DONT INITIALIZE THIS SO WE DON'T FETCH
-            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+        val calendarIds = dbCalendars.value.filter { it.fkUserId == userId.id }.map { it.id }
 
-
-
-            // TODO cache timestamps of this and don't fetch each time we scroll
-            // fetch from API
-            if (prefetchedFrom == null || fromDate.isBefore(prefetchedFrom)) {
-                when (fetchEventsUseCase.execute(userId, selectedCalendarIds, fromDate, toDate, timeZoneId)) {
-                    UseCase.Result.Success -> prefetchedFrom = fromDate
-                }
-            } else if (prefetchedTo == null || toDate.isAfter(prefetchedTo)) {
-
-                when (fetchEventsUseCase.execute(userId, selectedCalendarIds, fromDate, toDate, timeZoneId)) {
-                    UseCase.Result.Success -> prefetchedTo = toDate
-                }
-            }
-
-            fetchingState.value = CalendarsRepository.FetchingState.Finished
-        }
+        fetchEventsChannel.send(FetchWindow(userId, calendarIds, fromDate, toDate, timeZoneId))
 
     }
 
