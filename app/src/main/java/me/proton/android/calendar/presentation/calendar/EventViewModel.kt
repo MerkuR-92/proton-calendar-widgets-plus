@@ -211,6 +211,7 @@ class EventViewModel(
                 defaultCalendar.isActive,
                 defaultCalendar.display == 1
             ), newICalendar)
+            eventBumpSequence = true
 
             setDefaultAlarms(newEvent, this.calendarSettings)
             newEvent
@@ -236,7 +237,7 @@ class EventViewModel(
             }
 
             // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
-            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, timeZoneForOccurrence) ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.copy() as ICalendar))?.apply {
+            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, timeZoneForOccurrence) ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
@@ -383,7 +384,9 @@ class EventViewModel(
 
 
         val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
+        val originalDbEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
         val dbEventStartDate = dbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
+        val originalDbEventStartDate = originalDbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
         val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
         val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.iCalEvent?.getStart(event.defaultTimeZone!!)
 
@@ -434,6 +437,12 @@ class EventViewModel(
 
                     eventToCreate
 
+                } else if (dbEvent?.isSingleEdit() == true) {
+                    val eventToCreate = event.copy(iCalendar = event.iCalendar.clone())
+                    eventToCreate.iCalEvent.recurrenceRule = null
+                    eventToCreate.iCalEvent.exceptionDates.clear()
+
+                    eventToCreate
                 } else {
                     event // else no special changes for regular event, just overwrite everything
                 }
@@ -446,14 +455,21 @@ class EventViewModel(
                     logger.e("dbEvent == null")
                     return false
                 }
-                if (dbEventWithOccurrenceStartDate == null) {
+                if (!dbEvent.isSingleEdit() && dbEventWithOccurrenceStartDate == null) {
                     logger.e("dbEventWithOccurrenceStartDate == null")
                     return false
                 }
+                if (dbEvent.isSingleEdit() && (originalDbEvent == null || dbEventStartDate == null)) {
+                    if (originalDbEvent == null) logger.e("originalDbEvent == null")
+                    if (dbEventStartDate == null) logger.e("dbEventStartDate == null")
+                    return false
+                }
 
-                // delete single edits starting with just edited occurrence
-                val deleteSingleEditsResult = deleteEventUseCase.execute(userId, event.id, dbEventWithOccurrenceStartDate!!.minusNanos(1))
-                if (deleteSingleEditsResult != UseCase.Result.Success ) {
+                // delete single edits starting with just edited occurrence / single edit
+                val eventId = if (dbEvent.isSingleEdit()) originalDbEvent!!.id else event.id
+                val deleteStartDate = if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(1)
+                val deleteSingleEditsResult = deleteEventUseCase.execute(userId, eventId, deleteStartDate)
+                if (deleteSingleEditsResult != UseCase.Result.Success) {
                     logger.e("deleteSingleEditsResult != UseCase.Result.Success")
                     return false
                 }
@@ -462,17 +478,28 @@ class EventViewModel(
                 // - change COUNT to ((current occurrence number) - 1)
                 // OR
                 // - change UNTIL equal to (previous occurrence from just edited).endDate
-                val dbEventToUpdate = dbEvent.copy(iCalendar = dbEvent.iCalendar.clone())
+                val eventToCopy = if (dbEvent.isSingleEdit()) originalDbEvent else dbEvent
+                val dbEventToUpdate = eventToCopy!!.copy(iCalendar = eventToCopy.iCalendar.clone())
                 dbEventToUpdate.iCalEvent.recurrenceRule?.value?.let {
-                    dbEventToUpdate.iCalEvent.setRecurrenceRule(Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
-                        // TODO count = 0 will not happen because this edit option is not available for first occurrence
-                        .count(if (it.count != null) occurrenceNumber - 1 else null)
-                        // 1 second to midnight on the end-day of previous original occurrence
-                        .until(Date.from(dbEvent.generateOccurrence(occurrenceNumber - 1, event.defaultTimeZone!!)!!.endDateTime.plusDays(1).with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()), true)
-                        .build())
+                    dbEventToUpdate.iCalEvent.setRecurrenceRule(
+                        Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
+                            // TODO count = 0 will not happen because this edit option is not available for first occurrence
+                            .count(if (it.count != null) occurrenceNumber - 1 else null)
+                            // 1 second to midnight on the end-day of previous original occurrence
+                            .until(
+                                Date.from(
+                                    eventToCopy.generateOccurrence(
+                                        occurrenceNumber - 1,
+                                        event.defaultTimeZone!!
+                                    )!!.endDateTime.plusDays(1).with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1)
+                                        .toInstant()
+                                ), true
+                            )
+                            .build()
+                    )
 
                     val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
-                    if (editOriginalEventResult != UseCase.Result.Success ) {
+                    if (editOriginalEventResult != UseCase.Result.Success) {
                         if (editOriginalEventResult is UseCase.Result.Error) {
                             logger.i("error editing event: ${editOriginalEventResult.message}")
                             logger.e("error editing event: ${editOriginalEventResult.message}")
@@ -492,19 +519,29 @@ class EventViewModel(
                     id = ICalUtils.generateOfflineEventId(),
                     iCalendar = event.iCalendar.clone().apply {
                         this.events.first().apply {
-                            setUid(ICalUtils.generateProtonUid(event.uid, ICalDateFormat.DATE_TIME_BASIC_WITHOUT_TZ.format(Date.from(dbEventWithOccurrenceStartDate.toInstant()))))
+                            setUid(
+                                ICalUtils.generateProtonUid(
+                                    event.uid,
+                                    ICalDateFormat.DATE_TIME_BASIC_WITHOUT_TZ.format(
+                                        ICalUtils.eventStartZonedDateTimeToDate(if (dbEvent.isSingleEdit()) dbEventStartDate!! else dbEventWithOccurrenceStartDate!!, dbEvent.isAllDay())
+                                    )
+                                )
+                            )
                             exceptionDates.clear()
                             val nullDate: Date? = null
                             setRecurrenceId(nullDate)
                             event.iCalEvent.recurrenceRule?.value?.let {
-                                setRecurrenceRule(Recurrence.Builder(event.iCalEvent.recurrenceRule.value)
-                                    .count(if (it.count != null) it.count - occurrenceNumber + 1 else null)
-                                    // UNTIL is copied from event's RRULE
-                                    .build())
+                                setRecurrenceRule(
+                                    Recurrence.Builder(event.iCalEvent.recurrenceRule.value)
+                                        .count(if (it.count != null) it.count - occurrenceNumber + 1 else null)
+                                        // UNTIL is copied from event's RRULE
+                                        .build()
+                                )
                             }
                         }
                     }
                 )
+                if (dbEvent.isSingleEdit()) eventToCreate.iCalEvent.recurrenceId = null
 
                 //
 //            if (this.recurrenceRule?.value?.until != null) {
@@ -512,50 +549,85 @@ class EventViewModel(
 //            }
 
                 eventToCreate
-
             }
             EventEditDeleteOption.ALL_EVENTS -> {
 
-                // delete all single edits
-                val deleteSingleEditsResult = deleteEventUseCase.execute(userId, event.id, dbEventStartDate!!.minusNanos(1))
-                if (deleteSingleEditsResult != UseCase.Result.Success ) {
-                    logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
-                    return false
-                }
+                if (dbEvent?.isSingleEdit() == true && originalDbEvent != null) {
+                    // delete all single edits of original event
+                    val deleteSingleEditsResult = deleteEventUseCase.execute(userId, originalDbEvent.id, originalDbEventStartDate!!.minusNanos(1))
+                    if (deleteSingleEditsResult != UseCase.Result.Success) {
+                        logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
+                        return false
+                    }
 
-                // delete all single deletions
-                event.iCalEvent.exceptionDates.clear()
+                    // clear recurrenceId and use original event id since single edit will replace original event
+                    val newEvent = event.copy(id = originalDbEvent.id, iCalendar = event.iCalendar.clone())
+                    newEvent.iCalEvent.recurrenceId = null
+
+                    newEvent
+                } else {
+                    // delete all single edits
+                    val deleteSingleEditsResult =
+                        deleteEventUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
+                    if (deleteSingleEditsResult != UseCase.Result.Success) {
+                        logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
+                        return false
+                    }
+
+                    // delete all single deletions
+                    event.iCalEvent.exceptionDates.clear()
 
 //                TWO SEPARATE THINGS:
 //                - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
 //                - the same DAY but different TIME
 
-                if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone!!)?.truncatedTo(ChronoUnit.DAYS) &&
-                    dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
+                    if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone!!)
+                            ?.truncatedTo(ChronoUnit.DAYS) &&
+                        dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule
+                    ) {
 
-                    // update the original event's DTSTART only with new time (leave day the same)
+                        // update the original event's DTSTART only with new time (leave day the same)
 
-                    if (event.isAllDay()) {
-                        event.also {
-                            TimberLogger.d("all day, updating only new time: ${dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate()}/${dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate()}")
-                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
-                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate())
+                        if (event.isAllDay()) {
+                            event.also {
+                                TimberLogger.d(
+                                    "all day, updating only new time: ${
+                                        dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate()
+                                    }/${dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate()}"
+                                )
+                                it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
+                                it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate())
+                            }
+                        } else {
+                            TimberLogger.d(
+                                "part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone!!)!!}/${
+                                    dbEvent.getEnd(
+                                        event.defaultTimeZone!!
+                                    )!!
+                                }"
+                            )
+                            event.also {
+                                it.iCalEvent.setStart(
+                                    dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(),
+                                    event.getStart(event.defaultTimeZone!!)!!.toLocalTime(),
+                                    event.defaultTimeZone
+                                )
+                                it.iCalEvent.setEnd(
+                                    dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate(),
+                                    event.getEnd(event.defaultTimeZone!!)!!.toLocalTime(),
+                                    event.defaultTimeZone
+                                )
+                            }
                         }
+
                     } else {
-                        TimberLogger.d("part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone!!)!!}/${dbEvent.getEnd(event.defaultTimeZone!!)!!}")
-                        event.also {
-                            it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(), event.getStart(event.defaultTimeZone!!)!!.toLocalTime(), event.defaultTimeZone)
-                            it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate(), event.getEnd(event.defaultTimeZone!!)!!.toLocalTime(), event.defaultTimeZone)
-                        }
+
+                        // update the original event's DTSTART with date and time
+                        //  which means no changes to just edited event, but it will overwrite the original event
+
+                        event
+
                     }
-
-                } else {
-
-                    // update the original event's DTSTART with date and time
-                    //  which means no changes to just edited event, but it will overwrite the original event
-
-                    event
-
                 }
             }
             else -> event // else no special changes for regular event, just overwrite everything

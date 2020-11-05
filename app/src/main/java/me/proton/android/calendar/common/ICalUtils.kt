@@ -406,7 +406,9 @@ object ICalUtils {
         val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
-            val event = events.find { it.iCalEvent.recurrenceId?.value == Date.from(occurrence.startDateTime.toInstant())}?.copy() ?: originalEvent.copy()//.withOccurrence(occurrence)!!
+            val event = events.find {
+                it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(occurrence.startDateTime, originalEvent.isAllDay())
+            }?.copy() ?: originalEvent.copy()//.withOccurrence(occurrence)!!
             event.occurrence = occurrence
             event
         }
@@ -423,6 +425,14 @@ object ICalUtils {
         return this.filterNot { it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes }
     }
 
+    /**
+     * Returns event ZonedDateTime on Date format
+     * Converts it to default timezone when event is all day
+     */
+    fun eventStartZonedDateTimeToDate(startDate: ZonedDateTime, isAllDay: Boolean): Date {
+        return if (isAllDay) Date.from(startDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant())
+        else Date.from(startDate.toInstant())
+    }
 }
 
 data class CalendarSplit(

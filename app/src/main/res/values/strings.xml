@@ -127,6 +127,12 @@
     <string name="event_discard_changes_cancel">Keep editing</string>
     <string name="event_discard_changes_confirm">Discard</string>
 
+    <string name="event_recurring_update_this_title">Update recurring event</string>
+    <string name="event_recurring_update_this_description">Frequency modifications will be lost</string>
+    <string name="event_recurring_update_all_description">Previous modifications on this series will be lost</string>
+    <string name="event_recurring_update_this_cancel">Cancel</string>
+    <string name="event_recurring_update_this_confirm">Update</string>
+
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendars</string>
     <string name="nav_view_disabled_calendars">Disabled calendars</string>

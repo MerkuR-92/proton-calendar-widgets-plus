@@ -8,6 +8,7 @@ import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.createNewEvent
+import me.proton.android.calendar.common.ICalUtils.eventStartZonedDateTimeToDate
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
@@ -2141,5 +2142,61 @@ internal class ICalUtilsTest {
         ), iCal, null)
 
         assertThat(event.isRecurringUntilSameDay(timeZoneId)).isFalse()
+    }
+
+    @Test
+    fun `check partial day single edit recurrence id date when original event was all day`() {
+        val iCals = listOf(
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20201104
+    DTEND;VALUE=DATE:20201105
+    RRULE:FREQ=WEEKLY;COUNT=2;BYDAY=WE
+    SEQUENCE:2
+    SUMMARY:Weekly recurring
+    STATUS:CONFIRMED
+    DTSTAMP:20201105T135134Z
+    UID:c2vDbiFQVRp847bbZRNQKLeZ6pK7@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent(),
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Paris:20201104T135100
+    DTEND;TZID=Europe/Paris:20201104T142100
+    RECURRENCE-ID;VALUE=DATE:20201104
+    SEQUENCE:3
+    SUMMARY:Weekly recurring
+    STATUS:CONFIRMED
+    DTSTAMP:20201105T135151Z
+    UID:c2vDbiFQVRp847bbZRNQKLeZ6pK7@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+        val displayTimeZoneId = "Europe/Paris"
+
+        val events = iCals.mapIndexed { index, iCal ->
+            Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
+                "id",
+                "calendar",
+                "",
+                true,
+                true
+            ), ICalUtils.parseICalString(iCal)!!, null)
+        }
+
+        val displayRangeTo = LocalDate.of(2020, 12, 31)
+
+        val originalEvent = events.first()
+        val singleEdit = events[1]
+        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(originalEvent, events, displayRangeTo, displayTimeZoneId)!!
+
+        assertThat(eventStartZonedDateTimeToDate(originalEvent.iCalEvent.getStart(displayTimeZoneId)!!, originalEvent.isAllDay())).isEqualTo(eventStartZonedDateTimeToDate(singleEdit.iCalEvent.getStart(displayTimeZoneId)!!, originalEvent.isAllDay()))
+        assertThat(mapped[0].iCalEvent.getStart(displayTimeZoneId)).isEqualTo(singleEdit.iCalEvent.getStart(displayTimeZoneId))
     }
 }

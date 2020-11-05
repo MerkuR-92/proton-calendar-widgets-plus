@@ -104,73 +104,113 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 persistFormData()
 
-                val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
-                        (eventViewModel.dbEvent?.isRecurring() == true || eventViewModel.dbEvent?.isPartOfChain() == true) &&
-                        (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
+                // Allow saving with no edition if creating an event
+                if (navigationArguments.eventId.isNullOrEmpty() || (!navigationArguments.eventId.isNullOrEmpty() && eventViewModel.hasEventBeenEdited())) {
 
-                if (shouldShowConfirmationPicker) {
+                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
+                            (eventViewModel.dbEvent?.isRecurring() == true || eventViewModel.dbEvent?.isPartOfChain() == true) &&
+                            (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
 
-                    AndroidUtils.displaySingleChoiceConfirmationPicker(requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
-                        getString(R.string.event_recurring_edit_this),
-                        if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
-                        getString(R.string.event_recurring_edit_all_events)
-                    ).toTypedArray(), 0) {
+                    if (shouldShowConfirmationPicker) {
 
-                        lifecycleScope.launch {
-                            val success = withContext(Dispatchers.IO) {
+                        AndroidUtils.displaySingleChoiceConfirmationPicker(
+                            requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                                getString(R.string.event_recurring_edit_this),
+                                if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
+                                getString(R.string.event_recurring_edit_all_events)
+                            ).toTypedArray(), 0
+                        ) {
+                            val eventEditDeleteOption =
                                 if (it == 0) {
-                                    eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT, navigationArguments.occurrenceNumber)
+                                    EventEditDeleteOption.THIS_EVENT
                                 } else if (it == 1) {
                                     if (navigationArguments.occurrenceNumber == 1) {
-                                        eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
+                                        EventEditDeleteOption.ALL_EVENTS
                                     } else {
-                                        eventViewModel.handleSave(EventEditDeleteOption.THIS_EVENT_AND_FUTURE, navigationArguments.occurrenceNumber)
+                                        EventEditDeleteOption.THIS_EVENT_AND_FUTURE
                                     }
                                 } else { // it == 2
-                                    eventViewModel.handleSave(EventEditDeleteOption.ALL_EVENTS, navigationArguments.occurrenceNumber)
+                                    EventEditDeleteOption.ALL_EVENTS
+                                }
+
+                            // Display warning dialog for this event if recurrence rule has been edited
+                            if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.dbEvent?.iCalEvent?.recurrenceRule != eventViewModel.eventLiveData.value?.iCalEvent?.recurrenceRule) {
+                                displayUpdateRecurringEventDialog(R.string.event_recurring_update_this_description) { _, _ ->
+                                    handleSaveWithOption(eventEditDeleteOption)
                                 }
                             }
+                            // TODO: Warning dialog for All events option (Define cases where we show dialogs)
+//                            else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS) {
+//                                displayUpdateRecurringEventDialog(
+//                                    if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT) R.string.event_recurring_update_this_description
+//                                    else R.string.event_recurring_update_all_description
+//                                ) { _, _ ->
+//                                    handleSaveWithOption(eventEditDeleteOption)
+//                                }
+//                            }
+                            else {
+                                handleSaveWithOption(eventEditDeleteOption)
+                            }
+                        }
 
-                            if (success) { // TODO remove duplicated code here and below
+                    } else { // TODO merge this with code above
+                        val success = withContext(Dispatchers.IO) {
+                            eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
+                        }
+
+                        if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
+                            if (success) {
                                 onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
                                 jumpToMonthView()
                             } else {
                                 Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
                             }
-
-                        }
-                    }
-
-                } else { // TODO merge this with code above
-                    val success = withContext(Dispatchers.IO) {
-                        eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
-                    }
-
-                    if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
-                        if (success) {
-                            onSuccessEventUpdateCalendarDisplay()
-                            Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
-                            jumpToMonthView()
                         } else {
-                            Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
-                        }
-                    } else {
-                        if (success) {
-                            onSuccessEventUpdateCalendarDisplay()
-                            Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
+                            if (success) {
+                                onSuccessEventUpdateCalendarDisplay()
+                                Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
 //                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
-                            jumpToMonthView()
-                        } else {
-                            Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
+                                jumpToMonthView()
+                            } else {
+                                Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
+                            }
                         }
                     }
-                }
-
+                } else findNavController().navigateUp()
             }
         } else {
             AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.event_alert_invalid_start_end_date))
+        }
+    }
+
+    private fun displayUpdateRecurringEventDialog(message: Int, callback: DialogInterface.OnClickListener) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.event_recurring_update_this_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.event_recurring_update_this_confirm, callback)
+            .setNegativeButton(R.string.event_recurring_update_this_cancel) { _, _ -> }
+            .show()
+    }
+
+    private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption) {
+        lifecycleScope.launch {
+            val success = withContext(Dispatchers.IO) {
+                eventViewModel.handleSave(
+                    eventEditDeleteOption,
+                    navigationArguments.occurrenceNumber
+                )
+            }
+
+            if (success) { // TODO remove duplicated code here and below
+                onSuccessEventUpdateCalendarDisplay()
+                Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+                jumpToMonthView()
+            } else {
+                Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
+            }
+
         }
     }
 
