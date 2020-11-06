@@ -568,7 +568,7 @@ class EventViewModel(
                 } else {
                     // delete all single edits
                     val deleteSingleEditsResult =
-                        deleteEventUseCase.execute(TODOuserID, event.id, dbEventStartDate!!.minusNanos(1))
+                        deleteEventUseCase.execute(userId, event.id, dbEventStartDate!!.minusNanos(1))
                     if (deleteSingleEditsResult != UseCase.Result.Success) {
                         logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
                         return false
