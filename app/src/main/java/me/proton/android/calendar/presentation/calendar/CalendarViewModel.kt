@@ -127,10 +127,23 @@ class CalendarViewModel(
 
     private lateinit var miniCalendarPager: ViewPager2
     private lateinit var agendaPager: ViewPager2
+    var pagersInitialised = false
+    var updateSelectedLocalDate: LocalDate? = null
 
     fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2) {
         this.miniCalendarPager = miniCalendarPager
         this.agendaPager = agendaPager
+        pagersInitialised = true
+    }
+
+    fun handleInitialDaySelection(date: LocalDate) {
+        // Select specific date if it has been provided instead of default init value.
+        // Lets us handle selected date when navigating back from event details / form if it was opened from a notification
+        val immutableUpdateSelectedLocalDate = updateSelectedLocalDate
+        if (immutableUpdateSelectedLocalDate != null) {
+            handleDaySelected(immutableUpdateSelectedLocalDate)
+            updateSelectedLocalDate = null
+        } else handleDaySelected(date)
     }
 
     fun handleDaySelected(date: LocalDate) {

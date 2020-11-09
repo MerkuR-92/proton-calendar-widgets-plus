@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
+import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.text
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -38,6 +39,10 @@ class MiniCalendarItemAdapter(
         //val FIRST_WEEKDAY = DayOfWeek.MONDAY
     }
 
+    // TODO Workaround to make sure we are not trying the modify the list concurrently in two places (submitCalendarIndicators and markDayAsSelected)
+    var selectedDate: LocalDate? = null
+    private var updatingList: Boolean = false
+
     fun initialise() {
 
         val firstDayOfTheMonth = forDate.withDayOfMonth(1)
@@ -53,15 +58,22 @@ class MiniCalendarItemAdapter(
         }
 
         val dayItems = (0 until firstDayOfTheMonth.lengthOfMonth()).map {
-            MiniCalendarItem(firstDayOfTheMonth.plusDays(it.toLong()), false, true, emptyList())
+            val date = firstDayOfTheMonth.plusDays(it.toLong())
+            MiniCalendarItem(date, false, true, emptyList())
         }
 
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
 
         calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())).observe(lifecycleOwner) {
+            updatingList = true
             submitCalendarIndicators(forDate.month, it)
         }
 
+        calendarViewModel.selectedDate.observe(lifecycleOwner) {
+            // TODO Workaround to make sure we are not trying the modify the list concurrently in two places (submitCalendarIndicators and markDayAsSelected)
+            selectedDate = it
+            if (!updatingList) markDayAsSelected(it)
+        }
     }
 
 
@@ -77,7 +89,7 @@ class MiniCalendarItemAdapter(
             itemView
         ) {
 
-            fun bind(item: MiniCalendarItem?, clickListener: ((LocalDate) -> Unit)?) {
+            fun bind(item: MiniCalendarItem?, selectedDate: LocalDate? = null, clickListener: ((LocalDate) -> Unit)?) {
 
                 if (item == null) {
                     itemView.text.text = ""
@@ -85,15 +97,21 @@ class MiniCalendarItemAdapter(
                     itemView.setBackgroundResource(0)
                 } else {
 
-                    if (item.isSelected) {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
-                        itemView.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
-                    } else if (item.date == LocalDate.now(ZoneId.of(timeZoneId))) {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                        itemView.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
-                    } else {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                        itemView.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                    // TODO Workaround to manually update isSelected if we couldn't go through markDayAsSelected
+                    if (selectedDate == item.date) item.isSelected = true
+                    when {
+                        item.isSelected -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
+                            itemView.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                        }
+                        item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                            itemView.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
+                        }
+                        else -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                            itemView.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                        }
                     }
 
                     itemView.text.text = "${item.date.dayOfMonth}"
@@ -122,7 +140,7 @@ class MiniCalendarItemAdapter(
 
     }
 
-    fun markDayAsSelected(date: LocalDate) {
+    private fun markDayAsSelected(date: LocalDate) {
 
         TimberLogger.d("handleMiniCalendarDayPicked markday as selected $date")
 
@@ -141,7 +159,7 @@ class MiniCalendarItemAdapter(
         submitList(mutableList)
     }
 
-    fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
+    private fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
 
         val mutableList = currentList.toMutableList()
 
@@ -156,7 +174,7 @@ class MiniCalendarItemAdapter(
         }
 
         submitList(mutableList)
-
+        updatingList = false
     }
 
     private val ITEM_TYPE_HEADER = 0
@@ -199,7 +217,8 @@ class MiniCalendarItemAdapter(
         when (holder) {
             is MiniCalendarViewHolder.HeaderViewHolder -> holder.bind(getItem(position).date)
             is MiniCalendarViewHolder.DayViewHolder -> holder.bind(
-                getItem(position)
+                getItem(position),
+                selectedDate
             ) {
                 clickListener?.invoke(it)
             }

@@ -10,16 +10,17 @@ import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TimberLogger
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 
 
 class ItemMiniCalendarFragment(
-    val calendarViewModel: CalendarViewModel,
     val position: Int,
     val date: LocalDate
 ) : Fragment(), KoinComponent {
 
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
 
 //    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
@@ -60,11 +61,6 @@ class ItemMiniCalendarFragment(
             }
 
             (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise()
-
-        }
-
-        calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
-            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).markDayAsSelected(it)
         }
 
         calendarViewModel.lifeCycleScope.launch {

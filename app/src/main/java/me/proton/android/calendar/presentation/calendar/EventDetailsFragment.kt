@@ -55,6 +55,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = false
 
+    private lateinit var buttonEdit: View
+    private lateinit var attendeeListAdapter: AttendeeListAdapter
+
+    private val navigationArguments: EventDetailsFragmentArgs by navArgs()
+
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val eventViewModel: EventViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
+
     override fun onBackPressedCustom() {
 
         // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
@@ -62,6 +71,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         //  2. see if handling deeplink straight from notification (not indirectly from MainActivity and navigating manually)
         //  fixes this
         if (findNavController().previousBackStackEntry?.destination?.id != R.id.nav_calendar) {
+            // Only do this when details has been opened from notification
+            eventViewModel.eventLiveData.value?.startLocalDate?.let {
+                // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
+                if (calendarViewModel.selectedDate.value != it) calendarViewModel.updateSelectedLocalDate = it
+            }
             findNavController().navigate(Navigation.Deeplink.toMonth())
         } else {
             findNavController().navigateUp()
@@ -72,9 +86,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         onBackPressedCustom()
         return true
     }
-
-    private lateinit var buttonEdit: View
-    private lateinit var attendeeListAdapter: AttendeeListAdapter
 
     override fun onToolbarCreated(toolbar: Toolbar) {
 
@@ -228,12 +239,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 .show()
         }
     }
-
-    private val navigationArguments: EventDetailsFragmentArgs by navArgs()
-
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel()
-    private val mainViewModel: MainViewModel by sharedViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -162,7 +162,7 @@ class MonthFragment : BaseDialogFragment() {
 
         appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, appbar, false))
 
-        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday.withDayOfMonth(1))
+        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
             adapter = miniCalendarPagerAdapter
             offscreenPageLimit = 1
@@ -178,8 +178,10 @@ class MonthFragment : BaseDialogFragment() {
         }
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
 
+        // Init view pagers in VM
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
-        calendarViewModel.handleDaySelected(calendarViewModel.initialToday)
+        // Init selected date
+        calendarViewModel.handleInitialDaySelection(calendarViewModel.initialToday)
 
         setToolbarMonthYearTitle(calendarViewModel.initialToday)
 

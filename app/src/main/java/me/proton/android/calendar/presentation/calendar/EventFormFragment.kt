@@ -39,6 +39,11 @@ import java.time.ZonedDateTime
 
 class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
+    private val navigationArguments: EventFormFragmentArgs by navArgs()
+
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val eventViewModel: EventViewModel by sharedViewModel() //inject()
+
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
 
@@ -178,7 +183,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             if (success) {
                                 onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
-//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                                setMonthViewSelectedDay()
                                 jumpToMonthView()
                             } else {
                                 Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
@@ -187,7 +192,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             if (success) {
                                 onSuccessEventUpdateCalendarDisplay()
                                 Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
-//                                    findNavController().navigate(Navigation.Deeplink.toCalendar())
+                                setMonthViewSelectedDay()
                                 jumpToMonthView()
                             } else {
                                 Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
@@ -198,6 +203,17 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         } else {
             AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.event_alert_invalid_start_end_date))
+        }
+    }
+
+    private fun setMonthViewSelectedDay() {
+        eventViewModel.eventLiveData.value?.startLocalDate?.let {
+            if (calendarViewModel.selectedDate.value != it) {
+                // Call default method for selection if pagers have been initialised
+                if (calendarViewModel.pagersInitialised) calendarViewModel.handleDaySelected(it)
+                // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
+                else calendarViewModel.updateSelectedLocalDate = it
+            }
         }
     }
 
@@ -246,11 +262,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         // TODO CREATE EVENT WITHOUT SAVING BEFOREHAND? EXAMPLE CALL -> calendarViewModel.TEST_CREATE_EVENT_TODO()
     }
-
-    private val navigationArguments: EventFormFragmentArgs by navArgs()
-
-    private val calendarViewModel: CalendarViewModel by inject()
-    private val eventViewModel: EventViewModel by sharedViewModel() //inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
