@@ -167,7 +167,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                     if (deleteResult == UseCase.Result.Success) {
                         Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_SHORT).show()
-                        findNavController().navigateUp()
+                        // Use onBackPressedCustom to handle navigation when opening details from notification
+                        onBackPressedCustom()
                     } else {
 
                         if (deleteResult is UseCase.Result.Error) {
@@ -204,7 +205,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         }
                         if (deleteResult == UseCase.Result.Success) {
                             Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_LONG).show()
-                            findNavController().navigateUp()
+                            // Use onBackPressedCustom to handle navigation when opening details from notification
+                            onBackPressedCustom()
                         } else {
 
                             if (deleteResult is UseCase.Result.Error) {
@@ -257,7 +259,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // TODO display error and close? for example when we can't decrypt event
                 TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
                 Toast.makeText(requireContext(), "Error opening event", Toast.LENGTH_LONG).show()
-                findNavController().navigateUp()
+                // Use onBackPressedCustom to handle navigation when opening details from notification
+                onBackPressedCustom()
             }
 
         }
