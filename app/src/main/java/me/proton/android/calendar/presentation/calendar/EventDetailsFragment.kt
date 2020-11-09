@@ -103,6 +103,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        // TODO Hide button by default to avoid any case where edit would be possible. Remove once edit attendees is implemented
+        buttonEdit.visibleOrGone(false)
+
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
             addView(
@@ -278,6 +281,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun observeEventLiveData() {
 
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
+            // TODO Remove attendees condition once edit attendees is implemented
+            buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty())
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
@@ -301,9 +306,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
 
 //                text_event_title.text = "SIGNATURE VERIFICATION: ${event.verificationStatus}\n\n" + event.summary + "\n"
-
-            // TODO Remove attendees condition once edit attendees is implemented
-            buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty())
 
             with(section_event_info) {
 
