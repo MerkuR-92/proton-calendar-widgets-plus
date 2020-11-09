@@ -242,8 +242,9 @@ class EventViewModel(
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
 
-                    timeStartBackup = LocalTime.now()
-                    timeEndBackup = LocalTime.now().plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())//.truncatedTo(ChronoUnit.HOURS)
+                    val startTime = LocalTime.now().plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS)
+                    timeStartBackup = startTime
+                    timeEndBackup = startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
                 } else {
                     timeStartBackup = this.getStart(timeZoneForOccurrence)!!.toLocalTime()
                     timeEndBackup = this.getEnd(timeZoneForOccurrence)!!.toLocalTime()
