@@ -49,7 +49,23 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     override fun onBackPressedCustom() {
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
-                findNavController().navigateUp()
+                // Reinitialise event view model data when user chooses to discard modifications
+                lifecycleScope.launch {
+                    val viewModeInitStatus = eventViewModel.initialise(
+                        editMode = false,
+                        navigationArguments.eventId,
+                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                        null,
+                        null,
+                    )
+                    if (viewModeInitStatus == UseCase.Result.Success) {
+                        findNavController().navigateUp()
+                    } else {
+                        TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                        Toast.makeText(requireContext(), "Error opening event", Toast.LENGTH_LONG).show()
+                        jumpToMonthView()
+                    }
+                }
             }
         } else findNavController().navigateUp()
     }
