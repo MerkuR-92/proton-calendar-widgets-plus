@@ -287,7 +287,7 @@ class CalendarsRepositoryImpl(
             return a.isAllDay() &&
                     !b.isAllDay() &&
                     ((a.getActualStart(ZoneId.systemDefault().id))?.toLocalDate())?.isEqual((b.getActualEnd(ZoneId.systemDefault().id))?.toLocalDate()) == true &&
-                    b.spansSingleDay()
+                    b.spansSingleDay(timeZoneId = timeZoneId)
         }
 
         val comparator = Comparator<Event> { a, b ->
@@ -315,7 +315,7 @@ class CalendarsRepositoryImpl(
 
             val filtered = it.filter {
                 it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
-            }.groupBy { it.isAllDay() || !it.spansSingleDay() }
+            }.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
 
 //            (filtered.get(true)?.sortedWith(comparator) ?: emptyList())
 

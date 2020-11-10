@@ -111,7 +111,7 @@ data class Event(
      */
     fun calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> {
 
-        return if (spansSingleDay()) {
+        return if (spansSingleDay(timeZoneId = timeZoneId)) {
             Pair(1, 1)
         } else {
 
@@ -124,7 +124,7 @@ data class Event(
 
     fun formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
 
-        if (spansSingleDay()) return null
+        if (spansSingleDay(timeZoneId = timeZoneId)) return null
 
         val fullDayCounter = this.calculateFullDayCounter(date, timeZoneId)
 
@@ -171,7 +171,7 @@ data class Event(
     fun formatStartEndForActualEndDate(timeZoneId: String, resources: Resources, is24Hour: Boolean): String {
             TimberLogger.d("format startend for timezone=$timeZoneId")
             TimberLogger.d("format startend with occurrence=${this.occurrence}")
-            return if (this.spansSingleDay(actualEndDate = true)) {
+            return if (this.spansSingleDay(actualEndDate = true, timeZoneId = timeZoneId)) {
 
                 // TODO cleanup and check against requirements
                 val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first
@@ -245,10 +245,10 @@ data class Event(
 
         fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateEnd?.value?.hasTime() == false else true)
 
-        fun spansSingleDay(actualEndDate: Boolean = false): Boolean {
+        fun spansSingleDay(actualEndDate: Boolean = false, timeZoneId: String? = null): Boolean {
 
-            val dateStart = this.getStart(ZoneId.systemDefault().id)?.toLocalDate()
-            val dateEnd = this.getEnd(ZoneId.systemDefault().id)?.toLocalDate()
+            val dateStart = this.getStart(timeZoneId ?: ZoneId.systemDefault().id)?.toLocalDate()
+            val dateEnd = this.getEnd(timeZoneId ?: ZoneId.systemDefault().id)?.toLocalDate()
 
             if (dateStart == null) {
                 return false

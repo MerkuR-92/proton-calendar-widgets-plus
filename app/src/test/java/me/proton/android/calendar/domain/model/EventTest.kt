@@ -11,6 +11,7 @@ import me.proton.android.calendar.common.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.sql.Date
+import java.time.ZoneId
 
 internal class EventTest {
 
@@ -157,7 +158,22 @@ internal class EventTest {
         }
     }
 
+    @Test
+    fun `calendar with timezone and event displayed in timezone that makes end date at midnight or on next day`() {
+        val event = Event("id", Calendar("id", "name", "color", true, true), calendarTimezoneUtcEndOfDay!!)
 
+        // UTC makes event end at 10PM
+        var displayTimeZoneId = "UTC"
+        assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
+
+        // Europe/Vilnius makes event end at midnight, so counts as ending on next day
+        displayTimeZoneId = "Europe/Vilnius"
+        assertFalse(event.spansSingleDay(timeZoneId = displayTimeZoneId))
+
+        // Europe/Samara makes event start and end on next day
+        displayTimeZoneId = "Europe/Samara"
+        assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
+    }
 
 
 
@@ -328,4 +344,21 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
+    val calendarTimezoneUtcEndOfDay = ICalUtils.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:UTC
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;TZID=UTC:20201110T210000
+    DTEND;TZID=UTC:20201110T220000
+    SEQUENCE:1
+    SUMMARY:Event appear as all day
+    UID:DF6OBi2q7A7KV5qbO70j7uKRd0KJ@proton.me
+    DTSTAMP:20201110T092019Z
+    STATUS:CONFIRMED
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
 }

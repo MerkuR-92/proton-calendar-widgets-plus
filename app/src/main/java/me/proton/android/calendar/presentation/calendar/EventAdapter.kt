@@ -67,7 +67,7 @@ class EventAdapter(
 
                 textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
 
-                if (event.spansSingleDay()) {
+                if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
 
@@ -119,7 +119,7 @@ class EventAdapter(
                 val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
                 viewBackgroundStripedLayout.visibleOrGone(participationStatus == ParticipationStatus.NEEDS_ACTION)
 
-                if (!event.isAllDay() && !event.spansSingleDay()) {
+                if (!event.isAllDay() && !event.spansSingleDay(timeZoneId = timeZoneId)) {
                     val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
                     if (fullDayCounter.first == 1) { // this is the first day of an ongoing event
                         textViewHeader.visibleOrGone(true)
@@ -133,7 +133,7 @@ class EventAdapter(
 
                 textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
 
-                if (event.spansSingleDay()) {
+                if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
                     textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
@@ -204,7 +204,7 @@ class EventAdapter(
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) {
             ITEM_TYPE_HEADER
-        } else if (getItem(position).isAllDay() || !getItem(position).spansSingleDay()) {
+        } else if (getItem(position).isAllDay() || !getItem(position).spansSingleDay(timeZoneId = timeZoneId)) {
             ITEM_TYPE_EVENT_ALL_DAY
         } else {
             ITEM_TYPE_EVENT_PARTIAL_DAY
