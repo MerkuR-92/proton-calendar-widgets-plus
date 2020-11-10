@@ -54,7 +54,7 @@ interface CalendarsApi {
     /**
      * Update calendar.
      */
-    suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<GenericResponse>
+    suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<UpdateCalendarApiResponse>
 
 }
 

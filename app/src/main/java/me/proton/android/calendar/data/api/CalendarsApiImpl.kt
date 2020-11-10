@@ -47,7 +47,7 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : EventsByUidApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
-    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : GenericResponse
+    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : UpdateCalendarApiResponse
 
 }
 
@@ -112,7 +112,7 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             getEventsByUid(eventUid, page, pageSize)
         }.toApiResponse()
 
-    override suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<GenericResponse> =
+    override suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<UpdateCalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             updateCalendar(calendarId, body)
         }.toApiResponse()
@@ -149,6 +149,20 @@ data class SyncEventsUpdateApiRequest(
 
 @Serializable
 data class UpdateCalendarApiRequest(
+    @SerialName("Name")
+    val name: String? = null,
+    @SerialName("Description")
+    val description: String? = null,
+    @SerialName("Color")
+    val color: String? = null,
+    @SerialName("Display")
+    val display: Int? = null
+)
+
+@Serializable
+data class UpdateCalendarApiResponse(
+    @SerialName("ID")
+    val id: String? = null,
     @SerialName("Name")
     val name: String? = null,
     @SerialName("Description")
