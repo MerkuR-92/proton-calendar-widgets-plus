@@ -176,24 +176,6 @@ class CalendarViewModel(
 
     }
 
-
-    suspend fun eventsFlow(date: LocalDate): Flow<List<Event>> {
-        return eventsFlow(date, date)
-    }
-
-    suspend fun eventsFlow(fromDate: LocalDate, toDate: LocalDate): Flow<List<Event>> {
-
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-        return if (TODOuserID != null) {
-            calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id)
-        } else {
-            TimberLogger.e("eventsFlow is returning empty!!!")
-            flowOf<List<Event>>()
-        }
-
-    }
-
     fun calculateCalendarIndicators(events: List<Event>): Map<Int, List<String>> {
 
         val indicators = mutableMapOf<Int, MutableSet<String>>().withDefault { mutableSetOf() }

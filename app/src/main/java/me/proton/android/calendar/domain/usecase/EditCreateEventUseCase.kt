@@ -21,7 +21,7 @@ class EditCreateEventUseCase(
     private val gson: Gson,
     private val calendarsApi: CalendarsApi,
     private val addressesApi: AddressesApi,
-    private val keysApi: KeysApi,
+    private val calendarsRepository: CalendarsRepository,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
     private val database: AppDatabase): UseCase {
@@ -216,7 +216,7 @@ class EditCreateEventUseCase(
                     }
                 }
 
-                database.eventsDao().updateOrInsert(*eventsToInsertOrUpdate.toTypedArray())
+                calendarsRepository.persistEvents(*eventsToInsertOrUpdate.toTypedArray())
 
                 // TODO collect and handle multiple errors
                 if (syncResponse.data.responses.any { !it.response.isSuccessful }) {

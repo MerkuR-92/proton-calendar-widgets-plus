@@ -12,7 +12,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -23,9 +22,7 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
-import timber.log.Timber
 import java.time.*
-import kotlin.Comparator
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -46,13 +43,11 @@ class CalendarsRepositoryImpl(
     // TODO shard by dates -- tree?
     // all Events including expanded
     private val allEvents = MutableStateFlow<List<Event>>(emptyList())
+    private val allEventsMutex = Mutex()
 
     // events that should be currently visible // TODO remove when we introduce EventTree
     private val displayedEvents = MutableStateFlow<List<Event>>(emptyList())
     private val displayedEventsMutex = Mutex()
-
-    private var prefetchedFrom: LocalDate? = null
-    private var prefetchedTo: LocalDate? = null
 
     override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
@@ -62,7 +57,6 @@ class CalendarsRepositoryImpl(
     private lateinit var selectedCalendarIds: List<String>
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
-    private val expandEventsMutex = Mutex()
     private val expandEventsToDate = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
 
     private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
@@ -89,7 +83,7 @@ class CalendarsRepositoryImpl(
             visibleCalendars.value = dbCalendars.value.filterVisible()
 
             // force expanding Events after cold init is done
-            expandEventsMutex.withLock {
+            allEventsMutex.withLock {
                 expandEventsToDate.value = ZonedDateTime.now().plusMonths(1)
             }
 
@@ -136,14 +130,21 @@ class CalendarsRepositoryImpl(
                     fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
                     // fetch from API
-                    when (fetchEventsUseCase.execute(
+                    val fetchEventsResult = fetchEventsUseCase.execute(
                         fetchWindow.userId,
                         fetchWindow.calendarIds,
                         fetchWindow.fromDate,
                         fetchWindow.toDate,
                         fetchWindow.timeZoneId
-                    )) {
-                        UseCase.Result.Success -> {
+                    )
+
+                    if (fetchEventsResult.first is UseCase.Result.Success) {
+                        if (fetchEventsResult.second == null) {
+                            logger.e("fetchEventsResult: null event list when Sucess")
+                        }
+
+                        fetchEventsResult.second?.let {
+                            persistEvents(*it.toTypedArray())
                             fetchedWindows.add(fetchWindow)
                         }
                     }
@@ -264,6 +265,7 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ): Flow<List<Event>> {
 
+        /* unused for now, please don't delete the code
         fun isAllDayPrio(a: Event, b: Event): Boolean {
             // If a is an all day event,
             // b is a part day event,
@@ -291,13 +293,13 @@ class CalendarsRepositoryImpl(
                     coeficcient1.toInt() or coeficcient2.toInt()
                 }
             }
-        }
+        }*/
 
-        TimberLogger.v("zzz createEventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
+        logger.v("create EventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
         return displayedEvents.map {
 
-            TimberLogger.v("xxx flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size}")
+            logger.v("flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size} items total")
 
             val filtered = it.filter {
                 it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
@@ -311,7 +313,7 @@ class CalendarsRepositoryImpl(
             result
 
             //filtered.groupBy { it.isAllDay() || !it.spansSingleDay() }.flatMap { it.value.sortedWith(comparator) }//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
-        } //.distinctUntilChanged()
+        }.distinctUntilChanged()
 
     }
 
@@ -332,7 +334,7 @@ class CalendarsRepositoryImpl(
     ) {
 
         val expandUntilDateTime = ZonedDateTime.of(LocalDateTime.of(toDate, LocalTime.MIDNIGHT), ZoneId.of(timeZoneId))
-        expandEventsMutex.withLock {
+        allEventsMutex.withLock {
             if (expandUntilDateTime.isAfter(eventsExpandedUntil)) {
                 expandEventsToDate.value = expandUntilDateTime
             }
@@ -350,42 +352,41 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
 
-        expandEventsMutex.withLock {
-            TimberLogger.v("expanding local occurrences until ${toDateTime.toLocalDate()}")
+        allEventsMutex.withLock {
+            fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-                allEvents.value = dbEvents.flatMap { event ->
-                    if (event.isRecurring()) {
-                        // TODO FIXME java.util.ConcurrentModificationException
-                        val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, dbEvents.filter { it.uid == event.uid }, toDateTime.toLocalDate(), toDateTime.zone.id)!!
-                        val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
+            logger.v("expanding local occurrences until ${toDateTime.toLocalDate()}")
 
-                        filteredByExdates
-                    } else if (event.isSingleEdit()) {
-                        // single edits are already generated when expanding above ^
-                        //  however, orphaned single edits (without original recurring event)
-                        //  have to be added to the list manually
-                        if (dbEvents.find { it.uid == event.uid && it.isRecurring() } != null) {
-                            emptyList()
-                        } else {
-                            listOf(event)
-                        }
-                    } else {
-                        listOf(event)
-                    }
-                }
+                allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
 
-                TimberLogger.v("expanded local occurrences until ${toDateTime}: ${allEvents.value.size}")
+                logger.v("expanded local occurrences until ${toDateTime}: ${allEvents.value.size}")
 
                 if (dbEvents.isNotEmpty()) {
                     eventsExpandedUntil = toDateTime
                 }
 
+            fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
+    }
 
+    private fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
+        return if (event.isRecurring()) {
+            val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, allEvents.filter { it.uid == event.uid }, toDateTime.toLocalDate(), toDateTime.zone.id)!!
+            val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
 
-
-
-
+            filteredByExdates
+        } else if (event.isSingleEdit()) {
+            // single edits are already generated when expanding above ^
+            //  however, orphaned single edits (without original recurring event)
+            //  have to be added to the list manually
+            if (allEvents.find { it.uid == event.uid && it.isRecurring() } != null) {
+                emptyList()
+            } else {
+                listOf(event)
+            }
+        } else {
+            listOf(event)
+        }
     }
 
     override fun eventFlow(eventId: String): Flow<Event?> {
@@ -414,7 +415,26 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {
-        TimberLogger.v("persist Event: ${events.map { it.id + " for calendar " + it.calendarId }}")
+        logger.v("persist Event: ${events.map { it.id + " for calendar " + it.calendarId }}")
+
+        val eventsToAdd = mutableListOf<Event>()
+
+        allEventsMutex.withLock {
+            events.forEach { eventEntity ->
+                val transformedEvent = transformEventUseCase.execute(eventEntity)
+
+                if (transformedEvent != null) {
+                    val expandedEvents = expandDbEvent(transformedEvent, allEvents.value, expandEventsToDate.value)
+                    eventsToAdd.addAll(expandedEvents)
+                }
+            }
+
+            // replace all cached expanded events with newly expanded
+            allEvents.value = allEvents.value.filterNot { event -> eventsToAdd.find { event.id == it.id } != null }.plus(eventsToAdd)
+
+            // they will be displayed/hidden reactively by listener on `allEvents`
+        }
+
         database.eventsDao().updateOrInsert(*events)
     }
 
@@ -427,7 +447,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistCalendarKey(calendarKey: CalendarKeyEntity) {
-        Timber.d("persisting calendar key: $calendarKey")
+        logger.d("persisting calendar key: $calendarKey")
         database.calendarKeysDao().insert(calendarKey)
     }
 

@@ -61,7 +61,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
 
     override suspend fun doWork(): Result {
 
-        logger.e("inside UseCaseWorker doWork(), usecaseid: ${inputData.getString(INPUT_USE_CASE_ID)}")
+        logger.v("inside UseCaseWorker doWork(), usecaseid: ${inputData.getString(INPUT_USE_CASE_ID)}")
 
         val userId = inputData.getString(INPUT_USER_ID)?.let { UserId(it) } ?: return Result.failure()
         val useCaseId = inputData.getString(INPUT_USE_CASE_ID)

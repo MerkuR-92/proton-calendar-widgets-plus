@@ -32,6 +32,9 @@ class FetchPublicKeysUseCase(
 
         }
 
+        // TODO some emails have no public keys and will "always" fail to fetch them,
+        //  try to optimize this somehow, at least put it in memory and don't try to fetch again for some time
+
         return UseCase.Result.Success
 
     }

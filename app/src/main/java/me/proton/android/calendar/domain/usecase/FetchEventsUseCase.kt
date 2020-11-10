@@ -8,6 +8,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -31,7 +32,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
-    ) : UseCase.Result {
+    ) : Pair<UseCase.Result, List<EventEntity>?> { // TODO introduce new type of result with payload
 
         // TODO see if we should pass coroutinescope, so if worker gets cancelled, all operations continue anyway (is this needed?)
 
@@ -40,6 +41,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
         //withContext()
 
         val results = mutableListOf<UseCase.Result>()
+        val events = mutableListOf<EventEntity>()
 
         calendarIds.forEach { calendarId ->
 
@@ -64,9 +66,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                         TimberLogger.v("more: ${eventsResponse.data.more}")
 
-                        database.eventsDao().updateOrInsert(*eventsResponse.data.events.toTypedArray())
-
-                        logger.v("persisted ${eventsResponse.data.events.size} events for calendar ${calendarId}")
+                        events.addAll(eventsResponse.data.events)
 
                         // TODO collect all emails and move this to worker
                         try {
@@ -97,7 +97,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
         }
 
-        return if (results.all { it == UseCase.Result.Success }) UseCase.Result.Success else UseCase.Result.Error("error fetching events") // TODO which calendar?
+        return if (results.all { it == UseCase.Result.Success }) Pair(UseCase.Result.Success, events) else Pair(UseCase.Result.Error("error fetching events"), null) // TODO which calendar?
 
 
     }

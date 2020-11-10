@@ -21,7 +21,7 @@ class SyncServerEventsUseCase(
 
     suspend fun execute(userId: UserId): UseCase.Result {
 
-        logger.e("executing SyncServerEventsUseCase for $userId")
+        logger.v("executing SyncServerEventsUseCase for $userId")
 
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         var lastProtonEventId = valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)
