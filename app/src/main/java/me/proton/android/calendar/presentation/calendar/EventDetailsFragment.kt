@@ -433,9 +433,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 R.plurals.plural_participant_uppercase,
                 attendeeList.size
             ))
+
+        // Create map containing number of attendees for each participation status
         val statusMap = hashMapOf<ParticipationStatus, Int>()
         attendeeList.forEach {
-            if (it.participationStatus != null) {
+            // Non handled participation status are considered as NEEDS_ACTION
+            if (it.participationStatus != null
+                && (it.participationStatus == ParticipationStatus.ACCEPTED ||
+                        it.participationStatus == ParticipationStatus.TENTATIVE ||
+                        it.participationStatus == ParticipationStatus.DECLINED ||
+                        it.participationStatus == ParticipationStatus.NEEDS_ACTION)) {
                 statusMap[it.participationStatus] =
                     1 + (statusMap[it.participationStatus] ?: 0)
             } else {
@@ -479,6 +486,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
         val userEmail = (requireActivity() as MainActivity).getUserEmail()
+        event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
         if (userEmail == organizer.email) {
             event_attendee_organizer_layout.item_attendee_title.text =
                 resources.getString(R.string.event_attendee_is_organizer)
@@ -506,14 +514,17 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         // Remove organizer attendee from the list if it exists to avoid duplicates
         if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
-        attendeeListAdapter.submitList(attendeeList)
+
+        // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
+        val sortedAttendeeList = attendeeList.sortedWith(compareBy { getParticipationStatusPriorityValue(it.participationStatus) })
+        attendeeListAdapter.submitList(sortedAttendeeList)
         // Reset view height
         attendeesListHeight = null
 
-        if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && attendeeList.isNotEmpty()) {
+        if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
             event_attendee_list.visibleOrGone(true)
             rotateArrowUpward(event_attendees_button, 0)
-        } else if (attendeeList.isEmpty() && organizerAttendee != null) {
+        } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
             event_attendee_list.visibleOrGone(false)
             event_attendees_button.visibleOrGone(false)
             event_attendees_press.visibleOrGone(false)

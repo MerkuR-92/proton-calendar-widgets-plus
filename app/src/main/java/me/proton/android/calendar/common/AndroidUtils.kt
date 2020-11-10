@@ -36,6 +36,7 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.widget.doAfterTextChanged
 import biweekly.component.VAlarm
+import biweekly.parameter.ParticipationStatus
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
@@ -1002,5 +1003,16 @@ fun setStripedBackground(view: View, context: Context, stripeColor: Int) {
         bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT) // set repeat
         val drawable = LayerDrawable(arrayOf(colorDrawable, bitmapDrawable))
         view.background = drawable
+    }
+}
+
+fun getParticipationStatusPriorityValue(participationStatus: ParticipationStatus): Int {
+    // Lower value means higher priority in list, sort by ascending order
+    return when(participationStatus) {
+        ParticipationStatus.ACCEPTED -> 0
+        ParticipationStatus.TENTATIVE -> 1
+        ParticipationStatus.DECLINED -> 2
+        ParticipationStatus.NEEDS_ACTION -> 3
+        else -> 4
     }
 }
