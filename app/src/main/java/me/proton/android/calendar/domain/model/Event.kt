@@ -457,8 +457,8 @@ data class Event(
     }
 
     fun setRecurrenceId(recurrenceId: ZonedDateTime, hasTime: Boolean) {
-        if (hasTime) iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(TimeZone.getTimeZone(recurrenceId.zone.id), VTimezone(recurrenceId.zone.id)))
         iCalEvent.recurrenceId = RecurrenceId(ICalUtils.eventStartZonedDateTimeToDate(recurrenceId, !hasTime), hasTime)
+        if (hasTime) iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(TimeZone.getTimeZone(recurrenceId.zone.id), VTimezone(recurrenceId.zone.id)))
     }
 
     /**
