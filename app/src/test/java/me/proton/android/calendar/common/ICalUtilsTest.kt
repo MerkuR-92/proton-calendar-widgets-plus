@@ -2147,6 +2147,78 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `recurring event ends before next occurrence`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.13.0//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Vilnius
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=WEEKLY;UNTIL=20201117;BYDAY=SU
+    SEQUENCE:2
+    SUMMARY:Test rec
+    STATUS:CONFIRMED
+    DTSTAMP:20201111T165659Z
+    UID:ebhr8v5Lu0B46spPaRXs_sGC1Y9I@proton.me
+    DTSTART;VALUE=DATE:20201115
+    DTEND;VALUE=DATE:20201115
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        assertThat(event.isRecurringUntilBeforeNextOccurrence(timeZoneId)).isTrue()
+    }
+
+    @Test
+    fun `recurring event ends after next occurrence`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.13.0//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Vilnius
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=WEEKLY;UNTIL=20201123;BYDAY=SU
+    SEQUENCE:3
+    SUMMARY:Test rec
+    STATUS:CONFIRMED
+    DTSTAMP:20201111T170348Z
+    UID:ebhr8v5Lu0B46spPaRXs_sGC1Y9I@proton.me
+    DTSTART;VALUE=DATE:20201115
+    DTEND;VALUE=DATE:20201115
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        assertThat(event.isRecurringUntilBeforeNextOccurrence(timeZoneId)).isFalse()
+    }
+
+    @Test
     fun `check partial day single edit recurrence id date when original event was all day`() {
         val iCals = listOf(
             """
