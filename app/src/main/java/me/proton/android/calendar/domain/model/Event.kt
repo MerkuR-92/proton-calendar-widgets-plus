@@ -131,7 +131,7 @@ data class Event(
         return "(${fullDayCounter.first}/${fullDayCounter.second})"
     }
 
-    fun formatStart(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour)
+    fun formatStart(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour, this.isAllDay())
 
     fun formatStartForNotification(timeZoneId: String, resources: Resources) : String {
 
@@ -140,7 +140,7 @@ data class Event(
 
         if (startDate == null) return ""
 
-        val formattedDateTime = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour = null)
+        val formattedDateTime = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour = null, this.isAllDay())
 
         return if (this.isAllDay()) {
 
@@ -166,7 +166,7 @@ data class Event(
 
     }
 
-    fun formatEnd(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId, is24Hour)
+    fun formatEnd(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId, is24Hour, isAllDay())
 
     fun formatStartEndForActualEndDate(timeZoneId: String, resources: Resources, is24Hour: Boolean): String {
             TimberLogger.d("format startend for timezone=$timeZoneId")
@@ -218,12 +218,12 @@ data class Event(
         /**
          * @return <formatted date?, formatted time?>
          */
-        private fun formatDateOrDateTimeProperty(property: DateOrDateTimeProperty?, timeZoneId: String, is24Hour: Boolean?) : Pair<String?, String?> {
+        fun formatDateOrDateTimeProperty(property: DateOrDateTimeProperty?, timeZoneId: String, is24Hour: Boolean?, isAllDay: Boolean) : Pair<String?, String?> {
             var formattedDate: String? = null
             var formattedTime: String? = null
 
             if (property != null) {
-                val zonedDateTime = ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.of(timeZoneId))
+                val zonedDateTime = ZonedDateTime.of(ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
 
                 formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
                 if (property.value.hasTime()) {

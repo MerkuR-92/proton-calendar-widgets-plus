@@ -2201,4 +2201,40 @@ internal class ICalUtilsTest {
         assertThat(eventStartZonedDateTimeToDate(originalEvent.iCalEvent.getStart(displayTimeZoneId)!!, originalEvent.isAllDay())).isEqualTo(eventStartZonedDateTimeToDate(singleEdit.iCalEvent.getStart(displayTimeZoneId)!!, originalEvent.isAllDay()))
         assertThat(mapped[0].iCalEvent.getStart(displayTimeZoneId)).isEqualTo(singleEdit.iCalEvent.getStart(displayTimeZoneId))
     }
+
+    @Test
+    fun `reproduce event form all day event date formatted`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:UTC
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    SEQUENCE:0
+    SUMMARY:All day
+    UID:GAqLNyLWPaEIHKd-QYdNTUWlsxEZ@proton.me
+    DTSTAMP:20201111T123938Z
+    DTSTART;VALUE=DATE:20201117
+    DTEND;VALUE=DATE:20201117
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            true,
+            true
+        ), iCal, null)
+
+        val timeZoneId = "UTC"
+        // Should return "Tuesday, November 17, 2020" if in English so we just check if day was calculated right
+        val formattedStart = event.formatDateOrDateTimeProperty(event.iCalEvent.dateStart, timeZoneId, true, event.isAllDay())
+        assertThat(formattedStart.first).isNotNull()
+        assertThat(formattedStart.first!!.contains("17")).isTrue()
+        assertThat(formattedStart.second).isNull()
+    }
 }

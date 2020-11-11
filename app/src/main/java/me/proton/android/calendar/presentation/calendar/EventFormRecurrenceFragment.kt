@@ -29,6 +29,9 @@ import java.text.DateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.WeekFields
+import java.util.*
+import kotlin.collections.HashMap
 
 class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
@@ -141,11 +144,11 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                         val interval = custom_recurrence_count.text.toString().toIntOrNull()
                             ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT
 
-                        // weekdays for occurence
-                        val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
+                        // weekdays for occurrence
                         val daysOfWeek = (chip_group_day_of_week_layout as ViewGroup).children.mapIndexedNotNull() { index, chip ->
                             if ((chip as Chip).isChecked) {
-                                biweekly.util.DayOfWeek.values()[(dayNamesStartingIndex + index) % 7]
+                                val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(Locale.getDefault()).firstDayOfWeek.value else eventViewModel.userSettings.weekStart
+                                biweekly.util.DayOfWeek.values()[(index + weekStart) % 7]
                             } else null
                         }.toList()
 
@@ -355,26 +358,40 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        val dayNamesStartingIndex = if (eventViewModel.startWeekOnMonday) 1 else 0
+        // TODO Check if can be improved
 
+        // DayOfWeek of biweekly starts on Sunday (ordinal 0) and ends on Saturday (ordinal 6), we convert it to match java.time ordinals
         val byDayIndices =
-            eventViewModel.eventLiveData.value!!.iCalEvent?.recurrenceRule?.value?.byDay?.map { (it.day.ordinal + 7 - dayNamesStartingIndex) % 7 }
+            eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.byDay?.map { if (it.day.ordinal != 0) it.day.ordinal - 1 else 6 }
                 ?: emptyList()
 
+        // DayOfWeek of java.time starts on Monday (ordinal 0) and ends on Sunday (ordinal 6)
         val indexOfEventStartDay =
-            (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal
         val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
+        // We do minus 1 to match java.time DayOfWeek ordinals
+        val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(Locale.getDefault()).firstDayOfWeek.value - 1 else eventViewModel.userSettings.weekStart - 1
+        val weekEnd = 7
+        var stringArrayIndex = weekStart
+        // Iterate from weekStart first
         resources.getStringArray(R.array.days_of_week_letters)
-            .slice(dayNamesStartingIndex..(dayNamesStartingIndex + 6))
+            .slice(weekStart until weekEnd) // until excludes weekEnd value
             .forEachIndexed { index, dayName ->
-                ((chip_group_day_of_week_layout as ViewGroup).getChildAt(index) as Chip).apply {
-                    text = dayName
-                    isClickable =
-                        (index != indexOfEventStartDay) // we disable and check by default the day of event's start
-                    isChecked = (index in checkedDayIndices)
-                }
+                setChipItemContent(index, stringArrayIndex, indexOfEventStartDay, checkedDayIndices, dayName)
+                stringArrayIndex++
             }
+        if (weekStart != 0) {
+            // If weekStart was not Monday, iterate from 0 to fill the rest of the chips
+            stringArrayIndex = 0
+            resources.getStringArray(R.array.days_of_week_letters)
+                .slice(0 until weekStart) // until excludes weekStart value
+                .forEachIndexed { index, dayName ->
+                    val customIndex = (weekEnd - weekStart) + index
+                    setChipItemContent(customIndex, stringArrayIndex, indexOfEventStartDay, checkedDayIndices, dayName)
+                    stringArrayIndex++
+                }
+        }
 
         // TODO get this from VM
         val eventStartDate =
@@ -416,6 +433,15 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             requireActivity().clearFocusAndHideKeyboard(view)
             val monthlyRepeatOnOption = monthlyRecurrenceOnMap[checkedId]
             if (monthlyRepeatOnOption != null) eventViewModel.handleRecurrenceRepeatOn(monthlyRepeatOnOption)
+        }
+    }
+
+    private fun setChipItemContent(index: Int, stringArrayIndex: Int, indexOfEventStartDay: Int, checkedDayIndices: List<Int>, dayName: String) {
+        ((chip_group_day_of_week_layout as ViewGroup).getChildAt(index) as Chip).apply {
+            text = dayName
+            isClickable =
+                (stringArrayIndex != indexOfEventStartDay) // we disable and check by default the day of event's start
+            isChecked = (stringArrayIndex in checkedDayIndices)
         }
     }
 

@@ -62,9 +62,6 @@ class EventViewModel(
     private var eventEdited = false
     private var eventBumpSequence = false
 
-    // TODO get this from preferences/settings
-    val startWeekOnMonday = true
-
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private val bgScope = CoroutineScope(Dispatchers.Default + viewModelJob)

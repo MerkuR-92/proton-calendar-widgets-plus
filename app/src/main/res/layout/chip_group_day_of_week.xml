@@ -6,48 +6,57 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/chip_group_day_of_week_layout"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:overScrollMode="never"
             android:layout_marginTop="24dp"
             android:layout_marginStart="@dimen/spacing_page"
             android:layout_marginEnd="@dimen/spacing_page"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbarSize="4dp"
             android:gravity="start|center_vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:orientation="horizontal">
+            app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon" />
+                <LinearLayout
+                    android:id="@+id/chip_group_day_of_week_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon"/>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon" />
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon"/>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon"/>
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon"/>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon"/>
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon"/>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon"/>
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon"/>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon"/>
 
-                <com.google.android.material.chip.Chip
-                    style="@style/Chip"
-                    tools:text="Mon"/>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon"/>
 
-        </LinearLayout>
+                        <com.google.android.material.chip.Chip
+                            style="@style/Chip"
+                            tools:text="Mon"/>
+
+                </LinearLayout>
+
+        </HorizontalScrollView>
 
         <View
             android:id="@+id/chip_group_separator"
