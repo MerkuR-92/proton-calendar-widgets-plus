@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
@@ -178,6 +179,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawerLayout.close()
         }
         nav_view_main_content.nav_view_more_bug_press.setOnClickListener {
+            // TODO Remove when we make in app user bug report form
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://protonmail.com/support-form"))
+            startActivity(browserIntent)
             drawerLayout.close()
         }
         accountViewModel.hasPrimary {
