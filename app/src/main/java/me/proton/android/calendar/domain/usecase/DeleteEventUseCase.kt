@@ -102,7 +102,7 @@ class DeleteEventUseCase( // TODO TESTS
 
                 val errorEventIds = syncResponse.data.responses.map { eventIds[it.index] }
 
-                database.eventsDao().deleteByIds(eventIds.filterNot { it in errorEventIds })
+                calendarsRepository.deleteEventsById(eventIds.filterNot { it in errorEventIds })
 
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success

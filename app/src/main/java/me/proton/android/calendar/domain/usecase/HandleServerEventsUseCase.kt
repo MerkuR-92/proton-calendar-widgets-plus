@@ -58,7 +58,7 @@ class HandleServerEventsUseCase(
             eventsResponse.calendarEvents?.forEach {
                 logger.d("usecase calendar events: ${it}")
                 it.handleAction(
-                    { calendarsRepository.deleteEventById(it.id) },
+                    { calendarsRepository.deleteEventsById(listOf(it.id)) },
                     {
 
                         // TODO optimise this so we don't fetch unnecessary events outside of desired window

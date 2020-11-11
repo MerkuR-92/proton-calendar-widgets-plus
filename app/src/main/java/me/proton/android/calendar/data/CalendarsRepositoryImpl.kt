@@ -416,30 +416,11 @@ class CalendarsRepositoryImpl(
 
     override suspend fun persistEvents(vararg events: EventEntity) {
         logger.v("persist Event: ${events.map { it.id + " for calendar " + it.calendarId }}")
-
-        val eventsToAdd = mutableListOf<Event>()
-
-        allEventsMutex.withLock {
-            events.forEach { eventEntity ->
-                val transformedEvent = transformEventUseCase.execute(eventEntity)
-
-                if (transformedEvent != null) {
-                    val expandedEvents = expandDbEvent(transformedEvent, allEvents.value, expandEventsToDate.value)
-                    eventsToAdd.addAll(expandedEvents)
-                }
-            }
-
-            // replace all cached expanded events with newly expanded
-            allEvents.value = allEvents.value.filterNot { event -> eventsToAdd.find { event.id == it.id } != null }.plus(eventsToAdd)
-
-            // they will be displayed/hidden reactively by listener on `allEvents`
-        }
-
         database.eventsDao().updateOrInsert(*events)
     }
 
-    override suspend fun deleteEventById(id: String) {
-        database.eventsDao().deleteById(id)
+    override suspend fun deleteEventsById(ids: List<String>) {
+        database.eventsDao().deleteByIds(ids)
     }
 
     override suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity> {

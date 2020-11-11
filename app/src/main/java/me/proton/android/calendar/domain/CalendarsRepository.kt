@@ -71,7 +71,7 @@ interface CalendarsRepository {
 
     suspend fun persistEvents(vararg events: EventEntity)
 
-    suspend fun deleteEventById(id: String)
+    suspend fun deleteEventsById(ids: List<String>)
 
     // calendar keys
     suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity>
