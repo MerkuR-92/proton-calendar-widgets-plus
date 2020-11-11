@@ -169,163 +169,165 @@ data class Event(
     fun formatEnd(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId, is24Hour, isAllDay())
 
     fun formatStartEndForActualEndDate(timeZoneId: String, resources: Resources, is24Hour: Boolean): String {
-            TimberLogger.d("format startend for timezone=$timeZoneId")
-            TimberLogger.d("format startend with occurrence=${this.occurrence}")
-            return if (this.spansSingleDay(actualEndDate = true, timeZoneId = timeZoneId)) {
+        TimberLogger.d("format startend for timezone=$timeZoneId")
+        TimberLogger.d("format startend with occurrence=${this.occurrence}")
+        return if (this.spansSingleDay(actualEndDate = true, timeZoneId = timeZoneId)) {
 
-                // TODO cleanup and check against requirements
-                val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first
+            // TODO cleanup and check against requirements
+            val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first
 
-                if (this.isAllDay()) { // ignoring timezones
-                    formattedStartDate!! //TODO
-                } else {
-
-                    val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-                    val endDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
-
-                    val formattedStartTime = this.occurrence?.startDateTime?.formatTime(timeZoneId, is24Hour) ?: startDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)
-                    val formattedEndTime = this.occurrence?.endDateTime?.formatTime(timeZoneId, is24Hour) ?: endDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)
-
-                    // TODO R dependency
-                    "${formattedStartDate}\n${resources.getString(R.string.event_time_period_spanning_single_day, formattedStartTime, formattedEndTime)}"
-                }
+            if (this.isAllDay()) { // ignoring timezones
+                formattedStartDate!! //TODO
             } else {
 
-                if (this.isAllDay()) { // ignoring timezones
-                    val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
+                val startDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+                val endDateTimeInStartTimezone = ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+
+                val formattedStartTime = this.occurrence?.startDateTime?.formatTime(timeZoneId, is24Hour) ?: startDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)
+                val formattedEndTime = this.occurrence?.endDateTime?.formatTime(timeZoneId, is24Hour) ?: endDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)
+
+                // TODO R dependency
+                "${formattedStartDate}\n${resources.getString(R.string.event_time_period_spanning_single_day, formattedStartTime, formattedEndTime)}"
+            }
+        } else {
+
+            if (this.isAllDay()) { // ignoring timezones
+                val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first //DateFormat.getDateInstance(DateFormat.FULL).format(event.iCalEvent.dateStart.value.rawComponents.toDate())
 
 //                val endDateMinus1Day = (eventOccurrence?.endDateTime ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))).minusDays(1)
 //                val formattedEndDate = endDateMinus1Day.formatDate(timeZoneId)//DateFormat.getDateInstance(DateFormat.FULL).format()
                 val formattedEndDate = this.occurrence?.endDateTime?.minusDays(1)?.formatDate(timeZoneId) ?: this.formatEnd(timeZoneId, is24Hour).first//DateFormat.getDateInstance(DateFormat.FULL).format()
 
-                    resources.getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
-                } else {
+                resources.getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
+            } else {
 
 
-                    // TODO these two dates were formatted with calendar_timezone, check if this makes sense or not, it's changed to 1 timezone throughout this function
-                    val startDateTimeInStartTimezone = this.occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-                    val endDateTimeInStartTimezone = this.occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+                // TODO these two dates were formatted with calendar_timezone, check if this makes sense or not, it's changed to 1 timezone throughout this function
+                val startDateTimeInStartTimezone = this.occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+                val endDateTimeInStartTimezone = this.occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
 
-                    val startDateTime = "${startDateTimeInStartTimezone.formatDate(timeZoneId)} ${startDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}" //DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
-                    val endDateTime = "${endDateTimeInStartTimezone.formatDate(timeZoneId)} ${endDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}"//DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
+                val startDateTime = "${startDateTimeInStartTimezone.formatDate(timeZoneId)} ${startDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}" //DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(startDateTimeInStartTimezone.toInstant()))
+                val endDateTime = "${endDateTimeInStartTimezone.formatDate(timeZoneId)} ${endDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}"//DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT).format(Date.from(endDateTimeInStartTimezone.toInstant()))
 
-                    resources.getString(R.string.event_time_period_spanning_many_days, startDateTime, endDateTime)
-                }
+                resources.getString(R.string.event_time_period_spanning_many_days, startDateTime, endDateTime)
             }
         }
+    }
 
 
-        /**
-         * @return <formatted date?, formatted time?>
-         */
-        fun formatDateOrDateTimeProperty(property: DateOrDateTimeProperty?, timeZoneId: String, is24Hour: Boolean?, isAllDay: Boolean) : Pair<String?, String?> {
-            var formattedDate: String? = null
-            var formattedTime: String? = null
+    /**
+     * @return <formatted date?, formatted time?>
+     */
+    fun formatDateOrDateTimeProperty(property: DateOrDateTimeProperty?, timeZoneId: String, is24Hour: Boolean?, isAllDay: Boolean) : Pair<String?, String?> {
+        var formattedDate: String? = null
+        var formattedTime: String? = null
 
-            if (property != null) {
-                val zonedDateTime = ZonedDateTime.of(ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
+        if (property != null) {
+            val zonedDateTime =
+                if (isAllDay) ZonedDateTime.of(ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
+                else ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.of(timeZoneId))
 
-                formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
-                if (property.value.hasTime()) {
-                    formattedTime = zonedDateTime.toLocalTime().format(is24Hour)
-                }
+            formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+            if (property.value.hasTime()) {
+                formattedTime = zonedDateTime.toLocalTime().format(is24Hour)
             }
-            return Pair(formattedDate, formattedTime)
         }
+        return Pair(formattedDate, formattedTime)
+    }
 
-        //val notes: List<String> = iCalEvent.comments.map { it.value }
+    //val notes: List<String> = iCalEvent.comments.map { it.value }
 //        val dateStart: String = iCalEvent.dateStart.value.toString() // TODO probably won't be able to use this in GUI anyway
 //        val dateEnd: String = iCalEvent.dateEnd.value.toString() // TODO probably won't be able to use this in GUI anyway
-        /**
-         * Timestamp when this iCalendar Event was created.
-         */
+    /**
+     * Timestamp when this iCalendar Event was created.
+     */
 //        val dateTimeStamp: String
 
-        fun isSyncedWithApi(): Boolean = !id.startsWith(OFFLINE_EVENT_ID_PREFIX, ignoreCase = false)
+    fun isSyncedWithApi(): Boolean = !id.startsWith(OFFLINE_EVENT_ID_PREFIX, ignoreCase = false)
 
-        fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateEnd?.value?.hasTime() == false else true)
+    fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateEnd?.value?.hasTime() == false else true)
 
-        fun spansSingleDay(actualEndDate: Boolean = false, timeZoneId: String? = null): Boolean {
+    fun spansSingleDay(actualEndDate: Boolean = false, timeZoneId: String? = null): Boolean {
 
-            val dateStart = this.getStart(timeZoneId ?: ZoneId.systemDefault().id)?.toLocalDate()
-            val dateEnd = this.getEnd(timeZoneId ?: ZoneId.systemDefault().id)?.toLocalDate()
+        val dateStart = this.getStart(timeZoneId ?: ZoneId.systemDefault().id)?.toLocalDate()
+        val dateEnd = this.getEnd(timeZoneId ?: ZoneId.systemDefault().id)?.toLocalDate()
 
-            if (dateStart == null) {
-                return false
-            }
-
-            return if (isAllDay()) {
-                dateEnd == null || dateStart == dateEnd.minusDays(if (actualEndDate) 0 else 1)
-            } else {
-                dateStart == dateEnd
-            }
+        if (dateStart == null) {
+            return false
         }
+
+        return if (isAllDay()) {
+            dateEnd == null || dateStart == dateEnd.minusDays(if (actualEndDate) 0 else 1)
+        } else {
+            dateStart == dateEnd
+        }
+    }
 
     /**
      * Occurrence should always be expressed in timezone we format or display the calenendar with.
      */
     data class Occurrence(val startDateTime: ZonedDateTime, val endDateTime: ZonedDateTime, val occurrenceNumber: Int)
 
-        /**
-         * Occurrences are generated using DTSTART/DTEND timezone, but formatted with passed timeZoneId param.
-         */
-        fun generateOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+    /**
+     * Occurrences are generated using DTSTART/DTEND timezone, but formatted with passed timeZoneId param.
+     */
+    fun generateOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
 
-            if (!isRecurring()) return null
+        if (!isRecurring()) return null
 
-            val occurences = generateOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
+        val occurences = generateOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
 
-            return occurences.filter {
-                startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
-            }
-
+        return occurences.filter {
+            startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
         }
 
-        fun generateExdateFilteredOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+    }
 
-            if (!isRecurring()) return null
+    fun generateExdateFilteredOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
 
-            val occurences = generateExdateFilteredOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
+        if (!isRecurring()) return null
 
-            return occurences.filter {
-                startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
-            }
+        val occurences = generateExdateFilteredOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
 
+        return occurences.filter {
+            startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
         }
 
-        /**
-         * Generated occurrences and filters them out by EXDATE.
-         *
-         * @param timeZoneId timezone of toDate and returned occurrences
-         */
-        fun generateExdateFilteredOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+    }
 
-            if (!isRecurring()) return null
+    /**
+     * Generated occurrences and filters them out by EXDATE.
+     *
+     * @param timeZoneId timezone of toDate and returned occurrences
+     */
+    fun generateExdateFilteredOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
 
-            val occurences = generateOccurrencesUntil(toDate, if (this.isAllDay()) ZoneId.systemDefault().id else timeZoneId) ?: emptyList()
-            val exceptionDates = this.getExceptionDates() ?: emptyList()
+        if (!isRecurring()) return null
 
-            val result = occurences.filter { occurrence ->
-                !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
-            }
+        val occurences = generateOccurrencesUntil(toDate, if (this.isAllDay()) ZoneId.systemDefault().id else timeZoneId) ?: emptyList()
+        val exceptionDates = this.getExceptionDates() ?: emptyList()
 
-            return result.map {
-                it.copy(
-                    startDateTime = it.startDateTime.withZoneSameInstant(ZoneId.of(timeZoneId)),
-                    endDateTime = it.endDateTime.withZoneSameInstant(ZoneId.of(timeZoneId))
-                )
-            }
-
+        val result = occurences.filter { occurrence ->
+            !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
         }
 
-
-
-        fun filterOutOccurrences(occurences: List<Occurrence>): List<Occurrence> {
-            val exceptionDates = this.getExceptionDates() ?: emptyList()
-            return occurences.filter { occurrence ->
-                !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
-            }
+        return result.map {
+            it.copy(
+                startDateTime = it.startDateTime.withZoneSameInstant(ZoneId.of(timeZoneId)),
+                endDateTime = it.endDateTime.withZoneSameInstant(ZoneId.of(timeZoneId))
+            )
         }
+
+    }
+
+
+
+    fun filterOutOccurrences(occurences: List<Occurrence>): List<Occurrence> {
+        val exceptionDates = this.getExceptionDates() ?: emptyList()
+        return occurences.filter { occurrence ->
+            !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
+        }
+    }
 
     /**
      * Generates all occurrences of a recurring Event until given LocalDate in TimeZone
@@ -405,317 +407,317 @@ data class Event(
 
     }
 
-        // TODO merge this method with "generate occurrence x" to have something like "generate occurrences"
-        //  until X date or until Y occurrence number
-        /**
-         * Generates all occurrences of a recurring Event until given LocalDate in TimeZone.
-         *
-         * Occurrences are in passed timezone, not in original Event's timezone.
-         */
-        fun generateOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
-            return generateOccurrencesUntilOrCount(timeZoneId, toDate, null)
+    // TODO merge this method with "generate occurrence x" to have something like "generate occurrences"
+    //  until X date or until Y occurrence number
+    /**
+     * Generates all occurrences of a recurring Event until given LocalDate in TimeZone.
+     *
+     * Occurrences are in passed timezone, not in original Event's timezone.
+     */
+    fun generateOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
+        return generateOccurrencesUntilOrCount(timeZoneId, toDate, null)
+    }
+
+    // TODO move all these helper methods to utils
+
+
+
+    /**
+     * @return Exception Date if it has been set
+     */
+    fun addExceptionDate(occurrenceNumber: Int): ZonedDateTime? { // TODO decrement COUNT in RRULE?
+        if (isRecurring()) {
+
+            val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
+
+            val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
+
+            var counter = 1
+            while (startIterator.hasNext() && counter <= occurrenceNumber) {
+
+                val nextValue = startIterator.next()
+
+                if (counter == occurrenceNumber) {
+                    val exceptionDates = ExceptionDates()
+                    exceptionDates.values.add(ICalDate(nextValue, iCalEvent.dateStart.value.hasTime()))
+                    val exceptionDateIndex = iCalEvent.exceptionDates?.size ?: 0
+                    iCalEvent.addExceptionDates(exceptionDates)
+                    if (iCalEvent.dateStart.value.hasTime()) {
+                        iCalendar.timezoneInfo.setTimezone(iCalEvent.exceptionDates[exceptionDateIndex], TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
+                    }
+                    return ZonedDateTime.ofInstant(nextValue.toInstant(), ZoneId.systemDefault())
+                } else {
+                    counter++
+                }
+            }
+
         }
 
-        // TODO move all these helper methods to utils
+        return null // no exception date has been set
+    }
 
+    fun setRecurrenceId(recurrenceId: ZonedDateTime, hasTime: Boolean) {
+        if (hasTime) iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(TimeZone.getTimeZone(recurrenceId.zone.id), VTimezone(recurrenceId.zone.id)))
+        iCalEvent.recurrenceId = RecurrenceId(ICalUtils.eventStartZonedDateTimeToDate(recurrenceId, !hasTime), hasTime)
+    }
 
+    /**
+     * @param occurrenceNumber has to be 2 or more for this to make sense
+     */
+    fun handleDeleteThisAndFuture(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
 
-        /**
-         * @return Exception Date if it has been set
-         */
-        fun addExceptionDate(occurrenceNumber: Int): ZonedDateTime? { // TODO decrement COUNT in RRULE?
-            if (isRecurring()) {
+        val recurrenceRule = this.iCalEvent.recurrenceRule.value
 
-                val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
-
-                val startIterator = iCalEvent.recurrenceRule.getDateIterator(iCalEvent.dateStart.value, iCalTimeZoneStart)
-
-                var counter = 1
-                while (startIterator.hasNext() && counter <= occurrenceNumber) {
-
-                    val nextValue = startIterator.next()
-
-                    if (counter == occurrenceNumber) {
-                        val exceptionDates = ExceptionDates()
-                        exceptionDates.values.add(ICalDate(nextValue, iCalEvent.dateStart.value.hasTime()))
-                        val exceptionDateIndex = iCalEvent.exceptionDates?.size ?: 0
-                        iCalEvent.addExceptionDates(exceptionDates)
-                        if (iCalEvent.dateStart.value.hasTime()) {
-                            iCalendar.timezoneInfo.setTimezone(iCalEvent.exceptionDates[exceptionDateIndex], TimezoneAssignment(iCalTimeZoneStart, VTimezone(iCalTimeZoneStart.id)))
-                        }
-                        return ZonedDateTime.ofInstant(nextValue.toInstant(), ZoneId.systemDefault())
+        if (occurrenceNumber > 1) { // update COUNT
+            if (recurrenceRule.count != null && recurrenceRule.count >= occurrenceNumber) {
+                this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).count(
+                    if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
+                ).build())
+            } else { // otherwise, set or update UNTIL
+                generateOccurrence(occurrenceNumber, iCalendar.iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
+                    if (this.isAllDay()) {
+                        this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
+                            Date.from(it.startDateTime.minusDays(1).toInstant()),
+                            false
+                        ).build())
                     } else {
-                        counter++
-                    }
-                }
-
-            }
-
-            return null // no exception date has been set
-        }
-
-        fun setRecurrenceId(recurrenceId: ZonedDateTime, hasTime: Boolean) {
-            if (hasTime) iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(TimeZone.getTimeZone(recurrenceId.zone.id), VTimezone(recurrenceId.zone.id)))
-            iCalEvent.recurrenceId = RecurrenceId(ICalUtils.eventStartZonedDateTimeToDate(recurrenceId, !hasTime), hasTime)
-        }
-
-        /**
-         * @param occurrenceNumber has to be 2 or more for this to make sense
-         */
-        fun handleDeleteThisAndFuture(occurrenceNumber: Int) { // TODO decrement COUNT in RRULE?
-
-            val recurrenceRule = this.iCalEvent.recurrenceRule.value
-
-            if (occurrenceNumber > 1) { // update COUNT
-                if (recurrenceRule.count != null && recurrenceRule.count >= occurrenceNumber) {
-                    this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).count(
-                        if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
-                    ).build())
-                } else { // otherwise, set or update UNTIL
-                    generateOccurrence(occurrenceNumber, iCalendar.iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
-                        if (this.isAllDay()) {
-                            this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
-                                Date.from(it.startDateTime.minusDays(1).toInstant()),
-                                false
-                            ).build())
-                        } else {
-                            this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
-                                Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()),
-                                true
-                            ).build())
-                        }
+                        this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
+                            Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()),
+                            true
+                        ).build())
                     }
                 }
             }
         }
+    }
 
-        /**
-         * Calculate all Exception Dates in either the timezone of the EXDATE property, or default system timezone (if event is All-Day).
-         */
-        fun getExceptionDates(): List<ZonedDateTime>? {
-            return if (isRecurring()) {
+    /**
+     * Calculate all Exception Dates in either the timezone of the EXDATE property, or default system timezone (if event is All-Day).
+     */
+    fun getExceptionDates(): List<ZonedDateTime>? {
+        return if (isRecurring()) {
 
-                val dates = mutableListOf<ZonedDateTime>()
+            val dates = mutableListOf<ZonedDateTime>()
 
-                iCalEvent.exceptionDates?.forEach {
+            iCalEvent.exceptionDates?.forEach {
 
-                    val exceptionTimezone = iCalendar.iCalTimeZone(it)
+                val exceptionTimezone = iCalendar.iCalTimeZone(it)
 
-                    it.values?.forEach {
-                        val date = if (it.hasTime()) {
-                            ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(exceptionTimezone.id))
-                        } else {
-                            // unfortunately parser uses Calendar object with default timezone
-                            ZonedDateTime.ofInstant(it.toInstant(), ZoneId.systemDefault())
-                        }
-
-                        dates.add(date)
+                it.values?.forEach {
+                    val date = if (it.hasTime()) {
+                        ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(exceptionTimezone.id))
+                    } else {
+                        // unfortunately parser uses Calendar object with default timezone
+                        ZonedDateTime.ofInstant(it.toInstant(), ZoneId.systemDefault())
                     }
 
+                    dates.add(date)
                 }
 
-                dates
+            }
 
-            } else null
-        }
+            dates
 
-        /**
-         * Occurrence is generated using DTSTART/DTEND timezone, but formatted with passed param.
-         *
-         * @param occurrenceNumber has to be a positive number
-         */
-        fun generateOccurrence(occurrenceNumber: Int, timeZoneId: String): Occurrence? {
-            return generateOccurrencesUntilOrCount(timeZoneId, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
-        }
+        } else null
+    }
 
-        fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
+    /**
+     * Occurrence is generated using DTSTART/DTEND timezone, but formatted with passed param.
+     *
+     * @param occurrenceNumber has to be a positive number
+     */
+    fun generateOccurrence(occurrenceNumber: Int, timeZoneId: String): Occurrence? {
+        return generateOccurrencesUntilOrCount(timeZoneId, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
+    }
 
-            val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
-            val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+    fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
+
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
 //            val dateTimeStart = if (this.iCalEvent.dateStart != null) ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
 //            val dateTimeEnd = if (this.iCalEvent.dateEnd != null) ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
 
-            val dateTimeStart = this.getActualStart(timeZoneId)
-            val dateTimeEnd = this.getActualEnd(timeZoneId)
+        val dateTimeStart = this.getActualStart(timeZoneId)
+        val dateTimeEnd = this.getActualEnd(timeZoneId)
 
-            return (dateTimeStart?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
-                    || (dateTimeEnd?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
-                    || ((dateTimeStart?.isBefore(fromDateTime) ?: false) && dateTimeEnd?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
-        }
+        return (dateTimeStart?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true) ?: false) // starts in the range
+                || (dateTimeEnd?.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false) ?: false) // ends in the range
+                || ((dateTimeStart?.isBefore(fromDateTime) ?: false) && dateTimeEnd?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
+    }
 
-        /**
-         * Checks if Event starting at [startDateTime] and ending at [endDateTime] overlaps with
-         * range [fromDate]-[toDate].
-         */
-        fun startEndOverlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Boolean {
+    /**
+     * Checks if Event starting at [startDateTime] and ending at [endDateTime] overlaps with
+     * range [fromDate]-[toDate].
+     */
+    fun startEndOverlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Boolean {
 
-            val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
-            val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
-            return (startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
-                    || (endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
-                    || ((startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBefore(fromDateTime) ?: false) && endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isAfter(toDateTime)) // starts before or ends after range, but happens during range
-        }
+        return (startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
+                || (endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
+                || ((startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBefore(fromDateTime) ?: false) && endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isAfter(toDateTime)) // starts before or ends after range, but happens during range
+    }
 
 
 
-        fun overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean {
-            return (iCalEvent.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // starts in the range
-                    || (iCalEvent.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // ends in the range
-                    || ((iCalEvent.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && iCalEvent.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
-        }
+    fun overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean {
+        return (iCalEvent.getStart(fromDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // starts in the range
+                || (iCalEvent.getEnd(toDateTime.zone.id)?.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = false) ?: false) // ends in the range
+                || ((iCalEvent.getStart(fromDateTime.zone.id)?.isBefore(fromDateTime) ?: false) && iCalEvent.getEnd(toDateTime.zone.id)?.isAfter(toDateTime) ?: false) // starts before or ends after range, but happens during range
+    }
 
-        fun isFirstOccurrence(): Boolean {
-            return isRecurring() && this.occurrence?.occurrenceNumber == 1
-        }
+    fun isFirstOccurrence(): Boolean {
+        return isRecurring() && this.occurrence?.occurrenceNumber == 1
+    }
 
-        fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
+    fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
 
-        fun isSingleEdit(): Boolean = this.iCalEvent.recurrenceId != null
+    fun isSingleEdit(): Boolean = this.iCalEvent.recurrenceId != null
 
-        fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
-            isRecurring() && (this.iCalEvent.recurrenceRule.value.count == 1 || isRecurringUntilSameDay(timeZoneId))
+    fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
+        isRecurring() && (this.iCalEvent.recurrenceRule.value.count == 1 || isRecurringUntilSameDay(timeZoneId))
 
-        fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
-            if (iCalEvent.recurrenceRule.value.until == null) return false
-            val untilZonedDateTime =
-                ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))
-            val dateEnd = ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
-            val dateStart = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-            return ChronoUnit.DAYS.between(dateEnd, untilZonedDateTime).toInt() == 0 || ChronoUnit.DAYS.between(dateStart, untilZonedDateTime).toInt() == 0
-        }
+    fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
+        if (iCalEvent.recurrenceRule.value.until == null) return false
+        val untilZonedDateTime =
+            ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))
+        val dateEnd = ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
+        val dateStart = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+        return ChronoUnit.DAYS.between(dateEnd, untilZonedDateTime).toInt() == 0 || ChronoUnit.DAYS.between(dateStart, untilZonedDateTime).toInt() == 0
+    }
 
-        fun isCustomRecurring(): Boolean {
+    fun isCustomRecurring(): Boolean {
 
-            // no Recurrence Rule
-            if (!this.isRecurring()) return false
+        // no Recurrence Rule
+        if (!this.isRecurring()) return false
 
-            // look for any of the supported properties
-            if (this.iCalEvent.recurrenceRule.value.interval != null ||
-                this.iCalEvent.recurrenceRule.value.count != null ||
-                this.iCalEvent.recurrenceRule.value.until != null ||
-                this.iCalEvent.recurrenceRule.value.byDay?.size ?: 0 > 0
-            ) return true
+        // look for any of the supported properties
+        if (this.iCalEvent.recurrenceRule.value.interval != null ||
+            this.iCalEvent.recurrenceRule.value.count != null ||
+            this.iCalEvent.recurrenceRule.value.until != null ||
+            this.iCalEvent.recurrenceRule.value.byDay?.size ?: 0 > 0
+        ) return true
 
-            // by default we return false which means we will ignore non-supported combinations
-            return false
+        // by default we return false which means we will ignore non-supported combinations
+        return false
 
-        }
+    }
 
-        // this event might be a single edit so it's technically a separate event in the database,
-        //  but it's still considered as a part of a chain of events
-        fun isPartOfChain(): Boolean = this.isRecurring() || this.isSingleEdit()
+    // this event might be a single edit so it's technically a separate event in the database,
+    //  but it's still considered as a part of a chain of events
+    fun isPartOfChain(): Boolean = this.isRecurring() || this.isSingleEdit()
 
-        fun withOccurrence(occurrenceNumber: Int, timeZoneId: String): Event? {
+    fun withOccurrence(occurrenceNumber: Int, timeZoneId: String): Event? {
 
-            val occurrence = generateOccurrence(occurrenceNumber, timeZoneId)
+        val occurrence = generateOccurrence(occurrenceNumber, timeZoneId)
 
-            return if (occurrence != null) withOccurrence(occurrence) else null
-        }
+        return if (occurrence != null) withOccurrence(occurrence) else null
+    }
 
-        /**
-         * Overwrites start & end datetime with [Occurrence] values.
-         */
-        fun withOccurrence(occurrence: Occurrence): Event? {
-            return this.copy(iCalendar = this.iCalendar.copy() as ICalendar).apply {
-                if (this.isAllDay()) {
-                    this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate())
-                    this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate())
-                } else {
-                    this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate(), occurrence.startDateTime.toLocalTime(), occurrence.startDateTime.zone.id)
-                    this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate(), occurrence.endDateTime.toLocalTime(), occurrence.endDateTime.zone.id)
-                    this.iCalendar.setStartTimeZone(occurrence.startDateTime.zone.id)
-                    this.iCalendar.setEndTimeZone(occurrence.endDateTime.zone.id)
-                }
-                this.occurrence = occurrence
+    /**
+     * Overwrites start & end datetime with [Occurrence] values.
+     */
+    fun withOccurrence(occurrence: Occurrence): Event? {
+        return this.copy(iCalendar = this.iCalendar.copy() as ICalendar).apply {
+            if (this.isAllDay()) {
+                this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate())
+                this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate())
+            } else {
+                this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate(), occurrence.startDateTime.toLocalTime(), occurrence.startDateTime.zone.id)
+                this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate(), occurrence.endDateTime.toLocalTime(), occurrence.endDateTime.zone.id)
+                this.iCalendar.setStartTimeZone(occurrence.startDateTime.zone.id)
+                this.iCalendar.setEndTimeZone(occurrence.endDateTime.zone.id)
             }
-        }
-
-        @Serializable
-        data class SharedEvent( // TODO maybe this could be named "SharedPart" or "SharedSplit", the same for others
-            @SerialName("Type")
-            val type: Int, // 2 for SIGNED 3 for encrypted + signed
-            @SerialName("Data")
-            val data: String,
-            @SerialName("Signature")
-            val signature: String,
-            @SerialName("Author")
-            val author: String
-        ) {
-            val isEncrypted: Boolean get() = type and 1 > 0
-//        val isSigned: Boolean get() = type and 2 > 0
-        }
-
-        @Serializable
-        data class CalendarEvent(
-            @SerialName("Type")
-            val type: Int, // 2 for SIGNED 3 for encrypted + signed
-            @SerialName("Data")
-            val data: String,
-            @SerialName("Signature")
-            val signature: String,
-            @SerialName("Author")
-            val author: String
-        ) {
-            val isEncrypted: Boolean get() = type and 1 > 0
-//        val isSigned: Boolean get() = type and 2 > 0
-        }
-
-        @Serializable
-        data class PersonalEvent(
-            @SerialName("Type")
-            val type: Int, // 2 for SIGNED 3 for encrypted + signed
-            @SerialName("Data")
-            val data: String,
-            @SerialName("Signature")
-            val signature: String,
-            @SerialName("Author")
-            val author: String,
-            @SerialName("MemberID")
-            val memberId: String
-        ) {
-//        val isSigned: Boolean get() = type and 2 > 0
-        }
-
-        @Serializable
-        data class AttendeeEvent(
-            @SerialName("Type")
-            val type: Int, // 2 for SIGNED 3 for encrypted + signed
-            @SerialName("Data")
-            val data: String,
-            @SerialName("Signature")
-            val signature: String,
-            @SerialName("Author")
-            val author: String
-        ) {
-            val isEncrypted: Boolean get() = type and 1 > 0
-//            val isSigned: Boolean get() = type and 2 > 0
-        }
-
-        @Serializable
-        data class AttendeeStatusEvent(
-            @SerialName("ID")
-            val id: String,
-            @SerialName("Token")
-            val token: String,
-            @SerialName("Status")
-            val status: Int
-        ) {
-            val participationStatus: ParticipationStatus get() = when (status) {
-                1 -> ParticipationStatus.TENTATIVE
-                2 -> ParticipationStatus.DECLINED
-                3 -> ParticipationStatus.ACCEPTED
-                else -> ParticipationStatus.NEEDS_ACTION
-            }
-        }
-
-    enum class SignatureVerification {
-            SUCCESS,
-            FAILURE,
-            NO_KEYS
+            this.occurrence = occurrence
         }
     }
+
+    @Serializable
+    data class SharedEvent( // TODO maybe this could be named "SharedPart" or "SharedSplit", the same for others
+        @SerialName("Type")
+        val type: Int, // 2 for SIGNED 3 for encrypted + signed
+        @SerialName("Data")
+        val data: String,
+        @SerialName("Signature")
+        val signature: String,
+        @SerialName("Author")
+        val author: String
+    ) {
+        val isEncrypted: Boolean get() = type and 1 > 0
+//        val isSigned: Boolean get() = type and 2 > 0
+    }
+
+    @Serializable
+    data class CalendarEvent(
+        @SerialName("Type")
+        val type: Int, // 2 for SIGNED 3 for encrypted + signed
+        @SerialName("Data")
+        val data: String,
+        @SerialName("Signature")
+        val signature: String,
+        @SerialName("Author")
+        val author: String
+    ) {
+        val isEncrypted: Boolean get() = type and 1 > 0
+//        val isSigned: Boolean get() = type and 2 > 0
+    }
+
+    @Serializable
+    data class PersonalEvent(
+        @SerialName("Type")
+        val type: Int, // 2 for SIGNED 3 for encrypted + signed
+        @SerialName("Data")
+        val data: String,
+        @SerialName("Signature")
+        val signature: String,
+        @SerialName("Author")
+        val author: String,
+        @SerialName("MemberID")
+        val memberId: String
+    ) {
+//        val isSigned: Boolean get() = type and 2 > 0
+    }
+
+    @Serializable
+    data class AttendeeEvent(
+        @SerialName("Type")
+        val type: Int, // 2 for SIGNED 3 for encrypted + signed
+        @SerialName("Data")
+        val data: String,
+        @SerialName("Signature")
+        val signature: String,
+        @SerialName("Author")
+        val author: String
+    ) {
+        val isEncrypted: Boolean get() = type and 1 > 0
+//            val isSigned: Boolean get() = type and 2 > 0
+    }
+
+    @Serializable
+    data class AttendeeStatusEvent(
+        @SerialName("ID")
+        val id: String,
+        @SerialName("Token")
+        val token: String,
+        @SerialName("Status")
+        val status: Int
+    ) {
+        val participationStatus: ParticipationStatus get() = when (status) {
+            1 -> ParticipationStatus.TENTATIVE
+            2 -> ParticipationStatus.DECLINED
+            3 -> ParticipationStatus.ACCEPTED
+            else -> ParticipationStatus.NEEDS_ACTION
+        }
+    }
+
+    enum class SignatureVerification {
+        SUCCESS,
+        FAILURE,
+        NO_KEYS
+    }
+}
 
 
 
