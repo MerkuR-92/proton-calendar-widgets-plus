@@ -176,4 +176,6 @@
     <string name="hello_slideshow_second">Hello SlideshowSecondFragment. Arg: %1$s</string>
     <string name="delete">Delete</string>
 
+    <string name="feature_coming_soon">This feature is coming soon</string>
+
 </resources>

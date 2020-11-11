@@ -51,6 +51,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private val logger: Logger by inject()
 
+    private var toast: Toast? = null
+
     override fun onBackPressedCustom() {
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
@@ -432,11 +434,21 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_form_calendar_press.setOnClickListener {
+            // TODO Remove once change calendar has been implemented
+            if (navigationArguments.eventId != null) {
+                if (toast != null) toast!!.cancel()
+                toast = Toast.makeText(requireContext(), getString(R.string.feature_coming_soon), Toast.LENGTH_SHORT)
+                toast!!.show()
+                return@setOnClickListener
+            }
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
                 val calendars = withContext(Dispatchers.Default) {
                     calendarViewModel.getActiveCalendars()
                 }
+
+                // TODO Save active calendars in calendar VM to avoid triggering click effect when not needed
+                if (calendars.size <= 1) return@launch
 
                 val selectedIndex = calendars.indexOfFirst { it.id == eventViewModel.eventLiveData.value!!.calendar.id }
 
