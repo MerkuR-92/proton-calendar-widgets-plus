@@ -37,15 +37,14 @@ class CalendarsRepositoryImpl(
     private val daysToEvents = mutableMapOf<LocalDate, Event>()
     private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
 
+    private val eventsMutex = Mutex()
+
     // decrypted Events existing in database
     private val dbEvents = mutableListOf<Event>()
-
-    // TODO shard by dates -- tree?
     // all Events including expanded
     private val allEvents = MutableStateFlow<List<Event>>(emptyList())
-    private val allEventsMutex = Mutex()
 
-    // events that should be currently visible // TODO remove when we introduce EventTree
+    // events that should be currently visible
     private val displayedEvents = MutableStateFlow<List<Event>>(emptyList())
     private val displayedEventsMutex = Mutex()
 
@@ -57,7 +56,8 @@ class CalendarsRepositoryImpl(
     private lateinit var selectedCalendarIds: List<String>
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
-    private val expandEventsToDate = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
+    private val expandEventsToDateFlow = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
+    private val expandEventsToDateChannel = Channel<ZonedDateTime>(capacity = Channel.CONFLATED)
 
     private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
@@ -76,22 +76,28 @@ class CalendarsRepositoryImpl(
             // Events
             val eventEntities = database.eventsDao().selectEvents()
             val transformedEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
-            dbEvents.addAll(transformedEvents)
+            eventsMutex.withLock {
+                dbEvents.addAll(transformedEvents)
+            }
 
             // Calendars
             dbCalendars.value = database.calendarsDao().selectCalendars()
             visibleCalendars.value = dbCalendars.value.filterVisible()
 
             // force expanding Events after cold init is done
-            allEventsMutex.withLock {
-                expandEventsToDate.value = ZonedDateTime.now().plusMonths(1)
-            }
+            expandEventsToDateChannel.send(eventsExpandedUntil.plusMonths(2).withDayOfMonth(1))
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
 
         coroutineScope.launch {
-            expandEventsToDate.debounce(DEBOUNCE_EXPANDING_EVENTS_ON_FETCH.toMillis()).collect {
+            expandEventsToDateFlow.debounce(DEBOUNCE_EXPANDING_EVENTS_ON_FETCH.toMillis()).collect {
+                expandEventsToDateChannel.send(it)
+            }
+        }
+
+        coroutineScope.launch {
+            expandEventsToDateChannel.consumeEach {
                 expandDbEventsUntil(it)
             }
         }
@@ -111,7 +117,7 @@ class CalendarsRepositoryImpl(
 
         coroutineScope.launch {
             dbCalendars.collect {
-
+                // TODO do we do antything here?
             }
         }
 
@@ -165,10 +171,16 @@ class CalendarsRepositoryImpl(
     }
 
     private suspend fun showEventsInVisibleCalendars() {
-        displayedEvents.value = displayedEventsMutex.withLock {
+
+        // out of all events, filter out invisible ones (because of hidden calendar)
+        val events = eventsMutex.withLock {
             allEvents.value.filter { event ->
                 visibleCalendars.value.find { it.id == event.calendar.id } != null
             }
+        }
+
+        displayedEventsMutex.withLock {
+            displayedEvents.value = events
         }
     }
 
@@ -334,9 +346,9 @@ class CalendarsRepositoryImpl(
     ) {
 
         val expandUntilDateTime = ZonedDateTime.of(LocalDateTime.of(toDate, LocalTime.MIDNIGHT), ZoneId.of(timeZoneId))
-        allEventsMutex.withLock {
+        eventsMutex.withLock { // TODO this is only for out-of-the-box .debounce() on Flow
             if (expandUntilDateTime.isAfter(eventsExpandedUntil)) {
-                expandEventsToDate.value = expandUntilDateTime
+                expandEventsToDateFlow.value = expandUntilDateTime
             }
         }
 
@@ -352,12 +364,13 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
 
-        allEventsMutex.withLock {
-            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+        logger.v("expanding local occurrences until ${toDateTime.toLocalDate()}")
 
-            logger.v("expanding local occurrences until ${toDateTime.toLocalDate()}")
+        fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-                allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
+        eventsMutex.withLock {
+
+            allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
 
                 logger.v("expanded local occurrences until ${toDateTime}: ${allEvents.value.size}")
 
@@ -365,10 +378,14 @@ class CalendarsRepositoryImpl(
                     eventsExpandedUntil = toDateTime
                 }
 
-            fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
+
+        fetchingState.value = CalendarsRepository.FetchingState.Finished
     }
 
+    /**
+     * Calling this method requires obtained lock on 'allEvents'!
+     */
     private fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
         return if (event.isRecurring()) {
             val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, allEvents.filter { it.uid == event.uid }, toDateTime.toLocalDate(), toDateTime.zone.id)!!
@@ -415,12 +432,81 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {
-        logger.v("persist Event: ${events.map { it.id + " for calendar " + it.calendarId }}")
+        logger.v("persist Event: ")
+        events.forEach { logger.v("${it.id}") }
+
+        // update local database first
         database.eventsDao().updateOrInsert(*events)
+
+        // now update local events cache
+
+        // gather all new events along with all events in their chains
+        val newEvents = events.mapNotNull { transformEventUseCase.execute(it) }
+        val newEventsUids = newEvents.map { it.uid }
+
+        logger.v("newEventsUids: $newEventsUids")
+
+        eventsMutex.withLock {
+
+            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+
+            // extract all events in allEvents related to newly changed events
+            val relatedEvents = allEvents.value.filter { newEventsUids.contains(it.uid) }
+
+            logger.v("relatedEvents: ")
+            relatedEvents.forEach {
+                logger.v("${it.summary}")
+            }
+
+            // 'distinct' because each event is 'related' to iself
+            val affectedEvents = (newEvents + relatedEvents).distinctBy { it.id }
+
+            logger.v("all affected events:")
+            affectedEvents.forEach {
+                logger.v("${it.id}")
+            }
+
+            val newlyExpandedAffectedEvents = affectedEvents.flatMap { expandDbEvent(it, affectedEvents, eventsExpandedUntil) }
+
+            logger.v("expanded to replace: ")
+            newlyExpandedAffectedEvents.forEach {
+                logger.v("${it.summary}")
+            }
+            logger.v("=========")
+
+            // 1. remove all related events because we just expanded them again along with new ones
+            // 2. add newly expanded (new + related) events
+            allEvents.value = allEvents.value.filterNot {
+                    event -> relatedEvents.find { it.id == event.id } != null
+            } + newlyExpandedAffectedEvents
+
+            // replace (raw, not expanded) events in dbEvents, they are read when scrolling & expanding
+            dbEvents.removeAll { event -> affectedEvents.find { event.id == it.id } != null }
+            dbEvents.addAll(affectedEvents)
+
+            fetchingState.value = CalendarsRepository.FetchingState.Finished
+
+        }
+
     }
 
     override suspend fun deleteEventsById(ids: List<String>) {
+
         database.eventsDao().deleteByIds(ids)
+
+        eventsMutex.withLock {
+
+            // TODO I think this is all we have to do, we don't need to expand
+            //  related events because the only way they might have changed was
+            //  deleting single-occurrence, but that adds EXDATE in original event
+            //  so it will be handled by persistEvents()
+
+            allEvents.value = allEvents.value.filterNot { ids.contains(it.id) }
+
+            dbEvents.removeAll { ids.contains(it.id) }
+
+        }
+
     }
 
     override suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity> {
