@@ -498,10 +498,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
         event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email)
 
+        val organizerStatus = event_attendee_organizer_layout.item_attendee_status
         if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
-            val organizerStatus = event_attendee_organizer_layout.item_attendee_status
             initAttendeeStatus(organizerStatus, organizerAttendee.participationStatus, requireContext())
-        }
+        } else organizerStatus.visibleOrGone(false)
     }
 
     private var attendeesListHeight: Int? = null
