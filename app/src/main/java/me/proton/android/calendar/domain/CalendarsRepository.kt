@@ -58,9 +58,6 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
-//    @Deprecated("stop forcing events refresh, do it reactively from DB listener")
-//    suspend fun refreshEvents(calendarIds: List<String>? = null)
-
     suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String)
 
     /**

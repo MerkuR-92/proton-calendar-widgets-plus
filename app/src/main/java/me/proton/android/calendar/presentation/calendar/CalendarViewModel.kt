@@ -119,24 +119,6 @@ class CalendarViewModel(
 
                 TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 
-                //val defaultCalendar = calendarsRepository.getDefaultCalendarId(TODOuserID)
-
-
-
-
-                // TODO get calendars that are selected from the sidebar
-                val selectedActiveCalendarIds = calendarsRepository.getActiveCalendars(TODOuserID).map { it.id }.toList()
-                val selectedDisabledCalendarIds = calendarsRepository.getDisabledCalendars(TODOuserID).map { it.id }.toList()
-                val selectedCalendarIds = selectedActiveCalendarIds + selectedDisabledCalendarIds
-
-
-                coroutineScope.launch {
-                    // TODO this method never returns
-                    val firstDayOfTheMonth = LocalDate.now(timeZoneId).withDayOfMonth(1).plusMonths(1)
-                    val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-                    //calendarsRepository.init(selectedCalendarIds, TODOuserID, toDate, timeZoneId.id)
-                }
-
                 initialised = true
             }
         }

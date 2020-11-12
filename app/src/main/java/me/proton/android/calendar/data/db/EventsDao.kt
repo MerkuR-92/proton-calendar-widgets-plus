@@ -35,11 +35,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT EXISTS(SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId)")
     abstract suspend fun hasEvent(eventId: String, calendarId: String): Boolean
 
-    @Deprecated(message = "Do not use this method directly outside of CalendarsRepository", replaceWith = ReplaceWith("updateOrInsert"))
     @Query("DELETE FROM events WHERE id = :id")
     abstract suspend fun deleteById(id: String)
 
-    @Deprecated(message = "Do not use this method directly outside of CalendarsRepository", replaceWith = ReplaceWith("updateOrInsert"))
     @Query("DELETE FROM events WHERE id IN (:ids)")
     abstract suspend fun deleteByIds(ids: List<String>)
 
