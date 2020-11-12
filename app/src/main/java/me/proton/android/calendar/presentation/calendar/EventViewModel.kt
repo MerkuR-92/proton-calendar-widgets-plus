@@ -205,7 +205,7 @@ class EventViewModel(
                 defaultCalendar.id,
                 defaultCalendar.name,
                 defaultCalendar.color,
-                defaultCalendar.isActive,
+                defaultCalendar.flags,
                 defaultCalendar.display == 1
             ), newICalendar)
             eventBumpSequence = true
@@ -660,7 +660,7 @@ class EventViewModel(
                 (!event.isAllDay() && eventCustomPartialDayAlarmsSave != null)
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
-            event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.isActive, calendar.display == 1))
+            event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.flags, calendar.display == 1))
             if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)
             _event.postValue(event)
             true

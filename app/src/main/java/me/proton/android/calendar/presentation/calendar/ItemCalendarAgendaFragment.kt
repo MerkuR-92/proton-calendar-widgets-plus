@@ -25,7 +25,7 @@ class ItemCalendarAgendaFragment(
     val position: Int,
     val date: LocalDate
 ) : Fragment(), KoinComponent {
-    private val fakeHeaderEvent = Event("", Calendar("", "", "", true, true), ICalendar())
+    private val fakeHeaderEvent = Event("", Calendar("", "", "", 1, true), ICalendar())
 
     override fun onCreateView(
         inflater: LayoutInflater,

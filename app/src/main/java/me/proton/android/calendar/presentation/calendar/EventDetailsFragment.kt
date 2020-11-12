@@ -56,6 +56,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val navigateUp = false
 
     private lateinit var buttonEdit: View
+    private lateinit var buttonMenu: View
     private lateinit var attendeeListAdapter: AttendeeListAdapter
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
@@ -100,7 +101,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     )))
             }
         }
-        val buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
+        buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
         with (buttonMenu) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_three_dots_vertical))
             setOnClickListener {
@@ -114,8 +115,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        // TODO Hide button by default to avoid any case where edit would be possible. Remove once edit attendees is implemented
+        // TODO Hide buttons by default to avoid any case where edit would be possible. Remove once edit attendees is implemented
         buttonEdit.visibleOrGone(false)
+        buttonMenu.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
@@ -137,10 +139,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun handleDelete() {
         val event = eventViewModel.eventLiveData.value!!
 
-        if (event.isPartOfChain() && !event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)) {
+        if (event.isPartOfChain() && !event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) && event.calendar.isActive) {
 
             AndroidUtils.displaySingleChoiceConfirmationPicker(
-                requireContext(), getString(R.string.event_text_delete_event), listOfNotNull(
+                requireContext(), getString(R.string.dialog_title_delete_recurring_event), listOfNotNull(
                     getString(R.string.event_recurring_edit_this),
                     if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
                     getString(R.string.event_recurring_edit_all_events)
@@ -195,13 +197,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
         } else { // TODO unify showing dialog
+            // TODO Check if we need to handle inactive calendars the same way
+            val disabledCalendarRecurringEvent = event.calendar.isDisabled && event.isPartOfChain() && !event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.dialog_title_delete_event)
-                .setMessage(R.string.dialog_description_delete_event)
+                .setTitle(
+                    if (disabledCalendarRecurringEvent) R.string.dialog_title_delete_recurring_event
+                    else R.string.dialog_title_delete_event)
+                .setMessage(
+                    if (disabledCalendarRecurringEvent) R.string.dialog_description_delete_recurring_event
+                    else R.string.dialog_description_delete_event)
                 .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
                     lifecycleScope.launch { // TODO
                         val deleteResult = withContext(Dispatchers.Default) {
-                            if (event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)) {
+                            if (event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) || disabledCalendarRecurringEvent) {
                                 calendarViewModel.handleDeleteEvent(
                                     event.id,
                                     EventEditDeleteOption.ALL_EVENTS
@@ -291,6 +299,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
             // TODO Remove attendees condition once edit attendees is implemented
             buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty())
+            buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty())
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!

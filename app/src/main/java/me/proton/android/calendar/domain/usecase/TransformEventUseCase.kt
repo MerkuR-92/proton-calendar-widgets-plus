@@ -136,7 +136,7 @@ class TransformEventUseCase(
                     calendarEntity.id,
                     calendarEntity.name,
                     calendarEntity.color,
-                    calendarEntity.isActive,
+                    calendarEntity.flags,
                     calendarEntity.display == 1
                 ),
                 iCalendar = iCalendar,

@@ -9,6 +9,9 @@
     <string name="dialog_description_delete_event">Would you like to delete this event?</string>
     <string name="dialog_title_calendar_picker">Calendar</string>
 
+    <string name="dialog_title_delete_recurring_event">Delete recurring event</string>
+    <string name="dialog_description_delete_recurring_event">Would you like to delete all the events in the series?</string>
+
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_set">Set</string>
@@ -66,7 +69,6 @@
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
-    <string name="event_text_delete_event">Delete event</string>
     <string name="event_hint_title">Add Title</string>
     <string name="event_hint_location">Add location</string>
     <string name="event_text_switch_all_day">All day</string>
