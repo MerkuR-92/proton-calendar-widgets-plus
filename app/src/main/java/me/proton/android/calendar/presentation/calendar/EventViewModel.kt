@@ -91,6 +91,8 @@ class EventViewModel(
     lateinit var calendarUserSettings: CalendarUserSettingsEntity
     lateinit var userSettings: UserSettingsEntity
 
+    var savingEvent = MutableLiveData(false)
+
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
     //  Check if any case require us to pass through it again or if we keep the init data we had from details
     suspend fun initialise(
@@ -108,6 +110,7 @@ class EventViewModel(
         eventBumpSequence = false
         eventCustomPartialDayAlarmsSave = null
         eventCustomAllDayAlarmsSave = null
+        savingEvent.postValue(false)
 
 //            calendarUserSettings.defaultCalendarId // TODO we still can't rely on this, it can be null in API!!!
         val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
@@ -361,6 +364,9 @@ class EventViewModel(
 
         TimberLogger.d("handleSave with editOption: $editOption")
         TimberLogger.d("calendar before adjusting: " + event.iCalendar.printToString())
+
+        // Post saving event value to true to trigger loading state
+        savingEvent.postValue(true)
 
         if (event.isAllDay()) {
             event.iCalendar.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)

@@ -135,6 +135,8 @@
     <string name="event_recurring_update_this_cancel">Cancel</string>
     <string name="event_recurring_update_this_confirm">Update</string>
 
+    <string name="event_saving">Saving event, please wait</string>
+
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendars</string>
     <string name="nav_view_disabled_calendars">Disabled calendars</string>

@@ -12,6 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
+import androidx.core.view.forEach
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
@@ -53,7 +55,17 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private var toast: Toast? = null
 
+    private lateinit var loadingAction: View
+    private lateinit var buttonSave: View
+
     override fun onBackPressedCustom() {
+        val immutableSavingEvent = eventViewModel.savingEvent.value
+        if (immutableSavingEvent != null && immutableSavingEvent) {
+            if (toast != null) toast!!.cancel()
+            toast = Toast.makeText(requireContext(), getString(R.string.event_saving), Toast.LENGTH_SHORT)
+            toast!!.show()
+            return
+        }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
                 // Reinitialise event view model data when user chooses to discard modifications
@@ -78,6 +90,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onNavigationIconClicked(): Boolean {
+        val immutableSavingEvent = eventViewModel.savingEvent.value
+        if (immutableSavingEvent != null && immutableSavingEvent) {
+            if (toast != null) toast!!.cancel()
+            toast = Toast.makeText(requireContext(), getString(R.string.event_saving), Toast.LENGTH_SHORT)
+            toast!!.show()
+            return true
+        }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
                 jumpToMonthView()
@@ -106,7 +125,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        val buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
+        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_save)
             setOnClickListener {
@@ -114,10 +133,20 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, toolbar_content, false)
+        loadingAction.visibleOrGone(false)
+
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
             addView(
                 buttonSave, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            )
+            val layoutParams = LinearLayout.LayoutParams(
+                resources.getDimensionPixelSize(R.dimen.action_clickable_size),
+                resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+            layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.spacing_element_small)
+            addView(
+                loadingAction, layoutParams
             )
         }
     }
@@ -180,6 +209,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         val success = withContext(Dispatchers.IO) {
                             eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
                         }
+                        // Post saving event value to false to stop loading state
+                        eventViewModel.savingEvent.postValue(false)
 
                         if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                             if (success) {
@@ -236,6 +267,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     navigationArguments.occurrenceNumber
                 )
             }
+            // Post saving event value to false to stop loading state
+            eventViewModel.savingEvent.postValue(false)
 
             if (success) { // TODO remove duplicated code here and below
                 onSuccessEventUpdateCalendarDisplay()
@@ -296,6 +329,31 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 }
                 findNavController().navigateUp()
             }
+
+            eventViewModel.savingEvent.observe(viewLifecycleOwner, Observer { savingEvent: Boolean ->
+                // Update action bar buttons visibility
+                loadingAction.visibleOrGone(savingEvent)
+                buttonSave.visibleOrGone(!savingEvent)
+
+                // Disable/Enable all items linked to actions from our view
+                event_form_title.isEnabled = !savingEvent
+                event_form_location.isEnabled = !savingEvent
+                event_form_description.isEnabled = !savingEvent
+                event_form_all_day_press.isEnabled = !savingEvent
+                event_form_all_day_switch.isEnabled = !savingEvent
+                event_form_timezone_press.isEnabled = !savingEvent
+                event_form_start_date_press.isEnabled = !savingEvent
+                event_form_end_date_press.isEnabled = !savingEvent
+                event_form_start_time_press.isEnabled = !savingEvent
+                event_form_end_time_press.isEnabled = !savingEvent
+                event_form_calendar_press.isEnabled = !savingEvent
+                event_form_recurrence_press.isEnabled = !savingEvent
+                event_form_alarm_press.isEnabled = !savingEvent
+                for (i in 0 until event_form_alarm_list.childCount) {
+                    // Disable the delete buttons from inside alarm items views
+                    event_form_alarm_list.getChildAt(i).findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !savingEvent
+                }
+            })
         }
     }
 
