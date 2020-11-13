@@ -233,8 +233,7 @@ class AndroidUtils(context: Context) {
                         } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/ })
                             ?.mapIndexedNotNull { index, byDay ->
 
-                                val dayOfWeekAsWord =
-                                    context.resources.getStringArray(R.array.days_of_week)[byDay.day.ordinal] // TODO use date formatters
+                                val dayOfWeekAsWord = byDay.day.toDayOfWeek().format()
 
                                 val dayNumber: Int? = if (recurrence.bySetPos.isNotEmpty()) {
                                     recurrence.bySetPos[index]
@@ -288,14 +287,12 @@ class AndroidUtils(context: Context) {
                                             )
                                         )
                                     }
-                                val dayOfWeekJavaTimeOrdinal =
-                                    ((event.iCalEvent.getStart(timeZoneId)!!.dayOfWeek.ordinal) + 1 % 7)
                                 context.getString(
                                     R.string.event_recurrence_occurs_on_day_of_week,
                                     repeat,
-                                    if (onDaysOfWeek.isNullOrBlank()) context.resources.getStringArray(
-                                        R.array.days_of_week // TODO use date formatters
-                                    )[dayOfWeekJavaTimeOrdinal] else onDaysOfWeek
+                                    if (onDaysOfWeek.isNullOrBlank()) {
+                                        (event.iCalEvent.getStart(timeZoneId)!!.dayOfWeek).format()
+                                    } else onDaysOfWeek
                                 )
                             }
                             Frequency.MONTHLY -> {
@@ -823,16 +820,8 @@ fun LocalDate.formatMonthlyDayOfWeek(resources: Resources, backwards: Boolean = 
         resources.getStringArray(R.array.ordinals_as_words)[this.weekInMonth()]
     }
 
-    return "$ordinal ${this.dayOfWeek.getDisplayName(
-        TextStyle.FULL,
-        getDefault()
-    )}"
+    return "$ordinal ${this.dayOfWeek.format()}"
 
-}
-
-// TODO add switch for forced AM/PM when showing time
-fun LocalDateTime.format(showDayOfWeek: Boolean = false): String {
-    return "TODO"
 }
 
 /**

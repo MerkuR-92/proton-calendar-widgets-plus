@@ -22,6 +22,7 @@ import me.proton.android.calendar.domain.model.Event
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
@@ -463,8 +464,20 @@ fun ICalendar.printToString() : String {
 
 fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
 
+fun DayOfWeek.format(firstLetter: Boolean = false): String {
+    val formatted = this.getDisplayName(
+        TextStyle.FULL,
+        getLocaleForFormatting()
+    )
+    return if (firstLetter) formatted.firstOrNull()?.toString() ?: "" else formatted
+}
+
 fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
     return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
+}
+
+fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek {
+    return DayOfWeek.of((this.calendarConstant)).minus(1)
 }
 
 fun ZonedDateTime.formatDate(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))

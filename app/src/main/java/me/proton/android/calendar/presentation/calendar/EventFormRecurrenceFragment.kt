@@ -26,6 +26,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.DateFormat
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -362,20 +363,22 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // DayOfWeek of biweekly starts on Sunday (ordinal 0) and ends on Saturday (ordinal 6), we convert it to match java.time ordinals
         val byDayIndices =
-            eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.byDay?.map { if (it.day.ordinal != 0) it.day.ordinal - 1 else 6 }
-                ?: emptyList()
+            eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.byDay?.map { it.day.toDayOfWeek().ordinal } ?: emptyList()
 
         // DayOfWeek of java.time starts on Monday (ordinal 0) and ends on Sunday (ordinal 6)
         val indexOfEventStartDay =
             eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal
         val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
+        val weekDayLetters = (DayOfWeek.MONDAY.value .. DayOfWeek.SUNDAY.value).map { DayOfWeek.of(it).format(firstLetter = true) }
+
+        // TODO cleanup below after removing hardcoded string-array with date names
         // We do minus 1 to match java.time DayOfWeek ordinals
         val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(Locale.getDefault()).firstDayOfWeek.value - 1 else eventViewModel.userSettings.weekStart - 1
         val weekEnd = 7
         var stringArrayIndex = weekStart
         // Iterate from weekStart first
-        resources.getStringArray(R.array.days_of_week_letters)
+        weekDayLetters
             .slice(weekStart until weekEnd) // until excludes weekEnd value
             .forEachIndexed { index, dayName ->
                 setChipItemContent(index, stringArrayIndex, indexOfEventStartDay, checkedDayIndices, dayName)
@@ -384,7 +387,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         if (weekStart != 0) {
             // If weekStart was not Monday, iterate from 0 to fill the rest of the chips
             stringArrayIndex = 0
-            resources.getStringArray(R.array.days_of_week_letters)
+            weekDayLetters
                 .slice(0 until weekStart) // until excludes weekStart value
                 .forEachIndexed { index, dayName ->
                     val customIndex = (weekEnd - weekStart) + index

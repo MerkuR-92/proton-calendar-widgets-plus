@@ -2309,4 +2309,19 @@ internal class ICalUtilsTest {
         assertThat(formattedStart.first!!.contains("17")).isTrue()
         assertThat(formattedStart.second).isNull()
     }
+
+    @Test
+    fun `transform between biweekly and java-time DayOfWeek`() {
+
+        assertThat(biweekly.util.DayOfWeek.MONDAY.toDayOfWeek()).isEqualTo(java.time.DayOfWeek.MONDAY)
+        assertThat(biweekly.util.DayOfWeek.TUESDAY.toDayOfWeek()).isEqualTo(java.time.DayOfWeek.TUESDAY)
+        assertThat(biweekly.util.DayOfWeek.SATURDAY.toDayOfWeek()).isEqualTo(java.time.DayOfWeek.SATURDAY)
+        assertThat(biweekly.util.DayOfWeek.SUNDAY.toDayOfWeek()).isEqualTo(java.time.DayOfWeek.SUNDAY)
+
+        assertThat(java.time.DayOfWeek.MONDAY.toBiweeklyDayOfWeek()).isEqualTo(biweekly.util.DayOfWeek.MONDAY)
+        assertThat(java.time.DayOfWeek.TUESDAY.toBiweeklyDayOfWeek()).isEqualTo(biweekly.util.DayOfWeek.TUESDAY)
+        assertThat(java.time.DayOfWeek.SATURDAY.toBiweeklyDayOfWeek()).isEqualTo(biweekly.util.DayOfWeek.SATURDAY)
+        assertThat(java.time.DayOfWeek.SUNDAY.toBiweeklyDayOfWeek()).isEqualTo(biweekly.util.DayOfWeek.SUNDAY)
+
+    }
 }

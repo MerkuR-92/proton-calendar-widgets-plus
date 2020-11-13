@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="days_of_week">
-        <item>Sunday</item>
-        <item>Monday</item>
-        <item>Tuesday</item>
-        <item>Wednesday</item>
-        <item>Thursday</item>
-        <item>Friday</item>
-        <item>Saturday</item>
-        <item>Sunday</item>
-    </string-array>
-
-    <string-array name="days_of_week_letters">
-        <item>M</item>
-        <item>T</item>
-        <item>W</item>
-        <item>T</item>
-        <item>F</item>
-        <item>S</item>
-        <item>S</item>
-    </string-array>
 
     <string-array name="ordinals_as_words">
         <item></item>
