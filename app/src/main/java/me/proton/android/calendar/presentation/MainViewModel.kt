@@ -215,10 +215,12 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
      * Stores intent with given [action] in a map for clients to [consumeIntent] later.
      */
     fun handleIntent(intent: Intent) {
-        if (intent.action != null) {
-            intents.put(intent.action!!, intent)
+        intent.action?.let {
+            intents.put(it, intent)
         }
     }
+
+    fun containsIntent(action: String) = intents.containsKey(action)
 
     /**
      * Returns and deletes intent with given [action], if it has been handled previously.

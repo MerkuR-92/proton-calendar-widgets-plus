@@ -12,7 +12,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import androidx.lifecycle.whenStarted
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -27,15 +26,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
@@ -52,6 +50,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var navController: NavController
 
     private val valueStoreProvider: ValueStoreProvider by inject()
+    private val logger: Logger by inject()
 
     private val calendarViewModel: CalendarViewModel by viewModel()
     private val mainViewModel: MainViewModel by viewModel()
@@ -62,7 +61,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     // TODO move to MainViewModel once we have proper user management
     private lateinit var userEmail: String
 
-    private fun navigateToMonth() {
+    private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
             calendarViewModel.init(this)
 
@@ -70,8 +69,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             initDrawerHeader()
             initDrawerCalendarsListContent()
 
-            findNavController(R.id.nav_host_fragment_container_view)
-                .navigate(Navigation.Deeplink.toMonth())
+            findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
         }
     }
 
@@ -88,7 +86,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
                     is AccountViewModel.State.Ready -> {
                         drawerLayout.visibleOrGone(true)
-                        navigateToMonth()
+
+                        val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
+
+                        if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
+                            navigateTo(eventDetailsIntent.data!!)
+                        } else {
+                            navigateTo(Navigation.Deeplink.toMonth())
+                        }
+
                     }
                 }
             })
