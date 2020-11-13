@@ -5,7 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/rootFragment">
 
-    <fragment
+    <dialog
         android:id="@+id/nav_calendar"
         android:name="me.proton.android.calendar.presentation.calendar.MonthFragment"
         android:label=""
@@ -28,7 +28,7 @@
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />
-    </fragment>
+    </dialog>
 
     <fragment
         android:id="@+id/nav_contacts"

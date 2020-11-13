@@ -265,7 +265,7 @@
     </style>
 
 
-    <style name="AppFullscreenDialogTheme" parent="AppTheme">
+    <style name="AppFullscreenDialogTheme" parent="AppTheme.DayNight">
         <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
         <item name="android:windowExitAnimation">@anim/fragment_fade_exit</item>
     </style>

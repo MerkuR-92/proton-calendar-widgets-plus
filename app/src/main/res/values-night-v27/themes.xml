@@ -3,6 +3,7 @@
 
     <style name="AppTheme.DayNight" parent="AppTheme">
         <!-- Styling specific to light mode -->
+        <item name="android:statusBarColor">@color/background_norm</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <item name="android:navigationBarColor">@color/background_norm</item>

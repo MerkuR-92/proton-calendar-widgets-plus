@@ -82,8 +82,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             init(this@MainActivity)
             state.observe(this@MainActivity, Observer { state ->
                 when (state) {
-                    is AccountViewModel.State.LoginNeeded -> startLoginWorkflow()
-                    is AccountViewModel.State.Ready -> navigateToMonth()
+                    is AccountViewModel.State.LoginNeeded -> {
+                        drawerLayout.visibleOrGone(false)
+                        startLoginWorkflow()
+                    }
+                    is AccountViewModel.State.Ready -> {
+                        drawerLayout.visibleOrGone(true)
+                        navigateToMonth()
+                    }
                 }
             })
         }
@@ -104,56 +110,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         //setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        this.lifecycleScope.launch {
-//            val params = TextViewCompat.getTextMetricsParams(textView)
-//            val precomputedText = withContext(Dispatchers.Default) {
-//                PrecomputedTextCompat.create(longTextContent, params)
-//            }
-//            TextViewCompat.setPrecomputedText(textView, precomputedText)
-        }
-
-//fixedRateTimer().
-
-
-
-
-        //CountDownTimer().
-
-//        AlarmManagerCompat.setAlarmClock()
-
-
-
-        lifecycleScope.launch {
-            whenStarted {
-                // The block inside will run only when Lifecycle is at least STARTED.
-                // It will start executing when fragment is started and
-                // can call other suspend methods.
-//                loadingView.visibility = View.VISIBLE
-//                val canAccess = withContext(Dispatchers.IO) {
-//                    checkUserAccess()
-//                }
-
-                // When checkUserAccess returns, the next line is automatically
-                // suspended if the Lifecycle is not *at least* STARTED.
-                // We could safely run fragment transactions because we know the
-                // code won't run unless the lifecycle is at least STARTED.
-//                loadingView.visibility = View.GONE
-//                if (canAccess == false) {
-//                    findNavController().popBackStack()
-//                } else {
-//                    showContent()
-//                }
-            }
-
-            // This line runs only after the whenStarted block above has completed.
-
-        }
-
-        //TODO Remove once login module implemented
-        nav_view_main_content.nav_view_user_name.text = "Proton Calendar Rocks"
-        nav_view_main_content.nav_view_user_mail.text = "protoncalendarrocks@pm.me"
-        nav_view_main_content.nav_view_user_initials.text = "PC"
-
         nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
             BuildConfig.VERSION_NAME)
 
@@ -162,10 +118,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         initDrawerHeader()
 
         initDrawerCalendarsList()
-
-//        mainViewModel.syncServerEvents().observe(this, Observer {
-//            it?.let { TimberLogger.d("local server event sync state: ${it}") } // TODO progress indicator
-//        })
     }
 
     override fun onNewIntent(intent: Intent?) {

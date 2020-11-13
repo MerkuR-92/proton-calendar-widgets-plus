@@ -5,8 +5,6 @@
 
         <item name="colorAccent">@color/brand_norm</item>
 
-        <item name="android:statusBarColor">@color/background_norm</item>
-
         <item name="appBarLayoutStyle">@style/AppTheme.Toolbar</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
 
@@ -30,10 +28,22 @@
 <!--        <item name="android:fontFamily">@font/space_mono</item>-->
     </style>
 
+    <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:navigationBarColor">@color/brand_norm</item>
+    </style>
+
     <style name="AppTheme.DayNight" parent="AppTheme">
         <!-- Styling specific to light mode -->
         <!-- TODO windowLightStatusBar is API 23 Minimum, check if we need to support below APIs -->
+        <item name="android:statusBarColor">@color/background_norm</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight" />-->
@@ -44,7 +54,6 @@
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
-        <!--        <item name="titleTextAppearance">@style/MyTextAppearance</item>-->
     </style>
 
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
