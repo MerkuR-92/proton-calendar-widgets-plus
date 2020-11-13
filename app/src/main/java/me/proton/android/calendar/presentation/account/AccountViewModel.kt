@@ -110,10 +110,6 @@ class AccountViewModel(
         combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
             if (id != null && passphrase != null && eventId != null) {
                 setupUser(UserId(id), passphrase, eventId)
-                // Discard each current values.
-                this.userId.value = null
-                this.userPassphrase.value = null
-                this.lastServerEventId.value = null
             }
         }.launchIn(viewModelScope)
 
@@ -135,8 +131,14 @@ class AccountViewModel(
             .onAccountRemoved { cleanUser(it.userId) }
     }
 
-    fun startLoginWorkflow() =
+    fun startLoginWorkflow() {
+        // Discard each current values.
+        userId.value = null
+        userPassphrase.value = null
+        lastServerEventId.value = null
+
         authOrchestrator.startLoginWorkflow(AccountType.Internal)
+    }
 
     fun logoutPrimary() = viewModelScope.launch {
         accountManager.getPrimaryUserId().firstOrNull()?.let { userId -> removeUser(userId) }
