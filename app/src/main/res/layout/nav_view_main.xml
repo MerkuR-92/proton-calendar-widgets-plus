@@ -331,6 +331,76 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nav_view_timezone"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/nav_view_timezone_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nav_view_timezone"
+                    style="@style/Text.Caption.Weak.Dark"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:id="@+id/nav_view_timezone_separator"
+                    style="@style/Separator.Dark"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_timezone_title"
+                    app:layout_constraintStart_toStartOf="@+id/nav_view_timezone_title"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_timezone_login_layout"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_timezone_separator">
+
+                    <ImageView
+                        android:id="@+id/nav_view_timezone_login_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_globe"
+                        style="@style/AppImageViewIcon.Dark.Weak"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_timezone_login_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_timezone_login_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_timezone_login_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:text="Europe/Zurich (GMT+1)"
+                        style="@style/Text.DefaultSmall.Weak.Dark"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_timezone_login_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_timezone_login_separator"
+                        style="@style/Separator.Dark"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_timezone_login_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_timezone_login_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <TextView
                 android:id="@+id/nav_view_version"
                 android:layout_width="wrap_content"

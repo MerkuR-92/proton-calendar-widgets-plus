@@ -253,4 +253,9 @@ class CalendarViewModel(
 
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
+
+    // Returns timezoneid if it has been initialized
+    fun getTimeZone(): ZoneId? {
+        return if (this::timeZoneId.isInitialized) timeZoneId else null
+    }
 }

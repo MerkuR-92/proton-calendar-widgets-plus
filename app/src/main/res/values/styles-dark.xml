@@ -6,12 +6,20 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="Text.DefaultSmall.Weak.Dark">
+        <item name="android:textColor">@color/santas_gray</item>
+    </style>
+
     <style name="Text.Caption.Weak.Dark">
         <item name="android:textColor">@color/santas_gray</item>
     </style>
 
     <style name="AppImageViewIcon.Dark">
         <item name="tint">@color/white</item>
+    </style>
+
+    <style name="AppImageViewIcon.Dark.Weak">
+        <item name="tint">@color/santas_gray</item>
     </style>
 
     <style name="Separator.Dark">

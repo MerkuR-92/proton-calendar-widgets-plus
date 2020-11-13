@@ -141,6 +141,7 @@
     <string name="nav_view_calendars">Calendars</string>
     <string name="nav_view_disabled_calendars">Disabled calendars</string>
     <string name="nav_view_more">More</string>
+    <string name="nav_view_timezone">Timezone</string>
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Logout</string>
     <string name="nav_view_more_login">Login</string>

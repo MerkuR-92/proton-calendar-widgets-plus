@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
-import android.view.Window
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
@@ -26,12 +24,14 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
@@ -42,6 +42,7 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
+import java.time.ZonedDateTime
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -71,7 +72,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             initDrawerHeader()
             initDrawerCalendarsListContent()
 
-            findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+            withContext(Dispatchers.Main) {
+                // Use UI Thread because initDrawerTimeZone changes timezone view visibility
+                // TODO Remove once settings have been created
+                initDrawerTimeZone()
+            }
+
+            findNavController(R.id.nav_host_fragment_container_view)
+                .navigate(uri)
         }
     }
 
@@ -182,6 +190,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 var initials: String = getInitials(user.displayName)
                 nav_view_main_content.nav_view_user_initials.text = initials?: ""
             }
+        }
+    }
+
+    // TODO Remove once settings have been created
+    private fun initDrawerTimeZone() {
+        val timeZoneId = calendarViewModel.getTimeZone()
+        nav_view_timezone.visibleOrGone(timeZoneId != null)
+        timeZoneId?.let {
+            nav_view_timezone_login_title.text = ICalUtils.formatTimeZoneId(timeZoneId.id, ZonedDateTime.now(timeZoneId).toInstant())
         }
     }
 
