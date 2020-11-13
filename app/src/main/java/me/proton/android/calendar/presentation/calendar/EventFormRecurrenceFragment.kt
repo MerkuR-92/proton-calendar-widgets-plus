@@ -498,7 +498,8 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                         custom_recurrence_end_2.setText(getString(
                             R.string.event_recurrence_ends_on_date,
                             DateFormat.getDateInstance(
-                                DateFormat.LONG
+                                DateFormat.LONG,
+                                getLocaleForFormatting()
                             ).format(this.until))
                         )
                     }

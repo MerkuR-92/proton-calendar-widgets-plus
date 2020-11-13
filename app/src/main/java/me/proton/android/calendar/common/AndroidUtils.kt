@@ -14,7 +14,6 @@ import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
-import android.os.Build
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -53,14 +52,9 @@ import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
+import java.util.Locale.getDefault
 
 class AndroidUtils(context: Context) {
-
-    val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        context.resources.configuration.locales[0].toString()
-    } else {
-        context.resources.configuration.locale.toString()
-    }
 
     companion object {
 
@@ -365,12 +359,10 @@ class AndroidUtils(context: Context) {
                         }"
                     },
                     recurrence.until?.let {
-
-//                        if (timeZoneId != event.GET TIMEZONE FROM RRULE OR DTSTART)
-
                         context.getString(
                             R.string.event_recurrence_until, DateFormat.getDateInstance(
-                                DateFormat.LONG
+                                DateFormat.LONG,
+                                getLocaleForFormatting()
                             ).format(it)
                         )
                     },
@@ -765,11 +757,11 @@ fun RadioGroup.checkIndex(index: Int) {
 
 fun LocalTime.format(is24Hour: Boolean?): String {
     return if (is24Hour == true) {
-        this.format(DateTimeFormatter.ofPattern("HH:mm"))
+        this.format(DateTimeFormatter.ofPattern("HH:mm").withLocale(getLocaleForFormatting()))
     } else if (is24Hour == false) {
-        this.format(DateTimeFormatter.ofPattern("hh:mm a"))
+        this.format(DateTimeFormatter.ofPattern("hh:mm a").withLocale(getLocaleForFormatting()))
     } else {
-        this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+        this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocaleForFormatting()))
     }
 }
 
@@ -777,14 +769,10 @@ fun LocalTime.format(is24Hour: Boolean?): String {
 fun LocalDate.format(showDayOfWeek: Boolean = false): String {
 
     val dateTimeFormatter = if (showDayOfWeek) {
-        DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+        DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting())
     } else {
-        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocaleForFormatting())
     }
-
-//    if (locale != null) {
-//        dateTimeFormatter.withLocale(locale)
-//    }
 
     return this.format(dateTimeFormatter)
 }
@@ -799,17 +787,27 @@ fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
  * Returns "January", etc.
  */
 fun LocalDate.formatMonth(capitalize: Boolean = false): String {
-    val dateFormat = SimpleDateFormat("LLLL", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("LLLL", getLocaleForFormatting())
     val formattedMonth = dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
     if (capitalize)
-        return formattedMonth.substring(0, 1).toUpperCase(Locale.getDefault()) +
-                formattedMonth.substring(1).toLowerCase(Locale.getDefault())
+        return formattedMonth.substring(0, 1).toUpperCase(getDefault()) +
+                formattedMonth.substring(1).toLowerCase(getDefault())
     return formattedMonth
 }
 
 fun LocalDate.formatDayOfWeek(short: Boolean = false): String {
-    val dateFormat = SimpleDateFormat(if (short) "E" else "EEEE", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(if (short) "E" else "EEEE", getLocaleForFormatting())
     return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+}
+
+/**
+ * We only allow Locales used to format date & time that our application is translated to.
+ */
+fun getLocaleForFormatting(): Locale {
+    return when (getDefault()) {
+        // add mapping for other supported Locales
+        else -> Locale.US
+    }
 }
 
 /**
@@ -827,22 +825,9 @@ fun LocalDate.formatMonthlyDayOfWeek(resources: Resources, backwards: Boolean = 
 
     return "$ordinal ${this.dayOfWeek.getDisplayName(
         TextStyle.FULL,
-        Locale.getDefault()
+        getDefault()
     )}"
 
-//
-//
-//    val dateTimeFormatter = if (showDayOfWeek) {
-//        DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
-//    } else {
-//        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-//    }
-
-//    if (locale != null) {
-//        dateTimeFormatter.withLocale(locale)
-//    }
-
-    //return ""//this.format(dateTimeFormatter)
 }
 
 // TODO add switch for forced AM/PM when showing time

@@ -467,7 +467,7 @@ fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
     return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
 }
 
-fun ZonedDateTime.formatDate(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL))
+fun ZonedDateTime.formatDate(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
 
 fun ZonedDateTime.formatTime(timeZoneId: String, is24Hour: Boolean): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(is24Hour)
 
