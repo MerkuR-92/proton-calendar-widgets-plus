@@ -12,8 +12,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.view.children
-import androidx.core.view.forEach
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
@@ -125,7 +123,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
+        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_save)
             setOnClickListener {
@@ -133,11 +131,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, toolbar_content, false)
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
         loadingAction.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
-        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+        with(toolbar.findViewById<ViewGroup>(R.id.dialog_toolbar_content)) {
             addView(
                 buttonSave, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             )

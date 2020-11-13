@@ -21,8 +21,6 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import timber.log.Timber
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 
 class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
@@ -54,7 +52,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, toolbar_content, false)
+        val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonDone) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_done)
             setOnClickListener {
@@ -63,7 +61,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         // TODO extract somewhere to remove boilerplate
-        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+        with(toolbar.findViewById<ViewGroup>(R.id.dialog_toolbar_content)) {
             addView(
                 buttonDone, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             )
@@ -135,7 +133,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
+        toolbarTitle = toolbar.findViewById(R.id.dialog_toolbar_title)
         toolbarTitle.text = getString(R.string.event_alarms_title)
         toolbar.setNavigationIcon(R.drawable.ic_close)
 

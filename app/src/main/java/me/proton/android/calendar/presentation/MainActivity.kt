@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
+import android.view.Window
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
@@ -80,16 +82,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             init(this@MainActivity)
             state.observe(this@MainActivity, Observer { state ->
                 when (state) {
-                    is AccountViewModel.State.LoginNeeded -> {
-                        drawerLayout.visibleOrGone(false)
-                        startLoginWorkflow()
-                    }
+                    is AccountViewModel.State.LoginNeeded -> startLoginWorkflow()
                     is AccountViewModel.State.Ready -> {
-                        drawerLayout.visibleOrGone(true)
-
                         val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
                         if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
+                            displaySplashScreen(false)
                             navigateTo(eventDetailsIntent.data!!)
                         } else {
                             navigateTo(Navigation.Deeplink.toMonth())
@@ -113,7 +111,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         appBarConfiguration = AppBarConfiguration(setOf(
             R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
         ), drawerLayout)
-        //setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
@@ -124,6 +121,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         initDrawerHeader()
 
         initDrawerCalendarsList()
+
+    }
+
+    fun displaySplashScreen(display: Boolean) {
+        drawerLayout.visibleOrGone(!display)
+        val backgroundColor = if (display) R.color.brand_norm else R.color.background_norm
+        val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm
+        window.statusBarColor =  resources.getColor(backgroundColor, null)
+        window.navigationBarColor =  resources.getColor(backgroundColor, null)
+        window.setBackgroundDrawableResource(backgroundDrawable)
     }
 
     override fun onNewIntent(intent: Intent?) {

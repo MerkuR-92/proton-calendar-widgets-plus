@@ -90,7 +90,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onToolbarCreated(toolbar: Toolbar) {
 
-        buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
+        buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, dialog_toolbar_content, false)
         with (buttonEdit) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pencil))
             setOnClickListener {
@@ -101,7 +101,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     )))
             }
         }
-        buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
+        buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_secondary, dialog_toolbar_content, false)
         with (buttonMenu) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_three_dots_vertical))
             setOnClickListener {
@@ -120,7 +120,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         buttonMenu.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
-        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+        with(toolbar.findViewById<ViewGroup>(R.id.dialog_toolbar_content)) {
             addView(
                 buttonEdit, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size

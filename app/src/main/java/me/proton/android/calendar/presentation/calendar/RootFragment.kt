@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import me.proton.android.calendar.R
+import me.proton.android.calendar.presentation.MainActivity
 import org.koin.core.KoinComponent
 
 class RootFragment : Fragment(), KoinComponent {
@@ -16,6 +17,7 @@ class RootFragment : Fragment(), KoinComponent {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_root, container, false)
+
         return rootView
     }
 

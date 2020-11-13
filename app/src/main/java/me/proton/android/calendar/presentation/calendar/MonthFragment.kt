@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
+import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.pager_mini_calendar.*
@@ -29,7 +28,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
-import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.BaseFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.core.domain.entity.UserId
 import org.koin.android.ext.android.inject
@@ -37,7 +36,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 
-class MonthFragment : BaseDialogFragment() {
+class MonthFragment : BaseFragment() {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
@@ -55,11 +54,8 @@ class MonthFragment : BaseDialogFragment() {
     override val layoutResourceId: Int
         get() = R.layout.fragment_month
 
-    override val isTopLevel = true
-    override val isScrollable = false
-
     override fun onToolbarCreated(toolbar: Toolbar) {
-        val buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, toolbar_content, false)
+        val buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
         with (buttonCreate) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
             setOnClickListener {
@@ -68,7 +64,7 @@ class MonthFragment : BaseDialogFragment() {
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime()))
             }
         }
-        val buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, toolbar_content, false)
+        val buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
         with (buttonToday) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
             setOnClickListener {
@@ -78,7 +74,7 @@ class MonthFragment : BaseDialogFragment() {
         }
 
         // TODO extract somewhere to remove boilerplate
-        with(toolbar.findViewById<ViewGroup>(R.id.toolbar_content)) {
+        with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
             addView(
                 buttonToday, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
@@ -86,15 +82,15 @@ class MonthFragment : BaseDialogFragment() {
             )
 
             val layoutParams = LinearLayout.LayoutParams(
-            resources.getDimensionPixelSize(R.dimen.action_clickable_size),
-            resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+                resources.getDimensionPixelSize(R.dimen.action_clickable_size),
+                resources.getDimensionPixelSize(R.dimen.action_clickable_size))
             layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.spacing_element_small)
             addView(
                 buttonCreate, layoutParams
             )
         }
 
-        toolbarTitle = toolbar.findViewById(R.id.toolbar_title)
+        toolbarTitle = toolbar.findViewById(R.id.fragment_toolbar_title)
 
     }
 
@@ -160,7 +156,7 @@ class MonthFragment : BaseDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, appbar, false))
+        fragment_appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, dialog_appbar, false))
 
         miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{

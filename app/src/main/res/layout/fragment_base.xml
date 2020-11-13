@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/dialog_appbar"
+        android:id="@+id/fragment_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stateListAnimator="@animator/design_appbar_state_list_animator"
@@ -17,8 +17,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <ProgressBar
+                android:id="@+id/fragment_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:indeterminateOnly="true"
+                android:indeterminateTint="@color/brand_norm"
+                android:indeterminateTintMode="src_in"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="-4dp"/>
+
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/dialog_toolbar"
+                android:id="@+id/fragment_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:theme="@style/AppTheme.Toolbar"
@@ -32,7 +45,7 @@
                     android:background="@null">
 
                     <LinearLayout
-                        android:id="@+id/dialog_toolbar_content"
+                        android:id="@+id/fragment_toolbar_content"
                         android:layout_width="wrap_content"
                         android:layout_height="?attr/actionBarSize"
                         android:divider="@drawable/divider_toolbar"
@@ -43,7 +56,7 @@
                         android:background="@null"/>
 
                     <TextView
-                        android:id="@+id/dialog_toolbar_title"
+                        android:id="@+id/fragment_toolbar_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
@@ -58,17 +71,10 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/dialog_container_scrollable"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
     <FrameLayout
-        android:id="@+id/dialog_container"
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
