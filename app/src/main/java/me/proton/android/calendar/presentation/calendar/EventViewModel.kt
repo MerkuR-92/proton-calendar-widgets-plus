@@ -147,10 +147,10 @@ class EventViewModel(
             val newVEvent = newICalendar.events.first()
 
             // if there is no requested start date, we take today
-            val startDate = if (initStartDate != null) LocalDate.parse(initStartDate) else LocalDate.now()
+            val startDate = if (initStartDate != null) LocalDate.parse(initStartDate) else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
             // if there is no requested start time, we calculate it according to "now"
-            val startTime = if (initStartTime != null) LocalTime.parse(initStartTime) else LocalTime.now().plusMinutes(
-                this.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS)
+            val startTime = if (initStartTime != null) LocalTime.parse(initStartTime) else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).plusMinutes(
+                this.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS).toLocalTime()
             // end Zoned Date Time according to default event duration
             val endZonedDateTime = ZonedDateTime.of(startDate, startTime, ZoneId.of(eventTimeZoneId)).plusMinutes(
                 this.calendarSettings.defaultEventDuration.toLong())
@@ -242,7 +242,7 @@ class EventViewModel(
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
 
-                    val startTime = LocalTime.now().plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS)
+                    val startTime = ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS).toLocalTime()
                     timeStartBackup = startTime
                     timeEndBackup = startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
                 } else {

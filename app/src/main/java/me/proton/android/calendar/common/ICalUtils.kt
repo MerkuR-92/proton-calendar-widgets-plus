@@ -364,9 +364,9 @@ object ICalUtils {
         setSequence(0)
     }
 
-    fun generateEventStartTime(): LocalTime {
-        val time = LocalTime.now()
-        return time.plusMinutes(30L - (time.minute % 30))
+    fun generateEventStartTime(timeZoneId: ZoneId): LocalTime {
+        val time = ZonedDateTime.now(timeZoneId)
+        return time.plusMinutes(30L - (time.minute % 30)).toLocalTime()
     }
 
     /**

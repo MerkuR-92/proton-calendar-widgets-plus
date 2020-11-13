@@ -61,7 +61,8 @@ class MonthFragment : BaseFragment() {
             setOnClickListener {
                 // each item in the adapter is one day
                 val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-                requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime()))
+                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                    .navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime(calendarViewModel.timeZoneId)))
             }
         }
         val buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
