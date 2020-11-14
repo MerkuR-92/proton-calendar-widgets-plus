@@ -498,12 +498,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     // "ends" section
                     if (this.until != null) {
                         customEndingRadioGroup.check(R.id.custom_recurrence_end_2)
-                        custom_recurrence_end_2.setText(getString(
+                        custom_recurrence_end_2.text = getString(
                             R.string.event_recurrence_ends_on_date,
-                            DateFormat.getDateInstance(
-                                DateFormat.LONG,
-                                getLocaleForFormatting()
-                            ).format(this.until))
+                            ZonedDateTime.ofInstant(this.until.toInstant(), ZoneId.of(eventViewModel.eventTimeZoneId)).formatDate(eventViewModel.eventTimeZoneId)
                         )
                     }
                     if (this.count != null) {

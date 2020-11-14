@@ -356,11 +356,10 @@ class AndroidUtils(context: Context) {
                         }"
                     },
                     recurrence.until?.let {
+
                         context.getString(
-                            R.string.event_recurrence_until, DateFormat.getDateInstance(
-                                DateFormat.LONG,
-                                getLocaleForFormatting()
-                            ).format(it)
+                            R.string.event_recurrence_until,
+                            ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(timeZoneId)).formatDate(timeZoneId)
                         )
                     },
                 ).joinToString(separator = ", ")
