@@ -85,20 +85,30 @@ class CalendarsRepositoryImpl(
             visibleCalendars.value = dbCalendars.value.filterVisible()
 
             // force expanding Events after cold init is done
-            expandEventsToDateChannel.send(eventsExpandedUntil.plusMonths(2).withDayOfMonth(1))
+            eventsMutex.withLock {
+                expandEventsToDateChannel.send(eventsExpandedUntil.plusMonths(2).withDayOfMonth(1))
+            }
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
 
         coroutineScope.launch {
             expandEventsToDateFlow.debounce(DEBOUNCE_EXPANDING_EVENTS_ON_FETCH.toMillis()).collect {
-                expandEventsToDateChannel.send(it)
+                eventsMutex.withLock {
+                    if (it.isAfter(eventsExpandedUntil)) {
+                        expandEventsToDateChannel.send(it)
+                    }
+                }
             }
         }
 
         coroutineScope.launch {
+            // expand requests sent to the channel will be forced to execute for each message
+            //  but we take the maximum of until-dates
             expandEventsToDateChannel.consumeEach {
-                expandDbEventsUntil(it)
+                listOf(it, eventsExpandedUntil).maxByOrNull { it.toEpochSecond() }?.let {
+                    expandDbEventsUntil(it)
+                }
             }
         }
 
