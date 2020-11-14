@@ -10,29 +10,52 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import biweekly.ICalendar
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
+import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.visibleOrInvisible
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.MainActivity
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 
 
-class ItemCalendarAgendaFragment(
-    val calendarViewModel: CalendarViewModel,
-    val position: Int,
-    val date: LocalDate
-) : Fragment(), KoinComponent {
+class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
+
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+
+    private var position: Int? = null
+    private var date: LocalDate? = null
+
     private val fakeHeaderEvent = Event("", Calendar("", "", "", 1, true), ICalendar())
+
+    companion object {
+        fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment{
+            return ItemCalendarAgendaFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(POSITION_ARG, position)
+                    putSerializable(DATE_ARG, date)
+                }
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            position = it.getInt(POSITION_ARG)
+            date = it.getSerializable(DATE_ARG) as? LocalDate?
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val rootView = inflater.inflate(R.layout.item_calendar_agenda_fragment, container, false)
 
         return rootView
@@ -41,13 +64,16 @@ class ItemCalendarAgendaFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        TimberLogger.d("onViewCreated: $date")
+        // TODO To be tested but shouldn't happen
+        val immutableDate = date ?: return
+
+        TimberLogger.d("onViewCreated: $immutableDate")
 
         rv_agenda.apply {
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             // TODO: Use ViewModel to get userEmail once we have proper user management
-            adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, date, (requireActivity() as? MainActivity)?.getUserEmail()) {
+            adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, immutableDate, (requireActivity() as? MainActivity)?.getUserEmail()) {
                 findNavController().navigate(
                     Navigation.Deeplink.toEventDetails(
                         it.id,
@@ -61,8 +87,8 @@ class ItemCalendarAgendaFragment(
         list_view_status.visibleOrInvisible(true)
         list_view_status.text = resources.getString(R.string.agenda_loading_events)
 
-        calendarViewModel.eventsLiveData(date, date).observe(viewLifecycleOwner) {
-            TimberLogger.d("xxx observed events arrived in LIVE DATA, item agenda fragment: $date -> ${it.size}")
+        calendarViewModel.eventsLiveData(immutableDate, immutableDate).observe(viewLifecycleOwner) {
+            TimberLogger.d("xxx observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it.size}")
 
             if (it.isEmpty()) {
                 list_view_status.visibleOrInvisible(true)

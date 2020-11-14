@@ -70,6 +70,11 @@ object FormValidation {
 
 }
 
+object FragmentArguments {
+    const val POSITION_ARG = "POSITION_ARG"
+    const val DATE_ARG = "DATE_ARG"
+}
+
 val allowedTimezoneIds = listOf(
     "UTC",
     "Africa/Abidjan",

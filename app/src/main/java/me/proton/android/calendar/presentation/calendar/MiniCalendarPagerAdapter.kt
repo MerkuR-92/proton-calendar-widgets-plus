@@ -14,7 +14,7 @@ class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: 
     }
 
     override fun createFragment(position: Int): Fragment {
-        return ItemMiniCalendarFragment(
+        return ItemMiniCalendarFragment.newInstance(
             position,
             firstDayOfMonth.plusMonths((position - startingPosition).toLong())
         )

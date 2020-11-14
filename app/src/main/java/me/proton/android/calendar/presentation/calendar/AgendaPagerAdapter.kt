@@ -14,8 +14,7 @@ class AgendaPagerAdapter(activity: FragmentActivity, private val calendarViewMod
     }
 
     override fun createFragment(position: Int): Fragment {
-        return ItemCalendarAgendaFragment(
-            calendarViewModel,
+        return ItemCalendarAgendaFragment.newInstance(
             position,
             startingDate.plusDays((position - startingPosition).toLong())
         )
