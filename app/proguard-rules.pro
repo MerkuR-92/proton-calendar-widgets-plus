@@ -81,3 +81,12 @@
 -keepclasseswithmembers class me.proton.android.calendar.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+-keep,includedescriptorclasses class me.proton.core.**$$serializer { *; }
+-keepclassmembers class me.proton.core.** {
+    *** Companion;
+}
+-keepclasseswithmembers class me.proton.core.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
