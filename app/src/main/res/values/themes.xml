@@ -28,16 +28,16 @@
 <!--        <item name="android:fontFamily">@font/space_mono</item>-->
     </style>
 
-    <style name="AppTheme.DayNight" parent="AppTheme">
+    <style name="AppTheme.DayNight">
         <!-- Styling specific to light mode -->
         <!-- TODO windowLightStatusBar is API 23 Minimum, check if we need to support below APIs -->
         <item name="android:statusBarColor">@color/background_norm</item>
         <item name="android:windowLightStatusBar">true</item>
 
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/background_navigation_bar</item>
     </style>
 
-    <style name="AppTheme.DayNight.Splash" parent="AppTheme.DayNight">
+    <style name="AppTheme.DayNight.Splash">
         <item name="android:windowBackground">@drawable/splash_screen</item>
         <item name="android:statusBarColor">@color/brand_norm</item>
         <item name="android:navigationBarColor">@color/brand_norm</item>

@@ -87,7 +87,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
                         if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
-                            displaySplashScreen(false)
                             navigateTo(eventDetailsIntent.data!!)
                         } else {
                             navigateTo(Navigation.Deeplink.toMonth())
@@ -126,11 +125,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     fun displaySplashScreen(display: Boolean) {
         drawerLayout.visibleOrGone(!display)
-        val backgroundColor = if (display) R.color.brand_norm else R.color.background_norm
+
         val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm
-        window.statusBarColor =  resources.getColor(backgroundColor, null)
-        window.navigationBarColor =  resources.getColor(backgroundColor, null)
+        val statusBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_norm
+
         window.setBackgroundDrawableResource(backgroundDrawable)
+        window.statusBarColor =  resources.getColor(statusBarBackgroundColor, null)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+            val navigationBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_norm
+            window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        } else {
+            val navigationBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_navigation_bar
+            window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

@@ -37,7 +37,7 @@ abstract class BaseFragment : Fragment() {
         )
 
         // Hide splash screen
-        (requireActivity() as MainActivity).displaySplashScreen(false)
+        (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
         toolbar = rootView.findViewById(R.id.fragment_toolbar)
         toolbar.apply {

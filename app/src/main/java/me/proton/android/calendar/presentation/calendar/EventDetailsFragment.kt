@@ -297,6 +297,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun observeEventLiveData() {
 
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
+            (requireActivity() as? MainActivity)?.displaySplashScreen(false)
+
             // TODO Remove attendees condition once edit attendees is implemented
             buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty())
             buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty())
@@ -494,7 +496,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
-        val userEmail = (requireActivity() as MainActivity).getUserEmail()
+        val userEmail = (requireActivity() as? MainActivity)?.getUserEmail()
         event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
         if (userEmail == organizer.email) {
             event_attendee_organizer_layout.item_attendee_title.text =

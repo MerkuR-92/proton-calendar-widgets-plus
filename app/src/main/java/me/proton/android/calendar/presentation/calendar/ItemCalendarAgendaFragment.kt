@@ -47,7 +47,7 @@ class ItemCalendarAgendaFragment(
             //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             // TODO: Use ViewModel to get userEmail once we have proper user management
-            adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, date, (requireActivity() as MainActivity).getUserEmail()) {
+            adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, date, (requireActivity() as? MainActivity)?.getUserEmail()) {
                 findNavController().navigate(
                     Navigation.Deeplink.toEventDetails(
                         it.id,
