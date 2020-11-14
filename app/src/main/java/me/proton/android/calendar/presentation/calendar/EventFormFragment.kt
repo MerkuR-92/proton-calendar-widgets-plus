@@ -338,7 +338,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 event_form_location.isEnabled = !savingEvent
                 event_form_description.isEnabled = !savingEvent
                 event_form_all_day_press.isEnabled = !savingEvent
-                event_form_all_day_switch.isEnabled = !savingEvent
+                event_form_all_day_switch.isClickable = !savingEvent
+                event_form_all_day_switch.isFocusable = !savingEvent
                 event_form_timezone_press.isEnabled = !savingEvent
                 event_form_start_date_press.isEnabled = !savingEvent
                 event_form_end_date_press.isEnabled = !savingEvent
