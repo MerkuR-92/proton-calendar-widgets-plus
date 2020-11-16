@@ -35,16 +35,15 @@ class CalendarViewModel(
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val createEventUseCase: EditCreateEventUseCase,
-    private val updateCalendarUseCase: UpdateCalendarUseCase,
-    private val valueStoreProvider: ValueStoreProvider) : ViewModel() {
+    private val updateCalendarUseCase: UpdateCalendarUseCase) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
-    private var initialised = false
+    var initialised = false
 
-//    private lateinit var selectedCalendarIds: List<String>
+    private lateinit var userId: UserId
 
     override fun onCleared() {
         super.onCleared()
@@ -65,64 +64,37 @@ class CalendarViewModel(
 
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
-    val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-    private var userId: UserId? = null
-
-    //            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-//    val calendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")
-
     suspend fun getActiveCalendars(): List<CalendarEntity> {
-
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-
-        return if (TODOuserID != null) calendarsRepository.getActiveCalendars(TODOuserID).filter { it.isActive } else ArrayList()
+        return calendarsRepository.getActiveCalendars(userId.id).filter { it.isActive }
     }
 
     fun selectActiveCalendars(): LiveData<List<CalendarEntity>>? {
-
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-
-        return if (TODOuserID != null) calendarsRepository.flowCalendars(TODOuserID).map { calendars -> calendars.filter { it.isActive } }.asLiveData(Dispatchers.Default)
-        else null
+        return calendarsRepository.flowCalendars(userId.id).map { calendars -> calendars.filter { it.isActive } }.asLiveData(Dispatchers.Default)
     }
 
     fun selectDisabledCalendars(): LiveData<List<CalendarEntity>>? {
-
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-
-        return if (TODOuserID != null) calendarsRepository.flowCalendars(TODOuserID).map { calendars -> calendars.filter { it.isDisabled } }.asLiveData(Dispatchers.Default)
-        else null
+        return calendarsRepository.flowCalendars(userId.id).map { calendars -> calendars.filter { it.isDisabled } }.asLiveData(Dispatchers.Default)
     }
 
     suspend fun selectUser(): User? {
-
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-
-        return if (TODOuserID != null) usersRepository.selectUserById(TODOuserID) else null
+        return usersRepository.selectUserById(userId.id)
     }
 
-    suspend fun init(coroutineScope: CoroutineScope) {
-
-        if (!initialised) {
-            val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-            val TODOuserID = TODOvalueStore.getString("USERID") // TODO
-            if (TODOuserID != null) {
-                userId = UserId(TODOuserID)
-
-                timeZoneId = ZoneId.of(calendarsRepository.selectCalendarUserSettings(TODOuserID)?.primaryTimezone!!)
-                startWeekOn = usersRepository.selectUserSettings(TODOuserID)?.weekStartDayOfWeek()!!
-                timeFormatIs24Hour = usersRepository.selectUserSettings(TODOuserID)?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
+    suspend fun init(userId: UserId?) {
+        if (userId != null) {
+            this.userId = userId
+            if (!initialised) {
+                val timeZone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+                timeZoneId = ZoneId.of(timeZone)
+                startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
+                timeFormatIs24Hour =
+                    usersRepository.selectUserSettings(userId.id)?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
 
                 TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
 
                 initialised = true
             }
         }
-
     }
 
     private lateinit var miniCalendarPager: ViewPager2
@@ -189,10 +161,7 @@ class CalendarViewModel(
         return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
     }
 
-    private val eventsLiveDataMap = mutableMapOf<Pair<LocalDate, LocalDate>, LiveData<List<Event>>>()
-
     fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>> {
-//        return eventsLiveDataMap.getOrDefault(Pair(fromDate, toDate), calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default))
         return calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default)
     }
 
@@ -209,19 +178,18 @@ class CalendarViewModel(
                             timeZoneId: String) {
 
         withContext(Dispatchers.IO) {
-            calendarsRepository.fetchEvents(userId!!, fromDate, toDate, timeZoneId) // TODO UserId
+            calendarsRepository.fetchEvents(userId, fromDate, toDate, timeZoneId)
         }
-
     }
 
+    suspend fun handleDeleteEvent(eventId: String,
+                                  deleteOption: EventEditDeleteOption,
+                                  occurrenceNumber: Int? = null): UseCase.Result {
 
-
-    suspend fun handleDeleteEvent(eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int? = null): UseCase.Result {
         // TODO ÜBER IMPORTANT -- FIXME, PUT INTO WORKER!!!!!!!
-
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-                deleteEventUseCase.execute(userId!!, eventId, deleteOption, occurrenceNumber) // TODO UserId
+                deleteEventUseCase.execute(userId, eventId, deleteOption, occurrenceNumber) // TODO UserId
             }
         }.await()
     }
@@ -241,7 +209,7 @@ class CalendarViewModel(
             .setInputData(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR,
-                    UseCaseWorker.INPUT_USER_ID to userId?.id, // TODO UserId
+                    UseCaseWorker.INPUT_USER_ID to userId,
                     UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
                     UseCaseWorker.INPUT_CALENDAR_NAME to name,
                     UseCaseWorker.INPUT_CALENDAR_DESCRIPTION to description,
@@ -254,7 +222,7 @@ class CalendarViewModel(
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
 
-    // Returns timezoneid if it has been initialized
+    // Returns timezone id if it has been initialized
     fun getTimeZone(): ZoneId? {
         return if (this::timeZoneId.isInitialized) timeZoneId else null
     }

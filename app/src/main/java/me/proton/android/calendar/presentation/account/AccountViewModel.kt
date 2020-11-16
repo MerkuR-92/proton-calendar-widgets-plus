@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -48,11 +48,7 @@ class AccountViewModel(
     private val _state = MutableLiveData<State>()
 
     private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String) {
-        // TODO UGLY HACK SO WE CAN BOOTSTRAP CALENDARS AFTER LOGIN REMOVE THIS
-        var valueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-        valueStore.putString(ValueKey.USER_ID, userId.id)
-
-        valueStore = valueStoreProvider.provideValueStore(userId.id)
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
         valueStore.putString(ValueKey.USER_PASSPHRASE, String(passphrase))
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
@@ -75,7 +71,6 @@ class AccountViewModel(
 
     private suspend fun removeUser(userId: UserId) {
         accountManager.removeAccount(userId)
-        valueStoreProvider.provideValueStore("TODO LOGIN").clearAll()
         valueStoreProvider.provideValueStore(userId.id).clearAll()
     }
 
@@ -105,6 +100,12 @@ class AccountViewModel(
                     userPassphrase.value = result.passphrase
                 }
             }
+
+
+        viewModelScope.launch {
+            // Set userId value in VM if app was killed
+            if (userId.value == null) userId.value = accountManager.getPrimaryUserId().firstOrNull()?.id
+        }
 
         // Setup User as soon as all parameters are available.
         combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
@@ -148,5 +149,10 @@ class AccountViewModel(
         accountManager.getPrimaryUserId().onEach { userId ->
             userId?.let { action(true) } ?: action(false)
         }.launchIn(viewModelScope)
+    }
+
+    fun getUserId(): UserId? {
+        val userIdValue = userId.value ?: return null
+        return UserId(userIdValue)
     }
 }

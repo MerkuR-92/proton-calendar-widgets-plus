@@ -4,10 +4,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.presentation.account.AccountViewModel
+import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -15,8 +20,8 @@ import org.koin.core.inject
 class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
 
     private val logger: Logger by inject()
-    private val valueStoreProvider: ValueStoreProvider by inject()
     private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
+    private val accountManager: AccountManager by inject()
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -26,7 +31,11 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
         }
 
         // TODO for all users
-        val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")?.let { UserId(it) }
+        var userId: UserId?
+        runBlocking(Dispatchers.Default) {
+            userId = accountManager.getPrimaryUserId().firstOrNull()
+        }
+
         if (userId == null) {
             logger.e("userId null in ProtonCalendarBroadcastReceiver")
             return
@@ -38,13 +47,13 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
             // Intent.ACTION_LOCKED_BOOT_COMPLETED is probably not needed
             Intent.ACTION_BOOT_COMPLETED -> {
                 runBlocking(Dispatchers.Default) {
-                    handleAlarmsUseCase.execute(userId)
+                    handleAlarmsUseCase.execute(userId!!)
                 }
             }
             INTENT_ACTION_EVENT_ALARM -> {
                 runBlocking(Dispatchers.Default) {
                     handleAlarmsUseCase.execute(
-                        userId,
+                        userId!!,
                         if (intent.hasExtra(INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS)) intent.getLongExtra(
                             INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS,
                             0

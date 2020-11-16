@@ -92,7 +92,6 @@ class TransformEventUseCase(
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
             val attendees = eventEntity.attendees.map {
                 Json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
-//                gson.fromJson(it, Event.AttendeeStatusEvent::class.java)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter("X-PM-TOKEN")

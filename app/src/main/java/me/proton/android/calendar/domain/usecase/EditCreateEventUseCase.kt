@@ -109,9 +109,6 @@ class EditCreateEventUseCase(
 
         // 8. encrypt Attendees Part (optional)
 
-        // TODO GET RID OF THIS, GET MEMBER-ID
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
         val calendarId = newEvent.calendar.id // TODO get all members for this calendar and get 1st one
         val TODOmemberId = calendarId // TODO TAKE IT FROM MEMBER!!!
 

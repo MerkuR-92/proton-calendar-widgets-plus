@@ -42,6 +42,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.ZoneId
@@ -64,6 +65,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
+    private val accountViewModel: AccountViewModel by sharedViewModel()
     private val mainViewModel: MainViewModel by sharedViewModel()
 
     override fun onBackPressedCustom() {
@@ -254,17 +256,26 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
 
+            if (!calendarViewModel.initialised) {
+                //TODO Workaround since we create event details twice with current deeplink handling
+                return@launch
+            }
+
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
-            val viewModeInitStatus = withContext(Dispatchers.Default) {
-                eventViewModel.initialise(
-                    editMode = false,
-                    navigationArguments.eventId,
-                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                    null,
-                    null,
-                )
-            }
+            val userId = accountViewModel.getUserId()
+            val viewModeInitStatus =
+                if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                else withContext(Dispatchers.Default) {
+                    eventViewModel.initialise(
+                        userId,
+                        editMode = false,
+                        navigationArguments.eventId,
+                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                        null,
+                        null,
+                    )
+                }
 
             if (viewModeInitStatus == UseCase.Result.Success) {
                 observeEventLiveData()
@@ -276,10 +287,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
             }
-
         }
-
-
     }
 
     private fun attachActionHandlers() {

@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -26,11 +28,10 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.presentation.BaseFragment
 import me.proton.android.calendar.presentation.MainViewModel
-import me.proton.core.domain.entity.UserId
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -39,6 +40,7 @@ import java.time.LocalDate
 class MonthFragment : BaseFragment() {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val accountViewModel: AccountViewModel by sharedViewModel()
     private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
@@ -46,7 +48,6 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var toolbarTitle: TextView
 
-    private val valueStoreProvider: ValueStoreProvider by inject()
     private val mainViewModel: MainViewModel by viewModel()
 
     override val TAG: String
@@ -194,8 +195,7 @@ class MonthFragment : BaseFragment() {
 
         lifecycleScope.launchWhenStarted {
 
-            val userId = valueStoreProvider.provideValueStore("TODO LOGIN").getString("USERID")?.let { UserId(it) }
-
+            val userId = accountViewModel.getUserId()
             if (userId != null) {
 
                 // TODO schedule this from some global periodic scheduler

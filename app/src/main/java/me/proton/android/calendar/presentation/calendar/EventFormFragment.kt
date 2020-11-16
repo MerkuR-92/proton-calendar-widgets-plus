@@ -31,6 +31,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -43,7 +44,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel() //inject()
+    private val eventViewModel: EventViewModel by sharedViewModel()
+    private val accountViewModel: AccountViewModel by sharedViewModel()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -69,13 +71,17 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             displayDiscardChangesConfirmationDialog { _, _ ->
                 // Reinitialise event view model data when user chooses to discard modifications
                 lifecycleScope.launch {
-                    val viewModeInitStatus = eventViewModel.initialise(
-                        editMode = false,
-                        navigationArguments.eventId,
-                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                        null,
-                        null,
-                    )
+                    val userId = accountViewModel.getUserId()
+                    val viewModeInitStatus =
+                        if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                        else eventViewModel.initialise(
+                            userId,
+                            editMode = false,
+                            navigationArguments.eventId,
+                            if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                            null,
+                            null,
+                        )
                     if (viewModeInitStatus == UseCase.Result.Success) {
                         findNavController().navigateUp()
                     } else {
@@ -206,7 +212,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                     } else { // TODO merge this with code above
                         val success = withContext(Dispatchers.IO) {
-                            eventViewModel.handleSave(editOption = null, occurrenceNumber = 1)
+                            eventViewModel.handleSave(
+                                editOption = null,
+                                occurrenceNumber = 1)
                         }
                         // Post saving event value to false to stop loading state
                         eventViewModel.savingEvent.postValue(false)
@@ -304,8 +312,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
+            val userId = accountViewModel.getUserId()
             val viewModeInitStatus = withContext(Dispatchers.Default) {
-                eventViewModel.initialise(
+                if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                else eventViewModel.initialise(
+                    userId,
                     editMode = true,
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,

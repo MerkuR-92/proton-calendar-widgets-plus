@@ -8,14 +8,11 @@ import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Action
-import biweekly.property.DateStart
 import biweekly.property.Trigger
 import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
-import com.google.gson.Gson
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -31,7 +28,6 @@ import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
@@ -51,12 +47,11 @@ class EventViewModel(
     private val createEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
-    private val valueStoreProvider: ValueStoreProvider,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val gson: Gson,
     private val logger: Logger
 ) : ViewModel() {
 
+    private lateinit var userId: UserId
 
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
@@ -97,6 +92,7 @@ class EventViewModel(
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
     //  Check if any case require us to pass through it again or if we keep the init data we had from details
     suspend fun initialise(
+        userId: UserId,
         editMode: Boolean,
         eventId: String?,
         occurrenceNumber: Int?,
@@ -113,18 +109,12 @@ class EventViewModel(
         savingEvent.postValue(false)
         dbEvent = null
 
-//            calendarUserSettings.defaultCalendarId // TODO we still can't rely on this, it can be null in API!!!
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-//        val todoDefaultCalendarId = TODOvalueStore.getString("DEFAULT CALENDAR ID")!!
-        // TODO get those values from somewhere
-        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
-        val userId = TODOuserID//"IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
+        this.userId = userId
 
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId) ?: return UseCase.Result.Error("could not get default calendar ID")
+        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id) ?: return UseCase.Result.Error("could not get default calendar ID")
 
-        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId) ?: return UseCase.Result.Error("could not get Calendar User Settings")
-        userSettings = usersRepository.selectUserSettings(userId) ?: return UseCase.Result.Error("could not get User Settings")
+        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return UseCase.Result.Error("could not get Calendar User Settings")
+        userSettings = usersRepository.selectUserSettings(userId.id) ?: return UseCase.Result.Error("could not get User Settings")
 
 //        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 
@@ -343,7 +333,7 @@ class EventViewModel(
     var tempAlarmTime: LocalTime = LocalTime.of(9, 0)
 
     // TODO Remove filter once other type of alarms are handled
-    fun isAlarmLimitReached() = this.event.iCalEvent.alarms.filter { it.action == Action.display() }.size >= FormValidation.ALARM_COUNT_MAX
+    fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
     /**
      * Resets temporary values for Alarm.
@@ -356,6 +346,11 @@ class EventViewModel(
 
 
     suspend fun handleSave(editOption: EventEditDeleteOption? = null, occurrenceNumber: Int): Boolean { // create or edit
+
+        if (userId == null) {
+            logger.e("user ID is null in EventViewModel handleSave")
+            return false
+        }
 
 //        val calendarToSave = event.iCalendar
 
@@ -393,11 +388,6 @@ class EventViewModel(
         TimberLogger.d(("dbEventStartDate : ${dbEventStartDate}"))
         TimberLogger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence?.iCalendar?.printToString()}"))
         TimberLogger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
-
-        val TODOvalueStore = valueStoreProvider.provideValueStore("TODO LOGIN")
-//            val valueStore = valueStoreProvider.provideValueStore(TODOvalueStore.getString("USERID")!!)
-        val TODOuserID = TODOvalueStore.getString("USERID")!! // TODO
-        val userId = UserId(TODOuserID)
 
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {

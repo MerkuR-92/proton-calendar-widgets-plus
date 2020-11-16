@@ -28,15 +28,12 @@ import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.getInitials
-import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
@@ -52,7 +49,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
 
-    private val valueStoreProvider: ValueStoreProvider by inject()
     private val logger: Logger by inject()
 
     private val calendarViewModel: CalendarViewModel by viewModel()
@@ -66,7 +62,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
-            calendarViewModel.init(this)
+            val userId = accountViewModel.getUserId()
+            if (userId != null)calendarViewModel.init(userId)
+            // TODO Shouldn't happen : do we redirect to login if userId is null ?
+            else logger.e("Failed calendarViewModel initialization : user ID is null in MainActivity navigateTo")
 
             // Refresh drawer content now that we are logged in.
             initDrawerHeader()
@@ -99,7 +98,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         } else {
                             navigateTo(Navigation.Deeplink.toMonth())
                         }
-
                     }
                 }
             })
@@ -125,10 +123,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         initDrawerListeners()
 
-        initDrawerHeader()
-
         initDrawerCalendarsList()
-
     }
 
     fun displaySplashScreen(display: Boolean) {
@@ -178,7 +173,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    fun initDrawerHeader() {
+    private fun initDrawerHeader() {
         lifecycleScope.launch {
             val user = withContext(Dispatchers.Default) {
                 calendarViewModel.selectUser()
@@ -222,12 +217,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         (disabledCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         disabledCalendarListView.adapter = disabledCalendarListAdapter
-
-        //Populate calendars list
-        initDrawerCalendarsListContent()
     }
 
-    fun initDrawerCalendarsListContent() {
+    private fun initDrawerCalendarsListContent() {
         lifecycleScope.launch {
             calendarViewModel.selectActiveCalendars()?.observe(this@MainActivity) { activeCalendars ->
                 activeCalendarListAdapter.submitList(activeCalendars)
@@ -269,7 +261,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
 
 
-    //    private fun showDialogFragmentBottomSheet() {
+//    private fun showDialogFragmentBottomSheet() {
 //        val dialogView: View = layoutInflater.inflate(R.layout.fragment_bottom_sheet, null)
 //        val dialog = BottomSheetDialog(this)
 //        dialog.setContentView(dialogView)

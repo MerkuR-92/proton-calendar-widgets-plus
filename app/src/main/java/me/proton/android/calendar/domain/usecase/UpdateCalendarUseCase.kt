@@ -3,14 +3,10 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.UpdateCalendarApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
-import java.time.LocalDate
-import java.time.ZoneId
 
 class UpdateCalendarUseCase(
     private val logger: Logger,
