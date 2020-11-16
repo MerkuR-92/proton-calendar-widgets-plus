@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -182,7 +181,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     }
 
                     if (deleteResult == UseCase.Result.Success) {
-                        Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_SHORT).show()
+                        requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                         // Use onBackPressedCustom to handle navigation when opening details from notification
                         onBackPressedCustom()
                     } else {
@@ -193,7 +192,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
                         }
 
-                        Toast.makeText(requireContext(), "Error deleting event", Toast.LENGTH_LONG).show()
+                        view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
                     }
 
                 }
@@ -226,7 +225,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             }
                         }
                         if (deleteResult == UseCase.Result.Success) {
-                            Toast.makeText(requireContext(), "Event deleted", Toast.LENGTH_LONG).show()
+                            requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                             // Use onBackPressedCustom to handle navigation when opening details from notification
                             onBackPressedCustom()
                         } else {
@@ -237,11 +236,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
                             }
 
-                            Toast.makeText(
-                                requireContext(),
-                                "Error deleting event",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
                         }
                     }
                 }
@@ -283,7 +278,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
-                Toast.makeText(requireContext(), "Error opening event", Toast.LENGTH_LONG).show()
+                requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
             }
@@ -298,7 +293,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
         section_location.image_button_action.setOnClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
-                mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)
+                if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
+                    view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
+                }
             }
         }
     }

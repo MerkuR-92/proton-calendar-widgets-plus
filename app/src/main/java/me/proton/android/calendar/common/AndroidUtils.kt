@@ -39,6 +39,7 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -988,4 +989,26 @@ fun getParticipationStatusPriorityValue(participationStatus: ParticipationStatus
         ParticipationStatus.NEEDS_ACTION -> 3
         else -> 4
     }
+}
+
+fun Context.showToast(text: String) {
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+}
+
+// Call this method to display SnackBar in a Fragment
+fun Activity.displaySnackBar(message: String) {
+    Snackbar.make(
+        this.findViewById<View>(android.R.id.content),
+        message,
+        Snackbar.LENGTH_SHORT
+    ).show()
+}
+
+// Call this method to display SnackBar in a DialogFragment
+fun View.displaySnackBar(message: String) {
+    Snackbar.make(
+        this,
+        message,
+        Snackbar.LENGTH_SHORT
+    ).show()
 }

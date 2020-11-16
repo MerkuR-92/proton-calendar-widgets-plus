@@ -2,18 +2,14 @@ package me.proton.android.calendar.presentation
 
 import android.content.*
 import android.net.Uri
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
 import kotlinx.coroutines.Job
 import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.common.Navigation
 import me.proton.core.domain.entity.UserId
-import kotlin.Exception
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
@@ -50,7 +46,6 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             if (clipboard != null) {
                 val clip = ClipData.newPlainText("", content)
                 clipboard.setPrimaryClip(clip)
-                showToast(context.getString(R.string.toast_copied_to_clipboard))
                 TimberLogger.v("copying to clipboard success")
                 true
             } else false
@@ -58,10 +53,6 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             TimberLogger.v("copying to clipboard failed", e)
             false
         }
-    }
-
-    fun showToast(text: String) {
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     }
 
     // TODO sync all "active" accounts

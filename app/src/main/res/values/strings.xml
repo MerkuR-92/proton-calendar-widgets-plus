@@ -135,8 +135,6 @@
     <string name="event_recurring_update_this_cancel">Cancel</string>
     <string name="event_recurring_update_this_confirm">Update</string>
 
-    <string name="event_saving">Saving event, please wait</string>
-
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendars</string>
     <string name="nav_view_disabled_calendars">Disabled calendars</string>
@@ -147,10 +145,19 @@
     <string name="nav_view_more_login">Login</string>
     <string name="nav_view_version_name">ProtonCalendar %s</string>
 
-
-
-
-
+    <!-- SnackBar messages -->
+    <string name="snack_feature_coming_soon">This feature is coming soon</string>
+    <string name="snack_event_deleted">Event deleted</string>
+    <string name="snack_event_deleted_error">Error deleting event</string>
+    <string name="snack_event_opening_error">Error opening event</string>
+    <string name="snack_event_saving">Saving event</string>
+    <string name="snack_event_updated">Event updated</string>
+    <string name="snack_event_updated_error">Error updating event</string>
+    <string name="snack_event_created">Event created</string>
+    <string name="snack_event_created_error">Error creating event</string>
+    <string name="snack_event_opening_edit_error">Error opening event for edit</string>
+    <string name="snack_event_init_error">Error initialising new event</string>
+    <string name="snack_event_calendar_error">Error switching calendar</string>
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
@@ -159,6 +166,7 @@
     <string name="notification_text_tomorrow">Tomorrow</string>
     <string name="notification_text_tomorrow_part_time">Tomorrow at %s</string>
     <string name="notification_text_part_time">%s at %s</string>
+
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -180,7 +188,5 @@
     <string name="hello_gallery_second">Hello GallerySecondFragment. Arg: %1$s</string>
     <string name="hello_slideshow_second">Hello SlideshowSecondFragment. Arg: %1$s</string>
     <string name="delete">Delete</string>
-
-    <string name="feature_coming_soon">This feature is coming soon</string>
 
 </resources>

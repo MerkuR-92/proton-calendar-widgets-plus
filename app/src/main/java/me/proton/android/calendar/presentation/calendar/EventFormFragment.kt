@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
@@ -54,17 +53,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private val logger: Logger by inject()
 
-    private var toast: Toast? = null
-
     private lateinit var loadingAction: View
     private lateinit var buttonSave: View
 
     override fun onBackPressedCustom() {
         val immutableSavingEvent = eventViewModel.savingEvent.value
         if (immutableSavingEvent != null && immutableSavingEvent) {
-            if (toast != null) toast!!.cancel()
-            toast = Toast.makeText(requireContext(), getString(R.string.event_saving), Toast.LENGTH_SHORT)
-            toast!!.show()
+            view?.displaySnackBar(getString(R.string.snack_event_saving))
             return
         }
         if (eventViewModel.hasEventBeenEdited()) {
@@ -86,7 +81,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         findNavController().navigateUp()
                     } else {
                         TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
-                        Toast.makeText(requireContext(), "Error opening event", Toast.LENGTH_LONG).show()
+                        requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                         jumpToMonthView()
                     }
                 }
@@ -97,9 +92,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     override fun onNavigationIconClicked(): Boolean {
         val immutableSavingEvent = eventViewModel.savingEvent.value
         if (immutableSavingEvent != null && immutableSavingEvent) {
-            if (toast != null) toast!!.cancel()
-            toast = Toast.makeText(requireContext(), getString(R.string.event_saving), Toast.LENGTH_SHORT)
-            toast!!.show()
+            view?.displaySnackBar(getString(R.string.snack_event_saving))
             return true
         }
         if (eventViewModel.hasEventBeenEdited()) {
@@ -222,20 +215,20 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                             if (success) {
                                 onSuccessEventUpdateCalendarDisplay()
-                                Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+                                requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
                                 setMonthViewSelectedDay()
                                 jumpToMonthView()
                             } else {
-                                Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
+                                view?.displaySnackBar(getString(R.string.snack_event_updated_error))
                             }
                         } else {
                             if (success) {
                                 onSuccessEventUpdateCalendarDisplay()
-                                Toast.makeText(requireContext(), "Event created", Toast.LENGTH_SHORT).show()
+                                requireActivity().displaySnackBar(getString(R.string.snack_event_created))
                                 setMonthViewSelectedDay()
                                 jumpToMonthView()
                             } else {
-                                Toast.makeText(requireContext(), "Error creating event", Toast.LENGTH_LONG).show()
+                                view?.displaySnackBar(getString(R.string.snack_event_created_error))
                             }
                         }
                     }
@@ -279,10 +272,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             if (success) { // TODO remove duplicated code here and below
                 onSuccessEventUpdateCalendarDisplay()
-                Toast.makeText(requireContext(), "Event updated", Toast.LENGTH_SHORT).show()
+                requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
                 jumpToMonthView()
             } else {
-                Toast.makeText(requireContext(), "Error updating event", Toast.LENGTH_LONG).show()
+                view?.displaySnackBar(getString(R.string.snack_event_updated_error))
             }
 
         }
@@ -332,11 +325,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 logger.e((viewModeInitStatus as UseCase.Result.Error).message)
-                if (navigationArguments.eventId != null) { // TODO FIXME
-                    Toast.makeText(requireContext(), "Error opening event for edit", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(requireContext(), "Error initialising new event", Toast.LENGTH_LONG).show()
-                }
+                requireActivity().displaySnackBar(
+                    if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
+                    else getString(R.string.snack_event_init_error)
+                )
                 findNavController().navigateUp()
             }
 
@@ -505,9 +497,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_calendar_press.setOnClickListener {
             // TODO Remove once change calendar has been implemented
             if (navigationArguments.eventId != null) {
-                if (toast != null) toast!!.cancel()
-                toast = Toast.makeText(requireContext(), getString(R.string.feature_coming_soon), Toast.LENGTH_SHORT)
-                toast!!.show()
+                view?.displaySnackBar(getString(R.string.snack_feature_coming_soon))
                 return@setOnClickListener
             }
             requireActivity().clearFocusAndHideKeyboard(view)
@@ -525,7 +515,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                     lifecycleScope.launch {
                         if (!eventViewModel.handleCalendar(calendars[it])) {
-                            Toast.makeText(requireContext(), "Error switching calendar", Toast.LENGTH_LONG).show()
+                            view?.displaySnackBar(getString(R.string.snack_event_calendar_error))
                         }
                     }
 

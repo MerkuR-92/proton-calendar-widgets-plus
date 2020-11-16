@@ -153,6 +153,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_main_content.nav_view_user_layout.setOnClickListener {
             drawerLayout.close()
         }
+
         nav_view_main_content.nav_view_more_bug_press.setOnClickListener {
             // TODO Remove when we make in app user bug report form
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://protonmail.com/support-form"))
