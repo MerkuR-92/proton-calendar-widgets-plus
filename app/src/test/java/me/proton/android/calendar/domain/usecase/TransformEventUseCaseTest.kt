@@ -6,7 +6,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import biweekly.parameter.ParticipationStatus
-import com.google.gson.JsonParser
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -137,7 +136,7 @@ internal class TransformEventUseCaseTest {
             assertThat(event.iCalEvent.attendees[2].email).isEqualTo("adamtst@protonmail.com")
             assertThat(event.iCalEvent.attendees[2].participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
 
-            assertThat(event.verificationStatus).isEqualTo(Event.SignatureVerification.NO_KEYS)
+            assertThat(event.verificationStatus).isEqualTo(Event.SignatureVerification.SIGNED_BUT_NO_KEYS)
         }
     }
 

@@ -642,7 +642,7 @@ data class Event(
 
         abstract val type: Int // 0: cleartext, 1: encrypted, 2: signed, 3: encrypted & signed
         abstract val data: String
-        abstract val signature: String
+        abstract val signature: String?
         abstract val author: String
 
         val isEncrypted: Boolean get() = type and 1 > 0
@@ -655,12 +655,10 @@ data class Event(
             @SerialName("Data")
             override val data: String,
             @SerialName("Signature")
-            override val signature: String, // TODO can be null, APPLICABLE TO ALL PARTS
+            override val signature: String?,
             @SerialName("Author")
             override val author: String
-        ): EventPart() {
-
-        }
+        ): EventPart()
 
         @Serializable
         data class Calendar(
@@ -669,11 +667,10 @@ data class Event(
             @SerialName("Data")
             override val data: String,
             @SerialName("Signature")
-            override val signature: String,
+            override val signature: String?,
             @SerialName("Author")
             override val author: String
-        ): EventPart() {
-        }
+        ): EventPart()
 
         @Serializable
         data class Personal(
@@ -682,13 +679,12 @@ data class Event(
             @SerialName("Data")
             override val data: String,
             @SerialName("Signature")
-            override val signature: String,
+            override val signature: String?,
             @SerialName("Author")
             override val author: String,
             @SerialName("MemberID")
             val memberId: String
-        ): EventPart() {
-        }
+        ): EventPart()
 
         @Serializable
         data class Attendee(
@@ -697,11 +693,10 @@ data class Event(
             @SerialName("Data")
             override val data: String,
             @SerialName("Signature")
-            override val signature: String,
+            override val signature: String?,
             @SerialName("Author")
             override val author: String
-        ): EventPart() {
-        }
+        ): EventPart()
 
     }
 
@@ -725,7 +720,8 @@ data class Event(
     enum class SignatureVerification {
         SUCCESS,
         FAILURE,
-        NO_KEYS
+        SIGNED_BUT_NO_KEYS,
+        NOT_SIGNED
     }
 }
 

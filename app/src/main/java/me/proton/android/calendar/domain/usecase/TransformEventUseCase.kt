@@ -3,8 +3,11 @@ package me.proton.android.calendar.domain.usecase
 import com.google.gson.Gson
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.sanitise
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.adjustIncomingAllDayEvent
+import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
@@ -39,47 +42,44 @@ class TransformEventUseCase(
         eventEntity.sharedEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Shared>(it)
         }.forEach { sharedEvent ->
-            calendarParts.add(
                 getPlainText(
                     eventEntity.sharedKeyPacket,
                     calendarKey.privateKey,
                     keyPassphrase,
-                    sharedEvent))
+                    sharedEvent)?.let { calendarParts.add(it) }
         }
 
         // process Calendar Events
         eventEntity.calendarEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Calendar>(it)
         }.forEach { calendarEvent ->
-            calendarParts.add(
                 getPlainText(
                     eventEntity.calendarKeyPacket,
                     calendarKey.privateKey,
                     keyPassphrase,
-                    calendarEvent))
+                    calendarEvent)?.let { calendarParts.add(it) }
         }
 
         // process Personal Events
         eventEntity.personalEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Personal>(it)
         }.forEach { personalEvent ->
-            calendarParts.add(getPlainText(
+                getPlainText(
                 null, // personal parts are only signed
                 calendarKey.privateKey,
                 keyPassphrase,
-                personalEvent))
+                personalEvent)?.let { calendarParts.add(it) }
         }
 
         // process Attendees Events
         eventEntity.attendeesEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Attendee>(it)
         }.forEach { attendeeEvent ->
-            calendarParts.add(
                 getPlainText(
                 eventEntity.sharedKeyPacket,
                 calendarKey.privateKey,
                 keyPassphrase,
-                attendeeEvent))
+                attendeeEvent)?.let { calendarParts.add(it) }
         }
 
         if (calendarParts.isEmpty()) return null
@@ -120,8 +120,8 @@ class TransformEventUseCase(
                     Event.SignatureVerification.SUCCESS
                 } else if (verificationStatuses.any { it == Event.SignatureVerification.FAILURE }) {
                     Event.SignatureVerification.FAILURE
-                } else if (verificationStatuses.any { it == Event.SignatureVerification.NO_KEYS }) {
-                    Event.SignatureVerification.NO_KEYS
+                } else if (verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_NO_KEYS }) {
+                    Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                 } else null
             )
 
@@ -134,44 +134,53 @@ class TransformEventUseCase(
                                      privateKey: String,
                                      keyPassphrase: String,
                                      eventPart: Event.EventPart
-    ): String {
+    ): String? {
 
-         val isEncrypted = eventPart.isEncrypted
-         val data = eventPart.data
-         val author = eventPart.author
-         val signature = eventPart.signature
-
-        val decryptedText = if (isEncrypted && keyPacket != null) {
-            val cipherText = Ciphertext.from(keyPacket, data)
-            crypto.decryptText(cipherText.asArmoredPGPMessage(), privateKey, keyPassphrase.toByteArray())
-        } else null
-
-        // TODO consider creating flag for disabling verification, OR maybe when we create repository cache,
-        //  too many open cursors won't be a problem anymore
-        val verificationKeys = database.publicKeysDao().select(author).map { it.publicKey }
-        if (verificationKeys.isEmpty()) {
-            verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
+        // decrypt if necessary
+        val plainText = if (eventPart.isEncrypted) {
+            if (keyPacket != null) {
+                val cipherText = Ciphertext.from(keyPacket, eventPart.data)
+                crypto.decryptText(cipherText.asArmoredPGPMessage(), privateKey, keyPassphrase.toByteArray())
+            } else null
         } else {
-            val signatureOk = if (decryptedText != null) {
-                crypto.verifyTextDetached(decryptedText, signature, verificationKeys)
-            } else {
-                crypto.verifyTextDetached(data, signature, verificationKeys)
-            }
+            eventPart.data
+        }
 
-            if (signatureOk) {
-                verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+        if (plainText != null) {
+
+            // verify signature if necessary
+            if (eventPart.isSigned) {
+
+                if (eventPart.signature != null) {
+
+                    // TODO introduce verification keys cache
+                    val verificationKeys = database.publicKeysDao().select(eventPart.author).map { it.publicKey }
+                    if (verificationKeys.isEmpty()) {
+                        verificationStatuses.add(Event.SignatureVerification.SIGNED_BUT_NO_KEYS)
+                    } else {
+
+                        val signatureOk = eventPart.signature?.let {
+                            crypto.verifyTextDetached(plainText, it, verificationKeys)
+                        } ?: false
+
+                        if (signatureOk) {
+                            verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+                        } else {
+                            verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                            logger.v("signature not okay for ${plainText}")
+                        }
+                    }
+
+                } else {
+                    logger.e("EventPart ${eventPart.javaClass} is signed but there is no signature")
+                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                }
+
             } else {
-                verificationStatuses.add(Event.SignatureVerification.FAILURE)
-                logger.v("signature not okay for ${decryptedText}")
+                verificationStatuses.add(Event.SignatureVerification.NOT_SIGNED)
             }
         }
 
-        if (decryptedText != null) {
-            logger.v("decrypted shared event: " + decryptedText)
-        } else {
-            logger.v("not-decrypted shared event: " + data)
-        }
-
-        return decryptedText ?: data
+        return plainText
     }
 }
