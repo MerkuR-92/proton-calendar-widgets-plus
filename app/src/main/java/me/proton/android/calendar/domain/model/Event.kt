@@ -638,65 +638,71 @@ data class Event(
         }
     }
 
-    @Serializable
-    data class SharedEvent( // TODO maybe this could be named "SharedPart" or "SharedSplit", the same for others
-        @SerialName("Type")
-        val type: Int, // 2 for SIGNED 3 for encrypted + signed
-        @SerialName("Data")
-        val data: String,
-        @SerialName("Signature")
-        val signature: String,
-        @SerialName("Author")
-        val author: String
-    ) {
-        val isEncrypted: Boolean get() = type and 1 > 0
-//        val isSigned: Boolean get() = type and 2 > 0
-    }
+    sealed class EventPart {
 
-    @Serializable
-    data class CalendarEvent(
-        @SerialName("Type")
-        val type: Int, // 2 for SIGNED 3 for encrypted + signed
-        @SerialName("Data")
-        val data: String,
-        @SerialName("Signature")
-        val signature: String,
-        @SerialName("Author")
-        val author: String
-    ) {
-        val isEncrypted: Boolean get() = type and 1 > 0
-//        val isSigned: Boolean get() = type and 2 > 0
-    }
+        abstract val type: Int // 0: cleartext, 1: encrypted, 2: signed, 3: encrypted & signed
+        abstract val data: String
+        abstract val signature: String
+        abstract val author: String
 
-    @Serializable
-    data class PersonalEvent(
-        @SerialName("Type")
-        val type: Int, // 2 for SIGNED 3 for encrypted + signed
-        @SerialName("Data")
-        val data: String,
-        @SerialName("Signature")
-        val signature: String,
-        @SerialName("Author")
-        val author: String,
-        @SerialName("MemberID")
-        val memberId: String
-    ) {
-//        val isSigned: Boolean get() = type and 2 > 0
-    }
-
-    @Serializable
-    data class AttendeeEvent(
-        @SerialName("Type")
-        val type: Int, // 2 for SIGNED 3 for encrypted + signed
-        @SerialName("Data")
-        val data: String,
-        @SerialName("Signature")
-        val signature: String,
-        @SerialName("Author")
-        val author: String
-    ) {
         val isEncrypted: Boolean get() = type and 1 > 0
-//            val isSigned: Boolean get() = type and 2 > 0
+        val isSigned: Boolean get() = type and 2 > 0
+
+        @Serializable
+        data class Shared(
+            @SerialName("Type")
+            override val type: Int,
+            @SerialName("Data")
+            override val data: String,
+            @SerialName("Signature")
+            override val signature: String, // TODO can be null, APPLICABLE TO ALL PARTS
+            @SerialName("Author")
+            override val author: String
+        ): EventPart() {
+
+        }
+
+        @Serializable
+        data class Calendar(
+            @SerialName("Type")
+            override val type: Int,
+            @SerialName("Data")
+            override val data: String,
+            @SerialName("Signature")
+            override val signature: String,
+            @SerialName("Author")
+            override val author: String
+        ): EventPart() {
+        }
+
+        @Serializable
+        data class Personal(
+            @SerialName("Type")
+            override val type: Int,
+            @SerialName("Data")
+            override val data: String,
+            @SerialName("Signature")
+            override val signature: String,
+            @SerialName("Author")
+            override val author: String,
+            @SerialName("MemberID")
+            val memberId: String
+        ): EventPart() {
+        }
+
+        @Serializable
+        data class Attendee(
+            @SerialName("Type")
+            override val type: Int,
+            @SerialName("Data")
+            override val data: String,
+            @SerialName("Signature")
+            override val signature: String,
+            @SerialName("Author")
+            override val author: String
+        ): EventPart() {
+        }
+
     }
 
     @Serializable

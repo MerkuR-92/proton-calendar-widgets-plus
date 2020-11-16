@@ -2,17 +2,13 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
 import com.proton.gopenpgp.crypto.SessionKey
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 
@@ -122,13 +118,13 @@ class EditCreateEventUseCase(
 
         // 9. assemble API request, depending on action we're taking
         val sharedEventContent = listOf(
-            Event.SharedEvent(
+            Event.EventPart.Shared(
                 2,
                 sharedPartICalString,
                 signatureOfSharedPart!!, // TODO
                 "" // on server, "author" will be extracted from MemberID and this value ignored
             ),
-            Event.SharedEvent(
+            Event.EventPart.Shared(
                 3,
                 encryptedSharedPartCiphertext.encodedDataPacket,
                 signatureOfEncryptedSharedPart!!, // TODO
@@ -138,7 +134,7 @@ class EditCreateEventUseCase(
 
         val calendarEventContent = listOfNotNull(
             if (calendarPartICalString != null && signatureOfCalendarPart != null) {
-                Event.CalendarEvent(
+                Event.EventPart.Calendar(
                     2,
                     calendarPartICalString,
                     signatureOfCalendarPart,
@@ -146,7 +142,7 @@ class EditCreateEventUseCase(
                 )
             } else null,
             if (encryptedCalendarPartCiphertext != null && signatureOfEncryptedCalendarPart != null) {
-                Event.CalendarEvent(
+                Event.EventPart.Calendar(
                     3,
                     encryptedCalendarPartCiphertext.encodedDataPacket,
                     signatureOfEncryptedCalendarPart,
@@ -156,7 +152,7 @@ class EditCreateEventUseCase(
         ).ifEmpty { null }
 
         val personalEventContent = if (personalPartICalString != null && signatureOfPersonalPart != null) {
-            Event.PersonalEvent(
+            Event.EventPart.Personal(
                 2,
                 personalPartICalString,
                 signatureOfPersonalPart,

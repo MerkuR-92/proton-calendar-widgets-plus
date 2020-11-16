@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.parameter.ParticipationStatus
 import com.google.gson.Gson
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -38,72 +37,49 @@ class TransformEventUseCase(
 
         // process Shared Events
         eventEntity.sharedEvents.map {
-            Json.decodeFromJsonElement<Event.SharedEvent>(it)
-//            gson.fromJson(it, Event.SharedEvent::class.java)
+            Json.decodeFromJsonElement<Event.EventPart.Shared>(it)
         }.forEach { sharedEvent ->
             calendarParts.add(
-                getDecryptedText(
+                getPlainText(
                     eventEntity.sharedKeyPacket,
                     calendarKey.privateKey,
                     keyPassphrase,
-                    sharedEvent.isEncrypted,
-                    sharedEvent.data,
-                    sharedEvent.author,
-                    sharedEvent.signature))
+                    sharedEvent))
         }
 
         // process Calendar Events
         eventEntity.calendarEvents.map {
-            Json.decodeFromJsonElement<Event.CalendarEvent>(it)
-//            gson.fromJson(it, Event.CalendarEvent::class.java)
+            Json.decodeFromJsonElement<Event.EventPart.Calendar>(it)
         }.forEach { calendarEvent ->
             calendarParts.add(
-                getDecryptedText(
+                getPlainText(
                     eventEntity.calendarKeyPacket,
                     calendarKey.privateKey,
                     keyPassphrase,
-                    calendarEvent.isEncrypted,
-                    calendarEvent.data,
-                    calendarEvent.author,
-                    calendarEvent.signature))
+                    calendarEvent))
         }
 
-        // process Personal Events, those are only signed
+        // process Personal Events
         eventEntity.personalEvents.map {
-            Json.decodeFromJsonElement<Event.PersonalEvent>(it)
-//            gson.fromJson(it, Event.PersonalEvent::class.java)
+            Json.decodeFromJsonElement<Event.EventPart.Personal>(it)
         }.forEach { personalEvent ->
-            val verificationKeys = database.publicKeysDao().select(personalEvent.author).map { it.publicKey }
-            if (verificationKeys.isEmpty()) {
-                verificationStatuses.add(Event.SignatureVerification.NO_KEYS)
-            } else {
-                val signatureOk = crypto.verifyTextDetached(personalEvent.data, personalEvent.signature, verificationKeys)
-                if (signatureOk) {
-                    verificationStatuses.add(Event.SignatureVerification.SUCCESS)
-                } else {
-                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
-                }
-                logger.v("signature ok for personal event: " + signatureOk)
-                logger.v("not-decrypted personal event: " + personalEvent.data)
-            }
-
-            calendarParts.add(personalEvent.data)
+            calendarParts.add(getPlainText(
+                null, // personal parts are only signed
+                calendarKey.privateKey,
+                keyPassphrase,
+                personalEvent))
         }
 
         // process Attendees Events
         eventEntity.attendeesEvents.map {
-            Json.decodeFromJsonElement<Event.AttendeeEvent>(it)
-//            gson.fromJson(it, Event.AttendeeEvent::class.java)
+            Json.decodeFromJsonElement<Event.EventPart.Attendee>(it)
         }.forEach { attendeeEvent ->
             calendarParts.add(
-                getDecryptedText(
+                getPlainText(
                 eventEntity.sharedKeyPacket,
                 calendarKey.privateKey,
                 keyPassphrase,
-                attendeeEvent.isEncrypted,
-                attendeeEvent.data,
-                attendeeEvent.author,
-                attendeeEvent.signature))
+                attendeeEvent))
         }
 
         if (calendarParts.isEmpty()) return null
@@ -151,13 +127,19 @@ class TransformEventUseCase(
 
     }
 
-    private suspend fun getDecryptedText(keyPacket: String?,
-                                 privateKey: String,
-                                 keyPassphrase: String,
-                                 isEncrypted: Boolean,
-                                 data: String,
-                                 author: String,
-                                 signature: String): String {
+    /**
+     * Get plaintext payload or decrypt & check signature if necessary.
+     */
+    private suspend fun getPlainText(keyPacket: String?,
+                                     privateKey: String,
+                                     keyPassphrase: String,
+                                     eventPart: Event.EventPart
+    ): String {
+
+         val isEncrypted = eventPart.isEncrypted
+         val data = eventPart.data
+         val author = eventPart.author
+         val signature = eventPart.signature
 
         val decryptedText = if (isEncrypted && keyPacket != null) {
             val cipherText = Ciphertext.from(keyPacket, data)

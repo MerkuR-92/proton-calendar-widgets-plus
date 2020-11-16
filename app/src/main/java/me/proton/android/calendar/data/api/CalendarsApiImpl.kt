@@ -9,7 +9,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
-import me.proton.core.network.data.protonApi.GenericResponse
 import retrofit2.http.*
 
 interface CalendarsApiService : BaseRetrofitApi {
@@ -205,13 +204,13 @@ data class SyncEvent(
     @SerialName("CalendarKeyPacket")
     val calendarKeyPacket: String? = null,
     @SerialName("CalendarEventContent")
-    val calendarEventContent: List<Event.CalendarEvent>? = null,
+    val calendarEventContent: List<Event.EventPart.Calendar>? = null,
     @SerialName("SharedKeyPacket")
     val sharedKeyPacket: String? = null,
     @SerialName("SharedEventContent")
-    val sharedEventContent: List<Event.SharedEvent>,
+    val sharedEventContent: List<Event.EventPart.Shared>,
     @SerialName("PersonalEventContent")
-    val personalEventContent: Event.PersonalEvent? = null
+    val personalEventContent: Event.EventPart.Personal? = null
 )
 
 @Serializable
