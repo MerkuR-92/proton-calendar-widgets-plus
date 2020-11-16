@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
+import biweekly.property.Action
 import biweekly.property.Trigger
 import biweekly.util.*
 import biweekly.util.DayOfWeek
@@ -344,7 +345,8 @@ class EventViewModel(
     var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
     var tempAlarmTime: LocalTime = LocalTime.of(9, 0)
 
-    fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
+    // TODO Remove filter once other type of alarms are handled
+    fun isAlarmLimitReached() = this.event.iCalEvent.alarms.filter { it.action == Action.display() }.size >= FormValidation.ALARM_COUNT_MAX
 
     /**
      * Resets temporary values for Alarm.

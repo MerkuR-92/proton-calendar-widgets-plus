@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
@@ -539,7 +540,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         val event = eventViewModel.eventLiveData.value!!
 
-        event.iCalEvent.alarms.forEachIndexed { index, alarm ->
+        // TODO Remove filter once other type of alarms are handled
+        event.iCalEvent.alarms.filter { it.action == Action.display() }.forEachIndexed { index, alarm ->
 
             val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {

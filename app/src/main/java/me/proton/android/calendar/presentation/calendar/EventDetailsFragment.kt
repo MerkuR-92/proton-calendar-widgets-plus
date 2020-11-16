@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.parameter.ParticipationStatus
+import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Organizer
 import biweekly.property.Status
@@ -390,7 +391,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 visibleOrGone(true)
             }
 
-            val alarmLabels = event.iCalEvent.alarms.sortedBy { it.trigger.duration.toMillis() }
+            // TODO Remove filter once other type of alarms are handled
+            val alarmLabels = event.iCalEvent.alarms.filter { it.action == Action.display() }.sortedBy { it.trigger.duration.toMillis() }
                 .mapNotNull { alarm ->
                     AndroidUtils.formatAlarm(
                         resources,
