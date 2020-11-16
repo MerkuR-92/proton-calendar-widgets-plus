@@ -156,7 +156,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 persistFormData()
 
                 // Allow saving with no edition if creating an event
-                if (navigationArguments.eventId.isNullOrEmpty() || (!navigationArguments.eventId.isNullOrEmpty() && eventViewModel.hasEventBeenEdited())) {
+                if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
 
                     val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
                             (eventViewModel.dbEvent?.isRecurring() == true || eventViewModel.dbEvent?.isPartOfChain() == true) &&
