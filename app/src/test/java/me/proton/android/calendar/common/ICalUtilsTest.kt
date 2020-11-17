@@ -88,7 +88,7 @@ internal class ICalUtilsTest {
 
     }
 
-    // TODO check out how we can fallback for timeznes that are not handled on the device
+    // TODO check out how we can fallback for timezones that are not handled on the device
     //  this test fails on the CI which means it will fail on random devices as well
     @Disabled
     @Test
