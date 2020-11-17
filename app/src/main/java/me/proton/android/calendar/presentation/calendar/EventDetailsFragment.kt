@@ -42,6 +42,7 @@ import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
+import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.ZoneId
@@ -344,7 +345,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
 
                 this.text_summary.text =
-                    event.summary ?: resources.getString(R.string.default_event_summary)
+                    event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
 
                 this.text_date_time.text = event.formatStartEndForActualEndDate(
                     eventViewModel.displayTimeZoneId,
@@ -364,7 +365,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 visibleOrGone(true)
             }
 
-            event.location?.let {
+            event.location?.nullIfBlank()?.let {
                 with(section_location) {
                     text_header.text = event.location
                     val typedValue = TypedValue()
@@ -419,7 +420,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            event.description?.let {
+            event.description?.nullIfBlank()?.let {
                 with(section_description) {
                     text_header.text = event.description
                     Linkify.addLinks(text_header, Linkify.ALL)

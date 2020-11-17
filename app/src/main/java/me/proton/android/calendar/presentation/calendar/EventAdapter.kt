@@ -19,6 +19,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
+import me.proton.core.util.kotlin.nullIfBlank
 import java.time.LocalDate
 
 class EventAdapter(
@@ -65,7 +66,7 @@ class EventAdapter(
                         timeZoneId
                     ))?.formatTime(timeZoneId, is24Hour)}" // TODO
 
-                textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
+                textViewSubheader.text = event.summary?.nullIfBlank() ?: itemView.resources.getString(R.string.default_event_summary)
 
                 if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                     textViewSubheaderSide.visibleOrGone(false)
@@ -131,7 +132,7 @@ class EventAdapter(
                     textViewHeader.visibleOrGone(false)
                 }
 
-                textViewSubheader.text = event.summary ?: itemView.resources.getString(R.string.default_event_summary)
+                textViewSubheader.text = event.summary?.nullIfBlank() ?: itemView.resources.getString(R.string.default_event_summary)
 
                 if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                     textViewSubheaderSide.visibleOrGone(false)
