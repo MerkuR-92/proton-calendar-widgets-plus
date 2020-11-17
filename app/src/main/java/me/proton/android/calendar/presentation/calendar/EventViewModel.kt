@@ -372,8 +372,6 @@ class EventViewModel(
 
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
 
-        handleSequence()
-
         // TODO FIXME THIS HAS TO COUNT FROM db-EVENT START, NOT MODIFIED CURRENT EVENT!
         //val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
 
@@ -383,6 +381,8 @@ class EventViewModel(
         val originalDbEventStartDate = originalDbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
         val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
         val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.iCalEvent?.getStart(event.defaultTimeZone!!)
+
+        handleSequence(dbEventWithOccurrence)
 
         TimberLogger.d("db event =${dbEvent?.iCalendar?.printToString()}")
         TimberLogger.d(("dbEventStartDate : ${dbEventStartDate}"))
@@ -647,17 +647,24 @@ class EventViewModel(
 
     }
 
-    private fun handleSequence() {
+    private fun handleSequence(dbEventWithOccurrence: Event? = null) {
         // Bump sequence when event is new or following changes :
         // - Status
         // - Start / End time in UTC
         // - Recurrence ID
         // - Recurrence Rule
         // Note that when editing a single edits we ignore the recurrence rule changes
+        val dbEventStart =
+            if (event.isRecurring()) dbEventWithOccurrence?.getStart(eventTimeZoneId)
+            else dbEvent?.getStart(eventTimeZoneId)
+        val dbEventEnd =
+            if (event.isRecurring()) dbEventWithOccurrence?.getEnd(eventTimeZoneId)
+            else dbEvent?.getEnd(eventTimeZoneId)
+
         val bumpSequence = dbEvent == null ||
                 dbEvent?.status != event.status ||
-                dbEvent?.getStart(eventTimeZoneId) != event.getStart(eventTimeZoneId) ||
-                dbEvent?.getEnd(eventTimeZoneId) != event.getEnd(eventTimeZoneId) ||
+                dbEventStart != event.getStart(eventTimeZoneId) ||
+                dbEventEnd != event.getEnd(eventTimeZoneId) ||
                 (dbEvent?.isSingleEdit() == false && dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule)
 
         if (bumpSequence) {
