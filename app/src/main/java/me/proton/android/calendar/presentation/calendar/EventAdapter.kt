@@ -93,7 +93,7 @@ class EventAdapter(
                     textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
-                itemView.setOnClickListener { clickListener?.invoke(event) }
+                itemView.setOnSingleClickListener { clickListener?.invoke(event) }
             }
         }
 
@@ -192,7 +192,7 @@ class EventAdapter(
                     textViewSubheader.paintFlags = textViewSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
-                itemView.setOnClickListener { clickListener?.invoke(event) }
+                itemView.setOnSingleClickListener { clickListener?.invoke(event) }
             }
         }
     }

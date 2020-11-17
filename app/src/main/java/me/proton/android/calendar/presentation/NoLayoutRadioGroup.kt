@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation
 import android.view.View
 import android.widget.RadioButton
 import androidx.annotation.IdRes
+import me.proton.android.calendar.common.setOnSingleClickListener
 
 /**
  * Class mimicking RadioGroup component for checking RadioButtons that are not inside RadioGroup.
@@ -24,7 +25,7 @@ class NoLayoutRadioGroup(onChecked: (viewId: Int) -> Unit) {
     fun add(vararg radioButtons: RadioButton) {
         radioButtons.forEach {
             buttons.putIfAbsent(it.id, it.apply {
-                setOnClickListener(onClickListener)
+                setOnSingleClickListener(onClickListener)
             })
         }
     }

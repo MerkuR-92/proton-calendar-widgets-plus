@@ -150,11 +150,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerListeners() {
         //Navigation drawer items on click listeners
-        nav_view_main_content.nav_view_user_layout.setOnClickListener {
+        nav_view_main_content.nav_view_user_layout.setOnSingleClickListener {
             drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_more_bug_press.setOnClickListener {
+        nav_view_main_content.nav_view_more_bug_press.setOnSingleClickListener {
             // TODO Remove when we make in app user bug report form
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://protonmail.com/support-form"))
             startActivity(browserIntent)
@@ -164,11 +164,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             nav_view_main_content.nav_view_more_logout_layout.isVisible = it
             nav_view_main_content.nav_view_more_login_layout.isGone = it
         }
-        nav_view_main_content.nav_view_more_logout_press.setOnClickListener {
+        nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
             accountViewModel.logoutPrimary()
             drawerLayout.close()
         }
-        nav_view_main_content.nav_view_more_login_press.setOnClickListener {
+        nav_view_main_content.nav_view_more_login_press.setOnSingleClickListener {
             accountViewModel.startLoginWorkflow()
             drawerLayout.close()
         }
@@ -259,16 +259,5 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             super.onBackPressed()
         }
     }
-
-
-
-//    private fun showDialogFragmentBottomSheet() {
-//        val dialogView: View = layoutInflater.inflate(R.layout.fragment_bottom_sheet, null)
-//        val dialog = BottomSheetDialog(this)
-//        dialog.setContentView(dialogView)
-//        dialog.show()
-//    }
-//
-//
 
 }

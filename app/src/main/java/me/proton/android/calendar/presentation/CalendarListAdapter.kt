@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_drawer_calendar.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.setOnSingleClickListener
 import me.proton.android.calendar.data.entity.CalendarEntity
 
 class CalendarListAdapter(
@@ -48,7 +49,7 @@ class CalendarListAdapter(
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
 
-            calendarEntityItemOverlay.setOnClickListener {
+            calendarEntityItemOverlay.setOnSingleClickListener {
                 calendarEntityItemCheckBox.isChecked = !calendarEntityItemCheckBox.isChecked
                 listener(calendarEntity, if(calendarEntityItemCheckBox.isChecked) 1 else 0)
             }

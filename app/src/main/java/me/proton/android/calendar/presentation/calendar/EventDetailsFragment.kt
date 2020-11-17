@@ -95,7 +95,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_secondary, dialog_toolbar_content, false)
         with (buttonEdit) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_pencil))
-            setOnClickListener {
+            setOnSingleClickListener {
                 findNavController().navigate(
                     (Navigation.Deeplink.toEventEdit(
                         navigationArguments.eventId,
@@ -106,7 +106,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_secondary, dialog_toolbar_content, false)
         with (buttonMenu) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_three_dots_vertical))
-            setOnClickListener {
+            setOnSingleClickListener {
                 AndroidUtils.displayPopupMenu(
                     view = it,
                     labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
@@ -286,12 +286,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun attachActionHandlers() {
-        section_location.text_header.setOnClickListener {
+        section_location.text_header.setOnSingleClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
                 mainViewModel.handleEventLocationShow(it)
             }
         }
-        section_location.image_button_action.setOnClickListener {
+        section_location.image_button_action.setOnSingleClickListener() {
             eventViewModel.eventLiveData.value?.location?.let {
                 if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))

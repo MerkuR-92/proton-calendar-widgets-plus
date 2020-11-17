@@ -59,7 +59,7 @@ class MonthFragment : BaseFragment() {
         val buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
         with (buttonCreate) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
-            setOnClickListener {
+            setOnSingleClickListener {
                 // each item in the adapter is one day
                 val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view)
@@ -69,7 +69,7 @@ class MonthFragment : BaseFragment() {
         val buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
         with (buttonToday) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
-            setOnClickListener {
+            setOnSingleClickListener {
                 val todayDate = LocalDate.now(calendarViewModel.timeZoneId)
                 calendarViewModel.handleDaySelected(todayDate)
             }

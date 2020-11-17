@@ -84,7 +84,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonDone) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_done)
-            setOnClickListener {
+            setOnSingleClickListener {
                 onDoneClick()
             }
         }
@@ -275,7 +275,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        custom_recurrence_end_count_suffix.setOnClickListener {
+        custom_recurrence_end_count_suffix.setOnSingleClickListener {
             customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
             custom_recurrence_end_count.requestFocus()
         }

@@ -126,7 +126,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_save)
-            setOnClickListener {
+            setOnSingleClickListener {
                 onSaveClick()
             }
         }
@@ -441,7 +441,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             eventViewModel.handleAllDaySwitch(checked)
         }
 
-        event_form_timezone_press.setOnClickListener {
+        event_form_timezone_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
             AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
@@ -449,7 +449,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_start_date_press.setOnClickListener {
+        event_form_start_date_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
@@ -462,7 +462,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_end_date_press.setOnClickListener {
+        event_form_end_date_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
@@ -476,7 +476,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_start_time_press.setOnClickListener {
+        event_form_start_time_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalTime()
@@ -485,7 +485,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_end_time_press.setOnClickListener {
+        event_form_end_time_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalTime()
@@ -494,11 +494,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_calendar_press.setOnClickListener {
+        event_form_calendar_press.setOnSingleClickListener {
             // TODO Remove once change calendar has been implemented
             if (navigationArguments.eventId != null) {
                 view?.displaySnackBar(getString(R.string.snack_feature_coming_soon))
-                return@setOnClickListener
+                return@setOnSingleClickListener
             }
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
@@ -523,14 +523,14 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_recurrence_press.setOnClickListener {
+        event_form_recurrence_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForRecurrence()
             findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
         //TODO Attendees
-        //press_attendees.setOnClickListener {
+        //press_attendees.setOnSingleClickListener {
         //    findNavController().navigate(R.id.nav_event_form_attendees)
         //}
     }
@@ -550,7 +550,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 isClickable = false
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
-                setOnClickListener {
+                setOnSingleClickListener {
                     requireActivity().clearFocusAndHideKeyboard(view)
                     eventViewModel.handleAlarmDelete(index)
                 }
@@ -561,7 +561,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         // "add alarm" button
-        event_form_alarm_press.setOnClickListener {
+        event_form_alarm_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForAlarm()
             findNavController().navigate(R.id.nav_event_form_alarm)

@@ -55,7 +55,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonDone) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_done)
-            setOnClickListener {
+            setOnSingleClickListener {
                 onDoneClick()
             }
         }
@@ -246,7 +246,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT.toString())
         }
 
-        custom_alarm_time_press.setOnClickListener {
+        custom_alarm_time_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {

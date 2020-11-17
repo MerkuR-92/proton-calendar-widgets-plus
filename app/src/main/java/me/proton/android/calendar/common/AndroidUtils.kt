@@ -34,6 +34,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.text.HtmlCompat
 import androidx.core.view.children
 import androidx.core.widget.doAfterTextChanged
+import androidx.databinding.BindingAdapter
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
 import biweekly.util.DayOfWeek
@@ -54,6 +55,7 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
 import java.util.Locale.getDefault
+import java.util.concurrent.atomic.AtomicBoolean
 
 class AndroidUtils(context: Context) {
 
@@ -179,7 +181,7 @@ class AndroidUtils(context: Context) {
                         tag = position
                         isChecked = position == selectedIndex
 //                        compoundDrawablesRelative?.first().setTint(Color.parseColor(items[position].color))
-                        setOnClickListener {
+                        setOnSingleClickListener() {
                             selectedIndex = it.tag as Int
                             notifyDataSetChanged()
                             callback(selectedIndex)
@@ -579,7 +581,7 @@ class AndroidUtils(context: Context) {
             ) {
                 override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                     return super.getView(position, convertView, parent).apply {
-                        press_popup.setOnClickListener {
+                        press_popup.setOnSingleClickListener {
                             onItemClicked(position)
                             popupWindow.dismiss()
                         }
@@ -1011,4 +1013,28 @@ fun View.displaySnackBar(message: String) {
         message,
         Snackbar.LENGTH_SHORT
     ).show()
+}
+
+@BindingAdapter("onSingleClick")
+fun View.setOnSingleClickListener(clickListener: View.OnClickListener?) {
+    clickListener?.also {
+        setOnClickListener(OnSingleClickListener(it))
+    } ?: setOnClickListener(null)
+}
+
+class OnSingleClickListener(
+    private val clickListener: View.OnClickListener,
+) : View.OnClickListener {
+    private var canClick = AtomicBoolean(true)
+
+    override fun onClick(v: View?) {
+        if (canClick.getAndSet(false)) {
+            v?.run {
+                postDelayed({
+                    canClick.set(true)
+                }, CLICK_INTERVAL_MS)
+                clickListener.onClick(v)
+            }
+        }
+    }
 }
