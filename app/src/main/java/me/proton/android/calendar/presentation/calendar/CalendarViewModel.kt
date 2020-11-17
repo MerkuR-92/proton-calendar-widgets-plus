@@ -209,7 +209,7 @@ class CalendarViewModel(
             .setInputData(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR,
-                    UseCaseWorker.INPUT_USER_ID to userId,
+                    UseCaseWorker.INPUT_USER_ID to userId.id,
                     UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
                     UseCaseWorker.INPUT_CALENDAR_NAME to name,
                     UseCaseWorker.INPUT_CALENDAR_DESCRIPTION to description,
