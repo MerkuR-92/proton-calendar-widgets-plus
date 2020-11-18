@@ -1,5 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import me.proton.android.calendar.R
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -26,6 +28,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
         val calendarsResponse = calendarsApi.getCalendars(userId)
         if (calendarsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
+        } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
+            return UseCase.Result.Error("error user has no calendar")
         }
 
         val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId) // TODO this will have a value if we have at least 1 calendar

@@ -3,7 +3,9 @@ package me.proton.android.calendar.presentation
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.Menu
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
@@ -21,6 +23,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
@@ -87,19 +90,50 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         with(accountViewModel) {
             init(this@MainActivity)
-            state.observe(this@MainActivity, Observer { state ->
-                when (state) {
-                    is AccountViewModel.State.LoginNeeded -> startLoginWorkflow()
-                    is AccountViewModel.State.Ready -> {
-                        val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
-                        if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
-                            navigateTo(eventDetailsIntent.data!!)
-                        } else {
-                            navigateTo(Navigation.Deeplink.toMonth())
-                        }
+            state.observe(this@MainActivity, Observer { state ->
+                if (errorReport.value == AccountViewModel.Error.NoError) {
+                    handleAccountState(this, state)
+                }
+            })
+
+            // Handle Bootstrap errors
+            errorReport.observe(this@MainActivity, Observer { errorReport ->
+                if (errorReport == AccountViewModel.Error.NoError) return@Observer
+                val dialogTitle: Int
+                val dialogMessage: Int
+                when (errorReport) {
+                    is AccountViewModel.Error.NoCalendar -> {
+                        dialogTitle = R.string.bootstrap_error_no_calendar_title
+                        dialogMessage = R.string.bootstrap_error_no_calendar_message
+                    }
+                    is AccountViewModel.Error.FreeUser -> {
+                        dialogTitle = R.string.bootstrap_error_free_user_title
+                        dialogMessage = R.string.bootstrap_error_free_user_message
+                    }
+                    is AccountViewModel.Error.DelinquentUser -> {
+                        dialogTitle = R.string.bootstrap_error_delinquent_user_title
+                        dialogMessage = R.string.bootstrap_error_delinquent_user_message
+                    }
+                    is AccountViewModel.Error.StorageQuotaReached -> {
+                        dialogTitle = R.string.bootstrap_error_store_quota_reached_title
+                        dialogMessage = R.string.bootstrap_error_store_quota_reached_message
+                    }
+                    else -> {
+                        // TODO default case should not exist
+                        clearError()
+                        handleAccountState(this, state.value!!)
+                        return@Observer
                     }
                 }
+                val materialDialog = MaterialAlertDialogBuilder(this@MainActivity)
+                    .setTitle(dialogTitle)
+                    .setMessage(dialogMessage)
+                    .setPositiveButton(R.string.bootstrap_error_default_confirm) { _, _ ->
+                        clearError()
+                        handleAccountState(this, state.value!!)
+                    }.show()
+                materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
             })
         }
 
@@ -124,6 +158,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         initDrawerListeners()
 
         initDrawerCalendarsList()
+    }
+
+    private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
+        when (state) {
+            is AccountViewModel.State.LoginNeeded -> accountViewModel.startLoginWorkflow()
+            is AccountViewModel.State.Ready -> {
+                val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
+
+                if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
+                    navigateTo(eventDetailsIntent.data!!)
+                } else {
+                    navigateTo(Navigation.Deeplink.toMonth())
+                }
+            }
+        }
     }
 
     fun displaySplashScreen(display: Boolean) {

@@ -20,6 +20,15 @@ class FetchUserUseCase(
             return UseCase.Result.Error("user request failed: $userResponse")
         }
 
+        // Limit users
+        val userEntity = userResponse.data.user
+        // User has a free account
+        if (userEntity.subscribed <= 0) return UseCase.Result.Error("user is free")
+        // User's payment failed or expired
+        if (userEntity.delinquent > 0) return UseCase.Result.Error("user is delinquent")
+        // User reached storage quota: creation of event is disabled
+        if (userEntity.usedSpace >= userEntity.maxSpace) return UseCase.Result.Error("user reached storage quota")
+
         val user = userResponse.data.user.toUser()
         user.primaryKey ?: return UseCase.Result.Error("user has no primary key")
 

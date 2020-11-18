@@ -41,11 +41,20 @@ class AccountViewModel(
         object Ready : State()
     }
 
+    sealed class Error {
+        object NoError : Error()
+        object NoCalendar : Error()
+        object FreeUser : Error()
+        object DelinquentUser : Error()
+        object StorageQuotaReached : Error()
+    }
+
     private var userId = MutableStateFlow<String?>(null)
     private var userPassphrase = MutableStateFlow<ByteArray?>(null)
     private var lastServerEventId = MutableStateFlow<String?>(null)
 
     private val _state = MutableLiveData<State>()
+    private val _errorReport = MutableLiveData<Error>()
 
     private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String) {
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
@@ -55,17 +64,28 @@ class AccountViewModel(
         viewModelScope.launch {
             val fetchResult = fetchUserUseCase.execute(userId)
             if (fetchResult !is UseCase.Result.Success) {
+                if (fetchResult is UseCase.Result.Error) handleError(fetchResult.message)
                 removeUser(userId)
                 return@launch
             }
 
             val bootstrapResult = bootstrapCalendarsUseCase.execute(userId)
             if (bootstrapResult !is UseCase.Result.Success) {
+                if (bootstrapResult is UseCase.Result.Error) handleError(bootstrapResult.message)
                 removeUser(userId)
                 return@launch
             }
 
             _state.postValue(State.Ready)
+        }
+    }
+
+    private fun handleError(message: String) {
+        when (message) {
+            "user is free" -> _errorReport.postValue(Error.FreeUser)
+            "user is delinquent" -> _errorReport.postValue(Error.DelinquentUser)
+            "user reached storage quota" -> _errorReport.postValue(Error.StorageQuotaReached)
+            "error user has no calendar" -> _errorReport.postValue(Error.NoCalendar)
         }
     }
 
@@ -83,8 +103,12 @@ class AccountViewModel(
     }
 
     val state: LiveData<State> = _state
+    val errorReport: LiveData<Error> = _errorReport
 
     fun init(context: ComponentActivity) {
+        // Make sure we clear error on init
+        clearError()
+
         authOrchestrator.register(context)
 
         // Wait on mandatory parameters.
@@ -154,5 +178,9 @@ class AccountViewModel(
     fun getUserId(): UserId? {
         val userIdValue = userId.value ?: return null
         return UserId(userIdValue)
+    }
+
+    fun clearError() {
+        _errorReport.postValue(Error.NoError)
     }
 }

@@ -24,8 +24,15 @@ data class UserEntity(
     @SerialName("Name")
     val name: String,
     @SerialName("DisplayName")
-    val displayName: String
-
+    val displayName: String,
+    @SerialName("Subscribed")
+    val subscribed: Int,
+    @SerialName("UsedSpace")
+    val usedSpace: Long,
+    @SerialName("MaxSpace")
+    val maxSpace: Long,
+    @SerialName("Delinquent")
+    val delinquent: Int
 ) {
 
     fun toUser(): User {

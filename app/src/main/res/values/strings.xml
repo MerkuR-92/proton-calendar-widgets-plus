@@ -167,7 +167,16 @@
     <string name="notification_text_tomorrow_part_time">Tomorrow at %s</string>
     <string name="notification_text_part_time">%s at %s</string>
 
-
+    <!-- Bootstrap errors -->
+    <string name="bootstrap_error_default_confirm">Ok</string>
+    <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>
+    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
+    <string name="bootstrap_error_free_user_title">ProtonCalendar Beta app is currently available only to paid users.</string>
+    <string name="bootstrap_error_free_user_message">The app will be open to all users soon, stay tuned.</string>
+    <string name="bootstrap_error_delinquent_user_title">Problem with payment occurred.</string>
+    <string name="bootstrap_error_delinquent_user_message">To verify that your payment details are up to date visit <a href="https://account.protonmail.com">account.protonmail.com</a></string>
+    <string name="bootstrap_error_store_quota_reached_title">No more storage space available.</string>
+    <string name="bootstrap_error_store_quota_reached_message">To increase storage quota upgrade your account.</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
