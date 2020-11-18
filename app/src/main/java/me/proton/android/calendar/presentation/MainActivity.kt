@@ -107,6 +107,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         dialogTitle = R.string.bootstrap_error_no_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_calendar_message
                     }
+                    is AccountViewModel.Error.NoActiveCalendar -> {
+                        dialogTitle = R.string.bootstrap_error_no_active_calendar_title
+                        dialogMessage = R.string.bootstrap_error_no_active_calendar_message
+                    }
                     is AccountViewModel.Error.FreeUser -> {
                         dialogTitle = R.string.bootstrap_error_free_user_title
                         dialogMessage = R.string.bootstrap_error_free_user_message

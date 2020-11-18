@@ -43,10 +43,11 @@ class AccountViewModel(
 
     sealed class Error {
         object NoError : Error()
-        object NoCalendar : Error()
         object FreeUser : Error()
         object DelinquentUser : Error()
         object StorageQuotaReached : Error()
+        object NoCalendar : Error()
+        object NoActiveCalendar : Error()
     }
 
     private var userId = MutableStateFlow<String?>(null)
@@ -86,6 +87,7 @@ class AccountViewModel(
             "user is delinquent" -> _errorReport.postValue(Error.DelinquentUser)
             "user reached storage quota" -> _errorReport.postValue(Error.StorageQuotaReached)
             "error user has no calendar" -> _errorReport.postValue(Error.NoCalendar)
+            "error user has no active calendar" -> _errorReport.postValue(Error.NoActiveCalendar)
         }
     }
 

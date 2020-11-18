@@ -30,6 +30,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
             return UseCase.Result.Error("error user has no calendar")
+        } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive } == null) {
+            return UseCase.Result.Error("error user has no active calendar")
         }
 
         val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId) // TODO this will have a value if we have at least 1 calendar
