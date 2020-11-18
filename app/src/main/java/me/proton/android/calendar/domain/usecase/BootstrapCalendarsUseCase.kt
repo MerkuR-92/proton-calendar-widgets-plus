@@ -19,19 +19,35 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val settingsApi: SettingsApi,
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
-    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase): UseCase {
+    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
+    private val createCalendarUseCase: CreateCalendarUseCase): UseCase {
 
     suspend fun execute(userId: UserId) : UseCase.Result {
 
         logger.v("executing BootstrapCalendarsUseCase")
 
-        val calendarsResponse = calendarsApi.getCalendars(userId)
+        var calendarsResponse = calendarsApi.getCalendars(userId)
         if (calendarsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
-        } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
-            return UseCase.Result.Error("error user has no calendar")
-        } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+        } else if (calendarsResponse.data.calendars.isNotEmpty() &&
+            calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
             return UseCase.Result.Error("error user has no active calendar")
+        }
+
+        if (calendarsResponse.data.calendars.isNullOrEmpty()) {
+            val createDefaultCalendarResult = createCalendarUseCase.execute(userId, "My Calendar")
+            if (createDefaultCalendarResult !is UseCase.Result.Success) {
+                return UseCase.Result.Error("error unable to create default calendar for user")
+            }
+
+            calendarsResponse = calendarsApi.getCalendars(userId)
+            if (calendarsResponse !is ApiResponse.Success) {
+                return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
+            } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
+                return UseCase.Result.Error("error user has no calendar")
+            } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+                return UseCase.Result.Error("error user has no active calendar")
+            }
         }
 
         val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId) // TODO this will have a value if we have at least 1 calendar

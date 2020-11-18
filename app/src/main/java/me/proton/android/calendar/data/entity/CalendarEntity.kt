@@ -34,7 +34,7 @@ data class CalendarEntity(
     @SerialName("Display")
     val display: Int, // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
     @SerialName("Flags")
-    val flags: Int
+    val flags: Int = 1 // Flag not returned for Update/Create calendar. Default for create is 1 but on Update we keep the previous value
 ) {
 
     //@Expose(serialize = false, deserialize = false)

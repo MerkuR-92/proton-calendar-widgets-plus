@@ -6,7 +6,6 @@ import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.armor.Armor
 import com.proton.gopenpgp.crypto.*
 import com.proton.gopenpgp.helper.Helper
-import com.proton.gopenpgp.srp.Proofs
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
 
@@ -99,28 +98,32 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         }
     }
 
+    override fun encryptSignText(plaintext: String, armoredPublicKey: String, privateKey: String, passphrase: ByteArray): String? {
+        return try {
+            Helper.encryptSignMessageArmored(armoredPublicKey, privateKey, passphrase, plaintext)
+        } catch (e: Exception) {
+            logger.i("encrypt text with public key failed", e)
+            null
+        }
+    }
+
+    override fun encryptTextWithPassphrase(
+    plainText: String,
+    passphrase: ByteArray
+    ): String? {
+        return try {
+            Helper.encryptMessageWithPassword(passphrase, plainText)
+        } catch (e: Exception) {
+            logger.i("encrypt text with passphrase failed", e)
+            null
+        }
+    }
+
     override fun getArmoredPublicKey(armoredKey: String): String? {
         return try {
             Armor.armorKey(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredKey).publicKey)
         } catch (e: Exception) {
             logger.i("getArmoredPublicKey failed", e)
-            null
-        }
-    }
-
-    override fun generateSrpProofs(
-        username: String,
-        passphrase: ByteArray,
-        signedModulus: String,
-        serverEphemeral: String,
-        authVersion: Int,
-        salt: String
-    ): Proofs? {
-        return try {
-            val srpAuth = com.proton.gopenpgp.srp.Auth(authVersion.toLong(), username, String(passphrase) /*TODO change to bytes when supported by gopenpgp*/, salt, signedModulus, serverEphemeral)
-            srpAuth.generateProofs(SRP_PROOF_BITS)
-        } catch (e: Exception) {
-            logger.i("generateSrpProofs failed", e)
             null
         }
     }
@@ -137,6 +140,10 @@ class CryptoImpl(private val logger: Logger) : Crypto {
             logger.i("decryptSessionKey failed", e)
             null
         }
+    }
+
+    override fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String {
+        return Helper.generateKey(name, email, passphrase, "x25519", 0)
     }
 
     private fun createAndUnlockKeyring(armoredPrivateKey: String, passphrase: ByteArray) : KeyRing {

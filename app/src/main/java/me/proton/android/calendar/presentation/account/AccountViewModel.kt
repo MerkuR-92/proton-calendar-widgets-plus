@@ -12,6 +12,7 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.FetchUserUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.account.domain.entity.AccountState
@@ -32,6 +33,7 @@ class AccountViewModel(
     private val authOrchestrator: AuthOrchestrator,
     private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
+    private val createCalendarUseCase: CreateCalendarUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository

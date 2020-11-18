@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain
 
+import com.proton.gopenpgp.crypto.Key
 import com.proton.gopenpgp.crypto.SessionKey
 import com.proton.gopenpgp.srp.Proofs
 
@@ -49,21 +50,19 @@ interface Crypto {
     fun encryptText(plainText: String, sessionKey: SessionKey): String?
 
     /**
+     * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket.
+     */
+    fun encryptSignText(plaintext: String, armoredPublicKey: String, privateKey: String, passphrase: ByteArray): String?
+
+    /**
+     * EncryptMessageWithPassword encrypts a string with a passphrase using AES256.
+     */
+    fun encryptTextWithPassphrase(plainText: String, passphrase: ByteArray): String?
+
+    /**
      * Extracts public key from supplied key (private or public).
      */
     fun getArmoredPublicKey(armoredKey: String): String?
-
-    /**
-     * Generates Proofs for SRP login.
-     */
-    fun generateSrpProofs(
-        username: String,
-        passphrase: ByteArray,
-        signedModulus: String,
-        serverEphemeral: String,
-        authVersion: Int,
-        salt: String
-    ): Proofs?
 
     /**
      * Decrypts Base64-encoded KeyPacket.
@@ -73,4 +72,10 @@ interface Crypto {
         armoredPrivateKey: String,
         passphrase: ByteArray
     ): SessionKey?
+
+    /**
+     * Generate a new X25519 key.
+     */
+    fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String
+
 }

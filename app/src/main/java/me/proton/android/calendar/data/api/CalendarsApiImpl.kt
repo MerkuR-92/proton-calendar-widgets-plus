@@ -46,11 +46,19 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : EventsByUidApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
-    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : UpdateCalendarApiResponse
+    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : CalendarApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
     suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarDisplayApiRequest) : UpdateCalendarApiResponse
 
+    @POST("calendar/$API_VERSION_CALENDAR")
+    suspend fun createCalendar(@Body body: CreateCalendarApiRequest) : CalendarApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/members")
+    suspend fun getMemberList(@Path("calendarId") calendarId: String) : MemberListApiResponse
+
+    @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/keys")
+    suspend fun setupKey(@Path("calendarId") calendarId: String, @Body body: SetupKeyApiRequest) : SetupKeyApiResponse
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -114,7 +122,7 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             getEventsByUid(eventUid, page, pageSize)
         }.toApiResponse()
 
-    override suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<UpdateCalendarApiResponse> =
+    override suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<CalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             updateCalendar(calendarId, body)
         }.toApiResponse()
@@ -122,6 +130,21 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
     override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<UpdateCalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             updateCalendarDisplay(calendarId, body)
+        }.toApiResponse()
+
+    override suspend fun createCalendar(userId: UserId, body: CreateCalendarApiRequest): ApiResponse<CalendarApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            createCalendar(body)
+        }.toApiResponse()
+
+    override suspend fun getMemberList(userId: UserId, calendarId: String): ApiResponse<MemberListApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getMemberList(calendarId)
+        }.toApiResponse()
+
+    override suspend fun setupKey(userId: UserId, calendarId: String, body: SetupKeyApiRequest): ApiResponse<SetupKeyApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            setupKey(calendarId, body)
         }.toApiResponse()
 
 }
@@ -180,6 +203,58 @@ data class UpdateCalendarApiResponse(
 data class UpdateCalendarDisplayApiRequest(
     @SerialName("Display")
     val display: Int
+)
+
+@Serializable
+data class CreateCalendarApiRequest(
+    @SerialName("Name")
+    val name: String,
+    @SerialName("Description")
+    val description: String,
+    @SerialName("AddressID")
+    val addressId: String,
+    @SerialName("Color")
+    val color: String,
+    @SerialName("Display")
+    val display: Int
+)
+
+@Serializable
+data class CalendarApiResponse(
+    @SerialName("Calendar")
+    val calendar: CalendarEntity
+)
+
+@Serializable
+data class MemberListApiResponse(
+    @SerialName("Members")
+    val members: List<MemberEntity>
+)
+
+@Serializable
+data class SetupKeyApiRequest(
+    @SerialName("PrivateKey")
+    val privateKey: String,
+    @SerialName("Signature")
+    val signature: String,
+    @SerialName("AddressID")
+    val addressId: String,
+    @SerialName("Passphrase")
+    val passphrase: PassphraseApiRequest,
+)
+
+@Serializable
+data class PassphraseApiRequest(
+    @SerialName("DataPacket")
+    val dataPacket: String,
+    @SerialName("KeyPackets")
+    val keyPackets: Map<String, String>
+)
+
+@Serializable
+data class SetupKeyApiResponse(
+    @SerialName("Key")
+    val calendarKey: CalendarKeyEntity
 )
 
 // TODO container for CREATE LINKED by adding SharedEventID and UID

@@ -68,6 +68,7 @@ class TransformEventUseCase(
             Json.decodeFromJsonElement<Event.EventPart.Calendar>(it)
         }.forEach { calendarEvent ->
             getPlainText(
+                // TODO eventEntity.calendarKeyPacket is null
                 eventEntity.calendarKeyPacket,
                 calendarKey.privateKey,
                 keyPassphrase,
