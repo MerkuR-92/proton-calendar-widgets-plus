@@ -23,6 +23,7 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
 import java.time.*
+import java.time.temporal.TemporalAdjusters
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -33,9 +34,6 @@ class CalendarsRepositoryImpl(
     private val logger: Logger,
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val valueStoreProvider: ValueStoreProvider) : CalendarsRepository {
-
-    private val daysToEvents = mutableMapOf<LocalDate, Event>()
-    private val eventFlows = mutableMapOf<Pair<LocalDate, LocalDate>, Flow<List<Event>>>()
 
     private val eventsMutex = Mutex()
 
@@ -51,23 +49,95 @@ class CalendarsRepositoryImpl(
     override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
     private var fetchedWindows = mutableSetOf<FetchWindow>()
-    private val fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-
-    private lateinit var selectedCalendarIds: List<String>
+    private var fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
     private val expandEventsToDateFlow = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
-    private val expandEventsToDateChannel = Channel<ZonedDateTime>(capacity = Channel.CONFLATED)
+    private var expandEventsToDateChannel = Channel<ZonedDateTime>(capacity = Channel.CONFLATED)
 
     private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
     private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(500)
 
-    init {
+    private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
+        return this.filter {
+            it.display == 1 && (it.isActive || it.isDisabled)
+        }
+    }
+
+    private suspend fun showEventsInVisibleCalendars() {
+
+        // out of all events, filter out invisible ones (because of hidden calendar)
+        val events = eventsMutex.withLock {
+            allEvents.value.filter { event ->
+                visibleCalendars.value.find { it.id == event.calendar.id } != null
+            }
+        }
+
+        displayedEventsMutex.withLock {
+            displayedEvents.value = events
+        }
+    }
+
+    override suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String) {
+        // Members objects are used to link an Address and the Calendars that are part of it
+        val members = database.membersDao().selectByAddress(address)
+        val calendarIds = ArrayList<String>()
+        members.forEach { calendarIds.add(it.calendarId) }
+        calendarIds.forEach {
+            selectCalendar(it)?.let { dbCalendar ->
+                var flags = dbCalendar.flags
+                if (status == AddressStatus.DISABLED.value && !dbCalendar.isDisabled) {
+                    flags = addDisabledFlag(flags, dbCalendar)
+                } else if (status == AddressStatus.ENABLED.value && dbCalendar.isDisabled) {
+                    flags = removeDisabledFlag(flags, dbCalendar)
+                }
+                database.calendarsDao().updateCalendarFlags(dbCalendar.id, flags)
+            }
+        }
+    }
+
+    private fun removeDisabledFlag(flags: Int, dbCalendar: CalendarEntity): Int {
+        // status at 1 means the address is active
+
+        // if the calendar is inactive we keep the same flags but remove the disabled flag
+        // we also check if the calendar is simply disabled or super owner disabled to correctly update it
+        return if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
+            flags - CalendarFlags.DISABLED.value
+        } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
+            flags - CalendarFlags.SUPER_OWNER_DISABLED.value
+        } else {
+            // if the calendar is simply disabled we set the flags at active
+            CalendarFlags.ACTIVE.value
+        }
+    }
+
+    private fun addDisabledFlag(flags: Int, dbCalendar: CalendarEntity): Int {
+        // status at 0 means the address is disabled
+
+        // if the calendar is inactive we keep the same flags but add the disabled flag
+        return if (dbCalendar.isInactive)  {
+            flags + CalendarFlags.DISABLED.value
+        } else  {
+            // if the calendar is simply active we set the flags at disabled
+            CalendarFlags.DISABLED.value
+        }
+    }
+
+    override suspend fun initForUser(userId: String): Flow<CalendarsRepository.InitingState> {
+
+        logger.e("initForUser $userId")
+
+        if (coroutineScope.isActive) {
+            logger.e("scope active, cancelling")
+            coroutineScope.cancel()
+        }
+
+        coroutineScope = CoroutineScope(Dispatchers.Default)
 
         // cold init, fetch all needed entities straight from database
         coroutineScope.launch {
@@ -138,108 +208,119 @@ class CalendarsRepositoryImpl(
         }
 
         coroutineScope.launch {
-            fetchEventsChannel.consumeEach { fetchWindow ->
+            fetchEventsChannel.consumeEach { fetchEventsInWindow(it) }
+        }
 
-                if (!fetchedWindows.contains(fetchWindow)) {
-                    logger.v("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+        return flow {
+            emit(CalendarsRepository.InitingState.Initing)
 
-                    fetchingState.value = CalendarsRepository.FetchingState.Fetching
+            // if user has no Events in the database, perform cold init
+            val coldInitNeeded = database.calendarsDao().selectCalendars(userId).map { it.id }.all { database.eventsDao().count(it) == 0 }
+            if (coldInitNeeded) {
+                emit(CalendarsRepository.InitingState.ColdIniting)
+                coldInit(userId)
+            }
 
-                    // fetch from API
-                    val fetchEventsResult = fetchEventsUseCase.execute(
-                        fetchWindow.userId,
-                        fetchWindow.calendarIds,
-                        fetchWindow.fromDate,
-                        fetchWindow.toDate,
-                        fetchWindow.timeZoneId
-                    )
+            emit(CalendarsRepository.InitingState.Finished)
+        }
+    }
 
-                    if (fetchEventsResult.first is UseCase.Result.Success) {
-                        if (fetchEventsResult.second == null) {
-                            logger.e("fetchEventsResult: null event list when Sucess")
-                        }
+    private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
 
-                        fetchEventsResult.second?.let {
-                            persistEvents(*it.toTypedArray())
-                            fetchedWindows.add(fetchWindow)
-                        }
-                    }
+        if (!fetchedWindows.contains(fetchWindow)) {
+            logger.e("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
-                    fetchingState.value = CalendarsRepository.FetchingState.Finished
+            fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-                } else {
-                    logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+            // fetch from API
+            val fetchEventsResult = fetchEventsUseCase.execute(
+                fetchWindow.userId,
+                fetchWindow.calendarIds,
+                fetchWindow.fromDate,
+                fetchWindow.toDate,
+                fetchWindow.timeZoneId
+            )
+
+            if (fetchEventsResult.first is UseCase.Result.Success) {
+                if (fetchEventsResult.second == null) {
+                    logger.e("fetchEventsResult: null event list when Sucess")
+                }
+
+                fetchEventsResult.second?.let {
+                    persistEvents(*it.toTypedArray())
+                    fetchedWindows.add(fetchWindow)
                 }
             }
+
+            fetchingState.value = CalendarsRepository.FetchingState.Finished
+
+        } else {
+            logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
         }
+
     }
 
-    private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
-        return this.filter {
-            it.display == 1 && (it.isActive || it.isDisabled)
+    /**
+     * Synchronously fetch current month worth of Events.
+     */
+    private suspend fun coldInit(userId: String) {
+
+        val now = ZonedDateTime.now()
+        val calendarIds = database.calendarsDao().selectCalendars(userId).map { it.id }
+        val primaryTimeZone = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
+
+        val timeZoneId = if (primaryTimeZone == null) {
+            logger.e("could not retrieve user's primaryTimeZone in coldInitIfNeeded, using UTC")
+            ZoneId.of("UTC").id
+        } else {
+            primaryTimeZone
         }
+
+        logger.v("cold initing and fetching events for ${timeZoneId}")
+
+        // we are fetching synchronously instead of via channel
+        fetchEventsInWindow(
+            FetchWindow(
+                UserId(userId),
+                calendarIds,
+                now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
+                now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
+                timeZoneId
+            )
+        )
+
+        logger.v("finished cold fetching events for ${timeZoneId}")
     }
 
-    private suspend fun showEventsInVisibleCalendars() {
+    override suspend fun shutdown() {
+        logger.v("shutdown calendarepository")
 
-        // out of all events, filter out invisible ones (because of hidden calendar)
-        val events = eventsMutex.withLock {
-            allEvents.value.filter { event ->
-                visibleCalendars.value.find { it.id == event.calendar.id } != null
-            }
+        if (coroutineScope.isActive) {
+            logger.v("scope active, cancelling")
+            coroutineScope.cancel()
         }
+
+        fetchingState.value = CalendarsRepository.FetchingState.Finished
 
         displayedEventsMutex.withLock {
-            displayedEvents.value = events
+            displayedEvents.value = emptyList()
+        }
+
+        eventsMutex.withLock {
+            dbEvents.clear()
+            allEvents.value = emptyList()
+
+            fetchedWindows.clear()
+            fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+            eventsExpandedUntil = ZonedDateTime.now()
+            expandEventsToDateFlow.value = eventsExpandedUntil
+            expandEventsToDateChannel = Channel<ZonedDateTime>(capacity = Channel.CONFLATED)
+
+            dbCalendars.value = emptyList()
+            visibleCalendars.value = emptyList()
         }
     }
-
-    override suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String) {
-        // Members objects are used to link an Address and the Calendars that are part of it
-        val members = database.membersDao().selectByAddress(address)
-        val calendarIds = ArrayList<String>()
-        members.forEach { calendarIds.add(it.calendarId) }
-        calendarIds.forEach {
-            selectCalendar(it)?.let { dbCalendar ->
-                var flags = dbCalendar.flags
-                if (status == AddressStatus.DISABLED.value && !dbCalendar.isDisabled) {
-                    flags = addDisabledFlag(flags, dbCalendar)
-                } else if (status == AddressStatus.ENABLED.value && dbCalendar.isDisabled) {
-                    flags = removeDisabledFlag(flags, dbCalendar)
-                }
-                database.calendarsDao().updateCalendarFlags(dbCalendar.id, flags)
-            }
-        }
-    }
-
-    private fun removeDisabledFlag(flags: Int, dbCalendar: CalendarEntity): Int {
-        // status at 1 means the address is active
-
-        // if the calendar is inactive we keep the same flags but remove the disabled flag
-        // we also check if the calendar is simply disabled or super owner disabled to correctly update it
-        return if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
-            flags - CalendarFlags.DISABLED.value
-        } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
-            flags - CalendarFlags.SUPER_OWNER_DISABLED.value
-        } else {
-            // if the calendar is simply disabled we set the flags at active
-            CalendarFlags.ACTIVE.value
-        }
-    }
-
-    private fun addDisabledFlag(flags: Int, dbCalendar: CalendarEntity): Int {
-        // status at 0 means the address is disabled
-
-        // if the calendar is inactive we keep the same flags but add the disabled flag
-        return if (dbCalendar.isInactive)  {
-            flags + CalendarFlags.DISABLED.value
-        } else  {
-            // if the calendar is simply active we set the flags at disabled
-            CalendarFlags.DISABLED.value
-        }
-    }
-
-    // TODO add fetch(from, to)
 
     override suspend fun selectCalendar(calendarId: String): CalendarEntity? {
         return database.calendarsDao().selectById(calendarId)

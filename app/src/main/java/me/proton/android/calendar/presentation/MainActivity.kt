@@ -30,12 +30,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
@@ -65,23 +66,51 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
+
             val userId = accountViewModel.getUserId()
-            if (userId != null)calendarViewModel.init(userId)
-            // TODO Shouldn't happen : do we redirect to login if userId is null ?
-            else logger.e("Failed calendarViewModel initialization : user ID is null in MainActivity navigateTo")
+            if (userId == null) {
 
-            // Refresh drawer content now that we are logged in.
-            initDrawerHeader()
-            initDrawerCalendarsListContent()
+                logger.e("navigating from 'account ready' but userId is null")
+                accountViewModel.logoutPrimary()
+                calendarViewModel.shutdown()
 
-            withContext(Dispatchers.Main) {
-                // Use UI Thread because initDrawerTimeZone changes timezone view visibility
-                // TODO Remove once settings have been created
-                initDrawerTimeZone()
+            } else {
+
+                calendarViewModel.initForUser(userId).collect {
+                    when (it) {
+                        CalendarsRepository.InitingState.Initing -> {
+                            // TODO animation waiting for init
+                            logger.v("regular init, waiting in main activity")
+                        }
+                        CalendarsRepository.InitingState.ColdIniting -> {
+                            // TODO animation waiting for cold init
+                            displaySnackBar("Fetching events") // TODO
+                            logger.v("waiting for cold init in main activity")
+                        }
+                        CalendarsRepository.InitingState.Error -> {
+                            logger.e("navigating from `account ready` but error initialising calendarViewModel")
+
+                            accountViewModel.logoutPrimary()
+                            calendarViewModel.shutdown()
+                        }
+                        CalendarsRepository.InitingState.Finished -> {
+
+                            // Refresh drawer content now that we are logged in.
+                            initDrawerHeader()
+                            initDrawerCalendarsListContent()
+
+                            withContext(Dispatchers.Main) {
+                                // Use UI Thread because initDrawerTimeZone changes timezone view visibility
+                                // TODO Remove once settings have been created
+                                initDrawerTimeZone()
+                            }
+
+                            findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+
+                        }
+                    }
+                }
             }
-
-            findNavController(R.id.nav_host_fragment_container_view)
-                .navigate(uri)
         }
     }
 
@@ -168,6 +197,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         when (state) {
             is AccountViewModel.State.LoginNeeded -> accountViewModel.startLoginWorkflow()
             is AccountViewModel.State.Ready -> {
+
+                // TODO get rid of hack with consuming intent manually
                 val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
                 if (eventDetailsIntent != null && eventDetailsIntent.data != null) {

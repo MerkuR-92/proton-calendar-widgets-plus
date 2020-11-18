@@ -12,6 +12,10 @@ import java.time.LocalDate
 // TODO move to separate package?
 interface CalendarsRepository {
 
+    suspend fun initForUser(userId: String): Flow<InitingState>
+
+    suspend fun shutdown()
+
     // calendars
     suspend fun selectCalendar(calendarId: String): CalendarEntity?
 
@@ -128,5 +132,12 @@ interface CalendarsRepository {
         object NotNeeded : FetchingState()
         object Fetching : FetchingState()
         object Finished : FetchingState()
+    }
+
+    sealed class InitingState {
+        object Initing : InitingState()
+        object ColdIniting : InitingState()
+        object Finished : InitingState()
+        object Error : InitingState()
     }
 }

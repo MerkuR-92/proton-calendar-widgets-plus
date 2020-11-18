@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
@@ -33,7 +34,8 @@ class AccountViewModel(
     private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
+    private val calendarsRepository: CalendarsRepository
 ) : ViewModel() {
 
     sealed class State {
@@ -101,6 +103,7 @@ class AccountViewModel(
         // UseCases could catch Foreign Key Exceptions, if userId is not anymore present (or logged out).
         // Workers could observe getAccount(userId), and cancel if state == Removed ?
         // How to reproduce: 1) Login. 2) During loading/syncing, logout.
+        calendarsRepository.shutdown()
         usersRepository.deleteUserById(userId.id)
     }
 

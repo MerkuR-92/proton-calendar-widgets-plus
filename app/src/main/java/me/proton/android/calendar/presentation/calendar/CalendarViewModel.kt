@@ -7,18 +7,17 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
-import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
@@ -34,7 +33,7 @@ class CalendarViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val createEventUseCase: EditCreateEventUseCase,
+    private val logger: Logger,
     private val updateCalendarUseCase: UpdateCalendarUseCase) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -80,21 +79,49 @@ class CalendarViewModel(
         return usersRepository.selectUserById(userId.id)
     }
 
-    suspend fun init(userId: UserId?) {
-        if (userId != null) {
-            this.userId = userId
-            if (!initialised) {
-                val timeZone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
-                timeZoneId = ZoneId.of(timeZone)
-                startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
-                timeFormatIs24Hour =
-                    usersRepository.selectUserSettings(userId.id)?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
+    // TODO go back to UserId as String
+    suspend fun initForUser(userId: UserId): Flow<CalendarsRepository.InitingState> {
+        return flow {
 
-                TimberLogger.d("viewmodel timeZoneId = ${timeZoneId}")
+            // TODO make this prettier
 
-                initialised = true
+            calendarsRepository.initForUser(userId.id).collect {
+                when (it) {
+                    CalendarsRepository.InitingState.Initing -> {
+                        emit(it)
+                        logger.e("initing calendars repo")
+                    }
+                    CalendarsRepository.InitingState.ColdIniting -> {
+                        emit(it)
+                        logger.e("initing calendars repo")
+                    }
+                    CalendarsRepository.InitingState.Finished -> {
+
+                        val timeZone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+                        timeZoneId = ZoneId.of(timeZone)
+                        startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
+                        timeFormatIs24Hour =
+                            usersRepository.selectUserSettings(userId.id)
+                                ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
+
+                        initialised = true
+                        this@CalendarViewModel.userId = userId
+
+                        emit(it)
+                    }
+                    CalendarsRepository.InitingState.Error -> {
+                        logger.e("error in CalendarViewModel initForUser")
+                        emit(it)
+                    }
+                }
             }
+
         }
+    }
+
+    suspend fun shutdown() {
+        initialised = false
+        calendarsRepository.shutdown()
     }
 
     private lateinit var miniCalendarPager: ViewPager2
