@@ -109,6 +109,12 @@ class AccountViewModel(
         _state.postValue(State.LoggedOut)
     }
 
+    private fun finishAppIfNoAccount(context: ComponentActivity) = viewModelScope.launch {
+        if (accountManager.getAccounts().first().isEmpty()) {
+            context.finish()
+        }
+    }
+
     val state: LiveData<State> = _state
     val errorReport: LiveData<Error> = _errorReport
 
@@ -123,7 +129,7 @@ class AccountViewModel(
             .onLoginResult { result ->
                 result?.let {
                     lastServerEventId.value = result.session.eventId
-                }
+                } ?: finishAppIfNoAccount(context)
             }
             .onUserResult { result ->
                 result?.let {
@@ -131,12 +137,6 @@ class AccountViewModel(
                     userPassphrase.value = result.passphrase
                 }
             }
-
-
-        viewModelScope.launch {
-            // Set userId value in VM if app was killed
-            if (userId.value == null) userId.value = accountManager.getPrimaryUserId().firstOrNull()?.id
-        }
 
         // Setup User as soon as all parameters are available.
         combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
@@ -172,19 +172,18 @@ class AccountViewModel(
         authOrchestrator.startLoginWorkflow(AccountType.Internal)
     }
 
+    suspend fun getPrimaryUserId(): UserId? {
+        return accountManager.getPrimaryUserId().firstOrNull()
+    }
+
     fun logoutPrimary() = viewModelScope.launch {
-        accountManager.getPrimaryUserId().firstOrNull()?.let { userId -> removeUser(userId) }
+        getPrimaryUserId()?.let { userId -> removeUser(userId) }
     }
 
     fun hasPrimary(action: (Boolean) -> Unit) {
         accountManager.getPrimaryUserId().onEach { userId ->
             userId?.let { action(true) } ?: action(false)
         }.launchIn(viewModelScope)
-    }
-
-    fun getUserId(): UserId? {
-        val userIdValue = userId.value ?: return null
-        return UserId(userIdValue)
     }
 
     fun clearError() {

@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common
 
 import me.proton.android.calendar.BuildConfig
+import me.proton.core.network.data.ProtonErrorException
 import me.proton.core.util.kotlin.Logger
 import me.proton.core.util.kotlin.LoggerLogTag
 import org.jetbrains.annotations.NonNls
@@ -8,8 +9,29 @@ import timber.log.Timber
 
 object CoreLogger : Logger {
 
+    private const val HTTP_ERROR_UNAUTHORIZED = 401
+    private const val HTTP_ERROR_NOT_FOUND = 404
+    private const val HTTP_ERROR_UNPROCESSABLE_ENTITY = 422
+
+    private const val PROTON_ERROR_INVALID_REFRESH_TOKEN = 10013
+
+    private fun isLogNeeded(error: Throwable): Boolean {
+        return when (error) {
+            is ProtonErrorException -> when (error.response.code) {
+                HTTP_ERROR_UNAUTHORIZED -> false
+                HTTP_ERROR_NOT_FOUND -> false
+                HTTP_ERROR_UNPROCESSABLE_ENTITY -> when (error.protonData.code) {
+                    PROTON_ERROR_INVALID_REFRESH_TOKEN -> false
+                    else -> true
+                }
+                else -> true
+            }
+            else -> true
+        }
+    }
+
     override fun e(tag: String, e: Throwable) =
-        Timber.tag(tag).e(e)
+        if (isLogNeeded(e)) Timber.tag(tag).e(e) else Unit
 
     override fun e(tag: String, e: Throwable, @NonNls message: String) =
         Timber.tag(tag).e(e, message)

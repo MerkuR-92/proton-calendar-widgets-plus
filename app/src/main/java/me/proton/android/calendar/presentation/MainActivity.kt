@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
 
-            val userId = accountViewModel.getUserId()
+            val userId = accountViewModel.getPrimaryUserId()
             if (userId == null) {
 
                 logger.e("navigating from 'account ready' but userId is null")

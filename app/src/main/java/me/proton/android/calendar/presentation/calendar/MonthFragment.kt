@@ -195,7 +195,7 @@ class MonthFragment : BaseFragment() {
 
         lifecycleScope.launchWhenStarted {
 
-            val userId = accountViewModel.getUserId()
+            val userId = accountViewModel.getPrimaryUserId()
             if (userId != null) {
 
                 // TODO schedule this from some global periodic scheduler

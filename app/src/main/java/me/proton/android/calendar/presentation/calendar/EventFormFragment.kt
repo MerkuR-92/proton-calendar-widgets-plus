@@ -67,7 +67,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             displayDiscardChangesConfirmationDialog { _, _ ->
                 // Reinitialise event view model data when user chooses to discard modifications
                 lifecycleScope.launch {
-                    val userId = accountViewModel.getUserId()
+                    val userId = accountViewModel.getPrimaryUserId()
                     val viewModeInitStatus =
                         if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
                         else eventViewModel.initialise(
@@ -306,7 +306,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
-            val userId = accountViewModel.getUserId()
+            val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus = withContext(Dispatchers.Default) {
                 if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
                 else eventViewModel.initialise(
