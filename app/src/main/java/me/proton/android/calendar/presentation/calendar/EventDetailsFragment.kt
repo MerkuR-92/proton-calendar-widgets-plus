@@ -1,7 +1,9 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.text.format.DateFormat
 import android.text.util.Linkify
 import android.util.TypedValue
@@ -425,7 +427,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             event.description?.nullIfBlank()?.let {
                 with(section_description) {
-                    text_header.text = event.description
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        text_header.text = Html.fromHtml(event.description, Html.FROM_HTML_MODE_COMPACT)
+                    } else {
+                        text_header.text = Html.fromHtml(event.description)
+                    }
                     Linkify.addLinks(text_header, Linkify.ALL)
                     image_icon.setImageResource(R.drawable.ic_text_align_left)
                     visibleOrGone(true)
