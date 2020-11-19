@@ -219,7 +219,7 @@ class EventViewModel(
 
             dbEvent?.let {
                 hasSingleEdit = it.isRecurring() && calendarsRepository.hasSingleEdits(it.uid)
-                hasExDates = it.isRecurring() && !it.getExceptionDates().isNullOrEmpty()
+                hasExDates = it.isRecurring() && !it.iCalEvent.exceptionDates.isNullOrEmpty()
             }
 
             TimberLogger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")

@@ -155,9 +155,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 persistFormData()
 
-                eventViewModel.dbEvent?.getExceptionDates().isNullOrEmpty()
-                eventViewModel.hasSingleEdit
-
                 // Allow saving with no edition if creating an event
                 if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
 
