@@ -106,6 +106,12 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
 
             }
         }
+
+        // TODO in the future tag notifications with userId and cancel only for given user
+        fun cancelAllNotifications(context: Context) {
+            val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancelAll()
+        }
     }
 
 }

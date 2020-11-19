@@ -41,6 +41,7 @@ class AccountViewModel(
     sealed class State {
         object LoginNeeded : State()
         object Ready : State()
+        object LoggedOut : State()
     }
 
     sealed class Error {
@@ -105,6 +106,7 @@ class AccountViewModel(
         // How to reproduce: 1) Login. 2) During loading/syncing, logout.
         calendarsRepository.shutdown()
         usersRepository.deleteUserById(userId.id)
+        _state.postValue(State.LoggedOut)
     }
 
     val state: LiveData<State> = _state

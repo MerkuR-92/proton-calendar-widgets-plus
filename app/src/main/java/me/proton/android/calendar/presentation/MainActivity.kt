@@ -38,6 +38,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
@@ -160,6 +161,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         clearError()
                         handleAccountState(this, state.value!!)
                         return@Observer
+                    }
+                    AccountViewModel.State.LoggedOut -> {
+                        ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
                     }
                 }
                 val materialDialog = MaterialAlertDialogBuilder(this@MainActivity)
