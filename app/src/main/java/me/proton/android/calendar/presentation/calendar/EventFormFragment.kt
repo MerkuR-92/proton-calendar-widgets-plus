@@ -550,7 +550,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
-                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), ZoneId.of(eventViewModel.displayTimeZoneId)), alarm)
+                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), event.iCalEvent.getStart(eventViewModel.displayTimeZoneId)!!, alarm)
                 isClickable = false
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {

@@ -409,10 +409,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         resources,
                         event.isAllDay(),
                         calendarViewModel.timeFormatIs24Hour,
-                        ZonedDateTime.ofInstant(
-                            event.iCalEvent.dateStart.value.toInstant(),
-                            ZoneId.of(eventViewModel.displayTimeZoneId)
-                        ),
+                        event.iCalEvent.getStart(eventViewModel.displayTimeZoneId)!!,
                         alarm
                     )
                 }
