@@ -70,6 +70,8 @@ interface CalendarsRepository {
      */
     suspend fun selectRootEventEntity(eventUid: String): EventEntity?
 
+    suspend fun hasSingleEdits(eventUid: String): Boolean
+
     suspend fun persistEvents(vararg events: EventEntity)
 
     suspend fun deleteEventsById(ids: List<String>)

@@ -522,6 +522,10 @@ class CalendarsRepositoryImpl(
         }
     }
 
+    override suspend fun hasSingleEdits(eventUid: String): Boolean {
+        return database.eventsDao().countByUid(eventUid) > 1
+    }
+
     override suspend fun persistEvents(vararg events: EventEntity) {
         logger.v("persist Event: ")
         events.forEach { logger.v("${it.id}") }

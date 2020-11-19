@@ -87,6 +87,9 @@ class EventViewModel(
     lateinit var calendarUserSettings: CalendarUserSettingsEntity
     lateinit var userSettings: UserSettingsEntity
 
+    var hasSingleEdit: Boolean = false
+    var hasExDates: Boolean = false
+
     var savingEvent = MutableLiveData(false)
 
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
@@ -213,6 +216,11 @@ class EventViewModel(
             val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
             dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
             else null
+
+            dbEvent?.let {
+                hasSingleEdit = it.isRecurring() && calendarsRepository.hasSingleEdits(it.uid)
+                hasExDates = it.isRecurring() && !it.getExceptionDates().isNullOrEmpty()
+            }
 
             TimberLogger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 

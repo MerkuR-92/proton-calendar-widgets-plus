@@ -155,6 +155,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 persistFormData()
 
+                eventViewModel.dbEvent?.getExceptionDates().isNullOrEmpty()
+                eventViewModel.hasSingleEdit
+
                 // Allow saving with no edition if creating an event
                 if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
 
@@ -184,21 +187,21 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                     EventEditDeleteOption.ALL_EVENTS
                                 }
 
-                            // Display warning dialog for this event if recurrence rule has been edited
+                            // Display warning dialog for this event option if recurrence rule has been edited
                             if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.dbEvent?.iCalEvent?.recurrenceRule != eventViewModel.eventLiveData.value?.iCalEvent?.recurrenceRule) {
                                 displayUpdateRecurringEventDialog(R.string.event_recurring_update_this_description) { _, _ ->
                                     handleSaveWithOption(eventEditDeleteOption)
                                 }
                             }
-                            // TODO: Warning dialog for All events option (Define cases where we show dialogs)
-//                            else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS) {
-//                                displayUpdateRecurringEventDialog(
-//                                    if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT) R.string.event_recurring_update_this_description
-//                                    else R.string.event_recurring_update_all_description
-//                                ) { _, _ ->
-//                                    handleSaveWithOption(eventEditDeleteOption)
-//                                }
-//                            }
+                            // Display warning dialog for all events option if has ex dates or single edits
+                            else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates || eventViewModel.hasSingleEdit)) {
+                                displayUpdateRecurringEventDialog(
+                                    if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT) R.string.event_recurring_update_this_description
+                                    else R.string.event_recurring_update_all_description
+                                ) { _, _ ->
+                                    handleSaveWithOption(eventEditDeleteOption)
+                                }
+                            }
                             else {
                                 handleSaveWithOption(eventEditDeleteOption)
                             }
