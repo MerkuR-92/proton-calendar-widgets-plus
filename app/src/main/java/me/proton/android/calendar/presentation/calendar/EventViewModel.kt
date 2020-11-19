@@ -283,7 +283,8 @@ class EventViewModel(
     private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
         event.iCalEvent.alarms.clear()
         getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
-            event.iCalEvent.addAlarm(it)
+            // TODO Remove alarm type check once other types are handled
+            if (it.action == Action.display()) event.iCalEvent.addAlarm(it)
         }
     }
 
