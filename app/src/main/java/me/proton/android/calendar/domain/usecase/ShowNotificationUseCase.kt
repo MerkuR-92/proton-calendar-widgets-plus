@@ -66,7 +66,7 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
 
                     } else null
 
-                    val intent = MainViewModel.createIntentToShowEventDetails(context, dbEvent.id, eventWithOccurrence?.occurrence?.occurrenceNumber)
+                    val intent = MainViewModel.createMainIntentToShowEventDetails(context, dbEvent.id, eventWithOccurrence?.occurrence?.occurrenceNumber)
                     /* FLAG_ONE_SHOT cancels pending intent after it's sent */
                     val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 

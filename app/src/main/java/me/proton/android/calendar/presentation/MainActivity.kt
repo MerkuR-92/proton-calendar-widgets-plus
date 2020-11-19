@@ -117,6 +117,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        intent?.let { mainViewModel.handleIntent(intent) }
+
         with(accountViewModel) {
             init(this@MainActivity)
 
@@ -170,8 +172,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             })
         }
 
-        intent?.let { mainViewModel.handleIntent(intent) }
-
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -198,11 +198,23 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             is AccountViewModel.State.LoginNeeded -> accountViewModel.startLoginWorkflow()
             is AccountViewModel.State.Ready -> {
 
-                // TODO get rid of hack with consuming intent manually
-                val eventDetailsIntent = mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
+                val eventDetailsIntent =
+                    mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
                 if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
-                    navigateTo(eventDetailsIntent.data!!)
+                    logger.v("converting deeplink and navigating manually")
+
+                    // convert "main" deeplink to "event details" deeplink and navigate manually
+                    val eventId = eventDetailsIntent.data?.getQueryParameter("eventId")
+                    val occurrenceNumber = eventDetailsIntent.data?.getQueryParameter("occurrenceNumber")
+                    if (eventId != null && occurrenceNumber != null) {
+                        val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, occurrenceNumber.toInt())
+                        navigateTo(eventDetailsDeepLink)
+                    } else {
+                        logger.e("could not get eventId/occurrenceNumber from INTENT_ACTION_SHOW_EVENT_DETAILS")
+                        navigateTo(Navigation.Deeplink.toMonth())
+                    }
+
                 } else {
                     navigateTo(Navigation.Deeplink.toMonth())
                 }

@@ -130,10 +130,10 @@ class CalendarsRepositoryImpl(
 
     override suspend fun initForUser(userId: String): Flow<CalendarsRepository.InitingState> {
 
-        logger.e("initForUser $userId")
+        logger.d("initForUser $userId")
 
         if (coroutineScope.isActive) {
-            logger.e("scope active, cancelling")
+            logger.v("scope active, cancelling")
             coroutineScope.cancel()
         }
 
@@ -228,7 +228,7 @@ class CalendarsRepositoryImpl(
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
 
         if (!fetchedWindows.contains(fetchWindow)) {
-            logger.e("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+            logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
