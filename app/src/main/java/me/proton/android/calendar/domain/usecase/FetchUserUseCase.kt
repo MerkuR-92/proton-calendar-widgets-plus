@@ -4,6 +4,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.UsersApi
+import me.proton.android.calendar.domain.model.Delinquent
 import me.proton.core.domain.entity.UserId
 
 class FetchUserUseCase(
@@ -20,16 +21,16 @@ class FetchUserUseCase(
             return UseCase.Result.Error("user request failed: $userResponse")
         }
 
-        // Limit users
-        val userEntity = userResponse.data.user
-        // User has a free account
-        if (userEntity.subscribed <= 0) return UseCase.Result.Error("user is free")
-        // User's payment failed or expired
-        if (userEntity.delinquent > 0) return UseCase.Result.Error("user is delinquent")
-        // User reached storage quota: creation of event is disabled
-        if (userEntity.usedSpace >= userEntity.maxSpace) return UseCase.Result.Error("user reached storage quota")
-
         val user = userResponse.data.user.toUser()
+
+        // Limit users
+        // User has a free account
+        if (user.isFree) return UseCase.Result.Error("user is free")
+        // User's payment failed or expired
+        if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error("user is delinquent")
+        // User reached storage quota: creation of event is disabled
+        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error("user reached storage quota")
+
         user.primaryKey ?: return UseCase.Result.Error("user has no primary key")
 
         val addressesResponse = addressesApi.getAddresses(userId)

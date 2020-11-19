@@ -42,7 +42,11 @@ data class UserEntity(
                 Json { this.ignoreUnknownKeys = true }.decodeFromJsonElement<UserKey>(it)
             },
             email = this.email,
-            displayName = if (this.displayName.isNotEmpty()) this.displayName else this.name
+            displayName = if (this.displayName.isNotEmpty()) this.displayName else this.name,
+            subscribed = this.subscribed,
+            usedSpace = this.usedSpace,
+            maxSpace = this.maxSpace,
+            delinquent = this.delinquent
         )
     }
 
