@@ -162,9 +162,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         handleAccountState(this, state.value!!)
                         return@Observer
                     }
-                    AccountViewModel.State.LoggedOut -> {
-                        ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
-                    }
                 }
                 val materialDialog = MaterialAlertDialogBuilder(this@MainActivity)
                     .setTitle(dialogTitle)
@@ -223,6 +220,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 } else {
                     navigateTo(Navigation.Deeplink.toMonth())
                 }
+            }
+            is AccountViewModel.State.LoggedOut -> {
+                ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
         }
     }
