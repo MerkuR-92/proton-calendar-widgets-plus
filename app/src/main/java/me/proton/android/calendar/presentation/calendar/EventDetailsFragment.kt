@@ -276,6 +276,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (viewModeInitStatus == UseCase.Result.Success) {
                 observeEventLiveData()
                 attachActionHandlers()
+
+                // Keep drawer timezone updated using recently fetched EventViewModel displayTimezoneId
+                (requireActivity() as MainActivity).initDrawerTimeZone(eventViewModel.getDisplayTimeZone())
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)

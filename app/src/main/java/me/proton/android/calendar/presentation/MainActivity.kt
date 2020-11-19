@@ -43,6 +43,7 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @AndroidEntryPoint
@@ -286,11 +287,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     // TODO Remove once settings have been created
-    private fun initDrawerTimeZone() {
-        val timeZoneId = calendarViewModel.getTimeZone()
-        nav_view_timezone.visibleOrGone(timeZoneId != null)
-        timeZoneId?.let {
-            nav_view_timezone_login_title.text = ICalUtils.formatTimeZoneId(timeZoneId.id, ZonedDateTime.now(timeZoneId).toInstant())
+    fun initDrawerTimeZone(timeZoneId: ZoneId? = null) {
+        val timeZone = timeZoneId ?: calendarViewModel.getTimeZone()
+        nav_view_timezone.visibleOrGone(timeZone != null)
+        timeZone?.let {
+            nav_view_timezone_login_title.text = ICalUtils.formatTimeZoneId(timeZone.id, ZonedDateTime.now(timeZone).toInstant())
         }
     }
 

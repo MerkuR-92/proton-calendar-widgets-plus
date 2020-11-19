@@ -1025,4 +1025,9 @@ class EventViewModel(
         if (event.isAllDay()) eventCustomAllDayAlarmsSave = ArrayList(event.iCalEvent.alarms)
         else eventCustomPartialDayAlarmsSave = ArrayList(event.iCalEvent.alarms)
     }
+
+    // Returns timezone id if it has been initialized
+    fun getDisplayTimeZone(): ZoneId? {
+        return if (this::displayTimeZoneId.isInitialized) ZoneId.of(displayTimeZoneId) else null
+    }
 }

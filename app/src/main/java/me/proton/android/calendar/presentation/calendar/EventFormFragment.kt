@@ -30,6 +30,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -322,6 +323,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 if (navigationArguments.eventId == null) event_form_title.requestFocus()
                 observeEventLiveData()
                 attachActionHandlers()
+
+                // Keep drawer timezone updated using recently fetched EventViewModel displayTimezoneId
+                (requireActivity() as MainActivity).initDrawerTimeZone(eventViewModel.getDisplayTimeZone())
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 logger.e((viewModeInitStatus as UseCase.Result.Error).message)
