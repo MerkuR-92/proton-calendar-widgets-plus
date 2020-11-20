@@ -200,4 +200,6 @@
     <string name="hello_slideshow_second">Hello SlideshowSecondFragment. Arg: %1$s</string>
     <string name="delete">Delete</string>
 
+    <string name="splash_fetching_events">Fetching events</string>
+
 </resources>

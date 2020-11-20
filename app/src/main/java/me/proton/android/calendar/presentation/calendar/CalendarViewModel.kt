@@ -63,6 +63,8 @@ class CalendarViewModel(
 
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
+    val fetchingEvents: MutableLiveData<Boolean> = MutableLiveData(false)
+
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         return calendarsRepository.getActiveCalendars(userId.id).filter { it.isActive }
     }

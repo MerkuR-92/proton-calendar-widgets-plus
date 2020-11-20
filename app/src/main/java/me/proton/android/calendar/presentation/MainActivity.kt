@@ -27,6 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.Dispatchers
@@ -85,17 +86,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             logger.v("regular init, waiting in main activity")
                         }
                         CalendarsRepository.InitingState.ColdIniting -> {
+                            calendarViewModel.fetchingEvents.postValue(true)
                             // TODO animation waiting for cold init
-                            displaySnackBar("Fetching events") // TODO
                             logger.v("waiting for cold init in main activity")
                         }
                         CalendarsRepository.InitingState.Error -> {
+                            calendarViewModel.fetchingEvents.postValue(false)
                             logger.e("navigating from `account ready` but error initialising calendarViewModel")
 
                             accountViewModel.logoutPrimary()
                             calendarViewModel.shutdown()
                         }
                         CalendarsRepository.InitingState.Finished -> {
+                            calendarViewModel.fetchingEvents.postValue(false)
 
                             // Refresh drawer content now that we are logged in.
                             initDrawerHeader()
