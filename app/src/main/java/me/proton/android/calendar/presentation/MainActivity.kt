@@ -200,7 +200,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
         when (state) {
-            is AccountViewModel.State.LoginNeeded -> accountViewModel.startLoginWorkflow()
+            is AccountViewModel.State.LoginNeeded -> {
+                findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
+                accountViewModel.startLoginWorkflow()
+                ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
+            }
             is AccountViewModel.State.Ready -> {
 
                 val eventDetailsIntent =
@@ -224,14 +228,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     navigateTo(Navigation.Deeplink.toMonth())
                 }
             }
-            is AccountViewModel.State.LoggedOut -> {
-                ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
+            is AccountViewModel.State.Processing -> {
+                displaySplashScreen(true)
             }
         }
     }
 
     fun displaySplashScreen(display: Boolean) {
-        drawerLayout.visibleOrGone(!display)
+        drawerLayout.setDrawerLockMode(if (display) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED)
 
         val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm
         val statusBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_norm

@@ -40,8 +40,8 @@ class AccountViewModel(
 
     sealed class State {
         object LoginNeeded : State()
+        object Processing : State()
         object Ready : State()
-        object LoggedOut : State()
     }
 
     sealed class Error {
@@ -106,7 +106,6 @@ class AccountViewModel(
         // How to reproduce: 1) Login. 2) During loading/syncing, logout.
         calendarsRepository.shutdown()
         usersRepository.deleteUserById(userId.id)
-        _state.postValue(State.LoggedOut)
     }
 
     private fun finishAppIfNoAccount(context: ComponentActivity) = viewModelScope.launch {
@@ -141,6 +140,7 @@ class AccountViewModel(
         // Setup User as soon as all parameters are available.
         combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
             if (id != null && passphrase != null && eventId != null) {
+                _state.postValue(State.Processing)
                 setupUser(UserId(id), passphrase, eventId)
             }
         }.launchIn(viewModelScope)
