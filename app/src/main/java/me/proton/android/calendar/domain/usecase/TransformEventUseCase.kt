@@ -31,9 +31,21 @@ class TransformEventUseCase(
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
-        val calendarKey = database.calendarKeysDao().select(eventEntity.calendarId).firstOrNull { it.isActive && it.isPrimary } ?: return null // TODO this "fixes" crashes when being connected to vpn and not having login/bootstrap performerd -- but why do we lose CalendarKeys from db?
-        val calendarPassphrase = database.passphrasesDao().select(eventEntity.calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return null
+        val calendarKey = database.calendarKeysDao().select(eventEntity.calendarId).firstOrNull { it.isActive && it.isPrimary }
+        if (calendarKey == null) {
+            logger.e("TransformEventUseCase, calendarKey is null")
+            return null
+        }
+        val calendarPassphrase = database.passphrasesDao().select(eventEntity.calendarId).map { it.toPassphrase(gson) }.firstOrNull() { it.isActive }
+        if (calendarPassphrase == null) {
+            logger.e("TransformEventUseCase, calendarPassphrase is null")
+            return null
+        }
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id)
+        if (keyPassphrase == null) {
+            logger.e("TransformEventUseCase, keyPassphrase is null")
+            return null
+        }
 
         val calendarParts = mutableListOf<String>()
 
