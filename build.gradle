@@ -29,7 +29,7 @@ buildscript {
                 "proton_core_human_verification": "0.2.4",
                 "proton_core_data": "0.1.2",
                 "proton_core_domain": "0.2.4",
-                "proton_core_presentation": "0.4.8",
+                "proton_core_presentation": "0.4.9",
                 "proton_core_networking": "0.3.6",
                 "proton_core_util_kotlin": "0.2.4"
         ]
