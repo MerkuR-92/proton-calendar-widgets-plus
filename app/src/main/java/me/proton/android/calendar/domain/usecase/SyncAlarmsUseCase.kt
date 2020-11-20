@@ -118,10 +118,10 @@ class SyncAlarmsUseCase(
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                 is ApiResponse.Error -> {
-                                    logger.e("couldn't fetch event ${alarmEntity.eventId} for alarm: ${event.errorCode}, ${event.error}")
+                                    logger.e("couldn't fetch event for alarm: ${event.errorCode}, ${event.error} in SyncAlarmsUseCase")
                                     return UseCase.Result.Error("could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
                                 }
-                                is ApiResponse.Exception -> return UseCase.Result.Error("could not fetch missing event for alarm: ${event.exception}k")
+                                is ApiResponse.Exception -> return UseCase.Result.Error("could not fetch missing event for alarm: ${event.exception}")
                             }
                         } else {
                             calendarsRepository.persistEventAlarm(alarmEntity)

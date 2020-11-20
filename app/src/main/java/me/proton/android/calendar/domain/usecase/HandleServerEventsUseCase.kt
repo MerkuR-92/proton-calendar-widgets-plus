@@ -113,10 +113,10 @@ class HandleServerEventsUseCase(
                                     }
                                     // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                     is ApiResponse.Error -> {
-                                        logger.e("couldn't fetch event ${it.alarm.eventId} for alarm: ${event.errorCode}, ${event.error}")
+                                        logger.e("couldn't fetch event for alarm: ${event.errorCode}, ${event.error}")
                                     }
                                     is ApiResponse.Exception -> {
-                                        logger.e("couldn't fetch event ${it.alarm.eventId} for alarm: ${event.exception}")
+                                        logger.e("couldn't fetch event for alarm: ${event.exception}")
                                     }
                                 }
 
@@ -169,6 +169,9 @@ class HandleServerEventsUseCase(
             }
 
             UseCase.Result.Success
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            logger.e("CancellationException in HandleServerEventsUseCase")
+            UseCase.Result.Error(e.message ?: "CancellationException")
         } catch (e: Exception) {
             logger.e("Error in HandleServerEventsUseCase", e)
             UseCase.Result.Error(e.message ?: "no stack trace message available")
