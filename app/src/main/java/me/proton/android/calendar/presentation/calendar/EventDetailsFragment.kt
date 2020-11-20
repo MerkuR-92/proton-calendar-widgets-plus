@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -47,6 +48,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -64,6 +66,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var attendeeListAdapter: AttendeeListAdapter
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
+
+    private val logger: Logger by inject()
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
@@ -190,9 +194,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     } else {
 
                         if (deleteResult is UseCase.Result.Error) {
-                            TimberLogger.e("Error deleting event: ${deleteResult.message}")
+                            logger.e("Error deleting event: ${deleteResult.message}")
                         } else if (deleteResult is UseCase.Result.InvalidParams) {
-                            TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
+                            logger.e("InvalidParams deleting event: ${deleteResult.message}")
                         }
 
                         view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
@@ -234,9 +238,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         } else {
 
                             if (deleteResult is UseCase.Result.Error) {
-                                TimberLogger.e("Error deleting event: ${deleteResult.message}")
+                                logger.e("Error deleting event: ${deleteResult.message}")
                             } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                logger.e("InvalidParams deleting event: ${deleteResult.message}")
                             }
 
                             view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
@@ -283,7 +287,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 (requireActivity() as MainActivity).initDrawerTimeZone(eventViewModel.getDisplayTimeZone())
             } else {
                 // TODO display error and close? for example when we can't decrypt event
-                TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                logger.e((viewModeInitStatus as UseCase.Result.Error).message)
                 requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
@@ -294,13 +298,17 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun attachActionHandlers() {
         section_location.text_header.setOnSingleClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
-                mainViewModel.handleEventLocationShow(it)
+                if (!mainViewModel.handleEventLocationShow(it)) {
+                    logger.i("could not show location on map")
+                }
             }
         }
         section_location.image_button_action.setOnSingleClickListener() {
             eventViewModel.eventLiveData.value?.location?.let {
                 if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
+                } else {
+                    logger.i("could not copy to clipboard")
                 }
             }
         }
@@ -318,24 +326,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
 
-            TimberLogger.d("GOT EVENT IN DETAILS FRAGMENT: $event")
-            TimberLogger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
-            TimberLogger.d("${event?.iCalendar?.printToString()}")
-            TimberLogger.d("uid: ${event?.iCalEvent?.uid}")
-            TimberLogger.d("id: ${event?.id}")
-
-
-            // TODO EXTRACT DATE FORMATTING TO UTILS
-
-
-
-
-            //val eventOccurrence = event.generateOccurrence(navigationArguments.occurrenceNumber, calendarViewModel.timeZoneId.id)
-//            TimberLogger.d("event occurrence generated: ${eventOccurrence}")
-
+            logger.d("GOT EVENT IN DETAILS FRAGMENT: $event")
+            logger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
+            logger.d("${event?.iCalendar?.printToString()}")
+            logger.d("uid: ${event?.iCalEvent?.uid}")
+            logger.d("id: ${event?.id}")
 
             // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
 
+            // TODO display signature verification result
 //                text_event_title.text = "SIGNATURE VERIFICATION: ${event.verificationStatus}\n\n" + event.summary + "\n"
 
             with(section_event_info) {

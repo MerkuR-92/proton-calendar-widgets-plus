@@ -142,8 +142,6 @@ class MiniCalendarItemAdapter(
 
     private fun markDayAsSelected(date: LocalDate) {
 
-        TimberLogger.d("handleMiniCalendarDayPicked markday as selected $date")
-
         val mutableList = currentList.toMutableList()
 
         // select last index, because header items contain valid date for first days of the month
@@ -162,8 +160,6 @@ class MiniCalendarItemAdapter(
     private fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
 
         val mutableList = currentList.toMutableList()
-
-        TimberLogger.v("submitCalendarIndicators for ${month} in ${lifecycleOwner.lifecycle.currentState}: $indicators ")
 
         mutableList.forEachIndexed { index, miniCalendarItem ->
             if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == month) {

@@ -30,9 +30,5 @@ class FeedbackFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        logger.i("Sentry info test exception", java.lang.Exception("blabla"))
-        logger.e("Sentry error test exception", java.lang.Exception("blabla"))
-        throw Exception("Sentry test exception")
     }
 }

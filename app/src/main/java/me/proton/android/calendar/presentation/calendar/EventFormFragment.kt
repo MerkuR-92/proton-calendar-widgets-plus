@@ -81,7 +81,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     if (viewModeInitStatus == UseCase.Result.Success) {
                         findNavController().navigateUp()
                     } else {
-                        TimberLogger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                        logger.e((viewModeInitStatus as UseCase.Result.Error).message)
                         requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                         jumpToMonthView()
                     }

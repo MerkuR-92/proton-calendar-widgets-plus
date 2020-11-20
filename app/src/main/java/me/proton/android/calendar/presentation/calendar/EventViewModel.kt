@@ -123,11 +123,11 @@ class EventViewModel(
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
-        TimberLogger.d("displayTimezoneid = ${displayTimeZoneId}")
+        logger.d("displayTimezoneid = ${displayTimeZoneId}")
 
-        TimberLogger.d("EventViewModel initialise with EventId: $eventId")
-        TimberLogger.d("EventViewModel initialise with startDate: $initStartDate")
-        TimberLogger.d("EventViewModel initialise with startTime: ${initStartTime}")
+        logger.d("EventViewModel initialise with EventId: $eventId")
+        logger.d("EventViewModel initialise with startDate: $initStartDate")
+        logger.d("EventViewModel initialise with startTime: ${initStartTime}")
 
         val defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId) ?: return UseCase.Result.Error("could not get default Calendar from DB")
 
@@ -196,7 +196,7 @@ class EventViewModel(
 //            }
 
 
-            TimberLogger.d("INIT: ${newICalendar.printToString()}")
+            logger.d("INIT: ${newICalendar.printToString()}")
 
             val newEvent = Event(ICalUtils.generateOfflineEventId(), Calendar(
                 defaultCalendar.id,
@@ -211,7 +211,7 @@ class EventViewModel(
 
         } else {
 
-            TimberLogger.v("event view model init with occurrence: $occurrenceNumber")
+            logger.v("event view model init with occurrence: $occurrenceNumber")
 
             val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
             dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
@@ -222,7 +222,7 @@ class EventViewModel(
                 hasExDates = it.isRecurring() && !it.iCalEvent.exceptionDates.isNullOrEmpty()
             }
 
-            TimberLogger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
+            logger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 
             val eventStartTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?: displayTimeZoneId
 
@@ -365,18 +365,18 @@ class EventViewModel(
 
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
-        TimberLogger.d("handleSave with editOption: $editOption")
-        TimberLogger.d("calendar before adjusting: " + event.iCalendar.printToString())
+        logger.d("handleSave with editOption: $editOption")
+        logger.d("calendar before adjusting: " + event.iCalendar.printToString())
 
         // Post saving event value to true to trigger loading state
         savingEvent.postValue(true)
 
         if (event.isAllDay()) {
             event.iCalendar.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
-            TimberLogger.d("calendar for all-day: " + event.iCalendar.printToString())
+            logger.d("calendar for all-day: " + event.iCalendar.printToString())
         } else {
             event.iCalendar.adjustStartEndTimeZones(eventTimeZoneId, event.defaultTimeZone!!)
-            TimberLogger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
+            logger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
 
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
@@ -393,10 +393,10 @@ class EventViewModel(
 
         handleSequence(dbEventWithOccurrence)
 
-        TimberLogger.d("db event =${dbEvent?.iCalendar?.printToString()}")
-        TimberLogger.d(("dbEventStartDate : ${dbEventStartDate}"))
-        TimberLogger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence?.iCalendar?.printToString()}"))
-        TimberLogger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
+        logger.d("db event =${dbEvent?.iCalendar?.printToString()}")
+        logger.d(("dbEventStartDate : ${dbEventStartDate}"))
+        logger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence?.iCalendar?.printToString()}"))
+        logger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
 
         val newEvent = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {
@@ -426,10 +426,10 @@ class EventViewModel(
                     // TODO dtstart/end is incorrect, when creating new event that is in different timezone -- we should normalize the time back to original!!!!!
                     val timeHasBeenChanged = !eventToCreate.iCalendar.isDateTimeTheSame(dbEventWithOccurrence.iCalendar)
                     if (timeHasBeenChanged) { // TODO it looks like we always use occurrence start date anyway
-                        TimberLogger.d("time has been changed")
+                        logger.d("time has been changed")
 //                        eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !eventToCreate.isAllDay())
                     } else {
-                        TimberLogger.d("time is the same")
+                        logger.d("time is the same")
                     }
                     eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !dbEvent.isAllDay()) // RecurrenceId has to be in original event's format
 
@@ -501,10 +501,8 @@ class EventViewModel(
                     val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
                     if (editOriginalEventResult != UseCase.Result.Success) {
                         if (editOriginalEventResult is UseCase.Result.Error) {
-                            logger.i("error editing event: ${editOriginalEventResult.message}")
                             logger.e("error editing event: ${editOriginalEventResult.message}")
                         } else if (editOriginalEventResult is UseCase.Result.Error) {
-                            logger.i("error editing event: ${editOriginalEventResult.message}")
                             logger.e("error editing event: ${editOriginalEventResult.message}")
                         }
                         return false
@@ -590,7 +588,7 @@ class EventViewModel(
 
                         if (event.isAllDay()) {
                             event.also {
-                                TimberLogger.d(
+                                logger.d(
                                     "all day, updating only new time: ${
                                         dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate()
                                     }/${dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate()}"
@@ -599,7 +597,7 @@ class EventViewModel(
                                 it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate())
                             }
                         } else {
-                            TimberLogger.d(
+                            logger.d(
                                 "part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone!!)!!}/${
                                     dbEvent.getEnd(
                                         event.defaultTimeZone!!
@@ -638,17 +636,15 @@ class EventViewModel(
 
 
         // TODO run work manager
-        TimberLogger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
+        logger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
             createEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
         }.await()
 
         if (createEventResult is UseCase.Result.InvalidParams) {
-            logger.i("invalid params in create event: ${createEventResult.message}")
             logger.e("invalid params in create event: ${createEventResult.message}")
         }
         if (createEventResult is UseCase.Result.Error) {
-            logger.i("error in create event: ${createEventResult.message}")
             logger.e("error in create event: ${createEventResult.message}")
         }
 
@@ -939,7 +935,7 @@ class EventViewModel(
                 3 -> Duration.builder().prior(true).weeks(2).days(6).hours(15).build() // 3 weeks before at 9:00, -P2W6DT15H
                 4 -> null // all-day alarms have 1 fewer option
                 5 -> { // custom
-                    TimberLogger.d(" time = ${tempAlarmTime}") // TODO
+                    logger.d("alarm time = ${tempAlarmTime}") // TODO
 
                     // -P6DT15H 1 week before at 9
                     // -P6DT23H59M 1 week before at 00:01
@@ -1007,7 +1003,7 @@ class EventViewModel(
             }
         }
 
-        TimberLogger.d("duration: ${duration}")
+        logger.d("duration: ${duration}")
 
         duration?.apply {
 

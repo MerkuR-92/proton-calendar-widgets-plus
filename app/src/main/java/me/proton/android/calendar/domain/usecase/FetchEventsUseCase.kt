@@ -2,10 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonNull
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -64,7 +61,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                     val result = if (eventsResponse is ApiResponse.Success) {
 
-                        TimberLogger.v("more: ${eventsResponse.data.more}")
+                        logger.v("more: ${eventsResponse.data.more}")
 
                         events.addAll(eventsResponse.data.events)
 

@@ -18,21 +18,23 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.displaySnackBar
 import me.proton.android.calendar.common.visibleOrInvisible
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.MainActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.time.LocalDate
 
 
 class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val logger: Logger by inject()
 
     private var position: Int? = null
     private var date: LocalDate? = null
@@ -74,7 +76,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         // TODO To be tested but shouldn't happen
         val immutableDate = date ?: return
 
-        TimberLogger.d("onViewCreated: $immutableDate")
+        logger.d("onViewCreated: $immutableDate")
 
         rv_agenda.apply {
             //            setHasFixedSize(true)
@@ -104,9 +106,9 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                                     requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                                 } else {
                                     if (deleteResult is UseCase.Result.Error) {
-                                        TimberLogger.e("Error deleting event: ${deleteResult.message}")
+                                        logger.e("Error deleting event: ${deleteResult.message}")
                                     } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                        TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
                                     }
                                     requireActivity().displaySnackBar(getString(R.string.snack_event_deleted_error))
                                 }
@@ -123,7 +125,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         list_view_status.text = resources.getString(R.string.agenda_loading_events)
 
         calendarViewModel.eventsLiveData(immutableDate, immutableDate).observe(viewLifecycleOwner) {
-            TimberLogger.d("xxx observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it.size}")
+            logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it.size}")
 
             if (it.isEmpty()) {
                 list_view_status.visibleOrInvisible(true)

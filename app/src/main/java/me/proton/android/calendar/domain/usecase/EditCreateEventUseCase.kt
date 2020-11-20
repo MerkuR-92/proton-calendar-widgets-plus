@@ -60,17 +60,17 @@ class EditCreateEventUseCase(
             } else null
         }
 
-//        TimberLogger.d("old event entity: $oldEventEntity")
-//        TimberLogger.d("shared key packet raw: ${oldEventEntity?.sharedKeyPacket}")
-//        TimberLogger.d("calendar key packet raw: ${oldEventEntity?.calendarKeyPacket}")
+        logger.d("old event entity: $oldEventEntity")
+        logger.d("shared key packet raw: ${oldEventEntity?.sharedKeyPacket}")
+        logger.d("calendar key packet raw: ${oldEventEntity?.calendarKeyPacket}")
 
-//        TimberLogger.d("shared key packet decrypted algo: ${oldSharedSessionKey?.algo}")
-//        TimberLogger.d("calendar key packet decrypted algo: ${oldCalendarSessionKey?.algo}")
+        logger.d("shared key packet decrypted algo: ${oldSharedSessionKey?.algo}")
+        logger.d("calendar key packet decrypted algo: ${oldCalendarSessionKey?.algo}")
 
         // 5. sign and encrypt Shared Parts
         val sharedPartICalString = calendarSplit.sharedPart.printToString()
 
-//        TimberLogger.v("shared part: ${sharedPartICalString}")
+//        logger.v("shared part: ${sharedPartICalString}")
 
 //        return UseCase.Result.Error("TODO")
 

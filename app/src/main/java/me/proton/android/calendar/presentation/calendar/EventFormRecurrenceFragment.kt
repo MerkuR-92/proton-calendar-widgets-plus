@@ -20,12 +20,12 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.NoLayoutRadioGroup
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.inject
-import java.text.DateFormat
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
@@ -46,6 +46,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by inject()
+    private val logger: Logger by inject()
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
     private lateinit var monthlyRecurrenceOnMap: HashMap<Int, EventViewModel.MonthlyRepatOnOption>
 
@@ -468,7 +469,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun observeEventLiveData() {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer {
 
-            TimberLogger.d("event: ${it.iCalendar.printToString()}")
+            logger.v("event in eventform recurrence fragment: ${it.iCalendar.printToString()}")
 
             val radioButtonId = when (it.iCalEvent.recurrenceRule?.value?.frequency) {
                 Frequency.DAILY -> R.id.event_form_recurrence_2

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueKey

@@ -12,9 +12,10 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
-import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.domain.Logger
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.time.LocalDate
 
 
@@ -23,6 +24,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     private var date: LocalDate? = null
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val logger: Logger by inject()
 
 //    private val navigationArguments: EventFormFragmentArgs by navArgs()
 
@@ -61,9 +63,9 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         // TODO To be tested but shouldn't happen
         val immutableDate = date ?: return
 
-        TimberLogger.d("mini calendar onViewCreated: $immutableDate")
+        logger.d("mini calendar onViewCreated: $immutableDate")
 
-        TimberLogger.d("viewmodel timeZoneId (itemminicalendarfragment) = ${calendarViewModel.timeZoneId.id}")
+        logger.d("viewmodel timeZoneId (itemminicalendarfragment) = ${calendarViewModel.timeZoneId.id}")
 
         rv_mini_calendar.apply {
 //            setHasFixedSize(true) // TODO
@@ -89,7 +91,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             val fromDate = immutableDate.withDayOfMonth(1)
             val toDate = immutableDate.withDayOfMonth(immutableDate.lengthOfMonth())
 
-            TimberLogger.d("zzz requesting prefetch for date range ${fromDate} - ${toDate} in timezone: ${calendarViewModel.timeZoneId.id}")
             calendarViewModel.fetchEvents(fromDate, toDate, calendarViewModel.timeZoneId.id)
 
         }
