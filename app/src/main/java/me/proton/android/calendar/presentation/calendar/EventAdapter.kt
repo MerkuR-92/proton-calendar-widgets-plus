@@ -89,6 +89,7 @@ class EventAdapter(
                 } else {
                     decryptionErrorIcon.visibleOrGone(false)
                     decryptionErrorView.visibleOrGone(false)
+                    textViewSubheader.visibleOrGone(true)
                 }
 
                 if (event.isInThePast(timeZoneId)) {
@@ -168,6 +169,7 @@ class EventAdapter(
                 } else {
                     decryptionErrorIcon.visibleOrGone(false)
                     decryptionErrorView.visibleOrGone(false)
+                    textViewSubheader.visibleOrGone(true)
                 }
 
                 viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))

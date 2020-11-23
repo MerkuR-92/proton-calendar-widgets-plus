@@ -57,8 +57,8 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
             val title = if (description.isEmpty()) attendee.email else attendee.commonName
             attendeeItemTitle.text = title
 
+            attendeeItemDescription.visibleOrGone(description.isNotEmpty())
             if (description.isNotEmpty()) attendeeItemDescription.text = description
-            else attendeeItemDescription.visibleOrGone(false)
 
             // TODO Handle common name and picture when contacts are implemented
             attendeeItemDescription.visibleOrGone(false)
@@ -72,6 +72,8 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
                 constraintSet.clone(attendeeItemLayout)
                 constraintSet.clear(attendeeItemTextLayout.id, ConstraintSet.BOTTOM)
                 constraintSet.applyTo(attendeeItemLayout)
+            } else {
+                attendeeItemOptional.visibleOrGone(false)
             }
 
             initAttendeeStatus(attendeeItemStatus, attendee.participationStatus, view.context)
