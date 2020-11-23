@@ -433,7 +433,7 @@ object ICalUtils {
             }
 
         return this.filterNot {
-            if (originalEvent.isAllDay()) LocalDate.from(ZonedDateTime.ofInstant(it.occurrence!!.startDateTime.toInstant(), ZoneId.systemDefault())) in exZonedDateTimes
+            if (originalEvent.isAllDay()) LocalDate.from(it.occurrence!!.startDateTime) in exZonedDateTimes
             else it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes
         }
     }
