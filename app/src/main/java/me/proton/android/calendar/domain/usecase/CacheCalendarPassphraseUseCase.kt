@@ -17,7 +17,6 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
     private val valueStoreProvider: ValueStoreProvider
 ): UseCase {
 
-    // userid: "IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ=="
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
 
         logger.v("executing CacheCalendarPassphraseUseCase, user $userId, calendar $calendarId")
@@ -36,17 +35,19 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         // you can have more than one member
 
         val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(gson) }
+        val address = userAddresses.firstOrNull()
+            ?: return UseCase.Result.InvalidParams("there is no user address in CacheCalendarPassphraseUseCase") // TODO probably it will be multiple for more members
 
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
+            ?: return UseCase.Result.InvalidParams("there is no user address in CacheCalendarPassphraseUseCase")
 
-        val address = userAddresses.first() // TODO probably it will be multiple for more members
 
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey
         var decryptedPassphrase: String? = null
         address.keys.forEach { addressKey ->
             val decryptionResult = crypto.decryptText(
-                memberPassphrase!!.passphrase,
+                memberPassphrase.passphrase,
                 addressKey.privateKey,
                 (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray()
             )
@@ -63,16 +64,19 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
 
         }
 
-        return if (decryptedPassphrase.isNullOrBlank()) {
-            UseCase.Result.InvalidParams("there is no AddressKey for email ${member.email} to decrypt CalendarKeyPassphrase")
-        } else {
-            // we cache decrypted CalendarPassphrase under CalendarPassphraseId, but actually this is
-            //  Passphrase for CalendarKey, not Calendar
-            valueStore.putStringInSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id, decryptedPassphrase!!)
-            logger.v("success decrypting and storing passphrase for calendar $calendarId")
-            UseCase.Result.Success
+        if (decryptedPassphrase.isNullOrBlank()) {
+            return UseCase.Result.InvalidParams("could not decrypt passhprase in CacheCalendarPassphraseUseCase")
         }
 
+        decryptedPassphrase?.let {
+            // we cache decrypted CalendarPassphrase under CalendarPassphraseId, but actually this is
+            //  Passphrase for CalendarKey, not Calendar
+            valueStore.putStringInSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id, it)
+            logger.v("success decrypting and storing passphrase for calendar $calendarId")
+            return UseCase.Result.Success
+        }
+
+        return UseCase.Result.Error("CacheCalendarPassphraseUseCase should not happen")
     }
 
 }

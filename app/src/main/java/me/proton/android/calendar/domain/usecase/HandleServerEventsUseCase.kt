@@ -157,7 +157,10 @@ class HandleServerEventsUseCase(
                     {
                         calendarsRepository.persistPassphrase(it.passphrase!!)
                         // TODO make sure we delete passphrase from cache if it becomes inactive
-                        cacheCalendarPassphraseUseCase.execute(userId, it.passphrase.calendarId)
+                        when (val result = cacheCalendarPassphraseUseCase.execute(userId, it.passphrase.calendarId)) {
+                            is UseCase.Result.InvalidParams -> logger.e("event looop calendar passphrase caching InvalidParams: ${result.message}")
+                            is UseCase.Result.Error -> logger.e("event looop calendar passphrase caching Error: ${result.message}")
+                        }
                     }
                 )
             }

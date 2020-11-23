@@ -83,6 +83,7 @@ class AccountViewModel(
         }
     }
 
+    // TODO get rid of these strings
     private fun handleError(message: String) {
         when (message) {
             "user is free" -> _errorReport.postValue(Error.FreeUser)

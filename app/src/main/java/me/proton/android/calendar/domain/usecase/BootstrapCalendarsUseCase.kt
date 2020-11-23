@@ -30,7 +30,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
             return UseCase.Result.Error("error user has no calendar")
-        } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive } == null) {
+        } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
             return UseCase.Result.Error("error user has no active calendar")
         }
 
@@ -65,13 +65,23 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     // extract passphrase for just saved Calendar
                     val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
                     when (cachePassphraseResult) {
-                        is UseCase.Result.InvalidParams -> logger.e("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
-                        is UseCase.Result.Error -> logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")
+                        UseCase.Result.Success -> {
+                            // TODO this is related to User and not Calendars, in theory we could save it some other time
+                            //  but this should not cause any troubles
+
+                            // if at least one calendar bootstrap succeeded, we save user and calendar settings
+                            calendarsRepository.persistCalendarUserSettings(userId.id, calendarUserSettingsResponse.data.calendarUserSettings)
+                            usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
+                        }
+                        is UseCase.Result.InvalidParams -> {
+                            failedCalendarIds.add(calendarEntity.id)
+                            logger.e("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
+                        }
+                        is UseCase.Result.Error -> {
+                            failedCalendarIds.add(calendarEntity.id)
+                            logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")
+                        }
                     }
-
-                    calendarsRepository.persistCalendarUserSettings(userId.id, calendarUserSettingsResponse.data.calendarUserSettings)
-                    usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
-
                 }
                 is ApiResponse.Error -> {
                     logger.e("api error getting calendar bootstrap: $bootstrapResponse")
@@ -82,6 +92,17 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     failedCalendarIds.add(calendarEntity.id)
                 }
             }
+        }
+
+        failedCalendarIds.forEach {
+            calendarsRepository.deleteCalendarById(it)
+            // foreign keys on Calendar ID will also delete:
+            //  - Calendar Settings
+            //  - Passphrase
+            //  - CalendarKeys
+            //  - Members
+
+            // CalendarUserSettings and UserSettings will not be deleted
         }
 
         return if (failedCalendarIds.isNotEmpty()) {
