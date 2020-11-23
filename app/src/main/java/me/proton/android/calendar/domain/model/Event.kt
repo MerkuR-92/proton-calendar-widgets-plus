@@ -258,52 +258,6 @@ data class Event(
 
     }
 
-    fun generateExdateFilteredOccurrencesInFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
-
-        if (!isRecurring()) return null
-
-        val occurences = generateExdateFilteredOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
-
-        return occurences.filter {
-            startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
-        }
-
-    }
-
-    /**
-     * Generated occurrences and filters them out by EXDATE.
-     *
-     * @param timeZoneId timezone of toDate and returned occurrences
-     */
-    fun generateExdateFilteredOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
-
-        if (!isRecurring()) return null
-
-        val occurences = generateOccurrencesUntil(toDate, if (this.isAllDay()) ZoneId.systemDefault().id else timeZoneId) ?: emptyList()
-        val exceptionDates = this.getExceptionDates() ?: emptyList()
-
-        val result = occurences.filter { occurrence ->
-            !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
-        }
-
-        return result.map {
-            it.copy(
-                startDateTime = it.startDateTime.withZoneSameInstant(ZoneId.of(timeZoneId)),
-                endDateTime = it.endDateTime.withZoneSameInstant(ZoneId.of(timeZoneId))
-            )
-        }
-
-    }
-
-
-
-    fun filterOutOccurrences(occurences: List<Occurrence>): List<Occurrence> {
-        val exceptionDates = this.getExceptionDates() ?: emptyList()
-        return occurences.filter { occurrence ->
-            !exceptionDates.any { it.toInstant() == occurrence.startDateTime.toInstant() }
-        }
-    }
-
     /**
      * Generates all occurrences of a recurring Event until given LocalDate in TimeZone
      * or the first X occurrences, whatever comes first.

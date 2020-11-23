@@ -936,106 +936,6 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `generate occurrences of part-day event with EXDATES`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    BEGIN:VEVENT
-    DTSTART;TZID=/Europe/Budapest:20200625T160000
-    DTEND;TZID=/Europe/Budapest:20200625T163000
-    RRULE:FREQ=DAILY;COUNT=20
-    SUMMARY:recurring every day 20 times
-    UID:EGVy407XddW2_ESpoOVn7oN1qc9V@proton.me
-    DTSTAMP:20200625T143822Z
-    BEGIN:VALARM
-    TRIGGER:-PT15H
-    ACTION:DISPLAY
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val iCal = ICalUtils.parseICalString(iCalString)!!
-        val displayTimeZoneId = "Europe/Vilnius"
-        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
-            "id",
-            "calendar",
-            "",
-            1,
-            true
-        ), iCal, null)
-
-        val displayRangeTo = LocalDate.of(2020, 7, 30)
-
-        event.addExceptionDate(2)
-        event.addExceptionDate(3)
-        event.addExceptionDate(5)
-        event.addExceptionDate(10)
-        event.addExceptionDate(40) // non-existing occurrence
-
-        val occurrences = event.generateExdateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList()
-
-        assertThat(occurrences.size).isEqualTo(16)
-        assertThat(occurrences.none { it.occurrenceNumber == 2 }).isTrue()
-        assertThat(occurrences.none { it.occurrenceNumber == 3 }).isTrue()
-        assertThat(occurrences.none { it.occurrenceNumber == 5 }).isTrue()
-        assertThat(occurrences.none { it.occurrenceNumber == 10 }).isTrue()
-        assertThat(occurrences.all { it.startDateTime.zone.id == displayTimeZoneId }).isTrue()
-
-    }
-
-    @Test
-    fun `generate occurrences of all-day event with EXDATES`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    BEGIN:VEVENT
-    DTSTART;VALUE=DATE:20200626
-    DTEND;VALUE=DATE:20200627
-    RRULE:FREQ=DAILY;COUNT=20
-    SUMMARY:recurring every day 20 times
-    UID:EGVy407XddW2_ESpoOVn7oN1qc9V@proton.me
-    DTSTAMP:20200625T143822Z
-    BEGIN:VALARM
-    TRIGGER:-PT15H
-    ACTION:DISPLAY
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val iCal = ICalUtils.parseICalString(iCalString)!!
-        val displayTimeZoneId = "Europe/Vilnius"
-        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
-            "id",
-            "calendar",
-            "",
-            1,
-            true
-        ), iCal, null)
-
-        val displayRangeTo = LocalDate.of(2020, 7, 30)
-
-        event.addExceptionDate(2)
-        event.addExceptionDate(3)
-        event.addExceptionDate(5)
-        event.addExceptionDate(10)
-        event.addExceptionDate(40) // non-existing occurrence
-
-        val occurrences = event.generateExdateFilteredOccurrencesUntil(displayRangeTo, displayTimeZoneId) ?: emptyList() //event.filterOutOccurrences(event.generateOccurrencesUntil(displayRangeTo, ZoneId.systemDefault().id) ?: emptyList())
-
-        assertThat(occurrences.size).isEqualTo(16)
-        assertThat(occurrences.none { it.occurrenceNumber == 2 }).isTrue()
-        assertThat(occurrences.none { it.occurrenceNumber == 3 }).isTrue()
-        assertThat(occurrences.none { it.occurrenceNumber == 5 }).isTrue()
-        assertThat(occurrences.none { it.occurrenceNumber == 10 }).isTrue()
-        assertThat(occurrences.all { it.startDateTime.zone.id == displayTimeZoneId }).isTrue()
-
-    }
-
-    @Test
     fun `filter out occurrences by RECURRENCE-ID`() {
 
         val iCals = listOf(
@@ -1225,7 +1125,7 @@ internal class ICalUtilsTest {
         )
 
         val displayRangeTo = LocalDate.of(2020, 8, 9)
-        val displayTimeZoneId = "Europe/Zurich"
+        val displayTimeZoneId = "UTC"
 
         val events = iCals.mapIndexed { index, iCal ->
             Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
@@ -1259,6 +1159,45 @@ internal class ICalUtilsTest {
         assertThat(filteredByExdates.find { it.occurrence!!.occurrenceNumber == 5 }).isNull()
 
 
+    }
+
+    @Test
+    fun `filter out ex date from recurring event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:UTC
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;COUNT=7
+    EXDATE;VALUE=DATE:20201116
+    SEQUENCE:0
+    SUMMARY:Recurring
+    STATUS:CONFIRMED
+    UID:x6CIBatQ-BJuoKnwWMiJywzj7WPl@proton.me
+    DTSTAMP:20201123T143518Z
+    DTSTART;VALUE=DATE:20201115
+    DTEND;VALUE=DATE:20201115
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayRangeTo = LocalDate.of(2020, 11, 21)
+        val displayTimeZoneId = "UTC"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
+        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
+        assertThat(filteredByExdates.size).isEqualTo(6)
     }
 
     @Test

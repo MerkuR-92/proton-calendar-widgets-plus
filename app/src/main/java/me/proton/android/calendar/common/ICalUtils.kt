@@ -424,9 +424,18 @@ object ICalUtils {
      */
     fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event): List<Event> {
 
-        val exZonedDateTimes = originalEvent.iCalEvent.exceptionDates.flatMap { exDates -> exDates.values.map { exDate -> exDate.toInstant() } }
+        val exZonedDateTimes =
+            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+                exDates.values.map { exDate ->
+                    if (originalEvent.isAllDay()) LocalDate.from(ZonedDateTime.ofInstant(exDate.toInstant(), ZoneId.systemDefault()))
+                    else exDate.toInstant()
+                }
+            }
 
-        return this.filterNot { it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes }
+        return this.filterNot {
+            if (originalEvent.isAllDay()) LocalDate.from(ZonedDateTime.ofInstant(it.occurrence!!.startDateTime.toInstant(), ZoneId.systemDefault())) in exZonedDateTimes
+            else it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes
+        }
     }
 
     /**
