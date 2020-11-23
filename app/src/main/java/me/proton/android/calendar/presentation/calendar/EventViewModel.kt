@@ -251,6 +251,15 @@ class EventViewModel(
                 // default timezone in iCalendar is used for GUI
                 this.iCalendar.setDefaultTimeZone(timeZoneForOccurrence)
 
+                // Clone RRule from original event in DB if we are in edit mode
+                if (editMode) {
+                    val eventUid = dbEvent?.uid
+                    if (dbEvent?.isSingleEdit() == true && eventUid != null) {
+                        val originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
+                            ?.let { transformEventUseCase.execute(it) }
+                        this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
+                    }
+                }
 
             } ?: return UseCase.Result.Error("could not find event ${eventId}")
         }
@@ -356,14 +365,6 @@ class EventViewModel(
 
 
     suspend fun handleSave(editOption: EventEditDeleteOption? = null, occurrenceNumber: Int): Boolean { // create or edit
-
-        if (userId == null) {
-            logger.e("user ID is null in EventViewModel handleSave")
-            return false
-        }
-
-//        val calendarToSave = event.iCalendar
-
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
         logger.d("handleSave with editOption: $editOption")
@@ -381,9 +382,6 @@ class EventViewModel(
         }
 
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
-
-        // TODO FIXME THIS HAS TO COUNT FROM db-EVENT START, NOT MODIFIED CURRENT EVENT!
-        //val occurrence = event.generateOccurrence(occurrenceNumber ?: 0, event.defaultTimeZone!!)
 
         val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
         val originalDbEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
@@ -479,6 +477,8 @@ class EventViewModel(
                 // - change UNTIL equal to (previous occurrence from just edited).endDate
                 val eventToCopy = if (dbEvent.isSingleEdit()) originalDbEvent else dbEvent
                 val dbEventToUpdate = eventToCopy!!.copy(iCalendar = eventToCopy.iCalendar.clone())
+                // Bump sequence for original event
+                dbEventToUpdate.iCalEvent.setSequence((dbEventToUpdate.iCalEvent.sequence?.value ?: 0) + 1)
                 dbEventToUpdate.iCalEvent.recurrenceRule?.value?.let {
                     dbEventToUpdate.iCalEvent.setRecurrenceRule(
                         Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
@@ -496,8 +496,6 @@ class EventViewModel(
                             )
                             .build()
                     )
-                    // Bump sequence for original event
-                    dbEventToUpdate.iCalEvent.setSequence((dbEventToUpdate.iCalEvent.sequence?.value ?: 0) + 1)
 
                     val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
                     if (editOriginalEventResult != UseCase.Result.Success) {
@@ -550,61 +548,116 @@ class EventViewModel(
                 eventToCreate
             }
             EventEditDeleteOption.ALL_EVENTS -> {
+                // All events expected behavior :
+                // Single deletions and single edits are always reset when doing this operation.
+                // - If Event start date : only time changed (same day), and RRule not changed
+                //      -> update original event time with event value
+                // - If Event start date : date changed (different day) / RRule changed
+                //      -> update original event date and time with event values
 
-                if (dbEvent?.isSingleEdit() == true && originalDbEvent != null) {
-                    // delete all single edits of original event
-                    val deleteSingleEditsResult = deleteEventUseCase.execute(userId, originalDbEvent.id, originalDbEventStartDate!!.minusNanos(1))
-                    if (deleteSingleEditsResult != UseCase.Result.Success) {
-                        logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
-                        return false
-                    }
+                if (dbEvent?.isSingleEdit() == true && originalDbEvent == null) {
+                    logger.e("Edit all events: originalEventStartDate was null for single edit")
+                    return false
+                }
 
-                    // clear recurrenceId and use original event id since single edit will replace original event
-                    val newEvent = event.copy(id = originalDbEvent.id, iCalendar = event.iCalendar.clone())
-                    newEvent.iCalEvent.recurrenceId = null
+                // delete all single edits
+                val originalEventId =
+                    if (dbEvent?.isSingleEdit() == true) originalDbEvent?.id
+                    else event.id
+                val originalEventStartDate =
+                    if (dbEvent?.isSingleEdit() == true) originalDbEventStartDate
+                    else dbEventStartDate
 
-                    newEvent
-                } else {
-                    // delete all single edits
-                    val deleteSingleEditsResult =
-                        deleteEventUseCase.execute(userId, event.id, dbEventStartDate!!.minusNanos(1))
-                    if (deleteSingleEditsResult != UseCase.Result.Success) {
-                        logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
-                        return false
-                    }
+                if (originalEventStartDate == null) {
+                    logger.e("Edit all events: originalEventStartDate was null")
+                    return false
+                }
+                if (originalEventId == null) {
+                    logger.e("Edit all events: originalEventId was null")
+                    return false
+                }
 
-                    // delete all single deletions
-                    event.iCalEvent.exceptionDates.clear()
+                val deleteSingleEditsResult =
+                    deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                if (deleteSingleEditsResult != UseCase.Result.Success) {
+                    logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
+                    return false
+                }
 
-//                TWO SEPARATE THINGS:
-//                - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
-//                - the same DAY but different TIME
+                // delete all single deletions
+                event.iCalEvent.exceptionDates.clear()
 
-                    if (dbEventWithOccurrenceStartDate!!.truncatedTo(ChronoUnit.DAYS) == event.getStart(event.defaultTimeZone!!)
-                            ?.truncatedTo(ChronoUnit.DAYS) &&
-                        dbEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule
-                    ) {
+                // TWO SEPARATE THINGS:
+                // - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
+                // - the same DAY but different TIME
 
-                        // update the original event's DTSTART only with new time (leave day the same)
+                val originalEventWithOccurrence =
+                    if (dbEvent?.isSingleEdit() == true) originalDbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
+                    else dbEventWithOccurrence
 
+                if (originalEventWithOccurrence == null) {
+                    logger.e("Edit all events: originalEventWithOccurrence was null")
+                    return false
+                }
+
+                val hasDayChanged =
+                    (if (dbEvent?.isSingleEdit() == true) dbEventStartDate
+                    else dbEventWithOccurrenceStartDate)?.truncatedTo(ChronoUnit.DAYS) != event.getStart(event.defaultTimeZone!!)?.truncatedTo(ChronoUnit.DAYS)
+
+                if (!hasDayChanged &&
+                    originalEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
+
+                    // update the original event's DTSTART only with new time (leave day the same)
+
+                    // TODO Try to reduce duplicated code between single edit and occurrence logic
+                    if (dbEvent?.isSingleEdit() == true) {
+                        if (originalDbEvent == null) {
+                            logger.e("Edit all events: dbEvent was null")
+                            return false
+                        }
+
+                        val newEvent = event.copy(
+                            id = originalDbEvent.id,
+                            iCalendar = event.iCalendar.clone()
+                        )
+                        newEvent.iCalEvent.recurrenceId = null
+                        newEvent.iCalEvent.uid = originalDbEvent.iCalEvent.uid
+
+                        // For single edit we need to calculate span to add days to original event date end
+                        val eventSpan = ChronoUnit.DAYS.between(newEvent.getStart(event.defaultTimeZone!!), newEvent.getEnd(event.defaultTimeZone!!))
                         if (event.isAllDay()) {
-                            event.also {
-                                logger.d(
-                                    "all day, updating only new time: ${
-                                        dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate()
-                                    }/${dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate()}"
-                                )
-                                it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
-                                it.iCalEvent.setEnd(dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate())
+                            // We use original event LocalDate
+                            newEvent.also {
+                                it.iCalEvent.setStart(originalDbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
+                                it.iCalEvent.setEnd(originalDbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate())
                             }
                         } else {
-                            logger.d(
-                                "part day, updating datetime: ${dbEvent.getStart(event.defaultTimeZone!!)!!}/${
-                                    dbEvent.getEnd(
-                                        event.defaultTimeZone!!
-                                    )!!
-                                }"
-                            )
+                            // We use currently edited event LocalTime but keep original event LocalDate
+                            newEvent.also {
+                                it.iCalEvent.setStart(
+                                    originalDbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(),
+                                    newEvent.getStart(event.defaultTimeZone!!)!!.toLocalTime(),
+                                    event.defaultTimeZone
+                                )
+                                it.iCalEvent.setEnd(
+                                    originalDbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate(),
+                                    newEvent.getEnd(event.defaultTimeZone!!)!!.toLocalTime(),
+                                    event.defaultTimeZone
+                                )
+                            }
+                        }
+                    } else {
+                        if (dbEvent == null) {
+                            logger.e("Edit all events: dbEvent was null")
+                            return false
+                        }
+                        val eventSpan = ChronoUnit.DAYS.between(event.getStart(event.defaultTimeZone!!), event.getEnd(event.defaultTimeZone!!))
+                        if (event.isAllDay()) {
+                            event.also {
+                                it.iCalEvent.setStart(dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
+                                it.iCalEvent.setEnd(dbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate())
+                            }
+                        } else {
                             event.also {
                                 it.iCalEvent.setStart(
                                     dbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(),
@@ -612,21 +665,32 @@ class EventViewModel(
                                     event.defaultTimeZone
                                 )
                                 it.iCalEvent.setEnd(
-                                    dbEvent.getEnd(event.defaultTimeZone!!)!!.toLocalDate(),
+                                    dbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate(),
                                     event.getEnd(event.defaultTimeZone!!)!!.toLocalTime(),
                                     event.defaultTimeZone
                                 )
                             }
                         }
-
-                    } else {
-
-                        // update the original event's DTSTART with date and time
-                        //  which means no changes to just edited event, but it will overwrite the original event
-
-                        event
-
                     }
+
+                } else {
+                    // update the original event's DTSTART with date and time
+                    //  which means no changes to just edited event, but it will overwrite the original event
+
+                    if (dbEvent?.isSingleEdit() == true) {
+
+                        // clear recurrenceId and use original event id since single edit will replace original event
+                        val newEvent = event.copy(
+                            id = originalEventId,
+                            iCalendar = event.iCalendar.clone()
+                        )
+                        newEvent.iCalEvent.recurrenceId = null
+
+                        newEvent
+                    } else {
+                        event
+                    }
+
                 }
             }
             else -> event // else no special changes for regular event, just overwrite everything
