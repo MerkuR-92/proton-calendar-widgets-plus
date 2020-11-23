@@ -5,18 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import biweekly.ICalendar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.displaySnackBar
 import me.proton.android.calendar.common.visibleOrInvisible
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.MainActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -74,12 +81,40 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             // TODO: Use ViewModel to get userEmail once we have proper user management
             adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, immutableDate, (requireActivity() as? MainActivity)?.getUserEmail()) {
-                findNavController().navigate(
-                    Navigation.Deeplink.toEventDetails(
-                        it.id,
-                        it.occurrence?.occurrenceNumber ?: 0
+                if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
+                    findNavController().navigate(
+                        Navigation.Deeplink.toEventDetails(
+                            it.id,
+                            it.occurrence?.occurrenceNumber ?: 0
+                        )
                     )
-                )
+                } else {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.event_decryption_error_dialog_title)
+                        .setMessage(R.string.event_decryption_error_dialog_message)
+                        .setPositiveButton(R.string.event_decryption_error_dialog_confirmation) { _, _ ->
+                            lifecycleScope.launch { // TODO
+                                val deleteResult = withContext(Dispatchers.Default) {
+                                    calendarViewModel.handleDeleteEvent(
+                                        it.id,
+                                        EventEditDeleteOption.ALL_EVENTS
+                                    )
+                                }
+                                if (deleteResult == UseCase.Result.Success) {
+                                    requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
+                                } else {
+                                    if (deleteResult is UseCase.Result.Error) {
+                                        TimberLogger.e("Error deleting event: ${deleteResult.message}")
+                                    } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                        TimberLogger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                    }
+                                    requireActivity().displaySnackBar(getString(R.string.snack_event_deleted_error))
+                                }
+                            }
+                        }
+                        .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
+                        .show()
+                }
             }
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }

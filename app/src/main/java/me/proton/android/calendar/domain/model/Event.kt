@@ -22,11 +22,13 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 
+// TODO remove nullability from signature verification and decryption statuses
 data class Event(
     override val id: String, // ID from API and local database
     val calendar: Calendar,
     val iCalendar: ICalendar,
-    val verificationStatus: SignatureVerification? = null
+    val verificationStatus: SignatureVerification? = null,
+    val decryptionStatus: DecryptionStatus? = null
 ) : BaseModel() {
 
     var occurrence: Occurrence? = null
@@ -43,32 +45,9 @@ data class Event(
     // TODO FIXME if we're not always setting it, it will be null!!!!!!!!!!!!!!!!!!
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
 
-
-
-
-
-
-
-//    val startTimeZoneId: String? get() = iCalendar.timezoneInfo?.getTimezone(iCalEvent.dateStart)?.timeZone?.id
-//    val startTimeZoneId: String? get() = iCalendar.timezoneInfo?.getTimezone(iCalEvent.dateStart)?.timeZone?.id
-
-
     val startLocalDate: LocalDate? get() = Instant.ofEpochMilli(iCalEvent.dateStart?.value?.getTime()!!)
         .atZone(ZoneId.systemDefault())
         .toLocalDate() //LocalDate.from(iCalEvent.dateStart?.value?.toInstant())
-    // TODO TRY TO REMOVE THIS
-    val endLocalDate: LocalDate? get() = Instant.ofEpochMilli(iCalEvent.dateEnd?.value?.getTime()!!)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
-//    val endLocalDate: LocalDate? get() = LocalDate.from(iCalEvent.dateEnd?.value?.toInstant())
-
-
-
-
-
-
-//    fun getStart(): LocalDateTime
-
 
     fun getStart(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getStart(timeZoneId)
@@ -724,6 +703,11 @@ data class Event(
         FAILURE,
         SIGNED_BUT_NO_KEYS,
         NOT_SIGNED
+    }
+
+    enum class DecryptionStatus {
+        SUCCESS,
+        FAILURE
     }
 }
 

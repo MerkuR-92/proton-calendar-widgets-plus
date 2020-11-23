@@ -56,4 +56,29 @@
         app:layout_constraintTop_toBottomOf="@+id/text_header"
         tools:text="(1/2)" />
 
+    <ImageView
+        android:id="@+id/decryption_error_icon"
+        style="@style/Icon"
+        android:visibility="gone"
+        android:layout_width="@dimen/default_icon_size"
+        android:layout_height="@dimen/default_icon_size"
+        android:src="@drawable/ic_lock_exclamation_triangle"
+        app:layout_constraintStart_toStartOf="@+id/text_header"
+        app:layout_constraintTop_toBottomOf="@+id/text_header"/>
+
+    <View
+        android:id="@+id/decryption_error_view"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/shape_background_decryption_error"
+        android:backgroundTint="@color/text_norm"
+        android:alpha="0.1"
+        app:layout_constraintEnd_toStartOf="@+id/text_subheader_side"
+        app:layout_constraintStart_toEndOf="@+id/decryption_error_icon"
+        app:layout_constraintTop_toTopOf="@+id/decryption_error_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/decryption_error_icon"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

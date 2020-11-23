@@ -25,6 +25,7 @@ class TransformEventUseCase(
 ) : UseCase { // TODO ADD TEST
 
     private lateinit var verificationStatuses: MutableList<Event.SignatureVerification>
+    private lateinit var decryptionStatuses: MutableList<Event.DecryptionStatus>
 
     suspend fun execute(eventEntity: EventEntity) : Event? {
 
@@ -37,34 +38,35 @@ class TransformEventUseCase(
         val calendarParts = mutableListOf<String>()
 
         verificationStatuses = mutableListOf()
+        decryptionStatuses = mutableListOf()
 
         // process Shared Events
         eventEntity.sharedEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Shared>(it)
         }.forEach { sharedEvent ->
-                getPlainText(
-                    eventEntity.sharedKeyPacket,
-                    calendarKey.privateKey,
-                    keyPassphrase,
-                    sharedEvent)?.let { calendarParts.add(it) }
+            getPlainText(
+                eventEntity.sharedKeyPacket,
+                calendarKey.privateKey,
+                keyPassphrase,
+                sharedEvent)?.let { calendarParts.add(it) }
         }
 
         // process Calendar Events
         eventEntity.calendarEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Calendar>(it)
         }.forEach { calendarEvent ->
-                getPlainText(
-                    eventEntity.calendarKeyPacket,
-                    calendarKey.privateKey,
-                    keyPassphrase,
-                    calendarEvent)?.let { calendarParts.add(it) }
+            getPlainText(
+                eventEntity.calendarKeyPacket,
+                calendarKey.privateKey,
+                keyPassphrase,
+                calendarEvent)?.let { calendarParts.add(it) }
         }
 
         // process Personal Events
         eventEntity.personalEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Personal>(it)
         }.forEach { personalEvent ->
-                getPlainText(
+            getPlainText(
                 null, // personal parts are only signed
                 calendarKey.privateKey,
                 keyPassphrase,
@@ -75,7 +77,7 @@ class TransformEventUseCase(
         eventEntity.attendeesEvents.map {
             Json.decodeFromJsonElement<Event.EventPart.Attendee>(it)
         }.forEach { attendeeEvent ->
-                getPlainText(
+            getPlainText(
                 eventEntity.sharedKeyPacket,
                 calendarKey.privateKey,
                 keyPassphrase,
@@ -106,23 +108,37 @@ class TransformEventUseCase(
         iCalendar.adjustIncomingAllDayEvent()
 
         return Event(
-                id = eventEntity.id,
-                calendar = Calendar(
-                    calendarEntity.id,
-                    calendarEntity.name,
-                    calendarEntity.color,
-                    calendarEntity.flags,
-                    calendarEntity.display == 1
-                ),
-                iCalendar = iCalendar,
-                verificationStatus = if (verificationStatuses.all { it == Event.SignatureVerification.SUCCESS }) {
+            id = eventEntity.id,
+            calendar = Calendar(
+                calendarEntity.id,
+                calendarEntity.name,
+                calendarEntity.color,
+                calendarEntity.flags,
+                calendarEntity.display == 1
+            ),
+            iCalendar = iCalendar,
+            verificationStatus = when {
+                verificationStatuses.all { it == Event.SignatureVerification.SUCCESS } -> {
                     Event.SignatureVerification.SUCCESS
-                } else if (verificationStatuses.any { it == Event.SignatureVerification.FAILURE }) {
+                }
+                verificationStatuses.any { it == Event.SignatureVerification.FAILURE } -> {
                     Event.SignatureVerification.FAILURE
-                } else if (verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_NO_KEYS }) {
+                }
+                verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_NO_KEYS } -> {
                     Event.SignatureVerification.SIGNED_BUT_NO_KEYS
-                } else null
-            )
+                }
+                else -> null
+            },
+            decryptionStatus = when {
+                decryptionStatuses.all { it == Event.DecryptionStatus.SUCCESS } -> {
+                    Event.DecryptionStatus.SUCCESS
+                }
+                decryptionStatuses.any { it == Event.DecryptionStatus.FAILURE } -> {
+                    Event.DecryptionStatus.FAILURE
+                }
+                else -> null
+            }
+        )
 
     }
 
@@ -146,6 +162,8 @@ class TransformEventUseCase(
         }
 
         if (plainText != null) {
+
+            decryptionStatuses.add(Event.DecryptionStatus.SUCCESS)
 
             // verify signature if necessary
             if (eventPart.isSigned) {
@@ -178,6 +196,8 @@ class TransformEventUseCase(
             } else {
                 verificationStatuses.add(Event.SignatureVerification.NOT_SIGNED)
             }
+        } else if (eventPart.isEncrypted) {
+            decryptionStatuses.add(Event.DecryptionStatus.FAILURE)
         }
 
         return plainText

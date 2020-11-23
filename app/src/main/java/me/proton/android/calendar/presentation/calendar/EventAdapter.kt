@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
@@ -11,9 +12,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
+import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -47,6 +50,9 @@ class EventAdapter(
             private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
             private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
 
+            private val decryptionErrorIcon: ImageView = itemView.findViewById(R.id.decryption_error_icon)
+            private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
+
             // TODO consider databinding
             fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
 
@@ -76,10 +82,20 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
+                if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
+                    decryptionErrorIcon.visibleOrGone(true)
+                    decryptionErrorView.visibleOrGone(true)
+                    textViewSubheader.visibleOrGone(false)
+                } else {
+                    decryptionErrorIcon.visibleOrGone(false)
+                    decryptionErrorView.visibleOrGone(false)
+                }
+
                 if (event.isInThePast(timeZoneId)) {
                     textViewHeader.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(itemView.context, R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default_Weak)
+                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
                 } else {
                     textViewHeader.setTextAppearance(itemView.context, R.style.Text_DefaultSmall)
                     textViewSubheader.setTextAppearance(itemView.context, R.style.Text_Default)
@@ -114,6 +130,9 @@ class EventAdapter(
             private val viewBackgroundStripedLayout: CardView = itemView.findViewById(R.id.view_background_striped_layout)
             private val viewBackgroundStriped: View = itemView.findViewById(R.id.view_background_striped)
 
+            private val decryptionErrorIcon: ImageView = itemView.findViewById(R.id.decryption_error_icon)
+            private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
+
             // TODO consider databinding
             fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
 
@@ -141,12 +160,23 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
+                if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
+                    decryptionErrorIcon.visibleOrGone(true)
+                    decryptionErrorView.visibleOrGone(true)
+                    textViewHeader.visibleOrGone(false)
+                    textViewSubheader.visibleOrGone(false)
+                } else {
+                    decryptionErrorIcon.visibleOrGone(false)
+                    decryptionErrorView.visibleOrGone(false)
+                }
+
                 viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
 
                 if (event.isInThePast(timeZoneId)) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
+                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
 
                     if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
@@ -159,6 +189,8 @@ class EventAdapter(
                         ) // striped background with 20% opacity for unanswered all day events
                     } else {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_secondary))
+                        decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                        decryptionErrorView.alpha = 0.1f
                     }
                 } else {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall)
@@ -182,6 +214,9 @@ class EventAdapter(
                         textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
                         textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
                         textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                        ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color)))
+                        decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                        decryptionErrorView.alpha = 0.2f
                     }
                 }
 

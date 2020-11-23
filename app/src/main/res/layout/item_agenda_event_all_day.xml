@@ -97,4 +97,34 @@
         app:layout_goneMarginTop="8dp"
         tools:text="(1/2)" />
 
+    <ImageView
+        android:id="@+id/decryption_error_icon"
+        style="@style/Icon"
+        android:visibility="gone"
+        android:layout_width="@dimen/default_icon_size"
+        android:layout_height="@dimen/default_icon_size"
+        android:src="@drawable/ic_lock_exclamation_triangle"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="@dimen/spacing_element_small"
+        android:layout_marginBottom="@dimen/spacing_element_small"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <View
+        android:id="@+id/decryption_error_view"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="30dp"
+        android:background="@drawable/shape_background_decryption_error"
+        android:backgroundTint="@color/text_norm"
+        android:alpha="0.1"
+        app:layout_constraintEnd_toStartOf="@+id/text_subheader_side"
+        app:layout_constraintStart_toEndOf="@+id/decryption_error_icon"
+        app:layout_constraintTop_toTopOf="@+id/decryption_error_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/decryption_error_icon"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

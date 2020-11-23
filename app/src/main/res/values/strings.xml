@@ -66,6 +66,11 @@
     <string name="event_attendee_organizer">Organiser</string>
     <string name="event_attendee_optional">Optional</string>
 
+    <string name="event_decryption_error_dialog_title">Event failed to decrypt</string>
+    <string name="event_decryption_error_dialog_message">Decryption of this event’s content failed.</string>
+    <string name="event_decryption_error_dialog_confirmation">Delete</string>
+    <string name="event_decryption_error_dialog_close">Close</string>
+
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
