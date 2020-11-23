@@ -318,6 +318,7 @@ class EventViewModel(
         if (event.iCalEvent.summary?.value != summary ||
             event.iCalEvent.location?.value != location ||
             event.iCalEvent.description?.value != description) {
+            markEventAsEdited()
         }
 
         event.iCalEvent.setSummary(summary)
@@ -682,6 +683,7 @@ class EventViewModel(
         val alarmsEdited = (event.isAllDay() && eventCustomAllDayAlarmsSave != null) ||
                 (!event.isAllDay() && eventCustomPartialDayAlarmsSave != null)
         return if (loadSettingsForCalendar(calendar.id)) {
+            markEventAsEdited()
             event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.flags, calendar.display == 1))
             if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)
             _event.postValue(event)
@@ -692,12 +694,14 @@ class EventViewModel(
     }
 
     fun handleTimeZone(timeZoneId: String) {
+        markEventAsEdited()
         event.iCalendar.setDefaultTimeZone(timeZoneId)
         eventTimeZoneId = timeZoneId
         _event.postValue(event)
     }
 
     fun handleStartDate(newDate: LocalDate) {
+        markEventAsEdited()
         val old = event.getStart(eventTimeZoneId)!!
         val endDate = event.getEnd(eventTimeZoneId)!!
         val unit = ChronoUnit.DAYS
@@ -717,6 +721,7 @@ class EventViewModel(
     }
 
     fun handleEndDate(newDate: LocalDate) {
+        markEventAsEdited()
         val old = event.getEnd(eventTimeZoneId)!!
         if (event.isAllDay()) {
             event.iCalEvent.setEnd(newDate)
@@ -727,6 +732,7 @@ class EventViewModel(
     }
 
     fun handleStartTime(newTime: LocalTime) {
+        markEventAsEdited()
         val old = event.getStart(eventTimeZoneId)!!
         val endTime = event.getEnd(eventTimeZoneId)!!
         val newDate = LocalDateTime.of(old.toLocalDate(), newTime.truncatedTo(ChronoUnit.MINUTES))
@@ -742,6 +748,7 @@ class EventViewModel(
     }
 
     fun handleEndTime(newTime: LocalTime) {
+        markEventAsEdited()
         val old = event.getEnd(eventTimeZoneId)!!
         event.iCalEvent.setEnd(old.toLocalDate(), newTime, eventTimeZoneId)
         timeEndBackup = newTime
@@ -749,6 +756,7 @@ class EventViewModel(
     }
 
     fun handleAllDaySwitch(isAllDay: Boolean) {
+        markEventAsEdited()
         if (isAllDay) {
             // remove time part and timezone from start/end
             event.iCalEvent.setStart(event.getStart(eventTimeZoneId)!!.toLocalDate())
@@ -792,6 +800,7 @@ class EventViewModel(
      * @param frequency if null, removes entire recurrence rule
      */
     fun handleRecurrence(frequency: Frequency?, untilDate: Boolean, interval: Int? = null, count: Int? = null, daysOfWeek: List<DayOfWeek>? = null, customMonthly: Boolean = false) {
+        markEventAsEdited()
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -837,11 +846,12 @@ class EventViewModel(
         _event.postValue(event)
     }
 
+    private fun markEventAsEdited() {
+        eventEdited = true
+    }
+
     fun hasEventBeenEdited(): Boolean {
-        // Timezone doesn't change UTC time so it needs to be checked manually
-        val dbEventTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone
-        val timeZoneEdited = dbEventTimeZone != event.iCalendar.timezoneInfo.defaultTimezone.timeZone
-        return timeZoneEdited || dbEvent != event
+        return eventEdited
     }
 
     fun isEventNew() = !event.isSyncedWithApi()
@@ -853,6 +863,7 @@ class EventViewModel(
     fun isEventFirstOccurrence() = event.isFirstOccurrence()
 
     fun handleRecurrenceUntilDate(untilLocalDate: LocalDate?) {
+        markEventAsEdited()
         tempRecurrenceUntilLocalDate = untilLocalDate
     }
 
@@ -906,6 +917,7 @@ class EventViewModel(
     }
 
     fun handleRecurrenceRepeatOn(monthlyRepeatOnOption: MonthlyRepatOnOption) {
+        markEventAsEdited()
         this.tempMonthlyRepeatOption = monthlyRepeatOnOption
     }
 
@@ -919,14 +931,17 @@ class EventViewModel(
     }
 
     fun handleAlarmSendBy(option: SendByOption) {
+        markEventAsEdited()
         this.tempAlarmSendByOption = option
     }
 
     fun handleAlarmTime(time: LocalTime) {
+        markEventAsEdited()
         this.tempAlarmTime = time
     }
 
     fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null) {
+        markEventAsEdited()
         val duration = if (event.isAllDay()) {
             when (alarmTypeOption) {
                 0 -> Duration.builder().prior(false).hours(9).build() // on the day at 9:00
@@ -1019,6 +1034,7 @@ class EventViewModel(
     }
 
     fun handleAlarmDelete(index: Int) {
+        markEventAsEdited()
         event.iCalEvent.alarms.removeAt(index)
         saveUserEditedAlarms()
         _event.postValue(event)
