@@ -249,7 +249,8 @@ class MiniCalendarItemAdapter(
 
             return context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
                     fullWeeksInMonth * context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) +
-                    fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing)
+                    fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing) +
+                    context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing)
 
         }
 

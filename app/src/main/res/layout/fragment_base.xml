@@ -11,7 +11,11 @@
         android:layout_height="wrap_content"
         android:stateListAnimator="@animator/design_appbar_state_list_animator"
         app:liftOnScroll="true"
-        android:backgroundTint="@color/background_norm">
+        android:backgroundTint="@color/background_norm"
+        app:elevation="0dp"
+        >
+        <!-- TOOD elevation = 0 is set so we get rid of liftOnScroll effect on toolbar, because nothing else worked
+        this will break lift on scroll for other fragments with this layout, but at least it fixes month view -->
 
         <FrameLayout
             android:layout_width="match_parent"

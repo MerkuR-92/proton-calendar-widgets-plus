@@ -12,14 +12,15 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_month.*
-import kotlinx.android.synthetic.main.pager_mini_calendar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -56,6 +57,7 @@ class MonthFragment : BaseFragment() {
         get() = R.layout.fragment_month
 
     override fun onToolbarCreated(toolbar: Toolbar) {
+
         val buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
         with (buttonCreate) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
@@ -157,8 +159,6 @@ class MonthFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        fragment_appbar.addView(layoutInflater.inflate(R.layout.pager_mini_calendar, dialog_appbar, false))
 
         miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1))
         miniCalendarPager.apply{
