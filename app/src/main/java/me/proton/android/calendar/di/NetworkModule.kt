@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.API_BASE_URL
 import me.proton.android.calendar.common.CoreLogger
 import me.proton.android.calendar.data.api.CalendarApiClient
+import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.di.ApiFactory
 import me.proton.core.network.data.di.NetworkManager
@@ -55,6 +56,10 @@ object NetworkModule {
     @Singleton
     fun provideApiProvider(apiFactory: ApiFactory, sessionProvider: SessionProvider): ApiProvider =
         ApiProvider(apiFactory, sessionProvider)
+
+    @Provides
+    @Singleton
+    fun provideForceUpdate(): ForceUpdateViewModel = ForceUpdateViewModel()
 }
 
 @Module

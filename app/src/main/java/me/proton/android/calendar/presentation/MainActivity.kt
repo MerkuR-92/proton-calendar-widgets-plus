@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
@@ -39,11 +40,14 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
+import me.proton.core.presentation.utils.showForceUpdate
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -54,6 +58,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var navController: NavController
 
     private val logger: Logger by inject()
+
+    @Inject
+    lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
     private val calendarViewModel: CalendarViewModel by viewModel()
     private val mainViewModel: MainViewModel by viewModel()
@@ -121,6 +128,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
 
         intent?.let { mainViewModel.handleIntent(intent) }
+
+        with(forceUpdateViewModel) {
+            forceUpdate.observe(this@MainActivity, Observer {
+                if (it.forceUpdate) {
+                    supportFragmentManager.showForceUpdate(it.apiErrorMessage)
+                }
+            })
+        }
 
         with(accountViewModel) {
             init(this@MainActivity)
