@@ -110,8 +110,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 initDrawerTimeZone()
                             }
 
-                            findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
-
+                            withContext(Dispatchers.Main) {
+                                findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+                            }
                         }
                     }
                 }
