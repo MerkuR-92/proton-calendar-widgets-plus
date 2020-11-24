@@ -114,7 +114,7 @@ class EventViewModel(
 
         this.userId = userId
 
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id) ?: return UseCase.Result.Error("could not get default calendar ID")
+        var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id) ?: return UseCase.Result.Error("could not get default calendar ID")
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return UseCase.Result.Error("could not get Calendar User Settings")
         userSettings = usersRepository.selectUserSettings(userId.id) ?: return UseCase.Result.Error("could not get User Settings")
@@ -129,7 +129,11 @@ class EventViewModel(
         logger.d("EventViewModel initialise with startDate: $initStartDate")
         logger.d("EventViewModel initialise with startTime: ${initStartTime}")
 
-        val defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId) ?: return UseCase.Result.Error("could not get default Calendar from DB")
+        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+        if (defaultCalendar == null || !defaultCalendar.isActive) {
+            defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull() ?: return UseCase.Result.Error("no active calendars for user")
+            defaultCalendarId = defaultCalendar.id
+        }
 
         if (!loadSettingsForCalendar(defaultCalendarId)) return UseCase.Result.Error("could not get CalendarSettings")
 
