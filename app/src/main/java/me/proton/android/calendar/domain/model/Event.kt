@@ -60,13 +60,21 @@ data class Event(
     fun getActualStart(timeZoneId: String): ZonedDateTime? {
         return if (this.isSingleEdit()) {
             iCalEvent.getStart(timeZoneId)
-        } else occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
+        } else if (this.isAllDay()) {
+            occurrence?.startDateTime?.withZoneSameLocal(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
+        } else {
+            occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getStart(timeZoneId)
+        }
     }
 
     fun getActualEnd(timeZoneId: String): ZonedDateTime? {
         return if (this.isSingleEdit()) {
             iCalEvent.getEnd(timeZoneId)
-        } else occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
+        } else if (this.isAllDay()) {
+            occurrence?.endDateTime?.withZoneSameLocal(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
+        } else {
+            occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: iCalEvent.getEnd(timeZoneId)
+        }
     }
 
     fun isInThePast(timeZoneId: String): Boolean {
@@ -465,9 +473,6 @@ data class Event(
 
         val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
         val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
-
-//            val dateTimeStart = if (this.iCalEvent.dateStart != null) ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
-//            val dateTimeEnd = if (this.iCalEvent.dateEnd != null) ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)) else null
 
         val dateTimeStart = this.getActualStart(timeZoneId)
         val dateTimeEnd = this.getActualEnd(timeZoneId)

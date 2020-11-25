@@ -99,7 +99,10 @@ class CalendarViewModel(
                     }
                     CalendarsRepository.InitingState.Finished -> {
 
-                        val timeZone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+                        val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
+                        if (calendarUserSettings == null) logger.e("initForUser: calendarUserSettings was null")
+                        val timeZone = calendarUserSettings?.primaryTimezone
+                        if (timeZone == null) logger.e("initForUser: timeZone was null")
                         timeZoneId = ZoneId.of(timeZone)
                         startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
                         timeFormatIs24Hour =

@@ -424,8 +424,6 @@ class CalendarsRepositoryImpl(
                 it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
             }.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
 
-//            (filtered.get(true)?.sortedWith(comparator) ?: emptyList())
-
             val result = mutableListOf<Event>()
             result.addAll(filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
             result.addAll(filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
