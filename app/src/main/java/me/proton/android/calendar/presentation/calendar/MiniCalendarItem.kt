@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class MiniCalendarItem(
     val date: LocalDate,
-    var isSelected: Boolean,
+    val isSelected: Boolean,
     /**
      * Item is an actual day indicator and not dummy helper
      */

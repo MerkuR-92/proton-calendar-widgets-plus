@@ -12,16 +12,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
-import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.text
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.Month
-import java.time.ZoneId
+import java.time.*
 import kotlin.math.ceil
 
 class MiniCalendarItemAdapter(
@@ -38,10 +34,6 @@ class MiniCalendarItemAdapter(
         const val WEEKDAYS_TO_SHOW = 7 // window might be narrower than 7, TODO
         //val FIRST_WEEKDAY = DayOfWeek.MONDAY
     }
-
-    // TODO Workaround to make sure we are not trying the modify the list concurrently in two places (submitCalendarIndicators and markDayAsSelected)
-    var selectedDate: LocalDate? = null
-    private var updatingList: Boolean = false
 
     fun initialise() {
 
@@ -65,17 +57,12 @@ class MiniCalendarItemAdapter(
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
 
         calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())).observe(lifecycleOwner) {
-            updatingList = true
             submitCalendarIndicators(forDate.month, it)
         }
-
         calendarViewModel.selectedDate.observe(lifecycleOwner) {
-            // TODO Workaround to make sure we are not trying the modify the list concurrently in two places (submitCalendarIndicators and markDayAsSelected)
-            selectedDate = it
-            if (!updatingList) markDayAsSelected(it)
+            markDayAsSelected(it)
         }
     }
-
 
     sealed class MiniCalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -89,7 +76,7 @@ class MiniCalendarItemAdapter(
             itemView
         ) {
 
-            fun bind(item: MiniCalendarItem?, selectedDate: LocalDate? = null, clickListener: ((LocalDate) -> Unit)?) {
+            fun bind(item: MiniCalendarItem?, clickListener: ((LocalDate) -> Unit)?) {
 
                 if (item == null) {
                     itemView.text.text = ""
@@ -97,8 +84,6 @@ class MiniCalendarItemAdapter(
                     itemView.setBackgroundResource(0)
                 } else {
 
-                    // TODO Workaround to manually update isSelected if we couldn't go through markDayAsSelected
-                    if (selectedDate == item.date) item.isSelected = true
                     when {
                         item.isSelected -> {
                             itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
@@ -140,6 +125,7 @@ class MiniCalendarItemAdapter(
 
     }
 
+    @Synchronized
     private fun markDayAsSelected(date: LocalDate) {
 
         val mutableList = currentList.toMutableList()
@@ -157,6 +143,7 @@ class MiniCalendarItemAdapter(
         submitList(mutableList)
     }
 
+    @Synchronized
     private fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
 
         val mutableList = currentList.toMutableList()
@@ -170,7 +157,6 @@ class MiniCalendarItemAdapter(
         }
 
         submitList(mutableList)
-        updatingList = false
     }
 
     private val ITEM_TYPE_HEADER = 0
@@ -212,10 +198,7 @@ class MiniCalendarItemAdapter(
 
         when (holder) {
             is MiniCalendarViewHolder.HeaderViewHolder -> holder.bind(getItem(position).date)
-            is MiniCalendarViewHolder.DayViewHolder -> holder.bind(
-                getItem(position),
-                selectedDate
-            ) {
+            is MiniCalendarViewHolder.DayViewHolder -> holder.bind(getItem(position)) {
                 clickListener?.invoke(it)
             }
         }
@@ -228,7 +211,8 @@ class MiniCalendarItemAdapter(
         }
 
         override fun areContentsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {
-            return oldItem.equals(newItem)
+            return oldItem.isSelected == newItem.isSelected && oldItem.indicatorColors.size == newItem.indicatorColors.size
+                && oldItem.indicatorColors.containsAll(newItem.indicatorColors)
         }
     }
 
