@@ -56,10 +56,6 @@ object NetworkModule {
     @Singleton
     fun provideApiProvider(apiFactory: ApiFactory, sessionProvider: SessionProvider): ApiProvider =
         ApiProvider(apiFactory, sessionProvider)
-
-    @Provides
-    @Singleton
-    fun provideForceUpdate(): ForceUpdateViewModel = ForceUpdateViewModel()
 }
 
 @Module

@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Simple ViewModel that should notify the Activity that it should handle (show) the ForceUpdate dialog.
  * @author Dino Kadrikj.
  */
+@Singleton
 class ForceUpdateViewModel @Inject constructor() : ViewModel() {
 
     private val _forceUpdate: MutableLiveData<ForceUpdateInput> = MutableLiveData()
