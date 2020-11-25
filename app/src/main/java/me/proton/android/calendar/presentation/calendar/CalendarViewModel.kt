@@ -190,13 +190,17 @@ class CalendarViewModel(
         return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
     }
 
-    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>> {
-        return calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default)
+    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>?> {
+        return liveData<List<Event>?> {
+            emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default))
+        }
     }
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate): LiveData<Map<Int, List<String>>> {
         return eventsLiveData(fromDate, toDate).map {
-            calculateCalendarIndicators(it)
+            it?.let {
+                calculateCalendarIndicators(it)
+            } ?: emptyMap()
         }
     }
 

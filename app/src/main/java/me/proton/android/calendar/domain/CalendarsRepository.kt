@@ -42,7 +42,7 @@ interface CalendarsRepository {
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
-    ): Flow<List<Event>>
+    ): Flow<List<Event>?>
 
     /**
      * Request Events to be pushed to observers and also fetched from API if possible.

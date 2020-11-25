@@ -121,20 +121,20 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
 
-        list_view_status.visibleOrInvisible(true)
-        list_view_status.text = resources.getString(R.string.agenda_loading_events)
-
         calendarViewModel.eventsLiveData(immutableDate, immutableDate).observe(viewLifecycleOwner) {
-            logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it.size}")
+            logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it?.size}")
 
-            if (it.isEmpty()) {
+            if (it == null) {
+                list_view_status.visibleOrInvisible(true)
+                list_view_status.text = resources.getString(R.string.agenda_loading_events)
+            } else if (it.isEmpty()) {
                 list_view_status.visibleOrInvisible(true)
                 list_view_status.text = resources.getString(R.string.agenda_no_events)
             } else {
                 list_view_status.visibleOrInvisible(false)
             }
             (rv_agenda.adapter as? EventAdapter)?.submitList(
-                listOf(fakeHeaderEvent).plus(it)
+                listOf(fakeHeaderEvent).plus(it ?: emptyList())
             )
         }
     }

@@ -43,7 +43,7 @@ class CalendarsRepositoryImpl(
     private val allEvents = MutableStateFlow<List<Event>>(emptyList())
 
     // events that should be currently visible
-    private val displayedEvents = MutableStateFlow<List<Event>>(emptyList())
+    private val displayedEvents = MutableStateFlow<List<Event>?>(null)
     private val displayedEventsMutex = Mutex()
 
     override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
@@ -303,7 +303,7 @@ class CalendarsRepositoryImpl(
         fetchingState.value = CalendarsRepository.FetchingState.Finished
 
         displayedEventsMutex.withLock {
-            displayedEvents.value = emptyList()
+            displayedEvents.value = null
         }
 
         eventsMutex.withLock {
@@ -366,7 +366,7 @@ class CalendarsRepositoryImpl(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
-    ): Flow<List<Event>> {
+    ): Flow<List<Event>?> {
 
         /* unused for now, please don't delete the code
         fun isAllDayPrio(a: Event, b: Event): Boolean {
@@ -400,7 +400,23 @@ class CalendarsRepositoryImpl(
 
         logger.v("create EventsFlow: ${fromDate} - ${toDate}: ${timeZoneId}")
 
+//        val notFetchedYet = (fetchedWindows.find {
+//                (timeZoneId == it.timeZoneId) &&
+//                (fromDate.isEqual(it.fromDate) || fromDate.isAfter(it.fromDate)) &&
+//                (toDate.isEqual(it.toDate) || toDate.isBefore(it.toDate))
+//            } == null)
+
         return displayedEvents.map {
+
+            // we don't know if there are events for this particular date range
+            if (it == null) {
+                return@map null
+            }
+
+            // we haven't expanded the events for this date range yet
+            if (ZonedDateTime.of(fromDate, LocalTime.MIDNIGHT, ZoneId.of(timeZoneId)).isAfter(eventsExpandedUntil)) {
+                return@map null
+            }
 
             logger.v("flow filtering for full day range: ${fromDate} - ${toDate}: ${timeZoneId}, ${it.size} items total")
 
