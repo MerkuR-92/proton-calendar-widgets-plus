@@ -53,7 +53,7 @@ class CalendarsRepositoryImpl(
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
     private val expandEventsToDateFlow = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
-    private var expandEventsToDateChannel = Channel<ZonedDateTime>(capacity = Channel.CONFLATED)
+    private var expandEventsToDateChannel = Channel<ZonedDateTime>()
 
     private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
@@ -155,29 +155,24 @@ class CalendarsRepositoryImpl(
             visibleCalendars.value = dbCalendars.value.filterVisible()
 
             // force expanding Events after cold init is done
-            eventsMutex.withLock {
-                expandEventsToDateChannel.send(eventsExpandedUntil.plusMonths(2).withDayOfMonth(1))
-            }
+            expandEventsToDateChannel.send(eventsExpandedUntil.plusMonths(2).withDayOfMonth(1))
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
 
         coroutineScope.launch {
             expandEventsToDateFlow.debounce(DEBOUNCE_EXPANDING_EVENTS_ON_FETCH.toMillis()).collect {
-                eventsMutex.withLock {
-                    if (it.isAfter(eventsExpandedUntil)) {
-                        expandEventsToDateChannel.send(it)
-                    }
-                }
+                expandDbEventsUntil(it)
             }
         }
 
         coroutineScope.launch {
-            // expand requests sent to the channel will be forced to execute for each message
-            //  but we take the maximum of until-dates
             expandEventsToDateChannel.consumeEach {
+                logger.v("expandEventsToDateChannel consuming: $it")
+                // get max of currently requested and already expanded timestamps
                 listOf(it, eventsExpandedUntil).maxByOrNull { it.toEpochSecond() }?.let {
-                    expandDbEventsUntil(it)
+                    logger.v("expandEventsToDateChannel but publishing in flow: $it")
+                    expandEventsToDateFlow.value = it
                 }
             }
         }
@@ -313,9 +308,9 @@ class CalendarsRepositoryImpl(
             fetchedWindows.clear()
             fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-            eventsExpandedUntil = ZonedDateTime.now()
+            eventsExpandedUntil = ZonedDateTime.now() // TODO maybe set it to null or far in the past
             expandEventsToDateFlow.value = eventsExpandedUntil
-            expandEventsToDateChannel = Channel<ZonedDateTime>(capacity = Channel.CONFLATED)
+            expandEventsToDateChannel = Channel<ZonedDateTime>()
 
             dbCalendars.value = emptyList()
             visibleCalendars.value = emptyList()
@@ -455,11 +450,7 @@ class CalendarsRepositoryImpl(
     ) {
 
         val expandUntilDateTime = ZonedDateTime.of(LocalDateTime.of(toDate, LocalTime.MIDNIGHT), ZoneId.of(timeZoneId))
-        eventsMutex.withLock { // TODO this is only for out-of-the-box .debounce() on Flow
-            if (expandUntilDateTime.isAfter(eventsExpandedUntil)) {
-                expandEventsToDateFlow.value = expandUntilDateTime
-            }
-        }
+        expandEventsToDateChannel.send(expandUntilDateTime)
 
         val calendarIds = dbCalendars.value.filter { it.fkUserId == userId.id }.map { it.id }
 
@@ -473,7 +464,7 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
 
-        logger.v("expanding local occurrences until ${toDateTime.toLocalDate()}")
+        logger.v("expandDbEventsUntil ${toDateTime.toLocalDate()}")
 
         fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
@@ -481,7 +472,7 @@ class CalendarsRepositoryImpl(
 
             allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
 
-                logger.v("expanded local occurrences until ${toDateTime}: ${allEvents.value.size}")
+                logger.v("expanded count: ${allEvents.value.size}")
 
                 if (dbEvents.isNotEmpty()) {
                     eventsExpandedUntil = toDateTime
