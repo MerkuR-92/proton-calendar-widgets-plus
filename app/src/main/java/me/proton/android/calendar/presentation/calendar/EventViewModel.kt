@@ -689,6 +689,7 @@ class EventViewModel(
                             iCalendar = event.iCalendar.clone()
                         )
                         newEvent.iCalEvent.recurrenceId = null
+                        newEvent.iCalEvent.exceptionDates.clear()
 
                         newEvent
                     } else {

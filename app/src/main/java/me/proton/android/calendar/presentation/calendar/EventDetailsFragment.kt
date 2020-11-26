@@ -148,7 +148,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun handleDelete() {
         val event = eventViewModel.eventLiveData.value!!
 
-        if (event.isPartOfChain() && !event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) && event.calendar.isActive) {
+        if (event.isPartOfChain() &&
+            eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false &&
+            event.calendar.isActive) {
 
             AndroidUtils.displaySingleChoiceConfirmationPicker(
                 requireContext(), getString(R.string.dialog_title_delete_recurring_event), listOfNotNull(
@@ -207,7 +209,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         } else { // TODO unify showing dialog
             // TODO Check if we need to handle inactive calendars the same way
-            val disabledCalendarRecurringEvent = event.calendar.isDisabled && event.isPartOfChain() && !event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
+            val disabledCalendarRecurringEvent = event.calendar.isDisabled &&
+                    event.isPartOfChain() &&
+                    eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(
                     if (disabledCalendarRecurringEvent) R.string.dialog_title_delete_recurring_event
@@ -218,7 +222,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
                     lifecycleScope.launch { // TODO
                         val deleteResult = withContext(Dispatchers.Default) {
-                            if (event.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) || disabledCalendarRecurringEvent) {
+                            if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true
+                                || disabledCalendarRecurringEvent) {
                                 calendarViewModel.handleDeleteEvent(
                                     event.id,
                                     EventEditDeleteOption.ALL_EVENTS
