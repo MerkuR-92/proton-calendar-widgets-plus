@@ -147,6 +147,9 @@ class CalendarsRepositoryImpl(
             val eventEntities = database.eventsDao().selectEvents()
             val transformedEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
             eventsMutex.withLock {
+                // we just selected all events from DB so let's clear all that might have been added
+                // by fetching, user actions or
+                dbEvents.clear()
                 dbEvents.addAll(transformedEvents)
             }
 
@@ -586,6 +589,7 @@ class CalendarsRepositoryImpl(
 
             // replace (raw, not expanded) events in dbEvents, they are read when scrolling & expanding
             dbEvents.removeAll { event -> affectedEvents.find { event.id == it.id } != null }
+            logger.v("persistEvents dbEvents: ${dbEvents.size} adding ${affectedEvents.size}")
             dbEvents.addAll(affectedEvents)
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
