@@ -329,13 +329,13 @@ class CalendarsRepositoryImpl(
     }
 
     override fun flowCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowCalendars(userId)
+        return database.calendarsDao().flowCalendars(userId).distinctUntilChanged()
     }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
         calendar.fkUserId = userId
         //  TODO make sure we have "flags" set!!!!!
-        database.calendarsDao().insert(calendar)
+        database.calendarsDao().updateOrInsert(calendar)
     }
 
     override suspend fun updateCalendar(userId: String, calendar: CalendarEntity) {

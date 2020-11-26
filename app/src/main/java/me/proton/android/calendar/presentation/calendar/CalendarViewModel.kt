@@ -69,12 +69,16 @@ class CalendarViewModel(
         return calendarsRepository.getActiveCalendars(userId.id).filter { it.isActive }
     }
 
-    fun selectActiveCalendars(): LiveData<List<CalendarEntity>>? {
-        return calendarsRepository.flowCalendars(userId.id).map { calendars -> calendars.filter { it.isActive } }.asLiveData(Dispatchers.Default)
+    fun selectActiveCalendars(): LiveData<List<CalendarEntity>> {
+        return calendarsRepository.flowCalendars(userId.id).map { calendars ->
+            calendars.filter { it.isActive }
+        }.asLiveData(Dispatchers.Default)
     }
 
-    fun selectDisabledCalendars(): LiveData<List<CalendarEntity>>? {
-        return calendarsRepository.flowCalendars(userId.id).map { calendars -> calendars.filter { it.isDisabled } }.asLiveData(Dispatchers.Default)
+    fun selectDisabledCalendars(): LiveData<List<CalendarEntity>> {
+        return calendarsRepository.flowCalendars(userId.id).map { calendars ->
+            calendars.filter { it.isDisabled }
+        }.asLiveData(Dispatchers.Default)
     }
 
     suspend fun selectUser(): User? {
