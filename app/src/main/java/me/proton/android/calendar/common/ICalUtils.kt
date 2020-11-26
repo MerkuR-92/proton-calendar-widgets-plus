@@ -489,7 +489,15 @@ fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek {
     return DayOfWeek.of((this.calendarConstant)).minus(1)
 }
 
-fun ZonedDateTime.formatDate(timeZoneId: String): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
+fun ZonedDateTime.formatDate(timeZoneId: String, isAllDay: Boolean): String {
+    return if (isAllDay) {
+        this.withZoneSameLocal(ZoneId.of(timeZoneId)).toLocalDate()
+            .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
+    } else {
+        this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate()
+            .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
+    }
+}
 
 fun ZonedDateTime.formatTime(timeZoneId: String, is24Hour: Boolean): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(is24Hour)
 
@@ -646,5 +654,3 @@ fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQ
         events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
     }.map { it.value }.toList()
 }
-
-

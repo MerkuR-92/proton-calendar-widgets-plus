@@ -359,10 +359,13 @@ class AndroidUtils(context: Context) {
                         }"
                     },
                     recurrence.until?.let {
-
                         context.getString(
                             R.string.event_recurrence_until,
-                            ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(timeZoneId)).formatDate(timeZoneId)
+                            ZonedDateTime.ofInstant(
+                                it.toInstant(),
+                                if (event.isAllDay()) ZoneId.systemDefault()
+                                else ZoneId.of(timeZoneId)
+                            ).formatDate(timeZoneId, event.isAllDay())
                         )
                     },
                 ).joinToString(separator = ", ")

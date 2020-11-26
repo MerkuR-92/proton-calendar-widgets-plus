@@ -499,9 +499,14 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     // "ends" section
                     if (this.until != null) {
                         customEndingRadioGroup.check(R.id.custom_recurrence_end_2)
+                        val isAllDay = eventViewModel.eventLiveData.value!!.isAllDay()
                         custom_recurrence_end_2.text = getString(
                             R.string.event_recurrence_ends_on_date,
-                            ZonedDateTime.ofInstant(this.until.toInstant(), ZoneId.of(eventViewModel.eventTimeZoneId)).formatDate(eventViewModel.eventTimeZoneId)
+                            ZonedDateTime.ofInstant(
+                                this.until.toInstant(),
+                                if (isAllDay) ZoneId.systemDefault()
+                                else ZoneId.of(eventViewModel.eventTimeZoneId)
+                            ).formatDate(eventViewModel.eventTimeZoneId, isAllDay)
                         )
                     }
                     if (this.count != null) {
