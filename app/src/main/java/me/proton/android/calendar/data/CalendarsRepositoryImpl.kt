@@ -705,7 +705,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) {
-        database.eventAlarmsDao().insert(eventAlarm)
+        database.eventAlarmsDao().updateOrInsert(eventAlarm)
     }
 
     override suspend fun deleteEventAlarmById(eventAlarmId: String) {

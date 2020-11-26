@@ -13,6 +13,7 @@ const val API_APPLICATION_NAME = "AndroidCalendar"
 const val USER_AGENT_NAME = "ProtonCalendar"
 
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"
+const val OFFLINE_ALARM_ID_PREFIX = "Proton-Android-App-Offline-Alarm-ID:"
 const val ATTENDEE_AUTO_EXPAND_LIMIT = 5
 
 const val CLICK_INTERVAL_MS: Long = 500L

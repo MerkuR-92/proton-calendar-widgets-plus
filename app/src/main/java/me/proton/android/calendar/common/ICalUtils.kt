@@ -17,7 +17,7 @@ import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
-import me.proton.android.calendar.common.ICalUtils.sanitise
+import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -392,6 +392,11 @@ object ICalUtils {
     fun generateOfflineEventId() = "$OFFLINE_EVENT_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
 
     /**
+     * Generates offline AlarmID for offline alarms calculated locally.
+     */
+    fun generateOfflineAlarmId() = "$OFFLINE_ALARM_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
+
+    /**
      * Returns iCal Events with already applied DTSTART/DTEND according to Occurrence.
      * Takes single edits into account.
      *
@@ -445,6 +450,32 @@ object ICalUtils {
     fun eventStartZonedDateTimeToDate(startDate: ZonedDateTime, isAllDay: Boolean): Date {
         return if (isAllDay) Date.from(startDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant())
         else Date.from(startDate.toInstant())
+    }
+
+    /**
+     * Calculates all Alarm Entities for any given Event occurrence in the format used in API.
+     *
+     * ID is generated locally.
+     */
+    fun calculateAlarmEntities(event: Event, timeZoneId: String, memberId: String): List<EventAlarmEntity> {
+        return event.iCalEvent.alarms.map {
+
+            val occurrence = ZonedDateTime.ofInstant(it.trigger.duration.add(event.iCalEvent.dateStart.value).toInstant(), ZoneId.systemDefault())
+
+            val occurrenceInTimeZone = if (event.isAllDay()) {
+                occurrence.withZoneSameLocal(ZoneId.of(timeZoneId))
+            } else occurrence
+
+            EventAlarmEntity(
+                generateOfflineAlarmId(),
+                occurrenceInTimeZone.toEpochSecond(),
+                it.trigger.duration.toString(),
+                if (it.action.isDisplay) 2 else 1,
+                event.id,
+                memberId,
+                event.calendar.id
+            )
+        }
     }
 }
 
