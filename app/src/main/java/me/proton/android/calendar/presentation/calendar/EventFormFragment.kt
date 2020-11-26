@@ -22,6 +22,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -36,7 +37,6 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.ZoneId
-import java.time.ZonedDateTime
 
 
 class EventFormFragment() : BaseDialogFragment(), KoinComponent {
@@ -286,7 +286,14 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         val display = eventViewModel.eventLiveData.value?.calendar?.display
         if (display == null || display) return
         val calendarId = eventViewModel.eventLiveData.value?.calendar?.id
-        if (calendarId != null) calendarViewModel.updateServerCalendar(calendarId, display = 1)
+        if (calendarId != null) {
+            lifecycleScope.launch {
+                // 1. Update in DB
+                calendarViewModel.updateCalendarVisibility(calendarId, display = 1)
+                // 2. Update on Server
+                calendarViewModel.updateServerCalendar(calendarId)
+            }
+        }
     }
 
     private fun persistFormData() {

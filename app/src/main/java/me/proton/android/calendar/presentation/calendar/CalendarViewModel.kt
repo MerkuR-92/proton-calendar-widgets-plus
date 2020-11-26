@@ -230,12 +230,19 @@ class CalendarViewModel(
         }.await()
     }
 
-    fun updateServerCalendar(
-        calendarId: String,
-        name: String? = null,
-        description: String? = null,
-        color: String? = null,
-        display: Int? = null) : LiveData<Operation.State> {
+    suspend fun updateCalendarVisibility(calendarId: String, display: Int) {
+        withContext(Dispatchers.IO) {
+            calendarsRepository.updateCalendarDisplay(calendarId, display)
+        }
+    }
+
+    suspend fun updateCalendar(calendarEntity: CalendarEntity) {
+        withContext(Dispatchers.IO) {
+            calendarsRepository.updateCalendar(userId.id, calendarEntity)
+        }
+    }
+
+    fun updateServerCalendarListDisplay(calendars: List<CalendarEntity>) : LiveData<Operation.State> {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -244,18 +251,33 @@ class CalendarViewModel(
             .setConstraints(constraints)
             .setInputData(
                 workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_SERVER_CALENDAR,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_CALENDAR_NAME to name,
-                    UseCaseWorker.INPUT_CALENDAR_DESCRIPTION to description,
-                    UseCaseWorker.INPUT_CALENDAR_COLOR to color,
-                    UseCaseWorker.INPUT_CALENDAR_DISPLAY to display
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR_LIST,
+                    UseCaseWorker.INPUT_USER_ID to userId.id
                 )
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_SERVER_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_LIST, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    fun updateServerCalendar(
+        calendarId: String) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR,
+                    UseCaseWorker.INPUT_USER_ID to userId.id,
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
 
     // Returns timezone id if it has been initialized

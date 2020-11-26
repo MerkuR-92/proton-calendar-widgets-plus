@@ -21,6 +21,8 @@ val SYNC_EVENTS_IN_APP_REFRESH = Duration.ofSeconds(15)
 val SYNC_EVENTS_PERIODIC_REFRESH_PERIOD = Duration.ofHours(1)
 val SYNC_EVENTS_PERIODIC_DELAY_START = Duration.ofMinutes(1)
 
+val SYNC_CALENDARS_DELAY = Duration.ofSeconds(3)
+
 // TODO change this also in Navigation.kt
 const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_details/"
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="

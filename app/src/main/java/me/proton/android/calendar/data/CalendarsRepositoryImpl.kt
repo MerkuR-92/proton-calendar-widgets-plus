@@ -362,6 +362,10 @@ class CalendarsRepositoryImpl(
         return if (calendar != null) calendar.display == newDisplay else false
     }
 
+    override suspend fun updateCalendarDisplay(calendarId: String, display: Int) {
+        database.calendarsDao().updateCalendarDisplay(calendarId, display)
+    }
+
     override fun eventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,

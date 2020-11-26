@@ -35,6 +35,8 @@ interface CalendarsRepository {
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
+    suspend fun updateCalendarDisplay(calendarId: String, display: Int)
+
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
     // events

@@ -44,6 +44,8 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("UPDATE calendars SET flags = :flags WHERE id = :calendarId")
     abstract suspend fun updateCalendarFlags(calendarId: String, flags: Int)
 
+    @Query("UPDATE calendars SET display = :display WHERE id = :calendarId")
+    abstract suspend fun updateCalendarDisplay(calendarId: String, display: Int)
 
 // @Query("SELECT * from plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")
 //fun getPlantsWithGrowZoneNumberFlow(growZoneNumber: Int): Flow<List<Plant>>

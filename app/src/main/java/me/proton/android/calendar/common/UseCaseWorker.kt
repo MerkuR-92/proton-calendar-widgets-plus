@@ -27,7 +27,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val SYNC_SERVER_EVENTS = SyncServerEventsUseCase.WORKER_ID
             const val SYNC_SERVER_EVENTS_PERIODIC = SyncServerEventsUseCase.WORKER_PERIODIC_ID
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
-            const val UPDATE_SERVER_CALENDAR = UpdateCalendarUseCase.WORKER_ID
+            const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
+            const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
         }
     }
 
@@ -39,12 +40,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
-
-        //Update Calendar
-        const val INPUT_CALENDAR_NAME = "INPUT_CALENDAR_NAME"
-        const val INPUT_CALENDAR_DESCRIPTION = "INPUT_CALENDAR_DESCRIPTION"
-        const val INPUT_CALENDAR_COLOR = "INPUT_CALENDAR_COLOR"
-        const val INPUT_CALENDAR_DISPLAY = "INPUT_CALENDAR_DISPLAY"
     }
 
     /**
@@ -55,7 +50,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
             const val SYNC_SERVER_EVENTS_PERIODIC = "SYNC_SERVER_EVENTS_PERIODIC"
             const val SYNC_ALARMS = "SYNC_ALARMS"
-            const val UPDATE_SERVER_CALENDAR = "UPDATE_SERVER_CALENDAR"
+            const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
+            const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
         }
     }
 
@@ -89,15 +85,15 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 val syncAlarmsUseCase: SyncAlarmsUseCase = get()
                 syncAlarmsUseCase.execute(userId)
             }
-            UseCaseId.UPDATE_SERVER_CALENDAR -> {
+            UseCaseId.UPDATE_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
-                updateCalendarUseCase.executeServerUpdate(
+                updateCalendarUseCase.executeUpdate(
                     userId,
-                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
-                    inputData.getString(INPUT_CALENDAR_NAME),
-                    inputData.getString(INPUT_CALENDAR_DESCRIPTION),
-                    inputData.getString(INPUT_CALENDAR_COLOR),
-                    inputData.getInt(INPUT_CALENDAR_DISPLAY, -1))
+                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure())
+            }
+            UseCaseId.UPDATE_CALENDAR_LIST -> {
+                val updateCalendarUseCase: UpdateCalendarUseCase = get()
+                updateCalendarUseCase.executeUpdateList(userId)
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

@@ -13,7 +13,6 @@ import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -30,10 +29,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -292,8 +289,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 userEmail = user.email
                 nav_view_main_content.nav_view_user_name.text = user.displayName
                 nav_view_main_content.nav_view_user_mail.text = user.email
-                var initials: String = getInitials(user.displayName)
-                nav_view_main_content.nav_view_user_initials.text = initials?: ""
+                val initials: String = getInitials(user.displayName)
+                nav_view_main_content.nav_view_user_initials.text = initials
             }
         }
     }
@@ -311,9 +308,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val activeCalendarListView = nav_view_main_content.nav_view_calendars_list
         val activeCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         activeCalendarListView.layoutManager = activeCalendarsLayoutManager
-        activeCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
+        activeCalendarListAdapter = CalendarListAdapter() { calendarEntity ->
             //On Calendar click event
-            calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
+            lifecycleScope.launch {
+                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display)
+                updateCalendarsDelayed()
+            }
         }
         (activeCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         activeCalendarListView.adapter = activeCalendarListAdapter
@@ -321,12 +321,26 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val disabledCalendarListView = nav_view_main_content.nav_view_disabled_calendars_list
         val disabledCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         disabledCalendarListView.layoutManager = disabledCalendarLayoutManager
-        disabledCalendarListAdapter = CalendarListAdapter() { calendarEntity, display ->
+        disabledCalendarListAdapter = CalendarListAdapter() { calendarEntity ->
             //On Calendar click event
-            calendarViewModel.updateServerCalendar(calendarEntity.id, display = display)
+            lifecycleScope.launch {
+                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display)
+                updateCalendarsDelayed()
+            }
         }
         (disabledCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         disabledCalendarListView.adapter = disabledCalendarListAdapter
+    }
+
+    private lateinit var job: Job
+    private fun updateCalendarsDelayed() {
+        if (this::job.isInitialized && job.isActive) {
+            job.cancel()
+        }
+        job = lifecycleScope.launch {
+            delay(SYNC_CALENDARS_DELAY.toMillis())
+            calendarViewModel.updateServerCalendarListDisplay(activeCalendarListAdapter.currentList + disabledCalendarListAdapter.currentList)
+        }
     }
 
     private fun initDrawerCalendarsListContent() {

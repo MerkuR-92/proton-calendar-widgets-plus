@@ -48,6 +48,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
     suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : UpdateCalendarApiResponse
 
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
+    suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarDisplayApiRequest) : UpdateCalendarApiResponse
+
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -116,6 +119,11 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             updateCalendar(calendarId, body)
         }.toApiResponse()
 
+    override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<UpdateCalendarApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            updateCalendarDisplay(calendarId, body)
+        }.toApiResponse()
+
 }
 
 @Serializable
@@ -149,27 +157,29 @@ data class SyncEventsUpdateApiRequest(
 @Serializable
 data class UpdateCalendarApiRequest(
     @SerialName("Name")
-    val name: String? = null,
+    val name: String,
     @SerialName("Description")
-    val description: String? = null,
+    val description: String,
     @SerialName("Color")
-    val color: String? = null,
+    val color: String,
     @SerialName("Display")
-    val display: Int? = null
+    val display: Int
 )
 
 @Serializable
 data class UpdateCalendarApiResponse(
     @SerialName("ID")
-    val id: String? = null,
+    val id: String,
     @SerialName("Name")
-    val name: String? = null,
+    val name: String,
     @SerialName("Description")
-    val description: String? = null,
-    @SerialName("Color")
-    val color: String? = null,
+    val description: String
+)
+
+@Serializable
+data class UpdateCalendarDisplayApiRequest(
     @SerialName("Display")
-    val display: Int? = null
+    val display: Int
 )
 
 // TODO container for CREATE LINKED by adding SharedEventID and UID
