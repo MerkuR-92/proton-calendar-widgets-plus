@@ -125,11 +125,18 @@ interface CalendarsRepository {
      */
     suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity>
 
+    /**
+     * Selects EventAlarms that should be shown between [timestampSecondsFrom] and [timestampSecondsTo] inclusive.
+     */
+    suspend fun selectAllBetweenInclusive(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity>
+
     suspend fun selectEventAlarms(timestampSecondsStart: Long, timestampSecondsEnd: Long): List<EventAlarmEntity>
 
     suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity)
 
     suspend fun deleteEventAlarmById(id: String)
+
+    suspend fun deleteEventAlarmsForEvent(eventId: String)
 
     val fetchingState: Flow<FetchingState>
 

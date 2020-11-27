@@ -565,7 +565,7 @@ class CalendarsRepositoryImpl(
 
             logger.v("relatedEvents: ")
             relatedEvents.forEach {
-                logger.v("${it.summary}")
+                logger.v("${it.id}")
             }
 
             // 'distinct' because each event is 'related' to iself
@@ -590,6 +590,8 @@ class CalendarsRepositoryImpl(
                     event -> relatedEvents.find { it.id == event.id } != null
             } + newlyExpandedAffectedEvents
 
+            updateAlarmsForAffectedEvents(newlyExpandedAffectedEvents, eventsExpandedUntil.zone.id)
+
             // replace (raw, not expanded) events in dbEvents, they are read when scrolling & expanding
             dbEvents.removeAll { event -> affectedEvents.find { event.id == it.id } != null }
             logger.v("persistEvents dbEvents: ${dbEvents.size} adding ${affectedEvents.size}")
@@ -601,9 +603,34 @@ class CalendarsRepositoryImpl(
 
     }
 
+    private suspend fun updateAlarmsForAffectedEvents(events: List<Event>, timeZoneId: String) {
+
+        logger.v("updateAlarmsForAffectedEvents:")
+
+        val now = ZonedDateTime.now()
+
+        val upcomingOccurrences = events.filter { it.getActualStart(timeZoneId)?.isBefore(now) == false }.groupBy { it.id }.map { it.value.first() }
+
+        upcomingOccurrences.forEach {
+            logger.v("alarms for upcoming: $it")
+            val alarms = ICalUtils.calculateAlarmEntities(it, timeZoneId, "TODO")
+            if (alarms.isNotEmpty()) {
+                deleteEventAlarmsForEvent(it.id)
+                alarms.forEach {
+                    logger.v("$it")
+                    persistEventAlarm(it)
+                }
+            }
+        }
+
+    }
+
     override suspend fun deleteEventsById(ids: List<String>) {
 
         database.eventsDao().deleteByIds(ids)
+        ids.forEach {
+            database.eventAlarmsDao().deleteAllByEventId(it)
+        }
 
         eventsMutex.withLock {
 
@@ -704,12 +731,20 @@ class CalendarsRepositoryImpl(
         return database.eventAlarmsDao().selectUpcoming(timestampSeconds)
     }
 
+    override suspend fun selectAllBetweenInclusive(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity> {
+        return database.eventAlarmsDao().selectAllBetweenInclusive(timestampSecondsFrom, timestampSecondsTo)
+    }
+
     override suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) {
         database.eventAlarmsDao().updateOrInsert(eventAlarm)
     }
 
-    override suspend fun deleteEventAlarmById(eventAlarmId: String) {
-        database.eventAlarmsDao().deleteById(eventAlarmId)
+    override suspend fun deleteEventAlarmById(id: String) {
+        database.eventAlarmsDao().deleteById(id)
+    }
+
+    override suspend fun deleteEventAlarmsForEvent(eventId: String) {
+        database.eventAlarmsDao().deleteAllByEventId(eventId)
     }
 
 }

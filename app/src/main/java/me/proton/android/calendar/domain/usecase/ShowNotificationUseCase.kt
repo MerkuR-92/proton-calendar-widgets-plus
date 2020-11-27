@@ -7,19 +7,20 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.MainViewModel
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class ShowNotificationUseCase(private val logger: Logger, private val context: Context, private val calendarsRepository: CalendarsRepository, private val transformEventUseCase: TransformEventUseCase) {
+class ShowNotificationUseCase(private val logger: Logger, private val context: Context, private val calendarsRepository: CalendarsRepository, private val transformEventUseCase: TransformEventUseCase, private val database: AppDatabase) {
 
-
-
-    suspend fun execute(eventAlarms: List<EventAlarmEntity>) {
+    suspend fun execute(eventAlarms: List<EventAlarmEntity>, userId: String) {
 
         // Alarm's occurrence timestamp can be identical for multiple Alarms, but notification IDs
         //  have to be distinct for each one of them
@@ -39,6 +40,11 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID_EVENT_ALARMS)
         val systemDefaultZoneId = ZoneId.systemDefault()
+        val displayTimeZoneId = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
+
+        if (displayTimeZoneId == null) {
+            logger.e("empty displayTimeZoneId in ShowNotificationUseCase")
+        }
 
         eventAlarms.forEach {
 
@@ -81,8 +87,49 @@ class ShowNotificationUseCase(private val logger: Logger, private val context: C
                         .setAutoCancel(true)
 
                     notificationManager.notify(generateNotificationId(notificationManager, it), notificationBuilder.build())
+
+                    eventWithOccurrence?.let { currentEvent ->
+                        if (currentEvent.occurrence == null) {
+                            logger.e("occurrence of currentEvent for notifications is null")
+                        }
+                        currentEvent.occurrence?.let {
+                            createAlarmsForNextOccurrence(dbEvent, currentEvent, it, ZoneId.of(displayTimeZoneId ?: ZoneId.systemDefault().id))
+                        }
+                    }
                 }
             }
+        }
+
+    }
+
+    /**
+     * For next occurrence of current Event, make sure we have its Alarms in the database.
+     */
+    private suspend fun createAlarmsForNextOccurrence(originalEvent: Event, currentEvent: Event, currentOccurrence: Event.Occurrence, zoneId: ZoneId) {
+
+        val now = ZonedDateTime.now(zoneId)
+
+        if (now.isAfter(currentEvent.getActualStart(zoneId.id))) {
+            logger.v("createAlarmsForNextOccurrence for ${currentEvent.summary}, current occurrence: ${currentOccurrence}")
+
+            val nextOccurrenceNumber = currentOccurrence.occurrenceNumber + 1
+            val nextEvent = originalEvent.withOccurrence(nextOccurrenceNumber, zoneId.id)
+
+            logger.v("createAlarmsForNextOccurrence: next event with next occurrence: ${nextEvent}")
+
+            val alarmsForNextOccurrence = ICalUtils.calculateAlarmEntities(nextEvent!!, zoneId.id, "TODO")
+
+            logger.v("created next alarms for occurrence ${nextEvent.occurrence}:")
+            if (alarmsForNextOccurrence.isNotEmpty()) {
+                alarmsForNextOccurrence.forEach {
+                    calendarsRepository.deleteEventAlarmsForEvent(it.eventId)
+                    logger.v("${Instant.ofEpochSecond(it.occurrence)}")
+                    calendarsRepository.persistEventAlarm(it)
+                }
+            }
+
+        } else {
+            logger.v("createAlarmsForNextOccurrence it's not yet after occurrence for ${currentEvent.summary}, occurrence: ${currentOccurrence}")
         }
 
     }

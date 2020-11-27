@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
+import me.proton.android.calendar.common.ICalUtils.filterOutDuplicates
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
@@ -39,7 +40,7 @@ class HandleAlarmsUseCase(
             val alarmsToDisplayNow = calendarsRepository.selectUpcomingEventAlarms(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds }
 
             if (alarmsToDisplayNow.isNotEmpty()) {
-                showNotificationUseCase.execute(alarmsToDisplayNow)
+                showNotificationUseCase.execute(alarmsToDisplayNow.filterOutDuplicates(), userId.id)
             }
 
             valueStoreProvider.provideValueStore(userId.id).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, alarmEpochSeconds)
@@ -56,7 +57,7 @@ class HandleAlarmsUseCase(
             // TODO get most X recent alarms so we don't bombard user with obsolete alarms if they haven't used the app for a while
 
             logger.v("missed alarms to display at ${nowInstant}: ${alarmsToDisplayNow}")
-            showNotificationUseCase.execute(alarmsToDisplayNow)
+            showNotificationUseCase.execute(alarmsToDisplayNow.filterOutDuplicates(), userId.id)
 
             val maxAlarmOccurrenceSeconds = alarmsToDisplayNow.maxByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
             valueStoreProvider.provideValueStore(userId.id).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)

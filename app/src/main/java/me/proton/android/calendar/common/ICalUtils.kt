@@ -17,6 +17,7 @@ import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import java.time.*
@@ -441,6 +442,10 @@ object ICalUtils {
             if (originalEvent.isAllDay()) LocalDate.from(it.occurrence!!.startDateTime) in exZonedDateTimes
             else it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes
         }
+    }
+
+    fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
+        return this.distinctBy { "${it.eventId}${it.occurrence}" }
     }
 
     /**

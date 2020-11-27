@@ -150,7 +150,8 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             return Intent(context, MainActivity::class.java).apply {
                 action = INTENT_ACTION_SHOW_EVENT_DETAILS
                 data = Navigation.Deeplink.toMainActivityWithEventId(eventId, occurrenceNumber ?: 0)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                // TODO let's see if commenting this out causes fewer activity recreations
+                //flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
         }
     }

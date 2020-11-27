@@ -80,7 +80,7 @@ val useCaseModule = module {
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get()) }
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
-    factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get()) }
+    factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get()) }
 }
 
 fun coreModule(
