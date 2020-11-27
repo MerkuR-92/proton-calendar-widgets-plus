@@ -29,13 +29,14 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.account.AccountViewModel
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.ZoneId
 
 
@@ -46,6 +47,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
     private val accountViewModel: AccountViewModel by sharedViewModel()
+    private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -210,6 +212,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 editOption = null,
                                 occurrenceNumber = 1)
                         }
+                        withContext(Dispatchers.Default) {
+                            val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
+                            handleAlarmsUseCase.execute(userId)
+                        }
                         // Post saving event value to false to stop loading state
                         eventViewModel.savingEvent.postValue(false)
 
@@ -268,12 +274,17 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     navigationArguments.occurrenceNumber
                 )
             }
+            withContext(Dispatchers.Default) {
+                val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
+                handleAlarmsUseCase.execute(userId)
+            }
             // Post saving event value to false to stop loading state
             eventViewModel.savingEvent.postValue(false)
 
             if (success) { // TODO remove duplicated code here and below
                 onSuccessEventUpdateCalendarDisplay()
                 requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
+                setMonthViewSelectedDay()
                 jumpToMonthView()
             } else {
                 view?.displaySnackBar(getString(R.string.snack_event_updated_error))
