@@ -439,6 +439,20 @@ class EventViewModel(
                     }
                     eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !dbEvent.isAllDay()) // RecurrenceId has to be in original event's format
 
+                    // Update the sequence of parent if it didn't have a value before
+                    if (dbEvent.iCalEvent.sequence?.value == null) {
+                        dbEvent.iCalEvent.setSequence((dbEvent.iCalEvent.sequence?.value ?: 0) + 1)
+                        val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEvent.calendar.id, dbEvent)
+                        if (editOriginalEventResult != UseCase.Result.Success) {
+                            if (editOriginalEventResult is UseCase.Result.Error) {
+                                logger.e("error editing event: ${editOriginalEventResult.message}")
+                            } else if (editOriginalEventResult is UseCase.Result.Error) {
+                                logger.e("error editing event: ${editOriginalEventResult.message}")
+                            }
+                            return false
+                        }
+                    }
+
                     eventToCreate
 
                 } else if (dbEvent?.isSingleEdit() == true) {
