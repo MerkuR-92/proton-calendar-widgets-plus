@@ -12,6 +12,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -128,9 +129,11 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    override suspend fun initForUser(userId: String): Flow<CalendarsRepository.InitingState> {
+    override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
 
         logger.d("initForUser $userId")
+
+        eventsExpandedUntil = ZonedDateTime.now(timeZoneId)
 
         if (coroutineScope.isActive) {
             logger.v("scope active, cancelling")
@@ -475,11 +478,11 @@ class CalendarsRepositoryImpl(
 
             allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
 
-                logger.v("expanded count: ${allEvents.value.size}")
+            logger.v("expanded count: ${allEvents.value.size}")
 
-                if (dbEvents.isNotEmpty()) {
-                    eventsExpandedUntil = toDateTime
-                }
+            if (dbEvents.isNotEmpty()) {
+                eventsExpandedUntil = toDateTime
+            }
 
         }
 

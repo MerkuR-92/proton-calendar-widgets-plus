@@ -90,8 +90,20 @@ class CalendarViewModel(
         return flow {
 
             // TODO make this prettier
+            val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
+            if (calendarUserSettings == null) logger.e("initForUser: calendarUserSettings was null")
+            val timeZone = calendarUserSettings?.primaryTimezone
+            if (timeZone == null) logger.e("initForUser: timeZone was null")
 
-            calendarsRepository.initForUser(userId.id).collect {
+            timeZoneId = ZoneId.of(timeZone)
+            startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
+            timeFormatIs24Hour =
+                usersRepository.selectUserSettings(userId.id)
+                    ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
+
+            this@CalendarViewModel.userId = userId
+
+            calendarsRepository.initForUser(userId.id, timeZoneId).collect {
                 when (it) {
                     CalendarsRepository.InitingState.Initing -> {
                         emit(it)
@@ -102,20 +114,7 @@ class CalendarViewModel(
                         logger.d("cold initing calendars repo")
                     }
                     CalendarsRepository.InitingState.Finished -> {
-
-                        val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
-                        if (calendarUserSettings == null) logger.e("initForUser: calendarUserSettings was null")
-                        val timeZone = calendarUserSettings?.primaryTimezone
-                        if (timeZone == null) logger.e("initForUser: timeZone was null")
-                        timeZoneId = ZoneId.of(timeZone)
-                        startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
-                        timeFormatIs24Hour =
-                            usersRepository.selectUserSettings(userId.id)
-                                ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
-
                         initialised = true
-                        this@CalendarViewModel.userId = userId
-
                         emit(it)
                     }
                     CalendarsRepository.InitingState.Error -> {

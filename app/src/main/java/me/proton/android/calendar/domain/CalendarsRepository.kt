@@ -5,6 +5,7 @@ import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
+import java.time.ZoneId
 
 /**
  * Manages all Calendars, Events, Members, Passphrases etc.
@@ -12,7 +13,7 @@ import java.time.LocalDate
 // TODO move to separate package?
 interface CalendarsRepository {
 
-    suspend fun initForUser(userId: String): Flow<InitingState>
+    suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<InitingState>
 
     suspend fun shutdown()
 
