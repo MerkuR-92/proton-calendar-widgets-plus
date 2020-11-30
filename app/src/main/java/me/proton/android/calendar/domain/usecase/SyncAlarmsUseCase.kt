@@ -13,7 +13,8 @@ class SyncAlarmsUseCase(
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val calendarsApi: CalendarsApi,
-    private val calendarsRepository: CalendarsRepository
+    private val calendarsRepository: CalendarsRepository,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase
 ): UseCase {
 
     companion object {
@@ -57,6 +58,9 @@ class SyncAlarmsUseCase(
         val success = results.all { it is UseCase.Result.Success }
 
         logger.v("syncing alarms result = $results")
+
+        // schedule the just-synced alarms to fire
+        handleAlarmsUseCase.execute(userId)
 
         return if (success) {
             UseCase.Result.Success
