@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.EventApiResponse
+import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -86,6 +87,8 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistCalendar(userId.id, any()) } just Runs
             coEvery { calendarsRepositoryMock.updateCalendar(userId.id, any()) } just Runs
             coEvery { calendarsRepositoryMock.persistEvents(any()) } just Runs
+            coEvery { calendarsRepositoryMock.selectEventAlarm(any()) } returns EventAlarmEntity("", 0L, "", 2, "", "", "")
+            coEvery { calendarsRepositoryMock.deleteEventAlarmsByEventIdAndOccurrence(any(), any()) } just Runs
             coEvery { calendarsRepositoryMock.hasEvent(any(), any()) } returns true
             coEvery { calendarsRepositoryMock.refreshCalendarsFlagsForAddress(any(), any(), any()) } just Runs
             coEvery { usersRepositoryMock.persistAddress(userId.id, any()) } just Runs
@@ -158,7 +161,7 @@ internal class SyncServerEventsUseCaseTest {
                 calendarsRepositoryMock.persistEventAlarm(any())
             }
             coVerify(exactly = 3) {
-                calendarsRepositoryMock.deleteEventAlarmById(any())
+                calendarsRepositoryMock.deleteEventAlarmsByEventIdAndOccurrence(any(), any())
             }
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.persistCalendarKey(any())

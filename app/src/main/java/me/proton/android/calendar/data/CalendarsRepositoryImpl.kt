@@ -555,8 +555,6 @@ class CalendarsRepositoryImpl(
         val newEvents = events.mapNotNull { transformEventUseCase.execute(it) }
         val newEventsUids = newEvents.map { it.uid }
 
-        updateAlarmsForAffectedEvents(newEvents, eventsExpandedUntil.zone.id)
-
         logger.v("newEventsUids: $newEventsUids")
 
         eventsMutex.withLock {
@@ -593,6 +591,8 @@ class CalendarsRepositoryImpl(
                     event -> relatedEvents.find { it.id == event.id } != null
             } + newlyExpandedAffectedEvents
 
+            updateAlarmsForAffectedEvents(newlyExpandedAffectedEvents, eventsExpandedUntil.zone.id)
+
             // replace (raw, not expanded) events in dbEvents, they are read when scrolling & expanding
             dbEvents.removeAll { event -> affectedEvents.find { event.id == it.id } != null }
             logger.v("persistEvents dbEvents: ${dbEvents.size} adding ${affectedEvents.size}")
@@ -610,7 +610,13 @@ class CalendarsRepositoryImpl(
 
         val now = ZonedDateTime.now()
 
-        val upcomingOccurrences = events.filter { it.getActualStart(timeZoneId)?.isBefore(now) == false }.groupBy { it.id }.map { it.value.first() }
+        val upcomingOccurrences = events.filter {
+            if (it.isAllDay()) {
+                it.getActualStart(timeZoneId)?.toLocalDate()?.isBefore(now.toLocalDate()) == false
+            } else {
+                it.getActualStart(timeZoneId)?.isBefore(now) == false
+            }
+        }.groupBy { it.id }.map { it.value.first() }
 
         upcomingOccurrences.forEach {
             logger.v("alarms for upcoming: $it")
