@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.Flow
 abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
 
     @Query("SELECT * FROM event_alarms WHERE eventId = :eventId")
-    abstract fun select(eventId: String): Flow<List<EventAlarmEntity>>
+    abstract fun selectByEventId(eventId: String): Flow<List<EventAlarmEntity>>
+
+    @Query("SELECT * FROM event_alarms WHERE id = :id")
+    abstract fun select(id: String): EventAlarmEntity?
 
     @Query("SELECT * FROM event_alarms WHERE occurrence = (SELECT MIN(occurrence) FROM event_alarms WHERE occurrence >= :timestampSeconds)")
     abstract suspend fun selectUpcoming(timestampSeconds: Long): List<EventAlarmEntity>
@@ -25,5 +28,8 @@ abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
 
     @Query("DELETE FROM event_alarms WHERE eventId = :eventId")
     abstract suspend fun deleteAllByEventId(eventId: String)
+
+    @Query("DELETE FROM event_alarms WHERE eventId = :eventId AND occurrence = :occurrence")
+    abstract suspend fun deleteAllByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
 }

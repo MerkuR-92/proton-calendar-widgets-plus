@@ -12,6 +12,7 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import java.lang.Exception
+import java.time.Instant
 
 class HandleServerEventsUseCase(
     private val logger: Logger,
@@ -95,9 +96,17 @@ class HandleServerEventsUseCase(
                 )
             }
 
+            // if events changed, maybe also alarms changed so we need to reschedule them
+            if (eventsResponse.calendarAlarms?.isNotEmpty() == true) handleAlarmsUseCase.execute(userId)
+
             eventsResponse.calendarAlarms?.forEach {
                 it.handleAction(
-                    { calendarsRepository.deleteEventAlarmById(it.id) },
+                    {
+                        // delete all local Event Alarms along with the one from API
+                        calendarsRepository.selectEventAlarm(it.id)?.let {
+                            calendarsRepository.deleteEventAlarmsByEventIdAndOccurrence(it.eventId, it.occurrence)
+                        }
+                    },
                     {
                         try {
 
@@ -109,6 +118,7 @@ class HandleServerEventsUseCase(
                                     is ApiResponse.Success -> {
                                         logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
                                         calendarsRepository.persistEvents(event.data.event)
+                                        logger.e("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                         calendarsRepository.persistEventAlarm(it.alarm)
                                     }
                                     // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
@@ -121,6 +131,7 @@ class HandleServerEventsUseCase(
                                 }
 
                             } else {
+                                logger.e("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                 calendarsRepository.persistEventAlarm(it.alarm)
                             }
 

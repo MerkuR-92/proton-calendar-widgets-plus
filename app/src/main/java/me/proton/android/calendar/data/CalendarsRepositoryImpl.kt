@@ -19,6 +19,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
@@ -33,7 +34,7 @@ class CalendarsRepositoryImpl(
     private val transformEventUseCase: TransformEventUseCase,
     private val logger: Logger,
     private val fetchEventsUseCase: FetchEventsUseCase,
-    private val valueStoreProvider: ValueStoreProvider) : CalendarsRepository {
+    private val handleAlarmsUseCase: HandleAlarmsUseCase) : CalendarsRepository {
 
     private val eventsMutex = Mutex()
 
@@ -249,6 +250,7 @@ class CalendarsRepositoryImpl(
                 fetchEventsResult.second?.let {
                     persistEvents(*it.toTypedArray())
                     fetchedWindows.add(fetchWindow)
+                    handleAlarmsUseCase.execute(fetchWindow.userId)
                 }
             }
 
@@ -718,7 +720,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {
-        return database.eventAlarmsDao().select(eventId)
+        return database.eventAlarmsDao().selectByEventId(eventId)
     }
 
     override suspend fun selectEventAlarms(
@@ -726,6 +728,10 @@ class CalendarsRepositoryImpl(
         timestampSecondsEnd: Long
     ): List<EventAlarmEntity> {
         return database.eventAlarmsDao().select(timestampSecondsStart, timestampSecondsEnd)
+    }
+
+    override suspend fun selectEventAlarm(eventAlarmId: String): EventAlarmEntity? {
+        return database.eventAlarmsDao().select(eventAlarmId)
     }
 
     override suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity> {
@@ -746,6 +752,10 @@ class CalendarsRepositoryImpl(
 
     override suspend fun deleteEventAlarmsForEvent(eventId: String) {
         database.eventAlarmsDao().deleteAllByEventId(eventId)
+    }
+
+    override suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long) {
+        database.eventAlarmsDao().deleteAllByEventIdAndOccurrence(eventId, occurrence)
     }
 
 }

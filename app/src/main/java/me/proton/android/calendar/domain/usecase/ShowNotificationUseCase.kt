@@ -13,7 +13,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
-import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.MainViewModel
@@ -24,7 +23,6 @@ import java.time.ZonedDateTime
 class ShowNotificationUseCase(
     private val logger: Logger,
     private val context: Context,
-    private val calendarsRepository: CalendarsRepository,
     private val transformEventUseCase: TransformEventUseCase,
     private val database: AppDatabase
 ) {
@@ -45,7 +43,7 @@ class ShowNotificationUseCase(
 
         eventAlarms.forEach { eventAlarm ->
 
-            val eventEntity = calendarsRepository.selectEventEntity(eventAlarm.eventId)
+            val eventEntity = database.eventsDao().selectById(eventAlarm.eventId)
             if (eventEntity == null) {
                 logger.e("could not find EventEntity to show notification")
             } else {
@@ -168,12 +166,12 @@ class ShowNotificationUseCase(
             if (nextEvent != null) { // maybe [currentOccurrence] was the last valid occurrence of this event
                 val alarmsForNextOccurrence = ICalUtils.calculateAlarmEntities(nextEvent, zoneId.id, "TODO")
 
-                calendarsRepository.deleteEventAlarmsForEvent(nextEvent.id)
+                database.eventAlarmsDao().deleteAllByEventId(nextEvent.id)
 
                 logger.v("created next alarms for occurrence ${nextEvent.occurrence}:")
                 alarmsForNextOccurrence.forEach {
                     logger.v("${Instant.ofEpochSecond(it.occurrence)}")
-                    calendarsRepository.persistEventAlarm(it)
+                    database.eventAlarmsDao().updateOrInsert(it)
                 }
             }
 

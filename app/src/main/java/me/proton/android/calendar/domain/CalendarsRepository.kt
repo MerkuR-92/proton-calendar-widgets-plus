@@ -120,6 +120,9 @@ interface CalendarsRepository {
     // event alarms
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>
 
+    // event alarms
+    suspend fun selectEventAlarm(eventAlarmId: String): EventAlarmEntity?
+
     /**
      * Selects upcoming EventAlarms that should be shown at [timestampSeconds] or the nearest possible timestamp.
      */
@@ -137,6 +140,8 @@ interface CalendarsRepository {
     suspend fun deleteEventAlarmById(id: String)
 
     suspend fun deleteEventAlarmsForEvent(eventId: String)
+
+    suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
     val fetchingState: Flow<FetchingState>
 

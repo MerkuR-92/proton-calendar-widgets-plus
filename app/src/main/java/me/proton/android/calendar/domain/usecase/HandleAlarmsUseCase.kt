@@ -6,20 +6,17 @@ import android.content.Context
 import android.content.Intent
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.ICalUtils.filterOutDuplicates
-import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.domain.entity.UserId
-import java.time.Duration
 import java.time.Instant
-import java.util.concurrent.TimeUnit
-
 
 class HandleAlarmsUseCase(
     private val logger: Logger,
     private val context: Context,
-    private val calendarsRepository: CalendarsRepository,
+    private val database: AppDatabase,
     private val showNotificationUseCase: ShowNotificationUseCase,
     private val valueStoreProvider: ValueStoreProvider
 ) {
@@ -37,7 +34,7 @@ class HandleAlarmsUseCase(
             logger.v("alarms to display at alarmEpochSeconds ${alarmEpochSeconds}")
 
             // get only those alarms that we were supposed to show for this use case execution
-            val alarmsToDisplayNow = calendarsRepository.selectUpcomingEventAlarms(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds }
+            val alarmsToDisplayNow = database.eventAlarmsDao().selectUpcoming(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds }
 
             if (alarmsToDisplayNow.isNotEmpty()) {
                 showNotificationUseCase.execute(alarmsToDisplayNow.filterOutDuplicates(), userId.id)
@@ -52,7 +49,7 @@ class HandleAlarmsUseCase(
             val lastHandledTimestamp = valueStoreProvider.provideValueStore(userId.id).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP) ?: nowInstant.epochSecond
 
             // if no alarms were ever shown, this will return empty result
-            val alarmsToDisplayNow = calendarsRepository.selectEventAlarms(lastHandledTimestamp + 1, nowInstant.epochSecond)
+            val alarmsToDisplayNow = database.eventAlarmsDao().select(lastHandledTimestamp + 1, nowInstant.epochSecond)
 
             // TODO get most X recent alarms so we don't bombard user with obsolete alarms if they haven't used the app for a while
 
@@ -67,7 +64,7 @@ class HandleAlarmsUseCase(
         }
 
         // get next event alarms after currently shown and set system alarm to fire at that timestamp
-        val alarmsToDisplayNext = calendarsRepository.selectUpcomingEventAlarms(maxHandledAlarmOccurrenceSeconds + 1)
+        val alarmsToDisplayNext = database.eventAlarmsDao().selectUpcoming(maxHandledAlarmOccurrenceSeconds + 1)
         logger.v("alarmsToDisplayNext: ${alarmsToDisplayNext}")
         alarmsToDisplayNext.firstOrNull()?.let {
             rescheduleSystemAlarm(Instant.ofEpochSecond(it.occurrence))

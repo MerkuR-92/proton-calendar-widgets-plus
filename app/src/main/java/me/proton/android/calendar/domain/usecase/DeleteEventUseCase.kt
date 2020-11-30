@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 
 class DeleteEventUseCase( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
-    private val gson: Gson,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
@@ -103,6 +103,8 @@ class DeleteEventUseCase( // TODO TESTS
                 val errorEventIds = syncResponse.data.responses.map { eventIds[it.index] }
 
                 calendarsRepository.deleteEventsById(eventIds.filterNot { it in errorEventIds })
+
+                handleAlarmsUseCase.execute(userId)
 
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success

@@ -16,7 +16,7 @@ class EditCreateEventUseCase(
     private val logger: Logger,
     private val gson: Gson,
     private val calendarsApi: CalendarsApi,
-    private val addressesApi: AddressesApi,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val calendarsRepository: CalendarsRepository,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
@@ -210,6 +210,8 @@ class EditCreateEventUseCase(
                 }
 
                 calendarsRepository.persistEvents(*eventsToInsertOrUpdate.toTypedArray())
+
+                handleAlarmsUseCase.execute(userId)
 
                 // TODO collect and handle multiple errors
                 if (syncResponse.data.responses.any { !it.response.isSuccessful }) {
