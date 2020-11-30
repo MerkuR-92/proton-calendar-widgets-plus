@@ -26,10 +26,7 @@ import me.proton.android.calendar.presentation.NoLayoutRadioGroup
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.collections.HashMap
@@ -216,7 +213,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                 .toLocalDate()
 
-            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toInstant()
+            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toInstantWithTimezone(eventViewModel.displayTimeZoneId)
 
             val untilDate = eventViewModel.tempRecurrenceUntilLocalDate
                 ?: if (currentRecurrenceUntilInstant != null) {
@@ -503,10 +500,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                         custom_recurrence_end_2.text = getString(
                             R.string.event_recurrence_ends_on_date,
                             ZonedDateTime.ofInstant(
-                                this.until.toInstant(),
-                                if (isAllDay) ZoneId.systemDefault()
-                                else ZoneId.of(eventViewModel.eventTimeZoneId)
-                            ).formatDate(eventViewModel.eventTimeZoneId, isAllDay)
+                                this.until.toInstantWithTimezone(eventViewModel.eventTimeZoneId),
+                                ZoneId.of(eventViewModel.eventTimeZoneId)
+                            ).formatDate(eventViewModel.eventTimeZoneId)
                         )
                     }
                     if (this.count != null) {

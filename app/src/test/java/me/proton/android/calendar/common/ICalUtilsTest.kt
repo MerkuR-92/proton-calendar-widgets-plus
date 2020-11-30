@@ -975,7 +975,7 @@ internal class ICalUtilsTest {
         event.addExceptionDate(40) // non-existing occurrence
 
         val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
-        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
+        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event, displayTimeZoneId)
 
         assertThat(filteredByExdates.size).isEqualTo(16)
         assertThat(filteredByExdates.none { it.occurrence?.occurrenceNumber == 2 }).isTrue()
@@ -1024,7 +1024,7 @@ internal class ICalUtilsTest {
         event.addExceptionDate(40) // non-existing occurrence
 
         val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
-        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
+        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event, displayTimeZoneId)
 
         assertThat(filteredByExdates.size).isEqualTo(16)
         assertThat(filteredByExdates.none { it.occurrence?.occurrenceNumber == 2 }).isTrue()
@@ -1250,7 +1250,7 @@ internal class ICalUtilsTest {
         // there are 7 occurrences until 2020-08-09 and one additional that was moved from 2020-08-10 to 2020-08-09
         assertThat(mapped.size).isEqualTo(8)
 
-        val filteredByExdates = mapped.filterOutOccurrencesByExdates(events.first())
+        val filteredByExdates = mapped.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
 
         // one of the occurrences should be filtered out by exdate
         assertThat(filteredByExdates.size).isEqualTo(7)
@@ -1294,7 +1294,7 @@ internal class ICalUtilsTest {
         ), iCal, null)
 
         val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
-        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event)
+        val filteredByExdates = mapped.filterOutOccurrencesByExdates(event, displayTimeZoneId)
         assertThat(filteredByExdates.size).isEqualTo(6)
         assertThat(filteredByExdates.none { it.occurrence?.occurrenceNumber == 2 }).isTrue()
     }

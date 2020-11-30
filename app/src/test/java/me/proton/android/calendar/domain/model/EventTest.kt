@@ -175,13 +175,6 @@ internal class EventTest {
         assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
     }
 
-
-
-    // TODO example how to get zoned datetime
-    //         val start = ZonedDateTime.ofInstant(event.iCalEvent.dateStart.value.toInstant(), event.iCalTimezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.toZoneId())
-
-
-
     val calendarStartEndTimeDifferentDays = ICalUtils.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0

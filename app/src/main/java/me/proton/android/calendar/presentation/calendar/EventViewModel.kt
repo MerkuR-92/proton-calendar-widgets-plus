@@ -318,10 +318,8 @@ class EventViewModel(
      */
     fun initialiseForRecurrence() {
         this.tempMonthlyRepeatOption = MonthlyRepatOnOption.ON_DAY_X
-        val tempUntil: LocalDate? = event.iCalEvent.recurrenceRule?.value?.until?.toInstant()?.atZone(
-            if (event.isAllDay()) ZoneId.systemDefault()
-            else ZoneId.of(eventTimeZoneId)
-        )?.toLocalDate()
+        val until = event.iCalEvent.recurrenceRule?.value?.until?.toInstantWithTimezone(eventTimeZoneId) ?: return
+        val tempUntil: LocalDate? = until.atZone(ZoneId.of(eventTimeZoneId))?.toLocalDate()
         this.tempRecurrenceUntilLocalDate = tempUntil
     }
 
@@ -467,7 +465,6 @@ class EventViewModel(
 
             }
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
-
                 // TODO THIS NEEDS TO BE FIXED, WE PROBABLY CAN'T FIND EVENTS IN DB
                 if (dbEvent == null) {
                     logger.e("dbEvent == null")
@@ -500,20 +497,35 @@ class EventViewModel(
                 val dbEventToUpdate = eventToCopy!!.copy(iCalendar = eventToCopy.iCalendar.clone())
                 // Bump sequence for original event
                 dbEventToUpdate.iCalEvent.setSequence((dbEventToUpdate.iCalEvent.sequence?.value ?: 0) + 1)
+                val timezone = event.defaultTimeZone!!
                 dbEventToUpdate.iCalEvent.recurrenceRule?.value?.let {
                     dbEventToUpdate.iCalEvent.setRecurrenceRule(
                         Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
                             // TODO count = 0 will not happen because this edit option is not available for first occurrence
                             .count(if (it.count != null) occurrenceNumber - 1 else null)
-                            // 1 second to midnight on the end-day of previous original occurrence
                             .until(
-                                Date.from(
-                                    eventToCopy.generateOccurrence(
-                                        occurrenceNumber - 1,
-                                        event.defaultTimeZone!!
-                                    )!!.endDateTime.plusDays(1).with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1)
-                                        .toInstant()
-                                ), true
+                                if (event.isAllDay()) {
+                                    ICalDate(
+                                        eventToCopy.generateOccurrence(
+                                                occurrenceNumber - 1,
+                                            timezone
+                                            )!!.endDateTime
+                                            .with(ChronoField.HOUR_OF_DAY, 0)
+                                            .minusSeconds(1)
+                                            .toLocalDate()
+                                            .toDate(timezone)
+                                        , false
+                                    )
+                                } else {
+                                    // 1 second to midnight on the end-day of previous original occurrence
+                                    ICalDate(
+                                        Date.from(
+                                            ZonedDateTime.of(eventToCopy.generateOccurrence(occurrenceNumber - 1,
+                                            timezone)!!.endDateTime.toLocalDate(),
+                                            LocalTime.of(23, 59, 59), ZoneId.of(timezone)
+                                        ).toInstant()), true
+                                    )
+                                }
                             )
                             .build()
                     )
@@ -900,9 +912,9 @@ class EventViewModel(
             }
             if (untilDate && tempRecurrenceUntilLocalDate != null) {
                 val until = if (event.isAllDay()) {
-                    ICalDate(tempRecurrenceUntilLocalDate!!.toDate("UTC"), false)
+                    ICalDate(tempRecurrenceUntilLocalDate!!.toDate(eventTimeZoneId), false)
                 } else {
-                    ICalDate(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(eventTimeZoneId)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
+                    ICalDate(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(eventTimeZoneId)).withZoneSameInstant(ZoneId.of(eventTimeZoneId)).toInstant()), true)
                 }
                 builder.until(until)
             }

@@ -47,7 +47,7 @@ data class Event(
 
     val startLocalDate: LocalDate? get() = Instant.ofEpochMilli(iCalEvent.dateStart?.value?.getTime()!!)
         .atZone(ZoneId.systemDefault())
-        .toLocalDate() //LocalDate.from(iCalEvent.dateStart?.value?.toInstant())
+        .toLocalDate()
 
     fun getStart(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getStart(timeZoneId)
@@ -161,7 +161,7 @@ data class Event(
         return if (this.spansSingleDay(actualEndDate = true, timeZoneId = timeZoneId)) {
 
             // TODO cleanup and check against requirements
-            val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId, this.isAllDay()) ?: this.formatStart(timeZoneId, is24Hour).first
+            val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first
 
             if (this.isAllDay()) { // ignoring timezones
                 formattedStartDate!! //TODO
@@ -179,8 +179,8 @@ data class Event(
         } else {
 
             if (this.isAllDay()) { // ignoring timezones
-                val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId, this.isAllDay()) ?: this.formatStart(timeZoneId, is24Hour).first
-                val formattedEndDate = this.occurrence?.endDateTime?.minusDays(1)?.formatDate(timeZoneId, this.isAllDay()) ?: this.formatEnd(timeZoneId, is24Hour).first
+                val formattedStartDate = this.occurrence?.startDateTime?.formatDate(timeZoneId) ?: this.formatStart(timeZoneId, is24Hour).first
+                val formattedEndDate = this.occurrence?.endDateTime?.minusDays(1)?.formatDate(timeZoneId) ?: this.formatEnd(timeZoneId, is24Hour).first
 
                 resources.getString(R.string.event_time_period_spanning_many_days, formattedStartDate, formattedEndDate)
             } else {
@@ -189,8 +189,8 @@ data class Event(
                 val startDateTimeInStartTimezone = this.occurrence?.startDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
                 val endDateTimeInStartTimezone = this.occurrence?.endDateTime?.withZoneSameInstant(ZoneId.of(timeZoneId)) ?: ZonedDateTime.ofInstant(this.iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
 
-                val startDateTime = "${startDateTimeInStartTimezone.formatDate(timeZoneId, this.isAllDay())} ${startDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}"
-                val endDateTime = "${endDateTimeInStartTimezone.formatDate(timeZoneId, this.isAllDay())} ${endDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}"
+                val startDateTime = "${startDateTimeInStartTimezone.formatDate(timeZoneId)} ${startDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}"
+                val endDateTime = "${endDateTimeInStartTimezone.formatDate(timeZoneId)} ${endDateTimeInStartTimezone.formatTime(timeZoneId, is24Hour)}"
 
                 resources.getString(R.string.event_time_period_spanning_many_days, startDateTime, endDateTime)
             }
@@ -206,9 +206,7 @@ data class Event(
         var formattedTime: String? = null
 
         if (property != null) {
-            val zonedDateTime =
-                if (isAllDay) ZonedDateTime.of(ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
-                else ZonedDateTime.ofInstant(property.value.toInstant(), ZoneId.of(timeZoneId))
+            val zonedDateTime = ZonedDateTime.ofInstant(property.value.toInstantWithTimezone(timeZoneId), ZoneId.of(timeZoneId))
 
             formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
             if (property.value.hasTime()) {
@@ -297,7 +295,7 @@ data class Event(
 
         val hasTime = !isAllDay() && iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty()
 
-        val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
+        val startZonedDateTime = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstantWithTimezone(timeZoneId), ZoneId.of(timeZoneId))
         val startZonedDateTimeAllDayNormalised = ZonedDateTime.of(startZonedDateTime.toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
 
         val startICalDate = ICalDate(iCalEvent.dateStart.value, hasTime)
@@ -305,11 +303,7 @@ data class Event(
         val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
 
         val untilZonedDateTime = if (iCalEvent.recurrenceRule.value.until != null) {
-            if (isAllDay()) {
-                ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId))
-            } else {
-                ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))
-            }
+            ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstantWithTimezone(timeZoneId), ZoneId.of(timeZoneId))
         } else null
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
@@ -319,16 +313,15 @@ data class Event(
 
             occurrenceNumber++
 
-            val startIteratorNextInstant = startIterator.next().toInstant()
-            val occurrenceStart = if (this.isAllDay()) {
-                // we force the timezone to be the one we got in param
-                // unfortunately parser uses Calendar object with default timezone
-                ZonedDateTime.of(ZonedDateTime.ofInstant(startIteratorNextInstant, ZoneId.systemDefault()).toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
-            } else if (!hasTime && !isAllDay()) {
-                ZonedDateTime.ofInstant(startIteratorNextInstant, ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
-            } else {
-                ZonedDateTime.ofInstant(startIteratorNextInstant, ZoneId.of(timeZoneId))
-            }
+            val startIteratorNext = startIterator.next()
+            val startIteratorNextInstant = startIteratorNext.toInstantWithTimezone(timeZoneId, this.isAllDay())
+            val occurrenceStart =
+                if (!hasTime && !isAllDay()) {
+                    // Handle BySetPos edge case
+                    ZonedDateTime.ofInstant(startIteratorNextInstant, ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timeZoneId)).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
+                } else {
+                    ZonedDateTime.ofInstant(startIteratorNextInstant, ZoneId.of(timeZoneId))
+                }
 
             val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
 
@@ -395,7 +388,7 @@ data class Event(
                     if (hasTime) {
                         iCalendar.timezoneInfo.setTimezone(iCalEvent.exceptionDates[exceptionDateIndex], TimezoneAssignment(iteratorTimezone, VTimezone(iteratorTimezone.id)))
                     }
-                    return ZonedDateTime.ofInstant(nextValue.toInstant(), ZoneId.systemDefault())
+                    return ZonedDateTime.ofInstant(nextValue.toInstantWithTimezone(iteratorTimezone.id, isAllDay()), ZoneId.systemDefault())
                 } else {
                     counter++
                 }
@@ -453,15 +446,10 @@ data class Event(
 
                 val exceptionTimezone = iCalendar.iCalTimeZone(it)
 
-                it.values?.forEach {
-                    val date = if (it.hasTime()) {
-                        ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(exceptionTimezone.id))
-                    } else {
-                        // unfortunately parser uses Calendar object with default timezone
-                        ZonedDateTime.ofInstant(it.toInstant(), ZoneId.systemDefault())
-                    }
-
-                    dates.add(date)
+                it.values?.forEach { exDate ->
+                    dates.add(
+                        ZonedDateTime.ofInstant(exDate.toInstantWithTimezone(exceptionTimezone.id), ZoneId.of(exceptionTimezone.id))
+                    )
                 }
 
             }
@@ -529,16 +517,15 @@ data class Event(
     fun isRecurringUntilSameDay(timeZoneId: String): Boolean {
         if (iCalEvent.recurrenceRule.value.until == null) return false
         val untilZonedDateTime =
-            ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))
-        val dateEnd = ZonedDateTime.ofInstant(iCalEvent.dateEnd.value.toInstant(), ZoneId.of(timeZoneId))
-        val dateStart = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstant(), ZoneId.of(timeZoneId))
-        return ChronoUnit.DAYS.between(dateEnd, untilZonedDateTime).toInt() == 0 || ChronoUnit.DAYS.between(dateStart, untilZonedDateTime).toInt() == 0
+            ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstantWithTimezone(timeZoneId), ZoneId.of(timeZoneId))
+        val dateStart = ZonedDateTime.ofInstant(iCalEvent.dateStart.value.toInstantWithTimezone(timeZoneId), ZoneId.of(timeZoneId))
+        return ChronoUnit.DAYS.between(dateStart, untilZonedDateTime).toInt() <= 0
     }
 
     fun isRecurringUntilBeforeNextOccurrence(timeZoneId: String): Boolean {
         if (iCalEvent.recurrenceRule.value.until == null) return false
         val untilZonedDateTime =
-            ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstant(), ZoneId.of(timeZoneId))
+            ZonedDateTime.ofInstant(iCalEvent.recurrenceRule.value.until.toInstantWithTimezone(timeZoneId), ZoneId.of(timeZoneId))
         val occurrenceCount = generateOccurrencesUntil(untilZonedDateTime.toLocalDate(), timeZoneId)?.size
         return occurrenceCount == null || occurrenceCount <= 1
     }

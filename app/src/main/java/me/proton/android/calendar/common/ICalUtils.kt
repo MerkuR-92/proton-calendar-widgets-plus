@@ -162,18 +162,14 @@ object ICalUtils {
         }
 
         iCalEvent.recurrenceRule.value.until?.let {
-            val untilDate = ZonedDateTime.ofInstant(it.toInstant(), ZoneId.of(startTimeZone.id))
+            val untilDate = ZonedDateTime.ofInstant(it.toInstantWithTimezone(startTimeZone.id), ZoneId.of(startTimeZone.id))
 
             val newUntilDate = if (startDate.isAfter(untilDate)) startDate else untilDate
 
             val until : ICalDate = if (iCalEvent.dateStart.value.hasTime()) {
-
-                ICalDate(Date.from(ZonedDateTime.of(newUntilDate.toLocalDate(), LocalTime.of(23, 59, 59), ZoneId.of(startTimeZone.id)).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
-
-
-//                    ICalDate(Date.from(startDate.withHour(23).withMinute(59).withSecond(59).withZoneSameInstant(ZoneId.of("UTC")).toInstant()), true)
+                ICalDate(Date.from(ZonedDateTime.of(newUntilDate.toLocalDate(), LocalTime.of(23, 59, 59), ZoneId.of(startTimeZone.id)).withZoneSameInstant(ZoneId.of(startTimeZone.id)).toInstant()), true)
             } else {
-                ICalDate(Date.from(newUntilDate.toInstant()), false)
+                ICalDate(Date.from(newUntilDate.withZoneSameLocal(ZoneId.systemDefault()).toInstant()), false)
             }
 
             iCalEvent.recurrenceRule.value = iCalEvent.recurrenceRule.value.clone(
@@ -428,19 +424,21 @@ object ICalUtils {
     /**
      * Given original Event, filter out all occurrences that are excluded by EXDATE
      */
-    fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event): List<Event> {
+    fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event> {
 
         val exZonedDateTimes =
             originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
                 exDates.values.map { exDate ->
-                    if (originalEvent.isAllDay()) LocalDate.from(ZonedDateTime.ofInstant(exDate.toInstant(), ZoneId.systemDefault()))
-                    else exDate.toInstant()
+                    exDate.toInstantWithTimezone(timeZoneId)
                 }
             }
 
-        return this.filterNot {
-            if (originalEvent.isAllDay()) LocalDate.from(it.occurrence!!.startDateTime) in exZonedDateTimes
-            else it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes
+        return if (exZonedDateTimes.isNullOrEmpty()) {
+            this
+        } else {
+            this.filterNot {
+                it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes
+            }
         }
     }
 
@@ -453,6 +451,7 @@ object ICalUtils {
      * Converts it to default timezone when event is all day
      */
     fun eventStartZonedDateTimeToDate(startDate: ZonedDateTime, isAllDay: Boolean): Date {
+        // TODO Make utils method to get correct Date.from value
         return if (isAllDay) Date.from(startDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant())
         else Date.from(startDate.toInstant())
     }
@@ -525,14 +524,15 @@ fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek {
     return DayOfWeek.of((this.calendarConstant)).minus(1)
 }
 
-fun ZonedDateTime.formatDate(timeZoneId: String, isAllDay: Boolean): String {
-    return if (isAllDay) {
-        this.withZoneSameLocal(ZoneId.of(timeZoneId)).toLocalDate()
-            .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
-    } else {
-        this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate()
-            .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
-    }
+fun ZonedDateTime.formatDate(timeZoneId: String): String {
+    return this
+        .withZoneSameInstant(ZoneId.of(timeZoneId))
+        .toLocalDate()
+        .format(
+            DateTimeFormatter
+            .ofLocalizedDate(FormatStyle.FULL)
+            .withLocale(getLocaleForFormatting())
+        )
 }
 
 fun ZonedDateTime.formatTime(timeZoneId: String, is24Hour: Boolean): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(is24Hour)
@@ -647,35 +647,20 @@ fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
 
     if (this.dateStart?.value == null) return null // TODO
 
-    return if (this.dateStart.value.hasTime()) {
-        ZonedDateTime.ofInstant(
-            this.dateStart.value.toInstant(),
-            ZoneId.of(timeZoneId)
-        )
-    } else {
-        ZonedDateTime.ofInstant(
-            this.dateStart.value.toInstant(),
-            ZoneId.systemDefault()
-        ).withZoneSameLocal(ZoneId.of(timeZoneId))
-    }
-
+    return ZonedDateTime.ofInstant(
+        this.dateStart.value.toInstantWithTimezone(timeZoneId),
+        ZoneId.of(timeZoneId)
+    )
 }
 
 fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
 
     if (this.dateEnd?.value == null) return null // TODO
 
-    return if (this.dateEnd.value.hasTime()) {
-        ZonedDateTime.ofInstant(
-            this.dateEnd.value.toInstant(),
-            ZoneId.of(timeZoneId)
-        )
-    } else {
-        ZonedDateTime.ofInstant(
-            this.dateEnd.value.toInstant(),
-            ZoneId.systemDefault()
-        ).withZoneSameLocal(ZoneId.of(timeZoneId))
-    }
+    return ZonedDateTime.ofInstant(
+        this.dateEnd.value.toInstantWithTimezone(timeZoneId),
+        ZoneId.of(timeZoneId)
+    )
 }
 
 
@@ -689,4 +674,20 @@ fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQ
     return this.groupBy({it.uid}).mapValues { events ->
         events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
     }.map { it.value }.toList()
+}
+
+fun ICalDate.toInstantWithTimezone(timezone: String): Instant {
+    return if (this.hasTime()) {
+        this.toInstant()
+    } else {
+        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone)).toInstant()
+    }
+}
+
+fun Date.toInstantWithTimezone(timezone: String, isAllDay: Boolean): Instant {
+    return if (!isAllDay) {
+        this.toInstant()
+    } else {
+        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone)).toInstant()
+    }
 }

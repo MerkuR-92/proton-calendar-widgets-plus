@@ -496,7 +496,7 @@ class CalendarsRepositoryImpl(
     private fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
         return if (event.isRecurring()) {
             val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, allEvents.filter { it.uid == event.uid }, toDateTime.toLocalDate(), toDateTime.zone.id)!!
-            val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event)
+            val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event, toDateTime.zone.id)
 
             filteredByExdates
         } else if (event.isSingleEdit()) {

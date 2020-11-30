@@ -362,10 +362,9 @@ class AndroidUtils(context: Context) {
                         context.getString(
                             R.string.event_recurrence_until,
                             ZonedDateTime.ofInstant(
-                                it.toInstant(),
-                                if (event.isAllDay()) ZoneId.systemDefault()
-                                else ZoneId.of(timeZoneId)
-                            ).formatDate(timeZoneId, event.isAllDay())
+                                it.toInstantWithTimezone(timeZoneId),
+                                ZoneId.of(timeZoneId)
+                            ).formatDate(timeZoneId)
                         )
                     },
                 ).joinToString(separator = ", ")
