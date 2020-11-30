@@ -12,7 +12,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -554,6 +553,8 @@ class CalendarsRepositoryImpl(
         val newEvents = events.mapNotNull { transformEventUseCase.execute(it) }
         val newEventsUids = newEvents.map { it.uid }
 
+        updateAlarmsForAffectedEvents(newEvents, eventsExpandedUntil.zone.id)
+
         logger.v("newEventsUids: $newEventsUids")
 
         eventsMutex.withLock {
@@ -590,8 +591,6 @@ class CalendarsRepositoryImpl(
                     event -> relatedEvents.find { it.id == event.id } != null
             } + newlyExpandedAffectedEvents
 
-            updateAlarmsForAffectedEvents(newlyExpandedAffectedEvents, eventsExpandedUntil.zone.id)
-
             // replace (raw, not expanded) events in dbEvents, they are read when scrolling & expanding
             dbEvents.removeAll { event -> affectedEvents.find { event.id == it.id } != null }
             logger.v("persistEvents dbEvents: ${dbEvents.size} adding ${affectedEvents.size}")
@@ -613,13 +612,15 @@ class CalendarsRepositoryImpl(
 
         upcomingOccurrences.forEach {
             logger.v("alarms for upcoming: $it")
+
             val alarms = ICalUtils.calculateAlarmEntities(it, timeZoneId, "TODO")
-            if (alarms.isNotEmpty()) {
-                deleteEventAlarmsForEvent(it.id)
-                alarms.forEach {
-                    logger.v("$it")
-                    persistEventAlarm(it)
-                }
+
+            logger.v("deleting all alarms for `${it.summary}` and creating new ones")
+
+            deleteEventAlarmsForEvent(it.id)
+            alarms.forEach {
+                logger.v("at: ${Instant.ofEpochSecond(it.occurrence)}")
+                persistEventAlarm(it)
             }
         }
 

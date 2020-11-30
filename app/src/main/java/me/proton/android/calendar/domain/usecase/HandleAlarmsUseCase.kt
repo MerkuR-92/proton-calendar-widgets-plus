@@ -25,7 +25,7 @@ class HandleAlarmsUseCase(
 ) {
 
     /**
-     * @param alarmEpochSeconds if present, show notifications for alarms at this timestamp
+     * @param alarmEpochSeconds if present, show notifications for alarms at this timestamp or show all missed ones until now
      */
     suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null) {
         logger.v("executing HandleAlarmsUseCase, alarmEpochSeconds: $alarmEpochSeconds")
@@ -68,6 +68,7 @@ class HandleAlarmsUseCase(
 
         // get next event alarms after currently shown and set system alarm to fire at that timestamp
         val alarmsToDisplayNext = calendarsRepository.selectUpcomingEventAlarms(maxHandledAlarmOccurrenceSeconds + 1)
+        logger.v("alarmsToDisplayNext: ${alarmsToDisplayNext}")
         alarmsToDisplayNext.firstOrNull()?.let {
             rescheduleSystemAlarm(Instant.ofEpochSecond(it.occurrence))
         }
@@ -76,7 +77,7 @@ class HandleAlarmsUseCase(
 
     private fun rescheduleSystemAlarm(atInstant: Instant) {
 
-        logger.v("HandleAlarmsUseCase scheduling next alarm at ${atInstant}")
+        logger.d("HandleAlarmsUseCase scheduling next alarm at ${atInstant}")
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
