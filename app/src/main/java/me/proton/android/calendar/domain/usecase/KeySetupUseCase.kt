@@ -16,8 +16,6 @@ import me.proton.core.domain.entity.UserId
 
 class KeySetupUseCase(
     private val logger: Logger,
-    private val gson: Gson,
-    private val database: AppDatabase,
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider

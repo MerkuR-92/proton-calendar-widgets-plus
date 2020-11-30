@@ -16,7 +16,6 @@ class UpdateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
-    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     companion object {
