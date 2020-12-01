@@ -206,5 +206,6 @@
     <string name="delete">Delete</string>
 
     <string name="splash_fetching_events">Fetching events</string>
+    <string name="default_calendar_name">My Calendar</string>
 
 </resources>

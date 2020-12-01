@@ -32,21 +32,23 @@ class KeySetupUseCase(
         val passphrase = Base64.encode(Random.randBytes(32))
 
         // Create a new X25519 key that will be used as a Calendar key (please note that the UserID should be set to 'Calendar key')
-        val calendarPrivateKey = crypto.generateEncryptedKey("not-a-name", "not-an-email@example.tld", passphrase.toByteArray())
+        val calendarPrivateKey =
+            crypto.generateEncryptedKey("not-a-name", "not-an-email@example.tld", passphrase.toByteArray())
+                ?: return UseCase.Result.Error("generateEncryptedKey was null in KeySetupUseCase")
 
         // Encrypt and sign the passphrase using the member’s AddressKey
         val encryptedToken = crypto.encryptText(
             passphrase,
             memberAddressKey.privateKey
-        ) ?: return UseCase.Result.InvalidParams("encryptedSignedToken was null in KeySetupUseCase")
+        ) ?: return UseCase.Result.Error("encryptedSignedToken was null in KeySetupUseCase")
 
         val tokenSignature = crypto.signTextDetached(
             passphrase,
             memberAddressKey.privateKey,
             (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray()
-        ) ?: return UseCase.Result.InvalidParams("signature was null in KeySetupUseCase")
+        ) ?: return UseCase.Result.Error("signature was null in KeySetupUseCase")
 
-        val keyPackets = mapOf(memberId to (Ciphertext.from(encryptedToken).encodedKeyPacket ?: return UseCase.Result.InvalidParams("KeyPackets was null in KeySetupUseCase")))
+        val keyPackets = mapOf(memberId to (Ciphertext.from(encryptedToken).encodedKeyPacket ?: return UseCase.Result.Error("KeyPackets was null in KeySetupUseCase")))
         val passphraseApiRequest = PassphraseApiRequest(
             Ciphertext.from(encryptedToken).encodedDataPacket,
             keyPackets

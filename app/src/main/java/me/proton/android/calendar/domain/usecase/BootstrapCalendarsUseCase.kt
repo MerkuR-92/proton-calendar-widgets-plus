@@ -22,7 +22,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val createCalendarUseCase: CreateCalendarUseCase): UseCase {
 
-    suspend fun execute(userId: UserId) : UseCase.Result {
+    suspend fun execute(userId: UserId, defaultCalendarName: String) : UseCase.Result {
 
         logger.v("executing BootstrapCalendarsUseCase")
 
@@ -35,7 +35,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
         }
 
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
-            val createDefaultCalendarResult = createCalendarUseCase.execute(userId, "My Calendar")
+            val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
             if (createDefaultCalendarResult !is UseCase.Result.Success) {
                 return UseCase.Result.Error("error unable to create default calendar for user")
             }

@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
+import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
@@ -22,7 +23,7 @@ class CreateCalendarUseCase(
         const val WORKER_ID = "CREATE_CALENDAR"
     }
 
-    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = "#C26CC7", display: Int = 1) : UseCase.Result {
+    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1) : UseCase.Result {
 
         val user = usersRepository.selectUserById(userId.id)
         val email = user?.email ?: return UseCase.Result.Error("Email for user was null in CreateCalendarUseCase")

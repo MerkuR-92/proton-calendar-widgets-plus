@@ -142,8 +142,13 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         }
     }
 
-    override fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String {
-        return Helper.generateKey(name, email, passphrase, "x25519", 0)
+    override fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String? {
+        return try {
+            Helper.generateKey(name, email, passphrase, "x25519", 0)
+        } catch (e: Exception) {
+            logger.i("generate and encrypt key with passphrase failed", e)
+            null
+        }
     }
 
     private fun createAndUnlockKeyring(armoredPrivateKey: String, passphrase: ByteArray) : KeyRing {

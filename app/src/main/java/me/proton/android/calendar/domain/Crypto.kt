@@ -76,6 +76,6 @@ interface Crypto {
     /**
      * Generate a new X25519 key.
      */
-    fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String
+    fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String?
 
 }

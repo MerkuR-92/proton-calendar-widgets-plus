@@ -29,6 +29,8 @@ const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="
 const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/create"
 
+const val DEFAULT_CALENDAR_COLOR = "#C26CC7"
+
 object FormValidation {
 
     val MIN_SUPPORTED_DATETIME = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.of("UTC"))

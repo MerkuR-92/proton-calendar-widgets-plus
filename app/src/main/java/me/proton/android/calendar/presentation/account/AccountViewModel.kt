@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.ValueKey
@@ -61,7 +62,7 @@ class AccountViewModel(
     private val _state = MutableLiveData<State>()
     private val _errorReport = MutableLiveData<Error>()
 
-    private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String) {
+    private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String, defaultCalendarName: String) {
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         valueStore.putString(ValueKey.USER_PASSPHRASE, String(passphrase))
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
@@ -74,7 +75,7 @@ class AccountViewModel(
                 return@launch
             }
 
-            val bootstrapResult = bootstrapCalendarsUseCase.execute(userId)
+            val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName)
             if (bootstrapResult !is UseCase.Result.Success) {
                 if (bootstrapResult is UseCase.Result.Error) handleError(bootstrapResult.message)
                 removeUser(userId)
@@ -143,7 +144,7 @@ class AccountViewModel(
         combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
             if (id != null && passphrase != null && eventId != null) {
                 _state.postValue(State.Processing)
-                setupUser(UserId(id), passphrase, eventId)
+                setupUser(UserId(id), passphrase, eventId, context.resources.getString(R.string.default_calendar_name))
             }
         }.launchIn(viewModelScope)
 
