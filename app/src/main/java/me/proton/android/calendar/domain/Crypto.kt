@@ -1,8 +1,6 @@
 package me.proton.android.calendar.domain
 
-import com.proton.gopenpgp.crypto.Key
 import com.proton.gopenpgp.crypto.SessionKey
-import com.proton.gopenpgp.srp.Proofs
 
 interface Crypto {
 
@@ -74,8 +72,8 @@ interface Crypto {
     ): SessionKey?
 
     /**
-     * Generate a new X25519 key.
+     * Generate new X25519 key, returned as locked, armored String.
      */
-    fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String?
+    fun generateEccKey(name: String, email: String, passphrase: ByteArray): String?
 
 }

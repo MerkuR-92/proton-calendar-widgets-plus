@@ -19,10 +19,6 @@ class CreateCalendarUseCase(
     private val keySetupUseCase: KeySetupUseCase
 ): UseCase {
 
-    companion object {
-        const val WORKER_ID = "CREATE_CALENDAR"
-    }
-
     suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1) : UseCase.Result {
 
         val user = usersRepository.selectUserById(userId.id)
@@ -49,12 +45,20 @@ class CreateCalendarUseCase(
                     is ApiResponse.Success -> {
 
                         val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("memberId was null in CreateCalendarUseCase")
-                        return keySetupUseCase.execute(
+
+                        val keySetupResult = keySetupUseCase.execute(
                             userId,
                             address.id,
                             calendarId,
                             address.primaryKey ?: address.keys[0],
                             memberId)
+
+                        when (keySetupResult) {
+                            is UseCase.Result.InvalidParams -> { logger.e("InvalidParams in CreateCalendarUseCase: ${keySetupResult.message}") }
+                            is UseCase.Result.Error -> { logger.e("Error in CreateCalendarUseCase: ${keySetupResult.message}") }
+                        }
+
+                        return keySetupResult
                     }
                     is ApiResponse.Error -> UseCase.Result.Error(memberListApiResponse.error)
                     is ApiResponse.Exception -> UseCase.Result.Error(memberListApiResponse.exception.message ?: "(no exception message)")

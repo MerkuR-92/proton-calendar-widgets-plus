@@ -36,6 +36,12 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
+
+            when (createDefaultCalendarResult) {
+                is UseCase.Result.InvalidParams -> { logger.e("InvalidParams in CreateCalendarUseCase: ${createDefaultCalendarResult.message}") }
+                is UseCase.Result.Error -> { logger.e("Error in CreateCalendarUseCase: ${createDefaultCalendarResult.message}") }
+            }
+
             if (createDefaultCalendarResult !is UseCase.Result.Success) {
                 return UseCase.Result.Error("error unable to create default calendar for user")
             }

@@ -12,8 +12,6 @@ import me.proton.android.calendar.domain.Logger
 
 class CryptoImpl(private val logger: Logger) : Crypto {
 
-    private val SRP_PROOF_BITS: Long = 2048
-
     override fun generateUserPassphrase(passphrase: ByteArray, encodedSalt: String): ByteArray {
         val decodedKeySalt: ByteArray = Base64.decode(encodedSalt, Base64.DEFAULT)
         val generatedUserPassphraseByteRawHash = BCrypt.with(BCrypt.Version.VERSION_2Y).hashRaw(10, decodedKeySalt, passphrase).rawHash
@@ -142,11 +140,11 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         }
     }
 
-    override fun generateEncryptedKey(name: String, email: String, passphrase: ByteArray) : String? {
+    override fun generateEccKey(name: String, email: String, passphrase: ByteArray) : String? {
         return try {
             Helper.generateKey(name, email, passphrase, "x25519", 0)
         } catch (e: Exception) {
-            logger.i("generate and encrypt key with passphrase failed", e)
+            logger.i("generate and encrypt ECC key failed", e)
             null
         }
     }
