@@ -178,18 +178,23 @@ class CalendarViewModel(
 
     }
 
-    fun calculateCalendarIndicators(events: List<Event>): Map<Int, List<String>> {
+    private fun calculateCalendarIndicators(events: List<Event>): Map<Int, List<String>> {
 
         val indicators = mutableMapOf<Int, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
-            val firstDayOfEvent = event.getActualStart(timeZoneId.id)!!.toLocalDate()
-            val days = event.calculateFullDayCounter(firstDayOfEvent, timeZoneId.id)
+            var start = event.getActualStart(timeZoneId.id)!!.toLocalDate()
+            val end = event.getActualEnd(timeZoneId.id)!!.toLocalDate()
 
-            for (i in 0 until days.second) {
-                val current = indicators.getValue(firstDayOfEvent.dayOfMonth + i)
+            // Use !start.isAfter(end) to iterate inclusive
+            while (!start.isAfter(end)) {
+                val current = indicators.getValue(start.dayOfMonth)
                 current.add(event.calendar.color)
-                indicators.put(firstDayOfEvent.dayOfMonth + i, current)
+                indicators[start.dayOfMonth] = current
+                start = start.plusDays(1)
+
+                // All day events end on next day 00:00 so we need to break loop to exclude end day
+                if (event.isAllDay() && start == end) break
             }
         }
 
