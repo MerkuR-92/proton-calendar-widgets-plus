@@ -49,7 +49,7 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : CalendarApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
-    suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarDisplayApiRequest) : UpdateCalendarApiResponse
+    suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarDisplayApiRequest) : CalendarApiResponse
 
     @POST("calendar/$API_VERSION_CALENDAR")
     suspend fun createCalendar(@Body body: CreateCalendarApiRequest) : CalendarApiResponse
@@ -127,7 +127,7 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             updateCalendar(calendarId, body)
         }.toApiResponse()
 
-    override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<UpdateCalendarApiResponse> =
+    override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<CalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             updateCalendarDisplay(calendarId, body)
         }.toApiResponse()
@@ -187,16 +187,6 @@ data class UpdateCalendarApiRequest(
     val color: String,
     @SerialName("Display")
     val display: Int
-)
-
-@Serializable
-data class UpdateCalendarApiResponse(
-    @SerialName("ID")
-    val id: String,
-    @SerialName("Name")
-    val name: String,
-    @SerialName("Description")
-    val description: String
 )
 
 @Serializable
