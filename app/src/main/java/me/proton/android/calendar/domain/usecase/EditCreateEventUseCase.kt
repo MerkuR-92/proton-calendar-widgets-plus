@@ -7,7 +7,6 @@ import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
-import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
@@ -210,6 +209,19 @@ class EditCreateEventUseCase(
                 }
 
                 calendarsRepository.persistEvents(*eventsToInsertOrUpdate.toTypedArray())
+
+                // fetch and store alarms for just changed events
+                eventsToInsertOrUpdate.forEach { eventEntity ->
+                    val alarmsResponse = calendarsApi.getEventAlarms(userId, eventEntity.calendarId, eventEntity.id)
+                    when (alarmsResponse) {
+                        is ApiResponse.Success -> {
+                            database.eventAlarmsDao().deleteAllByEventId(eventEntity.id)
+                            alarmsResponse.data.alarms.forEach { database.eventAlarmsDao().updateOrInsert(it) }
+                        }
+                        is ApiResponse.Error -> logger.e("error getting alarms for created/edited event: ${alarmsResponse.error}")
+                        is ApiResponse.Exception -> logger.e("exceptiom getting alarms for created/edited event: ${alarmsResponse.exception}")
+                    }
+                }
 
                 handleAlarmsUseCase.execute(userId)
 

@@ -43,6 +43,11 @@ interface CalendarsApi {
     suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int) : ApiResponse<AlarmsApiResponse>
 
     /**
+     * Gets all "active" (occuring in the future) alarms of type "DISPLAY" for given event.
+     */
+    suspend fun getEventAlarms(userId: UserId, calendarId: String, eventId: String) : ApiResponse<AlarmsApiResponse>
+
+    /**
      * Delete an event.
      */
     suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String) : ApiResponse<StatusCodeApiResponse>

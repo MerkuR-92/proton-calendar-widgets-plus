@@ -36,6 +36,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/alarms")
     suspend fun getAlarms(@Path("calendarId") calendarId: String, @Query("Start") startTimestamp: Long, @Query("End") endTimestamp: Long, @Query("PageSize") pageSize: Int) : AlarmsApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/alarms")
+    suspend fun getEventAlarms(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : AlarmsApiResponse
+
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : StatusCodeApiResponse
 
@@ -105,6 +108,15 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
     override suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int): ApiResponse<AlarmsApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getAlarms(calendarId, startTimestamp, endTimestamp, pageSize)
+        }.toApiResponse()
+
+    override suspend fun getEventAlarms(
+        userId: UserId,
+        calendarId: String,
+        eventId: String
+    ): ApiResponse<AlarmsApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getEventAlarms(calendarId, eventId)
         }.toApiResponse()
 
     override suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse> =
