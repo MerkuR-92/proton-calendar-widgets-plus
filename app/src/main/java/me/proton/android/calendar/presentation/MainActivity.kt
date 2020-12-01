@@ -242,12 +242,17 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
             is AccountViewModel.State.Processing -> {
-                displaySplashScreen(true)
+                displaySplashScreen(true, true)
             }
         }
     }
 
-    fun displaySplashScreen(display: Boolean) {
+    fun displaySplashScreen(display: Boolean, spinner: Boolean = false) {
+
+        if (spinner) {
+            calendarViewModel.fetchingEvents.postValue(display)
+        }
+
         drawerLayout.setDrawerLockMode(if (display) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED)
 
         val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm

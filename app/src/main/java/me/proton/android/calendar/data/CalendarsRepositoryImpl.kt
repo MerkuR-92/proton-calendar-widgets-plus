@@ -135,6 +135,8 @@ class CalendarsRepositoryImpl(
 
         eventsExpandedUntil = ZonedDateTime.now(timeZoneId)
 
+        val flow = MutableStateFlow<CalendarsRepository.InitingState>(CalendarsRepository.InitingState.Initing)
+
         if (coroutineScope.isActive) {
             logger.v("scope active, cancelling")
             coroutineScope.cancel()
@@ -146,6 +148,8 @@ class CalendarsRepositoryImpl(
         coroutineScope.launch {
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
+            logger.v("getting events from db")
+
             // Events
             val eventEntities = database.eventsDao().selectEvents()
             val transformedEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
@@ -154,6 +158,7 @@ class CalendarsRepositoryImpl(
                 // by fetching, user actions or
                 dbEvents.clear()
                 dbEvents.addAll(transformedEvents)
+                logger.v("transformed and inserted into db events: ${transformedEvents.size}")
             }
 
             // Calendars
@@ -161,7 +166,10 @@ class CalendarsRepositoryImpl(
             visibleCalendars.value = dbCalendars.value.filterVisible()
 
             // force expanding Events after cold init is done
-            expandEventsToDateChannel.send(eventsExpandedUntil.plusMonths(2).withDayOfMonth(1))
+            eventsExpandedUntil = eventsExpandedUntil.plusMonths(2).withDayOfMonth(1)
+            expandEventsToDateChannel.send(eventsExpandedUntil)
+
+            flow.value = CalendarsRepository.InitingState.Finished
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
         }
@@ -212,18 +220,7 @@ class CalendarsRepositoryImpl(
             fetchEventsChannel.consumeEach { fetchEventsInWindow(it) }
         }
 
-        return flow {
-            emit(CalendarsRepository.InitingState.Initing)
-
-            // if user has no Events in the database, perform cold init
-            val coldInitNeeded = database.calendarsDao().selectCalendars(userId).map { it.id }.all { database.eventsDao().count(it) == 0 }
-            if (coldInitNeeded) {
-                emit(CalendarsRepository.InitingState.ColdIniting)
-                coldInit(userId)
-            }
-
-            emit(CalendarsRepository.InitingState.Finished)
-        }
+        return flow
     }
 
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
@@ -471,7 +468,7 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
 
-        logger.v("expandDbEventsUntil ${toDateTime.toLocalDate()}")
+        logger.e("expandDbEventsUntil ${toDateTime.toLocalDate()}")
 
         fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
@@ -479,7 +476,7 @@ class CalendarsRepositoryImpl(
 
             allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
 
-            logger.v("expanded count: ${allEvents.value.size}")
+            logger.e("expanded total count: ${allEvents.value.size}")
 
             if (dbEvents.isNotEmpty()) {
                 eventsExpandedUntil = toDateTime

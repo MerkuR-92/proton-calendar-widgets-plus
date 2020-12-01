@@ -1,14 +1,17 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import me.proton.android.calendar.R
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
+import org.koin.ext.scope
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.TemporalAdjusters
+import kotlin.coroutines.coroutineContext
 
 /**
  * Sets up all the user's calendars, call this only once after successful login.
@@ -20,27 +23,28 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
-    private val createCalendarUseCase: CreateCalendarUseCase): UseCase {
+    private val createCalendarUseCase: CreateCalendarUseCase,
+    private val fetchEventsUseCase: FetchEventsUseCase
+): UseCase {
 
-    suspend fun execute(userId: UserId, defaultCalendarName: String) : UseCase.Result {
+    suspend fun execute(userId: UserId, defaultCalendarName: String): UseCase.Result {
 
         logger.v("executing BootstrapCalendarsUseCase")
 
         var calendarsResponse = calendarsApi.getCalendars(userId)
         if (calendarsResponse !is ApiResponse.Success) {
+            logger.e("error getting calendars from API in BootstrapCalendarsUseCase")
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
             calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+            logger.e("error no active calendar in BootstrapCalendarsUseCase")
             return UseCase.Result.Error("error user has no active calendar")
         }
 
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
-            when (createDefaultCalendarResult) {
-                is UseCase.Result.InvalidParams -> { logger.e("InvalidParams in CreateCalendarUseCase: ${createDefaultCalendarResult.message}") }
-                is UseCase.Result.Error -> { logger.e("Error in CreateCalendarUseCase: ${createDefaultCalendarResult.message}") }
-            }
+            createDefaultCalendarResult.ifSuccessAndLogErrors(logger) { }
 
             if (createDefaultCalendarResult !is UseCase.Result.Success) {
                 return UseCase.Result.Error("error unable to create default calendar for user")
@@ -52,6 +56,16 @@ class BootstrapCalendarsUseCase( // TODO TEST
             } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
                 return UseCase.Result.Error("error user has no calendar")
             } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+                return UseCase.Result.Error("error user has no active calendar")
+            }
+
+            calendarsResponse = calendarsApi.getCalendars(userId)
+            if (calendarsResponse !is ApiResponse.Success) {
+                logger.e("error getting calendars from API after creating default calendar")
+                return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
+            } else if (calendarsResponse.data.calendars.isNotEmpty() &&
+                calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+                logger.e("still no active calendar after creating default calendar")
                 return UseCase.Result.Error("error user has no active calendar")
             }
         }
@@ -92,8 +106,35 @@ class BootstrapCalendarsUseCase( // TODO TEST
                             //  but this should not cause any troubles
 
                             // if at least one calendar bootstrap succeeded, we save user and calendar settings
-                            calendarsRepository.persistCalendarUserSettings(userId.id, calendarUserSettingsResponse.data.calendarUserSettings)
+                            calendarsRepository.persistCalendarUserSettings(
+                                userId.id,
+                                calendarUserSettingsResponse.data.calendarUserSettings
+                            )
                             usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
+
+                            // fetch events
+                            val displayTimeZoneId =
+                                calendarUserSettingsResponse.data.calendarUserSettings.primaryTimezone
+                            val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
+                            val fetchEventsResult = fetchEventsUseCase.execute(
+                                userId,
+                                listOf(calendarEntity.id),
+                                now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
+                                now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
+                                displayTimeZoneId
+                            )
+
+                            fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
+                                if (fetchEventsResult.second == null) {
+                                    logger.e("fetchEventsResult: null event list when Sucess")
+                                } else {
+                                    fetchEventsResult.second?.let {
+                                        logger.v("persisting events in bootstrap: ${it.size}")
+                                        calendarsRepository.persistEvents(*it.toTypedArray())
+                                    }
+                                }
+                            }
+
                         }
                         is UseCase.Result.InvalidParams -> {
                             failedCalendarIds.add(calendarEntity.id)
