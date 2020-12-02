@@ -42,6 +42,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.presentation.utils.showForceUpdate
+import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
@@ -301,10 +302,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.selectUser()
             }
             if (user != null) {
-                userEmail = user.email
-                nav_view_main_content.nav_view_user_name.text = user.displayName
-                nav_view_main_content.nav_view_user_mail.text = user.email
-                val initials: String = getInitials(user.displayName)
+                userEmail = user.email ?: resources.getString(R.string.default_user_email)
+                nav_view_main_content.nav_view_user_name.text = user.displayName?.nullIfBlank() ?: resources.getString(R.string.default_user_display_name)
+                nav_view_main_content.nav_view_user_mail.text = user.email?.nullIfBlank() ?: resources.getString(R.string.default_user_email)
+                val initials: String = getInitials(user.displayName ?: " ")
                 nav_view_main_content.nav_view_user_initials.text = initials
             }
         }

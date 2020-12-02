@@ -9,11 +9,12 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_USERS
 import me.proton.android.calendar.data.entity.*
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
-    version = 23
+    version = 24
 )
 @TypeConverters(DatabaseTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -30,12 +31,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun membersDao(): MembersDao
     abstract fun passphrasesDao(): PassphrasesDao
     abstract fun publicKeysDao(): PublicKeysDao
-
-//    fun calendarsDaoForUser(userId: String) : CalendarsDao {
-//        return calendarsDao().apply {
-//            this.userId = userId
-//        }
-//    }
 
     companion object {
 
@@ -67,11 +62,24 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun buildDatabase(appContext: Context) =
             Room.databaseBuilder(appContext, AppDatabase::class.java, "proton.calendar.db")
-                .fallbackToDestructiveMigration() // TODO fixme, force-clear & proper migrations
-                //.addMigrations()
-                .build()
+                // TODO we leave it like this, it's better to crash the app
+                //  in runtime than crash on startup and have no crash logs
+                .fallbackToDestructiveMigration()
+                .addMigrations(
+                    //MIGRATION_23_24
+                ).build()
     }
 }
+
+//val MIGRATION_23_24 = object : Migration(23, 24) {
+//    override fun migrate(database: SupportSQLiteDatabase) {
+//
+//        // add nullable versions of already existing columns
+//        database.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN email_nullable TEXT")
+//        database.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN name_nullable TEXT")
+//        database.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN displayName_nullable TEXT")
+//    }
+//}
 
 /**
  * Custom Type Converters for Room.
@@ -88,13 +96,4 @@ private class DatabaseTypeConverters {
         return Json.encodeToString(json)
     }
 
-}
-
-private class Migration1To2 : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("CREATE TABLE IF NOT EXISTS list_items" +
-//                "('item_description' TEXT NOT NULL, 'item_priority' INTEGER NOT NULL," +
-//                "'list_category_id' INTEGER NOT NULL, 'id' INTEGER NOT NULL, PRIMARY KEY(id)," +
-//                "FOREIGN KEY('list_category_id') REFERENCES list_categories('id') ON DELETE CASCADE)")
-    }
 }

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -20,11 +21,11 @@ data class UserEntity(
     @SerialName("Keys")
     val keys: List<JsonElement>, // this is actually UserKey
     @SerialName("Email")
-    val email: String, // TODO this can change over time! this is user's primary address!
+    val email: String? = null, // this can change over time, it's user's primary address but can be null and user still has valid Addresses
     @SerialName("Name")
-    val name: String,
+    val name: String? = null,
     @SerialName("DisplayName")
-    val displayName: String,
+    val displayName: String? = null,
     @SerialName("Subscribed")
     val subscribed: Int,
     @SerialName("UsedSpace")
@@ -32,7 +33,7 @@ data class UserEntity(
     @SerialName("MaxSpace")
     val maxSpace: Long,
     @SerialName("Delinquent")
-    val delinquent: Int
+    val delinquent: Int,
 ) {
 
     fun toUser(): User {
@@ -42,7 +43,7 @@ data class UserEntity(
                 Json { this.ignoreUnknownKeys = true }.decodeFromJsonElement<UserKey>(it)
             },
             email = this.email,
-            displayName = if (this.displayName.isNotEmpty()) this.displayName else this.name,
+            displayName = this.displayName ?: this.name,
             subscribed = this.subscribed,
             usedSpace = this.usedSpace,
             maxSpace = this.maxSpace,

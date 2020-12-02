@@ -6,8 +6,8 @@ import kotlinx.serialization.SerialName
 data class User(
     override val id: String,
     val keys: List<UserKey>,
-    val email: String, // TODO find out how this can be changed over time
-    val displayName: String,
+    val email: String?,
+    val displayName: String?,
     val subscribed: Int,
     val usedSpace: Long,
     val maxSpace: Long,

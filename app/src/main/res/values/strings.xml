@@ -2,6 +2,8 @@
     <string name="app_name">ProtonCalendar</string>
 
     <string name="default_event_summary">(no title)</string>
+    <string name="default_user_email">(no email address)</string>
+    <string name="default_user_display_name">(no name)</string>
 
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
 
