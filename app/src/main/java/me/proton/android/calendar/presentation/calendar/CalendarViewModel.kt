@@ -63,7 +63,7 @@ class CalendarViewModel(
 
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
-    val fetchingEvents: MutableLiveData<Boolean> = MutableLiveData(false)
+    val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         return calendarsRepository.getActiveCalendars(userId.id).filter { it.isActive }
@@ -107,11 +107,7 @@ class CalendarViewModel(
                 when (it) {
                     CalendarsRepository.InitingState.Initing -> {
                         emit(it)
-                        logger.d("initing calendars repo")
-                    }
-                    CalendarsRepository.InitingState.ColdIniting -> {
-                        emit(it)
-                        logger.d("cold initing calendars repo")
+                        logger.e("initing calendars repo")
                     }
                     CalendarsRepository.InitingState.Finished -> {
                         initialised = true

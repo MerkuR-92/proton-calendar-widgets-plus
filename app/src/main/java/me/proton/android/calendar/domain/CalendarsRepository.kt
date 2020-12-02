@@ -153,7 +153,6 @@ interface CalendarsRepository {
 
     sealed class InitingState {
         object Initing : InitingState()
-        object ColdIniting : InitingState()
         object Finished : InitingState()
         object Error : InitingState()
     }

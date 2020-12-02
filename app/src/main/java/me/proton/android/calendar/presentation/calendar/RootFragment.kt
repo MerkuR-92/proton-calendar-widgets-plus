@@ -24,8 +24,16 @@ class RootFragment : Fragment(), KoinComponent {
         val rootView = inflater.inflate(R.layout.fragment_root, container, false)
 
         calendarViewModel.fetchingEvents.observe(viewLifecycleOwner, Observer {
-            root_progress_bar.visibleOrGone(it)
-            root_fetching_events_text.visibleOrGone(it)
+            if (it == null) {
+                root_progress_bar.visibleOrGone(false)
+                root_progress_text.visibleOrGone(false)
+                root_progress_text.text = ""
+            } else {
+                root_progress_bar.visibleOrGone(true)
+                root_progress_text.visibleOrGone(true)
+                root_progress_text.text = it
+            }
+
         })
 
         return rootView

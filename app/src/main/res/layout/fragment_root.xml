@@ -34,13 +34,13 @@
         android:focusable="false" />
 
     <TextView
-        android:id="@+id/root_fetching_events_text"
+        android:id="@+id/root_progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Text.DefaultSmall"
         android:visibility="gone"
         tools:visibility="visible"
-        android:text="@string/splash_fetching_events"
+        android:text=""
         android:textColor="@color/white"
         app:layout_constraintTop_toBottomOf="@+id/root_progress_bar"
         app:layout_constraintStart_toStartOf="@+id/root_progress_bar"

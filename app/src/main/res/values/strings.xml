@@ -205,7 +205,8 @@
     <string name="hello_slideshow_second">Hello SlideshowSecondFragment. Arg: %1$s</string>
     <string name="delete">Delete</string>
 
-    <string name="splash_fetching_events">Fetching events</string>
+    <string name="splash_after_login_init">Preparing calendars</string>
+    <string name="splash_init">Decrypting events</string>
     <string name="default_calendar_name">My Calendar</string>
 
 </resources>

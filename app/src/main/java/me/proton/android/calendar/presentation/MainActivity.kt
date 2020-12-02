@@ -86,23 +86,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.initForUser(userId).collect {
                     when (it) {
                         CalendarsRepository.InitingState.Initing -> {
-                            // TODO animation waiting for init
+                            calendarViewModel.fetchingEvents.postValue(resources.getString(R.string.splash_init))
                             logger.v("regular init, waiting in main activity")
                         }
-                        CalendarsRepository.InitingState.ColdIniting -> {
-                            calendarViewModel.fetchingEvents.postValue(true)
-                            // TODO animation waiting for cold init
-                            logger.v("waiting for cold init in main activity")
-                        }
                         CalendarsRepository.InitingState.Error -> {
-                            calendarViewModel.fetchingEvents.postValue(false)
+                            calendarViewModel.fetchingEvents.postValue(null)
                             logger.e("navigating from `account ready` but error initialising calendarViewModel")
 
                             accountViewModel.logoutPrimary()
                             calendarViewModel.shutdown()
                         }
                         CalendarsRepository.InitingState.Finished -> {
-                            calendarViewModel.fetchingEvents.postValue(false)
+                            calendarViewModel.fetchingEvents.postValue(null)
 
                             // Refresh drawer content now that we are logged in.
                             initDrawerHeader()
@@ -242,15 +237,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
             is AccountViewModel.State.Processing -> {
-                displaySplashScreen(true, true)
+                displaySplashScreen(true, true, resources.getString(R.string.splash_after_login_init))
             }
         }
     }
 
-    fun displaySplashScreen(display: Boolean, spinner: Boolean = false) {
+    fun displaySplashScreen(display: Boolean, spinner: Boolean = false, spinnerText: String? = null) {
 
         if (spinner) {
-            calendarViewModel.fetchingEvents.postValue(display)
+            calendarViewModel.fetchingEvents.postValue(spinnerText)
         }
 
         drawerLayout.setDrawerLockMode(if (display) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED)

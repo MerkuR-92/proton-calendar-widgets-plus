@@ -50,21 +50,15 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 return UseCase.Result.Error("error unable to create default calendar for user")
             }
 
-            calendarsResponse = calendarsApi.getCalendars(userId)
-            if (calendarsResponse !is ApiResponse.Success) {
-                return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
-            } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
-                return UseCase.Result.Error("error user has no calendar")
-            } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
-                return UseCase.Result.Error("error user has no active calendar")
-            }
-
+            // GET the calendar list again after creating default one
             calendarsResponse = calendarsApi.getCalendars(userId)
             if (calendarsResponse !is ApiResponse.Success) {
                 logger.e("error getting calendars from API after creating default calendar")
                 return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
-            } else if (calendarsResponse.data.calendars.isNotEmpty() &&
-                calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+            } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
+                logger.e("still no calendar after creating default calendar")
+                return UseCase.Result.Error("error user has no calendar")
+            } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
                 logger.e("still no active calendar after creating default calendar")
                 return UseCase.Result.Error("error user has no active calendar")
             }
