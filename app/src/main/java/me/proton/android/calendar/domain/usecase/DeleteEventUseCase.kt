@@ -30,6 +30,8 @@ class DeleteEventUseCase( // TODO TESTS
 
         val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
 
+        // We need timezone when adding ex dates to handle DST
+        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
 
         // TODO when event is in the middle of chain, we need to select the root event and deal with it accordingly!!!
 
@@ -38,7 +40,7 @@ class DeleteEventUseCase( // TODO TESTS
 
                 if (event.isRecurring()) {
                     // add EXDATE to it
-                    event.addExceptionDate(occurrenceNumber!!) // TODO
+                    event.addExceptionDate(occurrenceNumber!!, timezone) // TODO
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 }
                 else if (event.isSingleEdit()) {
@@ -46,7 +48,7 @@ class DeleteEventUseCase( // TODO TESTS
                     val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
 
                     // add EXDATE to root event
-                    rootEvent.addExceptionDate(occurrenceNumber!!) // TODO
+                    rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
                     editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
 
                     // delete the single edit

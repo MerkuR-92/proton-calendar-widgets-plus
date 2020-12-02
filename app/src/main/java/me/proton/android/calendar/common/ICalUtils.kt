@@ -10,14 +10,12 @@ import biweekly.property.Attendee
 import biweekly.property.ICalProperty
 import biweekly.property.RecurrenceRule
 import biweekly.property.Status
-import biweekly.util.ByDay
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import java.time.*
@@ -162,7 +160,7 @@ object ICalUtils {
         }
 
         iCalEvent.recurrenceRule.value.until?.let {
-            val untilDate = ZonedDateTime.ofInstant(it.toInstantWithTimezone(startTimeZone.id), ZoneId.of(startTimeZone.id))
+            val untilDate = it.toZonedDateTime(startTimeZone.id)
 
             val newUntilDate = if (startDate.isAfter(untilDate)) startDate else untilDate
 
@@ -429,7 +427,7 @@ object ICalUtils {
         val exZonedDateTimes =
             originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
                 exDates.values.map { exDate ->
-                    exDate.toInstantWithTimezone(timeZoneId)
+                    exDate.toZonedDateTime(timeZoneId)
                 }
             }
 
@@ -437,7 +435,7 @@ object ICalUtils {
             this
         } else {
             this.filterNot {
-                it.occurrence!!.startDateTime.toInstant() in exZonedDateTimes
+                it.occurrence!!.startDateTime in exZonedDateTimes
             }
         }
     }
@@ -647,20 +645,14 @@ fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
 
     if (this.dateStart?.value == null) return null // TODO
 
-    return ZonedDateTime.ofInstant(
-        this.dateStart.value.toInstantWithTimezone(timeZoneId),
-        ZoneId.of(timeZoneId)
-    )
+    return this.dateStart.value.toZonedDateTime(timeZoneId)
 }
 
 fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
 
     if (this.dateEnd?.value == null) return null // TODO
 
-    return ZonedDateTime.ofInstant(
-        this.dateEnd.value.toInstantWithTimezone(timeZoneId),
-        ZoneId.of(timeZoneId)
-    )
+    return this.dateEnd.value.toZonedDateTime(timeZoneId)
 }
 
 
@@ -676,18 +668,18 @@ fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQ
     }.map { it.value }.toList()
 }
 
-fun ICalDate.toInstantWithTimezone(timezone: String): Instant {
+fun ICalDate.toZonedDateTime(timezone: String): ZonedDateTime {
     return if (this.hasTime()) {
-        this.toInstant()
+        ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
     } else {
-        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone)).toInstant()
+        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
     }
 }
 
-fun Date.toInstantWithTimezone(timezone: String, isAllDay: Boolean): Instant {
+fun Date.toZonedDateTime(timezone: String, isAllDay: Boolean): ZonedDateTime {
     return if (!isAllDay) {
-        this.toInstant()
+        ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
     } else {
-        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone)).toInstant()
+        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
     }
 }

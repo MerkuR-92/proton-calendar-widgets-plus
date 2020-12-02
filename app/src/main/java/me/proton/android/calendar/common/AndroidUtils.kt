@@ -46,12 +46,10 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import okhttp3.internal.toHexString
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.util.*
 import java.util.Locale.getDefault
@@ -361,10 +359,7 @@ class AndroidUtils(context: Context) {
                     recurrence.until?.let {
                         context.getString(
                             R.string.event_recurrence_until,
-                            ZonedDateTime.ofInstant(
-                                it.toInstantWithTimezone(timeZoneId),
-                                ZoneId.of(timeZoneId)
-                            ).formatDate(timeZoneId)
+                            it.toZonedDateTime(timeZoneId).formatDate(timeZoneId)
                         )
                     },
                 ).joinToString(separator = ", ")

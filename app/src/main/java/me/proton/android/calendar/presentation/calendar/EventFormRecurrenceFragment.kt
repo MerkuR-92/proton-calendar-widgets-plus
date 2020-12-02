@@ -213,11 +213,11 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
                 .toLocalDate()
 
-            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toInstantWithTimezone(eventViewModel.displayTimeZoneId)
+            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toZonedDateTime(eventViewModel.displayTimeZoneId)
 
             val untilDate = eventViewModel.tempRecurrenceUntilLocalDate
                 ?: if (currentRecurrenceUntilInstant != null) {
-                    ZonedDateTime.ofInstant(currentRecurrenceUntilInstant, ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
+                    currentRecurrenceUntilInstant.toLocalDate()
                 } else eventStartDate
 
             // handle click on day picker
@@ -228,13 +228,11 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     untilDate,
                     eventStartDate,
                     FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
-                ) {
-                    eventViewModel.handleRecurrenceUntilDate(it)
-                    custom_recurrence_end_2.setText(
-                        getString(
-                            R.string.event_recurrence_ends_on_date,
-                            it.format()
-                        )
+                ) { newDate ->
+                    eventViewModel.handleRecurrenceUntilDate(newDate)
+                    custom_recurrence_end_2.text = getString(
+                        R.string.event_recurrence_ends_on_date,
+                        newDate.format()
                     )
                 }
             }
@@ -499,10 +497,8 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                         val isAllDay = eventViewModel.eventLiveData.value!!.isAllDay()
                         custom_recurrence_end_2.text = getString(
                             R.string.event_recurrence_ends_on_date,
-                            ZonedDateTime.ofInstant(
-                                this.until.toInstantWithTimezone(eventViewModel.eventTimeZoneId),
-                                ZoneId.of(eventViewModel.eventTimeZoneId)
-                            ).formatDate(eventViewModel.eventTimeZoneId)
+                            this.until.toZonedDateTime(eventViewModel.eventTimeZoneId)
+                                .formatDate(eventViewModel.eventTimeZoneId)
                         )
                     }
                     if (this.count != null) {
