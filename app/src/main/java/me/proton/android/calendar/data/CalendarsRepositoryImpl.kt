@@ -131,7 +131,10 @@ class CalendarsRepositoryImpl(
 
     override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
 
-        logger.d("initForUser $userId")
+        // TODO temporary solution for being stuck on expandEventsToDateChannel.send
+        shutdown()
+
+        logger.v("initForUser $userId")
 
         eventsExpandedUntil = ZonedDateTime.now(timeZoneId)
 
@@ -188,6 +191,7 @@ class CalendarsRepositoryImpl(
                     logger.v("expandEventsToDateChannel but publishing in flow: $it")
                     expandEventsToDateFlow.value = it
                 }
+                logger.v("leaving consume expandeventschannel")
             }
         }
 
@@ -468,7 +472,7 @@ class CalendarsRepositoryImpl(
 
     private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
 
-        logger.e("expandDbEventsUntil ${toDateTime.toLocalDate()}")
+        logger.v("expandDbEventsUntil ${toDateTime.toLocalDate()}")
 
         fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
@@ -476,7 +480,7 @@ class CalendarsRepositoryImpl(
 
             allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
 
-            logger.e("expanded total count: ${allEvents.value.size}")
+            logger.v("expanded total count: ${allEvents.value.size}")
 
             if (dbEvents.isNotEmpty()) {
                 eventsExpandedUntil = toDateTime

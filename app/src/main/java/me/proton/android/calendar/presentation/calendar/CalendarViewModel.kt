@@ -107,9 +107,10 @@ class CalendarViewModel(
                 when (it) {
                     CalendarsRepository.InitingState.Initing -> {
                         emit(it)
-                        logger.e("initing calendars repo")
+                        logger.v("initing calendars repo")
                     }
                     CalendarsRepository.InitingState.Finished -> {
+                        logger.v("finished initing calendars repo")
                         initialised = true
                         emit(it)
                     }

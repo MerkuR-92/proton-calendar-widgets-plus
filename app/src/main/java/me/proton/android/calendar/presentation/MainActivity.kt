@@ -87,18 +87,25 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.initForUser(userId).collect {
                     when (it) {
                         CalendarsRepository.InitingState.Initing -> {
-                            calendarViewModel.fetchingEvents.postValue(resources.getString(R.string.splash_init))
+                            withContext(Dispatchers.Main) {
+                                displaySplashScreen(true, true, resources.getString(R.string.splash_init))
+                            }
                             logger.v("regular init, waiting in main activity")
                         }
                         CalendarsRepository.InitingState.Error -> {
-                            calendarViewModel.fetchingEvents.postValue(null)
+                            withContext(Dispatchers.Main) {
+                                displaySplashScreen(false)
+                            }
                             logger.e("navigating from `account ready` but error initialising calendarViewModel")
 
                             accountViewModel.logoutPrimary()
                             calendarViewModel.shutdown()
                         }
                         CalendarsRepository.InitingState.Finished -> {
-                            calendarViewModel.fetchingEvents.postValue(null)
+                            logger.v("regular init, got finished")
+                            withContext(Dispatchers.Main) {
+                                displaySplashScreen(false)
+                            }
 
                             // Refresh drawer content now that we are logged in.
                             initDrawerHeader()
