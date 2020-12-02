@@ -20,7 +20,7 @@ class ForceUpdateViewModel @Inject constructor() : ViewModel() {
      * Public interface that should trigger
      */
     fun forceUpdate(apiErrorMessage: String) {
-        _forceUpdate.value = ForceUpdateInput(apiErrorMessage = apiErrorMessage, forceUpdate = true)
+        _forceUpdate.postValue(ForceUpdateInput(apiErrorMessage = apiErrorMessage, forceUpdate = true))
     }
 }
 

@@ -60,6 +60,7 @@
         <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.App.Body.Text</item>
         <item name="buttonBarPositiveButtonStyle">@style/MaterialDialogButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/MaterialDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/MaterialDialogButtonStyle</item>
     </style>
 
     <style name="PickerDialog" parent="Theme.AppCompat.DayNight.Dialog">
