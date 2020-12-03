@@ -167,7 +167,7 @@ object ICalUtils {
             val until : ICalDate = if (iCalEvent.dateStart.value.hasTime()) {
                 ICalDate(Date.from(ZonedDateTime.of(newUntilDate.toLocalDate(), LocalTime.of(23, 59, 59), ZoneId.of(startTimeZone.id)).withZoneSameInstant(ZoneId.of(startTimeZone.id)).toInstant()), true)
             } else {
-                ICalDate(Date.from(newUntilDate.withZoneSameLocal(ZoneId.systemDefault()).toInstant()), false)
+                ICalDate(newUntilDate.toLocalDate().toDate(ZoneId.systemDefault().id), false)
             }
 
             iCalEvent.recurrenceRule.value = iCalEvent.recurrenceRule.value.clone(

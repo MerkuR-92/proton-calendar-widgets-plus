@@ -492,8 +492,8 @@ class EventViewModel(
                 // - change COUNT to ((current occurrence number) - 1)
                 // OR
                 // - change UNTIL equal to (previous occurrence from just edited).endDate
-                val eventToCopy = if (dbEvent.isSingleEdit()) originalDbEvent else dbEvent
-                val dbEventToUpdate = eventToCopy!!.copy(iCalendar = eventToCopy.iCalendar.clone())
+                val dbEventToCopy = if (dbEvent.isSingleEdit()) originalDbEvent else dbEvent
+                val dbEventToUpdate = dbEventToCopy!!.copy(iCalendar = dbEventToCopy.iCalendar.clone())
                 // Bump sequence for original event
                 dbEventToUpdate.iCalEvent.setSequence((dbEventToUpdate.iCalEvent.sequence?.value ?: 0) + 1)
                 val timezone = event.defaultTimeZone!!
@@ -501,16 +501,19 @@ class EventViewModel(
                     dbEventToUpdate.iCalEvent.setRecurrenceRule(
                         Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
                             // TODO count = 0 will not happen because this edit option is not available for first occurrence
-                            .count(if (it.count != null) occurrenceNumber - 1 else null)
+                            .count(
+                                if (it.count != null) occurrenceNumber - 1
+                                else null
+                            )
                             .until(
-                                if (event.isAllDay()) {
+                                if (dbEventToUpdate.isAllDay()) {
                                     ICalDate(
-                                        eventToCopy.generateOccurrence(
-                                                occurrenceNumber - 1,
+                                        dbEventToUpdate.generateOccurrence(
+                                            occurrenceNumber,
                                             timezone
-                                            )!!.endDateTime
+                                        )!!.endDateTime
+                                            .minusDays(1)
                                             .with(ChronoField.HOUR_OF_DAY, 0)
-                                            .minusSeconds(1)
                                             .toLocalDate()
                                             .toDate(timezone)
                                         , false
@@ -519,25 +522,28 @@ class EventViewModel(
                                     // 1 second to midnight on the end-day of previous original occurrence
                                     ICalDate(
                                         Date.from(
-                                            ZonedDateTime.of(eventToCopy.generateOccurrence(occurrenceNumber - 1,
-                                            timezone)!!.endDateTime.toLocalDate(),
-                                            LocalTime.of(23, 59, 59), ZoneId.of(timezone)
-                                        ).toInstant()), true
+                                            ZonedDateTime.of(
+                                                dbEventToUpdate.generateOccurrence(
+                                                    occurrenceNumber,
+                                                    timezone
+                                                )!!.endDateTime.minusDays(1).toLocalDate(),
+                                                LocalTime.of(23, 59, 59), ZoneId.of(timezone)
+                                            ).toInstant()), true
                                     )
                                 }
                             )
                             .build()
                     )
+                }
 
-                    val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
-                    if (editOriginalEventResult != UseCase.Result.Success) {
-                        if (editOriginalEventResult is UseCase.Result.Error) {
-                            logger.e("error editing event: ${editOriginalEventResult.message}")
-                        } else if (editOriginalEventResult is UseCase.Result.Error) {
-                            logger.e("error editing event: ${editOriginalEventResult.message}")
-                        }
-                        return false
+                val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
+                if (editOriginalEventResult != UseCase.Result.Success) {
+                    if (editOriginalEventResult is UseCase.Result.Error) {
+                        logger.e("error editing event: ${editOriginalEventResult.message}")
+                    } else if (editOriginalEventResult is UseCase.Result.Error) {
+                        logger.e("error editing event: ${editOriginalEventResult.message}")
                     }
+                    return false
                 }
 
                 // TODO delete exdates after this occurrence?
@@ -911,7 +917,7 @@ class EventViewModel(
             }
             if (untilDate && tempRecurrenceUntilLocalDate != null) {
                 val until = if (event.isAllDay()) {
-                    ICalDate(tempRecurrenceUntilLocalDate!!.toDate(eventTimeZoneId), false)
+                    ICalDate(tempRecurrenceUntilLocalDate!!.toDate(ZoneId.systemDefault().id), false)
                 } else {
                     ICalDate(Date.from(ZonedDateTime.of(tempRecurrenceUntilLocalDate!!, LocalTime.of(23, 59, 59), ZoneId.of(eventTimeZoneId)).withZoneSameInstant(ZoneId.of(eventTimeZoneId)).toInstant()), true)
                 }

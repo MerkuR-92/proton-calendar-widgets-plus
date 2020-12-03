@@ -1748,6 +1748,44 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate occurrences of all-day event with UNTIL, GMT+2, displayed in GMT+2`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Vilnius
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;UNTIL=20210109
+    SEQUENCE:8
+    SUMMARY:Daily partial
+    STATUS:CONFIRMED
+    DTSTAMP:20201203T172430Z
+    UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
+    DTSTART;VALUE=DATE:20210107
+    DTEND;VALUE=DATE:20210107
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "UTC+12"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        TestsLogger.d("Timezone : ${ZoneId.systemDefault()}")
+        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, LocalDate.of(2021, 1, 9), null)!!
+
+        assertThat(occurrences.size).isEqualTo(3)
+    }
+
+    @Test
     fun `generate occurrences of partial-day event with UNTIL, GMT-11`() {
 
         val iCalString = """
