@@ -251,6 +251,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     fun displaySplashScreen(display: Boolean, spinner: Boolean = false, spinnerText: String? = null) {
+        // TODO Status bar and navigation bar colors are set to brand_norm on dark / light mode change because of activity recreation
 
         if (spinner) {
             calendarViewModel.fetchingEvents.postValue(spinnerText)
