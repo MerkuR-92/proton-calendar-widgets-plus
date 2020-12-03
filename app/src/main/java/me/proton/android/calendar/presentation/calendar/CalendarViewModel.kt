@@ -58,9 +58,6 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
-    private val _calendarIndicators: MutableLiveData<LocalDate> = MutableLiveData()
-    val calendarIndicators: LiveData<LocalDate> = _calendarIndicators
-
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)

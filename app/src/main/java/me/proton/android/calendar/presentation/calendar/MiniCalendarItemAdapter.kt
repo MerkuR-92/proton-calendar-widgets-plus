@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +36,10 @@ class MiniCalendarItemAdapter(
         //val FIRST_WEEKDAY = DayOfWeek.MONDAY
     }
 
+    private var selectedDate: LocalDate? = null
+    private var indicators: Map<LocalDate, List<String>>? = null
+    private val indicatorsMediator = MediatorLiveData<List<MiniCalendarItem>>()
+
     fun initialise() {
 
         val firstDayOfTheMonth = forDate.withDayOfMonth(1)
@@ -54,14 +59,56 @@ class MiniCalendarItemAdapter(
             MiniCalendarItem(date, false, true, emptyList())
         }
 
+        // submit month skeleton with only days and weekday names
         this.submitList(concatenate(headerItems, dummyItems, dayItems))
 
-        calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())).observe(lifecycleOwner) {
-            submitCalendarIndicators(forDate.month, it)
+        // subscribe for calendar indicators and selected date
+
+        indicatorsMediator.addSource(calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()))) {
+            indicators = it
+
+            if (indicators != null && selectedDate != null) {
+                indicatorsMediator.value = applyIndicatorsAndSelectedDate(indicators!!, selectedDate!!)
+            }
         }
-        calendarViewModel.selectedDate.observe(lifecycleOwner) {
-            markDayAsSelected(it)
+        indicatorsMediator.addSource(calendarViewModel.selectedDate) {
+            selectedDate = it
+
+            if (indicators != null && selectedDate != null) {
+                indicatorsMediator.value = applyIndicatorsAndSelectedDate(indicators!!, selectedDate!!)
+            }
         }
+        indicatorsMediator.observe(lifecycleOwner) {
+            submitList(it)
+        }
+
+    }
+
+    private fun applyIndicatorsAndSelectedDate(indicators: Map<LocalDate, List<String>>, selectedDate: LocalDate): List<MiniCalendarItem> {
+
+        val mutableList = currentList.toMutableList()
+
+        // update selected date
+        // select last index, because header items contain valid date for first days of the month
+        val currentIndex = currentList.indexOfLast { it?.isSelected == true }
+        if (currentIndex != -1) {
+            mutableList[currentIndex] = mutableList[currentIndex].copy(isSelected = false)
+        }
+        val indexToSelect = currentList.indexOfLast { it?.date == selectedDate }
+        if (indexToSelect != -1) {
+            mutableList[indexToSelect] = mutableList[indexToSelect].copy(isSelected = true)
+        }
+
+        // update calendar indicators
+        mutableList.forEachIndexed { index, miniCalendarItem ->
+            if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == forDate.month) {
+                val colors = indicators.getOrDefault(miniCalendarItem.date, emptyList())
+
+                mutableList[index] = miniCalendarItem.copy(indicatorColors = colors)
+            }
+        }
+
+        return mutableList
     }
 
     sealed class MiniCalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -123,40 +170,6 @@ class MiniCalendarItemAdapter(
             }
         }
 
-    }
-
-    @Synchronized
-    private fun markDayAsSelected(date: LocalDate) {
-
-        val mutableList = currentList.toMutableList()
-
-        // select last index, because header items contain valid date for first days of the month
-        val currentIndex = currentList.indexOfLast { it?.isSelected == true }
-        if (currentIndex != -1) {
-            mutableList[currentIndex] = mutableList[currentIndex].copy(isSelected = false)
-        }
-        val indexToSelect = currentList.indexOfLast { it?.date == date }
-        if (indexToSelect != -1) {
-            mutableList[indexToSelect] = mutableList[indexToSelect].copy(isSelected = true)
-        }
-
-        submitList(mutableList)
-    }
-
-    @Synchronized
-    private fun submitCalendarIndicators(month: Month, indicators: Map<LocalDate, List<String>>) {
-
-        val mutableList = currentList.toMutableList()
-
-        mutableList.forEachIndexed { index, miniCalendarItem ->
-            if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == month) {
-                val colors = indicators.getOrDefault(miniCalendarItem.date, emptyList())
-
-                mutableList[index] = miniCalendarItem.copy(indicatorColors = colors)
-            }
-        }
-
-        submitList(mutableList)
     }
 
     private val ITEM_TYPE_HEADER = 0
