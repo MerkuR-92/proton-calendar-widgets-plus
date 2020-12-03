@@ -175,9 +175,9 @@ class CalendarViewModel(
 
     }
 
-    private fun calculateCalendarIndicators(events: List<Event>): Map<Int, List<String>> {
+    private fun calculateCalendarIndicators(events: List<Event>): Map<LocalDate, List<String>> {
 
-        val indicators = mutableMapOf<Int, MutableSet<String>>().withDefault { mutableSetOf() }
+        val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
             var start = event.getActualStart(timeZoneId.id)!!.toLocalDate()
@@ -185,9 +185,9 @@ class CalendarViewModel(
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
-                val current = indicators.getValue(start.dayOfMonth)
+                val current = indicators.getValue(start)
                 current.add(event.calendar.color)
-                indicators[start.dayOfMonth] = current
+                indicators[start] = current
                 start = start.plusDays(1)
 
                 // All day events end on next day 00:00 so we need to break loop to exclude end day
@@ -204,7 +204,7 @@ class CalendarViewModel(
         }
     }
 
-    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate): LiveData<Map<Int, List<String>>> {
+    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate): LiveData<Map<LocalDate, List<String>>> {
         return eventsLiveData(fromDate, toDate).map {
             it?.let {
                 calculateCalendarIndicators(it)

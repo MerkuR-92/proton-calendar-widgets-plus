@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.children
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -144,13 +144,13 @@ class MiniCalendarItemAdapter(
     }
 
     @Synchronized
-    private fun submitCalendarIndicators(month: Month, indicators: Map<Int, List<String>>) {
+    private fun submitCalendarIndicators(month: Month, indicators: Map<LocalDate, List<String>>) {
 
         val mutableList = currentList.toMutableList()
 
         mutableList.forEachIndexed { index, miniCalendarItem ->
             if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null && miniCalendarItem.date.month == month) {
-                val colors = indicators.getOrDefault(miniCalendarItem.date.dayOfMonth, emptyList())
+                val colors = indicators.getOrDefault(miniCalendarItem.date, emptyList())
 
                 mutableList[index] = miniCalendarItem.copy(indicatorColors = colors)
             }
