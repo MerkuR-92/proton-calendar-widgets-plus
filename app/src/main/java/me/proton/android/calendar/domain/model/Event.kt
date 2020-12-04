@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -300,7 +301,14 @@ data class Event(
 
         val startICalDate = ICalDate(iCalEvent.dateStart.value, hasTime)
         val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(iCalEvent.dateStart) else TimeZone.getDefault()
-        val startIterator = iCalEvent.recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
+
+        val recurrenceRule = if (this.isAllDay() && this.iCalEvent.recurrenceRule?.value?.until != null) {
+            RecurrenceRule(this.iCalEvent.recurrenceRule.value.clone(until = ICalDate(this.iCalEvent.recurrenceRule.value.until, true)))
+        } else {
+            this.iCalEvent.recurrenceRule
+        }
+
+        val startIterator = recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
 
         val untilZonedDateTime = if (iCalEvent.recurrenceRule.value.until != null) {
             iCalEvent.recurrenceRule.value.until.toZonedDateTime(timeZoneId)

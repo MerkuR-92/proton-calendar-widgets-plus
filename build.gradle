@@ -12,7 +12,7 @@ buildscript {
                 "security": "1.1.0-alpha02",
                 "timber": "4.7.1",
                 "koin": "2.1.2",
-                "biweekly": "0.6.4",
+                "biweekly": "0.6.5",
                 "constraint_layout": "2.0.1",
                 "viewpager2": "1.1.0-alpha01",
                 "material": "1.2.1",
