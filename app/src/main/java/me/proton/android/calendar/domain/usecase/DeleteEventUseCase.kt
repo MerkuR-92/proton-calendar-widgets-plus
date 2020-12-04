@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.gson.Gson
+import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -61,7 +62,7 @@ class DeleteEventUseCase( // TODO TESTS
             }
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
-                val occurrenceStart = event.generateOccurrence(occurrenceNumber!! /* TODO*/, ZoneId.systemDefault().id /*TODO calendar's timezone?*/)?.startDateTime ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
+                val occurrenceStart = event.generateOccurrence(occurrenceNumber!!, if (event.isAllDay()) ZoneId.systemDefault().id else event.iCalendar.iCalTimeZone(event.iCalEvent.dateStart).id)?.startDateTime ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
 
                 event.handleDeleteThisAndFuture(occurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, event.calendar.id, event)
@@ -124,7 +125,7 @@ class DeleteEventUseCase( // TODO TESTS
         return deleteSingleEditsAfter(userId, eventId, recurrenceIdIsAfter)
     }
 
-    private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+        private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
         val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("event $eventId doesn't exist in DB")
         val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("event $eventId could not be transformed")

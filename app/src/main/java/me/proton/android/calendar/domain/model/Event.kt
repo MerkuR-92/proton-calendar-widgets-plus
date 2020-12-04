@@ -439,10 +439,15 @@ data class Event(
                     if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
                 ).build())
             } else { // otherwise, set or update UNTIL
-                generateOccurrence(occurrenceNumber, iCalendar.iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
+                // Use default timezone for part day only
+                generateOccurrence(occurrenceNumber, if (this.isAllDay()) ZoneId.systemDefault().id else iCalendar.iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
                     if (this.isAllDay()) {
                         this.iCalEvent.setRecurrenceRule(Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
-                            Date.from(it.startDateTime.minusDays(1).toInstant()),
+                            it.startDateTime
+                                .minusDays(1)
+                                .with(ChronoField.HOUR_OF_DAY, 0)
+                                .toLocalDate()
+                                .toDate(it.startDateTime.zone.id),
                             false
                         ).build())
                     } else {

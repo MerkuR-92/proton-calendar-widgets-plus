@@ -500,13 +500,16 @@ class EventViewModel(
                 dbEventToUpdate.iCalEvent.recurrenceRule?.value?.let {
                     dbEventToUpdate.iCalEvent.setRecurrenceRule(
                         Recurrence.Builder(dbEventToUpdate.iCalEvent.recurrenceRule.value)
-                            // TODO count = 0 will not happen because this edit option is not available for first occurrence
+                            // count = 0 will not happen because this edit option is not available for first occurrence
                             .count(
                                 if (it.count != null) occurrenceNumber - 1
                                 else null
                             )
                             .until(
-                                if (dbEventToUpdate.isAllDay()) {
+                                // Prioritize count over until
+                                if (it.count != null) {
+                                    null
+                                } else if (dbEventToUpdate.isAllDay()) {
                                     ICalDate(
                                         dbEventToUpdate.generateOccurrence(
                                             occurrenceNumber,
@@ -568,7 +571,7 @@ class EventViewModel(
                             event.iCalEvent.recurrenceRule?.value?.let {
                                 setRecurrenceRule(
                                     Recurrence.Builder(event.iCalEvent.recurrenceRule.value)
-                                        .count(if (it.count != null) it.count else null)
+                                        .count(if (it.count != null) it.count - (occurrenceNumber - 1) else null)
                                         // UNTIL is copied from event's RRULE
                                         .build()
                                 )
@@ -577,11 +580,6 @@ class EventViewModel(
                     }
                 )
                 if (dbEvent.isSingleEdit()) eventToCreate.iCalEvent.recurrenceId = null
-
-                //
-//            if (this.recurrenceRule?.value?.until != null) {
-//                this.recurrenceRule = RecurrenceRule(Recurrence.Builder(this.recurrenceRule.value).until(this.recurrenceRule?.value?.until, false).build())
-//            }
 
                 eventToCreate
             }
