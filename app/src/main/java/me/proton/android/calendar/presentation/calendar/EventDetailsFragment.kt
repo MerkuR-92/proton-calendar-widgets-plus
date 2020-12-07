@@ -49,8 +49,6 @@ import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 
 
@@ -287,9 +285,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (viewModeInitStatus == UseCase.Result.Success) {
                 observeEventLiveData()
                 attachActionHandlers()
-
-                // Keep drawer timezone updated using recently fetched EventViewModel displayTimezoneId
-                (requireActivity() as MainActivity).initDrawerTimeZone(eventViewModel.getDisplayTimeZone())
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 logger.e((viewModeInitStatus as UseCase.Result.Error).message)
@@ -412,7 +407,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     AndroidUtils.formatAlarm(
                         resources,
                         event.isAllDay(),
-                        calendarViewModel.timeFormatIs24Hour,
+                        calendarViewModel.timeFormatIs24Hour.value!!,
                         event.iCalEvent.getStart(eventViewModel.displayTimeZoneId)!!,
                         alarm
                     )

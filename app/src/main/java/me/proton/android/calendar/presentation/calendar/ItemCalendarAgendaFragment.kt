@@ -18,6 +18,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.displaySnackBar
 import me.proton.android.calendar.common.visibleOrInvisible
 import me.proton.android.calendar.domain.Logger
@@ -65,24 +66,31 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.item_calendar_agenda_fragment, container, false)
-
-        return rootView
+        return inflater.inflate(R.layout.item_calendar_agenda_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO To be tested but shouldn't happen
-        val immutableDate = date ?: return
+        calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
+            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour.value ?: return@observe
+            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour)
+        }
 
+        calendarViewModel.timeFormatIs24Hour.observe(viewLifecycleOwner) { timeFormatIs24Hour ->
+            val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
+            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour)
+        }
+    }
+
+    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean) {
+        val immutableDate = date ?: return
         logger.d("onViewCreated: $immutableDate")
 
         rv_agenda.apply {
-            //            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
             // TODO: Use ViewModel to get userEmail once we have proper user management
-            adapter = EventAdapter(calendarViewModel.timeZoneId.id, calendarViewModel.timeFormatIs24Hour, immutableDate, (requireActivity() as? MainActivity)?.getUserEmail()) {
+            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, (requireActivity() as? MainActivity)?.getUserEmail()) {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(

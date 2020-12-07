@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
@@ -46,7 +45,6 @@ import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -57,6 +55,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
+    private lateinit var navHostFragment: NavHostFragment
 
     private val logger: Logger by inject()
 
@@ -110,12 +109,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             // Refresh drawer content now that we are logged in.
                             initDrawerHeader()
                             initDrawerCalendarsListContent()
-
-                            withContext(Dispatchers.Main) {
-                                // Use UI Thread because initDrawerTimeZone changes timezone view visibility
-                                // TODO Remove once settings have been created
-                                initDrawerTimeZone()
-                            }
 
                             withContext(Dispatchers.Main) {
                                 findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
@@ -189,7 +182,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         clearError()
                         handleAccountState(this, state.value!!)
                     }.show()
-                materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
+                materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod =
+                    LinkMovementMethod.getInstance()
             })
         }
 
@@ -198,20 +192,34 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
 
-        appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
-        ), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
+            ), drawerLayout
+        )
         navView.setupWithNavController(navController)
 
-        nav_view_main_content.nav_view_version.text = getString(R.string.nav_view_version_name,
-            BuildConfig.VERSION_NAME)
+        nav_view_main_content.nav_view_version.text = getString(
+            R.string.nav_view_version_name,
+            BuildConfig.VERSION_NAME
+        )
 
         initDrawerListeners()
 
         initDrawerCalendarsList()
+
+        // Set timezone visibility to gone by default
+        nav_view_timezone.visibleOrGone(false)
+
+        calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
+            nav_view_timezone.visibleOrGone(true)
+            nav_view_timezone_login_title.text =
+                ICalUtils.formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
+        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
@@ -222,6 +230,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
             is AccountViewModel.State.Ready -> {
+                // Default navigate to root
+                navController.navigate(Navigation.Deeplink.toRoot())
 
                 val eventDetailsIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
@@ -319,15 +329,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    // TODO Remove once settings have been created
-    fun initDrawerTimeZone(timeZoneId: ZoneId? = null) {
-        val timeZone = timeZoneId ?: calendarViewModel.getTimeZone()
-        nav_view_timezone.visibleOrGone(timeZone != null)
-        timeZone?.let {
-            nav_view_timezone_login_title.text = ICalUtils.formatTimeZoneId(timeZone.id, ZonedDateTime.now(timeZone).toInstant())
-        }
-    }
-
     private fun initDrawerCalendarsList() {
         val activeCalendarListView = nav_view_main_content.nav_view_calendars_list
         val activeCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
@@ -406,5 +407,4 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             super.onBackPressed()
         }
     }
-
 }

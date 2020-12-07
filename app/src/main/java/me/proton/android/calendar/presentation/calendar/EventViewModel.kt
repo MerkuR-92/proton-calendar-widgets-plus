@@ -63,11 +63,6 @@ class EventViewModel(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     private val bgScope = CoroutineScope(Dispatchers.Default + viewModelJob)
 
-//    val userLiveData: LiveData<User> = liveData {
-//        val data = database.loadUser() // loadUser is a suspend function.
-//        emit(data)
-//    }
-
     private lateinit var event: Event
     // original event from database, from before it has been edited
     var dbEvent: Event? = null
@@ -119,8 +114,6 @@ class EventViewModel(
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return UseCase.Result.Error("could not get Calendar User Settings")
         userSettings = usersRepository.selectUserSettings(userId.id) ?: return UseCase.Result.Error("could not get User Settings")
-
-//        val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendarId) ?: return UseCase.Result.Error("could not get Calendar Settings")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 

@@ -22,7 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -32,7 +31,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
-import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -341,9 +339,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 if (navigationArguments.eventId == null) event_form_title.requestFocus()
                 observeEventLiveData()
                 attachActionHandlers()
-
-                // Keep drawer timezone updated using recently fetched EventViewModel displayTimezoneId
-                (requireActivity() as MainActivity).initDrawerTimeZone(eventViewModel.getDisplayTimeZone())
             } else {
                 // TODO display error and close? for example when we can't decrypt event
                 logger.e((viewModeInitStatus as UseCase.Result.Error).message)

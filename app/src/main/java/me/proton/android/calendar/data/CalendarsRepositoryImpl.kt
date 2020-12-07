@@ -16,7 +16,6 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
@@ -39,6 +38,7 @@ class CalendarsRepositoryImpl(
 
     // decrypted Events existing in database
     private val dbEvents = mutableListOf<Event>()
+
     // all Events including expanded
     private val allEvents = MutableStateFlow<List<Event>>(emptyList())
 
@@ -46,7 +46,8 @@ class CalendarsRepositoryImpl(
     private val displayedEvents = MutableStateFlow<List<Event>?>(null)
     private val displayedEventsMutex = Mutex()
 
-    override val fetchingState = MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
+    override val fetchingState =
+        MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
     private var fetchedWindows = mutableSetOf<FetchWindow>()
     private var fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -120,9 +121,9 @@ class CalendarsRepositoryImpl(
         // status at 0 means the address is disabled
 
         // if the calendar is inactive we keep the same flags but add the disabled flag
-        return if (dbCalendar.isInactive)  {
+        return if (dbCalendar.isInactive) {
             flags + CalendarFlags.DISABLED.value
-        } else  {
+        } else {
             // if the calendar is simply active we set the flags at disabled
             CalendarFlags.DISABLED.value
         }
@@ -195,10 +196,11 @@ class CalendarsRepositoryImpl(
         }
 
         coroutineScope.launch {
-            database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).collect { calendarEntities ->
-                dbCalendars.value = calendarEntities
-                visibleCalendars.value = calendarEntities.filterVisible()
-            }
+            database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
+                .collect { calendarEntities ->
+                    dbCalendars.value = calendarEntities
+                    visibleCalendars.value = calendarEntities.filterVisible()
+                }
         }
 
         coroutineScope.launch {
@@ -431,8 +433,14 @@ class CalendarsRepositoryImpl(
             }.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
 
             val result = mutableListOf<Event>()
-            result.addAll(filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
-            result.addAll(filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary })) ?: emptyList())
+            result.addAll(
+                filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
+                    ?: emptyList()
+            )
+            result.addAll(
+                filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
+                    ?: emptyList()
+            )
             result
 
             //filtered.groupBy { it.isAllDay() || !it.spansSingleDay() }.flatMap { it.value.sortedWith(comparator) }//.sortedBy { it.summary } //.sortedWith(compareBy({ !it.isAllDay() }, { it.occurrence?.startDateTime ?: it.getStart() }, { it.summary }))
@@ -465,7 +473,8 @@ class CalendarsRepositoryImpl(
 
     }
 
-    override suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean = database.eventsDao().hasEvent(eventId, calendarId)
+    override suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean =
+        database.eventsDao().hasEvent(eventId, calendarId)
 
     override suspend fun hasCalendar(calendarId: String, ): Boolean = database.calendarsDao().hasCalendar(calendarId)
 
@@ -495,7 +504,12 @@ class CalendarsRepositoryImpl(
      */
     private fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
         return if (event.isRecurring()) {
-            val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(event, allEvents.filter { it.uid == event.uid }, toDateTime.toLocalDate(), toDateTime.zone.id)!!
+            val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(
+                event,
+                allEvents.filter { it.uid == event.uid },
+                toDateTime.toLocalDate(),
+                toDateTime.zone.id
+            )!!
             val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event, toDateTime.zone.id)
 
             filteredByExdates
@@ -523,7 +537,8 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
+    override suspend fun selectEventEntity(eventId: String): EventEntity? =
+        database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
 
     override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
         val formattedUid = formatUidForICal(eventUid)
@@ -579,7 +594,8 @@ class CalendarsRepositoryImpl(
                 logger.v("${it.id}")
             }
 
-            val newlyExpandedAffectedEvents = affectedEvents.flatMap { expandDbEvent(it, affectedEvents, eventsExpandedUntil) }
+            val newlyExpandedAffectedEvents =
+                affectedEvents.flatMap { expandDbEvent(it, affectedEvents, eventsExpandedUntil) }
 
             logger.v("expanded to replace: ")
             newlyExpandedAffectedEvents.forEach {
@@ -589,8 +605,8 @@ class CalendarsRepositoryImpl(
 
             // 1. remove all related events because we just expanded them again along with new ones
             // 2. add newly expanded (new + related) events
-            allEvents.value = allEvents.value.filterNot {
-                    event -> relatedEvents.find { it.id == event.id } != null
+            allEvents.value = allEvents.value.filterNot { event ->
+                relatedEvents.find { it.id == event.id } != null
             } + newlyExpandedAffectedEvents
 
             updateAlarmsForAffectedEvents(newlyExpandedAffectedEvents, eventsExpandedUntil.zone.id)

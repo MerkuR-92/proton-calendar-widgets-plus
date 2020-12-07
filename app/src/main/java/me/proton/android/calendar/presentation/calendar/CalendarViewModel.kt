@@ -18,7 +18,6 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
-import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
 import java.time.DayOfWeek
@@ -33,8 +32,7 @@ class CalendarViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val logger: Logger,
-    private val updateCalendarUseCase: UpdateCalendarUseCase) : ViewModel() {
+    private val logger: Logger) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -49,11 +47,16 @@ class CalendarViewModel(
         viewModelJob.cancel()
     }
 
-    lateinit var timeZoneId: ZoneId
-    lateinit var startWeekOn: DayOfWeek
-    var timeFormatIs24Hour: Boolean = false // TODO maybe use settings directly
+    private val _timeZoneId: MutableLiveData<ZoneId> = MutableLiveData()
+    val timeZoneId: LiveData<ZoneId> = _timeZoneId
 
-    val initialToday = LocalDate.now()
+    private val _startWeekOn: MutableLiveData<DayOfWeek> = MutableLiveData()
+    val startWeekOn: LiveData<DayOfWeek> = _startWeekOn
+
+    private val _timeFormatIs24Hour: MutableLiveData<Boolean> = MutableLiveData()
+    val timeFormatIs24Hour: LiveData<Boolean> = _timeFormatIs24Hour
+
+    val initialToday: LocalDate = LocalDate.now()
 
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
@@ -85,22 +88,20 @@ class CalendarViewModel(
     // TODO go back to UserId as String
     suspend fun initForUser(userId: UserId): Flow<CalendarsRepository.InitingState> {
         return flow {
-
             // TODO make this prettier
             val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
             if (calendarUserSettings == null) logger.e("initForUser: calendarUserSettings was null")
             val timeZone = calendarUserSettings?.primaryTimezone
             if (timeZone == null) logger.e("initForUser: timeZone was null")
 
-            timeZoneId = ZoneId.of(timeZone)
-            startWeekOn = usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!
-            timeFormatIs24Hour =
-                usersRepository.selectUserSettings(userId.id)
-                    ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!
+            _timeZoneId.postValue(ZoneId.of(timeZone))
+            _startWeekOn.postValue(usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!)
+            _timeFormatIs24Hour.postValue(usersRepository.selectUserSettings(userId.id)
+                    ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!)
 
             this@CalendarViewModel.userId = userId
 
-            calendarsRepository.initForUser(userId.id, timeZoneId).collect {
+            calendarsRepository.initForUser(userId.id, ZoneId.of(timeZone)).collect {
                 when (it) {
                     CalendarsRepository.InitingState.Initing -> {
                         emit(it)
@@ -176,9 +177,14 @@ class CalendarViewModel(
 
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
+        val timeZoneId = timeZoneId.value?.id
+        if (timeZoneId == null) {
+            logger.e("timeZoneId was null in CalendarViewModel calculateCalendarIndicators")
+            return HashMap()
+        }
         events.forEach { event ->
-            var start = event.getActualStart(timeZoneId.id)!!.toLocalDate()
-            val end = event.getActualEnd(timeZoneId.id)!!.toLocalDate()
+            var start = event.getActualStart(timeZoneId)!!.toLocalDate()
+            val end = event.getActualEnd(timeZoneId)!!.toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
@@ -197,7 +203,12 @@ class CalendarViewModel(
 
     fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>?> {
         return liveData<List<Event>?> {
-            emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId.id).asLiveData(Dispatchers.Default))
+            val timeZoneId = timeZoneId.value?.id
+            if (timeZoneId == null) {
+                logger.e("timeZoneId was null in CalendarViewModel calculateCalendarIndicators")
+                return@liveData
+            }
+            emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId).asLiveData(Dispatchers.Default))
         }
     }
 
@@ -280,10 +291,5 @@ class CalendarViewModel(
             .build()
 
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
-    }
-
-    // Returns timezone id if it has been initialized
-    fun getTimeZone(): ZoneId? {
-        return if (this::timeZoneId.isInitialized) timeZoneId else null
     }
 }
