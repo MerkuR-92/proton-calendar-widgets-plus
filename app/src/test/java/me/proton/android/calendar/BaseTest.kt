@@ -8,8 +8,8 @@ import org.koin.test.KoinTest
 
 internal abstract class BaseTest {
 
-    fun eventForICalString(iCalString: String): Event {
-        return Event("event-id", me.proton.android.calendar.domain.model.Calendar(
+    fun eventForICalString(iCalString: String, eventId: String? = null): Event {
+        return Event(eventId ?: "event-id", me.proton.android.calendar.domain.model.Calendar(
             "calendar-id",
             "calendar",
             "",

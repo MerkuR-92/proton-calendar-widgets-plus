@@ -2,7 +2,9 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
 import me.proton.android.calendar.BaseTest
+import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import org.junit.jupiter.api.Test
 import java.time.*
 
@@ -245,6 +247,288 @@ internal class AlarmsTest : BaseTest() {
         )
         assertThat(alarmsZurich[2].action).isEqualTo(2)
         assertThat(alarmsZurich[2].trigger).isEqualTo("-P2DT16H")
+    }
+
+    val allDay1 = eventForICalString(
+        """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;UNTIL=20201212
+    EXDATE;VALUE=DATE:20201208
+    SEQUENCE:0
+    SUMMARY:All-day daily\, alarm 1 day before at 9 and on the day at 9
+    STATUS:CONFIRMED
+    UID:Z3nFwzbyM-VdOYquZ2sVk5H9LrHJ@proton.me
+    DTSTAMP:20201207T093547Z
+    DTSTART;VALUE=DATE:20201207
+    DTEND;VALUE=DATE:20201207
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    BEGIN:VALARM
+    TRIGGER:PT9H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent(), "event1")
+
+    val allDay2 = eventForICalString(
+        """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20201209
+    RECURRENCE-ID;VALUE=DATE:20201209
+    SEQUENCE:0
+    SUMMARY:All-day daily\, single edit
+    STATUS:CONFIRMED
+    UID:Z3nFwzbyM-VdOYquZ2sVk5H9LrHJ@proton.me
+    DTSTAMP:20201207T093547Z
+    DTEND;VALUE=DATE:20201209
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    BEGIN:VALARM
+    TRIGGER:PT9H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent(), "event1-single-edit-1")
+
+    val allDay3 = eventForICalString(
+        """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20201211
+    RECURRENCE-ID;VALUE=DATE:20201211
+    SEQUENCE:0
+    SUMMARY:All-day daily\, single edit with alarms at 10 instead of 9
+    STATUS:CONFIRMED
+    UID:Z3nFwzbyM-VdOYquZ2sVk5H9LrHJ@proton.me
+    DTSTAMP:20201207T093547Z
+    DTEND;VALUE=DATE:20201211
+    BEGIN:VALARM
+    TRIGGER:-PT14H
+    ACTION:DISPLAY
+    END:VALARM
+    BEGIN:VALARM
+    TRIGGER:PT10H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent(), "event1-single-edit-2")
+
+    val allDay4NoAlarms = eventForICalString(
+        """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20201211
+    SEQUENCE:0
+    SUMMARY:Unrelated single event on 11th\, alarm on the same day at 12:00
+    STATUS:CONFIRMED
+    UID:xl2GkVJxpLvn_Si_eBxtQAxBO_Ei@proton.me
+    DTSTAMP:20201207T173100Z
+    DTEND;VALUE=DATE:20201211
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent(), "event2")
+
+    @Test
+    fun `calculate all alarms for chain of all-day events`() {
+
+        // daily event happening from 7th to 12th
+        // deleted on 8th
+        // single edit on 9th and 11th
+        val sameUidEvents = listOf(allDay1, allDay2, allDay3, allDay4NoAlarms)
+
+        val until = LocalDate.of(2020, 12, 12)
+        val timeZoneId = "Pacific/Apia"
+        val zoneId = ZoneId.of(timeZoneId)
+        val expandedEvents = ICalUtils.expandOccurrencesWithSingleEdits(allDay1, sameUidEvents, until, timeZoneId)
+        val exDateFiltered = expandedEvents!!.filterOutOccurrencesByExdates(allDay1, timeZoneId)
+        val withOccurrences = exDateFiltered.map {
+            if (it.occurrence != null) {
+                it.withOccurrence(it.occurrence!!)
+            } else it
+        }
+
+        val alarms = withOccurrences.flatMap {
+            ICalUtils.calculateAlarmEntities(it, timeZoneId, "TODO")
+        }
+
+        alarms.forEach {
+            TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} -> ${it.eventId}")
+        }
+
+        assertThat(alarms.size).isEqualTo(10)
+
+        assertThat(Instant.ofEpochSecond(alarms[0].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 6, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms[1].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 7, 9, 0, 0, 0, zoneId)
+        )
+
+        assertThat(Instant.ofEpochSecond(alarms[2].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 8, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms[3].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 9, 9, 0, 0, 0, zoneId)
+        )
+
+        assertThat(Instant.ofEpochSecond(alarms[4].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 9, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms[5].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 10, 9, 0, 0, 0, zoneId)
+        )
+
+        assertThat(Instant.ofEpochSecond(alarms[6].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 10, 10, 0, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms[7].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 11, 10, 0, 0, 0, zoneId)
+        )
+
+        assertThat(Instant.ofEpochSecond(alarms[8].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 11, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms[9].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 12, 9, 0, 0, 0, zoneId)
+        )
+
+    }
+
+    @Test
+    fun `calculate upcoming alarms for chain of all-day events`() {
+
+        // daily event happening from 7th to 12th
+        // deleted on 8th
+        // single edit on 9th and 11th
+        val sameUidEvents = listOf(allDay1, allDay2, allDay3, allDay4NoAlarms)
+
+        val timeZoneId = "Asia/Tokyo"
+        val zoneId = ZoneId.of(timeZoneId)
+
+        val now1 = ZonedDateTime.of(2020, 12, 5, 9, 0, 0, 0, zoneId)
+        val alarms = ICalUtils.calculateUpcomingAlarmEntities(sameUidEvents, now1, "TODO")
+
+        alarms.forEach {
+            TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
+        }
+
+        assertThat(alarms.size).isEqualTo(6)
+
+        // first occurrence
+        assertThat(Instant.ofEpochSecond(alarms[0].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 6, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[0].eventId).isEqualTo("event1")
+        assertThat(Instant.ofEpochSecond(alarms[1].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 7, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[1].eventId).isEqualTo("event1")
+
+        // single edit on 9th
+        assertThat(Instant.ofEpochSecond(alarms[2].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 8, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[2].eventId).isEqualTo("event1-single-edit-1")
+        assertThat(Instant.ofEpochSecond(alarms[3].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 9, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[3].eventId).isEqualTo("event1-single-edit-1")
+
+        // single edit on 11th
+        assertThat(Instant.ofEpochSecond(alarms[4].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 10, 10, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[4].eventId).isEqualTo("event1-single-edit-2")
+        assertThat(Instant.ofEpochSecond(alarms[5].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 11, 10, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[5].eventId).isEqualTo("event1-single-edit-2")
+
+    }
+
+    @Test
+    fun `calculate upcoming alarms for chain of all-day events with EXDATE`() {
+
+        // TODO we're not returning recurring event occurrence so we're not 100% sure we return alarms for correct
+        //  occurrences -- this is checked manually in calculateUpcomingAlarmEntities
+
+        // daily event happening from 7th to 12th
+        // deleted on 8th
+        // single edit on 9th and 11th
+        val sameUidEvents = listOf(allDay1, allDay2, allDay3, allDay4NoAlarms)
+
+        val timeZoneId = "Asia/Tokyo"
+        val zoneId = ZoneId.of(timeZoneId)
+
+        val now2 = ZonedDateTime.of(2020, 12, 8, 12, 0, 0, 0, zoneId)
+        val alarms = ICalUtils.calculateUpcomingAlarmEntities(sameUidEvents, now2, "TODO")
+
+        alarms.forEach {
+            TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
+        }
+
+        // 2 alarms for occurrence on 10th
+        // 1 alarm for single edit on 9th
+        // 2 alarms at 10:00 for single edit on 11th
+
+        assertThat(alarms.size).isEqualTo(5)
+
+        assertThat(Instant.ofEpochSecond(alarms[0].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 9, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[0].eventId).isEqualTo("event1")
+        assertThat(Instant.ofEpochSecond(alarms[1].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 10, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[1].eventId).isEqualTo("event1")
+
+        // single edit on 9th, but only 1 alarm, because the other has passed
+        assertThat(Instant.ofEpochSecond(alarms[2].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 9, 9, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[2].eventId).isEqualTo("event1-single-edit-1")
+
+        assertThat(Instant.ofEpochSecond(alarms[3].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 10, 10, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[3].eventId).isEqualTo("event1-single-edit-2")
+        assertThat(Instant.ofEpochSecond(alarms[4].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 11, 10, 0, 0, 0, zoneId)
+        )
+        assertThat(alarms[4].eventId).isEqualTo("event1-single-edit-2")
+
+        // no more alarms for event:
+
+        val afterAllEvents = ZonedDateTime.of(2020, 12, 12, 12, 0, 0, 0, zoneId)
+        val noMoreAlarms = ICalUtils.calculateUpcomingAlarmEntities(sameUidEvents, afterAllEvents, "TODO")
+
+        assertThat(noMoreAlarms.isEmpty()).isTrue()
+
     }
 
 }

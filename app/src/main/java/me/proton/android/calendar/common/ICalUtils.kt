@@ -457,6 +457,25 @@ object ICalUtils {
         else Date.from(startDate.toInstant())
     }
 
+    fun calculateAlarmEntity(event: Event, vAlarm: VAlarm, timeZoneId: String, memberId: String): EventAlarmEntity {
+
+            val occurrence = ZonedDateTime.ofInstant(vAlarm.trigger.duration.add(event.iCalEvent.dateStart.value).toInstant(), ZoneId.systemDefault())
+
+            val occurrenceInTimeZone = if (event.isAllDay()) {
+                occurrence.withZoneSameLocal(ZoneId.of(timeZoneId))
+            } else occurrence
+
+            return EventAlarmEntity(
+                generateOfflineAlarmId(),
+                occurrenceInTimeZone.toEpochSecond(),
+                vAlarm.trigger.duration.toString(),
+                if (vAlarm.action.isDisplay) 2 else 1,
+                event.id,
+                memberId,
+                event.calendar.id
+            )
+    }
+
     /**
      * Calculates all Alarm Entities for any given Event occurrence in the format used in API.
      *
@@ -464,24 +483,39 @@ object ICalUtils {
      */
     fun calculateAlarmEntities(event: Event, timeZoneId: String, memberId: String): List<EventAlarmEntity> {
         return event.iCalEvent.alarms.map {
-
-            val occurrence = ZonedDateTime.ofInstant(it.trigger.duration.add(event.iCalEvent.dateStart.value).toInstant(), ZoneId.systemDefault())
-
-            val occurrenceInTimeZone = if (event.isAllDay()) {
-                occurrence.withZoneSameLocal(ZoneId.of(timeZoneId))
-            } else occurrence
-
-            EventAlarmEntity(
-                generateOfflineAlarmId(),
-                occurrenceInTimeZone.toEpochSecond(),
-                it.trigger.duration.toString(),
-                if (it.action.isDisplay) 2 else 1,
-                event.id,
-                memberId,
-                event.calendar.id
-            )
+            calculateAlarmEntity(event, it, timeZoneId, memberId)
         }
     }
+
+    fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
+    ): List<EventAlarmEntity> {
+        return events.flatMap { event ->
+            event.iCalEvent.alarms.mapNotNull { vAlarm ->
+
+                val triggerRelativeSeconds = vAlarm.trigger.duration.toMillis() / 1000
+//                TestsLogger.v("trigger $triggerRelativeSeconds (${vAlarm.trigger.duration}) }")
+
+                val generateOccurrenceSince = now.minusSeconds(triggerRelativeSeconds)
+//                TestsLogger.v("generating first occurrence since: ${generateOcurrenceSince} ")
+
+                val eventOccurrence = if (event.isRecurring()) {
+                    val occurrence = event.generateFirstRealOccurrenceSince(events, generateOccurrenceSince)
+                    occurrence?.let { event.withOccurrence(it) }
+                } else {
+                    event
+                }
+
+                eventOccurrence?.let {
+                    val alarmEntity = calculateAlarmEntity(it, vAlarm, now.zone.id, memberId)
+                    if (alarmEntity.occurrence >= now.toEpochSecond()) {
+//                        TestsLogger.v("returning alarmEntity (${Instant.ofEpochSecond(alarmEntity.occurrence).atZone(now.zone)}) for ${it.summary} at ${it.getActualStart(now.zone.id)} -> ${alarmEntity}")
+                    }
+                    alarmEntity
+                }
+            }
+        }.filter { it.occurrence >= now.toEpochSecond() }
+    }
+
 }
 
 data class CalendarSplit(

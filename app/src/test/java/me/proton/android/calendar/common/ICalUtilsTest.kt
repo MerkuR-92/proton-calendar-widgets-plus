@@ -1824,6 +1824,48 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate first occurrence SINCE with EXDATE of all-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Vilnius
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;UNTIL=20210520
+    SEQUENCE:8
+    STATUS:CONFIRMED
+    EXDATE;VALUE=DATE:20210121
+    EXDATE;VALUE=DATE:20210122
+    EXDATE;VALUE=DATE:20210123
+    DTSTAMP:20201203T172430Z
+    UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
+    DTSTART;VALUE=DATE:20210107
+    DTEND;VALUE=DATE:20210107
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "UTC+12"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        val firstOccurrence = event.generateFirstRealOccurrenceSince(listOf(event), ZonedDateTime.of(LocalDate.of(2021, 1, 21), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))!!
+
+        TestsLogger.d("${firstOccurrence}")
+
+        assertThat(firstOccurrence.occurrenceNumber).isEqualTo(18)
+        assertThat(firstOccurrence.startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2021, 1, 24), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+    }
+
+    @Test
     fun `generate first occurrence SINCE of part-day event`() {
 
         val iCalString = """

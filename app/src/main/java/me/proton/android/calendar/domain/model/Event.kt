@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -380,6 +381,42 @@ data class Event(
         return generateOccurrences(fromDateTime.zone.id, null, fromDateTime, null)?.firstOrNull()
     }
 
+    // TODO unify filtering by exdates and single edits
+
+    /**
+     * Filtered by exdates and taking single edits into consideration.
+     */
+    fun generateFirstRealOccurrenceSince(allEvents: List<Event>, fromDateTime: ZonedDateTime): Occurrence? {
+
+        val originalEvent = this
+        val watchdog = ZonedDateTime.now().plusYears(50)
+        var from = fromDateTime
+
+        while (from.isBefore(watchdog)) {
+            val firstOccurrence = generateOccurrences(fromDateTime.zone.id, null, from, null)?.firstOrNull() ?: return null
+            val firstEventWithOccurrence = this.withOccurrence(firstOccurrence)
+
+            val filteredBySingleEdits = listOf(firstEventWithOccurrence).filter { allEvents.find {
+                it.iCalEvent.recurrenceId?.value == ICalUtils.eventStartZonedDateTimeToDate(
+                    firstOccurrence.startDateTime,
+                    originalEvent.isAllDay()
+                )
+            } == null }
+
+//            TestsLogger.v("firstOccurrence $firstOccurrence")
+            val filteredByExdates = filteredBySingleEdits.filterOutOccurrencesByExdates(this, fromDateTime.zone.id)
+
+//            TestsLogger.v("filtered $filtered")
+            if (filteredByExdates.isNotEmpty()) {
+                return filteredByExdates.first().occurrence
+            } else {
+                from = firstOccurrence.startDateTime.plusNanos(1)
+            }
+        }
+
+        return null
+    }
+
     // TODO move all these helper methods to utils
 
 
@@ -603,7 +640,7 @@ data class Event(
     /**
      * Overwrites start & end datetime with [Occurrence] values.
      */
-    fun withOccurrence(occurrence: Occurrence): Event? {
+    fun withOccurrence(occurrence: Occurrence): Event {
         return this.copy(iCalendar = this.iCalendar.copy() as ICalendar).apply {
             if (this.isAllDay()) {
                 this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate())
