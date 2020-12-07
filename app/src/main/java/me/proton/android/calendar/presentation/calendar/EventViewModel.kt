@@ -417,6 +417,8 @@ class EventViewModel(
                         return false
                     }
 
+                    if (!handleOriginalEventNullSequence(dbEvent)) return false
+
                     val eventToCreate = event.copy( // TODO move to helper method?
                         id = ICalUtils.generateOfflineEventId(),
                         iCalendar = event.iCalendar.clone()
@@ -437,23 +439,13 @@ class EventViewModel(
                     }
                     eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !dbEvent.isAllDay()) // RecurrenceId has to be in original event's format
 
-                    // Update the sequence of parent if it didn't have a value before
-                    if (dbEvent.iCalEvent.sequence?.value == null) {
-                        dbEvent.iCalEvent.setSequence((dbEvent.iCalEvent.sequence?.value ?: 0) + 1)
-                        val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEvent.calendar.id, dbEvent)
-                        if (editOriginalEventResult != UseCase.Result.Success) {
-                            if (editOriginalEventResult is UseCase.Result.Error) {
-                                logger.e("error editing event: ${editOriginalEventResult.message}")
-                            } else if (editOriginalEventResult is UseCase.Result.Error) {
-                                logger.e("error editing event: ${editOriginalEventResult.message}")
-                            }
-                            return false
-                        }
-                    }
-
                     eventToCreate
 
                 } else if (dbEvent?.isSingleEdit() == true) {
+                    originalDbEvent?.let {
+                        if (!handleOriginalEventNullSequence(it)) return false
+                    }
+
                     val eventToCreate = event.copy(iCalendar = event.iCalendar.clone())
                     eventToCreate.iCalEvent.recurrenceRule = null
                     eventToCreate.iCalEvent.exceptionDates.clear()
@@ -785,9 +777,26 @@ class EventViewModel(
                 dbEventEnd != event.getEnd(eventTimeZoneId) ||
                 (dbEvent?.isSingleEdit() == false && dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule)
 
-        if (bumpSequence) {
+        if (bumpSequence || event.iCalEvent.sequence?.value == null) {
             event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO conflict resolution
         }
+    }
+
+    private suspend fun handleOriginalEventNullSequence(dbEvent: Event): Boolean {
+        // Update the sequence of parent if it didn't have a value before
+        if (dbEvent.iCalEvent.sequence?.value == null) {
+            dbEvent.iCalEvent.setSequence((dbEvent.iCalEvent.sequence?.value ?: 0) + 1)
+            val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEvent.calendar.id, dbEvent)
+            if (editOriginalEventResult != UseCase.Result.Success) {
+                if (editOriginalEventResult is UseCase.Result.Error) {
+                    logger.e("error editing event: ${editOriginalEventResult.message}")
+                } else if (editOriginalEventResult is UseCase.Result.Error) {
+                    logger.e("error editing event: ${editOriginalEventResult.message}")
+                }
+                return false
+            }
+        }
+        return true
     }
 
     suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
