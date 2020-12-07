@@ -1656,7 +1656,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)
 
         assertThat(occurrences!!.size).isEqualTo(4)
 
@@ -1691,7 +1691,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)!!
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)!!
 
         assertThat(occurrences.first()).isEqualTo(Event.Occurrence(
             ZonedDateTime.of(2020, 10, 1, 18, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
@@ -1734,7 +1734,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)!!
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)!!
 
         assertThat(occurrences.first()).isEqualTo(Event.Occurrence(
             ZonedDateTime.of(2020, 10, 2, 3, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
@@ -1749,7 +1749,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `generate occurrences of all-day event with UNTIL, GMT+2, displayed in GMT+2`() {
+    fun `generate occurrences of all-day event with UNTIL, GMT+2, displayed in GMT+12`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -1760,7 +1760,7 @@ internal class ICalUtilsTest {
     BEGIN:VEVENT
     RRULE:FREQ=DAILY;UNTIL=20210109
     SEQUENCE:8
-    SUMMARY:Daily partial
+    SUMMARY:Daily all-day
     STATUS:CONFIRMED
     DTSTAMP:20201203T172430Z
     UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
@@ -1781,9 +1781,88 @@ internal class ICalUtilsTest {
         ), iCal, null)
 
         TestsLogger.d("Timezone : ${ZoneId.systemDefault()}")
-        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, LocalDate.of(2021, 1, 9), null)!!
+        val occurrences = event.generateOccurrences(displayTimeZoneId, LocalDate.of(2021, 1, 9), null, null)!!
 
         assertThat(occurrences.size).isEqualTo(3)
+    }
+
+    @Test
+    fun `generate first occurrence SINCE of all-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Vilnius
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;UNTIL=20210520
+    SEQUENCE:8
+    STATUS:CONFIRMED
+    DTSTAMP:20201203T172430Z
+    UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
+    DTSTART;VALUE=DATE:20210107
+    DTEND;VALUE=DATE:20210107
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "UTC+12"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        val firstOccurrence = event.generateFirstOccurrenceSince(ZonedDateTime.of(LocalDate.of(2021, 1, 21), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))!!
+
+        assertThat(firstOccurrence.occurrenceNumber).isEqualTo(15)
+        assertThat(firstOccurrence.startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2021, 1, 21), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+    }
+
+    @Test
+    fun `generate first occurrence SINCE of part-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=/Europe/Budapest:20200625T100000
+    DTEND;TZID=/Europe/Budapest:20200625T103000
+    RRULE:FREQ=DAILY;COUNT=20
+    SUMMARY:recurring every day 20 times
+    UID:EGVy407XddW2_ESpoOVn7oN1qc9V@proton.me
+    DTSTAMP:20200625T143822Z
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Budapest"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        val firstOccurrence = event.generateFirstOccurrenceSince(ZonedDateTime.of(LocalDate.of(2020, 7, 4), LocalTime.of(10, 0, 0), ZoneId.of(displayTimeZoneId)))!!
+
+        assertThat(firstOccurrence.occurrenceNumber).isEqualTo(10)
+        assertThat(firstOccurrence.startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2020, 7, 4), LocalTime.of(10, 0, 0), ZoneId.of(displayTimeZoneId)))
+
+        val firstOccurrenceVilnius = event.generateFirstOccurrenceSince(ZonedDateTime.of(LocalDate.of(2020, 7, 4), LocalTime.of(10, 0, 0), ZoneId.of("Europe/Vilnius")))!!
+
+        assertThat(firstOccurrenceVilnius.occurrenceNumber).isEqualTo(10)
+        assertThat(firstOccurrenceVilnius.startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2020, 7, 4), LocalTime.of(11, 0, 0), ZoneId.of("Europe/Vilnius")))
     }
 
     @Test
@@ -1815,7 +1894,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        val occurrences = event.generateOccurrencesUntilOrCount(displayTimeZoneId, null, 10)
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)
 
         assertThat(occurrences!!.size).isEqualTo(4)
 

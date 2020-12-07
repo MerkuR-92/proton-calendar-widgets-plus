@@ -269,15 +269,17 @@ data class Event(
      * Generates all occurrences of a recurring Event until given LocalDate in TimeZone
      * or the first X occurrences, whatever comes first.
      *
+     * If only [fromDateTime] is provided, first occurrence will start at that date, or later.
+     *
      * Occurrences are in passed timezone, not in original Event's timezone.
      *
-     * You need to provide at least [toDate] or [occurrenceCount]
+     * You need to provide at least [toDate] or [occurrenceCount] or [fromDateTime]
      */
-    fun generateOccurrencesUntilOrCount(timeZoneId: String, toDate: LocalDate?, occurrenceCount: Int?): List<Occurrence>? {
+    fun generateOccurrences(timeZoneId: String, toDate: LocalDate?, fromDateTime: ZonedDateTime?, occurrenceCount: Int?): List<Occurrence>? {
 
         if (!isRecurring()) return null
 
-        if (toDate == null && occurrenceCount == null) return null
+        if (toDate == null && occurrenceCount == null && fromDateTime == null) return null
 
         val occurrences = mutableListOf<Occurrence>()
 
@@ -343,6 +345,11 @@ data class Event(
                 continue
             }
 
+            // ignore occurrences before the [fromDate]
+            if (fromDateTime != null && fromDateTime.isAfter(occurrenceStart)) {
+                continue
+            }
+
             if ((toDateTime != null && occurrenceStart.isAfter(toDateTime)) || (occurrenceCount != null && occurrenceNumber > occurrenceCount)) {
                 break
             }
@@ -363,7 +370,14 @@ data class Event(
      * Occurrences are in passed timezone, not in original Event's timezone.
      */
     fun generateOccurrencesUntil(toDate: LocalDate, timeZoneId: String): List<Occurrence>? {
-        return generateOccurrencesUntilOrCount(timeZoneId, toDate, null)
+        return generateOccurrences(timeZoneId, toDate, null, null)
+    }
+
+    /**
+     * Generate first occurrence happening at [fromDateTime] or later.
+     */
+    fun generateFirstOccurrenceSince(fromDateTime: ZonedDateTime): Occurrence? {
+        return generateOccurrences(fromDateTime.zone.id, null, fromDateTime, null)?.firstOrNull()
     }
 
     // TODO move all these helper methods to utils
@@ -495,7 +509,7 @@ data class Event(
      * @param occurrenceNumber has to be a positive number
      */
     fun generateOccurrence(occurrenceNumber: Int, timeZoneId: String): Occurrence? {
-        return generateOccurrencesUntilOrCount(timeZoneId, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
+        return generateOccurrences(timeZoneId, null, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
     }
 
     fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
