@@ -571,7 +571,17 @@ class EventViewModel(
                             event.iCalEvent.recurrenceRule?.value?.let {
                                 setRecurrenceRule(
                                     Recurrence.Builder(event.iCalEvent.recurrenceRule.value)
-                                        .count(if (it.count != null) it.count - (occurrenceNumber - 1) else null)
+                                        .count(
+                                            if (it.count != null) {
+                                                val originalCount = dbEventToCopy.iCalEvent.recurrenceRule.value.count
+                                                if (originalCount != null && originalCount == it.count) {
+                                                    it.count - (occurrenceNumber - 1)
+                                                } else {
+                                                    it.count
+                                                }
+                                            }
+                                            else null
+                                        )
                                         // UNTIL is copied from event's RRULE
                                         .build()
                                 )
