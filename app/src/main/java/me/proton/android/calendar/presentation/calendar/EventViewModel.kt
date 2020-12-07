@@ -514,7 +514,7 @@ class EventViewModel(
                                         dbEventToUpdate.generateOccurrence(
                                             occurrenceNumber,
                                             timezone
-                                        )!!.endDateTime
+                                        )!!.startDateTime
                                             .minusDays(1)
                                             .with(ChronoField.HOUR_OF_DAY, 0)
                                             .toLocalDate()
@@ -522,14 +522,14 @@ class EventViewModel(
                                         , false
                                     )
                                 } else {
-                                    // 1 second to midnight on the end-day of previous original occurrence
+                                    // 1 second to midnight on the start-day of previous original occurrence
                                     ICalDate(
                                         Date.from(
                                             ZonedDateTime.of(
                                                 dbEventToUpdate.generateOccurrence(
                                                     occurrenceNumber,
                                                     timezone
-                                                )!!.endDateTime.minusDays(1).toLocalDate(),
+                                                )!!.startDateTime.minusDays(1).toLocalDate(),
                                                 LocalTime.of(23, 59, 59), ZoneId.of(timezone)
                                             ).toInstant()), true
                                     )
