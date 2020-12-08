@@ -56,7 +56,7 @@ class ShowNotificationUseCase(
 
                         val trigger = Trigger(Duration.parse(eventAlarm.trigger), Related.START)
                         val occurrenceStartEpoch =
-                            Instant.ofEpochSecond((if (trigger.duration.isPrior) 1 else -1) * (trigger.duration.toMillis() / 1000) + eventAlarm.occurrence)
+                            Instant.ofEpochSecond(eventAlarm.occurrence - (trigger.duration.toMillis() / 1000))
 
                         logger.v("xxx calculated occurrence start for event: ${occurrenceStartEpoch.atZone(ZoneId.systemDefault())}")
 

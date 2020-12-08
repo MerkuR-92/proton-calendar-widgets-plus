@@ -270,17 +270,18 @@ data class Event(
      * Generates all occurrences of a recurring Event until given LocalDate in TimeZone
      * or the first X occurrences, whatever comes first.
      *
-     * If only [fromDateTime] is provided, first occurrence will start at that date, or later.
+     * If only [firstOccurrenceFromDateTime] is provided, first occurrence will start at that date, or later,
+     * and we will return only that first one. NOT all occurrences between <firstOccurrenceFromDateTime - toDate>
      *
      * Occurrences are in passed timezone, not in original Event's timezone.
      *
-     * You need to provide at least [toDate] or [occurrenceCount] or [fromDateTime]
+     * You need to provide at least [toDate] or [occurrenceCount] or [firstOccurrenceFromDateTime]
      */
-    fun generateOccurrences(timeZoneId: String, toDate: LocalDate?, fromDateTime: ZonedDateTime?, occurrenceCount: Int?): List<Occurrence>? {
+    fun generateOccurrences(timeZoneId: String, toDate: LocalDate?, firstOccurrenceFromDateTime: ZonedDateTime?, occurrenceCount: Int?): List<Occurrence>? {
 
         if (!isRecurring()) return null
 
-        if (toDate == null && occurrenceCount == null && fromDateTime == null) return null
+        if (toDate == null && occurrenceCount == null && firstOccurrenceFromDateTime == null) return null
 
         val occurrences = mutableListOf<Occurrence>()
 
@@ -347,7 +348,7 @@ data class Event(
             }
 
             // ignore occurrences before the [fromDate]
-            if (fromDateTime != null && fromDateTime.isAfter(occurrenceStart)) {
+            if (firstOccurrenceFromDateTime != null && firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
                 continue
             }
 
@@ -358,8 +359,8 @@ data class Event(
             occurrences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
 
             // ignore occurrences before the [fromDate]
-            if (fromDateTime != null) {
-                if (fromDateTime.isAfter(occurrenceStart)) {
+            if (firstOccurrenceFromDateTime != null) {
+                if (firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
                     continue
                 } else {
                     break

@@ -131,7 +131,7 @@ class HandleServerEventsUseCase(
                                 }
 
                             } else {
-                                logger.e("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
+                                logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                 calendarsRepository.persistEventAlarm(it.alarm)
                             }
 
