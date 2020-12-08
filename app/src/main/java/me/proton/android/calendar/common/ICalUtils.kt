@@ -373,7 +373,10 @@ object ICalUtils {
      * Generates UID in the form of "original UID prefix + recurrenceId + original UID postfix (after @ symbol)".
      */
     fun generateProtonUid(originalUid: String, recurrenceId: String): String {
-        return "${originalUid.substringBefore("@")}_R$recurrenceId@${originalUid.substringAfter("@")}"
+        // UID has a maximum length allowed so we need to remove existing date from originalUid
+        val dateRegex = Regex("_R\\d{8}T\\d{6}")
+        val cleanOriginalUid = originalUid.replace(dateRegex, "").substringBefore("@")
+        return "${cleanOriginalUid}_R$recurrenceId@${originalUid.substringAfter("@")}"
     }
 
     /**
@@ -682,4 +685,13 @@ fun Date.toZonedDateTime(timezone: String, isAllDay: Boolean): ZonedDateTime {
     } else {
         this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
     }
+}
+
+fun formatUidForICal(eventUid: String): String {
+    // ICal fields maximum length is 75 octets. It separates its values with "\r\n[space]" when needed. In order to fetch
+    //  the UID value from SharedEvents in DB, we need to add the ICal separator to our UID if its length is more than 75
+    return if ((ICAL_UID_PREFIX + eventUid).length > ICAL_LINE_MAXIMUM_LENGTH) {
+        val valueMaxLengthIndex = ICAL_LINE_MAXIMUM_LENGTH - ICAL_UID_PREFIX.length
+        eventUid.substring(0, valueMaxLengthIndex) + ICAL_LINE_SEPARATOR + eventUid.substring(valueMaxLengthIndex)
+    } else eventUid
 }

@@ -12,6 +12,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -527,7 +528,8 @@ class CalendarsRepositoryImpl(
     override suspend fun selectEventEntity(eventId: String): EventEntity? = database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
 
     override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
-        return database.eventsDao().selectByUid(eventUid).find { eventEntity ->
+        val formattedUid = formatUidForICal(eventUid)
+        return database.eventsDao().selectByUid(formattedUid).find { eventEntity ->
             eventEntity.sharedEvents.any {
                 try {
                     // only root event contains RRULE
