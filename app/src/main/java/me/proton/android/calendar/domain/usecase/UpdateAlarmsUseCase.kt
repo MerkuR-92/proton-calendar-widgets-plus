@@ -7,6 +7,7 @@ import android.content.Intent
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutDuplicates
+import me.proton.android.calendar.common.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
@@ -40,7 +41,7 @@ class UpdateAlarmsUseCase(
                 logger.e("could not transform event in UpdateAlarmsUseCase")
                 null
             } else {
-                Pair(originalEvent, database.eventsDao().selectByUid(originalEvent.uid))
+                Pair(originalEvent, database.eventsDao().selectByUid(formatUidForICal(originalEvent.uid)))
             }
         }
 

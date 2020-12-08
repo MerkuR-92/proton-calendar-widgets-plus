@@ -403,7 +403,7 @@ data class Event(
         var from = fromDateTime
 
         while (from.isBefore(watchdog)) {
-            val firstOccurrence = generateOccurrences(fromDateTime.zone.id, null, from, null)?.firstOrNull() ?: return null
+            val firstOccurrence = generateFirstOccurrenceSince(from) ?: return null
             val firstEventWithOccurrence = this.withOccurrence(firstOccurrence)
 
             val filteredBySingleEdits = listOf(firstEventWithOccurrence).filter { allEvents.find {
