@@ -40,7 +40,8 @@ class CalendarViewModel(
 
     var initialised = false
 
-    private lateinit var userId: UserId
+    private val _userId: MutableLiveData<UserId> = MutableLiveData()
+    val userId: LiveData<UserId> = _userId
 
     override fun onCleared() {
         super.onCleared()
@@ -66,23 +67,43 @@ class CalendarViewModel(
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {
-        return calendarsRepository.getActiveCalendars(userId.id).filter { it.isActive }
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getActiveCalendars")
+            return arrayListOf()
+        }
+        return calendarsRepository.getActiveCalendars(userId).filter { it.isActive }
     }
 
     fun selectActiveCalendars(): LiveData<List<CalendarEntity>> {
-        return calendarsRepository.flowCalendars(userId.id).map { calendars ->
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel selectActiveCalendars")
+            return MutableLiveData()
+        }
+        return calendarsRepository.flowCalendars(userId).map { calendars ->
             calendars.filter { it.isActive }
         }.asLiveData(Dispatchers.Default)
     }
 
     fun selectDisabledCalendars(): LiveData<List<CalendarEntity>> {
-        return calendarsRepository.flowCalendars(userId.id).map { calendars ->
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
+            return MutableLiveData()
+        }
+        return calendarsRepository.flowCalendars(userId).map { calendars ->
             calendars.filter { it.isDisabled }
         }.asLiveData(Dispatchers.Default)
     }
 
     suspend fun selectUser(): User? {
-        return usersRepository.selectUserById(userId.id)
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel selectUser")
+            return null
+        }
+        return usersRepository.selectUserById(userId)
     }
 
     // TODO go back to UserId as String
@@ -99,7 +120,7 @@ class CalendarViewModel(
             _timeFormatIs24Hour.postValue(usersRepository.selectUserSettings(userId.id)
                     ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!)
 
-            this@CalendarViewModel.userId = userId
+            this@CalendarViewModel._userId.postValue(userId)
 
             calendarsRepository.initForUser(userId.id, ZoneId.of(timeZone)).collect {
                 when (it) {
@@ -226,6 +247,11 @@ class CalendarViewModel(
                             toDate: LocalDate,
                             timeZoneId: String) {
 
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            return
+        }
         withContext(Dispatchers.IO) {
             calendarsRepository.fetchEvents(userId, fromDate, toDate, timeZoneId)
         }
@@ -236,6 +262,11 @@ class CalendarViewModel(
                                   occurrenceNumber: Int? = null): UseCase.Result {
 
         // TODO ÜBER IMPORTANT -- FIXME, PUT INTO WORKER!!!!!!!
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            return UseCase.Result.Error("User ID was null in CalendarViewModel handleDeleteEvent")
+        }
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
                 deleteEventUseCase.execute(userId, eventId, deleteOption, occurrenceNumber) // TODO UserId
@@ -250,8 +281,13 @@ class CalendarViewModel(
     }
 
     suspend fun updateCalendar(calendarEntity: CalendarEntity) {
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            return
+        }
         withContext(Dispatchers.IO) {
-            calendarsRepository.updateCalendar(userId.id, calendarEntity)
+            calendarsRepository.updateCalendar(userId, calendarEntity)
         }
     }
 
@@ -265,7 +301,7 @@ class CalendarViewModel(
             .setInputData(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR_LIST,
-                    UseCaseWorker.INPUT_USER_ID to userId.id
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id
                 )
             )
             .build()
@@ -284,7 +320,7 @@ class CalendarViewModel(
             .setInputData(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
                     UseCaseWorker.INPUT_CALENDAR_ID to calendarId
                 )
             )
