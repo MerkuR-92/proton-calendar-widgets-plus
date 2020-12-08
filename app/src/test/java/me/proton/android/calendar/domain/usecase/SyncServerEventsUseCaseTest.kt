@@ -34,6 +34,7 @@ internal class SyncServerEventsUseCaseTest {
     private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
     private val calendarsApi: CalendarsApi = mockk()
     private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
+    private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
 
     private val userId = UserId("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
@@ -103,6 +104,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
             coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
+            coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
             coEvery { calendarsApi.getEvent(any(), any(), any()) } returns ApiResponse.Success(
                 EventApiResponse(EventEntity(
                     "id",
@@ -119,7 +121,7 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList()))
             )
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarsApi)
+            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarsApi)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
@@ -145,6 +147,9 @@ internal class SyncServerEventsUseCaseTest {
             }
             coVerify(exactly = 6) {
                 calendarsRepositoryMock.persistEvents(any())
+            }
+            coVerify(exactly = 6) {
+                updateAlarmsUseCaseMock.execute(userId.id, any())
             }
             coVerify(exactly = 2) {
                 usersRepositoryMock.updateAddress(userId.id, any())

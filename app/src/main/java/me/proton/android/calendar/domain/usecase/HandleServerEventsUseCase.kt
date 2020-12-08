@@ -20,6 +20,7 @@ class HandleServerEventsUseCase(
     private val usersRepository: UsersRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
 
@@ -72,6 +73,7 @@ class HandleServerEventsUseCase(
                         when (singleEventResponse) {
                             is ApiResponse.Success -> {
                                 calendarsRepository.persistEvents(singleEventResponse.data.event)
+                                updateAlarmsUseCase.execute(userId.id, listOf(singleEventResponse.data.event.id))
 
                                 // TODO move this to worker, remove duplicated code
                                 try {
@@ -96,9 +98,6 @@ class HandleServerEventsUseCase(
                 )
             }
 
-            // if events changed, maybe also alarms changed so we need to reschedule them
-            if (eventsResponse.calendarAlarms?.isNotEmpty() == true) handleAlarmsUseCase.execute(userId)
-
             eventsResponse.calendarAlarms?.forEach {
                 it.handleAction(
                     {
@@ -118,7 +117,8 @@ class HandleServerEventsUseCase(
                                     is ApiResponse.Success -> {
                                         logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
                                         calendarsRepository.persistEvents(event.data.event)
-                                        logger.e("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
+                                        updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
+                                        logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                         calendarsRepository.persistEventAlarm(it.alarm)
                                     }
                                     // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get

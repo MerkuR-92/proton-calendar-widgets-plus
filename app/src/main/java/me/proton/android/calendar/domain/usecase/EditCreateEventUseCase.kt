@@ -19,7 +19,9 @@ class EditCreateEventUseCase(
     private val calendarsRepository: CalendarsRepository,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
-    private val database: AppDatabase): UseCase {
+    private val database: AppDatabase,
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+    ): UseCase {
 
     suspend fun execute(userId: UserId, calendarId: String, newEvent: Event) : UseCase.Result {
 
@@ -209,9 +211,11 @@ class EditCreateEventUseCase(
                 }
 
                 calendarsRepository.persistEvents(*eventsToInsertOrUpdate.toTypedArray())
+                updateAlarmsUseCase.execute(userId.id, eventsToInsertOrUpdate.map { it.id })
 
+                // TODO we don't need it anymore, since all alarms are calculated locally
                 // fetch and store alarms for just changed events
-                eventsToInsertOrUpdate.forEach { eventEntity ->
+                /*eventsToInsertOrUpdate.forEach { eventEntity ->
                     val alarmsResponse = calendarsApi.getEventAlarms(userId, eventEntity.calendarId, eventEntity.id)
                     when (alarmsResponse) {
                         is ApiResponse.Success -> {
@@ -221,9 +225,7 @@ class EditCreateEventUseCase(
                         is ApiResponse.Error -> logger.e("error getting alarms for created/edited event: ${alarmsResponse.error}")
                         is ApiResponse.Exception -> logger.e("exceptiom getting alarms for created/edited event: ${alarmsResponse.exception}")
                     }
-                }
-
-                handleAlarmsUseCase.execute(userId)
+                }*/
 
                 // TODO collect and handle multiple errors
                 if (syncResponse.data.responses.any { !it.response.isSuccessful }) {

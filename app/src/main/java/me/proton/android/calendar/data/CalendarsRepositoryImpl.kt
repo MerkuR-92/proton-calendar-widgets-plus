@@ -17,10 +17,7 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
-import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
-import me.proton.android.calendar.domain.usecase.TransformEventUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import java.time.*
 import java.time.temporal.TemporalAdjusters
@@ -32,7 +29,8 @@ class CalendarsRepositoryImpl(
     private val transformEventUseCase: TransformEventUseCase,
     private val logger: Logger,
     private val fetchEventsUseCase: FetchEventsUseCase,
-    private val handleAlarmsUseCase: HandleAlarmsUseCase) : CalendarsRepository {
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+) : CalendarsRepository {
 
     private val eventsMutex = Mutex()
 
@@ -251,8 +249,8 @@ class CalendarsRepositoryImpl(
 
                 fetchEventsResult.second?.let {
                     persistEvents(*it.toTypedArray())
+                    updateAlarmsUseCase.execute(fetchWindow.userId.id, it.map { it.id })
                     fetchedWindows.add(fetchWindow)
-                    handleAlarmsUseCase.execute(fetchWindow.userId)
                 }
             }
 
@@ -609,8 +607,6 @@ class CalendarsRepositoryImpl(
                 relatedEvents.find { it.id == event.id } != null
             } + newlyExpandedAffectedEvents
 
-            updateAlarmsForAffectedEvents(newlyExpandedAffectedEvents, eventsExpandedUntil.zone.id)
-
             // replace (raw, not expanded) events in dbEvents, they are read when scrolling & expanding
             dbEvents.removeAll { event -> affectedEvents.find { event.id == it.id } != null }
             logger.v("persistEvents dbEvents: ${dbEvents.size} adding ${affectedEvents.size}")
@@ -618,36 +614,6 @@ class CalendarsRepositoryImpl(
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
 
-        }
-
-    }
-
-    private suspend fun updateAlarmsForAffectedEvents(events: List<Event>, timeZoneId: String) {
-
-        logger.v("updateAlarmsForAffectedEvents:")
-
-        val now = ZonedDateTime.now()
-
-        val upcomingOccurrences = events.filter {
-            if (it.isAllDay()) {
-                it.getActualStart(timeZoneId)?.toLocalDate()?.isBefore(now.toLocalDate()) == false
-            } else {
-                it.getActualStart(timeZoneId)?.isBefore(now) == false
-            }
-        }.groupBy { it.id }.map { it.value.first() }
-
-        upcomingOccurrences.forEach {
-            logger.v("alarms for upcoming: $it")
-
-            val alarms = ICalUtils.calculateAlarmEntities(it, timeZoneId, "TODO")
-
-            logger.v("deleting all alarms for `${it.summary}` and creating new ones")
-
-            deleteEventAlarmsForEvent(it.id)
-            alarms.forEach {
-                logger.v("at: ${Instant.ofEpochSecond(it.occurrence)}")
-                persistEventAlarm(it)
-            }
         }
 
     }

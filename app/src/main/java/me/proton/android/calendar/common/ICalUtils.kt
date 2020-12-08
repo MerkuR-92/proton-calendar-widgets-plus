@@ -487,6 +487,13 @@ object ICalUtils {
         }
     }
 
+    /**
+     * Calculates upcoming Alarms (triggering starting from [now]) for the upcoming occurrences of all the events
+     * supplied, filtered by exdates and single edits if they are in [events].
+     *
+     * If you need to refresh all alarms for an Event, it's best to supply here all the events in chain
+     * (sharing the same UID).
+     */
     fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
     ): List<EventAlarmEntity> {
         return events.flatMap { event ->

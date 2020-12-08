@@ -24,7 +24,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val createCalendarUseCase: CreateCalendarUseCase,
-    private val fetchEventsUseCase: FetchEventsUseCase
+    private val fetchEventsUseCase: FetchEventsUseCase,
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String): UseCase.Result {
@@ -125,6 +126,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                                     fetchEventsResult.second?.let {
                                         logger.v("persisting events in bootstrap: ${it.size}")
                                         calendarsRepository.persistEvents(*it.toTypedArray())
+                                        updateAlarmsUseCase.execute(userId.id, it.map { it.id })
                                     }
                                 }
                             }

@@ -12,6 +12,7 @@ import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
+import java.time.ZoneId
 
 class HandleAlarmsUseCase(
     private val logger: Logger,
@@ -74,7 +75,7 @@ class HandleAlarmsUseCase(
 
     private fun rescheduleSystemAlarm(atInstant: Instant) {
 
-        logger.d("HandleAlarmsUseCase scheduling next alarm at ${atInstant}")
+        logger.d("HandleAlarmsUseCase scheduling next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -87,6 +88,5 @@ class HandleAlarmsUseCase(
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
     }
-
 
 }
