@@ -56,19 +56,18 @@ class ShowNotificationUseCase(
 
                         val trigger = Trigger(Duration.parse(eventAlarm.trigger), Related.START)
                         val occurrenceStartEpoch =
-                            Instant.ofEpochSecond((if (trigger.duration.isPrior) -1 else 1) * (trigger.duration.toMillis() / 1000) + eventAlarm.occurrence)
+                            Instant.ofEpochSecond((if (trigger.duration.isPrior) 1 else -1) * (trigger.duration.toMillis() / 1000) + eventAlarm.occurrence)
 
-                        logger.v("calculated occurrence start for event: ${occurrenceStartEpoch}")
+                        logger.v("xxx calculated occurrence start for event: ${occurrenceStartEpoch.atZone(ZoneId.systemDefault())}")
 
                         // generate occurrence based on Alarm Trigger and Alarm Occurrence
-                        val alarmOccurrence = dbEvent.generateOccurrencesUntil(
+                        val alarmOccurrence = dbEvent.generateFirstOccurrenceSince(
                             ZonedDateTime.ofInstant(
                                 occurrenceStartEpoch,
                                 systemDefaultZoneId
-                            ).toLocalDate(), systemDefaultZoneId.id
-                        )?.lastOrNull()
+                            ))
 
-                        logger.v("occurrence for alarm: $alarmOccurrence")
+                        logger.v("xxx occurrence for alarm: $alarmOccurrence")
                         if (alarmOccurrence == null) {
                             logger.e("could not generate occurrence for notification of recurring event")
                             null
@@ -76,7 +75,7 @@ class ShowNotificationUseCase(
 
                     } else null
 
-                    logger.v("generated occurrence: ${eventWithOccurrence}")
+                    logger.v("xxx generated occurrence: ${eventWithOccurrence}")
 
                     val intent = MainViewModel.createMainIntentToShowEventDetails(
                         context,
