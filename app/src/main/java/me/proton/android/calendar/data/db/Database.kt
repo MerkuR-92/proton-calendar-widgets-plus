@@ -88,12 +88,12 @@ private class DatabaseTypeConverters {
 
     @TypeConverter
     fun toListOfJsonElements(value: String): List<JsonElement> {
-        return Json.decodeFromString<List<JsonElement>>(value)
+        return Json { ignoreUnknownKeys = true }.decodeFromString<List<JsonElement>>(value)
     }
 
     @TypeConverter
     fun fromListOfJsonElement(json: List<JsonElement>): String {
-        return Json.encodeToString(json)
+        return Json { ignoreUnknownKeys = true }.encodeToString(json)
     }
 
 }

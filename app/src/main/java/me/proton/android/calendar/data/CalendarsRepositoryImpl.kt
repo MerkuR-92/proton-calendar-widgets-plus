@@ -1,6 +1,5 @@
 package me.proton.android.calendar.data
 
-import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -30,7 +29,6 @@ import java.time.temporal.TemporalAdjusters
 @FlowPreview
 @ExperimentalCoroutinesApi
 class CalendarsRepositoryImpl(
-    private val gson: Gson,
     private val database: AppDatabase,
     private val transformEventUseCase: TransformEventUseCase,
     private val logger: Logger,

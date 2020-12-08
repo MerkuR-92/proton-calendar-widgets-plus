@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.google.gson.Gson
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase

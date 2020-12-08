@@ -2,7 +2,6 @@ package me.proton.android.calendar.domain.usecase
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
@@ -38,7 +37,6 @@ internal class SyncServerEventsUseCaseTest {
 
     private val userId = UserId("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
-    private val gson = GsonCommon.gson
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
 

@@ -9,9 +9,9 @@ import biweekly.parameter.ParticipationStatus
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.GsonCommon
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 
 internal class TransformEventUseCaseTest {
 
-    private val gson = GsonCommon.gson
+    private val json = Json
     private val testsLogger = TestsLogger
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val iCal = ICalUtils
@@ -98,7 +98,7 @@ internal class TransformEventUseCaseTest {
             val passPhraseEntity = PassphraseEntity(
                 "id",
                 1,
-                listOf(Json.decodeFromString<JsonElement>(gson.toJson(memberPassphrase))),
+                listOf(Json.decodeFromString<JsonElement>(Json.encodeToString(memberPassphrase))),
                 "calendarId")
             coEvery {
                 database.passphrasesDao().select(any())
@@ -115,7 +115,7 @@ internal class TransformEventUseCaseTest {
             } returns listOf()
 
             val useCase = TransformEventUseCase(
-                gson,
+                json,
                 database,
                 testsLogger,
                 valueStoreProviderMock,

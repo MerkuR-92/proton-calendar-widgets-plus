@@ -1,6 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.core.domain.entity.UserId
@@ -11,7 +11,7 @@ import me.proton.core.domain.entity.UserId
  */
 class CacheCalendarPassphraseUseCase( // TODO TEST
     private val database: AppDatabase,
-    private val gson: Gson,
+    private val json: Json,
     private val crypto: Crypto,
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider
@@ -26,7 +26,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
         val calendarMembers = database.membersDao().select(calendarId)
-        val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
+        val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         // Passphrase is linked to Calendar and is used by all CalendarKeys of that Calendar
 
         val member = calendarMembers.first() // TODO change to multiple members
@@ -34,7 +34,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         // you can join a calendar using Address1 and Address2
         // you can have more than one member
 
-        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(gson) }
+        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(json) }
         val address = userAddresses.firstOrNull()
             ?: return UseCase.Result.InvalidParams("there is no user address in CacheCalendarPassphraseUseCase") // TODO probably it will be multiple for more members
 

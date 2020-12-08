@@ -1,8 +1,5 @@
 package me.proton.android.calendar.domain.model
 
-import com.google.gson.JsonElement
-import kotlinx.serialization.SerialName
-
 data class User(
     override val id: String,
     val keys: List<UserKey>,

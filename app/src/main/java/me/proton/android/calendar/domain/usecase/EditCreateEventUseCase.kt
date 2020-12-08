@@ -1,7 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.google.gson.Gson
 import com.proton.gopenpgp.crypto.SessionKey
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.api.*
@@ -13,7 +13,7 @@ import me.proton.core.domain.entity.UserId
 
 class EditCreateEventUseCase(
     private val logger: Logger,
-    private val gson: Gson,
+    private val json: Json,
     private val calendarsApi: CalendarsApi,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val calendarsRepository: CalendarsRepository,
@@ -39,12 +39,12 @@ class EditCreateEventUseCase(
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).first()
-        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(gson) } // TODO in the future we will have dropdown with memberID, but now we take first
+        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(json) } // TODO in the future we will have dropdown with memberID, but now we take first
         val memberAddressKey = userAddresses.first().primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO Valentin how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
         val calendarKey = database.calendarKeysDao().select(calendarId).first { it.isActive && it.isPrimary }
-        val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(gson) }.first { it.isActive }
+        val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("there is no valid cached Calendar Passphrase")
 
         // 4. get Session Keys if they were already present in old Event

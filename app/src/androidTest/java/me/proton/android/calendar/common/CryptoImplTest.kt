@@ -2,7 +2,6 @@ package me.proton.android.calendar.common
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.google.gson.Gson
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -11,7 +10,6 @@ import org.junit.runner.RunWith
 @LargeTest
 class CryptoImplTest {
 
-    private val gson = Gson()
     private val crypto = CryptoImpl(TestsLogger)
 
     @Test

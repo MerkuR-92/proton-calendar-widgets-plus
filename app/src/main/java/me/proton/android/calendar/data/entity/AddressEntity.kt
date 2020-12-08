@@ -5,8 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
-import com.google.gson.annotations.Expose
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -43,13 +41,12 @@ data class AddressEntity(
     @kotlinx.serialization.Transient
     lateinit var fkUserId: String
 
-    fun toAddress(gson: Gson): Address {
+    fun toAddress(json: Json): Address {
         return Address(
             id = this.id,
             email = this.email,
             keys = this.keys.map {
-                Json { this.ignoreUnknownKeys = true } .decodeFromJsonElement<AddressKey>(it)
-//                gson.fromJson(it, AddressKey::class.java)
+                json.decodeFromJsonElement<AddressKey>(it)
             }
         )
     }

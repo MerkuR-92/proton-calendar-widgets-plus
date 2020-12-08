@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.google.gson.Gson
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.data.api.ApiResponse
@@ -15,7 +14,6 @@ import java.time.*
 
 class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
-    private val gson: Gson,
     private val calendarsApi: CalendarsApi,
     private val addressesApi: AddressesApi,
     private val keysApi: KeysApi,

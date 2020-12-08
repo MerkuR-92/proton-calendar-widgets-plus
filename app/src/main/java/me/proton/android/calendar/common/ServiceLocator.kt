@@ -1,6 +1,6 @@
 package me.proton.android.calendar.common
 
-import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.UsersRepositoryImpl
 import me.proton.android.calendar.data.api.*
@@ -24,7 +24,7 @@ import org.koin.dsl.module
  */
 
 val commonModule = module {
-    single<Gson> { GsonCommon.gson }
+    single<Json> { Json { ignoreUnknownKeys = true } }
     single<ICalUtils> { ICalUtils } // TODO maybe extract interface
     single<Logger> { TimberLogger }
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
@@ -48,7 +48,7 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get()) }
+    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get()) }
     single<UsersRepository> { UsersRepositoryImpl(get(), get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
@@ -62,14 +62,14 @@ val viewModelModule = module {
             get()
         )
     }
-    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
     factory<FetchUserUseCase> { FetchUserUseCase(get(), get(), get()) }
-    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get()) }

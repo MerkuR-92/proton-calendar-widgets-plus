@@ -1,8 +1,5 @@
 package me.proton.android.calendar.data.api
 
-import com.google.gson.*
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.entity.*
@@ -95,21 +92,6 @@ class ServerEvent {
 
         companion object {
             fun valueOf(value: Int) = values().find { it.value == value }
-        }
-
-        // TODO extract this to generic function?
-        class GsonSerializer : TypeAdapter<Action>() {
-            override fun write(out: JsonWriter?, value: Action) {
-                TODO("serializing enums is not implemented")
-
-                val test : ApiEnum<Action> = ApiEnum(Action.DELETE)
-
-            }
-
-            override fun read(jsonReader: JsonReader?): Action {
-                if (jsonReader == null) throw JsonParseException("JsonReader is null in GsonSerializer")
-                return valueOf(jsonReader.nextInt())!! // if we get unsupported value, then we fail
-            }
         }
     }
 

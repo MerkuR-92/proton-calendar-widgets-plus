@@ -1,6 +1,5 @@
 package me.proton.android.calendar.data
 
-import com.google.gson.Gson
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.AddressEntity
 import me.proton.android.calendar.data.entity.UserEntity
@@ -10,19 +9,18 @@ import me.proton.android.calendar.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import timber.log.Timber
 
 // TODO better name? move to separate package?
 class UsersRepositoryImpl(
     private val database: AppDatabase /*TODO probably will need more than 1 API here*/,
-    private val gson: Gson
+    private val json: Json
 ) : UsersRepository {
 
     override fun usersFlow(): Flow<List<UserEntity>> {
-        return database.usersDao().selectUsers().distinctUntilChanged()/*.map {
-            it.map { it.toUser(gson) }
-        }*/
+        return database.usersDao().selectUsers().distinctUntilChanged()
     }
 
     override suspend fun persistUser(user: UserEntity) {
@@ -44,7 +42,7 @@ class UsersRepositoryImpl(
 
     override fun addressesFlow(userId: String): Flow<List<Address>> {
         return database.addressesDao().selectFlow(userId).distinctUntilChanged().map {
-            it.map { it.toAddress(gson) }
+            it.map { it.toAddress(json) }
         }
     }
 

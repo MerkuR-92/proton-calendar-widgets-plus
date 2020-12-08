@@ -48,7 +48,8 @@ class EventViewModel(
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val logger: Logger
+    private val logger: Logger,
+    private val json: Json
 ) : ViewModel() {
 
     private lateinit var userId: UserId
@@ -289,7 +290,7 @@ class EventViewModel(
     private fun getDefaultAlarms(calendarSettings: CalendarSettingsEntity, isAllDay: Boolean): List<VAlarm> {
         val alarms = ArrayList<VAlarm>()
         val defaultNotifications = if (isAllDay) calendarSettings.defaultFullDayNotifications else calendarSettings.defaultPartDayNotifications
-        defaultNotifications.mapNotNull { if ((it as? JsonObject) != null) Json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(it) else null }.forEach { alarm ->
+        defaultNotifications.mapNotNull { if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(it) else null }.forEach { alarm ->
             alarm.parseTrigger()?.let {
                 if (alarm.type == 0) {
                     alarms.add(VAlarm.email(it, null, null))

@@ -1,6 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
@@ -14,7 +14,7 @@ class CreateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
-    private val gson: Gson,
+    private val json: Json,
     private val usersRepository: UsersRepository,
     private val keySetupUseCase: KeySetupUseCase
 ): UseCase {
@@ -23,7 +23,7 @@ class CreateCalendarUseCase(
 
         val user = usersRepository.selectUserById(userId.id)
         val email = user?.email ?: return UseCase.Result.Error("Email for user was null in CreateCalendarUseCase")
-        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(gson) ?: return UseCase.Result.Error("No address id found in CreateCalendarUseCase")
+        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json) ?: return UseCase.Result.Error("No address id found in CreateCalendarUseCase")
 
         val createCalendarApiRequest =
             CreateCalendarApiRequest(

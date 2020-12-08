@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -38,13 +37,12 @@ data class PassphraseEntity(
 
 //    lateinit var fkCalendarKeyId: String
 
-    fun toPassphrase(gson: Gson): Passphrase {
+    fun toPassphrase(json: Json): Passphrase {
         return Passphrase(
             id = this.id,
             flags = this.flags,
             memberPassphrases = this.memberPassphrases.map {
-                Json.decodeFromJsonElement<MemberPassphrase>(it)
-//                gson.fromJson(it, MemberPassphrase::class.java)
+                json.decodeFromJsonElement<MemberPassphrase>(it)
             },
             calendarId = this.calendarId
         )

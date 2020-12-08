@@ -68,8 +68,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false // TODO turn off for initial beta release
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
 
@@ -169,9 +169,7 @@ dependencies {
     implementation "org.koin:koin-android-viewmodel:${rootProject.ext.version.koin}"
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
-    implementation 'com.google.code.gson:gson:2.8.6'
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.version.retrofit}"
-    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${rootProject.ext.version.coroutine}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.version.coroutine}"
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2"
