@@ -357,6 +357,15 @@ data class Event(
 
             occurrences.add(Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
 
+            // ignore occurrences before the [fromDate]
+            if (fromDateTime != null) {
+                if (fromDateTime.isAfter(occurrenceStart)) {
+                    continue
+                } else {
+                    break
+                }
+            }
+
         }
 
         return occurrences
@@ -410,7 +419,7 @@ data class Event(
             if (filteredByExdates.isNotEmpty()) {
                 return filteredByExdates.first().occurrence
             } else {
-                from = firstOccurrence.startDateTime.plusNanos(1)
+                from = firstOccurrence.startDateTime.plusSeconds(1)
             }
         }
 

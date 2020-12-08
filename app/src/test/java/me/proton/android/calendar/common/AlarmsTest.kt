@@ -531,4 +531,80 @@ internal class AlarmsTest : BaseTest() {
 
     }
 
+    val partDay1 = eventForICalString(
+        """
+            BEGIN:VCALENDAR
+            BEGIN:VEVENT
+            DTSTART;TZID=Europe/Zurich:20201214T160000
+            DTEND;TZID=Europe/Zurich:20201214T170000
+            RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=2;BYDAY=MO
+            DTSTAMP:20201207T152413Z
+            UID:122qfbpnpghcrfqfqv94bg3hn0@google.com
+            CREATED:20201207T151852Z
+            DESCRIPTION:ah ah
+            LAST-MODIFIED:20201207T152412Z
+            LOCATION:
+            SEQUENCE:1
+            STATUS:CONFIRMED
+            SUMMARY:Event with interesting reminders
+            TRANSP:OPAQUE
+            BEGIN:VALARM
+            ACTION:DISPLAY
+            DESCRIPTION:This is an event reminder
+            TRIGGER:-P0DT0H10M0S
+            END:VALARM
+            BEGIN:VALARM
+            ACTION:DISPLAY
+            DESCRIPTION:This is an event reminder
+            TRIGGER:-P14D
+            END:VALARM
+            END:VEVENT
+            END:VCALENDAR
+        """.trimIndent(), "partDay1")
+
+    @Test
+    fun `calculate upcoming alarms for part-day event with WKST, BYDAY`() {
+
+        val events = listOf(partDay1)
+
+        val timeZoneId = "Europe/Zurich"
+        val zoneId = ZoneId.of(timeZoneId)
+
+        val now = ZonedDateTime.of(2020, 12, 7, 9, 0, 0, 0, zoneId)
+        val alarms = ICalUtils.calculateUpcomingAlarmEntities(events, now, "TODO")
+
+        alarms.forEach {
+            TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
+        }
+
+        // we should get 2 alarms, but for occurrence number n and n+1
+        assertThat(alarms.size).isEqualTo(2)
+
+        assertThat(Instant.ofEpochSecond(alarms[0].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 14, 15, 50, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms[1].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 14, 16, 0, 0, 0, zoneId)
+        )
+
+        // timestamp after last alarm for occurrence X
+        val now2 = ZonedDateTime.of(2020, 12, 14, 15, 55, 0, 0, zoneId)
+        val alarms2 = ICalUtils.calculateUpcomingAlarmEntities(events, now2, "TODO")
+
+        alarms2.forEach {
+            TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
+        }
+
+        // we should get 2 alarms for the same occurrence
+        assertThat(alarms2.size).isEqualTo(2)
+
+        assertThat(Instant.ofEpochSecond(alarms2[0].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 28, 15, 50, 0, 0, zoneId)
+        )
+        assertThat(Instant.ofEpochSecond(alarms2[1].occurrence).atZone(zoneId)).isEqualTo(
+            ZonedDateTime.of(2020, 12, 14, 16, 0, 0, 0, zoneId)
+        )
+
+    }
+
 }
