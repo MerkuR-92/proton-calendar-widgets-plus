@@ -691,7 +691,15 @@ fun formatUidForICal(eventUid: String): String {
     // ICal fields maximum length is 75 octets. It separates its values with "\r\n[space]" when needed. In order to fetch
     //  the UID value from SharedEvents in DB, we need to add the ICal separator to our UID if its length is more than 75
     return if ((ICAL_UID_PREFIX + eventUid).length > ICAL_LINE_MAXIMUM_LENGTH) {
-        val valueMaxLengthIndex = ICAL_LINE_MAXIMUM_LENGTH - ICAL_UID_PREFIX.length
-        eventUid.substring(0, valueMaxLengthIndex) + ICAL_LINE_SEPARATOR + eventUid.substring(valueMaxLengthIndex)
+        val eventUidValueLines = arrayListOf<String>()
+        val maxLengthWithPrefixIndex = ICAL_LINE_MAXIMUM_LENGTH - ICAL_UID_PREFIX.length
+        eventUidValueLines.add(eventUid.substring(0, maxLengthWithPrefixIndex))
+        var uid = eventUid.substring(maxLengthWithPrefixIndex)
+        while (uid.length > ICAL_LINE_MAXIMUM_LENGTH) {
+            eventUidValueLines.add(uid.substring(0, ICAL_LINE_MAXIMUM_LENGTH))
+            uid = uid.substring(ICAL_LINE_MAXIMUM_LENGTH)
+        }
+        eventUidValueLines.add(uid)
+        return eventUidValueLines.joinToString(ICAL_LINE_SEPARATOR)
     } else eventUid
 }

@@ -540,7 +540,8 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun hasSingleEdits(eventUid: String): Boolean {
-        return database.eventsDao().countByUid(eventUid) > 1
+        val formattedUid = formatUidForICal(eventUid)
+        return database.eventsDao().countByUid(formattedUid) > 1
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

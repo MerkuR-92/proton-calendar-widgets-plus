@@ -2405,9 +2405,12 @@ internal class ICalUtilsTest {
     @Test
     fun `UID formatting`() {
         val tooLongUid = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me"
-        assertThat(formatUidForICal(tooLongUid)).equals("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.m\\r\\n e")
+        assertThat(formatUidForICal(tooLongUid)).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.m\\r\\n e")
+
+        val wayTooLongUid = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T000000@proton.me"
+        assertThat(formatUidForICal(wayTooLongUid)).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000_R2020120\\r\\n 8T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T00000\\r\\n 0@proton.me")
 
         val uidWithDates = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me"
-        assertThat(generateProtonUid(uidWithDates, "20201209T193000")).equals("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201209T193000@proton.me")
+        assertThat(generateProtonUid(uidWithDates, "20201209T193000")).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201209T193000@proton.me")
     }
 }

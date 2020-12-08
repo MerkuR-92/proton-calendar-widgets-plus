@@ -29,9 +29,11 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE id = :id")
     abstract suspend fun selectById(id: String): EventEntity?
 
+    @Deprecated("Format UID with formatUidForICal")
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
     abstract suspend fun selectByUid(uid: String): List<EventEntity>
 
+    @Deprecated("Format UID with formatUidForICal")
     @Query("SELECT COUNT(id) FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
     abstract suspend fun countByUid(uid: String): Int
 
