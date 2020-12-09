@@ -460,9 +460,19 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         event_form_timezone_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            val selectedIndex = allowedTimezoneIds.indexOf(eventViewModel.eventLiveData.value?.defaultTimeZone)
-            AndroidUtils.displaySingleChoicePicker(requireContext(), null, allowedTimezoneIds.map { ICalUtils.formatTimeZoneId(it, eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!) }.toTypedArray(), selectedIndex) {
-                eventViewModel.handleTimeZone(allowedTimezoneIds[it])
+
+            val forInstant = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!
+            val formattedTimeZoneIds = allowedTimezoneIds.map {
+                ICalUtils.formatTimeZoneId(it, forInstant)
+            }.toTypedArray()
+            formattedTimeZoneIds.sortFormattedTimeZoneIds()
+            val defaultTimeZone = eventViewModel.eventLiveData.value?.defaultTimeZone
+            val selectedIndex =
+                if (defaultTimeZone == null) -1
+                else formattedTimeZoneIds.indexOf(ICalUtils.formatTimeZoneId(defaultTimeZone, forInstant))
+
+            AndroidUtils.displaySingleChoicePicker(requireContext(), null, formattedTimeZoneIds, selectedIndex) {
+                eventViewModel.handleTimeZone(formattedTimeZoneIds[it].formattedTimeZoneToId())
             }
         }
 

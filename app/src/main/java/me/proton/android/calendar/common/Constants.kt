@@ -430,4 +430,4 @@ val allowedTimezoneIds = listOf(
     "Pacific/Tarawa",
     "Pacific/Tongatapu",
     "UTC"
-).sortedWith(compareBy({ -TimeZone.getTimeZone(it).rawOffset }, { it }))
+)

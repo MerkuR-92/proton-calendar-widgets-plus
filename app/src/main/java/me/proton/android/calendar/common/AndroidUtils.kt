@@ -54,6 +54,9 @@ import java.time.temporal.ChronoField
 import java.util.*
 import java.util.Locale.getDefault
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.regex.Pattern
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class AndroidUtils(context: Context) {
 
@@ -1037,4 +1040,36 @@ class OnSingleClickListener(
             }
         }
     }
+}
+
+fun Array<String>.sortFormattedTimeZoneIds() {
+    this.sortWith { a, b ->
+        val aFloat = a.formattedTimeZoneToFloat()
+        val bFloat = b.formattedTimeZoneToFloat()
+        when {
+            (aFloat < bFloat) -> 1
+            (aFloat > bFloat) -> -1
+            (a < b) -> -1
+            (a > b) -> 1
+            else -> 0
+        }
+    }
+}
+
+private fun String.formattedTimeZoneToFloat(): Float {
+    // Returns timezone offset as float from formatted timezone with offset
+    val pattern = Pattern.compile("^.*GMT([+-]\\d{1,2}):?(\\d{1,2})?\\).*\$")
+    val matcher = pattern.matcher(this)
+    matcher.find()
+    val hours = matcher.group(1)?.toFloat()
+    val minutes = matcher.group(2)?.toFloat()?.div(100) ?: 0F
+    return (hours ?: 0F) + minutes
+}
+
+fun String.formattedTimeZoneToId(): String {
+    // Returns timezone id from formatted timezone with offset
+    return this.replace(
+        Regex(" (\\(GMT[+-]\\d{1,2}:?(\\d{1,2})?\\))"),
+        ""
+    )
 }
