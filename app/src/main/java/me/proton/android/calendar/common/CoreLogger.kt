@@ -14,6 +14,7 @@ object CoreLogger : Logger {
     private const val HTTP_ERROR_UNPROCESSABLE_ENTITY = 422
 
     private const val PROTON_ERROR_INVALID_REFRESH_TOKEN = 10013
+    private const val PROTON_ERROR_INCORRECT_LOGIN_CREDENTIALS = 8002
 
     private fun isLogNeeded(error: Throwable): Boolean {
         return when (error) {
@@ -22,10 +23,13 @@ object CoreLogger : Logger {
                 HTTP_ERROR_NOT_FOUND -> false
                 HTTP_ERROR_UNPROCESSABLE_ENTITY -> when (error.protonData.code) {
                     PROTON_ERROR_INVALID_REFRESH_TOKEN -> false
+                    PROTON_ERROR_INCORRECT_LOGIN_CREDENTIALS -> false
                     else -> true
                 }
                 else -> true
             }
+            is java.net.SocketTimeoutException -> false
+            is java.net.ConnectException -> false
             else -> true
         }
     }

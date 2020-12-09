@@ -260,7 +260,7 @@ class EventViewModel(
                     }
                 }
 
-            } ?: return UseCase.Result.Error("could not find event ${eventId}")
+            } ?: return UseCase.Result.Error("could not generate event with occurrence in EventViewModel")
         }
 
         _event.postValue(event)
