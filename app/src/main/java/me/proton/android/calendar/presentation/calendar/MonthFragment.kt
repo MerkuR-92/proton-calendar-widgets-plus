@@ -132,6 +132,9 @@ class MonthFragment : BaseFragment() {
         miniCalendarPagerLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
+                // TODO Null check here because this listener is triggered once even after view has been destroyed
+                if (miniCalendarPager == null) return
+
                 val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((miniCalendarPager.currentItem - miniCalendarPagerAdapter.startingPosition).toLong())
                 val desiredHeight = MiniCalendarItemAdapter.calculateAdapterHeight(
                     requireContext(),
