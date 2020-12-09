@@ -61,6 +61,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private lateinit var buttonEdit: View
     private lateinit var buttonMenu: View
+    private lateinit var loadingAction: View
     private lateinit var attendeeListAdapter: AttendeeListAdapter
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
@@ -122,6 +123,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
+        loadingAction.visibleOrGone(false)
+
+
         // TODO Hide buttons by default to avoid any case where edit would be possible. Remove once edit attendees is implemented
         buttonEdit.visibleOrGone(false)
         buttonMenu.visibleOrGone(false)
@@ -139,6 +144,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.spacing_element_small)
             addView(
                 buttonMenu, layoutParams
+            )
+            addView(
+                loadingAction, layoutParams
             )
         }
     }
@@ -187,6 +195,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         }
                     }
 
+                    // Post deleting event value to false to stop loading state
+                    calendarViewModel.deletingEvent.postValue(false)
+
                     if (deleteResult == UseCase.Result.Success) {
                         requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                         // Use onBackPressedCustom to handle navigation when opening details from notification
@@ -234,6 +245,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 )
                             }
                         }
+
+                        // Post deleting event value to false to stop loading state
+                        calendarViewModel.deletingEvent.postValue(false)
+
                         if (deleteResult == UseCase.Result.Success) {
                             requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                             // Use onBackPressedCustom to handle navigation when opening details from notification
@@ -292,6 +307,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
             }
+
+            calendarViewModel.deletingEvent.observe(viewLifecycleOwner, Observer { deletingEvent: Boolean ->
+                // Update action bar buttons visibility
+                loadingAction.visibleOrGone(deletingEvent)
+                buttonEdit.visibleOrGone(!deletingEvent)
+                buttonMenu.visibleOrGone(!deletingEvent)
+            })
         }
     }
 
