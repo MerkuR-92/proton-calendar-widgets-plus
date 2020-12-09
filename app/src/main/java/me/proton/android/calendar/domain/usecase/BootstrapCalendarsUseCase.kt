@@ -7,11 +7,9 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
-import org.koin.ext.scope
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
-import kotlin.coroutines.coroutineContext
 
 /**
  * Sets up all the user's calendars, call this only once after successful login.
@@ -25,7 +23,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val createCalendarUseCase: CreateCalendarUseCase,
     private val fetchEventsUseCase: FetchEventsUseCase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val syncAlarmsUseCase: SyncAlarmsUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String): UseCase.Result {
@@ -167,6 +166,12 @@ class BootstrapCalendarsUseCase( // TODO TEST
         return if (failedCalendarIds.isNotEmpty()) {
             UseCase.Result.Error("calendar bootstrap failed for: ${failedCalendarIds.joinToString(separator = ", ")}")
         } else {
+
+            // sync alarms right after downloading calendars and events
+            syncAlarmsUseCase.execute(userId).ifSuccessAndLogErrors(logger) {
+                logger.v("syncAlarmsUseCase in bootstrap success")
+            }
+
             UseCase.Result.Success
         }
     }
