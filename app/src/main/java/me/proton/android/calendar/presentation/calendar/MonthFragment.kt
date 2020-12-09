@@ -217,6 +217,7 @@ class MonthFragment : BaseFragment() {
             offscreenPageLimit = 1
             setCurrentItem(agendaPagerAdapter.startingPosition, false)
         }
+        agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
 
         // Init view pagers in VM
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
