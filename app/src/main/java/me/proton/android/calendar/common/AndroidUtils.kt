@@ -368,12 +368,11 @@ class AndroidUtils(context: Context) {
                 ).joinToString(separator = ", ")
 
                 val startTimeZone = event.iCalendar.timezoneInfo?.getTimezone(event.iCalendar.events.first().dateStart)?.timeZone
-                val startJavaTime = event.iCalendar.events.first().dateStart.value.time
                 val formatTimeZone = TimeZone.getTimeZone(timeZoneId)
 
                 TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
 
-                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.getOffset(startJavaTime) != startTimeZone.getOffset(startJavaTime)) {
+                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.id != startTimeZone.id) {
                     return "${label} (${formatTimeZone.id})"
                 } else {
                     return label
