@@ -58,7 +58,7 @@ class EventAdapter(
 
                 val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
 
-                if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                if (!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_event_unanswered_circle))
                 } else {
                     imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.shape_calendar_circle))
@@ -138,7 +138,7 @@ class EventAdapter(
             fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
 
                 val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
-                viewBackgroundStripedLayout.visibleOrGone(participationStatus == ParticipationStatus.NEEDS_ACTION)
+                viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
                 if (!event.isAllDay() && !event.spansSingleDay(timeZoneId = timeZoneId)) {
                     val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
