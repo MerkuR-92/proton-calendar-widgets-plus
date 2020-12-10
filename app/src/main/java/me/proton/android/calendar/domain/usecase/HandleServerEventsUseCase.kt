@@ -117,9 +117,9 @@ class HandleServerEventsUseCase(
                                     is ApiResponse.Success -> {
                                         logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
                                         calendarsRepository.persistEvents(event.data.event)
-                                        updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
                                         logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                         calendarsRepository.persistEventAlarm(it.alarm)
+                                        updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
                                     }
                                     // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                     is ApiResponse.Error -> {
@@ -133,6 +133,7 @@ class HandleServerEventsUseCase(
                             } else {
                                 logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                 calendarsRepository.persistEventAlarm(it.alarm)
+                                updateAlarmsUseCase.execute(userId.id, listOf(it.alarm.eventId))
                             }
 
                         } catch (e: SQLiteConstraintException) {
@@ -144,9 +145,6 @@ class HandleServerEventsUseCase(
                     }
                 )
             }
-
-            // if alarms changed, we need to reschedule them
-            if (eventsResponse.calendarAlarms?.isNotEmpty() == true) handleAlarmsUseCase.execute(userId)
 
             eventsResponse.calendarKeys?.forEach {
                 it.handleAction(
