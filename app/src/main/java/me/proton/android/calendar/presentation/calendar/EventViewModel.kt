@@ -20,6 +20,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -430,7 +431,16 @@ class EventViewModel(
                     } else {
                         logger.d("time is the same")
                     }
-                    eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !dbEvent.isAllDay()) // RecurrenceId has to be in original event's format
+
+                    // Make sure timezone matches parent timezone
+                    if (dbEvent.iCalendar.iCalTimeZone(dbEvent.iCalEvent.dateStart).id != event.defaultTimeZone!!) {
+                        eventToCreate.setRecurrenceId(
+                            dbEventWithOccurrenceStartDate.withZoneSameInstant(ZoneId.of(dbEvent.iCalendar.iCalTimeZone(dbEvent.iCalEvent.dateStart).id)),
+                            !dbEvent.isAllDay()
+                        )
+                    } else {
+                        eventToCreate.setRecurrenceId(dbEventWithOccurrenceStartDate, !dbEvent.isAllDay())
+                    }
 
                     eventToCreate
 
