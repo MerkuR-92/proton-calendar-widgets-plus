@@ -31,6 +31,7 @@ internal class SyncServerEventsUseCaseTest {
     private val valueStoreMock: ValueStore = mockk()
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val cacheCalendarPassphraseUseCaseMock: CacheCalendarPassphraseUseCase = mockk()
+    private val calendarUserSettingsChangedUseCaseMock: CalendarUserSettingsChangedUseCase = mockk()
     private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
     private val calendarsApi: CalendarsApi = mockk()
     private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
@@ -102,6 +103,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
             coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
             coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
+            coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
             coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
@@ -121,7 +123,7 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList()))
             )
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarsApi)
+            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarUserSettingsChangedUseCaseMock, calendarsApi)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
@@ -148,7 +150,7 @@ internal class SyncServerEventsUseCaseTest {
             coVerify(exactly = 6) {
                 calendarsRepositoryMock.persistEvents(any())
             }
-            coVerify(exactly = 6) {
+            coVerify(exactly = 11) {
                 updateAlarmsUseCaseMock.execute(userId.id, any())
             }
             coVerify(exactly = 2) {

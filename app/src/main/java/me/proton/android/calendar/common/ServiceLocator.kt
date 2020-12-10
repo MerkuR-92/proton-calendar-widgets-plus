@@ -76,7 +76,7 @@ val useCaseModule = module {
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get()) }
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get()) }
@@ -86,6 +86,7 @@ val useCaseModule = module {
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
+    factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
 }
 
 fun coreModule(

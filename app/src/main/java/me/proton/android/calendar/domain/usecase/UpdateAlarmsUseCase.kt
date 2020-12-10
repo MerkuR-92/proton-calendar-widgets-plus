@@ -23,8 +23,8 @@ class UpdateAlarmsUseCase(
         val primaryTimezone = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
         val fromZonedDateTime = if (primaryTimezone == null) {
             logger.e("no primary timezone in UpdateAlarmsUseCase")
-            ZonedDateTime.now()
-        } else ZonedDateTime.now(ZoneId.systemDefault())
+            ZonedDateTime.now(ZoneId.systemDefault())
+        } else ZonedDateTime.now(ZoneId.of(primaryTimezone))
 
         logger.v("executing UpdateAlarmsUseCase")
         eventIds.forEach {

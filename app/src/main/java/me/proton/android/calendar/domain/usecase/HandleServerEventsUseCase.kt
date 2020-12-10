@@ -22,6 +22,7 @@ class HandleServerEventsUseCase(
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
+    private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
 
     suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: UserId) : UseCase.Result {
@@ -36,7 +37,7 @@ class HandleServerEventsUseCase(
                 usersRepository.persistUserSettings(userId.id, it)
             }
             eventsResponse.calendarUserSettings?.let {
-                calendarsRepository.persistCalendarUserSettings(userId.id, it)
+                calendarUserSettingsChangedUseCase.execute(userId.id, it)
             }
 
             eventsResponse.calendars?.forEach {

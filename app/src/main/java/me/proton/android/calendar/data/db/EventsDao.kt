@@ -29,6 +29,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE id = :id")
     abstract suspend fun selectById(id: String): EventEntity?
 
+    @Query("SELECT * FROM events WHERE sharedEvents LIKE '%DTSTART;VALUE=DATE:%'")
+    abstract suspend fun selectAllDayOnly(): List<EventEntity>
+
     @Deprecated("Format UID with formatUidForICal")
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
     abstract suspend fun selectByUid(uid: String): List<EventEntity>
