@@ -1,20 +1,13 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.ICalUtils.filterOutDuplicates
 import me.proton.android.calendar.common.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueKey
-import me.proton.android.calendar.domain.ValueStoreProvider
-import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class UpdateAlarmsUseCase(
@@ -27,7 +20,11 @@ class UpdateAlarmsUseCase(
 
     suspend fun execute(userId: String, eventIds: List<String>) {
 
-        val now = ZonedDateTime.now()
+        val primaryTimezone = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
+        val fromZonedDateTime = if (primaryTimezone == null) {
+            logger.e("no primary timezone in UpdateAlarmsUseCase")
+            ZonedDateTime.now()
+        } else ZonedDateTime.now(ZoneId.systemDefault())
 
         logger.v("executing UpdateAlarmsUseCase")
         eventIds.forEach {
@@ -49,7 +46,7 @@ class UpdateAlarmsUseCase(
 
             val transformedChain = it.second.mapNotNull { transformEventUseCase.execute(it) }
 
-            val upcomingAlarms = ICalUtils.calculateUpcomingAlarmEntities(transformedChain, now, "TODO")
+            val upcomingAlarms = ICalUtils.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
 
             transformedChain.forEach {
                 database.eventAlarmsDao().deleteAllByEventId(it.id)
@@ -59,7 +56,7 @@ class UpdateAlarmsUseCase(
 
             logger.v("upcoming alarms for ${transformedChain.first().summary}")
             upcomingAlarms.forEach {
-                logger.v("${Instant.ofEpochSecond(it.occurrence).atZone(now.zone)}")
+                logger.v("${Instant.ofEpochSecond(it.occurrence).atZone(fromZonedDateTime.zone)}")
             }
 
         }
