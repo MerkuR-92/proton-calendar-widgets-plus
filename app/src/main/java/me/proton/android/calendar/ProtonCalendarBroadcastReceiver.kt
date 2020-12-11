@@ -3,6 +3,7 @@ package me.proton.android.calendar
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.SyncService
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.accountmanager.domain.AccountManager
@@ -46,6 +48,13 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
         when (intent.action) {
             // Intent.ACTION_LOCKED_BOOT_COMPLETED is probably not needed
             Intent.ACTION_BOOT_COMPLETED -> {
+
+                if (context == null) {
+                    logger.e("null Context in ProtonCalendarBroadcastReceiver")
+                } else {
+                    ContextCompat.startForegroundService(context, Intent(context, SyncService::class.java))
+                }
+
                 runBlocking(Dispatchers.Default) {
                     handleAlarmsUseCase.execute(userId!!)
                 }

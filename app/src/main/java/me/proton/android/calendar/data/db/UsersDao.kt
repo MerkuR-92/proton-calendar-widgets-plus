@@ -11,7 +11,10 @@ abstract class UsersDao : BaseDao<UserEntity> {
 //    lateinit var userId: String
 
     @Query("SELECT * FROM users")
-    abstract fun selectUsers(): Flow<List<UserEntity>>
+    abstract fun usersFlow(): Flow<List<UserEntity>>
+
+    @Query("SELECT * FROM users")
+    abstract fun select(): List<UserEntity>
 
     @Query("SELECT * FROM users WHERE id = :userId")
     abstract suspend fun selectUserById(userId: String): UserEntity?

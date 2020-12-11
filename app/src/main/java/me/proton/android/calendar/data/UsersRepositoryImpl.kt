@@ -20,7 +20,7 @@ class UsersRepositoryImpl(
 ) : UsersRepository {
 
     override fun usersFlow(): Flow<List<UserEntity>> {
-        return database.usersDao().selectUsers().distinctUntilChanged()
+        return database.usersDao().usersFlow().distinctUntilChanged()
     }
 
     override suspend fun persistUser(user: UserEntity) {
