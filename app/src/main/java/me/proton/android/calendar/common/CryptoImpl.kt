@@ -75,6 +75,32 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         }
     }
 
+    override fun decryptText(
+        cipherText: String,
+        armoredPrivateKeys: List<String>,
+        passphrase: ByteArray
+    ): String? {
+        var keyring: KeyRing? = null
+        return try {
+            keyring = com.proton.gopenpgp.crypto.Crypto.newKeyRing(null)
+            armoredPrivateKeys.forEach {
+                try {
+                    val unlockedKey = com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(it).unlock(passphrase)
+                    keyring.addKey(unlockedKey)
+                } catch (e: Exception) {
+                    logger.i("Unlocking key failed", e)
+                }
+            }
+
+            keyring.decrypt(PGPMessage(cipherText), null, 0L).string
+        } catch (e: Exception) {
+            logger.i("decrypt failed", e)
+            null
+        } finally {
+            keyring?.clearPrivateParams()
+        }
+    }
+
     override fun encryptText(
         plainText: String,
         armoredPublicKey: String

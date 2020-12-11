@@ -1,10 +1,10 @@
 package me.proton.android.calendar.domain.usecase
 
+import com.proton.gopenpgp.crypto.KeyRing
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.sanitise
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.adjustIncomingAllDayEvent
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.db.AppDatabase
@@ -30,8 +30,8 @@ class TransformEventUseCase(
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
-        val calendarKey = database.calendarKeysDao().select(eventEntity.calendarId).firstOrNull { it.isActive && it.isPrimary }
-        if (calendarKey == null) {
+        val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
+        if (calendarPrivateKeys.isNullOrEmpty()) {
             logger.e("TransformEventUseCase, calendarKey is null")
             return null
         }
@@ -57,7 +57,7 @@ class TransformEventUseCase(
         }.forEach { sharedEvent ->
             getPlainText(
                 eventEntity.sharedKeyPacket,
-                calendarKey.privateKey,
+                calendarPrivateKeys,
                 keyPassphrase,
                 sharedEvent)?.let { calendarParts.add(it) }
         }
@@ -68,7 +68,7 @@ class TransformEventUseCase(
         }.forEach { calendarEvent ->
             getPlainText(
                 eventEntity.calendarKeyPacket,
-                calendarKey.privateKey,
+                calendarPrivateKeys,
                 keyPassphrase,
                 calendarEvent)?.let { calendarParts.add(it) }
         }
@@ -79,7 +79,7 @@ class TransformEventUseCase(
         }.forEach { personalEvent ->
             getPlainText(
                 null, // personal parts are only signed
-                calendarKey.privateKey,
+                calendarPrivateKeys,
                 keyPassphrase,
                 personalEvent)?.let { calendarParts.add(it) }
         }
@@ -90,7 +90,7 @@ class TransformEventUseCase(
         }.forEach { attendeeEvent ->
             getPlainText(
                 eventEntity.sharedKeyPacket,
-                calendarKey.privateKey,
+                calendarPrivateKeys,
                 keyPassphrase,
                 attendeeEvent)?.let { calendarParts.add(it) }
         }
@@ -157,7 +157,7 @@ class TransformEventUseCase(
      * Get plaintext payload or decrypt & check signature if necessary.
      */
     private suspend fun getPlainText(keyPacket: String?,
-                                     privateKey: String,
+                                     privateKeys: List<String>,
                                      keyPassphrase: String,
                                      eventPart: Event.EventPart
     ): String? {
@@ -166,7 +166,7 @@ class TransformEventUseCase(
         val plainText = if (eventPart.isEncrypted) {
             if (keyPacket != null) {
                 val cipherText = Ciphertext.from(keyPacket, eventPart.data)
-                crypto.decryptText(cipherText.asArmoredPGPMessage(), privateKey, keyPassphrase.toByteArray())
+                crypto.decryptText(cipherText.asArmoredPGPMessage(), privateKeys, keyPassphrase.toByteArray())
             } else null
         } else {
             eventPart.data

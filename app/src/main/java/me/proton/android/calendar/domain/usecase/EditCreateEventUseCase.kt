@@ -45,7 +45,7 @@ class EditCreateEventUseCase(
         val memberAddressKey = userAddresses.first().primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO Valentin how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
-        val calendarKey = database.calendarKeysDao().select(calendarId).first { it.isActive && it.isPrimary }
+        val calendarKey = database.calendarKeysDao().select(calendarId).first { it.isActiveAndPrimary }
         val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("there is no valid cached Calendar Passphrase")
 

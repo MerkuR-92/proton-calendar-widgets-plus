@@ -21,7 +21,7 @@ data class CalendarKeyEntity(
     @SerialName("ID")
     val id: String,
     @SerialName("Flags")
-    val flags: Int, // bitmap 1: Primary, 2: Active
+    val flags: Int, // Key flags values: - 0: Inactive - 1: Active - 3: Active and primary
     @SerialName("PrivateKey")
     val privateKey: String, // encrypted with a passphrase
     @SerialName("PassphraseID")
@@ -29,6 +29,6 @@ data class CalendarKeyEntity(
     @SerialName("CalendarID")
     val calendarId: String
 ) {
-    val isPrimary: Boolean get() = flags and 1 > 0
-    val isActive: Boolean get() = flags and 2 > 0
+    val isActiveAndPrimary: Boolean get() = flags == 3
+    val isActive: Boolean get() = flags and 1 > 0
 }
