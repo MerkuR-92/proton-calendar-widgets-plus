@@ -171,6 +171,8 @@
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
+    <string name="notification_channel_sync">Calendar Synchronisation</string>
+    <string name="notification_sync">Synchronising Calendars…</string>
     <string name="notification_text_today">Today</string>
     <string name="notification_text_today_part_time">Today at %s</string>
     <string name="notification_text_tomorrow">Tomorrow</string>
@@ -187,7 +189,7 @@
     <string name="bug_report_discard_changes_confirm">Discard</string>
 
     <!-- Bootstrap errors -->
-    <string name="bootstrap_error_default_confirm">Ok</string>
+    <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_no_active_calendar_title">There are no active calendars associated with this account.</string>

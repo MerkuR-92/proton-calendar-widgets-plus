@@ -97,7 +97,7 @@ class ShowNotificationUseCase(
                         .setContentTitle(dbEvent.summary ?: context.getString(R.string.default_event_summary))
                         .setContentText(text)
                         .setContentIntent(pendingIntent)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true)
 
                     notificationManager.notify(
@@ -180,7 +180,10 @@ class ShowNotificationUseCase(
 
     companion object {
 
-        private val CHANNEL_ID_EVENT_ALARMS = "CHANNEL_ID_EVENT_ALARMS"
+        val CHANNEL_ID_EVENT_ALARMS = "CHANNEL_ID_EVENT_ALARMS"
+        val CHANNEL_ID_SYNC_SERVICE = "CHANNEL_ID_SYNC_SERVICE"
+
+        val NOTIFICATION_ID_SYNC_SERVICE: Int = 1
 
         fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -189,11 +192,15 @@ class ShowNotificationUseCase(
 
                 // event alarms channel
                 val name = context.getString(R.string.notification_channel_alarms)
-                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val importance = NotificationManager.IMPORTANCE_HIGH
                 val channel = NotificationChannel(CHANNEL_ID_EVENT_ALARMS, name, importance)
                 notificationManager.createNotificationChannel(channel)
 
-                // TODO other channels
+                // sync service channel
+                val nameSync = context.getString(R.string.notification_channel_sync)
+                val importanceSync = NotificationManager.IMPORTANCE_LOW
+                val channelSync = NotificationChannel(CHANNEL_ID_SYNC_SERVICE, nameSync, importanceSync)
+                notificationManager.createNotificationChannel(channelSync)
 
             }
         }
