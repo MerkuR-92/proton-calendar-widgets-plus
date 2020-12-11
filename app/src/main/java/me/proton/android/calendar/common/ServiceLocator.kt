@@ -45,6 +45,7 @@ val networkModule = module {
     single<AuthenticationApi> { AuthenticationApiImpl(get()) }
     single<ServerEventsApi> { ServerEventsApiImpl(get()) }
     single<SettingsApi> { SettingsApiImpl(get()) }
+    single<ReportsApi> { ReportsApiImpl(get()) }
 }
 
 val repositoryModule = module {
@@ -84,6 +85,7 @@ val useCaseModule = module {
     factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get(), get(), get()) }
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get()) }
+    factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
 }
 
 fun coreModule(

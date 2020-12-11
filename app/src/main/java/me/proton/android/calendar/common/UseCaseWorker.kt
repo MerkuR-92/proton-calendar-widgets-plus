@@ -5,10 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
-import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
-import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
-import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.get
@@ -29,6 +26,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
+            const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
         }
     }
 
@@ -40,6 +38,16 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
+
+        // Bug Report
+        const val INPUT_OS_NAME = "INPUT_OS_NAME"
+        const val INPUT_OS_VERSION = "INPUT_OS_VERSION"
+        const val INPUT_CLIENT = "INPUT_CLIENT"
+        const val INPUT_APP_VERSION_NAME = "INPUT_APP_VERSION_NAME"
+        const val INPUT_TITLE = "INPUT_TITLE"
+        const val INPUT_DESCRIPTION = "INPUT_DESCRIPTION"
+        const val INPUT_USERNAME = "INPUT_USERNAME"
+        const val INPUT_EMAIL = "INPUT_EMAIL"
     }
 
     /**
@@ -52,6 +60,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val SYNC_ALARMS = "SYNC_ALARMS"
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
+            const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
         }
     }
 
@@ -94,6 +103,19 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.UPDATE_CALENDAR_LIST -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
                 updateCalendarUseCase.executeUpdateList(userId)
+            }
+            UseCaseId.SEND_BUG_REPORT -> {
+                val sendBugReportUseCase: SendBugReportUseCase = get()
+                sendBugReportUseCase.execute(
+                    userId,
+                    inputData.getString(INPUT_OS_NAME) ?: return Result.failure(),
+                    inputData.getString(INPUT_OS_VERSION) ?: return Result.failure(),
+                    inputData.getString(INPUT_CLIENT) ?: return Result.failure(),
+                    inputData.getString(INPUT_APP_VERSION_NAME) ?: return Result.failure(),
+                    inputData.getString(INPUT_TITLE) ?: return Result.failure(),
+                    inputData.getString(INPUT_DESCRIPTION) ?: return Result.failure(),
+                    inputData.getString(INPUT_USERNAME) ?: return Result.failure(),
+                    inputData.getString(INPUT_EMAIL) ?: return Result.failure())
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

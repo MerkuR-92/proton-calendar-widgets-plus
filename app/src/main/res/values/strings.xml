@@ -165,6 +165,9 @@
     <string name="snack_event_opening_edit_error">Error opening event for edit</string>
     <string name="snack_event_init_error">Error initialising new event</string>
     <string name="snack_event_calendar_error">Error switching calendar</string>
+    <string name="snack_send_bug_report_success">Report sent, thank you for your feedback</string>
+    <string name="snack_send_bug_report_error">Error sending report, please try again later</string>
+    <string name="snack_send_bug_report_description_empty">Please provide a description to your report</string>
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
@@ -173,6 +176,15 @@
     <string name="notification_text_tomorrow">Tomorrow</string>
     <string name="notification_text_tomorrow_part_time">Tomorrow at %s</string>
     <string name="notification_text_part_time">%s at %s</string>
+
+    <!-- Bug report -->
+    <string name="bug_report_hint_title">Subject</string>
+    <string name="bug_report_hint_description">Please describe the problem and include any error messages.</string>
+
+    <string name="bug_report_discard_changes_title">Unsaved Changes</string>
+    <string name="bug_report_discard_changes_description">There are unsaved entries in the form. Are you sure you want to discard them?</string>
+    <string name="bug_report_discard_changes_cancel">Keep writing</string>
+    <string name="bug_report_discard_changes_confirm">Discard</string>
 
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Ok</string>

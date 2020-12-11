@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_nav_calendar_to_nav_event_form"
             app:destination="@id/nav_event_form" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_bug_report"
+            app:destination="@id/nav_bug_report" />
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />
@@ -45,6 +48,16 @@
         android:name="me.proton.android.calendar.presentation.settings.SettingsFragment"
         android:label=""
         tools:layout="@layout/fragment_settings"/>
+
+    <dialog
+        android:id="@+id/nav_bug_report"
+        android:name="me.proton.android.calendar.presentation.bug_report.BugReportFragment"
+        android:label=""
+        tools:layout="@layout/fragment_bug_report">
+        <action
+            android:id="@+id/action_nav_bug_report_to_nav_event_form"
+            app:destination="@id/nav_event_form" />
+    </dialog>
 
     <dialog
         android:id="@+id/nav_event_details"

@@ -295,9 +295,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_main_content.nav_view_more_bug_press.setOnSingleClickListener {
-            // TODO Remove when we make in app user bug report form
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://protonmail.com/support-form"))
-            startActivity(browserIntent)
+            navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
             drawerLayout.close()
         }
         accountViewModel.hasPrimary {
