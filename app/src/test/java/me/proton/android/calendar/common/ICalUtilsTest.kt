@@ -2525,11 +2525,20 @@ internal class ICalUtilsTest {
 
     @Test
     fun `UID formatting`() {
+        val normalUid = "7BtoMJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me"
+        assertThat(formatUidForICal(normalUid)).isEqualTo("7BtoMJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me")
+
         val tooLongUid = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me"
         assertThat(formatUidForICal(tooLongUid)).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.m\\r\\n e")
 
         val wayTooLongUid = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T000000@proton.me"
-        assertThat(formatUidForICal(wayTooLongUid)).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000_R2020120\\r\\n 8T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T00000\\r\\n 0@proton.me")
+        assertThat(formatUidForICal(wayTooLongUid)).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000_R2020120\\r\\n 8T000000_R20201208T000000_R20201208T000000_R20201208T000000_R20201208T0000\\r\\n 00@proton.me")
+
+        val alsoTooLongUid = "proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000_R20201207T163000@proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000"
+        assertThat(formatUidForICal(alsoTooLongUid)).isEqualTo("proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000_R\\r\\n 20201207T163000@proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R2020\\r\\n 0905T163000")
+
+        val exactLineLengthLimit = "proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000_R20201207T163000@proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R2020"
+        assertThat(formatUidForICal(exactLineLengthLimit)).isEqualTo("proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000_R\\r\\n 20201207T163000@proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R2020")
 
         val uidWithDates = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me"
         assertThat(generateProtonUid(uidWithDates, "20201209T193000")).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201209T193000@proton.me")

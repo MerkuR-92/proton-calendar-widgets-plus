@@ -737,9 +737,10 @@ fun formatUidForICal(eventUid: String): String {
         val maxLengthWithPrefixIndex = ICAL_LINE_MAXIMUM_LENGTH - ICAL_UID_PREFIX.length
         eventUidValueLines.add(eventUid.substring(0, maxLengthWithPrefixIndex))
         var uid = eventUid.substring(maxLengthWithPrefixIndex)
-        while (uid.length > ICAL_LINE_MAXIMUM_LENGTH) {
-            eventUidValueLines.add(uid.substring(0, ICAL_LINE_MAXIMUM_LENGTH))
-            uid = uid.substring(ICAL_LINE_MAXIMUM_LENGTH)
+        // From this point onward we need to count the space separator as part of the string when checking max line length
+        while (uid.length > ICAL_LINE_MAXIMUM_LENGTH - 1) {
+            eventUidValueLines.add(uid.substring(0, ICAL_LINE_MAXIMUM_LENGTH - 1))
+            uid = uid.substring(ICAL_LINE_MAXIMUM_LENGTH - 1)
         }
         eventUidValueLines.add(uid)
         return eventUidValueLines.joinToString(ICAL_LINE_SEPARATOR)
