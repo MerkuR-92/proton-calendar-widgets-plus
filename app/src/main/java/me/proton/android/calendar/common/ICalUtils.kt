@@ -375,8 +375,9 @@ object ICalUtils {
     fun generateProtonUid(originalUid: String, recurrenceId: String): String {
         // UID has a maximum length allowed so we need to remove existing date from originalUid
         val dateRegex = Regex("_R\\d{8}T\\d{6}")
-        val cleanOriginalUid = originalUid.replace(dateRegex, "").substringBefore("@")
-        return "${cleanOriginalUid}_R$recurrenceId@${originalUid.substringAfter("@")}"
+        val cleanOriginalUid = originalUid.replace(dateRegex, "")
+        val provider = cleanOriginalUid.substringAfterLast("@", "")
+        return "${cleanOriginalUid.substringBeforeLast("@", cleanOriginalUid)}_R$recurrenceId" + if (provider.isNotEmpty()) "@${provider}" else ""
     }
 
     /**

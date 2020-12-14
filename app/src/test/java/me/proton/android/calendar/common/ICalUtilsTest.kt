@@ -2533,5 +2533,21 @@ internal class ICalUtilsTest {
 
         val uidWithDates = "7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201207T000000_R20201208T000000@proton.me"
         assertThat(generateProtonUid(uidWithDates, "20201209T193000")).isEqualTo("7BtoMjJp56XF_1KHDP-4T1t5LuyS_R20201209T193000@proton.me")
+
+        val oldUid = "proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e"
+        assertThat(generateProtonUid(oldUid, "20201209T193000")).isEqualTo("proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20201209T193000")
+
+        // We just remove all _R{recurrenceId} and still keep everything after the last @ delimiter
+        val badUid = "proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000_R20201207T163000@proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20200905T163000"
+        assertThat(generateProtonUid(badUid, "20201209T193000")).isEqualTo("proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e_R20201209T193000@proton-calendar-350095ea-4368-26f0-4fc9-60a56015b02e")
+
+        val noDateUid = "7u13-5hSesk_5rif9dkj3KHgtGAB@proton.me"
+        assertThat(generateProtonUid(noDateUid, "20201209T193000")).isEqualTo("7u13-5hSesk_5rif9dkj3KHgtGAB_R20201209T193000@proton.me")
+
+        val badCharacterUid = "7u13-5hSesk_5rif9dk@j3KHgtGAB@proton.me"
+        assertThat(generateProtonUid(badCharacterUid, "20201209T193000")).isEqualTo("7u13-5hSesk_5rif9dk@j3KHgtGAB_R20201209T193000@proton.me")
+
+        val importedUid = "7u13-5hSesk_5rif9dkj3KHgtGAB@google.com"
+        assertThat(generateProtonUid(importedUid, "20201209T193000")).isEqualTo("7u13-5hSesk_5rif9dkj3KHgtGAB_R20201209T193000@google.com")
     }
 }
