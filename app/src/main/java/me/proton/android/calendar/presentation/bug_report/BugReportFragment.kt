@@ -138,7 +138,7 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
             )
         }
 
-        toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = "Report bugs"
+        toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_more_bug)
     }
 
     private fun displayLoading(display: Boolean) {
