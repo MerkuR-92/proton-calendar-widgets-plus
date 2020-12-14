@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.model
 
 data class User(
     override val id: String,
+    val name: String?,
     val keys: List<UserKey>,
     val email: String?,
     val displayName: String?,

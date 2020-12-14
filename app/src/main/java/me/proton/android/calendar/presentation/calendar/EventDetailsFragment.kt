@@ -307,13 +307,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
             }
-
-            calendarViewModel.deletingEvent.observe(viewLifecycleOwner, Observer { deletingEvent: Boolean ->
-                // Update action bar buttons visibility
-                loadingAction.visibleOrGone(deletingEvent)
-                buttonEdit.visibleOrGone(!deletingEvent)
-                buttonMenu.visibleOrGone(!deletingEvent)
-            })
         }
     }
 
@@ -341,9 +334,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
             (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
-            // TODO Remove attendees condition once edit attendees is implemented
-            buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty())
-            buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty())
+            calendarViewModel.deletingEvent.observe(viewLifecycleOwner, Observer { deletingEvent: Boolean ->
+                // Update action bar buttons visibility
+                loadingAction.visibleOrGone(deletingEvent)
+                // TODO Remove attendees condition once edit attendees is implemented
+                buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty() && !deletingEvent)
+                buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty() && !deletingEvent)
+            })
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!

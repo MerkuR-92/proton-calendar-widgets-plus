@@ -97,7 +97,7 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
                     )
                     val title: String = bug_report_title.text.toString()
                     val description: String = bug_report_description.text.toString()
-                    val username: String = user?.displayName ?: ""
+                    val username: String = user?.name ?: ""
                     val email: String = user?.email ?: ""
 
                     calendarViewModel.sendBugReport(

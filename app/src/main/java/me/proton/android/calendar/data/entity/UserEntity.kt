@@ -43,6 +43,7 @@ data class UserEntity(
                 Json { this.ignoreUnknownKeys = true }.decodeFromJsonElement<UserKey>(it)
             },
             email = this.email,
+            name = this.name,
             displayName = this.displayName ?: this.name,
             subscribed = this.subscribed,
             usedSpace = this.usedSpace,
