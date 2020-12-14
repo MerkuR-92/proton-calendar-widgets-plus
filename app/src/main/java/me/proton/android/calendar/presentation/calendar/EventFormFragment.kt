@@ -320,6 +320,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
 
+            // TODO Fix transition so title hint doesn't blink on screen
+            if (navigationArguments.eventId != null) event_form_title.hint = ""
+
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
             val userId = accountViewModel.getPrimaryUserId()
@@ -380,7 +383,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private fun observeEventLiveData() {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
 
-            event.summary?.let { event_form_title.setText(it) }
+            // TODO Fix transition so title hint doesn't blink on screen
+            event_form_title.hint = resources.getString(R.string.event_hint_title)
+            event.summary?.let {
+                if (it.isNotEmpty()) event_form_title.setText(it)
+            }
             event.location?.let { event_form_location.setText(it) }
             event.description?.let { event_form_description.setText(it) }
 

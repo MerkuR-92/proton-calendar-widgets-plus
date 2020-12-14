@@ -433,7 +433,7 @@ class EventViewModel(
                     }
 
                     // Make sure timezone matches parent timezone
-                    if (dbEvent.iCalendar.iCalTimeZone(dbEvent.iCalEvent.dateStart).id != event.defaultTimeZone!!) {
+                    if (!dbEvent.isAllDay() && dbEvent.iCalendar.iCalTimeZone(dbEvent.iCalEvent.dateStart).id != event.defaultTimeZone!!) {
                         eventToCreate.setRecurrenceId(
                             dbEventWithOccurrenceStartDate.withZoneSameInstant(ZoneId.of(dbEvent.iCalendar.iCalTimeZone(dbEvent.iCalEvent.dateStart).id)),
                             !dbEvent.isAllDay()
