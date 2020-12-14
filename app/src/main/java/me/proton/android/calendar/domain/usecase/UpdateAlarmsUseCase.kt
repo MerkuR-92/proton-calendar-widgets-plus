@@ -48,6 +48,11 @@ class UpdateAlarmsUseCase(
 
             val upcomingAlarms = ICalUtils.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
 
+            if (transformedChain.isEmpty()) {
+                logger.e("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")
+                return@forEach
+            }
+
             transformedChain.forEach {
                 database.eventAlarmsDao().deleteAllByEventId(it.id)
             }
