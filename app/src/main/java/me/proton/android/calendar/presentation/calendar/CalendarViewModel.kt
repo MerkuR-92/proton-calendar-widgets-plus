@@ -66,8 +66,6 @@ class CalendarViewModel(
 
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
 
-    var deletingEvent = MutableLiveData(false)
-
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
         if (userId == null) {
@@ -111,9 +109,6 @@ class CalendarViewModel(
     // TODO go back to UserId as String
     suspend fun initForUser(userId: UserId): Flow<CalendarsRepository.InitingState> {
         return flow {
-
-            // Set default deleting event value
-            deletingEvent.postValue(false)
 
             // TODO make this prettier
             val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
@@ -273,9 +268,6 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel fetchEvents")
             return UseCase.Result.Error("User ID was null in CalendarViewModel handleDeleteEvent")
         }
-
-        // Post deleting event value to true to trigger loading state
-        deletingEvent.postValue(true)
 
         return viewModelScope.async {
             withContext(Dispatchers.IO) {

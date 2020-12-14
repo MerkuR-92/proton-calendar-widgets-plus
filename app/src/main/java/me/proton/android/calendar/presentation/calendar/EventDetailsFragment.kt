@@ -167,6 +167,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             ) {
 
                 lifecycleScope.launch {
+
+                    // Post deleting event value to true to display loading state
+                    eventViewModel.savingEvent.postValue(true)
+
                     val deleteResult = withContext(Dispatchers.IO) {
                         if (it == 0) {
                             calendarViewModel.handleDeleteEvent(
@@ -196,7 +200,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     }
 
                     // Post deleting event value to false to stop loading state
-                    calendarViewModel.deletingEvent.postValue(false)
+                    eventViewModel.savingEvent.postValue(false)
 
                     if (deleteResult == UseCase.Result.Success) {
                         requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
@@ -230,6 +234,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     else R.string.dialog_description_delete_event)
                 .setPositiveButton(R.string.dialog_button_delete) { dialog, which ->
                     lifecycleScope.launch { // TODO
+
+                        // Post deleting event value to true to display loading state
+                        eventViewModel.savingEvent.postValue(true)
+
                         val deleteResult = withContext(Dispatchers.Default) {
                             if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true
                                 || disabledCalendarRecurringEvent) {
@@ -247,7 +255,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         }
 
                         // Post deleting event value to false to stop loading state
-                        calendarViewModel.deletingEvent.postValue(false)
+                        eventViewModel.savingEvent.postValue(false)
 
                         if (deleteResult == UseCase.Result.Success) {
                             requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
@@ -334,12 +342,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
             (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
-            calendarViewModel.deletingEvent.observe(viewLifecycleOwner, Observer { deletingEvent: Boolean ->
+            eventViewModel.savingEvent.observe(viewLifecycleOwner, Observer { savingEvent: Boolean ->
                 // Update action bar buttons visibility
-                loadingAction.visibleOrGone(deletingEvent)
+                loadingAction.visibleOrGone(savingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented
-                buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty() && !deletingEvent)
-                buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty() && !deletingEvent)
+                buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty() && !savingEvent)
+                buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty() && !savingEvent)
             })
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
