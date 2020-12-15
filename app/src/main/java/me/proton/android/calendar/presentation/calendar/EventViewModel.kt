@@ -788,7 +788,7 @@ class EventViewModel(
     private suspend fun handleOriginalEventNullSequence(dbEvent: Event): Boolean {
         // Update the sequence of parent if it didn't have a value before
         if (dbEvent.iCalEvent.sequence?.value == null) {
-            dbEvent.iCalEvent.setSequence((dbEvent.iCalEvent.sequence?.value ?: 0) + 1)
+            dbEvent.iCalEvent.setSequence(0)
             val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEvent.calendar.id, dbEvent)
             if (editOriginalEventResult != UseCase.Result.Success) {
                 if (editOriginalEventResult is UseCase.Result.Error) {
