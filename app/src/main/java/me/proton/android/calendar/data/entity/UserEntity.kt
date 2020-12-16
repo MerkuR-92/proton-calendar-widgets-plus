@@ -11,6 +11,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.model.UserKey
+import me.proton.core.util.kotlin.nullIfBlank
 
 @Serializable
 @Entity(tableName = AppDatabase.TABLE_USERS)
@@ -44,7 +45,7 @@ data class UserEntity(
             },
             email = this.email,
             name = this.name,
-            displayName = this.displayName ?: this.name,
+            displayName = this.displayName?.nullIfBlank() ?: this.name,
             subscribed = this.subscribed,
             usedSpace = this.usedSpace,
             maxSpace = this.maxSpace,
