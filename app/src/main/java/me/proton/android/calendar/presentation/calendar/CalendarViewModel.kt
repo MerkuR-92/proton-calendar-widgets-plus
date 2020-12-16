@@ -112,9 +112,13 @@ class CalendarViewModel(
 
             // TODO make this prettier
             val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
-            if (calendarUserSettings == null) logger.e("initForUser: calendarUserSettings was null")
+            if (calendarUserSettings == null) logger.e("CalendarViewModel initForUser: calendarUserSettings was null")
             val timeZone = calendarUserSettings?.primaryTimezone
-            if (timeZone == null) logger.e("initForUser: timeZone was null")
+            if (timeZone == null) {
+                logger.e("CalendarViewModel initForUser: timeZone was null. Emitting error state and going back to login screen.")
+                emit(CalendarsRepository.InitingState.Error)
+                return@flow
+            }
 
             _timeZoneId.postValue(ZoneId.of(timeZone))
             _startWeekOn.postValue(usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!)

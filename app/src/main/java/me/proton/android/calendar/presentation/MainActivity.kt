@@ -298,9 +298,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
             drawerLayout.close()
         }
-        accountViewModel.hasPrimary {
-            nav_view_main_content.nav_view_more_logout_layout.isVisible = it
-            nav_view_main_content.nav_view_more_login_layout.isGone = it
+        accountViewModel.hasPrimary.observe(this@MainActivity) { hasPrimary ->
+            nav_view_main_content.nav_view_more_logout_layout.isVisible = hasPrimary
+            nav_view_main_content.nav_view_more_login_layout.isGone = hasPrimary
         }
         nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
             accountViewModel.logoutPrimary()

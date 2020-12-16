@@ -58,11 +58,45 @@ class AccountViewModel(
     private var userId = MutableStateFlow<String?>(null)
     private var userPassphrase = MutableStateFlow<ByteArray?>(null)
     private var lastServerEventId = MutableStateFlow<String?>(null)
+    private val _hasPrimary = MutableLiveData<Boolean>()
 
     private val _state = MutableLiveData<State>()
     private val _errorReport = MutableLiveData<Error>()
 
-    private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String, defaultCalendarName: String) {
+    private var defaultCalendarName: String = "My calendar" // This value is set in init.
+
+    init {
+        // Setup User as soon as all parameters are available.
+        combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
+            if (id != null && passphrase != null && eventId != null) {
+                setupUser(UserId(id), passphrase, eventId)
+            }
+        }.launchIn(viewModelScope)
+
+        // Check if we already have Ready accounts.
+        viewModelScope.launch {
+            val initialReadyAccounts = accountManager.getAccounts(AccountState.Ready).first()
+            if (initialReadyAccounts.isNotEmpty()) _state.postValue(State.Ready)
+        }
+
+        // Raise LoginNeeded if no accounts, at anytime.
+        accountManager.getAccounts().onEach { accounts ->
+            if (accounts.isEmpty()) _state.postValue(State.LoginNeeded)
+        }.launchIn(viewModelScope)
+
+        // General state handling.
+        accountManager.observe(viewModelScope)
+            .onAccountDisabled { removeUser(it.userId) }
+            .onAccountTwoPassModeFailed { removeUser(it.userId) }
+            .onAccountRemoved { cleanUser(it.userId) }
+
+        // Observe primary user id.
+        accountManager.getPrimaryUserId().onEach { userId ->
+            _hasPrimary.postValue(userId != null)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String) {
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         valueStore.putString(ValueKey.USER_PASSPHRASE, String(passphrase))
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
@@ -119,10 +153,13 @@ class AccountViewModel(
 
     val state: LiveData<State> = _state
     val errorReport: LiveData<Error> = _errorReport
+    val hasPrimary: LiveData<Boolean> = _hasPrimary
 
     fun init(context: ComponentActivity) {
         // Make sure we clear error on init
         clearError()
+
+        defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
 
         authOrchestrator.register(context)
 
@@ -139,31 +176,6 @@ class AccountViewModel(
                     userPassphrase.value = result.passphrase
                 }
             }
-
-        // Setup User as soon as all parameters are available.
-        combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
-            if (id != null && passphrase != null && eventId != null) {
-                _state.postValue(State.Processing)
-                setupUser(UserId(id), passphrase, eventId, context.resources.getString(R.string.default_calendar_name))
-            }
-        }.launchIn(viewModelScope)
-
-        // Check if we already have Ready accounts.
-        viewModelScope.launch {
-            val initialReadyAccounts = accountManager.getAccounts(AccountState.Ready).first()
-            if (initialReadyAccounts.isNotEmpty()) _state.postValue(State.Ready)
-        }
-
-        // Raise LoginNeeded if no accounts, at anytime.
-        accountManager.getAccounts().onEach { accounts ->
-            if (accounts.isEmpty()) _state.postValue(State.LoginNeeded)
-        }.launchIn(viewModelScope)
-
-        // General state handling.
-        accountManager.observe(viewModelScope)
-            .onAccountDisabled { removeUser(it.userId) }
-            .onAccountTwoPassModeFailed { removeUser(it.userId) }
-            .onAccountRemoved { cleanUser(it.userId) }
     }
 
     fun startLoginWorkflow() {
@@ -173,6 +185,8 @@ class AccountViewModel(
         lastServerEventId.value = null
 
         authOrchestrator.startLoginWorkflow(AccountType.Internal)
+
+        _state.postValue(State.Processing)
     }
 
     suspend fun getPrimaryUserId(): UserId? {
@@ -181,12 +195,6 @@ class AccountViewModel(
 
     fun logoutPrimary() = viewModelScope.launch {
         getPrimaryUserId()?.let { userId -> removeUser(userId) }
-    }
-
-    fun hasPrimary(action: (Boolean) -> Unit) {
-        accountManager.getPrimaryUserId().onEach { userId ->
-            userId?.let { action(true) } ?: action(false)
-        }.launchIn(viewModelScope)
     }
 
     fun clearError() {
