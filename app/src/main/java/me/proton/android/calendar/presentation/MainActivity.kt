@@ -178,6 +178,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val materialDialog = MaterialAlertDialogBuilder(this@MainActivity)
                     .setTitle(dialogTitle)
                     .setMessage(dialogMessage)
+                    .setCancelable(false)
                     .setPositiveButton(R.string.bootstrap_error_default_confirm) { _, _ ->
                         clearError()
                         handleAccountState(this, state.value!!)
@@ -224,12 +225,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
         when (state) {
-            is AccountViewModel.State.LoginNeeded -> {
+            AccountViewModel.State.LoginNeeded -> {
                 findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
                 accountViewModel.startLoginWorkflow()
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
-            is AccountViewModel.State.Ready -> {
+            AccountViewModel.State.Ready -> {
                 // Default navigate to root
                 navController.navigate(Navigation.Deeplink.toRoot())
 
@@ -254,7 +255,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     navigateTo(Navigation.Deeplink.toMonth())
                 }
             }
-            is AccountViewModel.State.Processing -> {
+            AccountViewModel.State.LoginInProgress,
+            AccountViewModel.State.Processing -> {
                 displaySplashScreen(true, true, resources.getString(R.string.splash_after_login_init))
             }
         }

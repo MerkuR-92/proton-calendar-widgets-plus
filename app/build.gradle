@@ -127,6 +127,8 @@ dependencies {
     implementation "me.proton.core:network:${rootProject.ext.version.proton_core_networking}"
     implementation "me.proton.core:util-kotlin:${rootProject.ext.version.proton_core_util_kotlin}"
 
+    implementation "androidx.activity:activity-ktx:1.2.0-rc01"
+
     // Assisted Inject.
     compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:${rootProject.ext.version.assisted_inject}"
     kapt "com.squareup.inject:assisted-inject-processor-dagger2:${rootProject.ext.version.assisted_inject}"
