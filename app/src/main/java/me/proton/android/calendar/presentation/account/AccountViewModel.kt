@@ -8,12 +8,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.ValueKey
-import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
-import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.FetchUserUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.account.domain.entity.AccountState
@@ -34,7 +30,6 @@ class AccountViewModel(
     private val authOrchestrator: AuthOrchestrator,
     private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
-    private val createCalendarUseCase: CreateCalendarUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository
@@ -42,6 +37,7 @@ class AccountViewModel(
 
     sealed class State {
         object LoginNeeded : State()
+        object LoginInProgress : State()
         object Processing : State()
         object Ready : State()
     }
@@ -55,28 +51,39 @@ class AccountViewModel(
         object NoActiveCalendar : Error()
     }
 
-    private var userId = MutableStateFlow<String?>(null)
-    private var userPassphrase = MutableStateFlow<ByteArray?>(null)
-    private var lastServerEventId = MutableStateFlow<String?>(null)
     private val _hasPrimary = MutableLiveData<Boolean>()
-
     private val _state = MutableLiveData<State>()
     private val _errorReport = MutableLiveData<Error>()
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
     init {
-        // Setup User as soon as all parameters are available.
-        combine(userId, userPassphrase, lastServerEventId) { id, passphrase, eventId ->
-            if (id != null && passphrase != null && eventId != null) {
-                setupUser(UserId(id), passphrase, eventId)
-            }
-        }.launchIn(viewModelScope)
+        // General state handling.
+        accountManager.observe(viewModelScope)
+            .onAccountDisabled { removeUser(it.userId) }
+            .onAccountTwoPassModeFailed { removeUser(it.userId) }
+            .onAccountRemoved { cleanUser(it.userId) }
+
+        // Clean any unrecoverable Account.
+        viewModelScope.launch {
+            accountManager.getAccounts().first()
+                .filter {
+                    when (it.state) {
+                        AccountState.Removed,
+                        AccountState.Disabled,
+                        AccountState.TwoPassModeFailed -> true
+                        else -> false
+                    }
+                }
+                .forEach { removeUser(it.userId) }
+        }
 
         // Check if we already have Ready accounts.
         viewModelScope.launch {
             val initialReadyAccounts = accountManager.getAccounts(AccountState.Ready).first()
-            if (initialReadyAccounts.isNotEmpty()) _state.postValue(State.Ready)
+            if (initialReadyAccounts.isNotEmpty() && _state.value != State.Processing) {
+                _state.postValue(State.Ready)
+            }
         }
 
         // Raise LoginNeeded if no accounts, at anytime.
@@ -84,21 +91,34 @@ class AccountViewModel(
             if (accounts.isEmpty()) _state.postValue(State.LoginNeeded)
         }.launchIn(viewModelScope)
 
-        // General state handling.
-        accountManager.observe(viewModelScope)
-            .onAccountDisabled { removeUser(it.userId) }
-            .onAccountTwoPassModeFailed { removeUser(it.userId) }
-            .onAccountRemoved { cleanUser(it.userId) }
-
         // Observe primary user id.
         accountManager.getPrimaryUserId().onEach { userId ->
             _hasPrimary.postValue(userId != null)
         }.launchIn(viewModelScope)
     }
 
-    private fun setupUser(userId: UserId, passphrase: ByteArray, eventId: String) {
-        val valueStore = valueStoreProvider.provideValueStore(userId.id)
+    private fun saveEventId(eventId: String) {
+        val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+        valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
+    }
+
+    private fun saveUser(userId: UserId, passphrase: ByteArray) {
+        val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+        valueStore.putString(ValueKey.USER_ID, userId.id)
         valueStore.putString(ValueKey.USER_PASSPHRASE, String(passphrase))
+    }
+
+    private fun trySetupUser() {
+        val tempValueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+        val eventId = tempValueStore.getString(ValueKey.LAST_SERVER_EVENT_ID) ?: return
+        val userIdString = tempValueStore.getString(ValueKey.USER_ID) ?: return
+        val userId = UserId(userIdString)
+        val passphrase = tempValueStore.getString(ValueKey.USER_PASSPHRASE) ?: return
+
+        _state.postValue(State.Processing)
+
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
+        valueStore.putString(ValueKey.USER_PASSPHRASE, passphrase)
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
         viewModelScope.launch {
@@ -134,6 +154,7 @@ class AccountViewModel(
     private suspend fun removeUser(userId: UserId) {
         accountManager.removeAccount(userId)
         valueStoreProvider.provideValueStore(userId.id).clearAll()
+        valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET).clearAll()
     }
 
     private suspend fun cleanUser(userId: UserId) {
@@ -161,32 +182,27 @@ class AccountViewModel(
 
         defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
 
-        authOrchestrator.register(context)
-
         // Wait on mandatory parameters.
-        authOrchestrator
-            .onLoginResult { result ->
+        with(authOrchestrator) {
+            register(context)
+            onLoginResult { result ->
                 result?.let {
-                    lastServerEventId.value = result.session.eventId
+                    saveEventId(result.session.eventId)
+                    trySetupUser()
                 } ?: finishAppIfNoAccount(context)
             }
-            .onUserResult { result ->
+            onUserResult { result ->
                 result?.let {
-                    userId.value = result.id
-                    userPassphrase.value = result.passphrase
+                    saveUser(UserId(result.id), result.passphrase!!)
+                    trySetupUser()
                 }
             }
+        }
     }
 
     fun startLoginWorkflow() {
-        // Discard each current values.
-        userId.value = null
-        userPassphrase.value = null
-        lastServerEventId.value = null
-
+        _state.postValue(State.LoginInProgress)
         authOrchestrator.startLoginWorkflow(AccountType.Internal)
-
-        _state.postValue(State.Processing)
     }
 
     suspend fun getPrimaryUserId(): UserId? {
