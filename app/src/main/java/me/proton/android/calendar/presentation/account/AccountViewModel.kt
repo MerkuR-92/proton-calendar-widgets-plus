@@ -13,6 +13,7 @@ import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.FetchUserUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.account.domain.entity.AccountState
+import me.proton.core.account.domain.entity.SessionState
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getAccounts
 import me.proton.core.accountmanager.presentation.observe
@@ -63,20 +64,6 @@ class AccountViewModel(
             .onAccountDisabled { removeUser(it.userId) }
             .onAccountTwoPassModeFailed { removeUser(it.userId) }
             .onAccountRemoved { cleanUser(it.userId) }
-
-        // Clean any unrecoverable Account.
-        viewModelScope.launch {
-            accountManager.getAccounts().first()
-                .filter {
-                    when (it.state) {
-                        AccountState.Removed,
-                        AccountState.Disabled,
-                        AccountState.TwoPassModeFailed -> true
-                        else -> false
-                    }
-                }
-                .forEach { removeUser(it.userId) }
-        }
 
         // Check if we already have Ready accounts.
         viewModelScope.launch {
@@ -176,7 +163,7 @@ class AccountViewModel(
     val errorReport: LiveData<Error> = _errorReport
     val hasPrimary: LiveData<Boolean> = _hasPrimary
 
-    fun init(context: ComponentActivity) {
+    fun init(context: ComponentActivity, newActivity: Boolean) {
         // Make sure we clear error on init
         clearError()
 
@@ -197,6 +184,31 @@ class AccountViewModel(
                     trySetupUser()
                 }
             }
+        }
+
+        // Clean any unrecoverable Account.
+        viewModelScope.launch {
+            accountManager.getAccounts().first()
+                .filter { account ->
+
+                    val isAccountUnrecoverable = when (account.state) {
+                        AccountState.Removed,
+                        AccountState.Disabled,
+                        AccountState.TwoPassModeFailed -> true
+                        AccountState.TwoPassModeNeeded -> newActivity
+                        else -> false
+                    }
+
+                    val isSessionUnrecoverable = when (account.sessionState) {
+                        SessionState.SecondFactorNeeded -> newActivity // TODO wait for core to actually relaunch the login process
+                        else -> false
+                    }
+
+                    isAccountUnrecoverable || isSessionUnrecoverable
+                }
+                .forEach {
+                    removeUser(it.userId)
+                }
         }
     }
 
