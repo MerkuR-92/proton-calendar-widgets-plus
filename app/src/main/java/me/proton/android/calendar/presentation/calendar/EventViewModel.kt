@@ -1113,6 +1113,9 @@ class EventViewModel(
 
                                     if (positiveTimeOfDay.hour > 0) hours(positiveTimeOfDay.hour)
                                     if (positiveTimeOfDay.minute > 0) minutes(positiveTimeOfDay.minute)
+
+                                    // on the same day at 00:00 which means "at the time of the event"
+                                    if (tempAlarmTime == LocalTime.MIDNIGHT) seconds(0)
                                 }
                             }
                         }.build()
