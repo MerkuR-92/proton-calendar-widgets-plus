@@ -316,6 +316,7 @@
             <EditText
                 android:id="@+id/event_form_location"
                 style="@style/Text.Default"
+                android:textColorHint="@color/text_hint"
                 android:paddingStart="@dimen/default_margin_text_start"
                 android:paddingEnd="@dimen/default_margin_text_end"
                 android:paddingTop="@dimen/default_margin_text_vertical_large"
@@ -463,6 +464,7 @@
             <EditText
                 android:id="@+id/event_form_description"
                 style="@style/Text.Default"
+                android:textColorHint="@color/text_hint"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/default_margin_text_start"
