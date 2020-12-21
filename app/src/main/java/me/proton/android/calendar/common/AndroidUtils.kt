@@ -901,7 +901,8 @@ fun expand(v: View, duration: Long? = null, height: Int? = null) {
     }
 
     // Expansion speed of 1dp/ms
-    animation.duration = duration ?: (targetHeight / v.context.resources.displayMetrics.density).toLong()
+    val animationDuration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
+    animation.duration = duration ?: if (animationDuration > EXPAND_MAX_ANIM_DURATION) EXPAND_MAX_ANIM_DURATION else animationDuration
     TimberLogger.d("animation expand : duration = ${animation.duration}")
     v.startAnimation(animation)
 }
@@ -926,7 +927,8 @@ fun collapse(v: View, duration: Long? = null): Int {
     }
 
     // Collapse speed of 1dp/ms
-    animation.duration = duration ?: (initialHeight / v.context.resources.displayMetrics.density).toLong()
+    val animationDuration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
+    animation.duration = duration ?: if (animationDuration > COLLAPSE_MAX_ANIM_DURATION) COLLAPSE_MAX_ANIM_DURATION else animationDuration
     TimberLogger.d("animation collapse : duration = ${animation.duration}")
     v.startAnimation(animation)
     return initialHeight

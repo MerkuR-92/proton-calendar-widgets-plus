@@ -298,14 +298,11 @@ class MonthFragment : BaseFragment() {
         }
 
         calendarViewModel.hasActiveCalendars.observe(viewLifecycleOwner) { hasActiveCalendars ->
-            TimberLogger.e("test calendars: hasActiveCalendars 1 $hasActiveCalendars")
             hasActiveCalendars ?: return@observe // Ensure we won't be using a null value
             if (hasActiveCalendars) {
-                TimberLogger.e("test calendars: hasActiveCalendars 2")
                 buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_inverted))
                 buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_oval)
             } else {
-                TimberLogger.e("test calendars: hasActiveCalendars 3")
                 buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_disabled))
                 buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_disabled_oval)
             }

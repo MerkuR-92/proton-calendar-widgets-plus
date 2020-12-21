@@ -35,6 +35,9 @@ const val ICAL_LINE_MAXIMUM_LENGTH = 75
 const val ICAL_LINE_SEPARATOR = "\\r\\n "
 const val ICAL_UID_PREFIX = "UID:"
 
+const val EXPAND_MAX_ANIM_DURATION = 500L
+const val COLLAPSE_MAX_ANIM_DURATION = 500L
+
 object FormValidation {
 
     val MIN_SUPPORTED_DATETIME = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.of("UTC"))
