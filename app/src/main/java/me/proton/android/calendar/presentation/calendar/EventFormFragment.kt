@@ -208,7 +208,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     } else { // TODO merge this with code above
                         val success = withContext(Dispatchers.IO) {
                             eventViewModel.handleSave(
-                                editOption = null,
+                                editOption =
+                                if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true)
+                                    EventEditDeleteOption.ALL_EVENTS
+                                else
+                                    null,
                                 occurrenceNumber = 1)
                         }
                         withContext(Dispatchers.Default) {
