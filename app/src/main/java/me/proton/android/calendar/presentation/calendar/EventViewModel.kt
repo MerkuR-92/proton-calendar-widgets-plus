@@ -1085,7 +1085,7 @@ class EventViewModel(
                             when (countTypeOption) {
                                 2 -> {
                                     prior(true)
-                                    val adjustedDays = count - 1
+                                    val adjustedDays = count - 1 + (if (tempAlarmTime == LocalTime.MIDNIGHT) 1 else 0)
                                     if (adjustedDays > 0) days(adjustedDays)
                                     if (count == 0) days(count)
 

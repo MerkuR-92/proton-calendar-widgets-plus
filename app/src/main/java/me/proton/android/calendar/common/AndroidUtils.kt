@@ -426,10 +426,10 @@ class AndroidUtils(context: Context) {
                 TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
 
                 val onTheSameDay = !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
-
+                
                 // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
-                var daysFormatted: Int? = if (trigger.days != null) { // (trigger.days?.toInt() ?: 0) + 1
-                    trigger.days + 1
+                var daysFormatted: Int? = if (trigger.days != null) { // add 1 day if time of day exists and is different than midnight
+                    trigger.days + (if ((trigger.hours != null && trigger.hours.toInt() != 0) || (trigger.minutes != null && trigger.minutes?.toInt() != 0)) 1 else 0)
                 } else {
                     if (trigger.hours != null || trigger.minutes != null) {
                         1
