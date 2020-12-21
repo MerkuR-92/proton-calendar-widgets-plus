@@ -14,6 +14,7 @@ import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
+import android.os.Build
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -1071,4 +1072,12 @@ fun String.formattedTimeZoneToId(): String {
         Regex(" (\\(GMT[+-]\\d{1,2}:?(\\d{1,2})?\\))"),
         ""
     )
+}
+
+fun getCurrentLocale(context: Context): Locale? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        context.resources.configuration.locales[0]
+    } else {
+        context.resources.configuration.locale
+    }
 }
