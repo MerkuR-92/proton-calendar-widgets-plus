@@ -66,6 +66,9 @@ class CalendarViewModel(
 
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
 
+    private val _hasActiveCalendars: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
+    val hasActiveCalendars: LiveData<Boolean> = _hasActiveCalendars
+
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
         if (userId == null) {
@@ -82,7 +85,11 @@ class CalendarViewModel(
             return MutableLiveData()
         }
         return calendarsRepository.flowCalendars(userId).map { calendars ->
-            calendars.filter { it.isActive }
+            val filteredCalendars = calendars.filter {
+                it.isActive
+            }
+            _hasActiveCalendars.postValue(filteredCalendars.isNotEmpty())
+            return@map filteredCalendars
         }.asLiveData(Dispatchers.Default)
     }
 

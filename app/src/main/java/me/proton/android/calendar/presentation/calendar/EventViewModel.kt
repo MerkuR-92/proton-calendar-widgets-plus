@@ -111,7 +111,19 @@ class EventViewModel(
 
         this.userId = userId
 
-        var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id) ?: return UseCase.Result.Error("could not get default calendar ID")
+        var defaultCalendar: CalendarEntity? = null
+        if (editMode) {
+            var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+                ?: return UseCase.Result.Error("could not get default calendar ID")
+            defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+            if (defaultCalendar == null || !defaultCalendar.isActive) {
+                defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull()
+                    ?: return UseCase.Result.Error("no active calendars for user")
+                defaultCalendarId = defaultCalendar.id
+            }
+
+            if (!loadSettingsForCalendar(defaultCalendarId)) return UseCase.Result.Error("could not get CalendarSettings")
+        }
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return UseCase.Result.Error("could not get Calendar User Settings")
         userSettings = usersRepository.selectUserSettings(userId.id) ?: return UseCase.Result.Error("could not get User Settings")
@@ -124,15 +136,9 @@ class EventViewModel(
         logger.d("EventViewModel initialise with startDate: $initStartDate")
         logger.d("EventViewModel initialise with startTime: ${initStartTime}")
 
-        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
-        if (defaultCalendar == null || !defaultCalendar.isActive) {
-            defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull() ?: return UseCase.Result.Error("no active calendars for user")
-            defaultCalendarId = defaultCalendar.id
-        }
-
-        if (!loadSettingsForCalendar(defaultCalendarId)) return UseCase.Result.Error("could not get CalendarSettings")
-
         event = if (eventId == null) {
+
+            if (defaultCalendar == null) return UseCase.Result.Error("could not get default calendar")
 
             eventTimeZoneId = displayTimeZoneId
 
@@ -140,13 +146,21 @@ class EventViewModel(
             val newVEvent = newICalendar.events.first()
 
             // if there is no requested start date, we take today
-            val startDate = if (initStartDate != null) LocalDate.parse(initStartDate) else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
+            val startDate =
+                if (initStartDate != null) LocalDate.parse(initStartDate)
+                else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
             // if there is no requested start time, we calculate it according to "now"
-            val startTime = if (initStartTime != null) LocalTime.parse(initStartTime) else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).plusMinutes(
-                this.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS).toLocalTime()
+            val startTime =
+                if (initStartTime != null) LocalTime.parse(initStartTime)
+                else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).plusMinutes(
+                    this.calendarSettings.defaultEventDuration.toLong()
+                ).truncatedTo(ChronoUnit.HOURS).toLocalTime()
             // end Zoned Date Time according to default event duration
-            val endZonedDateTime = ZonedDateTime.of(startDate, startTime, ZoneId.of(eventTimeZoneId)).plusMinutes(
-                this.calendarSettings.defaultEventDuration.toLong())
+            val endZonedDateTime = ZonedDateTime.of(
+                startDate,
+                startTime,
+                ZoneId.of(eventTimeZoneId)).plusMinutes(this.calendarSettings.defaultEventDuration.toLong()
+            )
 
             timeStartBackup = startTime
             timeEndBackup = endZonedDateTime.toLocalTime() // this time can be before timeStartBackup at this point
@@ -172,28 +186,6 @@ class EventViewModel(
                 newICalendar.setStartTimeZone(eventTimeZoneId)
                 newICalendar.setEndTimeZone(eventTimeZoneId)
             }
-
-
-
-//            if (initStartDate == null) { // TODO this will be only used when we create new event from outside of the app
-//                newVEvent.setStart(defaultStartDate)
-//                newVEvent.setEnd(defaultStartDate)
-//            } else {
-//
-
-//                if (initStartTime == null) { // create new all-day event
-//                    newVEvent.setStart(requestedStartDate)
-//                    newVEvent.setEnd(requestedStartDate.plusDays(1))
-//                } else { // create new partial-day event
-
-//                }
-
-//                if (initStartTime == null) { // create new all-day event
-
-//                }
-
-//            }
-
 
             logger.d("INIT: ${newICalendar.printToString()}")
 
@@ -238,20 +230,26 @@ class EventViewModel(
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
-
-                    val startTime = ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong()).truncatedTo(ChronoUnit.HOURS).toLocalTime()
-                    timeStartBackup = startTime
-                    timeEndBackup = startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
-                } else {
-                    timeStartBackup = this.getStart(timeZoneForOccurrence)!!.toLocalTime()
-                    timeEndBackup = this.getEnd(timeZoneForOccurrence)!!.toLocalTime()
                 }
 
                 // default timezone in iCalendar is used for GUI
                 this.iCalendar.setDefaultTimeZone(timeZoneForOccurrence)
 
-                // Clone RRule from original event in DB if we are in edit mode
                 if (editMode) {
+                    // Setup event time backup values
+                    if (this.isAllDay()) {
+                        val startTime = ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
+                            .plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
+                            .truncatedTo(ChronoUnit.HOURS).toLocalTime()
+                        timeStartBackup = startTime
+                        timeEndBackup =
+                            startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
+                    } else {
+                        timeStartBackup = this.getStart(timeZoneForOccurrence)!!.toLocalTime()
+                        timeEndBackup = this.getEnd(timeZoneForOccurrence)!!.toLocalTime()
+                    }
+
+                    // Clone RRule from original event in DB if we are in edit mode
                     val eventUid = dbEvent?.uid
                     if (dbEvent?.isSingleEdit() == true && eventUid != null) {
                         val originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)

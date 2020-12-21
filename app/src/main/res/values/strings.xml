@@ -168,6 +168,7 @@
     <string name="snack_send_bug_report_success">Report sent, thank you for your feedback</string>
     <string name="snack_send_bug_report_error">Error sending report, please try again later</string>
     <string name="snack_send_bug_report_description_empty">Please provide a description of your report</string>
+    <string name="snack_create_event_no_active_calendar">You need an active calendar to create events</string>
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>

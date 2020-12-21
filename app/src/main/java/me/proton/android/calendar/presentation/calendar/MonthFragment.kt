@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -12,12 +13,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_month.*
+import kotlinx.android.synthetic.main.toolbar_action_primary.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -90,10 +93,21 @@ class MonthFragment : BaseFragment() {
 
     private fun setToolbarListeners(timeZoneId: ZoneId) {
         buttonCreate.setOnSingleClickListener {
-            // each item in the adapter is one day
-            val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-            requireActivity().findNavController(R.id.nav_host_fragment_container_view)
-                .navigate(Navigation.Deeplink.toEventCreate(currentDate, ICalUtils.generateEventStartTime(timeZoneId)))
+            val hasActiveCalendars = calendarViewModel.hasActiveCalendars.value ?: false
+            if (hasActiveCalendars) {
+                // each item in the adapter is one day
+                val currentDate =
+                    calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
+                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                    .navigate(
+                        Navigation.Deeplink.toEventCreate(
+                            currentDate,
+                            ICalUtils.generateEventStartTime(timeZoneId)
+                        )
+                    )
+            } else {
+                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
+            }
         }
 
         buttonToday.setOnSingleClickListener {
@@ -281,6 +295,20 @@ class MonthFragment : BaseFragment() {
 
             miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
             miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+        }
+
+        calendarViewModel.hasActiveCalendars.observe(viewLifecycleOwner) { hasActiveCalendars ->
+            TimberLogger.e("test calendars: hasActiveCalendars 1 $hasActiveCalendars")
+            hasActiveCalendars ?: return@observe // Ensure we won't be using a null value
+            if (hasActiveCalendars) {
+                TimberLogger.e("test calendars: hasActiveCalendars 2")
+                buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_inverted))
+                buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_oval)
+            } else {
+                TimberLogger.e("test calendars: hasActiveCalendars 3")
+                buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_disabled))
+                buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_disabled_oval)
+            }
         }
     }
 
