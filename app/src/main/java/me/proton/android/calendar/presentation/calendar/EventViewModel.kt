@@ -1081,11 +1081,14 @@ class EventViewModel(
 
                     if (count != null && countTypeOption != null) {
                         Duration.builder().apply {
+
+                            val alarmAtMidnight = tempAlarmTime == LocalTime.MIDNIGHT
+
                             // We hide minutes and hours buttons and use same radio group so days and weeks have id 2 & 3
                             when (countTypeOption) {
                                 2 -> {
                                     prior(true)
-                                    val adjustedDays = count - 1 + (if (tempAlarmTime == LocalTime.MIDNIGHT) 1 else 0)
+                                    val adjustedDays = count - 1 + (if (alarmAtMidnight) 1 else 0)
                                     if (adjustedDays > 0) days(adjustedDays)
                                     if (count == 0) days(count)
 
@@ -1096,15 +1099,17 @@ class EventViewModel(
                                 }
                                 3 -> {
                                     prior(true)
-                                    val adjustedWeeks = count - 1
+                                    val adjustedWeeks = count - 1 + (if (alarmAtMidnight) 1 else 0)
                                     if (adjustedWeeks > 0) weeks(adjustedWeeks)
-                                    days(7 - 1)
+
+                                    if (!alarmAtMidnight) {
+                                        days(7 - 1)
+                                    }
 
                                     val negativeTimeOfDay = LocalTime.of(0, 0).minusHours(tempAlarmTime.hour.toLong()).minusMinutes(tempAlarmTime.minute.toLong())
 
                                     if (negativeTimeOfDay.hour > 0) hours(negativeTimeOfDay.hour)
                                     if (negativeTimeOfDay.minute > 0) minutes(negativeTimeOfDay.minute)
-                                    // TODO
                                 }
                                 // On the day at x
                                 4 -> {
