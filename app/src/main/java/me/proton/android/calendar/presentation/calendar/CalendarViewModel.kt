@@ -57,17 +57,17 @@ class CalendarViewModel(
     private val _timeFormatIs24Hour: MutableLiveData<Boolean> = MutableLiveData()
     val timeFormatIs24Hour: LiveData<Boolean> = _timeFormatIs24Hour
 
-    val initialToday: LocalDate = LocalDate.now()
-
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
+
+    var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+
+    val initialToday: LocalDate = LocalDate.now()
 
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
-
-    private val _hasActiveCalendars: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-    val hasActiveCalendars: LiveData<Boolean> = _hasActiveCalendars
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
@@ -78,28 +78,26 @@ class CalendarViewModel(
         return calendarsRepository.getActiveCalendars(userId).filter { it.isActive }
     }
 
-    fun selectActiveCalendars(): LiveData<List<CalendarEntity>> {
+    fun selectActiveCalendars() {
         val userId = userId.value?.id
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel selectActiveCalendars")
-            return MutableLiveData()
+            return
         }
-        return calendarsRepository.flowCalendars(userId).map { calendars ->
-            val filteredCalendars = calendars.filter {
+        activeCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
+            calendars.filter {
                 it.isActive
             }
-            _hasActiveCalendars.postValue(filteredCalendars.isNotEmpty())
-            return@map filteredCalendars
         }.asLiveData(Dispatchers.Default)
     }
 
-    fun selectDisabledCalendars(): LiveData<List<CalendarEntity>> {
+    fun selectDisabledCalendars() {
         val userId = userId.value?.id
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
-            return MutableLiveData()
+            return
         }
-        return calendarsRepository.flowCalendars(userId).map { calendars ->
+        disabledCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
             calendars.filter { it.isDisabled }
         }.asLiveData(Dispatchers.Default)
     }

@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.math.min
 
 class AndroidUtils(context: Context) {
 
@@ -902,7 +903,7 @@ fun expand(v: View, duration: Long? = null, height: Int? = null) {
 
     // Expansion speed of 1dp/ms
     val animationDuration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
-    animation.duration = duration ?: if (animationDuration > EXPAND_MAX_ANIM_DURATION) EXPAND_MAX_ANIM_DURATION else animationDuration
+    animation.duration = duration ?: min(animationDuration, EXPAND_MAX_ANIM_DURATION)
     TimberLogger.d("animation expand : duration = ${animation.duration}")
     v.startAnimation(animation)
 }
@@ -928,7 +929,7 @@ fun collapse(v: View, duration: Long? = null): Int {
 
     // Collapse speed of 1dp/ms
     val animationDuration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
-    animation.duration = duration ?: if (animationDuration > COLLAPSE_MAX_ANIM_DURATION) COLLAPSE_MAX_ANIM_DURATION else animationDuration
+    animation.duration = duration ?: min(animationDuration, EXPAND_MAX_ANIM_DURATION)
     TimberLogger.d("animation collapse : duration = ${animation.duration}")
     v.startAnimation(animation)
     return initialHeight

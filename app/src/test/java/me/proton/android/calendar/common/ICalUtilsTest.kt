@@ -2249,6 +2249,38 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `recurring event ends after two occurrence but has one ex date`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=UTC:20201202T100000
+    DTEND;TZID=UTC:20201202T103000
+    RRULE:FREQ=DAILY;COUNT=2
+    SEQUENCE:1
+    EXDATE;TZID=UTC:20201203T100000
+    STATUS:CONFIRMED
+    DTSTAMP:20201222T095645Z
+    UID:ZnMrGMJfKHacVbleN1Js9L9Q2vrR@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
+    }
+
+    @Test
     fun `recurring event ends after two occurrences`() {
         val iCalString = """
     BEGIN:VCALENDAR
@@ -2309,7 +2341,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        assertThat(event.isRecurringUntilSameDay(timeZoneId)).isTrue()
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
     }
 
     @Test
@@ -2341,7 +2373,39 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        assertThat(event.isRecurringUntilSameDay(timeZoneId)).isFalse()
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
+    }
+
+    @Test
+    fun `recurring event ends on the next day but has an ex date`() {
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=UTC:20201202T100000
+    DTEND;TZID=UTC:20201202T103000
+    RRULE:FREQ=DAILY;UNTIL=20201203T235959Z
+    SEQUENCE:1
+    EXDATE;TZID=UTC:20201203T100000
+    STATUS:CONFIRMED
+    DTSTAMP:20201222T095843Z
+    UID:SHxct-Ln7syB1-L2ORzMMN_91EKj@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
     }
 
     @Test
@@ -2377,7 +2441,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        assertThat(event.isRecurringUntilBeforeNextOccurrence(timeZoneId)).isTrue()
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
     }
 
     @Test
@@ -2413,7 +2477,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)
 
-        assertThat(event.isRecurringUntilBeforeNextOccurrence(timeZoneId)).isFalse()
+        assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
     }
 
     @Test

@@ -491,8 +491,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_start_date_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalDate()
-            val currentLocale = getCurrentLocale(requireContext())
-            if (currentLocale != null) Locale.setDefault(Locale.ENGLISH)
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
                 firstDayOfWeek = eventViewModel.userSettings.weekStartDayOfWeek(),
@@ -501,14 +499,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 maxDate = FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()) {
                 eventViewModel.handleStartDate(it)
             }
-            if (currentLocale != null) Locale.setDefault(currentLocale)
         }
 
         event_form_end_date_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalDate()
-            val currentLocale = getCurrentLocale(requireContext())
-            if (currentLocale != null) Locale.setDefault(Locale.ENGLISH)
             AndroidUtils.displayDatePicker(
                 context = requireContext(),
                 firstDayOfWeek = eventViewModel.userSettings.weekStartDayOfWeek(),
@@ -518,7 +513,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             ) {
                 eventViewModel.handleEndDate(it)
             }
-            if (currentLocale != null) Locale.setDefault(currentLocale)
         }
 
         event_form_start_time_press.setOnSingleClickListener {

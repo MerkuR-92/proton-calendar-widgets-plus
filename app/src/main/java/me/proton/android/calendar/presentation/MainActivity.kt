@@ -1,5 +1,7 @@
 package me.proton.android.calendar.presentation
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -46,6 +48,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.time.ZonedDateTime
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -379,14 +382,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerCalendarsListContent() {
         lifecycleScope.launch {
-            calendarViewModel.selectActiveCalendars().observe(this@MainActivity) { activeCalendars ->
+            calendarViewModel.selectActiveCalendars()
+            calendarViewModel.activeCalendars.observe(this@MainActivity) { activeCalendars ->
+                activeCalendars ?: return@observe
                 activeCalendarListAdapter.submitList(activeCalendars)
-                nav_view_main_content.nav_view_calendars.visibleOrGone(!activeCalendars.isEmpty())
+                nav_view_main_content.nav_view_calendars.visibleOrGone(activeCalendars.isNotEmpty())
             }
 
-            calendarViewModel.selectDisabledCalendars().observe(this@MainActivity) { disabledCalendars ->
+            calendarViewModel.selectDisabledCalendars()
+            calendarViewModel.disabledCalendars.observe(this@MainActivity) { disabledCalendars ->
+                disabledCalendars ?: return@observe
                 disabledCalendarListAdapter.submitList(disabledCalendars)
-                nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(!disabledCalendars.isEmpty())
+                nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(disabledCalendars.isNotEmpty())
             }
         }
     }
