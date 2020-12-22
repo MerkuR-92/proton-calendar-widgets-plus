@@ -159,15 +159,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false &&
             event.calendar.isActive) {
 
+            val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
+                    !event.isEventFirstOccurrence(dbEvent, eventViewModel.displayTimeZoneId)
             AndroidUtils.displaySingleChoiceConfirmationPicker(
                 requireContext(), getString(R.string.dialog_title_delete_recurring_event), listOfNotNull(
                     getString(R.string.event_recurring_edit_this),
-                    if (navigationArguments.occurrenceNumber > 1 &&
-                        !event.isEventFirstOccurrence(
-                            dbEvent,
-                            eventViewModel.displayTimeZoneId
-                        )
-                    ) getString(R.string.event_recurring_edit_this_and_future)
+                    if (showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
                     else null,
                     getString(R.string.event_recurring_edit_all_events)
                 ).toTypedArray(), 0
@@ -186,16 +183,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 navigationArguments.occurrenceNumber
                             )
                         } else if (it == 1) {
-                            if (navigationArguments.occurrenceNumber == 1) {
-                                calendarViewModel.handleDeleteEvent(
-                                    event.id,
-                                    EventEditDeleteOption.ALL_EVENTS
-                                )
-                            } else {
+                            if (showThisAndFuture) {
                                 calendarViewModel.handleDeleteEvent(
                                     event.id,
                                     EventEditDeleteOption.THIS_EVENT_AND_FUTURE,
                                     navigationArguments.occurrenceNumber
+                                )
+                            } else {
+                                calendarViewModel.handleDeleteEvent(
+                                    event.id,
+                                    EventEditDeleteOption.ALL_EVENTS
                                 )
                             }
                         } else { // it == 2

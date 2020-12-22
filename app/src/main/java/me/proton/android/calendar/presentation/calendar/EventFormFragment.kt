@@ -165,16 +165,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
 
                     if (shouldShowConfirmationPicker) {
-
+                        val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
+                                (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(dbEvent,
+                                            eventViewModel.displayTimeZoneId) == false)
                         AndroidUtils.displaySingleChoiceConfirmationPicker(
                             requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                                 getString(R.string.event_recurring_edit_this),
-                                if (navigationArguments.occurrenceNumber > 1 &&
-                                    (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(
-                                        dbEvent,
-                                        eventViewModel.displayTimeZoneId
-                                    ) == false)
-                                ) getString(R.string.event_recurring_edit_this_and_future)
+                                if (showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
                                 else null,
                                 getString(R.string.event_recurring_edit_all_events)
                             ).toTypedArray(), 0
@@ -183,10 +180,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 if (it == 0) {
                                     EventEditDeleteOption.THIS_EVENT
                                 } else if (it == 1) {
-                                    if (navigationArguments.occurrenceNumber == 1) {
-                                        EventEditDeleteOption.ALL_EVENTS
-                                    } else {
+                                    if (showThisAndFuture) {
                                         EventEditDeleteOption.THIS_EVENT_AND_FUTURE
+                                    } else {
+                                        EventEditDeleteOption.ALL_EVENTS
                                     }
                                 } else { // it == 2
                                     EventEditDeleteOption.ALL_EVENTS
