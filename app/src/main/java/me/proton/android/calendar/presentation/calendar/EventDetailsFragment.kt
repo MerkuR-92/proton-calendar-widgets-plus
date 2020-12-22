@@ -153,15 +153,22 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun handleDelete() {
         val event = eventViewModel.eventLiveData.value!!
+        val dbEvent = eventViewModel.dbEvent
 
         if (event.isPartOfChain() &&
-            eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false &&
+            dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false &&
             event.calendar.isActive) {
 
             AndroidUtils.displaySingleChoiceConfirmationPicker(
                 requireContext(), getString(R.string.dialog_title_delete_recurring_event), listOfNotNull(
                     getString(R.string.event_recurring_edit_this),
-                    if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
+                    if (navigationArguments.occurrenceNumber > 1 &&
+                        !event.isEventFirstOccurrence(
+                            dbEvent,
+                            eventViewModel.displayTimeZoneId
+                        )
+                    ) getString(R.string.event_recurring_edit_this_and_future)
+                    else null,
                     getString(R.string.event_recurring_edit_all_events)
                 ).toTypedArray(), 0
             ) {

@@ -2692,4 +2692,69 @@ internal class ICalUtilsTest {
         val importedUid = "7u13-5hSesk_5rif9dkj3KHgtGAB@google.com"
         assertThat(generateProtonUid(importedUid, "20201209T193000")).isEqualTo("7u13-5hSesk_5rif9dkj3KHgtGAB_R20201209T193000@google.com")
     }
+
+    @Test
+    fun `check if selected event is first occurence when original event has been deleted`() {
+        val originalEventICalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:UTC
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY
+    SEQUENCE:1
+    EXDATE;TZID=UTC:20201211T103000
+    SUMMARY:Xx
+    STATUS:CONFIRMED
+    DTSTAMP:20201222T100238Z
+    UID:3BRpEzVDWGs3oG28rvAVMNU4GNYR@proton.me
+    DTSTART;TZID=UTC:20201211T103000
+    DTEND;TZID=UTC:20201211T110000
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:UTC
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY
+    SEQUENCE:1
+    EXDATE;TZID=UTC:20201211T103000
+    SUMMARY:Xx
+    STATUS:CONFIRMED
+    DTSTAMP:20201222T100238Z
+    UID:3BRpEzVDWGs3oG28rvAVMNU4GNYR@proton.me
+    DTSTART;TZID=UTC:20201212T103000
+    DTEND;TZID=UTC:20201212T110000
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val originalEventICal = ICalUtils.parseICalString(originalEventICalString)!!
+        val originalEvent = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), originalEventICal, null)
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        assertThat(event.isEventFirstOccurrence(originalEvent, timeZoneId)).isTrue()
+    }
 }

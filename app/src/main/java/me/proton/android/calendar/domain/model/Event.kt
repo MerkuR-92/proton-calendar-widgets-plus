@@ -622,6 +622,27 @@ data class Event(
         return occurrenceCount == null || occurrenceCount <= 1 || occurrenceCount - 1 == iCalEvent.exceptionDates?.distinct()?.size
     }
 
+    fun isEventFirstOccurrence(originalEvent: Event, timeZoneId: String): Boolean {
+
+        val startDate = this.startLocalDate ?: return false
+        val occurrences = originalEvent.generateOccurrencesUntil(startDate, timeZoneId)
+
+        val exZonedDateTimes =
+            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+                exDates.values.map { exDate ->
+                    exDate.toZonedDateTime(timeZoneId)
+                }
+            }
+
+        return if (exZonedDateTimes.isNullOrEmpty()) {
+            false
+        } else {
+            occurrences?.filterNot {
+                it.startDateTime in exZonedDateTimes
+            }?.size == 1
+        }
+    }
+
     fun isCustomRecurring(): Boolean {
 
         // no Recurrence Rule

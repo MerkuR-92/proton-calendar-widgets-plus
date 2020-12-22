@@ -159,16 +159,23 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 // Allow saving with no edition if creating an event
                 if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
 
+                    val dbEvent = eventViewModel.dbEvent
                     val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
-                            (eventViewModel.dbEvent?.isRecurring() == true || eventViewModel.dbEvent?.isPartOfChain() == true) &&
-                            (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == false)
+                            (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
+                            !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
 
                     if (shouldShowConfirmationPicker) {
 
                         AndroidUtils.displaySingleChoiceConfirmationPicker(
                             requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                                 getString(R.string.event_recurring_edit_this),
-                                if (navigationArguments.occurrenceNumber > 1) getString(R.string.event_recurring_edit_this_and_future) else null,
+                                if (navigationArguments.occurrenceNumber > 1 &&
+                                    (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(
+                                        dbEvent,
+                                        eventViewModel.displayTimeZoneId
+                                    ) == false)
+                                ) getString(R.string.event_recurring_edit_this_and_future)
+                                else null,
                                 getString(R.string.event_recurring_edit_all_events)
                             ).toTypedArray(), 0
                         ) {
