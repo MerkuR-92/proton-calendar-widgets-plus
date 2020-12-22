@@ -604,7 +604,7 @@ data class Event(
 
     fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =
         isRecurring() && (iCalEvent.recurrenceRule.value.count == 1 ||
-                (iCalEvent.recurrenceRule.value.count != null && iCalEvent.exceptionDates?.size == iCalEvent.recurrenceRule.value.count - 1) ||
+                (iCalEvent.recurrenceRule.value.count != null && iCalEvent.exceptionDates?.distinct()?.size == iCalEvent.recurrenceRule.value.count - 1) ||
                 isRecurringUntilSameDay(timeZoneId) ||
                 isRecurringUntilBeforeNextOccurrence(timeZoneId))
 
@@ -619,7 +619,7 @@ data class Event(
         if (iCalEvent.recurrenceRule.value.until == null) return false
         val untilZonedDateTime = iCalEvent.recurrenceRule.value.until.toZonedDateTime(timeZoneId)
         val occurrenceCount = generateOccurrencesUntil(untilZonedDateTime.toLocalDate(), timeZoneId)?.size
-        return occurrenceCount == null || occurrenceCount <= 1 || occurrenceCount - 1 == iCalEvent.exceptionDates?.size
+        return occurrenceCount == null || occurrenceCount <= 1 || occurrenceCount - 1 == iCalEvent.exceptionDates?.distinct()?.size
     }
 
     fun isCustomRecurring(): Boolean {
