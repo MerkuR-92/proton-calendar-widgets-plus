@@ -13,7 +13,6 @@ import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.API_BASE_URL
 import me.proton.android.calendar.common.CoreLogger
 import me.proton.android.calendar.data.api.CalendarApiClient
-import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.di.ApiFactory
 import me.proton.core.network.data.di.NetworkManager
@@ -49,7 +48,7 @@ object NetworkModule {
         sessionListener: SessionListener
     ): ApiFactory = ApiFactory(
         API_BASE_URL, apiClient, CoreLogger, networkManager, networkPrefs, sessionProvider, sessionListener,
-        CoroutineScope(Job() + Dispatchers.Default)
+        cookieStore = null, CoroutineScope(Job() + Dispatchers.Default)
     )
 
     @Provides
