@@ -12,10 +12,12 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.formatUidForICal
+import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
@@ -29,7 +31,8 @@ class CalendarsRepositoryImpl(
     private val transformEventUseCase: TransformEventUseCase,
     private val logger: Logger,
     private val fetchEventsUseCase: FetchEventsUseCase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val calendarsApi: CalendarsApi
 ) : CalendarsRepository {
 
     private val eventsMutex = Mutex()
@@ -552,9 +555,18 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    override suspend fun hasSingleEdits(eventUid: String): Boolean {
+    override suspend fun hasSingleEdits(userId: UserId, eventUid: String): Boolean {
         val formattedUid = formatUidForICal(eventUid)
-        return database.eventsDao().countByUid(formattedUid) > 1
+        val hasSingleEditsInDb = database.eventsDao().countByUid(formattedUid) > 1
+        if (hasSingleEditsInDb) return true
+        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
+        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return false
+        return eventsSharingUid.size > 1
+    }
+
+    override suspend fun getSingleEdits(userId: UserId, eventUid: String): List<Event> {
+        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
+        return if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return listOf()
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

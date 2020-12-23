@@ -74,6 +74,8 @@ class EventViewModel(
     private lateinit var calendarSettings: CalendarSettingsEntity
     private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
 
+    private var originalDbEvent: Event? = null
+
     val eventLiveData: LiveData<Event> = _event
 
     // TimeZone used when displaying event is taken from settings
@@ -85,7 +87,7 @@ class EventViewModel(
     lateinit var userSettings: UserSettingsEntity
 
     var hasSingleEdit: Boolean = false
-    var hasExDates: Boolean = false
+    var hasFutureSingleEdit: Boolean = false
 
     var savingEvent = MutableLiveData(false)
 
@@ -108,6 +110,9 @@ class EventViewModel(
         eventCustomAllDayAlarmsSave = null
         savingEvent.postValue(false)
         dbEvent = null
+        hasSingleEdit = false
+        hasFutureSingleEdit = false
+        originalDbEvent = null
 
         this.userId = userId
 
@@ -208,11 +213,6 @@ class EventViewModel(
             dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
             else null
 
-            dbEvent?.let {
-                hasSingleEdit = it.isRecurring() && calendarsRepository.hasSingleEdits(it.uid)
-                hasExDates = it.isRecurring() && !it.iCalEvent.exceptionDates.isNullOrEmpty()
-            }
-
             logger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 
             val eventStartTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?: displayTimeZoneId
@@ -252,9 +252,32 @@ class EventViewModel(
                     // Clone RRule from original event in DB if we are in edit mode
                     val eventUid = dbEvent?.uid
                     if (dbEvent?.isSingleEdit() == true && eventUid != null) {
-                        val originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
+                        // We store reference to originalDbEvent for later use
+                        originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
                             ?.let { transformEventUseCase.execute(it) }
                         this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
+                    }
+
+                    dbEvent?.let {
+                        val occurrenceStart = this.getActualStart(eventTimeZoneId)
+                        val allowShowThisAndFuture =
+                            occurrenceNumber != null &&
+                                    occurrenceNumber > 1 &&
+                                    !this.isEventFirstOccurrence(it, eventTimeZoneId)
+
+                        // We check for single edits only once and in initialise because it may require API calls
+                        hasSingleEdit =
+                            if (occurrenceNumber == 1 && !allowShowThisAndFuture) {
+                                // We don't have option "this and future" when updating first event in chain
+                                it.isRecurring() && calendarsRepository.hasSingleEdits(userId, it.uid)
+                            } else {
+                                val singleEdits = calendarsRepository.getSingleEdits(userId, it.uid)
+                                hasFutureSingleEdit = singleEdits.firstOrNull { singleEdit ->
+                                    singleEdit.getActualStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
+                                } != null
+                                singleEdits.size > 1
+                            }
+                        hasExDates(true)
                     }
                 }
 
@@ -381,9 +404,9 @@ class EventViewModel(
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
 
         val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
-        val originalDbEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
+        val immutableOriginalDbEvent = originalDbEvent
         val dbEventStartDate = dbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
-        val originalDbEventStartDate = originalDbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
+        val originalDbEventStartDate = immutableOriginalDbEvent?.iCalEvent?.getStart(event.defaultTimeZone!!)
         val dbEventWithOccurrence = dbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
         val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.iCalEvent?.getStart(event.defaultTimeZone!!)
 
@@ -443,7 +466,7 @@ class EventViewModel(
                     eventToCreate
 
                 } else if (dbEvent?.isSingleEdit() == true) {
-                    originalDbEvent?.let {
+                    immutableOriginalDbEvent?.let {
                         if (!handleOriginalEventNullSequence(it)) return false
                     }
 
@@ -467,14 +490,14 @@ class EventViewModel(
                     logger.e("dbEventWithOccurrenceStartDate == null")
                     return false
                 }
-                if (dbEvent.isSingleEdit() && (originalDbEvent == null || dbEventStartDate == null)) {
-                    if (originalDbEvent == null) logger.e("originalDbEvent == null")
+                if (dbEvent.isSingleEdit() && (immutableOriginalDbEvent == null || dbEventStartDate == null)) {
+                    if (immutableOriginalDbEvent == null) logger.e("originalDbEvent == null")
                     if (dbEventStartDate == null) logger.e("dbEventStartDate == null")
                     return false
                 }
 
                 // delete single edits starting with just edited occurrence / single edit
-                val eventId = if (dbEvent.isSingleEdit()) originalDbEvent!!.id else event.id
+                val eventId = if (dbEvent.isSingleEdit()) immutableOriginalDbEvent!!.id else event.id
                 val deleteStartDate = if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(1)
                 val deleteSingleEditsResult = deleteEventUseCase.execute(userId, eventId, deleteStartDate)
                 if (deleteSingleEditsResult != UseCase.Result.Success) {
@@ -486,7 +509,7 @@ class EventViewModel(
                 // - change COUNT to ((current occurrence number) - 1)
                 // OR
                 // - change UNTIL equal to (previous occurrence from just edited).endDate
-                val dbEventToCopy = if (dbEvent.isSingleEdit()) originalDbEvent else dbEvent
+                val dbEventToCopy = if (dbEvent.isSingleEdit()) immutableOriginalDbEvent else dbEvent
                 val dbEventToUpdate = dbEventToCopy!!.copy(iCalendar = dbEventToCopy.iCalendar.clone())
                 // Bump sequence for original event
                 dbEventToUpdate.iCalEvent.setSequence((dbEventToUpdate.iCalEvent.sequence?.value ?: 0) + 1)
@@ -595,14 +618,14 @@ class EventViewModel(
                 // - If Event start date : date changed (different day) / RRule changed
                 //      -> update original event date and time with event values
 
-                if (dbEvent?.isSingleEdit() == true && originalDbEvent == null) {
+                if (dbEvent?.isSingleEdit() == true && immutableOriginalDbEvent == null) {
                     logger.e("Edit all events: originalEventStartDate was null for single edit")
                     return false
                 }
 
                 // delete all single edits
                 val originalEventId =
-                    if (dbEvent?.isSingleEdit() == true) originalDbEvent?.id
+                    if (dbEvent?.isSingleEdit() == true) immutableOriginalDbEvent?.id
                     else event.id
                 val originalEventStartDate =
                     if (dbEvent?.isSingleEdit() == true) originalDbEventStartDate
@@ -632,7 +655,7 @@ class EventViewModel(
                 // - the same DAY but different TIME
 
                 val originalEventWithOccurrence =
-                    if (dbEvent?.isSingleEdit() == true) originalDbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
+                    if (dbEvent?.isSingleEdit() == true) immutableOriginalDbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
                     else dbEventWithOccurrence
 
                 if (originalEventWithOccurrence == null) {
@@ -651,36 +674,36 @@ class EventViewModel(
 
                     // TODO Try to reduce duplicated code between single edit and occurrence logic
                     if (dbEvent?.isSingleEdit() == true) {
-                        if (originalDbEvent == null) {
+                        if (immutableOriginalDbEvent == null) {
                             logger.e("Edit all events: dbEvent was null")
                             return false
                         }
 
                         val newEvent = event.copy(
-                            id = originalDbEvent.id,
+                            id = immutableOriginalDbEvent.id,
                             iCalendar = event.iCalendar.clone()
                         )
                         newEvent.iCalEvent.recurrenceId = null
-                        newEvent.iCalEvent.uid = originalDbEvent.iCalEvent.uid
+                        newEvent.iCalEvent.uid = immutableOriginalDbEvent.iCalEvent.uid
 
                         // For single edit we need to calculate span to add days to original event date end
                         val eventSpan = ChronoUnit.DAYS.between(newEvent.getStart(event.defaultTimeZone!!), newEvent.getEnd(event.defaultTimeZone!!))
                         if (event.isAllDay()) {
                             // We use original event LocalDate
                             newEvent.also {
-                                it.iCalEvent.setStart(originalDbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
-                                it.iCalEvent.setEnd(originalDbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate())
+                                it.iCalEvent.setStart(immutableOriginalDbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate())
+                                it.iCalEvent.setEnd(immutableOriginalDbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate())
                             }
                         } else {
                             // We use currently edited event LocalTime but keep original event LocalDate
                             newEvent.also {
                                 it.iCalEvent.setStart(
-                                    originalDbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(),
+                                    immutableOriginalDbEvent.getStart(event.defaultTimeZone!!)!!.toLocalDate(),
                                     newEvent.getStart(event.defaultTimeZone!!)!!.toLocalTime(),
                                     event.defaultTimeZone
                                 )
                                 it.iCalEvent.setEnd(
-                                    originalDbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate(),
+                                    immutableOriginalDbEvent.getStart(event.defaultTimeZone!!)!!.plusDays(eventSpan).toLocalDate(),
                                     newEvent.getEnd(event.defaultTimeZone!!)!!.toLocalTime(),
                                     event.defaultTimeZone
                                 )
@@ -1179,5 +1202,35 @@ class EventViewModel(
     // Returns timezone id if it has been initialized
     fun getDisplayTimeZone(): ZoneId? {
         return if (this::displayTimeZoneId.isInitialized) ZoneId.of(displayTimeZoneId) else null
+    }
+
+    fun hasExDates(afterSelectedEvent: Boolean = false): Boolean {
+        val immutableOriginalEvent =
+            if (event.isSingleEdit()) originalDbEvent
+            else dbEvent
+
+        immutableOriginalEvent?.let { dbEvent ->
+            return if (afterSelectedEvent) {
+                val exZonedDateTimes =
+                    dbEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+                        exDates.values.map { exDate ->
+                            exDate.toZonedDateTime(eventTimeZoneId)
+                        }
+                    }
+                exZonedDateTimes.firstOrNull {
+                    it.isAfter(event.getStart(eventTimeZoneId))
+                } != null
+            } else {
+                dbEvent.isRecurring() && !dbEvent.iCalEvent.exceptionDates.isNullOrEmpty()
+            }
+        }
+        return false
+    }
+
+    fun hasRecurrenceRuleBeenEdited(): Boolean {
+        val immutableOriginalEvent =
+            if (event.isSingleEdit()) originalDbEvent
+            else dbEvent
+        return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
     }
 }
