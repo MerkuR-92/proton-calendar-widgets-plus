@@ -560,13 +560,30 @@ class CalendarsRepositoryImpl(
         val hasSingleEditsInDb = database.eventsDao().countByUid(formattedUid) > 1
         if (hasSingleEditsInDb) return true
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
-        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return false
-        return eventsSharingUid.size > 1
+        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) {
+            eventsSharingUidResponse.data.events.mapNotNull {
+                val event = transformEventUseCase.execute(it)
+                if (event?.iCalEvent?.recurrenceId != null) event
+                else null
+            }
+        } else return false
+        return eventsSharingUid.isNotEmpty()
     }
 
-    override suspend fun getSingleEdits(userId: UserId, eventUid: String): List<Event> {
+    override suspend fun getSingleEdits(userId: UserId, eventUid: String, stopAfter: ZonedDateTime?, timeZoneId: String?): List<Event> {
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
-        return if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return listOf()
+        return if (eventsSharingUidResponse is ApiResponse.Success) {
+            val events = arrayListOf<Event>()
+            eventsSharingUidResponse.data.events.forEach {
+                val event = transformEventUseCase.execute(it)
+                if (stopAfter != null && timeZoneId != null && event?.getStart(timeZoneId)?.isAfter(stopAfter) == true) {
+                    events.add(event)
+                    return events
+                }
+                if (event?.iCalEvent?.recurrenceId != null) events.add(event)
+            }
+            events
+        } else return listOf()
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

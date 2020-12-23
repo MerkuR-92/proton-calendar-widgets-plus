@@ -271,11 +271,11 @@ class EventViewModel(
                                 // We don't have option "this and future" when updating first event in chain
                                 it.isRecurring() && calendarsRepository.hasSingleEdits(userId, it.uid)
                             } else {
-                                val singleEdits = calendarsRepository.getSingleEdits(userId, it.uid)
+                                val singleEdits = calendarsRepository.getSingleEdits(userId, it.uid, occurrenceStart, eventTimeZoneId)
                                 hasFutureSingleEdit = singleEdits.firstOrNull { singleEdit ->
-                                    singleEdit.getActualStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
+                                    singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
                                 } != null
-                                singleEdits.size > 1
+                                singleEdits.isNotEmpty()
                             }
                         hasExDates(true)
                     }

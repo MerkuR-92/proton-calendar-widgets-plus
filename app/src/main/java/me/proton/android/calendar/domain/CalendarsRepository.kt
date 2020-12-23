@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * Manages all Calendars, Events, Members, Passphrases etc.
@@ -75,7 +76,7 @@ interface CalendarsRepository {
 
     suspend fun hasSingleEdits(userId: UserId, eventUid: String): Boolean
 
-    suspend fun getSingleEdits(userId: UserId, eventUid: String): List<Event>
+    suspend fun getSingleEdits(userId: UserId, eventUid: String, stopAfter: ZonedDateTime? = null,  timeZoneId: String? = null): List<Event>
 
     suspend fun persistEvents(vararg events: EventEntity)
 
