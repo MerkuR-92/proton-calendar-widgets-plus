@@ -237,7 +237,7 @@ object ICalUtils {
                 setUid(originalEvent.uid)
                 setCreated(originalEvent.created)
                 setLastModified(originalEvent.lastModified)
-//                setDateTimeStamp(event.dateTimeStamp)
+                setDateTimeStamp(originalEvent.dateTimeStamp)
                 setDateStart(originalEvent.dateStart)
                 setDateEnd(originalEvent.dateEnd)
                 setRecurrenceRule(originalEvent.recurrenceRule)
@@ -268,7 +268,6 @@ object ICalUtils {
                 setUid(originalEvent.uid)
                 setCreated(originalEvent.created)
                 setLastModified(originalEvent.lastModified)
-//                setDateTimeStamp(event.dateTimeStamp)
                 setDescription(originalEvent.description) // TODO force substring to be max VALIDATION_EVENT_DESCRIPTION_MAX_LENGTH long?
                 setSummary(originalEvent.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
                 setLocation(originalEvent.location) // TODO force substring to be max VALIDATION_EVENT_LOCATION_MAX_LENGTH long?
@@ -279,7 +278,6 @@ object ICalUtils {
                     setUid(originalEvent.uid)
                     setCreated(originalEvent.created)
                     setLastModified(originalEvent.lastModified)
-//                    setDateTimeStamp(event.dateTimeStamp)
                     setStatus(originalEvent.status)
                     setTransparency(originalEvent.transparency)
                     wrapInICalendar()
@@ -290,7 +288,6 @@ object ICalUtils {
                     setUid(originalEvent.uid)
                     setCreated(originalEvent.created)
                     setLastModified(originalEvent.lastModified)
-//                    setDateTimeStamp(event.dateTimeStamp)
                     originalEvent.comments.forEach {
                         addComment(it)
                     }
@@ -303,7 +300,6 @@ object ICalUtils {
                     setUid(originalEvent.uid)
                     setCreated(originalEvent.created)
                     setLastModified(originalEvent.lastModified)
-//                    setDateTimeStamp(event.dateTimeStamp)
                     originalEvent.alarms.forEach {
                         addAlarm(it)
                     }

@@ -84,6 +84,7 @@ internal class ICalTest {
 
         assertThat(mergedEvent.dateStart.value.time).isEqualTo(ZonedDateTime.of(LocalDate.of(2020, 2, 28), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toEpochSecond() * 1000)
         assertThat(mergedEvent.dateEnd.value.time).isEqualTo(ZonedDateTime.of(LocalDate.of(2020, 2, 29), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toEpochSecond() * 1000)
+        assertThat(mergedEvent.dateTimeStamp.value.toInstant()).isEqualTo(Instant.ofEpochSecond(1582909551)) // 20200228T170551Z
         assertThat(mergedEvent.summary.value).isEqualTo("Event after successful connection between database, usecase and api")
         assertThat(mergedEvent.alarms.first().action.value).isEqualTo("DISPLAY")
         assertThat(mergedEvent.alarms).hasSize(5)

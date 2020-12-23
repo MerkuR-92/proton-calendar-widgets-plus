@@ -25,7 +25,7 @@ internal class EditCreateEventUseCaseTest {
             setLastModified(getCreated().value)
             setDateStart(Date.from(ZonedDateTime.of(LocalDate.of(2020, 4, 2), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toInstant()), false)
             setDateEnd(Date.from(ZonedDateTime.of(LocalDate.of(2020, 4, 3), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toInstant()), false)
-            //setDateTimeStamp() this is added by default
+            setDateTimeStamp(Date.from(Instant.ofEpochSecond(666)))
             setSummary("All-day event on 2nd April")
             setDescription("2 alarms, 30 minutes (display) and 2 hours (email) before")
             setLocation("Zurich")
@@ -57,6 +57,7 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.dateEnd.value.hasTime()).isFalse()
             assertThat(calendarSplit.sharedPart.timezoneInfo.getTimezone(this.dateEnd)).isNull()
             // TODO rrule, recurrence-id, sequence, exdate
+            assertThat(this.dateTimeStamp.value).isEqualTo(Date.from(Instant.ofEpochSecond(666)))
             assertThat(this.summary).isNull()
             assertThat(this.description).isNull()
             assertThat(this.status).isNull()
