@@ -5,6 +5,7 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.UsersApi
 import me.proton.android.calendar.domain.model.Delinquent
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.domain.entity.UserId
 
 class FetchUserUseCase(
@@ -25,11 +26,11 @@ class FetchUserUseCase(
 
         // Limit users
         // User has a free account
-        if (user.isFree) return UseCase.Result.Error("user is free")
+        if (user.isFree) return UseCase.Result.Error(AccountViewModel.Error.FreeUser.value)
         // User's payment failed or expired
-        if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error("user is delinquent")
+        if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error(AccountViewModel.Error.DelinquentUser.value)
         // User reached storage quota: creation of event is disabled
-        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error("user reached storage quota")
+        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error(AccountViewModel.Error.StorageQuotaReached.value)
 
         user.primaryKey ?: return UseCase.Result.Error("user has no primary key")
 

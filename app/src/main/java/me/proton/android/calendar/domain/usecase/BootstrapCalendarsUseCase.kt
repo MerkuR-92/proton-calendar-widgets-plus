@@ -7,6 +7,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.domain.entity.UserId
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -38,10 +39,13 @@ class BootstrapCalendarsUseCase( // TODO TEST
         if (calendarsResponse !is ApiResponse.Success) {
             logger.e("error getting calendars from API in BootstrapCalendarsUseCase")
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
+        } else if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
+            logger.e("error reset needed for calendar in BootstrapCalendarsUseCase")
+            return UseCase.Result.Error(AccountViewModel.Error.ResetNeeded.value)
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
             calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup } == null) {
             logger.e("error no active calendar in BootstrapCalendarsUseCase")
-            return UseCase.Result.Error("error user has no active calendar")
+            return UseCase.Result.Error(AccountViewModel.Error.NoActiveCalendar.value)
         }
 
         var redoGetCalendars = false
@@ -78,11 +82,17 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
         calendarsResponse.data.calendars.forEach {
             if (it.hasIncompleteKeySetup) {
+                // Handle flag INCOMPLETE_SETUP
                 val keySetupResult = keySetupUseCase.execute(userId, it.id)
 
                 keySetupResult.ifSuccessAndLogErrors(logger) { }
 
                 redoGetCalendars = true
+            }
+
+            if (it.isResetNeeded) {
+                // Handle flag RESET_NEEDED
+
             }
         }
 
@@ -94,10 +104,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
             } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
                 logger.e("still no calendar after creating default calendar")
-                return UseCase.Result.Error("error user has no calendar")
+                return UseCase.Result.Error(AccountViewModel.Error.NoCalendar.value)
             } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
                 logger.e("still no active calendar after creating default calendar")
-                return UseCase.Result.Error("error user has no active calendar")
+                return UseCase.Result.Error(AccountViewModel.Error.NoActiveCalendar.value)
             }
         }
 

@@ -156,6 +156,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 if (errorReport == AccountViewModel.Error.NoError) return@Observer
                 val dialogTitle: Int
                 val dialogMessage: Int
+                var dialogPositiveButton = R.string.bootstrap_error_default_confirm
                 when (errorReport) {
                     is AccountViewModel.Error.NoCalendar -> {
                         dialogTitle = R.string.bootstrap_error_no_calendar_title
@@ -177,6 +178,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         dialogTitle = R.string.bootstrap_error_store_quota_reached_title
                         dialogMessage = R.string.bootstrap_error_store_quota_reached_message
                     }
+                    is AccountViewModel.Error.ResetNeeded -> {
+                        dialogTitle = R.string.bootstrap_error_reset_needed_title
+                        dialogMessage = R.string.bootstrap_error_reset_needed_message
+                        dialogPositiveButton = R.string.bootstrap_error_reset_needed_positive_button
+                    }
                     else -> {
                         // TODO default case should not exist
                         clearError()
@@ -188,9 +194,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     .setTitle(dialogTitle)
                     .setMessage(dialogMessage)
                     .setCancelable(false)
-                    .setPositiveButton(R.string.bootstrap_error_default_confirm) { _, _ ->
-                        clearError()
-                        handleAccountState(this, state.value!!)
+                    .setPositiveButton(dialogPositiveButton) { _, _ ->
+                        if (errorReport == AccountViewModel.Error.ResetNeeded) {
+                            // TODO Do reset password procedure
+                            clearError()
+                            calendarViewModel.fetchingEvents.postValue("Reset password procedure")
+                        } else {
+                            clearError()
+                            handleAccountState(this, state.value!!)
+                        }
                     }.show()
                 materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod =
                     LinkMovementMethod.getInstance()

@@ -43,13 +43,14 @@ class AccountViewModel(
         object Ready : State()
     }
 
-    sealed class Error {
-        object NoError : Error()
-        object FreeUser : Error()
-        object DelinquentUser : Error()
-        object StorageQuotaReached : Error()
-        object NoCalendar : Error()
-        object NoActiveCalendar : Error()
+    sealed class Error(val value: String) {
+        object NoError : Error("no error")
+        object FreeUser : Error("user is free")
+        object DelinquentUser : Error("user is delinquent")
+        object StorageQuotaReached : Error("user reached storage quota")
+        object NoCalendar : Error("error user has no calendar")
+        object NoActiveCalendar : Error("error user has no active calendar")
+        object ResetNeeded: Error("error reset needed for calendar")
     }
 
     private val _hasPrimary = MutableLiveData<Boolean>()
@@ -118,7 +119,10 @@ class AccountViewModel(
 
             val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName)
             if (bootstrapResult !is UseCase.Result.Success) {
-                if (bootstrapResult is UseCase.Result.Error) handleError(bootstrapResult.message)
+                if (bootstrapResult is UseCase.Result.Error) {
+                    handleError(bootstrapResult.message)
+                    if (bootstrapResult.message == Error.ResetNeeded.value) return@launch
+                }
                 removeUser(userId)
                 return@launch
             }
@@ -130,11 +134,12 @@ class AccountViewModel(
     // TODO get rid of these strings
     private fun handleError(message: String) {
         when (message) {
-            "user is free" -> _errorReport.postValue(Error.FreeUser)
-            "user is delinquent" -> _errorReport.postValue(Error.DelinquentUser)
-            "user reached storage quota" -> _errorReport.postValue(Error.StorageQuotaReached)
-            "error user has no calendar" -> _errorReport.postValue(Error.NoCalendar)
-            "error user has no active calendar" -> _errorReport.postValue(Error.NoActiveCalendar)
+            Error.FreeUser.value -> _errorReport.postValue(Error.FreeUser)
+            Error.DelinquentUser.value -> _errorReport.postValue(Error.DelinquentUser)
+            Error.StorageQuotaReached.value -> _errorReport.postValue(Error.StorageQuotaReached)
+            Error.NoCalendar.value -> _errorReport.postValue(Error.NoCalendar)
+            Error.NoActiveCalendar.value -> _errorReport.postValue(Error.NoActiveCalendar)
+            Error.ResetNeeded.value -> _errorReport.postValue(Error.ResetNeeded)
         }
     }
 
