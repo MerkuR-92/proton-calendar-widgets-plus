@@ -384,14 +384,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerCalendarsListContent() {
         lifecycleScope.launch {
-            calendarViewModel.selectActiveCalendars()
+            calendarViewModel.selectCalendars()
             calendarViewModel.activeCalendars.observe(this@MainActivity) { activeCalendars ->
                 activeCalendars ?: return@observe
                 activeCalendarListAdapter.submitList(activeCalendars)
                 nav_view_main_content.nav_view_calendars.visibleOrGone(activeCalendars.isNotEmpty())
             }
-
-            calendarViewModel.selectDisabledCalendars()
             calendarViewModel.disabledCalendars.observe(this@MainActivity) { disabledCalendars ->
                 disabledCalendars ?: return@observe
                 disabledCalendarListAdapter.submitList(disabledCalendars)

@@ -65,6 +65,7 @@ class CalendarViewModel(
 
     var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var inactiveCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -81,27 +82,20 @@ class CalendarViewModel(
         return calendarsRepository.getActiveCalendars(userId).filter { it.isActive }
     }
 
-    fun selectActiveCalendars() {
-        val userId = userId.value?.id
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel selectActiveCalendars")
-            return
-        }
-        activeCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
-            calendars.filter {
-                it.isActive
-            }
-        }.asLiveData(Dispatchers.Default)
-    }
-
-    fun selectDisabledCalendars() {
+    fun selectCalendars() {
         val userId = userId.value?.id
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
             return
         }
+        activeCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
+            calendars.filter { it.isActive }
+        }.asLiveData(Dispatchers.Default)
         disabledCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
             calendars.filter { it.isDisabled }
+        }.asLiveData(Dispatchers.Default)
+        inactiveCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
+            calendars.filter { it.isInactive }
         }.asLiveData(Dispatchers.Default)
     }
 

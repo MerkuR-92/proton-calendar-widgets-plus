@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
@@ -25,7 +26,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val createCalendarUseCase: CreateCalendarUseCase,
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val syncAlarmsUseCase: SyncAlarmsUseCase
+    private val syncAlarmsUseCase: SyncAlarmsUseCase,
+    private val keySetupUseCase: KeySetupUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String): UseCase.Result {
@@ -37,10 +39,12 @@ class BootstrapCalendarsUseCase( // TODO TEST
             logger.e("error getting calendars from API in BootstrapCalendarsUseCase")
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
-            calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+            calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup } == null) {
             logger.e("error no active calendar in BootstrapCalendarsUseCase")
             return UseCase.Result.Error("error user has no active calendar")
         }
+
+        var redoGetCalendars = false
 
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
 
@@ -69,8 +73,21 @@ class BootstrapCalendarsUseCase( // TODO TEST
             if (createDefaultCalendarResult !is UseCase.Result.Success) {
                 return UseCase.Result.Error("error unable to create default calendar for user")
             }
+            redoGetCalendars = true
+        }
 
-            // GET the calendar list again after creating default one
+        calendarsResponse.data.calendars.forEach {
+            if (it.hasIncompleteKeySetup) {
+                val keySetupResult = keySetupUseCase.execute(userId, it.id)
+
+                keySetupResult.ifSuccessAndLogErrors(logger) { }
+
+                redoGetCalendars = true
+            }
+        }
+
+        if (redoGetCalendars) {
+            // GET the calendar list again after creating default one or fixing incomplete setup
             calendarsResponse = calendarsApi.getCalendars(userId)
             if (calendarsResponse !is ApiResponse.Success) {
                 logger.e("error getting calendars from API after creating default calendar")
