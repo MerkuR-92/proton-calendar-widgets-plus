@@ -42,14 +42,14 @@ class DeleteEventUseCase( // TODO TESTS
                     // add EXDATE to it
                     event.addExceptionDate(occurrenceNumber!!, timezone) // TODO
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
-                }
-                else if (event.isSingleEdit()) {
+                } else if (event.isSingleEdit()) {
 
                     val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
 
                     // add EXDATE to root event
                     rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
-                    editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                    val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                    editResult.ifSuccessAndLogErrors(logger) {}
 
                     // delete the single edit
                     deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
@@ -65,9 +65,11 @@ class DeleteEventUseCase( // TODO TESTS
 
                 event.handleDeleteThisAndFuture(occurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, event.calendar.id, event)
+                editResult.ifSuccessAndLogErrors(logger) {}
 
                 // delete single edits happening after this occurrence
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, occurrenceStart)
+                deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
                 if ((editResult is UseCase.Result.Success) && (deleteSingleEditsResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and future< events")
 
@@ -78,11 +80,15 @@ class DeleteEventUseCase( // TODO TESTS
 
                 // TODO maybe merge this into one request
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, event.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
+                deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
                 val deleteResult = deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                deleteResult.ifSuccessAndLogErrors(logger) {}
 
                 if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >all< events")
             }
         }
+
+        result.ifSuccessAndLogErrors(logger) {}
 
         return result
     }
