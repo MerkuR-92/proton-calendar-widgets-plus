@@ -285,7 +285,7 @@ data class Event(
 
         val occurrences = mutableListOf<Occurrence>()
 
-        val toDateTime = toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
 
         val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
 

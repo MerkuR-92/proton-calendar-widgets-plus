@@ -2694,7 +2694,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `check if selected event is first occurence when original event has been deleted`() {
+    fun `check if selected partial day event is first occurence when original event has been deleted`() {
         val originalEventICalString = """
     BEGIN:VCALENDAR
     VERSION:2.0
@@ -2731,6 +2731,70 @@ internal class ICalUtilsTest {
     UID:3BRpEzVDWGs3oG28rvAVMNU4GNYR@proton.me
     DTSTART;TZID=UTC:20201212T103000
     DTEND;TZID=UTC:20201212T110000
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val timeZoneId = "Europe/Paris"
+
+        val originalEventICal = ICalUtils.parseICalString(originalEventICalString)!!
+        val originalEvent = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), originalEventICal, null)
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        assertThat(event.isEventFirstOccurrence(originalEvent, timeZoneId)).isTrue()
+    }
+
+    @Test
+    fun `check if selected all day event is first occurence when original event has been deleted`() {
+        val originalEventICalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;UNTIL=20201111
+    SEQUENCE:1
+    EXDATE;VALUE=DATE:20201108
+    SUMMARY:Xx
+    STATUS:CONFIRMED
+    DTSTAMP:20201228T100331Z
+    UID:T7v3-cIgOks12IJix_3zis93zu5f@proton.me
+    DTSTART;VALUE=DATE:20201108
+    DTEND;VALUE=DATE:20201108
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=DAILY;UNTIL=20201111
+    SEQUENCE:1
+    EXDATE;VALUE=DATE:20201108
+    STATUS:CONFIRMED
+    DTSTAMP:20201228T100331Z
+    UID:T7v3-cIgOks12IJix_3zis93zu5f@proton.me
+    DTSTART;VALUE=DATE:20201109
+    DTEND;VALUE=DATE:20201109
     END:VEVENT
     END:VCALENDAR
     """.trimIndent()
