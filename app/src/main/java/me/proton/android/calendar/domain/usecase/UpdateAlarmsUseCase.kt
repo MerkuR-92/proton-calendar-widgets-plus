@@ -59,7 +59,7 @@ class UpdateAlarmsUseCase(
 
             database.eventAlarmsDao().updateOrInsert(*upcomingAlarms.toTypedArray())
 
-            logger.v("upcoming alarms for ${transformedChain.first().summary}")
+            logger.v("upcoming alarms for ${transformedChain.firstOrNull()?.summary}")
             upcomingAlarms.forEach {
                 logger.v("${Instant.ofEpochSecond(it.occurrence).atZone(fromZonedDateTime.zone)}")
             }

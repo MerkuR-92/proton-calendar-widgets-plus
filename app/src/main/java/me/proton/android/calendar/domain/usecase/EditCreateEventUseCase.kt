@@ -26,13 +26,10 @@ class EditCreateEventUseCase(
     suspend fun execute(userId: UserId, calendarId: String, newEvent: Event) : UseCase.Result {
 
         // TODO figure out member-id, it's hardcoded below
-        // TODO userId
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
         logger.d("executing EditCreateEventUseCase from newEvent: ${newEvent}")
         logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
-
-        // TODO SEQUENCE ID has to be already incremented
 
         // 1. split original event according to the matrix
         val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
@@ -40,9 +37,9 @@ class EditCreateEventUseCase(
         //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
         // 2. get Member's AddressKey for signing
-        val member = database.membersDao().select(calendarId).first()
+        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("there is no valid first Member when creating Event")
         val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(json) } // TODO in the future we will have dropdown with memberID, but now we take first
-        val memberAddressKey = userAddresses.first().primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO Valentin how to select address? how to select address-key?
+        val memberAddressKey = userAddresses.firstOrNull()?.primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
         val calendarKey = database.calendarKeysDao().select(calendarId).first { it.isActiveAndPrimary }
@@ -204,7 +201,6 @@ class EditCreateEventUseCase(
                     if (it.response.isSuccessful) {
                         it.response.event
                     } else {
-                        logger.i("error in sync: ${it.response.code}: ${it.response.error}")
                         logger.e("error in sync: ${it.response.code}: ${it.response.error}")
                         null
                     }

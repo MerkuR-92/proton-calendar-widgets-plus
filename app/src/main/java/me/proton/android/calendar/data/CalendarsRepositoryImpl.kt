@@ -536,7 +536,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun selectEventEntity(eventId: String): EventEntity? =
-        database.eventsDao().selectByIdFlow(eventId).first() // TODO exception
+        database.eventsDao().selectById(eventId)
 
     override suspend fun selectRootEventEntity(eventUid: String): EventEntity? {
         val formattedUid = formatUidForICal(eventUid)
