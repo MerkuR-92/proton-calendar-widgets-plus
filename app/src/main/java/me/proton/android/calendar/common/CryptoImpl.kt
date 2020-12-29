@@ -5,6 +5,7 @@ import at.favre.lib.crypto.bcrypt.Radix64Encoder
 import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.armor.Armor
 import com.proton.gopenpgp.crypto.*
+import com.proton.gopenpgp.crypto.Crypto.*
 import com.proton.gopenpgp.helper.Helper
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
@@ -20,7 +21,7 @@ class CryptoImpl(private val logger: Logger) : Crypto {
 
     override fun checkPassphrase(armoredKey: String, passphrase: ByteArray): Boolean {
         return try {
-            val unlockedKey = com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredKey).unlock(passphrase)
+            val unlockedKey = newKeyFromArmored(armoredKey).unlock(passphrase)
             unlockedKey.clearPrivateParams()
             true
         } catch (e: Exception) {
@@ -52,8 +53,8 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         armoredPublicKeys: List<String>
     ): Boolean {
         return try {
-            val keyring = com.proton.gopenpgp.crypto.Crypto.newKeyRing(null)
-            armoredPublicKeys.forEach { keyring.addKey(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(it)) }
+            val keyring = newKeyRing(null)
+            armoredPublicKeys.forEach { keyring.addKey(newKeyFromArmored(it)) }
             keyring.verifyDetached(PlainMessage(plainText), PGPSignature(armoredSignature), 0L) // TODO handle actual error? use different method?
             true
         } catch (e: Exception) {
@@ -82,10 +83,10 @@ class CryptoImpl(private val logger: Logger) : Crypto {
     ): String? {
         var keyring: KeyRing? = null
         return try {
-            keyring = com.proton.gopenpgp.crypto.Crypto.newKeyRing(null)
+            keyring = newKeyRing(null)
             armoredPrivateKeys.forEach {
                 try {
-                    val unlockedKey = com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(it).unlock(passphrase)
+                    val unlockedKey = newKeyFromArmored(it).unlock(passphrase)
                     keyring.addKey(unlockedKey)
                 } catch (e: Exception) {
                     logger.i("Unlocking key failed", e)
@@ -98,6 +99,36 @@ class CryptoImpl(private val logger: Logger) : Crypto {
             null
         } finally {
             keyring?.clearPrivateParams()
+        }
+    }
+
+    override fun encryptTextWithSessionKey(
+        plainText: String,
+        publicKeys: List<String>
+    ): Pair<String, List<String?>> {
+        val sessionKey = generateSessionKey()
+
+        val keyPackets = arrayListOf<String?>()
+        publicKeys.forEach { publicKey ->
+            keyPackets.add(getKeyPacket(sessionKey, publicKey))
+        }
+
+        val dataPacket = sessionKey.encrypt(
+            PlainMessage(plainText)
+        )
+
+        // TODO Update CipherText to handle multiple key packets
+        return Pair(Base64.encode(dataPacket), keyPackets)
+    }
+
+    private fun getKeyPacket(sessionKey: SessionKey, publicKey: String): String? {
+        return try {
+            val keyRing = newKeyRing(newKeyFromArmored(publicKey))
+            val keyPacket = keyRing.encryptSessionKey(sessionKey)
+            Base64.encode(keyPacket)
+        } catch (e: java.lang.Exception) {
+            logger.i("encryptTextWithSessionKey failed", e)
+            null
         }
     }
 
@@ -145,7 +176,7 @@ class CryptoImpl(private val logger: Logger) : Crypto {
 
     override fun getArmoredPublicKey(armoredKey: String): String? {
         return try {
-            Armor.armorKey(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredKey).publicKey)
+            Armor.armorKey(newKeyFromArmored(armoredKey).publicKey)
         } catch (e: Exception) {
             logger.i("getArmoredPublicKey failed", e)
             null
@@ -176,7 +207,7 @@ class CryptoImpl(private val logger: Logger) : Crypto {
     }
 
     private fun createAndUnlockKeyring(armoredPrivateKey: String, passphrase: ByteArray) : KeyRing {
-        return com.proton.gopenpgp.crypto.Crypto.newKeyRing(com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored(armoredPrivateKey).unlock(passphrase))
+        return newKeyRing(newKeyFromArmored(armoredPrivateKey).unlock(passphrase))
     }
 
 }

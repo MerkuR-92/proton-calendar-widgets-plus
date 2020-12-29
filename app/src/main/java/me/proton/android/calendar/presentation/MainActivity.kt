@@ -196,9 +196,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     .setCancelable(false)
                     .setPositiveButton(dialogPositiveButton) { _, _ ->
                         if (errorReport == AccountViewModel.Error.ResetNeeded) {
-                            // TODO Do reset password procedure
                             clearError()
                             calendarViewModel.fetchingEvents.postValue("Reset password procedure")
+                            accountViewModel.resetPassword()
                         } else {
                             clearError()
                             handleAccountState(this, state.value!!)

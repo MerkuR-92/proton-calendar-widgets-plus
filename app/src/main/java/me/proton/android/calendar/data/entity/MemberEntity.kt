@@ -48,7 +48,7 @@ data class MemberEntity(
         AVAILABILITY(1)
     }
 
-    fun hasPermission(permission: Permission) { // TODO add test
-        this.permissions.and(permission.value)
+    fun hasPermission(permission: Permission): Boolean { // TODO add test
+        return this.permissions.and(permission.value) >= 1
     }
 }

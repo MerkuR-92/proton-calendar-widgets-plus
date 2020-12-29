@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain
 
+import com.proton.gopenpgp.crypto.PGPSplitMessage
 import com.proton.gopenpgp.crypto.SessionKey
 
 interface Crypto {
@@ -51,6 +52,11 @@ interface Crypto {
      * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket.
      */
     fun encryptText(plainText: String, sessionKey: SessionKey): String?
+
+    /**
+     * Encrypts plaintext with array of public keys and return PgpSplitMessage
+     */
+    fun encryptTextWithSessionKey(plainText: String, publicKeys: List<String>): Pair<String, List<String?>>
 
     /**
      * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket.

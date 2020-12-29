@@ -55,7 +55,7 @@ interface CalendarsApi {
     /**
      * Delete an event.
      */
-    suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String) : ApiResponse<StatusCodeApiResponse>
+    suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String) : ApiResponse<DeleteEventApiResponse>
 
     suspend fun syncEvents(userId: UserId, calendarId: String, body: SyncEventsUpdateApiRequest) : ApiResponse<SyncEventsApiResponse>
 
@@ -82,5 +82,15 @@ interface CalendarsApi {
      * Sets a new calendar key and updates the encrypted passphrases for all existing members.
      */
     suspend fun setupKey(userId: UserId, calendarId: String, body: SetupKeyApiRequest): ApiResponse<SetupKeyApiResponse>
+
+    /**
+     * Retrieves all the calendars whose keys needs to be reset.
+     */
+    suspend fun getResetInfo(userId: UserId): ApiResponse<ResetInfoApiResponse>
+
+    /**
+     * Install a new key for each calendar that needs to be reset. For each calendar, the body has the same definition has the key setup bodies.
+     */
+    suspend fun resetCalendar(userId: UserId, body: ResetCalendarApiRequest): ApiResponse<ResetCalendarApiResponse>
 
 }

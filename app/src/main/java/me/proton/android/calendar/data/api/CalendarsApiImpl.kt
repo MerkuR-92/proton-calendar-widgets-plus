@@ -43,7 +43,7 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun getEventAlarms(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : AlarmsApiResponse
 
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
-    suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : StatusCodeApiResponse
+    suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : DeleteEventApiResponse
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/sync")
     suspend fun syncEvents(@Path("calendarId") calendarId: String, @Body body: SyncEventsUpdateApiRequest) : SyncEventsApiResponse
@@ -65,6 +65,12 @@ interface CalendarsApiService : BaseRetrofitApi {
 
     @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/keys")
     suspend fun setupKey(@Path("calendarId") calendarId: String, @Body body: SetupKeyApiRequest) : SetupKeyApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/keys/reset")
+    suspend fun getResetInfo() : ResetInfoApiResponse
+
+    @POST("calendar/$API_VERSION_CALENDAR/keys/reset")
+    suspend fun resetCalendar(@Body body: ResetCalendarApiRequest) : ResetCalendarApiResponse
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -127,7 +133,7 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             getEventAlarms(calendarId, eventId)
         }.toApiResponse()
 
-    override suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String): ApiResponse<StatusCodeApiResponse> =
+    override suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String): ApiResponse<DeleteEventApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             deleteEvent(calendarId, eventId)
         }.toApiResponse()
@@ -167,6 +173,15 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             setupKey(calendarId, body)
         }.toApiResponse()
 
+    override suspend fun getResetInfo(userId: UserId): ApiResponse<ResetInfoApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getResetInfo()
+        }.toApiResponse()
+
+    override suspend fun resetCalendar(userId: UserId, body: ResetCalendarApiRequest): ApiResponse<ResetCalendarApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            resetCalendar(body)
+        }.toApiResponse()
 }
 
 @Serializable
@@ -267,6 +282,31 @@ data class SetupKeyApiResponse(
     val calendarKey: CalendarKeyEntity
 )
 
+@Serializable
+data class ResetInfoApiResponse(
+    @SerialName("Calendars")
+    val calendars: List<ResetInfoCalendar>
+)
+
+@Serializable
+data class ResetInfoCalendar(
+    @SerialName("ID")
+    val id: String,
+    @SerialName("Name")
+    val name: String,
+    @SerialName("Description")
+    val description: String,
+    @SerialName("Members")
+    val members: Map<String, String>
+)
+
+@Serializable
+data class ResetCalendarApiRequest(
+    @SerialName("CalendarKeys")
+    val calendarKeys: Map<String, SetupKeyApiRequest>
+)
+
+
 // TODO container for CREATE LINKED by adding SharedEventID and UID
 
 @Serializable
@@ -355,3 +395,15 @@ data class EventsByUidApiResponse(
     @SerialName("Events")
     val events: List<EventEntity>
 )
+
+@Serializable
+data class ResetCalendarApiResponse(
+    @SerialName("Code")
+    override val code: Int
+) : BaseApiResponse()
+
+@Serializable
+data class DeleteEventApiResponse(
+    @SerialName("Code")
+    override val code: Int
+) : BaseApiResponse()

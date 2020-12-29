@@ -9,9 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.*
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
-import me.proton.android.calendar.domain.usecase.FetchUserUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.account.domain.entity.AccountState
 import me.proton.core.account.domain.entity.SessionState
 import me.proton.core.accountmanager.domain.AccountManager
@@ -33,7 +31,8 @@ class AccountViewModel(
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val usersRepository: UsersRepository,
-    private val calendarsRepository: CalendarsRepository
+    private val calendarsRepository: CalendarsRepository,
+    private val resetPasswordUseCase: ResetPasswordUseCase
 ) : ViewModel() {
 
     sealed class State {
@@ -232,5 +231,21 @@ class AccountViewModel(
 
     fun clearError() {
         _errorReport.postValue(Error.NoError)
+    }
+
+    fun resetPassword() {
+        viewModelScope.launch {
+            val tempValueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+            val userIdString = tempValueStore.getString(ValueKey.USER_ID) ?: return@launch
+            val userId = UserId(userIdString)
+
+            val resetPasswordResult = resetPasswordUseCase.execute(userId)
+            if (resetPasswordResult !is UseCase.Result.Success) {
+                removeUser(userId)
+                return@launch
+            }
+
+            _state.postValue(State.Ready)
+        }
     }
 }

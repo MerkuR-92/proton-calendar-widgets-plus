@@ -30,6 +30,7 @@ class KeySetupUseCase(
         val calendarPassphrase = Base64.encode(Random.randBytes(32))
 
         // Create a new X25519 key that will be used as a Calendar key (please note that the UserID should be set to 'Calendar key')
+        // and encrypt key with new 32 bytes string token
         val calendarPrivateKey =
             crypto.generateEccKey("not-a-name", "not-an-email@example.tld", calendarPassphrase.toByteArray())
                 ?: return UseCase.Result.Error("generateEncryptedKey was null in KeySetupUseCase")
@@ -74,14 +75,14 @@ class KeySetupUseCase(
 
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
         val user = usersRepository.selectUserById(userId.id)
-        val email = user?.email ?: return UseCase.Result.Error("Email for user was null in CreateCalendarUseCase")
-        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json) ?: return UseCase.Result.Error("No address id found in CreateCalendarUseCase")
+        val email = user?.email ?: return UseCase.Result.Error("Email for user was null in KeySetupUseCase")
+        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json) ?: return UseCase.Result.Error("No address id found in KeySetupUseCase")
 
         // Get member for address
         return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
             is ApiResponse.Success -> {
 
-                val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("memberId was null in CreateCalendarUseCase")
+                val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("memberId was null in KeySetupUseCase")
 
                 val memberAddressKey = address.primaryKey ?: address.keys.firstOrNull { it.isActive } ?: return UseCase.Result.Error("memberAddressKey was null in CreateCalendarUseCase")
                 val keySetupResult = execute(
@@ -92,8 +93,8 @@ class KeySetupUseCase(
                     memberId)
 
                 when (keySetupResult) {
-                    is UseCase.Result.InvalidParams -> { logger.e("InvalidParams in CreateCalendarUseCase: ${keySetupResult.message}") }
-                    is UseCase.Result.Error -> { logger.e("Error in CreateCalendarUseCase: ${keySetupResult.message}") }
+                    is UseCase.Result.InvalidParams -> { logger.e("InvalidParams in KeySetupUseCase: ${keySetupResult.message}") }
+                    is UseCase.Result.Error -> { logger.e("Error in KeySetupUseCase: ${keySetupResult.message}") }
                 }
 
                 return keySetupResult
