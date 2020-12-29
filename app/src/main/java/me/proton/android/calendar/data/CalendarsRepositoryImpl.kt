@@ -555,22 +555,23 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    override suspend fun hasSingleEdits(userId: UserId, eventUid: String): Boolean {
+    override suspend fun hasSingleEdits(userId: UserId, eventUid: String): Boolean? {
+        // Return null for failed API calls
         val formattedUid = formatUidForICal(eventUid)
         val hasSingleEditsInDb = database.eventsDao().countByUid(formattedUid) > 1
         if (hasSingleEditsInDb) return true
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
-        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) {
-            eventsSharingUidResponse.data.events.mapNotNull {
+        return if (eventsSharingUidResponse is ApiResponse.Success) {
+            eventsSharingUidResponse.data.events.forEach {
                 val event = transformEventUseCase.execute(it)
-                if (event?.iCalEvent?.recurrenceId != null) event
-                else null
+                if (event?.iCalEvent?.recurrenceId != null) return true
             }
-        } else return false
-        return eventsSharingUid.isNotEmpty()
+            false
+        } else null
     }
 
-    override suspend fun getSingleEdits(userId: UserId, eventUid: String, stopAfter: ZonedDateTime?, timeZoneId: String?): List<Event> {
+    override suspend fun getSingleEdits(userId: UserId, eventUid: String, stopAfter: ZonedDateTime?, timeZoneId: String?): List<Event>? {
+        // Return null for failed API calls
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             val events = arrayListOf<Event>()
@@ -583,7 +584,7 @@ class CalendarsRepositoryImpl(
                 if (event?.iCalEvent?.recurrenceId != null) events.add(event)
             }
             events
-        } else return listOf()
+        } else return null
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {
