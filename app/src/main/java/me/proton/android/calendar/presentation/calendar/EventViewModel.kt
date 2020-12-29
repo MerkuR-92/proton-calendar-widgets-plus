@@ -903,6 +903,9 @@ class EventViewModel(
     }
 
     fun handleAllDaySwitch(isAllDay: Boolean) {
+        val timeStart = timeStartBackup
+        val timeEnd = timeEndBackup
+        if (timeStart == null || timeEnd == null) return
         markEventAsEdited()
         if (isAllDay) {
             // remove time part and timezone from start/end
@@ -912,13 +915,13 @@ class EventViewModel(
             // get times & timezone from backup, but date from current event date
             event.iCalEvent.setStart(
                 event.getStart(eventTimeZoneId)!!.toLocalDate(),
-                timeStartBackup!!,
+                timeStart,
                 eventTimeZoneId
             )
 
             event.iCalEvent.setEnd(
                 event.getEnd(eventTimeZoneId)!!.toLocalDate(),
-                timeEndBackup!!,
+                timeEnd,
                 eventTimeZoneId
             )
         }
