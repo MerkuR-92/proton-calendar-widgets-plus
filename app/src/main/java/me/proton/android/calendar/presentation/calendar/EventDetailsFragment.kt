@@ -313,9 +313,18 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 observeEventLiveData()
                 attachActionHandlers()
             } else {
-                // TODO display error and close? for example when we can't decrypt event
-                logger.e((viewModeInitStatus as EventViewModel.Result.Error).message)
-                requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
+                when (viewModeInitStatus) {
+                    EventViewModel.Result.OccurrenceDoesntExist -> {
+                        AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_doesnt_exist))
+                    }
+                    EventViewModel.Result.EventDoesntExist -> {
+                        AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_doesnt_exist))
+                    }
+                    is EventViewModel.Result.Error -> {
+                        logger.e(viewModeInitStatus.message)
+                        requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
+                    }
+                }
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
             }

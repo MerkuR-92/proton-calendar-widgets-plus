@@ -20,6 +20,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -55,6 +56,8 @@ class EventViewModel(
 
     sealed class Result {
         object Success : Result()
+        object OccurrenceDoesntExist : Result()
+        object EventDoesntExist : Result()
         class Error(val message: String) : Result()
     }
 
@@ -218,6 +221,8 @@ class EventViewModel(
             dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
             else null
 
+            if (dbEvent == null) return Result.EventDoesntExist
+
             logger.d("timezone before generating occurrence: ${dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id}")
 
             val eventStartTimeZone = dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id ?: displayTimeZoneId
@@ -231,7 +236,10 @@ class EventViewModel(
             }
 
             // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
-            (dbEvent?.withOccurrence(occurrenceNumber ?: 0, timeZoneForOccurrence) ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
+            val dbEventWithOccurrence = occurrenceNumber?.let { dbEvent?.withOccurrence(occurrenceNumber, timeZoneForOccurrence) }
+            if (occurrenceNumber != null && dbEventWithOccurrence == null) return Result.OccurrenceDoesntExist
+
+            val adjustedEvent = (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence)!!.toLocalDate().minusDays(1))
@@ -288,7 +296,17 @@ class EventViewModel(
                     }
                 }
 
-            } ?: return Result.Error("could not generate event with occurrence in EventViewModel")
+            }
+
+            if (adjustedEvent != null) {
+
+                if (dbEvent != null && listOf(adjustedEvent).filterOutOccurrencesByExdates(dbEvent!!, timeZoneForOccurrence).isEmpty()) {
+                    return Result.OccurrenceDoesntExist
+                }
+
+                adjustedEvent
+
+            } else return Result.Error("could not generate event with occurrence in EventViewModel")
         }
 
         _event.postValue(event)

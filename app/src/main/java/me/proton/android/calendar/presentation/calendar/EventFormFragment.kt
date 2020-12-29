@@ -82,8 +82,18 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     if (viewModeInitStatus == EventViewModel.Result.Success) {
                         findNavController().navigateUp()
                     } else {
-                        logger.e((viewModeInitStatus as EventViewModel.Result.Error).message)
-                        requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
+                        when (viewModeInitStatus) {
+                            EventViewModel.Result.OccurrenceDoesntExist -> {
+                                AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_doesnt_exist))
+                            }
+                            EventViewModel.Result.EventDoesntExist -> {
+                                AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_doesnt_exist))
+                            }
+                            is EventViewModel.Result.Error -> {
+                                logger.e(viewModeInitStatus.message)
+                                requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
+                            }
+                        }
                         jumpToMonthView()
                     }
                 }
@@ -361,12 +371,21 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 observeEventLiveData()
                 attachActionHandlers()
             } else {
-                // TODO display error and close? for example when we can't decrypt event
-                logger.e((viewModeInitStatus as EventViewModel.Result.Error).message)
-                requireActivity().displaySnackBar(
-                    if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
-                    else getString(R.string.snack_event_init_error)
-                )
+                when (viewModeInitStatus) {
+                    EventViewModel.Result.OccurrenceDoesntExist -> {
+                        AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_doesnt_exist))
+                    }
+                    EventViewModel.Result.EventDoesntExist -> {
+                        AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_doesnt_exist))
+                    }
+                    is EventViewModel.Result.Error -> {
+                        logger.e(viewModeInitStatus.message)
+                        requireActivity().displaySnackBar(
+                            if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
+                            else getString(R.string.snack_event_init_error)
+                        )
+                    }
+                }
                 findNavController().navigateUp()
             }
 

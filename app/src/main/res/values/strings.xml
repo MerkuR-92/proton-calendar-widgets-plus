@@ -170,6 +170,10 @@
     <string name="snack_send_bug_report_description_empty">Please provide a description of your report</string>
     <string name="snack_create_event_no_active_calendar">You need an active calendar to create events</string>
 
+    <!-- Dialogs -->
+    <string name="error_event_doesnt_exist">Event doesn\'t exist</string>
+    <string name="error_occurrence_doesnt_exist">Occurrence doesn\'t exist</string>
+
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
     <string name="notification_channel_sync">Calendar Synchronisation</string>
