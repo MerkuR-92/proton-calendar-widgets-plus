@@ -53,6 +53,11 @@ class EventViewModel(
     private val json: Json
 ) : ViewModel() {
 
+    sealed class Result {
+        object Success : Result()
+        class Error(val message: String) : Result()
+    }
+
     private lateinit var userId: UserId
 
     private var timeStartBackup: LocalTime? = null
@@ -100,7 +105,7 @@ class EventViewModel(
         occurrenceNumber: Int?,
         initStartDate: String?,
         initStartTime: String? /*TODO in the future also endDate for multi-day events*/
-    ): UseCase.Result /* TODO maybe use separate Result class */ {
+    ): Result {
 
         // reset backup values
         timeStartBackup = null
@@ -119,19 +124,19 @@ class EventViewModel(
         var defaultCalendar: CalendarEntity? = null
         if (editMode) {
             var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
-                ?: return UseCase.Result.Error("could not get default calendar ID")
+                ?: return Result.Error("could not get default calendar ID")
             defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
             if (defaultCalendar == null || !defaultCalendar.isActive) {
                 defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull()
-                    ?: return UseCase.Result.Error("no active calendars for user")
+                    ?: return Result.Error("no active calendars for user")
                 defaultCalendarId = defaultCalendar.id
             }
 
-            if (!loadSettingsForCalendar(defaultCalendarId)) return UseCase.Result.Error("could not get CalendarSettings")
+            if (!loadSettingsForCalendar(defaultCalendarId)) return Result.Error("could not get CalendarSettings")
         }
 
-        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return UseCase.Result.Error("could not get Calendar User Settings")
-        userSettings = usersRepository.selectUserSettings(userId.id) ?: return UseCase.Result.Error("could not get User Settings")
+        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return Result.Error("could not get Calendar User Settings")
+        userSettings = usersRepository.selectUserSettings(userId.id) ?: return Result.Error("could not get User Settings")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
@@ -143,7 +148,7 @@ class EventViewModel(
 
         event = if (eventId == null) {
 
-            if (defaultCalendar == null) return UseCase.Result.Error("could not get default calendar")
+            if (defaultCalendar == null) return Result.Error("could not get default calendar")
 
             eventTimeZoneId = displayTimeZoneId
 
@@ -283,12 +288,12 @@ class EventViewModel(
                     }
                 }
 
-            } ?: return UseCase.Result.Error("could not generate event with occurrence in EventViewModel")
+            } ?: return Result.Error("could not generate event with occurrence in EventViewModel")
         }
 
         _event.postValue(event)
 
-        return UseCase.Result.Success
+        return Result.Success
     }
 
     private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {

@@ -70,7 +70,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 lifecycleScope.launch {
                     val userId = accountViewModel.getPrimaryUserId()
                     val viewModeInitStatus =
-                        if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                        if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
                         else eventViewModel.initialise(
                             userId,
                             editMode = false,
@@ -79,10 +79,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             null,
                             null,
                         )
-                    if (viewModeInitStatus == UseCase.Result.Success) {
+                    if (viewModeInitStatus == EventViewModel.Result.Success) {
                         findNavController().navigateUp()
                     } else {
-                        logger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                        logger.e((viewModeInitStatus as EventViewModel.Result.Error).message)
                         requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                         jumpToMonthView()
                     }
@@ -345,7 +345,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus = withContext(Dispatchers.Default) {
-                if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
                 else eventViewModel.initialise(
                     userId,
                     editMode = true,
@@ -356,13 +356,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 )
             }
 
-            if (viewModeInitStatus == UseCase.Result.Success) {
+            if (viewModeInitStatus == EventViewModel.Result.Success) {
                 if (navigationArguments.eventId == null) event_form_title.requestFocus()
                 observeEventLiveData()
                 attachActionHandlers()
             } else {
                 // TODO display error and close? for example when we can't decrypt event
-                logger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                logger.e((viewModeInitStatus as EventViewModel.Result.Error).message)
                 requireActivity().displaySnackBar(
                     if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
                     else getString(R.string.snack_event_init_error)

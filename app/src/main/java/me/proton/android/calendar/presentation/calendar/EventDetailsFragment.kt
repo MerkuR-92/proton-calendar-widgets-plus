@@ -297,7 +297,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus =
-                if (userId == null) UseCase.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
                 else withContext(Dispatchers.Default) {
                     eventViewModel.initialise(
                         userId,
@@ -309,12 +309,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     )
                 }
 
-            if (viewModeInitStatus == UseCase.Result.Success) {
+            if (viewModeInitStatus == EventViewModel.Result.Success) {
                 observeEventLiveData()
                 attachActionHandlers()
             } else {
                 // TODO display error and close? for example when we can't decrypt event
-                logger.e((viewModeInitStatus as UseCase.Result.Error).message)
+                logger.e((viewModeInitStatus as EventViewModel.Result.Error).message)
                 requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                 // Use onBackPressedCustom to handle navigation when opening details from notification
                 onBackPressedCustom()
