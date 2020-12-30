@@ -28,7 +28,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val syncAlarmsUseCase: SyncAlarmsUseCase,
-    private val keySetupUseCase: KeySetupUseCase
+    private val keySetupUseCase: KeySetupUseCase,
+    private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String): UseCase.Result {
@@ -43,7 +44,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             logger.e("error reset needed for calendar in BootstrapCalendarsUseCase")
             return UseCase.Result.Error(AccountViewModel.Error.ResetNeeded.value)
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
-            calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup } == null) {
+            calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
             logger.e("error no active calendar in BootstrapCalendarsUseCase")
             return UseCase.Result.Error(AccountViewModel.Error.NoActiveCalendar.value)
         }
@@ -90,9 +91,13 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 redoGetCalendars = true
             }
 
-            if (it.isResetNeeded) {
-                // Handle flag RESET_NEEDED
+            if (it.hasUpdatePassphrase) {
+                // Handle flag UPDATE_PASSPHRASE
+                val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id)
 
+                reactivateCalendarKeyResult.ifSuccessAndLogErrors(logger) { }
+
+                redoGetCalendars = true
             }
         }
 

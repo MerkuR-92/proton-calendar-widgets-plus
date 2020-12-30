@@ -69,6 +69,11 @@ interface Crypto {
     fun encryptTextWithPassphrase(plainText: String, passphrase: ByteArray): String?
 
     /**
+     * DecryptMessageWithPassword decrypts a string with a passphrase using AES256.
+     */
+    fun decryptTextWithPassphrase(encodedText: String, passphrase: ByteArray): String?
+
+    /**
      * Extracts public key from supplied key (private or public).
      */
     fun getArmoredPublicKey(armoredKey: String): String?

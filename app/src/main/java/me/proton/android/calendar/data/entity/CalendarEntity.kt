@@ -47,6 +47,7 @@ data class CalendarEntity(
     val isSuperOwnerDisabled: Boolean get() = flags and 64 >= 1
     val hasIncompleteKeySetup: Boolean get() = flags and 8 >= 1
     val isResetNeeded: Boolean get() = flags and 4 >= 1
+    val hasUpdatePassphrase: Boolean get() = flags and 2 >= 1
 }
 
 enum class CalendarFlags(val value: Int) {

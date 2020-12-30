@@ -174,6 +174,18 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         }
     }
 
+    override fun decryptTextWithPassphrase(
+        encodedText: String,
+        passphrase: ByteArray
+    ): String? {
+        return try {
+            Helper.decryptMessageWithPassword(passphrase, encodedText)
+        } catch (e: Exception) {
+            logger.i("encrypt text with passphrase failed", e)
+            null
+        }
+    }
+
     override fun getArmoredPublicKey(armoredKey: String): String? {
         return try {
             Armor.armorKey(newKeyFromArmored(armoredKey).publicKey)

@@ -66,11 +66,21 @@ interface CalendarsApiService : BaseRetrofitApi {
     @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/keys")
     suspend fun setupKey(@Path("calendarId") calendarId: String, @Body body: SetupKeyApiRequest) : SetupKeyApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/keys/all")
+    suspend fun getKeys(@Path("calendarId") calendarId: String) : KeysApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/keys/reset")
     suspend fun getResetInfo() : ResetInfoApiResponse
 
     @POST("calendar/$API_VERSION_CALENDAR/keys/reset")
     suspend fun resetCalendar(@Body body: ResetCalendarApiRequest) : ResetCalendarApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/passphrases")
+    suspend fun getPassphrases(@Path("calendarId") calendarId: String) : PassphrasesApiResponse
+
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/keys/{keyId}")
+    suspend fun reenableKey(@Path("calendarId") calendarId: String, @Path("keyId") keyId: String, @Body body: ReenableKeyApiRequest) : ReenableKeyApiResponse
+
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -173,6 +183,16 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
             setupKey(calendarId, body)
         }.toApiResponse()
 
+    override suspend fun getKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getKeys(calendarId)
+        }.toApiResponse()
+
+    override suspend fun reenableKey(userId: UserId, calendarId: String, keyId: String, body: ReenableKeyApiRequest): ApiResponse<ReenableKeyApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            reenableKey(calendarId, keyId, body)
+        }.toApiResponse()
+
     override suspend fun getResetInfo(userId: UserId): ApiResponse<ResetInfoApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getResetInfo()
@@ -181,6 +201,11 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
     override suspend fun resetCalendar(userId: UserId, body: ResetCalendarApiRequest): ApiResponse<ResetCalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             resetCalendar(body)
+        }.toApiResponse()
+
+    override suspend fun getPassphrases(userId: UserId, calendarId: String): ApiResponse<PassphrasesApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getPassphrases(calendarId)
         }.toApiResponse()
 }
 
@@ -407,3 +432,27 @@ data class DeleteEventApiResponse(
     @SerialName("Code")
     override val code: Int
 ) : BaseApiResponse()
+
+@Serializable
+data class KeysApiResponse(
+    @SerialName("Keys")
+    val keys: List<CalendarKeyEntity>,
+)
+
+@Serializable
+data class PassphrasesApiResponse(
+    @SerialName("Passphrases")
+    val passphrases: List<PassphraseEntity>,
+)
+
+@Serializable
+data class ReenableKeyApiResponse(
+    @SerialName("Key")
+    val calendarKey: CalendarKeyEntity
+)
+
+@Serializable
+data class ReenableKeyApiRequest(
+    @SerialName("PrivateKey")
+    val privateKey: String
+)

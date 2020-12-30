@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.protonApi.GenericResponse
 import retrofit2.Response
@@ -84,6 +85,16 @@ interface CalendarsApi {
     suspend fun setupKey(userId: UserId, calendarId: String, body: SetupKeyApiRequest): ApiResponse<SetupKeyApiResponse>
 
     /**
+     * Retrieves all keys associated with the calendar, active or not. Available with admin permissions.
+     */
+    suspend fun getKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse>
+
+    /**
+     * Reenable a calendar key. Only available with admin permissions. Useful after a password reset.
+     */
+    suspend fun reenableKey(userId: UserId, calendarId: String, keyId: String, body: ReenableKeyApiRequest): ApiResponse<ReenableKeyApiResponse>
+
+    /**
      * Retrieves all the calendars whose keys needs to be reset.
      */
     suspend fun getResetInfo(userId: UserId): ApiResponse<ResetInfoApiResponse>
@@ -92,5 +103,10 @@ interface CalendarsApi {
      * Install a new key for each calendar that needs to be reset. For each calendar, the body has the same definition has the key setup bodies.
      */
     suspend fun resetCalendar(userId: UserId, body: ResetCalendarApiRequest): ApiResponse<ResetCalendarApiResponse>
+
+    /**
+     * Retrieve a list of passphrases associated with this calendar. Used for recovery. Available with admin permissions.
+     */
+    suspend fun getPassphrases(userId: UserId, calendarId: String): ApiResponse<PassphrasesApiResponse>
 
 }
