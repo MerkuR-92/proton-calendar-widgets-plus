@@ -83,9 +83,8 @@ class ShowNotificationUseCase(
                         eventWithOccurrence?.occurrence?.occurrenceNumber
                     )
 
-                    /* FLAG_ONE_SHOT cancels pending intent after it's sent */
                     val pendingIntent: PendingIntent =
-                        PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+                        PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
                     val text = (eventWithOccurrence ?: dbEvent).formatStartForNotification(
                         systemDefaultZoneId.id,
