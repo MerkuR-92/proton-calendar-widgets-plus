@@ -188,7 +188,9 @@ class CalendarViewModel(
         val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + monthsOffset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
-            miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
+            miniCalendarPager.post {
+                miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
+            }
         }
 
         // adjust Agenda
@@ -198,7 +200,9 @@ class CalendarViewModel(
             val agendaIndex = agendaAdapter.startingPosition + selectedDayOffset
 
             if (agendaPager.currentItem != agendaIndex) {
-                agendaPager.setCurrentItem(agendaIndex, false)
+                agendaPager.post {
+                    agendaPager.setCurrentItem(agendaIndex, false)
+                }
             }
         }
 
