@@ -80,12 +80,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         //  2. see if handling deeplink straight from notification (not indirectly from MainActivity and navigating manually)
         //  fixes this
         if (findNavController().previousBackStackEntry?.destination?.id != R.id.nav_calendar) {
-            // Only do this when details has been opened from notification
-            eventViewModel.eventLiveData.value?.startLocalDate?.let {
-                // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
-                if (calendarViewModel.selectedDate.value != it) calendarViewModel.updateSelectedLocalDate = it
-            }
-            findNavController().navigate(Navigation.Deeplink.toMonth())
+            findNavController().navigate(Navigation.Deeplink.toMonth(eventViewModel.eventLiveData.value?.startLocalDate))
         } else {
             findNavController().navigateUp()
         }
