@@ -279,7 +279,6 @@ class MonthFragment : BaseFragment() {
             }
 
             while(true) {
-                delay(SYNC_EVENTS_IN_APP_REFRESH.toMillis())
 
                 if (userId != null) {
                     mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
@@ -290,6 +289,8 @@ class MonthFragment : BaseFragment() {
                         }
                     }
                 }
+
+                delay(SYNC_EVENTS_IN_APP_REFRESH.toMillis())
             }
         }
 
