@@ -75,20 +75,18 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresBatteryNotLow(!BuildConfig.DEBUG)
-            .setRequiresDeviceIdle(!BuildConfig.DEBUG)
+                // TODO provide options for this in settings
+//            .setRequiresBatteryNotLow(!BuildConfig.DEBUG)
+//            .setRequiresDeviceIdle(!BuildConfig.DEBUG)
             .build()
 
-        val work = PeriodicWorkRequestBuilder<UseCaseWorker>(SYNC_EVENTS_PERIODIC_REFRESH_PERIOD)
+        val work = PeriodicWorkRequestBuilder<SyncWorker>(SYNC_EVENTS_PERIODIC_REFRESH_PERIOD)
             .setConstraints(constraints)
             .setInitialDelay(if (BuildConfig.DEBUG) 0L else SYNC_EVENTS_PERIODIC_DELAY_START.get(ChronoUnit.SECONDS), TimeUnit.SECONDS)
-            .setInputData(workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_SERVER_EVENTS_PERIODIC,
-            ))
             .build()
 
         return WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS_PERIODIC,
+            SyncWorker.UNIQUE_WORK_NAME,
             if (BuildConfig.DEBUG) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
             work
         ).state

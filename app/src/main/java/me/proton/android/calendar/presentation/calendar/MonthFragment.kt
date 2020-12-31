@@ -290,7 +290,7 @@ class MonthFragment : BaseFragment() {
                     }
                 }
 
-                delay(SYNC_EVENTS_IN_APP_REFRESH.toMillis())
+                delay(SYNC_EVENTS_IN_APP_REFRESH_PERIOD.toMillis())
             }
         }
 

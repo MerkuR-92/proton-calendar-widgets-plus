@@ -22,7 +22,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UseCaseId {
         companion object {
             const val SYNC_SERVER_EVENTS = SyncServerEventsUseCase.WORKER_ID
-            const val SYNC_SERVER_EVENTS_PERIODIC = SyncServerEventsUseCase.WORKER_PERIODIC_ID
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
@@ -56,7 +55,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
     class UniqueWorkNames {
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
-            const val SYNC_SERVER_EVENTS_PERIODIC = "SYNC_SERVER_EVENTS_PERIODIC"
             const val SYNC_ALARMS = "SYNC_ALARMS"
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
@@ -74,21 +72,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.SYNC_SERVER_EVENTS -> {
                 val syncServerEventsUseCase: SyncServerEventsUseCase = get()
                 syncServerEventsUseCase.execute(userId)
-            }
-            UseCaseId.SYNC_SERVER_EVENTS_PERIODIC -> {
-                val syncServerEventsUseCase: SyncServerEventsUseCase = get()
-
-                // TODO support more users
-                val userIds = arrayOf(userId)
-                if (userIds.isNotEmpty()) {
-                    val results = userIds.map {
-                        syncServerEventsUseCase.execute(it)
-                    }
-
-                    results.firstOrNull { it is UseCase.Result.Error } ?: results.firstOrNull { it is UseCase.Result.InvalidParams } ?: UseCase.Result.Success
-                } else {
-                    UseCase.Result.Success
-                }
             }
             UseCaseId.SYNC_ALARMS -> {
                 val syncAlarmsUseCase: SyncAlarmsUseCase = get()
