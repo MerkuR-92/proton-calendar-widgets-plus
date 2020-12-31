@@ -179,7 +179,14 @@ class CalendarViewModel(
         } else handleDaySelected(date)
     }
 
-    fun handleDaySelected(date: LocalDate) {
+    fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
+
+        // prevent mini-calendar scroll from overriding selected date
+        _selectedDate.value?.let {
+            if (fromMonthPagerCallback && it.month == date.month && it.year == date.year) {
+                return
+            }
+        }
 
         _selectedDate.postValue(date)
 

@@ -31,6 +31,14 @@
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />
+        <argument
+            android:name="date"
+            android:defaultValue="null"
+            app:argType="string"
+            app:nullable="true" />
+        <deepLink
+            android:id="@+id/deepLink7"
+            app:uri="proton-calendar://protonmail.com/month/details?date={date}" />
     </fragment>
 
     <fragment

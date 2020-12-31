@@ -13,9 +13,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import kotlinx.android.synthetic.main.fragment_base.*
@@ -39,6 +39,8 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 class MonthFragment : BaseFragment() {
 
@@ -48,6 +50,8 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
     private lateinit var agendaPagerAdapter: AgendaPagerAdapter
+
+    private val navigationArguments: MonthFragmentArgs by navArgs()
 
     private lateinit var toolbarTitle: TextView
 
@@ -124,7 +128,7 @@ class MonthFragment : BaseFragment() {
                 super.onPageSelected(position)
 
                 val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
-                calendarViewModel.handleDaySelected(firstDayOfMonth)
+                calendarViewModel.handleDaySelected(firstDayOfMonth, fromMonthPagerCallback = true)
 
                 setToolbarMonthYearTitle(firstDayOfMonth)
 
@@ -235,8 +239,12 @@ class MonthFragment : BaseFragment() {
 
         // Init view pagers in VM
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
+
         // Init selected date
-        calendarViewModel.handleInitialDaySelection(calendarViewModel.initialToday)
+        val navigationDate = try {
+            LocalDate.parse(navigationArguments.date, DateTimeFormatter.ISO_LOCAL_DATE)
+        } catch (e: DateTimeParseException) { null }
+        calendarViewModel.handleInitialDaySelection(navigationDate ?: calendarViewModel.initialToday)
 
         setToolbarMonthYearTitle(calendarViewModel.initialToday)
 
