@@ -16,6 +16,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR")
     suspend fun getCalendars(@Query("Page") page: Int = 0, @Query("PageSize") pageSize: Int = 100): CalendarsApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}")
+    suspend fun getCalendar(@Path("calendarId") calendarId: String): CalendarApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
     suspend fun getEvents(
         @Path("calendarId") calendarId: String,
@@ -70,6 +73,11 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getCalendars()
         }.toApiResponse()
+
+    override suspend fun getCalendar(userId: UserId, calendarId: String): ApiResponse<CalendarApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getCalendar(calendarId)
+    }.toApiResponse()
 
     override suspend fun getEvents(
         userId: UserId,

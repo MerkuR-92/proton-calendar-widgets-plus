@@ -23,6 +23,7 @@ class HandleServerEventsUseCase(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
+    private val keySetupUseCase: KeySetupUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
 
     suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: UserId) : UseCase.Result {
@@ -43,7 +44,21 @@ class HandleServerEventsUseCase(
             eventsResponse.calendars?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarById(it.id) },
-                    { calendarsRepository.persistCalendar(userId.id, it.calendar!!) },
+                    {
+                        if (it.calendar?.hasIncompleteKeySetup == true) {
+                            val keySetupResult = keySetupUseCase.execute(userId, it.id)
+                            keySetupResult.ifSuccessAndLogErrors(logger) {
+                                val calendarResponse = calendarsApi.getCalendar(userId, it.id)
+                                if (calendarResponse !is ApiResponse.Success) {
+                                    logger.e("error getting calendar from API in HandleServerEventsUseCase")
+                                } else {
+                                    calendarsRepository.persistCalendar(userId.id, calendarResponse.data.calendar)
+                                }
+                            }
+                        } else {
+                            calendarsRepository.persistCalendar(userId.id, it.calendar!!)
+                        }
+                    },
                     { calendarsRepository.updateCalendar(userId.id, it.calendar!!) }
                 )
             }

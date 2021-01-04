@@ -14,6 +14,11 @@ interface CalendarsApi {
     suspend fun getCalendars(userId: UserId): ApiResponse<CalendarsApiResponse>
 
     /**
+     * Get calendar by id.
+     */
+    suspend fun getCalendar(userId: UserId, calendarId: String): ApiResponse<CalendarApiResponse>
+
+    /**
      * Gets all events for given calendar, happening between timestamps in given timezone.
      */
     suspend fun getEvents(
