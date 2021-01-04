@@ -32,6 +32,7 @@ internal class SyncServerEventsUseCaseTest {
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val cacheCalendarPassphraseUseCaseMock: CacheCalendarPassphraseUseCase = mockk()
     private val calendarUserSettingsChangedUseCaseMock: CalendarUserSettingsChangedUseCase = mockk()
+    private val keySetupUseCaseMock: KeySetupUseCase = mockk()
     private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
     private val calendarsApi: CalendarsApi = mockk()
     private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
@@ -106,6 +107,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
+            coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
             coEvery { calendarsApi.getEvent(any(), any(), any()) } returns ApiResponse.Success(
                 EventApiResponse(EventEntity(
@@ -123,7 +125,7 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList()))
             )
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarUserSettingsChangedUseCaseMock, calendarsApi)
+            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, fetchPublicKeysUseCaseMock, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, calendarsApi)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
