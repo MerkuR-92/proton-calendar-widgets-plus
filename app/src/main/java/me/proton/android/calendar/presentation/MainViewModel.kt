@@ -19,7 +19,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
     private val intents = mutableMapOf<String, Intent>()
 
     init {
-        setupPeriodicServerEventsSync()
+        SyncWorker.setup(context)
     }
 
     /**
@@ -71,27 +71,6 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
     }
 
-    private fun setupPeriodicServerEventsSync() : LiveData<Operation.State> {
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-                // TODO provide options for this in settings
-//            .setRequiresBatteryNotLow(!BuildConfig.DEBUG)
-//            .setRequiresDeviceIdle(!BuildConfig.DEBUG)
-            .build()
-
-        val work = PeriodicWorkRequestBuilder<SyncWorker>(SYNC_EVENTS_PERIODIC_REFRESH_PERIOD)
-            .setConstraints(constraints)
-            .setInitialDelay(if (BuildConfig.DEBUG) 0L else SYNC_EVENTS_PERIODIC_DELAY_START.get(ChronoUnit.SECONDS), TimeUnit.SECONDS)
-            .build()
-
-        return WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            SyncWorker.UNIQUE_WORK_NAME,
-            if (BuildConfig.DEBUG) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
-            work
-        ).state
-    }
-
     // TODO run only after bootstrap & successful "cold fetch" of events for the first required period
     fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
 
@@ -117,10 +96,6 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
-    }
-
-    fun start() {
-
     }
 
     /**

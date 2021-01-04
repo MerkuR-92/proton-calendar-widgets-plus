@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import me.proton.android.calendar.common.SyncWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.SyncService
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
@@ -53,6 +54,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
                     logger.e("null Context in ProtonCalendarBroadcastReceiver")
                 } else {
                     ContextCompat.startForegroundService(context, Intent(context, SyncService::class.java))
+                    SyncWorker.setup(context)
                 }
 
                 runBlocking(Dispatchers.Default) {
