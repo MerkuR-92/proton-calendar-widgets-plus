@@ -2,6 +2,9 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.*
+import biweekly.component.ICalComponent
+import biweekly.property.Attendee
+import biweekly.property.ICalProperty
 import biweekly.property.RecurrenceRule
 import biweekly.util.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
@@ -2821,4 +2824,47 @@ internal class ICalUtilsTest {
 
         assertThat(event.isEventFirstOccurrence(originalEvent, timeZoneId)).isTrue()
     }
+
+    @Test
+    fun `extract attendee email`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20210105T120000
+    DTEND;TZID=Europe/Zurich:20210105T123000
+    ORGANIZER;CN=adamtst@protonmail.com:mailto:adamtst@protonmail.com
+    SEQUENCE:0
+    SUMMARY:Inviting BLT from adamtst
+    STATUS:CONFIRMED
+    DTSTAMP:20210105T101420Z
+    UID:GOmbzP5Ok3Uo7QYgYyb7LCCijGzS@proton.me
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:james@example.com
+    ATTENDEE;CN=james@pm.me;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james2@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=James;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;EMAIL=AmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=IAmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val eventIcal = ICalUtils.parseICalString(iCalString)!!
+        val attendees = eventIcal.events.first().attendees
+
+        assertThat(attendees.size).isEqualTo(10)
+
+        for (i in 0..8) {
+            assertThat(attendees[i].extractEmail()).isEqualTo("james@example.com")
+        }
+
+        assertThat(attendees[9].extractEmail()).isNull()
+
+    }
+
 }

@@ -18,6 +18,7 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_attendee.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.extractEmail
 import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
 
@@ -25,7 +26,7 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
 
     class AttendeeDiffCallback : DiffUtil.ItemCallback<Attendee>() {
         override fun areItemsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
-            return oldItem.email == newItem.email
+            return oldItem.extractEmail() == newItem.extractEmail()
         }
 
         override fun areContentsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
@@ -53,8 +54,8 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
         private val attendeeItemOptional: TextView = view.item_attendee_optional
 
         fun bind(attendee : Attendee, position : Int) {
-            val description = if (!attendee.commonName.isNullOrEmpty()) attendee.email else ""
-            val title = if (description.isEmpty()) attendee.email else attendee.commonName
+            val description = if (!attendee.commonName.isNullOrEmpty()) (attendee.extractEmail() ?: "") else ""
+            val title = if (description.isEmpty()) (attendee.extractEmail() ?: "") else attendee.commonName
             attendeeItemTitle.text = title
 
             attendeeItemDescription.visibleOrGone(description.isNotEmpty())

@@ -696,6 +696,16 @@ fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
     return this.dateEnd.value.toZonedDateTime(timeZoneId)
 }
 
+fun Attendee.extractEmail(): String? {
+
+    val uri = if (this.uri?.contains("@") == true) this.uri.substringAfter("mailto:") else null
+
+    val email = if (this.email?.contains("@") == true) this.email else null
+
+    val cn = if (this.commonName?.contains("@") == true) this.commonName else null
+
+    return uri ?: email ?: cn
+}
 
 /**
  * Filters out original Events that have occurrences with RECURRENCE-ID pointing to

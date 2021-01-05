@@ -91,7 +91,7 @@ data class Event(
 
     // TODO: Once we have proper user management, check if we could get participation status for current user on event init
     fun getParticipationStatus(userEmail: String): ParticipationStatus? {
-        return iCalEvent.attendees.find { it.email.toLowerCase(Locale.getDefault()) == userEmail.toLowerCase(Locale.getDefault()) }?.participationStatus
+        return iCalEvent.attendees.find { it.extractEmail().equals(userEmail, ignoreCase = true) }?.participationStatus
     }
 
     /**
