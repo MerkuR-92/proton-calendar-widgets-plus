@@ -15,7 +15,7 @@ data class AddressKey(
     @SerialName("Primary")
     val primary: Int, // 1 -- primary
     @SerialName("Flags")
-    val flags: Int,
+    val flags: Int, // 0: inactive, 1: active, 3: active & primary
     @SerialName("PrivateKey")
     val privateKey: String,
     @SerialName("PublicKey")
@@ -42,5 +42,9 @@ data class AddressKey(
     "Signature": null
     }
      */
-): BaseModel()
+): BaseModel() {
+
+    val isActive: Boolean get() = (flags and 1 >= 1)
+
+}
 

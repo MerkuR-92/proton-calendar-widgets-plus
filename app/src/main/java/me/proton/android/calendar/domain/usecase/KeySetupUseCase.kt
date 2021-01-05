@@ -83,11 +83,12 @@ class KeySetupUseCase(
 
                 val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("memberId was null in CreateCalendarUseCase")
 
+                val memberAddressKey = address.primaryKey ?: address.keys.firstOrNull { it.isActive } ?: return UseCase.Result.Error("memberAddressKey was null in CreateCalendarUseCase")
                 val keySetupResult = execute(
                     userId,
                     address.id,
                     calendarId,
-                    address.primaryKey ?: address.keys[0],
+                    memberAddressKey,
                     memberId)
 
                 when (keySetupResult) {
