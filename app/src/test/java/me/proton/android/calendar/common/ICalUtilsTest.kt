@@ -298,13 +298,13 @@ internal class ICalUtilsTest {
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.FRIDAY))).isTrue()
         assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(2)
 
-        // fifth Wednesday -- 2020-07-29
+        // fifth Wednesday -- 2020-07-29 -- we should display it as "last Wednesday" though
         event.iCalEvent.setStart(LocalDate.of(2020, 7, 29), LocalTime.of(13, 0), "Europe/Zurich")
         event.iCalendar.setStartTimeZone("Europe/Zurich")
         event.iCalendar.adjustRRuleToStartDate()
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.size).isEqualTo(1)
         assertThat(event.iCalEvent.recurrenceRule.value.byDay.contains(ByDay(DayOfWeek.WEDNESDAY))).isTrue()
-        assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(5)
+        assertThat(event.iCalEvent.recurrenceRule.value.bySetPos[0]).isEqualTo(-1)
 
     }
 

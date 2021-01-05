@@ -145,7 +145,7 @@ object ICalUtils {
 
                 if (rrule.byDay.isNotEmpty() && rrule.bySetPos.isNotEmpty()) {
 
-                    val setPos = if (rrule.bySetPos[0] < 0 && iCalEvent.getStart(startTimeZone.id)!!.toLocalDate().isLastDayOfWeekInMonth()) {
+                    val setPos = if (iCalEvent.getStart(startTimeZone.id)!!.toLocalDate().isLastDayOfWeekInMonth()) {
                         -1
                     } else {
                         startDayWeekInMonth
