@@ -4,14 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="@dimen/spacing_page"
-    android:paddingEnd="@dimen/spacing_page"
     android:paddingTop="@dimen/spacing_element"
     android:paddingBottom="@dimen/spacing_element">
 
     <ImageView
         android:id="@+id/image_icon"
         style="@style/Icon"
+        android:layout_marginStart="@dimen/default_inner_padding_start"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_map_marker"
@@ -36,9 +35,9 @@
         style="@style/Text.Default"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_element"
+        android:layout_marginStart="@dimen/default_margin_text_start"
         app:layout_constraintEnd_toStartOf="@+id/image_button_action"
-        app:layout_constraintStart_toEndOf="@+id/image_icon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Klosterstraße 44, 10179 Berlin, Germany" />
 
@@ -46,7 +45,7 @@
         android:id="@+id/text_subheader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/Text.DefaultSmall.Weak"
+        style="@style/Text.DefaultSmall.Weak"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/text_header"
         app:layout_constraintEnd_toEndOf="@+id/text_header"
@@ -59,6 +58,7 @@
         android:layout_width="@dimen/default_icon_size"
         android:layout_height="@dimen/default_icon_size"
         android:layout_marginStart="@dimen/spacing_element_small"
+        android:layout_marginEnd="@dimen/spacing_page"
         android:background="?android:selectableItemBackgroundBorderless"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"

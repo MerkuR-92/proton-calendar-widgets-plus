@@ -30,9 +30,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_element"
-        android:layout_marginStart="@dimen/spacing_element"
+        android:layout_marginStart="@dimen/default_margin_text_start"
         app:layout_constraintEnd_toStartOf="@+id/event_attendees_button"
-        app:layout_constraintStart_toEndOf="@+id/event_attendees_icon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="8 Participants" />
 

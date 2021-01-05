@@ -309,6 +309,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
             drawerLayout.close()
         }
+        // TODO Remove feature flag
+        nav_view_main_content.nav_view_more_settings_layout.visibleOrGone(FeatureFlag.SETTINGS_DRAWER)
+        nav_view_main_content.nav_view_more_settings_press.setOnSingleClickListener {
+            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+            drawerLayout.close()
+        }
         accountViewModel.hasPrimary.observe(this@MainActivity) { hasPrimary ->
             nav_view_main_content.nav_view_more_logout_layout.isVisible = hasPrimary
             nav_view_main_content.nav_view_more_login_layout.isGone = hasPrimary

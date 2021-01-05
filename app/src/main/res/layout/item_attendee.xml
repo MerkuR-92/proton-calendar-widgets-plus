@@ -10,7 +10,7 @@
             android:id="@+id/item_attendee_photo"
             android:layout_width="@dimen/attendee_avatar_size"
             android:layout_height="@dimen/attendee_avatar_size"
-            android:layout_marginStart="38dp"
+            android:layout_marginStart="46dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/item_attendee_text_layout"
             app:layout_constraintBottom_toBottomOf="@+id/item_attendee_text_layout"
