@@ -11,7 +11,6 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
-import java.lang.Exception
 import java.time.Instant
 
 class HandleServerEventsUseCase(
@@ -46,13 +45,26 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.deleteCalendarById(it.id) },
                     {
                         if (it.calendar?.hasIncompleteKeySetup == true) {
-                            val keySetupResult = keySetupUseCase.execute(userId, it.id)
-                            keySetupResult.ifSuccessAndLogErrors(logger) {
-                                val calendarResponse = calendarsApi.getCalendar(userId, it.id)
-                                if (calendarResponse !is ApiResponse.Success) {
-                                    logger.e("error getting calendar from API in HandleServerEventsUseCase")
-                                } else {
-                                    calendarsRepository.persistCalendar(userId.id, calendarResponse.data.calendar)
+                            // Try to complete key setup for calendar:
+                            // - we persist newly updated calendar fetched from API if it succeeds
+                            // - we persist calendar from server event if it fails
+                            when (val keySetupResult = keySetupUseCase.execute(userId, it.id)) {
+                                is UseCase.Result.Success -> {
+                                    val calendarResponse = calendarsApi.getCalendar(userId, it.id)
+                                    if (calendarResponse !is ApiResponse.Success) {
+                                        logger.e("error getting calendar from API in HandleServerEventsUseCase")
+                                        calendarsRepository.persistCalendar(userId.id, it.calendar)
+                                    } else {
+                                        calendarsRepository.persistCalendar(userId.id, calendarResponse.data.calendar)
+                                    }
+                                }
+                                is UseCase.Result.InvalidParams -> {
+                                    logger.e("keySetupResult invalid params: ${keySetupResult.message}")
+                                    calendarsRepository.persistCalendar(userId.id, it.calendar)
+                                }
+                                is UseCase.Result.Error -> {
+                                    logger.e("keySetupResult error: ${keySetupResult.message}")
+                                    calendarsRepository.persistCalendar(userId.id, it.calendar)
                                 }
                             }
                         } else {
