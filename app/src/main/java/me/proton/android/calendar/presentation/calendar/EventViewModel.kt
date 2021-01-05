@@ -237,7 +237,8 @@ class EventViewModel(
 
             // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
             val dbEventWithOccurrence = occurrenceNumber?.let { dbEvent?.withOccurrence(occurrenceNumber, timeZoneForOccurrence) }
-            if (occurrenceNumber != null && dbEventWithOccurrence == null) return Result.OccurrenceDoesntExist
+            // return error only if event dbEvent is recurring, if it's a single edit it's okay that occurrence can't be generated
+            if (occurrenceNumber != null && (dbEvent?.isRecurring() == true) && dbEventWithOccurrence == null) return Result.OccurrenceDoesntExist
 
             val adjustedEvent = (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
 
