@@ -32,7 +32,8 @@ class AccountViewModel(
     private val valueStoreProvider: ValueStoreProvider,
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
-    private val resetPasswordUseCase: ResetPasswordUseCase
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase
 ) : ViewModel() {
 
     sealed class State {
@@ -50,6 +51,7 @@ class AccountViewModel(
         object NoCalendar : Error("error user has no calendar")
         object NoActiveCalendar : Error("error user has no active calendar")
         object ResetNeeded: Error("error reset needed for calendar")
+        object UpdatePassphrase: Error("error update passphrase for calendar")
     }
 
     private val _hasPrimary = MutableLiveData<Boolean>()
@@ -95,7 +97,7 @@ class AccountViewModel(
         valueStore.putString(ValueKey.USER_PASSPHRASE, String(passphrase))
     }
 
-    private fun trySetupUser() {
+    private fun trySetupUser(showConfirmationDialog: Boolean = true) {
         val tempValueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
         val eventId = tempValueStore.getString(ValueKey.LAST_SERVER_EVENT_ID) ?: return
         val userIdString = tempValueStore.getString(ValueKey.USER_ID) ?: return
@@ -109,18 +111,19 @@ class AccountViewModel(
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
         viewModelScope.launch {
-            val fetchResult = fetchUserUseCase.execute(userId)
+            val fetchResult = fetchUserUseCase.execute(userId) // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
             if (fetchResult !is UseCase.Result.Success) {
                 if (fetchResult is UseCase.Result.Error) handleError(fetchResult.message)
                 removeUser(userId)
                 return@launch
             }
 
-            val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName)
+            val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
             if (bootstrapResult !is UseCase.Result.Success) {
                 if (bootstrapResult is UseCase.Result.Error) {
                     handleError(bootstrapResult.message)
-                    if (bootstrapResult.message == Error.ResetNeeded.value) return@launch
+                    if (bootstrapResult.message == Error.ResetNeeded.value ||
+                        bootstrapResult.message == Error.UpdatePassphrase.value) return@launch
                 }
                 removeUser(userId)
                 return@launch
@@ -139,6 +142,7 @@ class AccountViewModel(
             Error.NoCalendar.value -> _errorReport.postValue(Error.NoCalendar)
             Error.NoActiveCalendar.value -> _errorReport.postValue(Error.NoActiveCalendar)
             Error.ResetNeeded.value -> _errorReport.postValue(Error.ResetNeeded)
+            Error.UpdatePassphrase.value -> _errorReport.postValue(Error.UpdatePassphrase)
         }
     }
 
@@ -245,7 +249,11 @@ class AccountViewModel(
                 return@launch
             }
 
-            _state.postValue(State.Ready)
+            trySetupUser(false)
         }
+    }
+
+    fun updatePassphrase() {
+        trySetupUser(false)
     }
 }

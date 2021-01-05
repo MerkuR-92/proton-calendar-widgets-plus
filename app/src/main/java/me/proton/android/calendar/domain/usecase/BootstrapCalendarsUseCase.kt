@@ -32,7 +32,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, defaultCalendarName: String): UseCase.Result {
+    suspend fun execute(userId: UserId, defaultCalendarName: String, showConfirmationDialog: Boolean): UseCase.Result {
 
         logger.v("executing BootstrapCalendarsUseCase")
 
@@ -41,7 +41,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             logger.e("error getting calendars from API in BootstrapCalendarsUseCase")
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
-            logger.e("error reset needed for calendar in BootstrapCalendarsUseCase")
+            // Always show confirmation dialog if a calendar has flag RESET_NEEDED
             return UseCase.Result.Error(AccountViewModel.Error.ResetNeeded.value)
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
             calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
@@ -93,6 +93,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
             if (it.hasUpdatePassphrase) {
                 // Handle flag UPDATE_PASSPHRASE
+
+                // Skip confirmation dialog if we just handled flag RESET_NEEDED
+                if (showConfirmationDialog) return UseCase.Result.Error(AccountViewModel.Error.UpdatePassphrase.value)
+
                 val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id)
 
                 reactivateCalendarKeyResult.ifSuccessAndLogErrors(logger) { }

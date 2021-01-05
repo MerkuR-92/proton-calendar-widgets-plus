@@ -218,7 +218,9 @@
     <string name="bootstrap_error_store_quota_reached_message">To learn more about storage quota visit our <a href="https://protonmail.com/support/knowledge-base/increase-my-storage-space/">knowledge base</a></string>
     <string name="bootstrap_error_reset_needed_title">Reset calendar keys.</string>
     <string name="bootstrap_error_reset_needed_message">Your password has been reset and your calendars events could not be decrypted.</string>
-    <string name="bootstrap_error_reset_needed_positive_button">Continue</string>
+    <string name="bootstrap_error_update_passphrase_title">Reactivate calendar keys.</string>
+    <string name="bootstrap_error_update_passphrase_message">You have reactivated your keys and the events linked to the following calendars can now be decrypted.</string>
+    <string name="bootstrap_error_continue_button">Continue</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

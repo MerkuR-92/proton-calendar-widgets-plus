@@ -179,9 +179,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         dialogMessage = R.string.bootstrap_error_store_quota_reached_message
                     }
                     is AccountViewModel.Error.ResetNeeded -> {
+                        // TODO Custom dialog with calendars to reset
                         dialogTitle = R.string.bootstrap_error_reset_needed_title
                         dialogMessage = R.string.bootstrap_error_reset_needed_message
-                        dialogPositiveButton = R.string.bootstrap_error_reset_needed_positive_button
+                        dialogPositiveButton = R.string.bootstrap_error_continue_button
+                    }
+                    is AccountViewModel.Error.UpdatePassphrase -> {
+                        // TODO Custom dialog with calendars to reactivate
+                        dialogTitle = R.string.bootstrap_error_update_passphrase_title
+                        dialogMessage = R.string.bootstrap_error_update_passphrase_message
+                        dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
                     else -> {
                         // TODO default case should not exist
@@ -197,8 +204,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     .setPositiveButton(dialogPositiveButton) { _, _ ->
                         if (errorReport == AccountViewModel.Error.ResetNeeded) {
                             clearError()
-                            calendarViewModel.fetchingEvents.postValue("Reset password procedure")
                             accountViewModel.resetPassword()
+                        } else if (errorReport == AccountViewModel.Error.UpdatePassphrase) {
+                            clearError()
+                            accountViewModel.updatePassphrase()
                         } else {
                             clearError()
                             handleAccountState(this, state.value!!)
