@@ -200,26 +200,20 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 }
 
                             // Display warning dialog for this event option if recurrence rule has been edited
-                            if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.hasRecurrenceRuleBeenEdited()) {
+                            if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.recurrenceManuallyEdited && eventViewModel.hasRecurrenceRuleBeenEdited()) {
                                 displayUpdateRecurringEventDialog(R.string.event_recurring_update_this_description) { _, _ ->
                                     handleSaveWithOption(eventEditDeleteOption)
                                 }
                             }
                             // Display warning dialog for all events option if has ex dates or single edits
                             else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates() || eventViewModel.hasSingleEdit)) {
-                                displayUpdateRecurringEventDialog(
-                                    if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT) R.string.event_recurring_update_this_description
-                                    else R.string.event_recurring_update_all_description
-                                ) { _, _ ->
+                                displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
                                     handleSaveWithOption(eventEditDeleteOption)
                                 }
                             }
                             // Display warning dialog for all events option if has ex dates or single edits
                             else if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT_AND_FUTURE && (eventViewModel.hasExDates(true) || eventViewModel.hasFutureSingleEdit)) {
-                                displayUpdateRecurringEventDialog(
-                                    if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT) R.string.event_recurring_update_this_description
-                                    else R.string.event_recurring_update_all_description
-                                ) { _, _ ->
+                                displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
                                     handleSaveWithOption(eventEditDeleteOption)
                                 }
                             }

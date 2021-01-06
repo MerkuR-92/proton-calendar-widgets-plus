@@ -96,6 +96,7 @@ class EventViewModel(
 
     var hasSingleEdit: Boolean = false
     var hasFutureSingleEdit: Boolean = false
+    var recurrenceManuallyEdited: Boolean = false
 
     var savingEvent = MutableLiveData(false)
 
@@ -121,6 +122,7 @@ class EventViewModel(
         hasSingleEdit = false
         hasFutureSingleEdit = false
         originalDbEvent = null
+        recurrenceManuallyEdited = false
 
         this.userId = userId
 
@@ -975,6 +977,7 @@ class EventViewModel(
      */
     fun handleRecurrence(frequency: Frequency?, untilDate: Boolean, interval: Int? = null, count: Int? = null, daysOfWeek: List<DayOfWeek>? = null, customMonthly: Boolean = false) {
         markEventAsEdited()
+        recurrenceManuallyEdited = true
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
