@@ -71,9 +71,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
     private lateinit var disabledCalendarListAdapter: CalendarListAdapter
 
-    // TODO move to MainViewModel once we have proper user management
-    private lateinit var userEmail: String
-
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
 
@@ -332,7 +329,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.selectUser()
             }
             if (user != null) {
-                userEmail = user.email ?: resources.getString(R.string.default_user_email)
                 nav_view_main_content.nav_view_user_name.text = user.displayName?.nullIfBlank() ?: resources.getString(R.string.default_user_display_name)
                 nav_view_main_content.nav_view_user_mail.text = user.email?.nullIfBlank() ?: resources.getString(R.string.default_user_email)
                 val initials: String = getInitials(user.displayName ?: " ")
@@ -396,10 +392,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(disabledCalendars.isNotEmpty())
             }
         }
-    }
-
-    fun getUserEmail(): String? {
-        return if (this::userEmail.isInitialized) userEmail else ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

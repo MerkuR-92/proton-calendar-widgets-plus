@@ -40,6 +40,12 @@ class UsersRepositoryImpl(
         return database.usersDao().selectUserById(userId)?.toUser()
     }
 
+    override suspend fun getUserEmails(userId: String): List<String>? {
+        return database.addressesDao().select(userId).map {
+            it.email
+        }
+    }
+
     override fun addressesFlow(userId: String): Flow<List<Address>> {
         return database.addressesDao().selectFlow(userId).distinctUntilChanged().map {
             it.map { it.toAddress(json) }

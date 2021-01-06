@@ -60,6 +60,9 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
+    private val _userEmails: MutableLiveData<List<String>> = MutableLiveData()
+    val userEmails: LiveData<List<String>> = _userEmails
+
     var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
 
@@ -129,6 +132,7 @@ class CalendarViewModel(
             _startWeekOn.postValue(usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!)
             _timeFormatIs24Hour.postValue(usersRepository.selectUserSettings(userId.id)
                     ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!)
+            _userEmails.postValue(usersRepository.getUserEmails(userId.id))
 
             this@CalendarViewModel._userId.postValue(userId)
 

@@ -89,8 +89,8 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
-            // TODO: Use ViewModel to get userEmail once we have proper user management
-            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, (requireActivity() as? MainActivity)?.getUserEmail()) {
+
+            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, calendarViewModel.userEmails.value) {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(

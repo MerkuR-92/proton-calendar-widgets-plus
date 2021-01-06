@@ -29,7 +29,7 @@ class EventAdapter(
     private val timeZoneId: String,
     private val is24Hour: Boolean,
     private val date: LocalDate,
-    private val userEmail: String?,
+    private val userEmails: List<String>?,
     private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
 ) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
@@ -54,9 +54,9 @@ class EventAdapter(
             private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
 
             // TODO consider databinding
-            fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
 
-                val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
+                val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
 
                 if (!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_event_unanswered_circle))
@@ -135,9 +135,9 @@ class EventAdapter(
             private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
 
             // TODO consider databinding
-            fun bind(event: Event, date: LocalDate, userEmail: String?, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
 
-                val participationStatus = if (userEmail != null) event.getParticipationStatus(userEmail) else null
+                val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
                 viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
                 if (!event.isAllDay() && !event.spansSingleDay(timeZoneId = timeZoneId)) {
@@ -300,13 +300,13 @@ class EventAdapter(
             is EventViewHolder.PartialDayEventViewHolder -> holder.bind(
                 getItem(position),
                 date,
-                userEmail,
+                userEmails,
                 clickListener
             )
             is EventViewHolder.AllDayEventViewHolder -> holder.bind(
                 getItem(position),
                 date,
-                userEmail,
+                userEmails,
                 clickListener
             )
         }
