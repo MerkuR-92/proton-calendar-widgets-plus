@@ -1,16 +1,19 @@
 package me.proton.android.calendar.domain.usecase
 
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.core.domain.entity.UserId
-import java.time.*
+import java.time.LocalDate
+import java.time.ZoneId
 
 class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
@@ -19,7 +22,8 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val keysApi: KeysApi,
     private val crypto: Crypto,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
-    private val database: AppDatabase): UseCase {
+    private val database: AppDatabase
+) : UseCase {
 
     suspend fun execute(
         userId: UserId,
@@ -27,61 +31,69 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
-    ) : Pair<UseCase.Result, List<EventEntity>?> { // TODO introduce new type of result with payload
-
-        // TODO see if we should pass coroutinescope, so if worker gets cancelled, all operations continue anyway (is this needed?)
+    ): Pair<UseCase.Result, List<EventEntity>?> { // TODO introduce new type of result with payload
 
         logger.v("executing FetchEventsUseCase")
 
-        //withContext()
+        val combinedResults = coroutineScope {
 
-        val results = mutableListOf<UseCase.Result>()
-        val events = mutableListOf<EventEntity>()
+            calendarIds.map { calendarId ->
+                async {
+                    val resultsEventsPairs = (0..3).map { type -> // we need to fire off 4 requests with different types
 
-        calendarIds.forEach { calendarId ->
+                        async {
+                            var page = 0
+                            val results = mutableListOf<UseCase.Result>()
+                            val events = mutableListOf<EventEntity>()
 
-            for (type in 0..3) { // we need to fire off 4 requests with different types
+                            do {
 
-                var page = 0
+                                val eventsResponse = calendarsApi.getEvents(
+                                    userId,
+                                    calendarId,
+                                    fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
+                                    toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
+                                    timeZoneId,
+                                    type,
+                                    page++,
+                                    100
+                                )
 
-                do {
+                                val result = if (eventsResponse is ApiResponse.Success) {
 
-                    val eventsResponse = calendarsApi.getEvents(
-                        userId,
-                        calendarId,
-                        fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
-                        toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
-                        timeZoneId,
-                        type,
-                        page++,
-                        100
-                    )
+                                    logger.v("more: ${eventsResponse.data.more}")
 
-                    val result = if (eventsResponse is ApiResponse.Success) {
+                                    events.addAll(eventsResponse.data.events)
 
-                        logger.v("more: ${eventsResponse.data.more}")
+                                    UseCase.Result.Success
+                                } else {
+                                    logger.e("error fetching events for calendar: $eventsResponse")
+                                    UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
+                                }
 
-                        events.addAll(eventsResponse.data.events)
+                                results.add(result)
 
-                        fetchPublicKeysUseCase.execute(userId, eventsResponse.data.events)
+                            } while (eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
 
-                        UseCase.Result.Success
-                    } else {
-                        logger.e("error fetching events for calendar: $eventsResponse")
-                        UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
-                    }
+                            Pair(results, events)
+                        }
 
-                    results.add(result)
+                    }.awaitAll()
 
-                } while (eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
+                    fetchPublicKeysUseCase.execute(userId, resultsEventsPairs.flatMap { it.second })
 
+                    Pair(resultsEventsPairs.flatMap { it.first }, resultsEventsPairs.flatMap { it.second })
+                }
             }
 
+        }.awaitAll()
 
-        }
-
-        return if (results.all { it == UseCase.Result.Success }) Pair(UseCase.Result.Success, events) else Pair(UseCase.Result.Error("error fetching events"), null) // TODO which calendar?
-
+        return if (combinedResults.all { it.first.all { it == UseCase.Result.Success } }) Pair(
+            UseCase.Result.Success,
+            combinedResults.flatMap { it.second }) else Pair(
+            UseCase.Result.Error("error fetching events"),
+            null
+        ) // TODO which calendar?
 
     }
 
