@@ -195,10 +195,10 @@
     <string name="bug_report_discard_changes_confirm">Discard</string>
 
     <!-- Settings -->
-    <string name="settings_device_title">Device</string>
-    <string name="settings_device_theme_title">Theme</string>
-    <string name="settings_device_timezone_title">Timezone</string>
+    <string name="settings_app_title">App</string>
+    <string name="settings_app_theme_title">Theme</string>
     <string name="settings_proton_account_title">Proton Account</string>
+    <string name="settings_proton_account_timezone_title">Timezone</string>
     <string name="settings_proton_account_week_start_title">Week start</string>
     <string name="settings_proton_account_time_format_title">Time format</string>
     <string name="settings_proton_account_week_numbers_title">Show week numbers</string>

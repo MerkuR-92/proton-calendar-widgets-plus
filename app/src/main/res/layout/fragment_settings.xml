@@ -7,10 +7,10 @@
     >
 
     <TextView
-        android:id="@+id/settings_device_title"
+        android:id="@+id/settings_app_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/settings_device_title"
+        android:text="@string/settings_app_title"
         style="@style/Text.DefaultSmall.Strong"
         android:textColor="@color/brand_norm"
         android:layout_marginTop="32dp"
@@ -22,15 +22,15 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/settings_device_theme"
+        android:id="@+id/settings_app_theme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/settings_device_title"
+        app:layout_constraintTop_toBottomOf="@+id/settings_app_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <include
-            android:id="@+id/settings_device_theme_press"
+            android:id="@+id/settings_app_theme_press"
             layout="@layout/view_press_overlay"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -40,18 +40,18 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageView
-            android:id="@+id/settings_device_theme_icon"
+            android:id="@+id/settings_app_theme_icon"
             style="@style/Icon.Form"
             android:src="@drawable/ic_theme"
-            app:layout_constraintBottom_toBottomOf="@+id/settings_device_theme_title"
-            app:layout_constraintTop_toTopOf="@+id/settings_device_theme_title"
+            app:layout_constraintBottom_toBottomOf="@+id/settings_app_theme_title"
+            app:layout_constraintTop_toTopOf="@+id/settings_app_theme_title"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/settings_device_theme_title"
+            android:id="@+id/settings_app_theme_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/settings_device_theme_title"
+            android:text="@string/settings_app_theme_title"
             style="@style/Text.Default"
             android:layout_marginTop="@dimen/default_margin_text_vertical"
             android:layout_marginStart="@dimen/default_margin_text_start"
@@ -61,79 +61,25 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
-            android:id="@+id/settings_device_theme_value"
+            android:id="@+id/settings_app_theme_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             tools:text="Light"
             android:text="@string/settings_value_placeholder"
             style="@style/Text.DefaultSmall.Weak"
             android:layout_marginBottom="@dimen/default_margin_text_vertical"
-            app:layout_constraintTop_toBottomOf="@+id/settings_device_theme_title"
+            app:layout_constraintTop_toBottomOf="@+id/settings_app_theme_title"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/settings_device_theme_title"
-            app:layout_constraintEnd_toEndOf="@+id/settings_device_theme_title"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/settings_device_timezone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/settings_device_theme"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <include
-            android:id="@+id/settings_device_timezone_press"
-            layout="@layout/view_press_overlay"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <ImageView
-            android:id="@+id/settings_device_timezone_icon"
-            style="@style/Icon.Form"
-            android:src="@drawable/ic_globe"
-            app:layout_constraintBottom_toBottomOf="@+id/settings_device_timezone_title"
-            app:layout_constraintTop_toTopOf="@+id/settings_device_timezone_title"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/settings_device_timezone_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_device_timezone_title"
-            style="@style/Text.Default"
-            android:layout_marginTop="@dimen/default_margin_text_vertical"
-            android:layout_marginStart="@dimen/default_margin_text_start"
-            android:layout_marginEnd="@dimen/spacing_page"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <TextView
-            android:id="@+id/settings_device_timezone_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            tools:text="Europe/Zurich (GMT+1)"
-            android:text="@string/settings_value_placeholder"
-            style="@style/Text.DefaultSmall.Weak"
-            android:layout_marginBottom="@dimen/default_margin_text_vertical"
-            app:layout_constraintTop_toBottomOf="@+id/settings_device_timezone_title"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/settings_device_timezone_title"
-            app:layout_constraintEnd_toEndOf="@+id/settings_device_timezone_title"/>
+            app:layout_constraintStart_toStartOf="@+id/settings_app_theme_title"
+            app:layout_constraintEnd_toEndOf="@+id/settings_app_theme_title"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
-        android:id="@+id/settings_device_separator"
+        android:id="@+id/settings_app_separator"
         style="@style/Separator"
         android:layout_marginTop="@dimen/spacing_element_small"
-        app:layout_constraintTop_toBottomOf="@+id/settings_device_timezone"
+        app:layout_constraintTop_toBottomOf="@+id/settings_app_theme"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -148,15 +94,69 @@
         android:layout_marginStart="@dimen/default_margin_text_start"
         android:layout_marginEnd="@dimen/spacing_page"
         android:paddingBottom="@dimen/spacing_page"
-        app:layout_constraintTop_toBottomOf="@+id/settings_device_separator"
+        app:layout_constraintTop_toBottomOf="@+id/settings_app_separator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_proton_account_timezone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/settings_proton_account_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <include
+            android:id="@+id/settings_proton_account_timezone_press"
+            layout="@layout/view_press_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+            android:id="@+id/settings_proton_account_timezone_icon"
+            style="@style/Icon.Form"
+            android:src="@drawable/ic_globe"
+            app:layout_constraintBottom_toBottomOf="@+id/settings_proton_account_timezone_title"
+            app:layout_constraintTop_toTopOf="@+id/settings_proton_account_timezone_title"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/settings_proton_account_timezone_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_proton_account_timezone_title"
+            style="@style/Text.Default"
+            android:layout_marginTop="@dimen/default_margin_text_vertical"
+            android:layout_marginStart="@dimen/default_margin_text_start"
+            android:layout_marginEnd="@dimen/spacing_page"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/settings_proton_account_timezone_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:text="Europe/Zurich (GMT+1)"
+            android:text="@string/settings_value_placeholder"
+            style="@style/Text.DefaultSmall.Weak"
+            android:layout_marginBottom="@dimen/default_margin_text_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/settings_proton_account_timezone_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/settings_proton_account_timezone_title"
+            app:layout_constraintEnd_toEndOf="@+id/settings_proton_account_timezone_title"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/settings_proton_account_week_start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/settings_proton_account_title"
+        app:layout_constraintTop_toBottomOf="@+id/settings_proton_account_timezone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

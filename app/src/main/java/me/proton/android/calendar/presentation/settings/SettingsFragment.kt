@@ -38,13 +38,12 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         // TODO Remove feature flags
-        settings_device_title.visibleOrGone(FeatureFlag.SETTINGS_THEME || FeatureFlag.SETTINGS_TIMEZONE)
-        settings_device_separator.visibleOrGone(FeatureFlag.SETTINGS_THEME || FeatureFlag.SETTINGS_TIMEZONE)
-        settings_device_theme.visibleOrGone(FeatureFlag.SETTINGS_THEME)
-        settings_device_timezone.visibleOrGone(FeatureFlag.SETTINGS_TIMEZONE)
+        settings_app_title.visibleOrGone(FeatureFlag.SETTINGS_THEME)
+        settings_app_separator.visibleOrGone(FeatureFlag.SETTINGS_THEME)
+        settings_app_theme.visibleOrGone(FeatureFlag.SETTINGS_THEME)
 
-        settings_proton_account_title.visibleOrGone(FeatureFlag.SETTINGS_WEEK_START || FeatureFlag.SETTINGS_TIME_FORMAT || FeatureFlag.SETTINGS_WEEK_NUMBERS)
-        settings_proton_account_separator.visibleOrGone(FeatureFlag.SETTINGS_WEEK_START || FeatureFlag.SETTINGS_TIME_FORMAT || FeatureFlag.SETTINGS_WEEK_NUMBERS)
+        settings_proton_account_title.visibleOrGone(FeatureFlag.SETTINGS_TIMEZONE || FeatureFlag.SETTINGS_WEEK_START || FeatureFlag.SETTINGS_TIME_FORMAT || FeatureFlag.SETTINGS_WEEK_NUMBERS)
+        settings_proton_account_separator.visibleOrGone(FeatureFlag.SETTINGS_TIMEZONE || FeatureFlag.SETTINGS_WEEK_START || FeatureFlag.SETTINGS_TIME_FORMAT || FeatureFlag.SETTINGS_WEEK_NUMBERS)
         settings_proton_account_week_start.visibleOrGone(FeatureFlag.SETTINGS_WEEK_START)
         settings_proton_account_time_format.visibleOrGone(FeatureFlag.SETTINGS_TIME_FORMAT)
         settings_proton_account_week_numbers.visibleOrGone(FeatureFlag.SETTINGS_WEEK_NUMBERS)
