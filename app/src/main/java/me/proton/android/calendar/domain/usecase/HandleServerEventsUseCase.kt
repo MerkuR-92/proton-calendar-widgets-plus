@@ -109,21 +109,7 @@ class HandleServerEventsUseCase(
                             is ApiResponse.Success -> {
                                 calendarsRepository.persistEvents(singleEventResponse.data.event)
                                 updateAlarmsUseCase.execute(userId.id, listOf(singleEventResponse.data.event.id))
-
-                                // TODO move this to worker, remove duplicated code
-                                try {
-                                    val emails =
-                                        (singleEventResponse.data.event.sharedEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
-                                                singleEventResponse.data.event.calendarEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
-                                                singleEventResponse.data.event.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content })
-                                            .filterNotNull()
-                                    emails.distinct().forEach {
-                                        fetchPublicKeysUseCase.execute(userId, it)
-                                    }
-
-                                } catch (e: IllegalStateException) {
-                                    logger.e("error getting event's author from JSON")
-                                }
+                                fetchPublicKeysUseCase.execute(userId, listOf(singleEventResponse.data.event))
                             }
                             is ApiResponse.Error -> throw Exception(singleEventResponse.error)
                             is ApiResponse.Exception -> throw Exception(singleEventResponse.exception)

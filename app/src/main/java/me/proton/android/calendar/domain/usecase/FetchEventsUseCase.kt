@@ -63,19 +63,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                         events.addAll(eventsResponse.data.events)
 
-                        // TODO collect all emails and move this to worker
-                        try {
-                            val emails = eventsResponse.data.events.flatMap {
-                                it.sharedEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
-                                        it.calendarEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
-                                        it.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content }
-                            }.filterNotNull()
-                            emails.distinct().forEach {
-                                fetchPublicKeysUseCase.execute(userId, it)
-                            }
-                        } catch (e: IllegalStateException) {
-                            logger.e("error getting event's author from JSON")
-                        }
+                        fetchPublicKeysUseCase.execute(userId, eventsResponse.data.events)
 
                         UseCase.Result.Success
                     } else {
