@@ -10,6 +10,7 @@ import me.proton.core.domain.entity.UserId
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
+import java.util.*
 
 /**
  * Sets up all the user's calendars, call this only once after successful login.
@@ -44,7 +45,12 @@ class BootstrapCalendarsUseCase( // TODO TEST
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
-            createDefaultCalendarResult.ifSuccessAndLogErrors(logger) { }
+            createDefaultCalendarResult.ifSuccessAndLogErrors(logger) {
+                when (val updateUserPrimaryTimezoneResponse = settingsApi.updateUserPrimaryTimezone(userId, TimeZone.getDefault().id)) {
+                    is ApiResponse.Error -> logger.e("api error updating user timezone: $updateUserPrimaryTimezoneResponse")
+                    is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateUserPrimaryTimezoneResponse")
+                }
+            }
 
             if (createDefaultCalendarResult !is UseCase.Result.Success) {
                 return UseCase.Result.Error("error unable to create default calendar for user")
