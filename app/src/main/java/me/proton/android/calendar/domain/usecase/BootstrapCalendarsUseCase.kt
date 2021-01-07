@@ -45,10 +45,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
 
             // Only update user primary timezone if user has no calendar settings yet
-            var updateUserPrimaryTimezone = false
+            var updateCalendarUserPrimaryTimezone = false
             when (val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId)) {
                 is ApiResponse.Error -> {
-                    updateUserPrimaryTimezone = calendarUserSettingsResponse.httpCode == 404
+                    updateCalendarUserPrimaryTimezone = calendarUserSettingsResponse.httpCode == 404
                     if (calendarUserSettingsResponse.httpCode != 404) logger.e("api error getting calendar user settings: $calendarUserSettingsResponse")
                 }
                 is ApiResponse.Exception -> logger.e("api error getting calendar user settings: $calendarUserSettingsResponse")
@@ -57,11 +57,11 @@ class BootstrapCalendarsUseCase( // TODO TEST
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
             createDefaultCalendarResult.ifSuccessAndLogErrors(logger) {
-                if (updateUserPrimaryTimezone) {
-                    when (val updateUserPrimaryTimezoneResponse =
-                        settingsApi.updateUserPrimaryTimezone(userId, TimeZone.getDefault().id)) {
-                        is ApiResponse.Error -> logger.e("api error updating user timezone: $updateUserPrimaryTimezoneResponse")
-                        is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateUserPrimaryTimezoneResponse")
+                if (updateCalendarUserPrimaryTimezone) {
+                    when (val updateCalendarUserPrimaryTimezoneResponse =
+                        settingsApi.updateCalendarUserPrimaryTimezone(userId, TimeZone.getDefault().id)) {
+                        is ApiResponse.Error -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
+                        is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                     }
                 }
             }
