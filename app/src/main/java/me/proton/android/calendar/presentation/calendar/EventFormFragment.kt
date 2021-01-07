@@ -364,6 +364,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             if (viewModeInitStatus == EventViewModel.Result.Success) {
                 if (navigationArguments.eventId == null) event_form_title.requestFocus()
+                launch {
+                    eventViewModel.getSingleEditsInfo()
+                }
                 observeEventLiveData()
                 attachActionHandlers()
             } else {

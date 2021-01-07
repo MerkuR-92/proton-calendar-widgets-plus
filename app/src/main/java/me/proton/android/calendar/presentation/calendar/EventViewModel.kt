@@ -42,6 +42,7 @@ import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.coroutines.coroutineContext
 
 class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
@@ -95,6 +96,7 @@ class EventViewModel(
     lateinit var userSettings: UserSettingsEntity
 
     var recurrenceManuallyEdited: Boolean = false
+    private var singleEditsInfo: SingleEditsInfo? = null
 
     var savingEvent = MutableLiveData(false)
 
@@ -119,6 +121,7 @@ class EventViewModel(
         dbEvent = null
         originalDbEvent = null
         recurrenceManuallyEdited = false
+        singleEditsInfo = null
 
         this.userId = userId
 
@@ -297,35 +300,40 @@ class EventViewModel(
 
     suspend fun getSingleEditsInfo(): SingleEditsInfo? {
 
-        val event = _event.value ?: return null
-        val dbEvent = dbEvent ?: return null
+        if (singleEditsInfo == null) {
 
-        var hasSingleEdit: Boolean = false
-        var hasFutureSingleEdit: Boolean = false
+            val event = _event.value ?: return null
+            val dbEvent = dbEvent ?: return null
 
-        val occurrenceStart = event.getActualStart(eventTimeZoneId)
-        val occurrence = event.occurrence
-        val allowShowThisAndFuture =
-            occurrence?.occurrenceNumber != null &&
-                    occurrence.occurrenceNumber > 1 &&
-                    !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
+            var hasSingleEdit: Boolean = false
+            var hasFutureSingleEdit: Boolean = false
 
-        // We check for single edits only once and in initialise because it may require API calls
-        hasSingleEdit =
-            if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture) {
-                // We don't have option "this and future" when updating first event in chain
-                // TODO Decide behavior if API call was an error and method returns null
-                dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
-            } else {
-                // TODO Decide behavior if API call was an error and method returns null
-                val singleEdits = calendarsRepository.getSingleEdits(userId, dbEvent.uid, occurrenceStart, eventTimeZoneId)
-                hasFutureSingleEdit = singleEdits?.firstOrNull { singleEdit ->
-                    singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
-                } != null
-                !singleEdits.isNullOrEmpty()
-            }
+            val occurrenceStart = event.getActualStart(eventTimeZoneId)
+            val occurrence = event.occurrence
+            val allowShowThisAndFuture =
+                occurrence?.occurrenceNumber != null &&
+                        occurrence.occurrenceNumber > 1 &&
+                        !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
-        return SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit)
+            // We check for single edits only once and in initialise because it may require API calls
+            hasSingleEdit =
+                if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture) {
+                    // We don't have option "this and future" when updating first event in chain
+                    // TODO Decide behavior if API call was an error and method returns null
+                    dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
+                } else {
+                    // TODO Decide behavior if API call was an error and method returns null
+                    val singleEdits = calendarsRepository.getSingleEdits(userId, dbEvent.uid, occurrenceStart, eventTimeZoneId)
+                    hasFutureSingleEdit = singleEdits?.firstOrNull { singleEdit ->
+                        singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
+                    } != null
+                    !singleEdits.isNullOrEmpty()
+                }
+
+            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit)
+        }
+
+        return singleEditsInfo
 
     }
 
