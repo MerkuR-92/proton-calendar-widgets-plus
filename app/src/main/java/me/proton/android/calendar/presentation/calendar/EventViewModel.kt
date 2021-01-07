@@ -94,8 +94,6 @@ class EventViewModel(
     lateinit var calendarUserSettings: CalendarUserSettingsEntity
     lateinit var userSettings: UserSettingsEntity
 
-    var hasSingleEdit: Boolean = false
-    var hasFutureSingleEdit: Boolean = false
     var recurrenceManuallyEdited: Boolean = false
 
     var savingEvent = MutableLiveData(false)
@@ -119,8 +117,6 @@ class EventViewModel(
         eventCustomAllDayAlarmsSave = null
         savingEvent.postValue(false)
         dbEvent = null
-        hasSingleEdit = false
-        hasFutureSingleEdit = false
         originalDbEvent = null
         recurrenceManuallyEdited = false
 
@@ -274,27 +270,7 @@ class EventViewModel(
                         this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
                     }
 
-                    dbEvent?.let {
-                        val occurrenceStart = this.getActualStart(eventTimeZoneId)
-                        val allowShowThisAndFuture =
-                            occurrenceNumber != null &&
-                                    occurrenceNumber > 1 &&
-                                    !this.isEventFirstOccurrence(it, eventTimeZoneId)
-
-                        // We check for single edits only once and in initialise because it may require API calls
-                        hasSingleEdit =
-                            if (occurrenceNumber == 1 && !allowShowThisAndFuture) {
-                                // We don't have option "this and future" when updating first event in chain
-                                // TODO Decide behavior if API call was an error and method returns null
-                                it.isRecurring() && calendarsRepository.hasSingleEdits(userId, it.uid) == true
-                            } else {
-                                // TODO Decide behavior if API call was an error and method returns null
-                                val singleEdits = calendarsRepository.getSingleEdits(userId, it.uid, occurrenceStart, eventTimeZoneId)
-                                hasFutureSingleEdit = singleEdits?.firstOrNull { singleEdit ->
-                                    singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
-                                } != null
-                                !singleEdits.isNullOrEmpty()
-                            }
+                    dbEvent?.let { dbEvent ->
                         hasExDates(true)
                     }
                 }
@@ -315,6 +291,42 @@ class EventViewModel(
         _event.postValue(event)
 
         return Result.Success
+    }
+
+    data class SingleEditsInfo(val hasSingleEdit: Boolean, val hasFutureSingleEdit: Boolean)
+
+    suspend fun getSingleEditsInfo(): SingleEditsInfo? {
+
+        val event = _event.value ?: return null
+        val dbEvent = dbEvent ?: return null
+
+        var hasSingleEdit: Boolean = false
+        var hasFutureSingleEdit: Boolean = false
+
+        val occurrenceStart = event.getActualStart(eventTimeZoneId)
+        val occurrence = event.occurrence
+        val allowShowThisAndFuture =
+            occurrence?.occurrenceNumber != null &&
+                    occurrence.occurrenceNumber > 1 &&
+                    !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
+
+        // We check for single edits only once and in initialise because it may require API calls
+        hasSingleEdit =
+            if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture) {
+                // We don't have option "this and future" when updating first event in chain
+                // TODO Decide behavior if API call was an error and method returns null
+                dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
+            } else {
+                // TODO Decide behavior if API call was an error and method returns null
+                val singleEdits = calendarsRepository.getSingleEdits(userId, dbEvent.uid, occurrenceStart, eventTimeZoneId)
+                hasFutureSingleEdit = singleEdits?.firstOrNull { singleEdit ->
+                    singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
+                } != null
+                !singleEdits.isNullOrEmpty()
+            }
+
+        return SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit)
+
     }
 
     private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {

@@ -174,6 +174,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
                             !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
 
+                    val singleEditsInfo = eventViewModel.getSingleEditsInfo()
+
                     if (shouldShowConfirmationPicker) {
                         val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
                                 (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(dbEvent,
@@ -206,13 +208,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 }
                             }
                             // Display warning dialog for all events option if has ex dates or single edits
-                            else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates() || eventViewModel.hasSingleEdit)) {
+                            else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates() || (singleEditsInfo?.hasSingleEdit == true))) {
                                 displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
                                     handleSaveWithOption(eventEditDeleteOption)
                                 }
                             }
                             // Display warning dialog for all events option if has ex dates or single edits
-                            else if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT_AND_FUTURE && (eventViewModel.hasExDates(true) || eventViewModel.hasFutureSingleEdit)) {
+                            else if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT_AND_FUTURE && (eventViewModel.hasExDates(true) || (singleEditsInfo?.hasFutureSingleEdit == true))) {
                                 displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
                                     handleSaveWithOption(eventEditDeleteOption)
                                 }
