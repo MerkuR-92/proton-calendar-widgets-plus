@@ -86,6 +86,7 @@ val useCaseModule = module {
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get()) }
+    factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
     factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }

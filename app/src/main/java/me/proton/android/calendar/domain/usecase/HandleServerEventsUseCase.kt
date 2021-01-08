@@ -1,8 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.database.sqlite.SQLiteConstraintException
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
@@ -20,7 +18,7 @@ class HandleServerEventsUseCase(
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
+    private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase,
     private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
     private val keySetupUseCase: KeySetupUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
@@ -92,31 +90,8 @@ class HandleServerEventsUseCase(
                 calendarsRepository.refreshCalendars(userId)
             }
 
-            eventsResponse.calendarEvents?.forEach {
-                logger.d("usecase calendar events: ${it}")
-                it.handleAction(
-                    { calendarsRepository.deleteEventsById(listOf(it.id)) },
-                    {
-
-                        // TODO optimise this so we don't fetch unnecessary events outside of desired window
-                        // https://jira.protontech.ch/browse/CALAND-463
-
-                        // after "event metadata migration", we need to fetch events separately
-                        val singleEventResponse = calendarsApi.getEvent(userId, it.event!!.calendarId, it.event!!.id)
-
-                        // TODO MOVE THIS TO SEPARATE USECASE
-                        when (singleEventResponse) {
-                            is ApiResponse.Success -> {
-                                calendarsRepository.persistEvents(singleEventResponse.data.event)
-                                updateAlarmsUseCase.execute(userId.id, listOf(singleEventResponse.data.event.id))
-                                fetchPublicKeysUseCase.execute(userId, listOf(singleEventResponse.data.event))
-                            }
-                            is ApiResponse.Error -> throw Exception(singleEventResponse.error)
-                            is ApiResponse.Exception -> throw Exception(singleEventResponse.exception)
-                        }
-
-                    }
-                )
+            eventsResponse.calendarEvents?.let {
+                handleEventsMetadataUseCase.execute(userId, it)
             }
 
             eventsResponse.calendarAlarms?.forEach {
