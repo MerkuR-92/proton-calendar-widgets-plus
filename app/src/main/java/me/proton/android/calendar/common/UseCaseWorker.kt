@@ -26,6 +26,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
             const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
+            const val UPDATE_CALENDAR_USER_SETTINGS = UpdateCalendarUserSettingsUseCase.WORKER_ID
         }
     }
 
@@ -37,6 +38,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
+        const val INPUT_PRIMARY_TIMEZONE = "INPUT_PRIMARY_TIMEZONE"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -59,6 +61,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
             const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
+            const val UPDATE_CALENDAR_USER_SETTINGS = "UPDATE_CALENDAR_USER_SETTINGS"
         }
     }
 
@@ -99,6 +102,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_DESCRIPTION) ?: return Result.failure(),
                     inputData.getString(INPUT_USERNAME) ?: return Result.failure(),
                     inputData.getString(INPUT_EMAIL) ?: return Result.failure())
+            }
+            UseCaseId.UPDATE_CALENDAR_USER_SETTINGS -> {
+                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
+                updateCalendarUserSettingsUseCase.execute(
+                    userId,
+                    inputData.getString(INPUT_PRIMARY_TIMEZONE) ?: return Result.failure(),
+                )
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

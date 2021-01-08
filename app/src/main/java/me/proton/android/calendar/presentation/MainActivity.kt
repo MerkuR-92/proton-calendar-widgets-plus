@@ -255,12 +255,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
-
-        calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
-            nav_view_timezone.visibleOrGone(true)
-            nav_view_timezone_login_title.text =
-                ICalUtils.formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
-        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
@@ -409,11 +403,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         job = lifecycleScope.launch {
             delay(SYNC_CALENDARS_DELAY.toMillis())
-            calendarViewModel.updateServerCalendarListDisplay(activeCalendarListAdapter.currentList + disabledCalendarListAdapter.currentList)
+            calendarViewModel.updateServerCalendarListDisplay()
         }
     }
 
     private fun initDrawerCalendarsListContent() {
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
+                nav_view_timezone.visibleOrGone(true)
+                nav_view_timezone_login_title.text =
+                    ICalUtils.formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
+            }
+        }
+
         lifecycleScope.launch {
             calendarViewModel.selectCalendars()
             calendarViewModel.activeCalendars.observe(this@MainActivity) { activeCalendars ->

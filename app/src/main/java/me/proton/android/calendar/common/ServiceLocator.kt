@@ -49,7 +49,7 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get()) }
+    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get(), get()) }
     single<UsersRepository> { UsersRepositoryImpl(get(), get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
@@ -90,6 +90,7 @@ val useCaseModule = module {
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
     factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get()) }
 }
 
 fun coreModule(

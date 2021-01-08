@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
+import java.time.Instant
 
 class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
@@ -20,6 +24,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         get() = R.layout.fragment_settings
 
     override val navigateUp = false
+
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -53,6 +59,31 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
         settings_proton_account_week_numbers_switch.setOnCheckedChangeListener { _, checked ->
             // Handle show week numbers switch action
+        }
+
+        settings_proton_account_timezone_press.setOnSingleClickListener {
+            //.atZone(calendarViewModel.timeZoneId.value).toInstant()
+            val forInstant = Instant.now()
+            val formattedTimeZoneIds = allowedTimezoneIds.map {
+                ICalUtils.formatTimeZoneId(it, forInstant)
+            }.toTypedArray()
+            formattedTimeZoneIds.sortFormattedTimeZoneIds()
+            val defaultTimeZone = calendarViewModel.timeZoneId.value?.id
+            val selectedIndex =
+                if (defaultTimeZone == null) -1
+                else formattedTimeZoneIds.indexOf(ICalUtils.formatTimeZoneId(defaultTimeZone, forInstant))
+
+            AndroidUtils.displaySingleChoicePicker(requireContext(), null, formattedTimeZoneIds, selectedIndex) {
+                lifecycleScope.launch {
+                    calendarViewModel.updateCalendarUserSettings(formattedTimeZoneIds[it].formattedTimeZoneToId())
+                }
+            }
+        }
+
+        // Settings values
+
+        calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
+            settings_proton_account_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)
         }
     }
 }

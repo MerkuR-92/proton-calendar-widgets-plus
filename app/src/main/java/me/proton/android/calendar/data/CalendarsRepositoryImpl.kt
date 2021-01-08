@@ -18,11 +18,14 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import java.time.*
 import java.time.temporal.TemporalAdjusters
+import java.util.*
+import kotlin.collections.ArrayList
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -32,7 +35,8 @@ class CalendarsRepositoryImpl(
     private val logger: Logger,
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val calendarsApi: CalendarsApi
+    private val calendarsApi: CalendarsApi,
+    private val settingsApi: SettingsApi
 ) : CalendarsRepository {
 
     private val eventsMutex = Mutex()
@@ -742,6 +746,10 @@ class CalendarsRepositoryImpl(
 
     override suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity? {
         return database.calendarUserSettingsDao().select(userId)
+    }
+
+    override fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?> {
+        return database.calendarUserSettingsDao().flowCalendarUserSettingsPrimaryTimezone(userId)
     }
 
     override suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity) {

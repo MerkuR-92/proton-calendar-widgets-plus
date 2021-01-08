@@ -2,6 +2,8 @@ package me.proton.android.calendar.data.db
 
 import androidx.room.Dao
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 
 
@@ -15,5 +17,8 @@ abstract class CalendarUserSettingsDao : BaseDao<CalendarUserSettingsEntity> {
 
     @Query("DELETE FROM calendar_user_settings WHERE fkUserId = :userId")
     abstract suspend fun deleteByUserId(userId: String)
+
+    @Query("SELECT primaryTimezone FROM calendar_user_settings WHERE fkUserId = :userId")
+    abstract fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String>
 
 }
