@@ -40,7 +40,7 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(UNIQUE_WORK_NAME,
-                if (BuildConfig.DEBUG) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 work
             )
         }
