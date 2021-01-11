@@ -75,16 +75,23 @@ class HandleServerEventsUseCase(
                 )
             }
 
+            var checkCalendarFlags = false
             eventsResponse.addresses?.forEach {
                 it.handleAction(
                     { usersRepository.deleteAddressById(it.id) },
                     { usersRepository.persistAddress(userId.id, it.address!!) },
                     {
+                        if (!checkCalendarFlags && usersRepository.hasReactivatedAddressKeys(it.address!!)) checkCalendarFlags = true
                         usersRepository.updateAddress(userId.id, it.address!!)
                         calendarsRepository.refreshCalendarsFlagsForAddress(it.address.email, it.address.status, userId.id)
                     }
                 )
             }
+
+            if (checkCalendarFlags) {
+                calendarsRepository.refreshCalendars(userId)
+            }
+
             eventsResponse.calendarEvents?.forEach {
                 logger.d("usecase calendar events: ${it}")
                 it.handleAction(

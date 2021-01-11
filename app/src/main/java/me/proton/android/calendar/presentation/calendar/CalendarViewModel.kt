@@ -18,7 +18,9 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
+import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.domain.entity.UserId
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -32,6 +34,7 @@ class CalendarViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
+    private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val logger: Logger) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -382,5 +385,23 @@ class CalendarViewModel(
             .build()
 
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    suspend fun updateInactiveCalendarsPassphrase() {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel updateInactiveCalendarsPassphrase")
+            return
+        }
+
+        inactiveCalendars.value?.forEach { calendar ->
+            if (calendar.hasUpdatePassphrase) {
+                // Handle flag UPDATE_PASSPHRASE
+                val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, calendar.id)
+                reactivateCalendarKeyResult.ifSuccessAndLogErrors(logger) { }
+            }
+        }
+
+        calendarsRepository.refreshCalendars(userId)
     }
 }

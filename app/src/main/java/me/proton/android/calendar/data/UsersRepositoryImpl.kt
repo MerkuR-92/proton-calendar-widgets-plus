@@ -80,5 +80,13 @@ class UsersRepositoryImpl(
         database.userSettingsDao().updateOrInsert(userSettings)
     }
 
+    override suspend fun hasReactivatedAddressKeys(address: AddressEntity): Boolean {
+        val newAddress = address.toAddress(json)
+        val dbAddress = database.addressesDao().selectById(address.id)?.toAddress(json) ?: return false
+        dbAddress.keys.forEach { dbAddressKey ->
+            if (dbAddressKey.active == 0 && newAddress.keys.firstOrNull { it.id == dbAddressKey.id }?.active == 1) return true
+        }
+        return false
+    }
 
 }

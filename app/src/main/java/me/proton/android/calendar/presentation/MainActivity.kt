@@ -39,6 +39,8 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
@@ -415,6 +417,22 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 disabledCalendars ?: return@observe
                 disabledCalendarListAdapter.submitList(disabledCalendars)
                 nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(disabledCalendars.isNotEmpty())
+            }
+
+            calendarViewModel.inactiveCalendars.observe(this@MainActivity) { inactiveCalendars ->
+                inactiveCalendars ?: return@observe
+
+                if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null) {
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle(R.string.bootstrap_error_update_passphrase_title)
+                        .setMessage(R.string.bootstrap_error_update_passphrase_message)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.bootstrap_error_continue_button) { _, _ ->
+                            lifecycleScope.launch {
+                                calendarViewModel.updateInactiveCalendarsPassphrase()
+                            }
+                        }.show()
+                }
             }
         }
     }

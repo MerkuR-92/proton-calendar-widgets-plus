@@ -354,6 +354,17 @@ class CalendarsRepositoryImpl(
         database.calendarsDao().deleteById(id)
     }
 
+    override suspend fun refreshCalendars(userId: UserId) {
+        val calendarsResponse = calendarsApi.getCalendars(userId)
+        if (calendarsResponse !is ApiResponse.Success) {
+            logger.e("error getting calendars from API in CalendarsRepositoryImpl")
+        } else {
+            calendarsResponse.data.calendars.forEach {
+                persistCalendar(userId.id, it)
+            }
+        }
+    }
+
     override suspend fun getActiveCalendars(userId: String): List<CalendarEntity> {
         return selectCalendars(userId).filter { it.isActive }
     }

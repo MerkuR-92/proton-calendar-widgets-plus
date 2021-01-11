@@ -31,6 +31,8 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarById(id: String)
 
+    suspend fun refreshCalendars(userId: UserId)
+
     suspend fun getActiveCalendars(userId: String): List<CalendarEntity>
 
     suspend fun getDisabledCalendars(userId: String): List<CalendarEntity>

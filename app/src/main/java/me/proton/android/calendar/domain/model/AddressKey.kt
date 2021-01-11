@@ -19,7 +19,9 @@ data class AddressKey(
     @SerialName("PrivateKey")
     val privateKey: String,
     @SerialName("PublicKey")
-    val publicKey: String
+    val publicKey: String,
+    @SerialName("Active")
+    val active: Int // 1 can be used, check flags - 0 can't be used
 //    val token: String?,
 //    val signature: String?
 //    val activation: String?

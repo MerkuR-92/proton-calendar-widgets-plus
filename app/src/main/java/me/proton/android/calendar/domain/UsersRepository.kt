@@ -40,4 +40,6 @@ interface UsersRepository {
 
     suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity)
 
+    suspend fun hasReactivatedAddressKeys(address: AddressEntity): Boolean
+
 }

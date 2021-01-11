@@ -44,10 +44,10 @@ data class CalendarEntity(
     val isActive: Boolean get() = !isDisabled && !isInactive && (flags and 1 == 1)
     val isInactive: Boolean get() = (flags and (0 + 2 + 4 + 8 + 16) >= 1)
     val isDisabled: Boolean get() = !isInactive && (flags and (32 + 64) >= 1)
-    val isSuperOwnerDisabled: Boolean get() = flags and 64 >= 1
-    val hasIncompleteKeySetup: Boolean get() = flags and 8 >= 1
-    val isResetNeeded: Boolean get() = flags and 4 >= 1
-    val hasUpdatePassphrase: Boolean get() = flags and 2 >= 1
+    val isSuperOwnerDisabled: Boolean get() = flags and 64 == 64
+    val hasIncompleteKeySetup: Boolean get() = flags and 8 == 8
+    val isResetNeeded: Boolean get() = flags and 4 == 4
+    val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
 }
 
 enum class CalendarFlags(val value: Int) {
