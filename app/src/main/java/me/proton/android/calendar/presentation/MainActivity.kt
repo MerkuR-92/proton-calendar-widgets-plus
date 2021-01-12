@@ -1,7 +1,5 @@
 package me.proton.android.calendar.presentation
 
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -36,11 +34,10 @@ import kotlinx.coroutines.flow.collect
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.Companion.displayCalendarListMaterialDialog
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
@@ -199,24 +196,42 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         return@Observer
                     }
                 }
-                val materialDialog = MaterialAlertDialogBuilder(this@MainActivity)
-                    .setTitle(dialogTitle)
-                    .setMessage(dialogMessage)
-                    .setCancelable(false)
-                    .setPositiveButton(dialogPositiveButton) { _, _ ->
-                        if (errorReport == AccountViewModel.Error.ResetNeeded) {
-                            clearError()
-                            accountViewModel.resetPassword()
-                        } else if (errorReport == AccountViewModel.Error.UpdatePassphrase) {
-                            clearError()
-                            accountViewModel.updatePassphrase()
-                        } else {
+
+                if (errorReport == AccountViewModel.Error.ResetNeeded || errorReport == AccountViewModel.Error.UpdatePassphrase) {
+                    // Display dialog with list of calendars to fix
+                    lifecycleScope.launch {
+                        // If we fail to fetch calendars, we still display dialog without the calendar list
+                        val userId = accountViewModel.getPrimaryUserId()
+                        val calendars = if (userId != null) calendarViewModel.fetchCalendars(userId) ?: arrayListOf() else arrayListOf()
+                        this@MainActivity.displayCalendarListMaterialDialog(
+                            dialogTitle,
+                            dialogMessage,
+                            false,
+                            if (errorReport == AccountViewModel.Error.ResetNeeded) calendars.filter { it.isResetNeeded }
+                            else calendars.filter { it.hasUpdatePassphrase }
+                        ) { _, _ ->
+                            if (errorReport == AccountViewModel.Error.ResetNeeded) {
+                                clearError()
+                                accountViewModel.resetPassword()
+                            } else if (errorReport == AccountViewModel.Error.UpdatePassphrase) {
+                                clearError()
+                                accountViewModel.updatePassphrase()
+                            }
+                        }
+                    }
+                } else {
+                    // Display normal error dialogs
+                    val materialDialog = MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setCancelable(false)
+                        .setPositiveButton(dialogPositiveButton) { _, _ ->
                             clearError()
                             handleAccountState(this, state.value!!)
-                        }
-                    }.show()
-                materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod =
-                    LinkMovementMethod.getInstance()
+                        }.show()
+                    materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod =
+                        LinkMovementMethod.getInstance()
+                }
             })
         }
 
@@ -423,15 +438,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 inactiveCalendars ?: return@observe
 
                 if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null) {
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.bootstrap_error_update_passphrase_title)
-                        .setMessage(R.string.bootstrap_error_update_passphrase_message)
-                        .setCancelable(false)
-                        .setPositiveButton(R.string.bootstrap_error_continue_button) { _, _ ->
-                            lifecycleScope.launch {
-                                calendarViewModel.updateInactiveCalendarsPassphrase()
-                            }
-                        }.show()
+                    this@MainActivity.displayCalendarListMaterialDialog(
+                        R.string.bootstrap_error_update_passphrase_title,
+                        R.string.bootstrap_error_update_passphrase_message,
+                        true,
+                        inactiveCalendars.filter { it.hasUpdatePassphrase }) { _, _ ->
+                        lifecycleScope.launch {
+                            calendarViewModel.updateInactiveCalendarsPassphrase()
+                        }
+                    }
                 }
             }
         }

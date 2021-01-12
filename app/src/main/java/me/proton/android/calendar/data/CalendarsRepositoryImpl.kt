@@ -365,6 +365,16 @@ class CalendarsRepositoryImpl(
         }
     }
 
+    override suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
+        val calendarsResponse = calendarsApi.getCalendars(userId)
+        return if (calendarsResponse !is ApiResponse.Success) {
+            logger.e("error getting calendars from API in CalendarsRepositoryImpl")
+            null
+        } else {
+            calendarsResponse.data.calendars
+        }
+    }
+
     override suspend fun getActiveCalendars(userId: String): List<CalendarEntity> {
         return selectCalendars(userId).filter { it.isActive }
     }

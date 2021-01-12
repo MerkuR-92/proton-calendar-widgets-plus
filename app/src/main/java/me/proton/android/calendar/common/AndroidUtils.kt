@@ -41,7 +41,10 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
+import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -210,6 +213,57 @@ class AndroidUtils(context: Context) {
             val dialog = builder.create()
             adapter.dialog = dialog
             dialog.show()
+        }
+
+        fun Context.displayCalendarListMaterialDialog(
+            title: Int,
+            message: Int,
+            cancellable: Boolean,
+            items: List<CalendarEntity>,
+            callback: DialogInterface.OnClickListener
+        ) {
+            val materialDialogBuilder = MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setCancelable(cancellable)
+                .setPositiveButton(R.string.bootstrap_error_continue_button, callback)
+
+            val adapter = object : ArrayAdapter<CalendarEntity>(this, R.layout.item_calendar_dialog, items) {
+
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    var view = convertView
+                    if (view == null) {
+                        view = LayoutInflater.from(context)
+                            .inflate(R.layout.item_calendar_dialog, parent, false)
+                    }
+
+                    view!!.findViewById<TextView>(R.id.item_calendar_dialog_title).apply {
+                        text = getItem(position)?.name
+                        tag = position
+                    }
+
+                    view.findViewById<ImageView>(R.id.item_calendar_dialog_icon).drawable.setTint(
+                        Color.parseColor(
+                            getItem(position)?.color
+                        )
+                    )
+
+                    view.isClickable = false
+
+                    return view
+                }
+
+            }
+
+            val view = LayoutInflater.from(this)
+                .inflate(R.layout.dialog_calendar_list, null, false)
+
+            view.dialog_calendar_list_header.text = getString(message)
+
+            view.dialog_calendar_list_recycler_view.adapter = adapter
+            view.dialog_calendar_list_recycler_view.divider = null
+
+            materialDialogBuilder.setView(view)
+            materialDialogBuilder.show()
         }
 
         fun formatRecurrence(context: Context, event: Event, timeZoneId: String): String? {

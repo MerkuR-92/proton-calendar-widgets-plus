@@ -33,6 +33,8 @@ interface CalendarsRepository {
 
     suspend fun refreshCalendars(userId: UserId)
 
+    suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
+
     suspend fun getActiveCalendars(userId: String): List<CalendarEntity>
 
     suspend fun getDisabledCalendars(userId: String): List<CalendarEntity>

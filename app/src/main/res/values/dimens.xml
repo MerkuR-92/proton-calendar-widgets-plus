@@ -41,6 +41,9 @@
     <dimen name="attendee_status_size">16dp</dimen>
     <dimen name="attendee_single_title_bottom_margin">22dp</dimen>
 
+    <dimen name="material_dialog_inset_start">24dp</dimen>
+    <dimen name="material_dialog_inset_end">24dp</dimen>
+
 
 
 

@@ -404,4 +404,8 @@ class CalendarViewModel(
 
         calendarsRepository.refreshCalendars(userId)
     }
+
+    suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
+        return calendarsRepository.fetchCalendars(userId)
+    }
 }
