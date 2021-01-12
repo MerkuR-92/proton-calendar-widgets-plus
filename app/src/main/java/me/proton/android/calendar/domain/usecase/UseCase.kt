@@ -1,16 +1,22 @@
 package me.proton.android.calendar.domain.usecase
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import me.proton.android.calendar.domain.Logger
-import kotlin.coroutines.CoroutineContext
 
 interface UseCase {
     sealed class Result {
         object Success : Result()
         class InvalidParams(val message: String) : Result()
-        class Error(val message: String) : Result()
+        class Error(val message: String, val error: UseCase.Error? = null) : Result()
+    }
+
+    enum class Error {
+        FREE_USER,
+        DELINQUENT_USER,
+        STORAGE_QUOTA_REACHED,
+        NO_CALENDAR,
+        NO_ACTIVE_CALENDAR,
+        RESET_NEEDED,
+        UPDATE_PASSPHRASE
     }
 }
 

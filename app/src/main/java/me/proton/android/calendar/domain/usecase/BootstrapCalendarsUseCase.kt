@@ -42,11 +42,11 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
-            return UseCase.Result.Error(AccountViewModel.Error.ResetNeeded.value)
+            return UseCase.Result.Error("error reset needed for calendar", UseCase.Error.RESET_NEEDED)
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
             calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
             logger.e("error no active calendar in BootstrapCalendarsUseCase")
-            return UseCase.Result.Error(AccountViewModel.Error.NoActiveCalendar.value)
+            return UseCase.Result.Error("error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
         }
 
         var redoGetCalendars = false
@@ -95,7 +95,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 // Handle flag UPDATE_PASSPHRASE
 
                 // Skip confirmation dialog if we just handled flag RESET_NEEDED
-                if (showConfirmationDialog) return UseCase.Result.Error(AccountViewModel.Error.UpdatePassphrase.value)
+                if (showConfirmationDialog) return UseCase.Result.Error("error update passphrase for calendar", UseCase.Error.UPDATE_PASSPHRASE)
 
                 val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id)
 
@@ -113,10 +113,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
             } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
                 logger.e("still no calendar after creating default calendar")
-                return UseCase.Result.Error(AccountViewModel.Error.NoCalendar.value)
+                return UseCase.Result.Error("error user has no calendar", UseCase.Error.NO_CALENDAR)
             } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
                 logger.e("still no active calendar after creating default calendar")
-                return UseCase.Result.Error(AccountViewModel.Error.NoActiveCalendar.value)
+                return UseCase.Result.Error("error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
             }
         }
 

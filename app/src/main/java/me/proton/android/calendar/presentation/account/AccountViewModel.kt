@@ -43,20 +43,9 @@ class AccountViewModel(
         object Ready : State()
     }
 
-    sealed class Error(val value: String) {
-        object NoError : Error("no error")
-        object FreeUser : Error("user is free")
-        object DelinquentUser : Error("user is delinquent")
-        object StorageQuotaReached : Error("user reached storage quota")
-        object NoCalendar : Error("error user has no calendar")
-        object NoActiveCalendar : Error("error user has no active calendar")
-        object ResetNeeded: Error("error reset needed for calendar")
-        object UpdatePassphrase: Error("error update passphrase for calendar")
-    }
-
     private val _hasPrimary = MutableLiveData<Boolean>()
     private val _state = MutableLiveData<State>()
-    private val _errorReport = MutableLiveData<Error>()
+    private val _errorReport = MutableLiveData<UseCase.Error?>()
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
@@ -113,7 +102,7 @@ class AccountViewModel(
         viewModelScope.launch {
             val fetchResult = fetchUserUseCase.execute(userId) // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
             if (fetchResult !is UseCase.Result.Success) {
-                if (fetchResult is UseCase.Result.Error) handleError(fetchResult.message)
+                if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
                 removeUser(userId)
                 return@launch
             }
@@ -121,28 +110,15 @@ class AccountViewModel(
             val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
             if (bootstrapResult !is UseCase.Result.Success) {
                 if (bootstrapResult is UseCase.Result.Error) {
-                    handleError(bootstrapResult.message)
-                    if (bootstrapResult.message == Error.ResetNeeded.value ||
-                        bootstrapResult.message == Error.UpdatePassphrase.value) return@launch
+                    _errorReport.postValue(bootstrapResult.error)
+                    if (bootstrapResult.error == UseCase.Error.RESET_NEEDED ||
+                        bootstrapResult.error == UseCase.Error.UPDATE_PASSPHRASE) return@launch
                 }
                 removeUser(userId)
                 return@launch
             }
 
             _state.postValue(State.Ready)
-        }
-    }
-
-    // TODO get rid of these strings
-    private fun handleError(message: String) {
-        when (message) {
-            Error.FreeUser.value -> _errorReport.postValue(Error.FreeUser)
-            Error.DelinquentUser.value -> _errorReport.postValue(Error.DelinquentUser)
-            Error.StorageQuotaReached.value -> _errorReport.postValue(Error.StorageQuotaReached)
-            Error.NoCalendar.value -> _errorReport.postValue(Error.NoCalendar)
-            Error.NoActiveCalendar.value -> _errorReport.postValue(Error.NoActiveCalendar)
-            Error.ResetNeeded.value -> _errorReport.postValue(Error.ResetNeeded)
-            Error.UpdatePassphrase.value -> _errorReport.postValue(Error.UpdatePassphrase)
         }
     }
 
@@ -168,7 +144,7 @@ class AccountViewModel(
     }
 
     val state: LiveData<State> = _state
-    val errorReport: LiveData<Error> = _errorReport
+    val errorReport: LiveData<UseCase.Error?> = _errorReport
     val hasPrimary: LiveData<Boolean> = _hasPrimary
 
     fun init(context: ComponentActivity, newActivity: Boolean) {
@@ -234,7 +210,7 @@ class AccountViewModel(
     }
 
     fun clearError() {
-        _errorReport.postValue(Error.NoError)
+        _errorReport.postValue(null)
     }
 
     fun resetCalendarsKey() {

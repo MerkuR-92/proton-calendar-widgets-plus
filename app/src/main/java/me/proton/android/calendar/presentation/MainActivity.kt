@@ -38,6 +38,7 @@ import me.proton.android.calendar.common.AndroidUtils.Companion.displayCalendarL
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
@@ -145,59 +146,51 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             init(this@MainActivity, savedInstanceState == null)
 
             state.observe(this@MainActivity, Observer { state ->
-                if (errorReport.value == AccountViewModel.Error.NoError) {
+                if (errorReport.value == null) {
                     handleAccountState(this, state)
                 }
             })
 
             // Handle Bootstrap errors
             errorReport.observe(this@MainActivity, Observer { errorReport ->
-                if (errorReport == AccountViewModel.Error.NoError) return@Observer
+                errorReport ?: return@Observer
                 val dialogTitle: Int
                 val dialogMessage: Int
                 var dialogPositiveButton = R.string.bootstrap_error_default_confirm
                 when (errorReport) {
-                    is AccountViewModel.Error.NoCalendar -> {
+                    UseCase.Error.NO_CALENDAR -> {
                         dialogTitle = R.string.bootstrap_error_no_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_calendar_message
                     }
-                    is AccountViewModel.Error.NoActiveCalendar -> {
+                    UseCase.Error.NO_ACTIVE_CALENDAR -> {
                         dialogTitle = R.string.bootstrap_error_no_active_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_active_calendar_message
                     }
-                    is AccountViewModel.Error.FreeUser -> {
+                    UseCase.Error.FREE_USER -> {
                         dialogTitle = R.string.bootstrap_error_free_user_title
                         dialogMessage = R.string.bootstrap_error_free_user_message
                     }
-                    is AccountViewModel.Error.DelinquentUser -> {
+                    UseCase.Error.DELINQUENT_USER -> {
                         dialogTitle = R.string.bootstrap_error_delinquent_user_title
                         dialogMessage = R.string.bootstrap_error_delinquent_user_message
                     }
-                    is AccountViewModel.Error.StorageQuotaReached -> {
+                    UseCase.Error.STORAGE_QUOTA_REACHED -> {
                         dialogTitle = R.string.bootstrap_error_store_quota_reached_title
                         dialogMessage = R.string.bootstrap_error_store_quota_reached_message
                     }
-                    is AccountViewModel.Error.ResetNeeded -> {
-                        // TODO Custom dialog with calendars to reset
+                    UseCase.Error.RESET_NEEDED -> {
                         dialogTitle = R.string.bootstrap_error_reset_needed_title
                         dialogMessage = R.string.bootstrap_error_reset_needed_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
-                    is AccountViewModel.Error.UpdatePassphrase -> {
-                        // TODO Custom dialog with calendars to reactivate
+                    UseCase.Error.UPDATE_PASSPHRASE -> {
                         dialogTitle = R.string.bootstrap_error_update_passphrase_title
                         dialogMessage = R.string.bootstrap_error_update_passphrase_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
-                    else -> {
-                        // TODO default case should not exist
-                        clearError()
-                        handleAccountState(this, state.value!!)
-                        return@Observer
-                    }
                 }
 
-                if (errorReport == AccountViewModel.Error.ResetNeeded || errorReport == AccountViewModel.Error.UpdatePassphrase) {
+                if (errorReport == UseCase.Error.RESET_NEEDED || errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
                     // Display dialog with list of calendars to fix
                     lifecycleScope.launch {
                         // If we fail to fetch calendars, we still display dialog without the calendar list
@@ -207,13 +200,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             dialogTitle,
                             dialogMessage,
                             false,
-                            if (errorReport == AccountViewModel.Error.ResetNeeded) calendars.filter { it.isResetNeeded }
+                            if (errorReport == UseCase.Error.RESET_NEEDED) calendars.filter { it.isResetNeeded }
                             else calendars.filter { it.hasUpdatePassphrase }
                         ) { _, _ ->
-                            if (errorReport == AccountViewModel.Error.ResetNeeded) {
+                            if (errorReport == UseCase.Error.RESET_NEEDED) {
                                 clearError()
                                 accountViewModel.resetCalendarsKey()
-                            } else if (errorReport == AccountViewModel.Error.UpdatePassphrase) {
+                            } else if (errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
                                 clearError()
                                 accountViewModel.updatePassphrase()
                             }

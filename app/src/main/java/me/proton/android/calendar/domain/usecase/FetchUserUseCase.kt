@@ -26,11 +26,11 @@ class FetchUserUseCase(
 
         // Limit users
         // User has a free account
-        if (user.isFree) return UseCase.Result.Error(AccountViewModel.Error.FreeUser.value)
+        if (user.isFree) return UseCase.Result.Error("user is free", UseCase.Error.FREE_USER)
         // User's payment failed or expired
-        if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error(AccountViewModel.Error.DelinquentUser.value)
+        if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error("user is delinquent", UseCase.Error.DELINQUENT_USER)
         // User reached storage quota: creation of event is disabled
-        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error(AccountViewModel.Error.StorageQuotaReached.value)
+        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error("user reached storage quota", UseCase.Error.STORAGE_QUOTA_REACHED)
 
         user.primaryKey ?: return UseCase.Result.Error("user has no primary key")
 
