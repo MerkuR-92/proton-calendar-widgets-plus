@@ -15,8 +15,6 @@ import java.util.concurrent.TimeUnit
 class SyncWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams),
     KoinComponent {
 
-    private val logger: Logger by inject()
-
     override suspend fun doWork(): Result {
         ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, SyncService::class.java))
         return Result.success()
@@ -25,24 +23,28 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
     companion object {
         const val UNIQUE_WORK_NAME = "SYNC_SERVER_EVENTS_PERIODIC"
 
-        fun setup(context: Context) {
+        fun setup(context: Context, logger: Logger) {
 
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                // TODO provide options for this in settings
+            try {
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    // TODO provide options for this in settings
 //            .setRequiresBatteryNotLow(!BuildConfig.DEBUG)
 //            .setRequiresDeviceIdle(!BuildConfig.DEBUG)
-                .build()
+                    .build()
 
-            val work = PeriodicWorkRequestBuilder<SyncWorker>(SYNC_EVENTS_PERIODIC_REFRESH_PERIOD)
-                .setConstraints(constraints)
-                .setInitialDelay(if (BuildConfig.DEBUG) 0L else SYNC_EVENTS_PERIODIC_DELAY_START.get(ChronoUnit.SECONDS), TimeUnit.SECONDS)
-                .build()
+                val work = PeriodicWorkRequestBuilder<SyncWorker>(SYNC_EVENTS_PERIODIC_REFRESH_PERIOD)
+                    .setConstraints(constraints)
+                    .setInitialDelay(if (BuildConfig.DEBUG) 0L else SYNC_EVENTS_PERIODIC_DELAY_START.get(ChronoUnit.SECONDS), TimeUnit.SECONDS)
+                    .build()
 
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(UNIQUE_WORK_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
-                work
-            )
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(UNIQUE_WORK_NAME,
+                    ExistingPeriodicWorkPolicy.REPLACE,
+                    work
+                )
+            } catch (e: Exception) {
+                logger.e("exception in SyncWorker setup", e)
+            }
         }
     }
 

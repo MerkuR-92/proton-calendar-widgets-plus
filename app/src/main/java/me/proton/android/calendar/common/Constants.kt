@@ -20,7 +20,7 @@ const val CLICK_INTERVAL_MS: Long = 500L
 
 val SYNC_EVENTS_IN_APP_REFRESH_PERIOD = Duration.ofSeconds(15)
 val SYNC_EVENTS_PERIODIC_REFRESH_PERIOD = Duration.ofHours(1)
-val SYNC_EVENTS_PERIODIC_DELAY_START = Duration.ofMinutes(1)
+val SYNC_EVENTS_PERIODIC_DELAY_START = Duration.ofMinutes(5)
 
 val SYNC_CALENDARS_DELAY = Duration.ofSeconds(3)
 

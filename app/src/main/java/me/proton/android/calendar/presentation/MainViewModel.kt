@@ -18,10 +18,6 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
 
     private val intents = mutableMapOf<String, Intent>()
 
-    init {
-        SyncWorker.setup(context)
-    }
-
     /**
      * Try to open maps with event location.
      */

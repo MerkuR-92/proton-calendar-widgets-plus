@@ -54,7 +54,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
                     logger.e("null Context in ProtonCalendarBroadcastReceiver")
                 } else {
                     ContextCompat.startForegroundService(context, Intent(context, SyncService::class.java))
-                    SyncWorker.setup(context)
+                    SyncWorker.setup(context, logger)
                 }
 
                 runBlocking(Dispatchers.Default) {

@@ -5,10 +5,12 @@ import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.network.data.ApiProvider
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -26,6 +28,8 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var authOrchestrator: AuthOrchestrator
+
+    private val logger: Logger by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -46,6 +50,8 @@ class ProtonCalendarApplication : Application() {
         }
 
         ShowNotificationUseCase.createNotificationChannels(this)
+
+        SyncWorker.setup(this, logger)
     }
 
 }
