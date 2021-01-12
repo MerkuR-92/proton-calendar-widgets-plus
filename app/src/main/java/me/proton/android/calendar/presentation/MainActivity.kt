@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         ) { _, _ ->
                             if (errorReport == AccountViewModel.Error.ResetNeeded) {
                                 clearError()
-                                accountViewModel.resetPassword()
+                                accountViewModel.resetCalendarsKey()
                             } else if (errorReport == AccountViewModel.Error.UpdatePassphrase) {
                                 clearError()
                                 accountViewModel.updatePassphrase()
@@ -441,7 +441,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     this@MainActivity.displayCalendarListMaterialDialog(
                         R.string.bootstrap_error_update_passphrase_title,
                         R.string.bootstrap_error_update_passphrase_message,
-                        true,
+                        false,
                         inactiveCalendars.filter { it.hasUpdatePassphrase }) { _, _ ->
                         lifecycleScope.launch {
                             calendarViewModel.updateInactiveCalendarsPassphrase()

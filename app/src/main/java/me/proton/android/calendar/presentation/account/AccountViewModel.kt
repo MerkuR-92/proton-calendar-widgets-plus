@@ -32,7 +32,7 @@ class AccountViewModel(
     private val valueStoreProvider: ValueStoreProvider,
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
-    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase
 ) : ViewModel() {
 
@@ -237,14 +237,12 @@ class AccountViewModel(
         _errorReport.postValue(Error.NoError)
     }
 
-    fun resetPassword() {
+    fun resetCalendarsKey() {
         viewModelScope.launch {
-            val tempValueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
-            val userIdString = tempValueStore.getString(ValueKey.USER_ID) ?: return@launch
-            val userId = UserId(userIdString)
+            val userId = getPrimaryUserId() ?: return@launch
 
-            val resetPasswordResult = resetPasswordUseCase.execute(userId)
-            if (resetPasswordResult !is UseCase.Result.Success) {
+            val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
+            if (resetCalendarsKeyResult !is UseCase.Result.Success) {
                 removeUser(userId)
                 return@launch
             }

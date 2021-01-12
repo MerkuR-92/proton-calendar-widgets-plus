@@ -14,7 +14,7 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.AddressKey
 import me.proton.core.domain.entity.UserId
 
-class ResetPasswordUseCase(
+class ResetCalendarsKeyUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,
@@ -51,12 +51,12 @@ class ResetPasswordUseCase(
                     val address =
                         database.addressesDao().select(userId.id, adminMember.email).firstOrNull()?.toAddress(json)
                             ?: return UseCase.Result.Error("No address id found in ResetCalendarKeysUseCase")
-                    // TODO check key validity
 
+                    val memberAddressKey = address.primaryKey ?: address.keys.firstOrNull { it.isActive } ?: return UseCase.Result.Error("memberAddressKey was null in ResetCalendarKeysUseCase")
                     setupKeyApiRequestMap[calendarId] = getSetupKeyApiRequest(
                         userId,
                         address.id,
-                        address.primaryKey ?: address.keys[0],
+                        memberAddressKey,
                         it.members
                     ) ?: return UseCase.Result.Error("getSetupKeyApiRequest was null in ResetCalendarKeysUseCase")
                 }
