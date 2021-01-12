@@ -34,6 +34,16 @@ class ValueStoreProviderImpl(private val sharedPreferencesProvider: SharedPrefer
             if (sharedPreferences.contains(key)) sharedPreferences.getLong(key, 0L) else null
 
         @Synchronized
+        override fun putBoolean(key: String, value: Boolean) = sharedPreferences.edit().putBoolean(
+            key,
+            value
+        ).apply()
+
+        @Synchronized
+        override fun getBoolean(key: String): Boolean? =
+            if (sharedPreferences.contains(key)) sharedPreferences.getBoolean(key, true) else null
+
+        @Synchronized
         override fun putStringInSet(setName: String, key: String, value: String) = putString("$setName~$key", value)
 
         @Synchronized

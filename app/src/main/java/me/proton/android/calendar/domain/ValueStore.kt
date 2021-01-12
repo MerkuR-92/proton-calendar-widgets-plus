@@ -10,6 +10,8 @@ interface ValueStore {
     fun getString(key: String): String?
     fun putLong(key: String, value: Long)
     fun getLong(key: String): Long?
+    fun putBoolean(key: String, value: Boolean)
+    fun getBoolean(key: String): Boolean?
     fun putStringInSet(setName: String, key: String, value: String)
     fun getStringFromSet(setName: String, key: String): String?
     fun putLongInSet(setName: String, key: String, value: Long)
@@ -26,6 +28,7 @@ object ValueKey {
     const val USER_PASSPHRASE = "USER_PASSPHRASE"
     const val LAST_EVENT_ALARM_HANDLED_TIMESTAMP = "LAST_EVENT_ALARM_HANDLED_TIMESTAMP"
     const val LAST_SERVER_EVENT_ID = "LAST_SERVER_EVENT_ID"
+    const val SHOW_TIMEZONE_UPDATE_DIALOG = "SHOW_TIMEZONE_UPDATE_DIALOG"
 }
 
 object ValueSet {

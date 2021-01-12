@@ -1,9 +1,12 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +21,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_month.*
+import kotlinx.android.synthetic.main.item_form_section.view.*
 import kotlinx.android.synthetic.main.toolbar_action_primary.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -41,6 +46,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.util.*
 
 class MonthFragment : BaseFragment() {
 
@@ -64,6 +70,9 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var buttonCreate: View
     private lateinit var buttonToday: View
+
+    // If app is killed we will show timezone on start
+    private var updateTimeZoneDialogLastShown: LocalDate? = null
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
@@ -183,9 +192,35 @@ class MonthFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
 
+        checkLocalTimezone()
+
         // make sure currently selected month always has desired height, even if adjacent pages make
         //  entire ViewPager to have different height
         if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+    }
+
+    private fun checkLocalTimezone() {
+        if (!calendarViewModel.getShowTimezoneUpdateDialog() || LocalDate.now() == updateTimeZoneDialogLastShown) return
+        updateTimeZoneDialogLastShown = LocalDate.now()
+        val timeZoneId = calendarViewModel.timeZoneId.value
+        timeZoneId?.let {
+            if (timeZoneId != ZoneId.systemDefault()) {
+                // We add tags to the timezone string argument directly because it is not supported otherwise
+                val dialogMessage: Spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Html.fromHtml(getString(R.string.update_timezone_dialog_message, "<b>$timeZoneId</b>"), Html.FROM_HTML_MODE_COMPACT)
+                } else {
+                    Html.fromHtml(getString(R.string.update_timezone_dialog_message, "<b>$timeZoneId</b>"))
+                }
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.update_timezone_dialog_title)
+                    .setMessage(dialogMessage)
+                    .setPositiveButton(R.string.update_timezone_dialog_confirmation) { _, _ ->
+                        calendarViewModel.updateCalendarUserSettings(TimeZone.getDefault().id)
+                    }
+                    .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
+                    .show()
+            }
+        }
     }
 
     override fun onPause() {

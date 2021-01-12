@@ -13,9 +13,8 @@ import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
@@ -36,6 +35,7 @@ class CalendarViewModel(
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
+    private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -433,5 +433,24 @@ class CalendarViewModel(
 
     suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
         return calendarsRepository.fetchCalendars(userId)
+    }
+
+    fun setShowTimezoneUpdateDialog(showDialog: Boolean) {
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel setShowTimezoneUpdateDialog")
+            return
+        }
+        valueStoreProvider.provideValueStore(userId).putBoolean(ValueKey.SHOW_TIMEZONE_UPDATE_DIALOG, showDialog)
+    }
+
+    fun getShowTimezoneUpdateDialog(): Boolean {
+        // Return true by default
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel setShowTimezoneUpdateDialog")
+            return true
+        }
+        return valueStoreProvider.provideValueStore(userId).getBoolean(ValueKey.SHOW_TIMEZONE_UPDATE_DIALOG) ?: true
     }
 }

@@ -61,6 +61,14 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             // Handle show week numbers switch action
         }
 
+        settings_proton_account_update_timezone_press.setOnClickListener {
+            settings_proton_account_update_timezone_switch.performClick()
+        }
+        settings_proton_account_update_timezone_switch.setOnCheckedChangeListener { _, checked ->
+            // Handle show update timezone dialog switch action
+            calendarViewModel.setShowTimezoneUpdateDialog(checked)
+        }
+
         settings_proton_account_timezone_press.setOnSingleClickListener {
             //.atZone(calendarViewModel.timeZoneId.value).toInstant()
             val forInstant = Instant.now()
@@ -81,6 +89,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Settings values
+
+        settings_proton_account_update_timezone_switch.isChecked = calendarViewModel.getShowTimezoneUpdateDialog()
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
             settings_proton_account_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)

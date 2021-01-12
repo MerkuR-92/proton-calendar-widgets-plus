@@ -175,6 +175,11 @@
     <string name="error_event_doesnt_exist">Event doesn\'t exist</string>
     <string name="error_occurrence_doesnt_exist">Occurrence doesn\'t exist</string>
 
+    <string name="update_timezone_dialog_title">Time zone changed</string>
+    <string name="update_timezone_dialog_message">Your system time zone seems to have changed to %s. Do you want to update your time zone preference?</string>
+    <string name="update_timezone_dialog_confirmation">Update</string>
+    <string name="update_timezone_dialog_cancel">Cancel</string>
+
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
     <string name="notification_channel_sync">Calendar Synchronisation</string>
@@ -198,7 +203,9 @@
     <string name="settings_app_title">App</string>
     <string name="settings_app_theme_title">Theme</string>
     <string name="settings_proton_account_title">Proton Account</string>
-    <string name="settings_proton_account_timezone_title">Timezone</string>
+    <string name="settings_proton_account_timezone_title">Time zone</string>
+    <string name="settings_proton_account_update_timezone_title">Ask to update time zone setting</string>
+    <string name="settings_proton_account_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>
     <string name="settings_proton_account_week_start_title">Week start</string>
     <string name="settings_proton_account_time_format_title">Time format</string>
     <string name="settings_proton_account_week_numbers_title">Show week numbers</string>
