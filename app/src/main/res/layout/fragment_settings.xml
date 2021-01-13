@@ -37,7 +37,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toTopOf="@+id/settings_app_theme_info"/>
 
         <ImageView
             android:id="@+id/settings_app_theme_icon"
@@ -69,6 +69,18 @@
             style="@style/Text.DefaultSmall.Weak"
             android:layout_marginBottom="@dimen/default_margin_text_vertical"
             app:layout_constraintTop_toBottomOf="@+id/settings_app_theme_title"
+            app:layout_constraintBottom_toTopOf="@+id/settings_app_theme_info"
+            app:layout_constraintStart_toStartOf="@+id/settings_app_theme_title"
+            app:layout_constraintEnd_toEndOf="@+id/settings_app_theme_title"/>
+
+        <TextView
+            android:id="@+id/settings_app_theme_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_app_theme_info"
+            style="@style/Text.DefaultSmall.Weak"
+            android:layout_marginBottom="@dimen/default_margin_text_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/settings_app_theme_value"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/settings_app_theme_title"
             app:layout_constraintEnd_toEndOf="@+id/settings_app_theme_title"/>
@@ -170,7 +182,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/settings_proton_account_update_timezone_value"/>
+            app:layout_constraintBottom_toTopOf="@+id/settings_proton_account_update_timezone_info"/>
 
         <TextView
             android:id="@+id/settings_proton_account_update_timezone_title"
@@ -196,7 +208,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/settings_proton_account_update_timezone_value"
+            android:id="@+id/settings_proton_account_update_timezone_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/settings_proton_account_update_timezone_subtitle"
