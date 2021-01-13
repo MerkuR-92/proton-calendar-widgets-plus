@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.settings
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -12,8 +13,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
-import me.proton.core.util.kotlin.toBoolean
-import me.proton.core.util.kotlin.toInt
+import me.proton.android.calendar.presentation.MainActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.Instant
@@ -91,7 +91,25 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        // Settings values
+        val currentAppTheme = (activity as MainActivity).getAppTheme()
+        val appThemes = resources.getStringArray(R.array.app_themes)
+        settings_app_theme_value.text = appThemes[currentAppTheme.value]
+
+        // TODO Handle themes for Android P and below
+        settings_app_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            settings_app_theme_press.setOnSingleClickListener {
+                AndroidUtils.displaySingleChoicePicker(
+                    requireContext(),
+                    getString(R.string.settings_app_theme_title),
+                    appThemes,
+                    AppTheme.values().indexOf(currentAppTheme)
+                ) { index ->
+                    settings_app_theme_value.text = appThemes[index]
+                    (activity as MainActivity).changeAppTheme(AppTheme.values()[index])
+                }
+            }
+        }
 
         lifecycleScope.launch {
             settings_proton_account_update_timezone_switch.isChecked = calendarViewModel.getCalendarUserSettingsAutoDetectPrimaryTimezone()

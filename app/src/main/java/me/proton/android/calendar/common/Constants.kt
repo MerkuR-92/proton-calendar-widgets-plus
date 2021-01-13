@@ -39,11 +39,17 @@ const val MAX_ANIM_DURATION = 500L
 
 object FeatureFlag {
     const val SETTINGS_DRAWER = true
-    const val SETTINGS_THEME = false
     const val SETTINGS_TIMEZONE = true
+    const val SETTINGS_THEME = true
     const val SETTINGS_WEEK_START = false
     const val SETTINGS_TIME_FORMAT = false
     const val SETTINGS_WEEK_NUMBERS = false
+}
+
+enum class AppTheme(val value: Int) {
+    LIGHT(0),
+    DARK(1),
+    SYSTEM_DEFAULT(2)
 }
 
 object FormValidation {

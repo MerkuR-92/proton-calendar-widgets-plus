@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -120,7 +122,39 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    fun getAppTheme(): AppTheme {
+        return AppTheme.values()[getSharedPreferences(
+            getString(R.string.shared_preferences_key),
+            MODE_PRIVATE
+        ).getInt(getString(R.string.shared_preferences_theme_key), AppTheme.SYSTEM_DEFAULT.value)]
+    }
+
+    fun changeAppTheme(theme: AppTheme) {
+        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_key),  Context.MODE_PRIVATE)
+
+        val editor = sharedPreferences.edit()
+        editor.putInt(getString(R.string.shared_preferences_theme_key), theme.value)
+        editor.apply()
+
+        handleAppTheme()
+    }
+
+    private fun handleAppTheme() {
+        when (getAppTheme()) {
+            AppTheme.LIGHT -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            AppTheme.DARK -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            else -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        handleAppTheme()
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
