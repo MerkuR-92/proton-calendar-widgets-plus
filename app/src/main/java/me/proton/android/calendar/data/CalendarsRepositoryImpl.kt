@@ -748,8 +748,12 @@ class CalendarsRepositoryImpl(
         return database.calendarUserSettingsDao().select(userId)
     }
 
+    override suspend fun selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId: String): Int? {
+        return database.calendarUserSettingsDao().selectAutoDetectPrimaryTimezone(userId)
+    }
+
     override fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?> {
-        return database.calendarUserSettingsDao().flowCalendarUserSettingsPrimaryTimezone(userId)
+        return database.calendarUserSettingsDao().flowCalendarUserSettingsPrimaryTimezone(userId).distinctUntilChanged()
     }
 
     override suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity) {

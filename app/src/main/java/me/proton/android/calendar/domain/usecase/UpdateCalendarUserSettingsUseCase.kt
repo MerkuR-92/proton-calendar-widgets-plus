@@ -17,20 +17,25 @@ class UpdateCalendarUserSettingsUseCase(
         const val WORKER_ID = "UPDATE_CALENDAR_USER_SETTINGS"
     }
 
-    suspend fun execute(userId: UserId, primaryTimezone: String): UseCase.Result {
-        return when (val updateCalendarUserPrimaryTimezoneResponse =
-            settingsApi.updateCalendarUserPrimaryTimezone(userId, primaryTimezone)) {
+    suspend fun execute(userId: UserId, primaryTimezone: String? = null, autoDetectPrimaryTimezone: Int? = null): UseCase.Result {
+        return when (val updateCalendarUserSettingsResponse =
+            when {
+                primaryTimezone != null -> settingsApi.updateCalendarUserPrimaryTimezone(userId, primaryTimezone)
+                autoDetectPrimaryTimezone != null -> settingsApi.updateCalendarUserAutoDetectTimezone(userId, autoDetectPrimaryTimezone)
+                else -> return UseCase.Result.Error("api error updating calendar user settings: missing parameter")
+            }
+        ) {
             is ApiResponse.Success -> {
-                calendarUserSettingsChangedUseCase.execute(userId.id, updateCalendarUserPrimaryTimezoneResponse.data.calendarUserSettings)
+                calendarUserSettingsChangedUseCase.execute(userId.id, updateCalendarUserSettingsResponse.data.calendarUserSettings)
                 UseCase.Result.Success
             }
             is ApiResponse.Error -> {
-                logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                UseCase.Result.Error(updateCalendarUserPrimaryTimezoneResponse.error)
+                logger.e("api error updating calendar user settings: $updateCalendarUserSettingsResponse")
+                UseCase.Result.Error(updateCalendarUserSettingsResponse.error)
             }
             is ApiResponse.Exception -> {
-                logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                UseCase.Result.Error(updateCalendarUserPrimaryTimezoneResponse.exception.message ?: "(no exception message)")
+                logger.e("api error updating calendar user settings: $updateCalendarUserSettingsResponse")
+                UseCase.Result.Error(updateCalendarUserSettingsResponse.exception.message ?: "(no exception message)")
             }
         }
     }

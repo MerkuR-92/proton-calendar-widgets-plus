@@ -1,15 +1,20 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.content.Context
+import android.os.Build
+import android.text.Html
+import android.text.Spanned
 import android.text.format.DateFormat
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -22,10 +27,13 @@ import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.domain.entity.UserId
+import me.proton.core.util.kotlin.toBoolean
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.*
+import kotlin.collections.HashMap
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -75,6 +83,8 @@ class CalendarViewModel(
     val lifeCycleScope: CoroutineScope = this.viewModelScope
 
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
+
+    private var updateTimeZoneDialogLastShown: LocalDate? = null
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
@@ -134,7 +144,7 @@ class CalendarViewModel(
                 if (it != null) {
                     ZoneId.of(it)
                 } else {
-                    timeZoneId.value!!
+                    ZoneId.of(timeZone)
                 }
             }.asLiveData(Dispatchers.Default)
 
@@ -321,7 +331,7 @@ class CalendarViewModel(
         }
     }
 
-    fun updateCalendarUserSettings(primaryTimezone: String) : LiveData<Operation.State> {
+    fun updateCalendarUserSettings(primaryTimezone: String? = null, autoDetectPrimaryTimezone: Int? = null) : LiveData<Operation.State> {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -332,7 +342,8 @@ class CalendarViewModel(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR_USER_SETTINGS,
                     UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_PRIMARY_TIMEZONE to primaryTimezone
+                    UseCaseWorker.INPUT_PRIMARY_TIMEZONE to primaryTimezone,
+                    UseCaseWorker.INPUT_AUTO_DETECT_PRIMARY_TIMEZONE to autoDetectPrimaryTimezone
                 )
             )
             .build()
@@ -435,22 +446,41 @@ class CalendarViewModel(
         return calendarsRepository.fetchCalendars(userId)
     }
 
-    fun setShowTimezoneUpdateDialog(showDialog: Boolean) {
+    suspend fun getCalendarUserSettingsAutoDetectPrimaryTimezone(): Boolean {
         val userId = userId.value?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel setShowTimezoneUpdateDialog")
-            return
+            logger.e("User ID was null in CalendarViewModel checkLocalTimezone")
+            return true // TODO Define default value for auto detect primary timezone
         }
-        valueStoreProvider.provideValueStore(userId).putBoolean(ValueKey.SHOW_TIMEZONE_UPDATE_DIALOG, showDialog)
+        return calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId)?.toBoolean() ?: true
     }
 
-    fun getShowTimezoneUpdateDialog(): Boolean {
-        // Return true by default
-        val userId = userId.value?.id
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel setShowTimezoneUpdateDialog")
-            return true
+    suspend fun checkLocalTimezone(context: Context) {
+        val autoDetectPrimaryTimezone = getCalendarUserSettingsAutoDetectPrimaryTimezone()
+        if (!autoDetectPrimaryTimezone|| LocalDate.now() == updateTimeZoneDialogLastShown) return
+
+        updateTimeZoneDialogLastShown = LocalDate.now()
+        val timeZoneId = timeZoneId.value
+        timeZoneId?.let {
+            if (timeZoneId != ZoneId.systemDefault()) {
+                // We add tags to the timezone string argument directly because it is not supported otherwise
+                val dialogMessage: Spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Html.fromHtml(
+                        context.getString(R.string.update_timezone_dialog_message, "<b>${ZoneId.systemDefault()}</b>"),
+                        Html.FROM_HTML_MODE_COMPACT
+                    )
+                } else {
+                    Html.fromHtml(context.getString(R.string.update_timezone_dialog_message, "<b>${ZoneId.systemDefault()}</b>"))
+                }
+                MaterialAlertDialogBuilder(context)
+                    .setTitle(R.string.update_timezone_dialog_title)
+                    .setMessage(dialogMessage)
+                    .setPositiveButton(R.string.update_timezone_dialog_confirmation) { _, _ ->
+                        updateCalendarUserSettings(TimeZone.getDefault().id)
+                    }
+                    .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
+                    .show()
+            }
         }
-        return valueStoreProvider.provideValueStore(userId).getBoolean(ValueKey.SHOW_TIMEZONE_UPDATE_DIALOG) ?: true
     }
 }

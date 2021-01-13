@@ -39,6 +39,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
         const val INPUT_PRIMARY_TIMEZONE = "INPUT_PRIMARY_TIMEZONE"
+        const val INPUT_AUTO_DETECT_PRIMARY_TIMEZONE = "INPUT_AUTO_DETECT_PRIMARY_TIMEZONE"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -104,10 +105,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_EMAIL) ?: return Result.failure())
             }
             UseCaseId.UPDATE_CALENDAR_USER_SETTINGS -> {
+                val primaryTimezone = inputData.getString(INPUT_PRIMARY_TIMEZONE)
+                val autoDetectPrimaryTimezone = inputData.getInt(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE, -1)
                 val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
                 updateCalendarUserSettingsUseCase.execute(
                     userId,
-                    inputData.getString(INPUT_PRIMARY_TIMEZONE) ?: return Result.failure(),
+                    primaryTimezone,
+                    if (autoDetectPrimaryTimezone == -1) null else autoDetectPrimaryTimezone
                 )
             }
             else -> {

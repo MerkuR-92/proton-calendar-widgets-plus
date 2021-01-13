@@ -118,6 +118,8 @@ interface CalendarsRepository {
     // calendar user settings
     suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity?
 
+    suspend fun selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId: String): Int?
+
     fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?>
 
     suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity)

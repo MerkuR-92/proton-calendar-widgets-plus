@@ -19,6 +19,9 @@ interface SettingsApiService : BaseRetrofitApi {
     @PUT("settings/calendar")
     suspend fun updateCalendarUserPrimaryTimezone(@Body body: UpdateCalendarUserPrimaryTimezoneApiRequest): CalendarUserSettingsApiResponse
 
+    @PUT("settings/calendar")
+    suspend fun updateCalendarUserAutoDetectTimezone(@Body body: UpdateCalendarUserAutoDetectTimezoneApiRequest): CalendarUserSettingsApiResponse
+
     @GET("settings")
     suspend fun getUserSettings(): UserSettingsApiResponse
 }
@@ -42,6 +45,12 @@ class SettingsApiImpl(private val apiProvider: ApiProvider) : SettingsApi {
             )
         }.toApiResponse()
 
+    override suspend fun updateCalendarUserAutoDetectTimezone(userId: UserId, autoDetectPrimaryTimezone: Int): ApiResponse<CalendarUserSettingsApiResponse> =
+        apiProvider.get<SettingsApiService>(userId).invoke {
+            updateCalendarUserAutoDetectTimezone(
+                UpdateCalendarUserAutoDetectTimezoneApiRequest(autoDetectPrimaryTimezone)
+            )
+        }.toApiResponse()
 }
 
 @Serializable
@@ -60,4 +69,10 @@ data class UserSettingsApiResponse(
 data class UpdateCalendarUserPrimaryTimezoneApiRequest(
     @SerialName("PrimaryTimezone")
     val primaryTimezone: String
+)
+
+@Serializable
+data class UpdateCalendarUserAutoDetectTimezoneApiRequest(
+    @SerialName("AutoDetectPrimaryTimezone")
+    val autoDetectPrimaryTimezone: Int
 )

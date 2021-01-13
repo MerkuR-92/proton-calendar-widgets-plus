@@ -12,6 +12,8 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import me.proton.core.util.kotlin.toBoolean
+import me.proton.core.util.kotlin.toInt
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.Instant
@@ -64,9 +66,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_proton_account_update_timezone_press.setOnClickListener {
             settings_proton_account_update_timezone_switch.performClick()
         }
-        settings_proton_account_update_timezone_switch.setOnCheckedChangeListener { _, checked ->
-            // Handle show update timezone dialog switch action
-            calendarViewModel.setShowTimezoneUpdateDialog(checked)
+        settings_proton_account_update_timezone_switch.setOnClickListener {
+            lifecycleScope.launch {
+                calendarViewModel.updateCalendarUserSettings(autoDetectPrimaryTimezone = settings_proton_account_update_timezone_switch.isChecked.toInt())
+            }
         }
 
         settings_proton_account_timezone_press.setOnSingleClickListener {
@@ -83,14 +86,17 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
             AndroidUtils.displaySingleChoicePicker(requireContext(), null, formattedTimeZoneIds, selectedIndex) {
                 lifecycleScope.launch {
-                    calendarViewModel.updateCalendarUserSettings(formattedTimeZoneIds[it].formattedTimeZoneToId())
+                    calendarViewModel.updateCalendarUserSettings(primaryTimezone = formattedTimeZoneIds[it].formattedTimeZoneToId())
                 }
             }
         }
 
         // Settings values
 
-        settings_proton_account_update_timezone_switch.isChecked = calendarViewModel.getShowTimezoneUpdateDialog()
+        lifecycleScope.launch {
+            settings_proton_account_update_timezone_switch.isChecked = calendarViewModel.getCalendarUserSettingsAutoDetectPrimaryTimezone()
+            settings_proton_account_update_timezone_switch.jumpDrawablesToCurrentState()
+        }
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
             settings_proton_account_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)

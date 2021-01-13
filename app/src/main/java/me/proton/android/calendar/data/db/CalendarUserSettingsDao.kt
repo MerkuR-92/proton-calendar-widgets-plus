@@ -21,4 +21,7 @@ abstract class CalendarUserSettingsDao : BaseDao<CalendarUserSettingsEntity> {
     @Query("SELECT primaryTimezone FROM calendar_user_settings WHERE fkUserId = :userId")
     abstract fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String>
 
+    @Query("SELECT autoDetectPrimaryTimezone FROM calendar_user_settings WHERE fkUserId = :userId")
+    abstract suspend fun selectAutoDetectPrimaryTimezone(userId: String): Int?
+
 }
