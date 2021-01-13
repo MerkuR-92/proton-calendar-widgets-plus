@@ -68,7 +68,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
         settings_proton_account_update_timezone_switch.setOnClickListener {
             lifecycleScope.launch {
-                calendarViewModel.updateCalendarUserSettings(autoDetectPrimaryTimezone = settings_proton_account_update_timezone_switch.isChecked.toInt())
+                calendarViewModel.updateAutoDetectPrimaryTimezone(settings_proton_account_update_timezone_switch.isChecked)
             }
         }
 
@@ -86,7 +86,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
             AndroidUtils.displaySingleChoicePicker(requireContext(), null, formattedTimeZoneIds, selectedIndex) {
                 lifecycleScope.launch {
-                    calendarViewModel.updateCalendarUserSettings(primaryTimezone = formattedTimeZoneIds[it].formattedTimeZoneToId())
+                    calendarViewModel.updatePrimaryTimezone(formattedTimeZoneIds[it].formattedTimeZoneToId())
                 }
             }
         }

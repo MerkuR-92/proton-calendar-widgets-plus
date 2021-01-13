@@ -331,7 +331,7 @@ class CalendarViewModel(
         }
     }
 
-    fun updateCalendarUserSettings(primaryTimezone: String? = null, autoDetectPrimaryTimezone: Int? = null) : LiveData<Operation.State> {
+    fun updatePrimaryTimezone(primaryTimezone: String) : LiveData<Operation.State> {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -340,15 +340,33 @@ class CalendarViewModel(
             .setConstraints(constraints)
             .setInputData(
                 workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR_USER_SETTINGS,
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PRIMARY_TIMEZONE,
                     UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_PRIMARY_TIMEZONE to primaryTimezone,
+                    UseCaseWorker.INPUT_PRIMARY_TIMEZONE to primaryTimezone
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    fun updateAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone: Boolean) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
                     UseCaseWorker.INPUT_AUTO_DETECT_PRIMARY_TIMEZONE to autoDetectPrimaryTimezone
                 )
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_USER_SETTINGS, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateServerCalendarListDisplay() : LiveData<Operation.State> {
@@ -476,7 +494,7 @@ class CalendarViewModel(
                     .setTitle(R.string.update_timezone_dialog_title)
                     .setMessage(dialogMessage)
                     .setPositiveButton(R.string.update_timezone_dialog_confirmation) { _, _ ->
-                        updateCalendarUserSettings(TimeZone.getDefault().id)
+                        updatePrimaryTimezone(ZoneId.systemDefault().id)
                     }
                     .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
                     .show()

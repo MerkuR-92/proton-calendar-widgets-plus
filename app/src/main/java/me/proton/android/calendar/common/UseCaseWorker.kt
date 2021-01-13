@@ -3,6 +3,7 @@ package me.proton.android.calendar.common
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.hasKeyWithValueOfType
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.*
@@ -26,7 +27,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
             const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
-            const val UPDATE_CALENDAR_USER_SETTINGS = UpdateCalendarUserSettingsUseCase.WORKER_ID
+            const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
+            const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_AUTO_DETECT
         }
     }
 
@@ -62,7 +64,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
             const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
-            const val UPDATE_CALENDAR_USER_SETTINGS = "UPDATE_CALENDAR_USER_SETTINGS"
+            const val UPDATE_PRIMARY_TIMEZONE = "UPDATE_PRIMARY_TIMEZONE"
+            const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = "UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE"
         }
     }
 
@@ -104,14 +107,20 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_USERNAME) ?: return Result.failure(),
                     inputData.getString(INPUT_EMAIL) ?: return Result.failure())
             }
-            UseCaseId.UPDATE_CALENDAR_USER_SETTINGS -> {
-                val primaryTimezone = inputData.getString(INPUT_PRIMARY_TIMEZONE)
-                val autoDetectPrimaryTimezone = inputData.getInt(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE, -1)
+            UseCaseId.UPDATE_PRIMARY_TIMEZONE -> {
                 val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
-                updateCalendarUserSettingsUseCase.execute(
+                updateCalendarUserSettingsUseCase.executePrimaryTimezone(
                     userId,
-                    primaryTimezone,
-                    if (autoDetectPrimaryTimezone == -1) null else autoDetectPrimaryTimezone
+                    inputData.getString(INPUT_PRIMARY_TIMEZONE) ?: return Result.failure()
+                )
+            }
+            UseCaseId.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE -> {
+                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
+                updateCalendarUserSettingsUseCase.executeAutoDetectPrimaryTimezone(
+                    userId,
+                    if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE))
+                        inputData.getBoolean(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE, true)
+                    else return Result.failure()
                 )
             }
             else -> {
