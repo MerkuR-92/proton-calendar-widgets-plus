@@ -583,7 +583,7 @@ class EventViewModel(
                                             .minusDays(1)
                                             .with(ChronoField.HOUR_OF_DAY, 0)
                                             .toLocalDate()
-                                            .toDate(timezone)
+                                            .toDate(ZoneId.systemDefault().id)
                                         , false
                                     )
                                 } else {
