@@ -197,7 +197,7 @@ class ShowNotificationUseCase(
 
                 // sync service channel
                 val nameSync = context.getString(R.string.notification_channel_sync)
-                val importanceSync = NotificationManager.IMPORTANCE_LOW
+                val importanceSync = NotificationManager.IMPORTANCE_MIN
                 val channelSync = NotificationChannel(CHANNEL_ID_SYNC_SERVICE, nameSync, importanceSync)
                 notificationManager.createNotificationChannel(channelSync)
 

@@ -57,7 +57,7 @@ class SyncService : Service() {
     private fun createNotification(): Notification = notificationBuilder
         .setSmallIcon(R.drawable.ic_calendar_today)
         .setContentTitle(resources.getString(R.string.notification_sync))
-        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setPriority(NotificationCompat.PRIORITY_MIN)
         .setProgress(0, 0, true)
         .build()
 
