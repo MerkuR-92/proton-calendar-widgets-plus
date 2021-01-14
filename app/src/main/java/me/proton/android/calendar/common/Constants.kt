@@ -46,6 +46,10 @@ object FeatureFlag {
     const val SETTINGS_WEEK_NUMBERS = false
 }
 
+object SharedPreferencesKeys {
+    const val THEME = "theme"
+}
+
 enum class AppTheme(val value: Int) {
     LIGHT(0),
     DARK(1),

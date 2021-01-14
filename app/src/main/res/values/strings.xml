@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">ProtonCalendar</string>
-    <string name="shared_preferences_key">me.proton.android.calendar.preferences</string>
-    <string name="shared_preferences_theme_key">theme</string>
 
     <string name="default_event_summary">(no title)</string>
     <string name="default_user_email">(no email address)</string>

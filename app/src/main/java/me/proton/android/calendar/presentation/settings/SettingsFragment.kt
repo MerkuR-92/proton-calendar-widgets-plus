@@ -91,9 +91,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        val currentAppTheme = (activity as MainActivity).getAppTheme()
         val appThemes = resources.getStringArray(R.array.app_themes)
-        settings_app_theme_value.text = appThemes[currentAppTheme.value]
+        settings_app_theme_value.text = appThemes[(activity as MainActivity).getAppTheme().value]
 
         // TODO Handle themes for Android P and below
         settings_app_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -103,7 +102,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     requireContext(),
                     getString(R.string.settings_app_theme_title),
                     appThemes,
-                    AppTheme.values().indexOf(currentAppTheme)
+                    AppTheme.values().indexOf((activity as MainActivity).getAppTheme())
                 ) { index ->
                     settings_app_theme_value.text = appThemes[index]
                     (activity as MainActivity).changeAppTheme(AppTheme.values()[index])

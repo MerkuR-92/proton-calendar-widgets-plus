@@ -197,6 +197,9 @@ dependencies {
 //    implementation "org.mnode.ical4j:ical4j:${rootProject.ext.version.ical}"
     implementation "net.sf.biweekly:biweekly:${rootProject.ext.version.biweekly}"
 
+    // Shared preferences
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+
     detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
     detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'
     detektPlugins 'pm.algirdas.detekt:codeanalysis:0.3.3'

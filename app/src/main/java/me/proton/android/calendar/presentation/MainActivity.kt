@@ -21,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -123,17 +124,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     fun getAppTheme(): AppTheme {
-        return AppTheme.values()[getSharedPreferences(
-            getString(R.string.shared_preferences_key),
-            MODE_PRIVATE
-        ).getInt(getString(R.string.shared_preferences_theme_key), AppTheme.SYSTEM_DEFAULT.value)]
+        return AppTheme.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)]
     }
 
     fun changeAppTheme(theme: AppTheme) {
-        val sharedPreferences = getSharedPreferences(getString(R.string.shared_preferences_key),  Context.MODE_PRIVATE)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         val editor = sharedPreferences.edit()
-        editor.putInt(getString(R.string.shared_preferences_theme_key), theme.value)
+        editor.putInt(SharedPreferencesKeys.THEME, theme.value)
         editor.apply()
 
         handleAppTheme()
