@@ -748,6 +748,10 @@ class CalendarsRepositoryImpl(
         return database.calendarUserSettingsDao().select(userId)
     }
 
+    override suspend fun updateCalendarUserSettingsAutoDetectPrimaryTimezone(userId: String, autoDetectPrimaryTimezone: Int) {
+        return database.calendarUserSettingsDao().updateAutoDetectPrimaryTimezone(userId, autoDetectPrimaryTimezone)
+    }
+
     override suspend fun selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId: String): Int? {
         return database.calendarUserSettingsDao().selectAutoDetectPrimaryTimezone(userId)
     }

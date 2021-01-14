@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
@@ -11,7 +12,8 @@ import me.proton.core.util.kotlin.toInt
 class UpdateCalendarUserSettingsUseCase(
     private val logger: Logger,
     private val settingsApi: SettingsApi,
-    private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase
+    private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     companion object {
@@ -43,7 +45,11 @@ class UpdateCalendarUserSettingsUseCase(
             settingsApi.updateCalendarUserAutoDetectTimezone(userId, autoDetectPrimaryTimezone.toInt())
         ) {
             is ApiResponse.Success -> {
-                calendarUserSettingsChangedUseCase.execute(userId.id, updateCalendarUserAutoDetectTimezoneResponse.data.calendarUserSettings)
+                calendarsRepository.updateCalendarUserSettingsAutoDetectPrimaryTimezone(
+                    userId.id,
+                    updateCalendarUserAutoDetectTimezoneResponse.data.calendarUserSettings.autoDetectPrimaryTimezone
+                )
+                UseCase.Result.Success
             }
             is ApiResponse.Error -> {
                 logger.e("api error updating calendar user auto detect primary timezone: $updateCalendarUserAutoDetectTimezoneResponse")

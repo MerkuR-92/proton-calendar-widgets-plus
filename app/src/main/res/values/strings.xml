@@ -206,6 +206,7 @@
     <string name="settings_proton_account_timezone_title">Time zone</string>
     <string name="settings_proton_account_update_timezone_title">Ask to update time zone setting</string>
     <string name="settings_proton_account_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>
+    <string name="settings_proton_account_update_timezone_checkbox">Don\'t ask me again</string>
     <string name="settings_proton_account_week_start_title">Week start</string>
     <string name="settings_proton_account_time_format_title">Time format</string>
     <string name="settings_proton_account_week_numbers_title">Show week numbers</string>

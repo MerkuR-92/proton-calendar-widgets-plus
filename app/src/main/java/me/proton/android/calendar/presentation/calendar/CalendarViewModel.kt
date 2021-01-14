@@ -5,10 +5,14 @@ import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateFormat
+import android.view.LayoutInflater
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
+import kotlinx.android.synthetic.main.dialog_update_timezone.view.*
+import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -492,14 +496,27 @@ class CalendarViewModel(
                 } else {
                     Html.fromHtml(context.getString(R.string.update_timezone_dialog_message, "<b>${systemTimeZone}</b>"))
                 }
+
+                val view = LayoutInflater.from(context)
+                    .inflate(R.layout.dialog_update_timezone, null, false)
+
+                view.dialog_update_timezone_header.text = dialogMessage
+                view.dialog_update_timezone_checkbox_press.setOnClickListener {
+                    view.dialog_update_timezone_checkbox.performClick()
+                }
+
                 MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.update_timezone_dialog_title)
-                    .setMessage(dialogMessage)
+                    .setView(view)
                     .setPositiveButton(R.string.update_timezone_dialog_confirmation) { _, _ ->
                         updatePrimaryTimezone(systemTimeZone)
                     }
                     .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
-                    .show()
+                    .show().setOnDismissListener {
+                        if (view.dialog_update_timezone_checkbox.isChecked) {
+                            updateAutoDetectPrimaryTimezone(false)
+                        }
+                    }
             }
         }
     }
