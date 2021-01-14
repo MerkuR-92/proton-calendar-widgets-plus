@@ -194,10 +194,10 @@ class AccountViewModel(
                     removeUser(it.userId)
                 }
         }
+
         accountManager.onHumanVerificationNeeded().onEach { (account, details) ->
             authOrchestrator.startHumanVerificationWorkflow(account.sessionId!!, details)
         }.launchIn(viewModelScope)
-
     }
 
     fun startLoginWorkflow() {

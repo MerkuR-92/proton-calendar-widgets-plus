@@ -48,7 +48,7 @@ object NetworkModule {
         sessionListener: SessionListener
     ): ApiFactory = ApiFactory(
         API_BASE_URL, apiClient, CoreLogger, networkManager, networkPrefs, sessionProvider, sessionListener,
-        cookieStore = null, CoroutineScope(Job() + Dispatchers.Default), emptyArray(), emptyList()
+        cookieStore = null, CoroutineScope(Job() + Dispatchers.Default)
     )
 
     @Provides
