@@ -442,7 +442,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     AndroidUtils.formatAlarm(
                         resources,
                         event.isAllDay(),
-                        calendarViewModel.timeFormatIs24Hour.value!!,
+                        calendarViewModel.timeFormatIs24Hour(requireContext()),
                         event.iCalEvent.getStart(eventViewModel.displayTimeZoneId)!!,
                         alarm
                     )

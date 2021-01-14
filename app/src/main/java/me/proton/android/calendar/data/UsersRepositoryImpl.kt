@@ -89,4 +89,8 @@ class UsersRepositoryImpl(
         return false
     }
 
+    override fun flowTimeFormat(userId: String): Flow<Int?> {
+        return database.userSettingsDao().flowTimeFormat(userId).distinctUntilChanged()
+    }
+
 }

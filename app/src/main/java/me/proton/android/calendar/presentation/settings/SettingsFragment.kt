@@ -110,6 +110,23 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        val timeFormats = resources.getStringArray(R.array.time_formats)
+        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
+            settings_proton_account_time_format_value.text = timeFormats[timeFormat]
+        }
+
+        settings_proton_account_time_format_press.setOnSingleClickListener {
+            AndroidUtils.displaySingleChoicePicker(
+                requireContext(),
+                getString(R.string.settings_proton_account_time_format_title),
+                timeFormats,
+                timeFormats.indexOf(settings_proton_account_time_format_value.text)
+            ) { index ->
+                settings_proton_account_time_format_value.text = timeFormats[index]
+                calendarViewModel.updateTimeFormat(index)
+            }
+        }
+
         lifecycleScope.launch {
             settings_proton_account_update_timezone_switch.isChecked = calendarViewModel.getCalendarUserSettingsAutoDetectPrimaryTimezone()
             settings_proton_account_update_timezone_switch.jumpDrawablesToCurrentState()

@@ -73,13 +73,15 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour.value ?: return@observe
+            zoneId ?: return@observe
+            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
             setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour)
         }
 
-        calendarViewModel.timeFormatIs24Hour.observe(viewLifecycleOwner) { timeFormatIs24Hour ->
+        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
+            timeFormat ?: return@observe
             val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour)
+            setupItemMiniCalendarContent(zoneId.id, calendarViewModel.timeFormatIs24Hour(requireContext()))
         }
     }
 

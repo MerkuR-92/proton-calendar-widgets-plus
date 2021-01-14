@@ -25,4 +25,9 @@
         <item>System default</item>
     </string-array>
 
+    <string-array name="time_formats">
+        <item>System default</item>
+        <item>13:00</item>
+        <item>1pm</item>
+    </string-array>
 </resources>

@@ -68,9 +68,6 @@ class CalendarViewModel(
     private val _startWeekOn: MutableLiveData<DayOfWeek> = MutableLiveData()
     val startWeekOn: LiveData<DayOfWeek> = _startWeekOn
 
-    private val _timeFormatIs24Hour: MutableLiveData<Boolean> = MutableLiveData()
-    val timeFormatIs24Hour: LiveData<Boolean> = _timeFormatIs24Hour
-
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
@@ -82,6 +79,7 @@ class CalendarViewModel(
     var inactiveCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
+    var timeFormat: LiveData<Int> = MutableLiveData()
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -141,8 +139,6 @@ class CalendarViewModel(
             }
 
             _startWeekOn.postValue(usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!)
-            _timeFormatIs24Hour.postValue(usersRepository.selectUserSettings(userId.id)
-                ?.timeFormatIs24Hour(DateFormat.is24HourFormat(context))!!)
             _userEmails.postValue(usersRepository.getUserEmails(userId.id))
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {
@@ -151,6 +147,10 @@ class CalendarViewModel(
                 } else {
                     ZoneId.of(timeZone)
                 }
+            }.asLiveData(Dispatchers.Default)
+
+            timeFormat = usersRepository.flowTimeFormat(userId.id).map {
+                it ?: 0 // Local default
             }.asLiveData(Dispatchers.Default)
 
             this@CalendarViewModel._userId.postValue(userId)
@@ -374,6 +374,25 @@ class CalendarViewModel(
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
     }
 
+    fun updateTimeFormat(timeFormat: Int) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_TIME_FORMAT,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
+                    UseCaseWorker.INPUT_TIME_FORMAT to timeFormat
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
+    }
+
     fun updateServerCalendarListDisplay() : LiveData<Operation.State> {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -518,6 +537,14 @@ class CalendarViewModel(
                         }
                     }
             }
+        }
+    }
+
+    fun timeFormatIs24Hour(context: Context): Boolean {
+        return when (timeFormat.value) {
+            1 -> true
+            2 -> false
+            else -> DateFormat.is24HourFormat(context)
         }
     }
 }

@@ -29,6 +29,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
             const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_AUTO_DETECT
+            const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
         }
     }
 
@@ -42,6 +43,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
         const val INPUT_PRIMARY_TIMEZONE = "INPUT_PRIMARY_TIMEZONE"
         const val INPUT_AUTO_DETECT_PRIMARY_TIMEZONE = "INPUT_AUTO_DETECT_PRIMARY_TIMEZONE"
+        const val INPUT_TIME_FORMAT = "INPUT_TIME_FORMAT"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -66,6 +68,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
             const val UPDATE_PRIMARY_TIMEZONE = "UPDATE_PRIMARY_TIMEZONE"
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = "UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE"
+            const val UPDATE_TIME_FORMAT = "UPDATE_TIME_FORMAT"
         }
     }
 
@@ -120,6 +123,15 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     userId,
                     if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE))
                         inputData.getBoolean(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE, true)
+                    else return Result.failure()
+                )
+            }
+            UseCaseId.UPDATE_TIME_FORMAT -> {
+                val updateUserSettingsUseCase: UpdateUserSettingsUseCase = get()
+                updateUserSettingsUseCase.executeTimeFormat(
+                    userId,
+                    if (inputData.hasKeyWithValueOfType<Int>(INPUT_TIME_FORMAT))
+                        inputData.getInt(INPUT_TIME_FORMAT, 0)
                     else return Result.failure()
                 )
             }

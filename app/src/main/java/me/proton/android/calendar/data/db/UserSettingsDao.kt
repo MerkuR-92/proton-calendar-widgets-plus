@@ -2,6 +2,7 @@ package me.proton.android.calendar.data.db
 
 import androidx.room.Dao
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 
@@ -17,4 +18,6 @@ abstract class UserSettingsDao : BaseDao<UserSettingsEntity> {
     @Query("DELETE FROM user_settings WHERE fkUserId = :userId")
     abstract suspend fun deleteByUserId(userId: String)
 
+    @Query("SELECT timeFormat FROM user_settings WHERE fkUserId = :userId")
+    abstract fun flowTimeFormat(userId: String): Flow<Int?>
 }

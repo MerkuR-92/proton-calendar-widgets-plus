@@ -42,4 +42,6 @@ interface UsersRepository {
 
     suspend fun hasReactivatedAddressKeys(address: AddressEntity): Boolean
 
+    fun flowTimeFormat(userId: String): Flow<Int?>
+
 }
