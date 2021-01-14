@@ -199,6 +199,8 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // custom ending radio group ("ends on date/after X occurrences...")
         setupCustomEndingRadioGroup()
+
+        updateChipHeight()
     }
 
     private fun setupCustomEndingRadioGroup() {
@@ -591,6 +593,20 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 custom_recurrence_occurrence_time_radio_group.visibleOrGone(false)
                 custom_recurrence_occurrence_group.visibleOrGone(false)
                 custom_recurrence_chips_layout.visibleOrGone(false)
+            }
+        }
+    }
+
+    /**
+     * Updates week days chips height to match dynamic width measured by the system to keep the chips round
+     */
+    private fun updateChipHeight() {
+        custom_recurrence_chips_layout.viewTreeObserver.addOnGlobalLayoutListener {
+            (chip_group_day_of_week_layout as ViewGroup).children.forEach { view ->
+                if (view.measuredWidth == 0) return@addOnGlobalLayoutListener
+                val currentLayoutParams = view.layoutParams
+                currentLayoutParams.height = view.measuredWidth
+                view.layoutParams = currentLayoutParams
             }
         }
     }

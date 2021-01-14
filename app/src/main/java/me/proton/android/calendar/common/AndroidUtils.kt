@@ -1164,3 +1164,11 @@ fun getCurrentLocale(context: Context): Locale? {
         context.resources.configuration.locale
     }
 }
+
+fun Context.dpToPixel(dp: Int): Int {
+    return (dp * resources.displayMetrics.density).toInt()
+}
+
+fun Context.pixelToDp(pixel: Int): Int {
+    return (pixel / resources.displayMetrics.density).toInt()
+}
