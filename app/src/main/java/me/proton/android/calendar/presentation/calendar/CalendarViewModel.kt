@@ -15,8 +15,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.AndroidUtils
+import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.UseCaseWorker
-import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -480,21 +481,22 @@ class CalendarViewModel(
         updateTimeZoneDialogLastShown = LocalDate.now()
         val timeZoneId = timeZoneId.value
         timeZoneId?.let {
-            if (timeZoneId != ZoneId.systemDefault()) {
+            val systemTimeZone = AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id)
+            if (ICalUtils.areTimeZoneOffsetsDifferent(timeZoneId.id, systemTimeZone) == true) {
                 // We add tags to the timezone string argument directly because it is not supported otherwise
                 val dialogMessage: Spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     Html.fromHtml(
-                        context.getString(R.string.update_timezone_dialog_message, "<b>${ZoneId.systemDefault()}</b>"),
+                        context.getString(R.string.update_timezone_dialog_message, "<b>${systemTimeZone}</b>"),
                         Html.FROM_HTML_MODE_COMPACT
                     )
                 } else {
-                    Html.fromHtml(context.getString(R.string.update_timezone_dialog_message, "<b>${ZoneId.systemDefault()}</b>"))
+                    Html.fromHtml(context.getString(R.string.update_timezone_dialog_message, "<b>${systemTimeZone}</b>"))
                 }
                 MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.update_timezone_dialog_title)
                     .setMessage(dialogMessage)
                     .setPositiveButton(R.string.update_timezone_dialog_confirmation) { _, _ ->
-                        updatePrimaryTimezone(ZoneId.systemDefault().id)
+                        updatePrimaryTimezone(systemTimeZone)
                     }
                     .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
                     .show()

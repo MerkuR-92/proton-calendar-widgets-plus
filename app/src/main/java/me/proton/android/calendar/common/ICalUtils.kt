@@ -53,6 +53,18 @@ object ICalUtils {
         return "${timeZoneId} (GMT${if (rawOffset < 0) "-" else "+"}${offset})"
     }
 
+    fun areTimeZoneOffsetsDifferent(timeZoneIdA: String, timeZoneIdB: String, forInstant: Instant? = null): Boolean? {
+
+        if (!TimeZone.getAvailableIDs().contains(timeZoneIdA) || !TimeZone.getAvailableIDs().contains(timeZoneIdB)) {
+            return null
+        }
+
+        val offsetA = TimeZone.getTimeZone(timeZoneIdA).getOffset(Date.from(forInstant ?: Instant.now()).time).toLong()
+        val offsetB = TimeZone.getTimeZone(timeZoneIdB).getOffset(Date.from(forInstant ?: Instant.now()).time).toLong()
+
+        return offsetA != offsetB
+    }
+
     /**
      * Takes iCalendar parts split according to "the matrix" and returns one iCalendar object.
      */

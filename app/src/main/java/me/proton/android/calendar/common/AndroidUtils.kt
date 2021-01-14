@@ -700,9 +700,31 @@ class AndroidUtils(context: Context) {
             return "#${color.toHexString()}"
         }
 
+        /**
+         * If supplied TimeZone is not supported, fallback retaining UTC offset.
+         */
+        fun fallbackTimeZone(timeZone: String): String {
+
+            return if (allowedTimezoneIds.contains(timeZone)) {
+                timeZone
+            } else {
+
+                if (TimeZone.getAvailableIDs().contains(timeZone)) {
+
+                    val offset = TimeZone.getTimeZone(timeZone).getOffset(Date.from(Instant.now()).time)
+                    val alternativeTimezones = TimeZone.getAvailableIDs(offset).filter { allowedTimezoneIds.contains(it) }
+
+                    val alternative = alternativeTimezones.firstOrNull { it.startsWith(timeZone.substringBefore("/")) } ?: alternativeTimezones.firstOrNull()
+
+                    alternative ?: TimeZone.getDefault().id
+                } else {
+                    TimeZone.getDefault().id
+                }
+
+            }
+        }
+
     }
-
-
 
 }
 
@@ -1113,8 +1135,10 @@ fun Array<String>.sortFormattedTimeZoneIds() {
     }
 }
 
+/**
+ * Returns timezone offset as float from formatted timezone with offset
+ */
 private fun String.formattedTimeZoneToFloat(): Float {
-    // Returns timezone offset as float from formatted timezone with offset
     val pattern = Pattern.compile("^.*GMT([+-]\\d{1,2}):?(\\d{1,2})?\\).*\$")
     val matcher = pattern.matcher(this)
     matcher.find()
@@ -1123,8 +1147,10 @@ private fun String.formattedTimeZoneToFloat(): Float {
     return (hours ?: 0F) + minutes
 }
 
+/**
+ * Returns timezone id from formatted timezone with offset
+  */
 fun String.formattedTimeZoneToId(): String {
-    // Returns timezone id from formatted timezone with offset
     return this.replace(
         Regex(" (\\(GMT[+-]\\d{1,2}:?(\\d{1,2})?\\))"),
         ""

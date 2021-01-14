@@ -108,6 +108,20 @@ internal class ICalUtilsTest {
 
     }
 
+    @Disabled
+    @Test
+    fun `fallback to allowed timezone`() {
+
+        val defaultSystemTimeZone = TimeZone.getDefault().id
+
+        assertThat(AndroidUtils.fallbackTimeZone("Non/Existing_Timezone")).isEqualTo(defaultSystemTimeZone)
+
+        assertThat(AndroidUtils.fallbackTimeZone("Europe/Zurich")).isEqualTo("Europe/Zurich")
+
+        assertThat(AndroidUtils.fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Amsterdam")
+
+    }
+
     @Test
     fun `all-day event has no time and no timezone property`() {
 
