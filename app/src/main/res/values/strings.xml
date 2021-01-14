@@ -201,7 +201,7 @@
 
     <!-- Settings -->
     <string name="settings_theme_title">Theme</string>
-    <string name="settings_theme_info">The app will restart automatically upon switching theme.</string>
+    <string name="settings_theme_info">This setting affects only the appearance of the ProtonCalendar app on this device.The app will restart after changing the theme.</string>
     <string name="settings_timezone_title">Time zone</string>
     <string name="settings_update_timezone_title">Ask to update time zone setting</string>
     <string name="settings_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>
