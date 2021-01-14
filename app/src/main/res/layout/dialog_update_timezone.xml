@@ -44,7 +44,7 @@
         android:id="@+id/dialog_update_timezone_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/settings_proton_account_update_timezone_checkbox"
+        android:text="@string/settings_update_timezone_checkbox"
         style="@style/Text.DefaultSmall"
         android:layout_marginTop="@dimen/spacing_page"
         android:layout_marginEnd="@dimen/spacing_element"

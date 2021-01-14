@@ -46,33 +46,28 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         // TODO Remove feature flags
-        settings_app_title.visibleOrGone(FeatureFlag.SETTINGS_THEME)
-        settings_app_separator.visibleOrGone(FeatureFlag.SETTINGS_THEME)
-        settings_app_theme.visibleOrGone(FeatureFlag.SETTINGS_THEME)
+        settings_theme.visibleOrGone(FeatureFlag.SETTINGS_THEME)
+        settings_week_start.visibleOrGone(FeatureFlag.SETTINGS_WEEK_START)
+        settings_time_format.visibleOrGone(FeatureFlag.SETTINGS_TIME_FORMAT)
+        settings_week_numbers.visibleOrGone(FeatureFlag.SETTINGS_WEEK_NUMBERS)
 
-        settings_proton_account_title.visibleOrGone(FeatureFlag.SETTINGS_TIMEZONE || FeatureFlag.SETTINGS_WEEK_START || FeatureFlag.SETTINGS_TIME_FORMAT || FeatureFlag.SETTINGS_WEEK_NUMBERS)
-        settings_proton_account_separator.visibleOrGone(FeatureFlag.SETTINGS_TIMEZONE || FeatureFlag.SETTINGS_WEEK_START || FeatureFlag.SETTINGS_TIME_FORMAT || FeatureFlag.SETTINGS_WEEK_NUMBERS)
-        settings_proton_account_week_start.visibleOrGone(FeatureFlag.SETTINGS_WEEK_START)
-        settings_proton_account_time_format.visibleOrGone(FeatureFlag.SETTINGS_TIME_FORMAT)
-        settings_proton_account_week_numbers.visibleOrGone(FeatureFlag.SETTINGS_WEEK_NUMBERS)
-
-        settings_proton_account_week_numbers_press.setOnClickListener {
-            settings_proton_account_week_numbers_switch.performClick()
+        settings_week_numbers_press.setOnClickListener {
+            settings_week_numbers_switch.performClick()
         }
-        settings_proton_account_week_numbers_switch.setOnCheckedChangeListener { _, checked ->
+        settings_week_numbers_switch.setOnCheckedChangeListener { _, checked ->
             // Handle show week numbers switch action
         }
 
-        settings_proton_account_update_timezone_press.setOnClickListener {
-            settings_proton_account_update_timezone_switch.performClick()
+        settings_update_timezone_press.setOnClickListener {
+            settings_update_timezone_switch.performClick()
         }
-        settings_proton_account_update_timezone_switch.setOnClickListener {
+        settings_update_timezone_switch.setOnClickListener {
             lifecycleScope.launch {
-                calendarViewModel.updateAutoDetectPrimaryTimezone(settings_proton_account_update_timezone_switch.isChecked)
+                calendarViewModel.updateAutoDetectPrimaryTimezone(settings_update_timezone_switch.isChecked)
             }
         }
 
-        settings_proton_account_timezone_press.setOnSingleClickListener {
+        settings_timezone_press.setOnSingleClickListener {
             //.atZone(calendarViewModel.timeZoneId.value).toInstant()
             val forInstant = Instant.now()
             val formattedTimeZoneIds = allowedTimezoneIds.map {
@@ -92,19 +87,19 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val appThemes = resources.getStringArray(R.array.app_themes)
-        settings_app_theme_value.text = appThemes[(activity as MainActivity).getAppTheme().value]
+        settings_theme_value.text = appThemes[(activity as MainActivity).getAppTheme().value]
 
         // TODO Handle themes for Android P and below
-        settings_app_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        settings_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            settings_app_theme_press.setOnSingleClickListener {
+            settings_theme_press.setOnSingleClickListener {
                 AndroidUtils.displaySingleChoicePicker(
                     requireContext(),
-                    getString(R.string.settings_app_theme_title),
+                    getString(R.string.settings_theme_title),
                     appThemes,
                     AppTheme.values().indexOf((activity as MainActivity).getAppTheme())
                 ) { index ->
-                    settings_app_theme_value.text = appThemes[index]
+                    settings_theme_value.text = appThemes[index]
                     (activity as MainActivity).changeAppTheme(AppTheme.values()[index])
                 }
             }
@@ -112,28 +107,28 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
         val timeFormats = resources.getStringArray(R.array.time_formats)
         calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
-            settings_proton_account_time_format_value.text = timeFormats[timeFormat]
+            settings_time_format_value.text = timeFormats[timeFormat]
         }
 
-        settings_proton_account_time_format_press.setOnSingleClickListener {
+        settings_time_format_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
-                getString(R.string.settings_proton_account_time_format_title),
+                getString(R.string.settings_time_format_title),
                 timeFormats,
-                timeFormats.indexOf(settings_proton_account_time_format_value.text)
+                timeFormats.indexOf(settings_time_format_value.text)
             ) { index ->
-                settings_proton_account_time_format_value.text = timeFormats[index]
+                settings_time_format_value.text = timeFormats[index]
                 calendarViewModel.updateTimeFormat(index)
             }
         }
 
         lifecycleScope.launch {
-            settings_proton_account_update_timezone_switch.isChecked = calendarViewModel.getCalendarUserSettingsAutoDetectPrimaryTimezone()
-            settings_proton_account_update_timezone_switch.jumpDrawablesToCurrentState()
+            settings_update_timezone_switch.isChecked = calendarViewModel.getCalendarUserSettingsAutoDetectPrimaryTimezone()
+            settings_update_timezone_switch.jumpDrawablesToCurrentState()
         }
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            settings_proton_account_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)
+            settings_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)
         }
     }
 }
