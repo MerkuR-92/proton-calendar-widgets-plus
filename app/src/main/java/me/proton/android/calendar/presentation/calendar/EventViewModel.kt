@@ -850,7 +850,9 @@ class EventViewModel(
                 (dbEvent?.isSingleEdit() == false && dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule)
 
         if (bumpSequence || event.iCalEvent.sequence?.value == null) {
-            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO conflict resolution
+            if (event.isSyncedWithApi()) {
+                event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1) // TODO conflict resolution
+            }
         }
     }
 
