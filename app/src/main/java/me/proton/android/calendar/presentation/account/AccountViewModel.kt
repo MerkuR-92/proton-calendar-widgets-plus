@@ -73,6 +73,11 @@ class AccountViewModel(
         accountManager.getPrimaryUserId().onEach { userId ->
             _hasPrimary.postValue(userId != null)
         }.launchIn(viewModelScope)
+
+        // Observe for human verification requirement from the API
+        accountManager.onHumanVerificationNeeded().onEach { (account, details) ->
+            authOrchestrator.startHumanVerificationWorkflow(account.sessionId!!, details)
+        }.launchIn(viewModelScope)
     }
 
     private fun saveEventId(eventId: String) {
@@ -194,10 +199,6 @@ class AccountViewModel(
                     removeUser(it.userId)
                 }
         }
-
-        accountManager.onHumanVerificationNeeded().onEach { (account, details) ->
-            authOrchestrator.startHumanVerificationWorkflow(account.sessionId!!, details)
-        }.launchIn(viewModelScope)
     }
 
     fun startLoginWorkflow() {
