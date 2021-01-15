@@ -237,18 +237,22 @@ class MiniCalendarItemAdapter(
          */
         fun calculateAdapterHeight(context: Context, firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {
 
-            val firstDayOfTheWeekNumber = firstDayOfMonth.dayOfWeek.value - startWeekOn.value
-            val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
-
-            val dayCellsToShow = firstDayOfTheWeekOffset + firstDayOfMonth.lengthOfMonth()
-
-            val fullWeeksInMonth = ceil(dayCellsToShow / DAYS_IN_A_WEEK.toDouble()).toInt()
+            val fullWeeksInMonth = calculateFullWeeksInMonth(firstDayOfMonth, startWeekOn)
 
             return context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
                     fullWeeksInMonth * context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) +
                     fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing) +
                     context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing)
 
+        }
+
+        fun calculateFullWeeksInMonth(firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {
+            val firstDayOfTheWeekNumber = firstDayOfMonth.dayOfWeek.value - startWeekOn.value
+            val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+
+            val dayCellsToShow = firstDayOfTheWeekOffset + firstDayOfMonth.lengthOfMonth()
+
+            return ceil(dayCellsToShow / DAYS_IN_A_WEEK.toDouble()).toInt()
         }
 
     }

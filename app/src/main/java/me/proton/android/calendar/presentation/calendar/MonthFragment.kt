@@ -306,10 +306,6 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
-            // TODO Handle week numbers in mini calendar
-        }
-
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
             setToolbarListeners(zoneId)
         }
