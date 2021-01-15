@@ -605,7 +605,15 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             (chip_group_day_of_week_layout as ViewGroup).children.forEach { view ->
                 if (view.measuredWidth == 0) return@addOnGlobalLayoutListener
                 val currentLayoutParams = view.layoutParams
-                currentLayoutParams.height = view.measuredWidth
+                val maxChipSizePixel = resources.getDimensionPixelSize(R.dimen.week_day_chip_max_size)
+                val widthPixel = view.measuredWidth
+                if (widthPixel > maxChipSizePixel) {
+                    currentLayoutParams.width = maxChipSizePixel
+                    currentLayoutParams.height = maxChipSizePixel
+                    (currentLayoutParams as (LinearLayout.LayoutParams)).weight = 0.0f
+                } else {
+                    currentLayoutParams.height = view.measuredWidth
+                }
                 view.layoutParams = currentLayoutParams
             }
         }
