@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.common.getWeekStartDayOfWeek
 import me.proton.android.calendar.domain.Logger
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -57,13 +59,15 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            val startWeekOn = calendarViewModel.startWeekOn.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, startWeekOn)
+            zoneId ?: return@observe
+            val weekStart = calendarViewModel.weekStart.value ?: return@observe
+            setupItemMiniCalendarContent(zoneId.id, getWeekStartDayOfWeek(weekStart))
         }
 
-        calendarViewModel.startWeekOn.observe(viewLifecycleOwner) { startWeekOn ->
+        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
+            weekStart ?: return@observe
             val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, startWeekOn)
+            setupItemMiniCalendarContent(zoneId.id, getWeekStartDayOfWeek(weekStart))
         }
     }
 

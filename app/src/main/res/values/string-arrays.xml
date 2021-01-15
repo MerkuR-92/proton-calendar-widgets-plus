@@ -30,4 +30,11 @@
         <item>13:00</item>
         <item>1pm</item>
     </string-array>
+
+    <string-array name="week_start">
+        <item>System default</item>
+        <item>Monday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
 </resources>

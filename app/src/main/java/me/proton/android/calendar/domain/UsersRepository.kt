@@ -44,4 +44,6 @@ interface UsersRepository {
 
     fun flowTimeFormat(userId: String): Flow<Int?>
 
+    fun flowWeekStart(userId: String): Flow<Int?>
+
 }

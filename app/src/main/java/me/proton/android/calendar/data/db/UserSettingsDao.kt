@@ -20,4 +20,7 @@ abstract class UserSettingsDao : BaseDao<UserSettingsEntity> {
 
     @Query("SELECT timeFormat FROM user_settings WHERE fkUserId = :userId")
     abstract fun flowTimeFormat(userId: String): Flow<Int?>
+
+    @Query("SELECT weekStart FROM user_settings WHERE fkUserId = :userId")
+    abstract fun flowWeekStart(userId: String): Flow<Int?>
 }

@@ -310,7 +310,10 @@ class MonthFragment : BaseFragment() {
             setToolbarListeners(zoneId)
         }
 
-        calendarViewModel.startWeekOn.observe(viewLifecycleOwner) { startWeekOn ->
+        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
+            if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+
+            val startWeekOn = getWeekStartDayOfWeek(weekStart)
             setMiniCalendarPagerLayoutListener(startWeekOn)
             setMiniCalendarPageChangeCallback(startWeekOn)
 

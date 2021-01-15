@@ -93,4 +93,8 @@ class UsersRepositoryImpl(
         return database.userSettingsDao().flowTimeFormat(userId).distinctUntilChanged()
     }
 
+    override fun flowWeekStart(userId: String): Flow<Int?> {
+        return database.userSettingsDao().flowWeekStart(userId).distinctUntilChanged()
+    }
+
 }

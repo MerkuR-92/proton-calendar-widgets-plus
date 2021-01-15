@@ -55,6 +55,7 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
+import java.time.temporal.WeekFields
 import java.util.*
 import java.util.Locale.getDefault
 import java.util.concurrent.atomic.AtomicBoolean
@@ -1171,4 +1172,11 @@ fun Context.dpToPixel(dp: Int): Int {
 
 fun Context.pixelToDp(pixel: Int): Int {
     return (pixel / resources.displayMetrics.density).toInt()
+}
+
+fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {
+    1 -> java.time.DayOfWeek.MONDAY
+    6 -> java.time.DayOfWeek.SATURDAY
+    7 -> java.time.DayOfWeek.SUNDAY
+    else -> WeekFields.of(getDefault()).firstDayOfWeek
 }

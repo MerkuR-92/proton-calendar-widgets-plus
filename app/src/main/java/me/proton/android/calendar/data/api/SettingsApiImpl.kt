@@ -28,6 +28,9 @@ interface SettingsApiService : BaseRetrofitApi {
     @PUT("settings/timeformat")
     suspend fun updateUserTimeFormat(@Body body: UpdateUserTimeFormatApiRequest): UserSettingsApiResponse
 
+    @PUT("settings/weekstart")
+    suspend fun updateUserWeekStart(@Body body: UpdateUserWeekStartApiRequest): UserSettingsApiResponse
+
 }
 
 class SettingsApiImpl(private val apiProvider: ApiProvider) : SettingsApi {
@@ -62,6 +65,13 @@ class SettingsApiImpl(private val apiProvider: ApiProvider) : SettingsApi {
                 UpdateUserTimeFormatApiRequest(timeFormat)
             )
         }.toApiResponse()
+
+    override suspend fun updateUserWeekStart(userId: UserId, weekStart: Int): ApiResponse<UserSettingsApiResponse> =
+        apiProvider.get<SettingsApiService>(userId).invoke {
+            updateUserWeekStart(
+                UpdateUserWeekStartApiRequest(weekStart)
+            )
+        }.toApiResponse()
 }
 
 @Serializable
@@ -92,4 +102,10 @@ data class UpdateCalendarUserAutoDetectTimezoneApiRequest(
 data class UpdateUserTimeFormatApiRequest(
     @SerialName("TimeFormat")
     val timeFormat: Int
+)
+
+@Serializable
+data class UpdateUserWeekStartApiRequest(
+    @SerialName("WeekStart")
+    val weekStart: Int
 )

@@ -16,6 +16,7 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.MainActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
+import java.time.DayOfWeek
 import java.time.Instant
 
 class SettingsFragment : BaseDialogFragment(), KoinComponent {
@@ -46,9 +47,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         // TODO Remove feature flags
-        settings_theme.visibleOrGone(FeatureFlag.SETTINGS_THEME)
-        settings_week_start.visibleOrGone(FeatureFlag.SETTINGS_WEEK_START)
-        settings_time_format.visibleOrGone(FeatureFlag.SETTINGS_TIME_FORMAT)
         settings_week_numbers.visibleOrGone(FeatureFlag.SETTINGS_WEEK_NUMBERS)
 
         settings_week_numbers_press.setOnClickListener {
@@ -68,7 +66,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         settings_timezone_press.setOnSingleClickListener {
-            //.atZone(calendarViewModel.timeZoneId.value).toInstant()
             val forInstant = Instant.now()
             val formattedTimeZoneIds = allowedTimezoneIds.map {
                 ICalUtils.formatTimeZoneId(it, forInstant)
@@ -106,10 +103,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val timeFormats = resources.getStringArray(R.array.time_formats)
-        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
-            settings_time_format_value.text = timeFormats[timeFormat]
-        }
-
         settings_time_format_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
@@ -127,8 +120,40 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             settings_update_timezone_switch.jumpDrawablesToCurrentState()
         }
 
+        val weekStartValues = resources.getStringArray(R.array.week_start)
+        settings_week_start_press.setOnSingleClickListener {
+            AndroidUtils.displaySingleChoicePicker(
+                requireContext(),
+                null,
+                weekStartValues,
+                weekStartValues.indexOf(settings_week_start_value.text)) { index ->
+                lifecycleScope.launch {
+                    val weekStart = when (index) {
+                        2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
+                        3 -> DayOfWeek.SUNDAY.value // 7 is value for Sunday and index 3 in available days string array
+                        else -> index
+                    }
+                    calendarViewModel.updateWeekStart(weekStart)
+                }
+            }
+        }
+
+        // Observers
+
+        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
+            settings_time_format_value.text = timeFormats[timeFormat]
+        }
+
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
             settings_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)
+        }
+
+        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
+            settings_week_start_value.text = when (weekStart) {
+                DayOfWeek.SATURDAY.value -> weekStartValues[2] // 6 is value for Saturday and index 2 in available days string array
+                DayOfWeek.SUNDAY.value -> weekStartValues[3] // 7 is value for Sunday and index 3 in available days string array
+                else -> weekStartValues[weekStart]
+            }
         }
     }
 }

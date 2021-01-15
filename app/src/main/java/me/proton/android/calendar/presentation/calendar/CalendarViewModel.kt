@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -37,6 +38,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -65,9 +67,6 @@ class CalendarViewModel(
         viewModelJob.cancel()
     }
 
-    private val _startWeekOn: MutableLiveData<DayOfWeek> = MutableLiveData()
-    val startWeekOn: LiveData<DayOfWeek> = _startWeekOn
-
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
@@ -80,6 +79,7 @@ class CalendarViewModel(
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
     var timeFormat: LiveData<Int> = MutableLiveData()
+    var weekStart: LiveData<Int> = MutableLiveData()
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -138,7 +138,6 @@ class CalendarViewModel(
                 return@flow
             }
 
-            _startWeekOn.postValue(usersRepository.selectUserSettings(userId.id)?.weekStartDayOfWeek()!!)
             _userEmails.postValue(usersRepository.getUserEmails(userId.id))
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {
@@ -150,7 +149,11 @@ class CalendarViewModel(
             }.asLiveData(Dispatchers.Default)
 
             timeFormat = usersRepository.flowTimeFormat(userId.id).map {
-                it ?: 0 // Local default
+                it ?: 0 // Locale default
+            }.asLiveData(Dispatchers.Default)
+
+            weekStart = usersRepository.flowWeekStart(userId.id).map {
+                it ?: 0 // Locale default
             }.asLiveData(Dispatchers.Default)
 
             this@CalendarViewModel._userId.postValue(userId)
@@ -391,6 +394,25 @@ class CalendarViewModel(
             .build()
 
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    fun updateWeekStart(weekStart: Int) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_WEEK_START,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
+                    UseCaseWorker.INPUT_WEEK_START to weekStart
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_WEEK_START, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateServerCalendarListDisplay() : LiveData<Operation.State> {
