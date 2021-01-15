@@ -52,8 +52,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_week_numbers_press.setOnClickListener {
             settings_week_numbers_switch.performClick()
         }
-        settings_week_numbers_switch.setOnCheckedChangeListener { _, checked ->
-            // Handle show week numbers switch action
+        settings_week_numbers_switch.setOnClickListener {
+            lifecycleScope.launch {
+                calendarViewModel.updateDisplayWeekNumber(settings_week_numbers_switch.isChecked)
+            }
         }
 
         settings_update_timezone_press.setOnClickListener {
@@ -154,6 +156,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 DayOfWeek.SUNDAY.value -> weekStartValues[3] // 7 is value for Sunday and index 3 in available days string array
                 else -> weekStartValues[weekStart]
             }
+        }
+
+        calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
+            settings_week_numbers_switch.isChecked = displayWeekNumber
+            settings_week_numbers_switch.jumpDrawablesToCurrentState()
         }
     }
 }

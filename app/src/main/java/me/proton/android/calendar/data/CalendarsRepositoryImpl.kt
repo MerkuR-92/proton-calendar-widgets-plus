@@ -756,6 +756,14 @@ class CalendarsRepositoryImpl(
         return database.calendarUserSettingsDao().selectAutoDetectPrimaryTimezone(userId)
     }
 
+    override suspend fun updateCalendarUserSettingsDisplayWeekNumber(userId: String, displayWeekNumber: Int) {
+        return database.calendarUserSettingsDao().updateDisplayWeekNumber(userId, displayWeekNumber)
+    }
+
+    override fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?> {
+        return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
+    }
+
     override fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?> {
         return database.calendarUserSettingsDao().flowCalendarUserSettingsPrimaryTimezone(userId).distinctUntilChanged()
     }

@@ -10,6 +10,7 @@ interface SettingsApi {
     suspend fun getUserSettings(userId: UserId): ApiResponse<UserSettingsApiResponse>
     suspend fun updateCalendarUserPrimaryTimezone(userId: UserId, primaryTimezone: String): ApiResponse<CalendarUserSettingsApiResponse>
     suspend fun updateCalendarUserAutoDetectTimezone(userId: UserId, autoDetectPrimaryTimezone: Int): ApiResponse<CalendarUserSettingsApiResponse>
+    suspend fun updateCalendarUserDisplayWeekNumber(userId: UserId, displayWeekNumber: Int): ApiResponse<CalendarUserSettingsApiResponse>
     suspend fun updateUserTimeFormat(userId: UserId, timeFormat: Int): ApiResponse<UserSettingsApiResponse>
     suspend fun updateUserWeekStart(userId: UserId, weekStart: Int): ApiResponse<UserSettingsApiResponse>
 }

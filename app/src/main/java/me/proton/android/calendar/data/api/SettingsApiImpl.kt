@@ -22,6 +22,9 @@ interface SettingsApiService : BaseRetrofitApi {
     @PUT("settings/calendar")
     suspend fun updateCalendarUserAutoDetectTimezone(@Body body: UpdateCalendarUserAutoDetectTimezoneApiRequest): CalendarUserSettingsApiResponse
 
+    @PUT("settings/calendar")
+    suspend fun updateCalendarUserDisplayWeekNumber(@Body body: UpdateCalendarUserDisplayWeekNumberApiRequest): CalendarUserSettingsApiResponse
+
     @GET("settings")
     suspend fun getUserSettings(): UserSettingsApiResponse
 
@@ -56,6 +59,13 @@ class SettingsApiImpl(private val apiProvider: ApiProvider) : SettingsApi {
         apiProvider.get<SettingsApiService>(userId).invoke {
             updateCalendarUserAutoDetectTimezone(
                 UpdateCalendarUserAutoDetectTimezoneApiRequest(autoDetectPrimaryTimezone)
+            )
+        }.toApiResponse()
+
+    override suspend fun updateCalendarUserDisplayWeekNumber(userId: UserId, displayWeekNumber: Int): ApiResponse<CalendarUserSettingsApiResponse> =
+        apiProvider.get<SettingsApiService>(userId).invoke {
+            updateCalendarUserDisplayWeekNumber(
+                UpdateCalendarUserDisplayWeekNumberApiRequest(displayWeekNumber)
             )
         }.toApiResponse()
 
@@ -96,6 +106,12 @@ data class UpdateCalendarUserPrimaryTimezoneApiRequest(
 data class UpdateCalendarUserAutoDetectTimezoneApiRequest(
     @SerialName("AutoDetectPrimaryTimezone")
     val autoDetectPrimaryTimezone: Int
+)
+
+@Serializable
+data class UpdateCalendarUserDisplayWeekNumberApiRequest(
+    @SerialName("DisplayWeekNumber")
+    val displayWeekNumber: Int
 )
 
 @Serializable

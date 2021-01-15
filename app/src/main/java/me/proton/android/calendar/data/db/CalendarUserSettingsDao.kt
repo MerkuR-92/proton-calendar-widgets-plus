@@ -27,4 +27,10 @@ abstract class CalendarUserSettingsDao : BaseDao<CalendarUserSettingsEntity> {
     @Query("UPDATE calendar_user_settings SET autoDetectPrimaryTimezone = :autoDetectPrimaryTimezone WHERE fkUserId = :userId")
     abstract suspend fun updateAutoDetectPrimaryTimezone(userId: String, autoDetectPrimaryTimezone: Int)
 
+    @Query("SELECT displayWeekNumber FROM calendar_user_settings WHERE fkUserId = :userId")
+    abstract fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int>
+
+    @Query("UPDATE calendar_user_settings SET displayWeekNumber = :displayWeekNumber WHERE fkUserId = :userId")
+    abstract suspend fun updateDisplayWeekNumber(userId: String, displayWeekNumber: Int)
+
 }

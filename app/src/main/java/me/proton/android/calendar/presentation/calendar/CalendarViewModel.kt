@@ -80,6 +80,7 @@ class CalendarViewModel(
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
     var timeFormat: LiveData<Int> = MutableLiveData()
     var weekStart: LiveData<Int> = MutableLiveData()
+    var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -146,6 +147,10 @@ class CalendarViewModel(
                 } else {
                     ZoneId.of(timeZone)
                 }
+            }.asLiveData(Dispatchers.Default)
+
+            displayWeekNumber = calendarsRepository.flowCalendarUserSettingsDisplayWeekNumber(userId.id).map {
+                it?.toBoolean() ?: true // Show week numbers by default
             }.asLiveData(Dispatchers.Default)
 
             timeFormat = usersRepository.flowTimeFormat(userId.id).map {
@@ -375,6 +380,25 @@ class CalendarViewModel(
             .build()
 
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    fun updateDisplayWeekNumber(displayWeekNumber: Boolean) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_DISPLAY_WEEK_NUMBER,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
+                    UseCaseWorker.INPUT_DISPLAY_WEEK_NUMBER to displayWeekNumber
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateTimeFormat(timeFormat: Int) : LiveData<Operation.State> {
