@@ -73,6 +73,8 @@ class HandleServerEventsUseCase(
                 )
             }
 
+            val justDeletedCalendarIds = eventsResponse.calendars?.mapNotNull { if (it.action == ServerEvent.Action.DELETE.value) it.id else null } ?: emptyList()
+
             var checkCalendarFlags = false
             eventsResponse.addresses?.forEach {
                 it.handleAction(
@@ -145,13 +147,25 @@ class HandleServerEventsUseCase(
             eventsResponse.calendarKeys?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarKeyById(it.id) },
-                    { calendarsRepository.persistCalendarKey(it.key!!) }
+                    {
+                        if (justDeletedCalendarIds.contains(it.key?.calendarId)) {
+                            logger.i("action CREATE/UPDATE for calendarKey in just deleted calendar")
+                        } else {
+                            calendarsRepository.persistCalendarKey(it.key!!)
+                        }
+                    }
                 )
             }
             eventsResponse.calendarMembers?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteMemberById(it.id) },
-                    { calendarsRepository.persistMember(it.member!!) }
+                    {
+                        if (justDeletedCalendarIds.contains(it.member?.calendarId)) {
+                            logger.i("action CREATE/UPDATE for calendarMember in just deleted calendar")
+                        } else {
+                            calendarsRepository.persistMember(it.member!!)
+                        }
+                    }
                 )
             }
             eventsResponse.calendarPassphrases?.forEach {
@@ -160,11 +174,15 @@ class HandleServerEventsUseCase(
                 it.handleAction(
                     { calendarsRepository.deletePassphraseById(it.id) },
                     {
-                        calendarsRepository.persistPassphrase(it.passphrase!!)
-                        // TODO make sure we delete passphrase from cache if it becomes inactive
-                        when (val result = cacheCalendarPassphraseUseCase.execute(userId, it.passphrase.calendarId)) {
-                            is UseCase.Result.InvalidParams -> logger.e("event looop calendar passphrase caching InvalidParams: ${result.message}")
-                            is UseCase.Result.Error -> logger.e("event looop calendar passphrase caching Error: ${result.message}")
+                        if (justDeletedCalendarIds.contains(it.passphrase?.calendarId)) {
+                            logger.i("action CREATE/UPDATE for calendarPassphrase in just deleted calendar")
+                        } else {
+                            calendarsRepository.persistPassphrase(it.passphrase!!)
+                            // TODO make sure we delete passphrase from cache if it becomes inactive
+                            when (val result = cacheCalendarPassphraseUseCase.execute(userId, it.passphrase.calendarId)) {
+                                is UseCase.Result.InvalidParams -> logger.e("event looop calendar passphrase caching InvalidParams: ${result.message}")
+                                is UseCase.Result.Error -> logger.e("event looop calendar passphrase caching Error: ${result.message}")
+                            }
                         }
                     }
                 )
@@ -172,7 +190,13 @@ class HandleServerEventsUseCase(
             eventsResponse.calendarSettings?.forEach {
                 it.handleAction(
                     { calendarsRepository.deleteCalendarSettingsById(it.id) },
-                    { calendarsRepository.persistCalendarSettings(it.calendarSettings!!) }
+                    {
+                        if (justDeletedCalendarIds.contains(it.calendarSettings?.calendarId)) {
+                            logger.i("action CREATE/UPDATE for calendarSettings in just deleted calendar")
+                        } else {
+                            calendarsRepository.persistCalendarSettings(it.calendarSettings!!)
+                        }
+                    }
                 )
             }
 
