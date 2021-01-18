@@ -144,7 +144,14 @@ class SyncAlarmsUseCase(
 
                     logger.v("alarm window after adjusting => ${windowStart}-${windowEnd}, end = $end")
                 }
-                is ApiResponse.Error -> return UseCase.Result.Error("api error getting server events: $alarmsResponse")
+                is ApiResponse.Error -> {
+                    return if (alarmsResponse.httpCode == 404) {
+                        logger.e("404 requesting alarms for calendar in handleCalendarAlarms")
+                        UseCase.Result.Success
+                    } else {
+                        UseCase.Result.Error("api error getting server events: $alarmsResponse")
+                    }
+                }
                 is ApiResponse.Exception -> return UseCase.Result.Error("exception getting server events: $alarmsResponse")
             }
 
