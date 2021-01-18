@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -32,7 +33,10 @@ import kotlinx.android.synthetic.main.event_info.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_details.*
 import kotlinx.android.synthetic.main.item_attendee.view.*
+import kotlinx.android.synthetic.main.item_change_answer.view.*
+import kotlinx.android.synthetic.main.item_change_answer_button.view.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
+import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,6 +62,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val layoutResourceId = R.layout.fragment_event_details
 
     override val navigateUp = false
+    override val isScrollable = false
 
     private lateinit var buttonEdit: View
     private lateinit var buttonMenu: View
@@ -281,6 +286,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        section_answer.item_change_answer_button_yes.item_change_answer_button_title.text = getString(R.string.event_answer_yes)
+        section_answer.item_change_answer_button_no.item_change_answer_button_title.text = getString(R.string.event_answer_no)
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.text = getString(R.string.event_answer_maybe)
+
         lifecycleScope.launch {
 
             if (!calendarViewModel.initialised) {
@@ -480,6 +489,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
 
                 initAttendeeList(attendeeList, organizerAttendee)
+
+                val userEmails = calendarViewModel.userEmails.value
+                userEmails?.let {
+                    updateAttendeeAnswerState(
+                        event.getParticipationStatus(userEmails)
+                    )
+                }
             }
         })
     }
@@ -606,5 +622,52 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    private fun updateAttendeeAnswerState(participationStatus: ParticipationStatus?) {
+
+        section_answer.visibleOrGone(participationStatus != null)
+
+        section_answer.item_change_answer_button_yes.item_change_answer_button_title.backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
+        section_answer.item_change_answer_button_no.item_change_answer_button_title.backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
+
+        section_answer.item_change_answer_button_yes.item_change_answer_button_title.setTextColor(
+            resources.getColor(R.color.white, null)
+        )
+        section_answer.item_change_answer_button_no.item_change_answer_button_title.setTextColor(
+            resources.getColor(R.color.white, null)
+        )
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.setTextColor(
+            resources.getColor(R.color.white, null)
+        )
+
+        when (participationStatus) {
+            ParticipationStatus.ACCEPTED -> {
+                section_answer.item_change_answer_button_yes.item_change_answer_button_title.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                section_answer.item_change_answer_button_yes.item_change_answer_button_title.setTextColor(
+                    resources.getColor(R.color.woodsmoke, null)
+                )
+            }
+            ParticipationStatus.DECLINED -> {
+                section_answer.item_change_answer_button_no.item_change_answer_button_title.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                section_answer.item_change_answer_button_no.item_change_answer_button_title.setTextColor(
+                    resources.getColor(R.color.woodsmoke, null)
+                )
+            }
+            ParticipationStatus.TENTATIVE -> {
+                section_answer.item_change_answer_button_maybe.item_change_answer_button_title.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                section_answer.item_change_answer_button_maybe.item_change_answer_button_title.setTextColor(
+                    resources.getColor(R.color.woodsmoke, null)
+                )
+            }
+        }
+
+
+    }
 
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/woodsmoke">
+
+    <TextView
+        android:id="@+id/item_change_answer_attending"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/event_answer_attending"
+        style="@style/Text.DefaultSmall.Weak.Dark"
+        android:layout_marginStart="@dimen/default_margin_text_start"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"/>
+
+    <include
+        android:id="@+id/item_change_answer_button_yes"
+        layout="@layout/item_change_answer_button" />
+
+    <include
+        android:id="@+id/item_change_answer_button_no"
+        layout="@layout/item_change_answer_button" />
+
+    <include
+        android:id="@+id/item_change_answer_button_maybe"
+        layout="@layout/item_change_answer_button" />
+
+</LinearLayout>

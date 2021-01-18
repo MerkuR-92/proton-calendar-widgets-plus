@@ -68,6 +68,11 @@
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
 
+    <string name="event_answer_attending">Attending?</string>
+    <string name="event_answer_yes">Yes</string>
+    <string name="event_answer_no">No</string>
+    <string name="event_answer_maybe">Maybe</string>
+
     <string name="event_decryption_error_dialog_title">Event failed to decrypt</string>
     <string name="event_decryption_error_dialog_message">Decryption of this event’s content failed.</string>
     <string name="event_decryption_error_dialog_confirmation">Delete event</string>
