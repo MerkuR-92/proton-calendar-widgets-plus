@@ -125,15 +125,21 @@ class BootstrapCalendarsUseCase( // TODO TEST
         if (calendarUserSettingsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
+        calendarsRepository.persistCalendarUserSettings(
+            userId.id,
+            calendarUserSettingsResponse.data.calendarUserSettings
+        )
 
         val userSettingsResponse = settingsApi.getUserSettings(userId)
         if (userSettingsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("error getting user settings from API: $userSettingsResponse")
         }
+        usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
 
         val failedCalendarIds = mutableListOf<String>()
 
         calendarsResponse.data.calendars.forEach { calendarEntity ->
+            if (!calendarEntity.isActive) return@forEach
             when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
                 is ApiResponse.Success -> {
                     logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
@@ -153,16 +159,6 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
                     when (cachePassphraseResult) {
                         UseCase.Result.Success -> {
-                            // TODO this is related to User and not Calendars, in theory we could save it some other time
-                            //  but this should not cause any troubles
-
-                            // if at least one calendar bootstrap succeeded, we save user and calendar settings
-                            calendarsRepository.persistCalendarUserSettings(
-                                userId.id,
-                                calendarUserSettingsResponse.data.calendarUserSettings
-                            )
-                            usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
-
                             // fetch events
                             val displayTimeZoneId =
                                 calendarUserSettingsResponse.data.calendarUserSettings.primaryTimezone
