@@ -66,6 +66,14 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                                     events.addAll(eventsResponse.data.events)
 
                                     UseCase.Result.Success
+                                } else if (eventsResponse is ApiResponse.Error) {
+                                    if (eventsResponse.httpCode == 404) {
+                                        logger.e("404 requesting events in FetchEventsUseCase")
+                                        UseCase.Result.Success
+                                    } else {
+                                        logger.e("error fetching events for calendar: $eventsResponse")
+                                        UseCase.Result.Error("api error in FetchEventsUseCase: ${eventsResponse}")
+                                    }
                                 } else {
                                     logger.e("error fetching events for calendar: $eventsResponse")
                                     UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
