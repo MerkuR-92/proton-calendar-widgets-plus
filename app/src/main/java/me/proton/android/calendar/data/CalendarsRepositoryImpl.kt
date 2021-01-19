@@ -160,7 +160,12 @@ class CalendarsRepositoryImpl(
 
             // Events
             val eventEntities = database.eventsDao().selectEvents()
-            val transformedEvents = eventEntities.mapNotNull { transformEventUseCase.execute(it) }
+            val transformedEvents = eventEntities.map {
+                async {
+                    transformEventUseCase.execute(it)
+                }
+            }.awaitAll().filterNotNull()
+
             eventsMutex.withLock {
                 // we just selected all events from DB so let's clear all that might have been added
                 // by fetching, user actions or
