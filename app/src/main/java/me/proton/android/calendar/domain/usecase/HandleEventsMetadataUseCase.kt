@@ -41,7 +41,7 @@ class HandleEventsMetadataUseCase(
 
         eventMetadata.filter { it.action == ServerEvent.Action.CREATE.value || it.action == ServerEvent.Action.UPDATE.value }
             .let { events ->
-                events.filter { it.event != null && shouldFetchEvent(it.event) }.let {
+                events.filter { it.event != null && (shouldFetchEvent(it.event) || calendarsRepository.hasEvent(it.event.id, it.event.calendarId)) }.let {
 
                     val responses = coroutineScope {
                         it.map { async { calendarsApi.getEvent(userId, it.event!!.calendarId, it.event.id) } }
