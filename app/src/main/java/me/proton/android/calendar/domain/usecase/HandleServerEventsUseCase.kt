@@ -109,27 +109,27 @@ class HandleServerEventsUseCase(
 
                             if (!calendarsRepository.hasEvent(it.alarm!!.eventId, it.alarm.calendarId)) {
 
-                                logger.v("event ${it.alarm.eventId} for alarm doesn't exist in DB")
-                                // event doesn't exist locally, fetch and save it before inserting alarm
-                                when (val event = calendarsApi.getEvent(userId, it.alarm.calendarId, it.alarm.eventId)) {
-                                    is ApiResponse.Success -> {
-                                        logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
-
-                                        try {
+                                if (HandleEventsMetadataUseCase.shouldFetchEvent(it.alarm)) {
+                                    logger.v("event ${it.alarm.eventId} for alarm doesn't exist in DB")
+                                    // event doesn't exist locally, fetch and save it before inserting alarm
+                                    when (val event = calendarsApi.getEvent(userId, it.alarm.calendarId, it.alarm.eventId)) {
+                                        is ApiResponse.Success -> {
+                                            logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
                                             calendarsRepository.persistEvents(event.data.event)
                                             logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
                                             calendarsRepository.persistEventAlarm(it.alarm)
                                             updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
-                                        } catch (e: SQLiteConstraintException) {
-                                            logger.e("exception when inserting newly fetched Event for Alarm", e)
+                                        }
+                                        // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
+                                        is ApiResponse.Error -> {
+                                            logger.e("couldn't fetch event for alarm: ${event.errorCode}, ${event.error}")
+                                        }
+                                        is ApiResponse.Exception -> {
+                                            logger.e("couldn't fetch event for alarm: ${event.exception}")
                                         }
                                     }
-                                    is ApiResponse.Error -> {
-                                        logger.e("couldn't fetch event for alarm: ${event.errorCode}, ${event.error}")
-                                    }
-                                    is ApiResponse.Exception -> {
-                                        logger.e("couldn't fetch event for alarm: ${event.exception}")
-                                    }
+                                } else {
+                                    logger.v("event ${it.alarm.eventId} for alarm doesn't exist in DB but is outside of sync window")
                                 }
 
                             } else {

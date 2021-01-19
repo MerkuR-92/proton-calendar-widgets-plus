@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
+import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -114,6 +115,21 @@ class HandleEventsMetadataUseCase(
         }
 
         return true
+    }
+
+    companion object {
+
+        /**
+         * If based on EventAlarm trigger, we should fetch the Event.
+         */
+        fun shouldFetchEvent(alarm: EventAlarmEntity): Boolean {
+
+            val now = Instant.now()
+            val alarmInstant = Instant.ofEpochSecond(alarm.occurrence)
+
+            return !now.plus(120, ChronoUnit.DAYS).isBefore(alarmInstant)
+
+        }
     }
 
 }
