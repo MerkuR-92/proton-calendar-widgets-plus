@@ -114,12 +114,16 @@ class HandleServerEventsUseCase(
                                 when (val event = calendarsApi.getEvent(userId, it.alarm.calendarId, it.alarm.eventId)) {
                                     is ApiResponse.Success -> {
                                         logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
-                                        calendarsRepository.persistEvents(event.data.event)
-                                        logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
-                                        calendarsRepository.persistEventAlarm(it.alarm)
-                                        updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
+
+                                        try {
+                                            calendarsRepository.persistEvents(event.data.event)
+                                            logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
+                                            calendarsRepository.persistEventAlarm(it.alarm)
+                                            updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
+                                        } catch (e: SQLiteConstraintException) {
+                                            logger.e("exception when inserting newly fetched Event for Alarm", e)
+                                        }
                                     }
-                                    // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                     is ApiResponse.Error -> {
                                         logger.e("couldn't fetch event for alarm: ${event.errorCode}, ${event.error}")
                                     }

@@ -47,12 +47,27 @@ class HandleEventsMetadataUseCase(
                             .awaitAll()
                     }
 
+                    val localCalendarIds = calendarsRepository.selectCalendars(userId.id).map { it.id }
+
                     responses.mapNotNull { if (it is ApiResponse.Success) it.data.event else null }
                         .let { eventEntities ->
-                            calendarsRepository.persistEvents(*eventEntities.toTypedArray())
 
-                            updateAlarmsUseCase.execute(userId.id, eventEntities.map { it.id })
-                            fetchPublicKeysUseCase.execute(userId, eventEntities)
+                            val groupedEntities = eventEntities.groupBy { localCalendarIds.contains(it.calendarId) }
+
+                            // EventEntities belonging to Calendars that exist locally
+                            groupedEntities[true]?.let { entities ->
+                                calendarsRepository.persistEvents(*entities.toTypedArray())
+
+                                updateAlarmsUseCase.execute(userId.id, entities.map { it.id })
+                                fetchPublicKeysUseCase.execute(userId, entities)
+                            }
+
+                            // EventEntities belonging to Calendars that don't exist locally, inserting
+                            // would cause SQLiteConstraint exception
+                            groupedEntities[false]?.let {
+                                logger.e("HandleEventsMetadataUseCase Event entities to insert for non-existing calendars")
+                            }
+
                         }
 
                     var errorOccurred = false
