@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
-import com.proton.gopenpgp.crypto.KeyRing
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.ICalUtils
@@ -51,48 +53,71 @@ class TransformEventUseCase(
         verificationStatuses = mutableListOf()
         decryptionStatuses = mutableListOf()
 
-        // process Shared Events
-        eventEntity.sharedEvents.map {
-            json.decodeFromJsonElement<Event.EventPart.Shared>(it)
-        }.forEach { sharedEvent ->
-            getPlainText(
-                eventEntity.sharedKeyPacket,
-                calendarPrivateKeys,
-                keyPassphrase,
-                sharedEvent)?.let { calendarParts.add(it) }
-        }
+        coroutineScope {
 
-        // process Calendar Events
-        eventEntity.calendarEvents.map {
-            json.decodeFromJsonElement<Event.EventPart.Calendar>(it)
-        }.forEach { calendarEvent ->
-            getPlainText(
-                eventEntity.calendarKeyPacket,
-                calendarPrivateKeys,
-                keyPassphrase,
-                calendarEvent)?.let { calendarParts.add(it) }
-        }
+            // process Shared Events
+            val processedSharedEvents = async {
+                eventEntity.sharedEvents.map {
+                    json.decodeFromJsonElement<Event.EventPart.Shared>(it)
+                }.map { sharedEvent ->
+                    getPlainText(
+                        eventEntity.sharedKeyPacket,
+                        calendarPrivateKeys,
+                        keyPassphrase,
+                        sharedEvent
+                    )
+                }
+            }
 
-        // process Personal Events
-        eventEntity.personalEvents.map {
-            json.decodeFromJsonElement<Event.EventPart.Personal>(it)
-        }.forEach { personalEvent ->
-            getPlainText(
-                null, // personal parts are only signed
-                calendarPrivateKeys,
-                keyPassphrase,
-                personalEvent)?.let { calendarParts.add(it) }
-        }
+            // process Calendar Events
+            val processedCalendarEvents = async {
+                eventEntity.calendarEvents.map {
+                    json.decodeFromJsonElement<Event.EventPart.Calendar>(it)
+                }.map { calendarEvent ->
+                    getPlainText(
+                        eventEntity.calendarKeyPacket,
+                        calendarPrivateKeys,
+                        keyPassphrase,
+                        calendarEvent
+                    )
+                }
+            }
 
-        // process Attendees Events
-        eventEntity.attendeesEvents.map {
-            json.decodeFromJsonElement<Event.EventPart.Attendee>(it)
-        }.forEach { attendeeEvent ->
-            getPlainText(
-                eventEntity.sharedKeyPacket,
-                calendarPrivateKeys,
-                keyPassphrase,
-                attendeeEvent)?.let { calendarParts.add(it) }
+            // process Personal Events
+            val processedPersonalEvents = async {
+                eventEntity.personalEvents.map {
+                    json.decodeFromJsonElement<Event.EventPart.Personal>(it)
+                }.map { personalEvent ->
+                    getPlainText(
+                        null, // personal parts are only signed
+                        calendarPrivateKeys,
+                        keyPassphrase,
+                        personalEvent
+                    )
+                }
+            }
+
+            // process Attendees Events
+            val processedAttendeesEvemts = async {
+                eventEntity.attendeesEvents.map {
+                    json.decodeFromJsonElement<Event.EventPart.Attendee>(it)
+                }.map { attendeeEvent ->
+                    getPlainText(
+                        eventEntity.sharedKeyPacket,
+                        calendarPrivateKeys,
+                        keyPassphrase,
+                        attendeeEvent
+                    )
+                }
+            }
+
+            listOf(processedSharedEvents, processedCalendarEvents, processedPersonalEvents, processedAttendeesEvemts)
+                .awaitAll().flatten().filterNotNull().forEach {
+                    calendarParts.add(it.plainText)
+                    decryptionStatuses.add(it.decryptionStatus)
+                    verificationStatuses.add(it.signatureVerification)
+                }
+
         }
 
         if (calendarParts.isEmpty()) return null
@@ -153,6 +178,12 @@ class TransformEventUseCase(
 
     }
 
+    private data class ProcessResult(
+        val plainText: String,
+        val decryptionStatus: Event.DecryptionStatus,
+        val signatureVerification: Event.SignatureVerification
+    )
+
     /**
      * Get plaintext payload or decrypt & check signature if necessary.
      */
@@ -160,7 +191,7 @@ class TransformEventUseCase(
                                      privateKeys: List<String>,
                                      keyPassphrase: String,
                                      eventPart: Event.EventPart
-    ): String? {
+    ): ProcessResult? {
 
         // decrypt if necessary
         val plainText = if (eventPart.isEncrypted) {
@@ -172,9 +203,9 @@ class TransformEventUseCase(
             eventPart.data
         }
 
-        if (plainText != null) {
+        return if (plainText != null) {
 
-            decryptionStatuses.add(Event.DecryptionStatus.SUCCESS)
+            var signatureVerification: Event.SignatureVerification = Event.SignatureVerification.FAILURE
 
             // verify signature if necessary
             if (eventPart.isSigned) {
@@ -184,7 +215,7 @@ class TransformEventUseCase(
                     // TODO introduce verification keys cache
                     val verificationKeys = database.publicKeysDao().select(eventPart.author).map { it.publicKey }
                     if (verificationKeys.isEmpty()) {
-                        verificationStatuses.add(Event.SignatureVerification.SIGNED_BUT_NO_KEYS)
+                        signatureVerification = Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                     } else {
 
                         val signatureOk = eventPart.signature?.let {
@@ -192,25 +223,26 @@ class TransformEventUseCase(
                         } ?: false
 
                         if (signatureOk) {
-                            verificationStatuses.add(Event.SignatureVerification.SUCCESS)
+                            signatureVerification = Event.SignatureVerification.SUCCESS
                         } else {
-                            verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                            signatureVerification = Event.SignatureVerification.FAILURE
                             logger.v("signature not okay for ${plainText}")
                         }
                     }
 
                 } else {
                     logger.e("EventPart ${eventPart.javaClass} is signed but there is no signature")
-                    verificationStatuses.add(Event.SignatureVerification.FAILURE)
+                    signatureVerification = Event.SignatureVerification.FAILURE
                 }
 
             } else {
-                verificationStatuses.add(Event.SignatureVerification.NOT_SIGNED)
+                signatureVerification = Event.SignatureVerification.NOT_SIGNED
             }
-        } else if (eventPart.isEncrypted) {
-            decryptionStatuses.add(Event.DecryptionStatus.FAILURE)
+
+            ProcessResult(plainText, Event.DecryptionStatus.SUCCESS, signatureVerification)
+        } else {
+            null
         }
 
-        return plainText
     }
 }
