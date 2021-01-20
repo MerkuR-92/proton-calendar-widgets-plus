@@ -339,8 +339,16 @@ class CalendarsRepositoryImpl(
         return database.calendarsDao().selectCalendars(userId)
     }
 
-    override fun flowCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowCalendars(userId).distinctUntilChanged()
+    override fun flowActiveCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowActiveCalendars(userId).distinctUntilChanged()
+    }
+
+    override fun flowDisabledCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowDisabledCalendars(userId).distinctUntilChanged()
+    }
+
+    override fun flowInactiveCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowInactiveCalendars(userId).distinctUntilChanged()
     }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {

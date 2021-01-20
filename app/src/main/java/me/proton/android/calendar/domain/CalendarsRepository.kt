@@ -23,7 +23,11 @@ interface CalendarsRepository {
 
     suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
-    fun flowCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowActiveCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    fun flowDisabledCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    fun flowInactiveCalendars(userId: String): Flow<List<CalendarEntity>>
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 

@@ -38,6 +38,7 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.Companion.displayCalendarListMaterialDialog
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
@@ -428,12 +429,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         disabledCalendarListView.adapter = disabledCalendarListAdapter
     }
 
-    private lateinit var job: Job
+    private lateinit var updateCalendarsJob: Job
     private fun updateCalendarsDelayed() {
-        if (this::job.isInitialized && job.isActive) {
-            job.cancel()
+        if (this::updateCalendarsJob.isInitialized && updateCalendarsJob.isActive) {
+            updateCalendarsJob.cancel()
         }
-        job = lifecycleScope.launch {
+        updateCalendarsJob = lifecycleScope.launch {
             delay(SYNC_CALENDARS_DELAY.toMillis())
             calendarViewModel.updateServerCalendarListDisplay()
         }
@@ -466,15 +467,26 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 inactiveCalendars ?: return@observe
 
                 if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null) {
-                    this@MainActivity.displayCalendarListMaterialDialog(
-                        R.string.bootstrap_error_update_passphrase_title,
-                        R.string.bootstrap_error_update_passphrase_message,
-                        false,
-                        inactiveCalendars.filter { it.hasUpdatePassphrase }) { _, _ ->
-                        lifecycleScope.launch {
-                            calendarViewModel.updateInactiveCalendarsPassphrase()
-                        }
-                    }
+                    handleUpdatePassphrase(inactiveCalendars)
+                }
+            }
+        }
+    }
+
+    private lateinit var inactiveCalendarsJob: Job
+    private fun handleUpdatePassphrase(inactiveCalendars: List<CalendarEntity>) {
+        if (this::inactiveCalendarsJob.isInitialized && inactiveCalendarsJob.isActive) {
+            inactiveCalendarsJob.cancel()
+        }
+        inactiveCalendarsJob = lifecycleScope.launch {
+            delay(UPDATE_PASSPHRASE_CALENDARS_DELAY.toMillis())
+            this@MainActivity.displayCalendarListMaterialDialog(
+                R.string.bootstrap_error_update_passphrase_title,
+                R.string.bootstrap_error_update_passphrase_message,
+                false,
+                inactiveCalendars.filter { it.hasUpdatePassphrase }) { _, _ ->
+                lifecycleScope.launch {
+                    calendarViewModel.updateInactiveCalendarsPassphrase()
                 }
             }
         }

@@ -106,15 +106,9 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
             return
         }
-        activeCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
-            calendars.filter { it.isActive }
-        }.asLiveData(Dispatchers.Default)
-        disabledCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
-            calendars.filter { it.isDisabled }
-        }.asLiveData(Dispatchers.Default)
-        inactiveCalendars = calendarsRepository.flowCalendars(userId).map { calendars ->
-            calendars.filter { it.isInactive }
-        }.asLiveData(Dispatchers.Default)
+        activeCalendars = calendarsRepository.flowActiveCalendars(userId).asLiveData(Dispatchers.Default)
+        disabledCalendars = calendarsRepository.flowDisabledCalendars(userId).asLiveData(Dispatchers.Default)
+        inactiveCalendars = calendarsRepository.flowInactiveCalendars(userId).asLiveData(Dispatchers.Default)
     }
 
     suspend fun selectUser(): User? {
