@@ -117,11 +117,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        lifecycleScope.launch {
-            settings_update_timezone_switch.isChecked = calendarViewModel.getCalendarUserSettingsAutoDetectPrimaryTimezone()
-            settings_update_timezone_switch.jumpDrawablesToCurrentState()
-        }
-
         val weekStartValues = resources.getStringArray(R.array.week_start)
         settings_week_start_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
@@ -161,6 +156,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
             settings_week_numbers_switch.isChecked = displayWeekNumber
             settings_week_numbers_switch.jumpDrawablesToCurrentState()
+        }
+
+        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
+            settings_update_timezone_switch.isChecked = autoDetectPrimaryTimezone
+            settings_update_timezone_switch.jumpDrawablesToCurrentState()
         }
     }
 }

@@ -79,6 +79,7 @@ class CalendarViewModel(
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
     var timeFormat: LiveData<Int> = MutableLiveData()
+    var autoDetectPrimaryTimezone: LiveData<Boolean> = MutableLiveData()
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
@@ -147,6 +148,10 @@ class CalendarViewModel(
                 } else {
                     ZoneId.of(timeZone)
                 }
+            }.asLiveData(Dispatchers.Default)
+
+            autoDetectPrimaryTimezone = calendarsRepository.flowCalendarUserSettingsAutoDetectPrimaryTimezone(userId.id).map {
+                it?.toBoolean() ?: true // Show week numbers by default
             }.asLiveData(Dispatchers.Default)
 
             displayWeekNumber = calendarsRepository.flowCalendarUserSettingsDisplayWeekNumber(userId.id).map {

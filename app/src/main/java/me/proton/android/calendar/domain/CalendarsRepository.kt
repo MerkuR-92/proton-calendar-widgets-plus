@@ -122,6 +122,8 @@ interface CalendarsRepository {
 
     suspend fun selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId: String): Int?
 
+    fun flowCalendarUserSettingsAutoDetectPrimaryTimezone(userId: String): Flow<Int?>
+
     suspend fun updateCalendarUserSettingsDisplayWeekNumber(userId: String, displayWeekNumber: Int)
 
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>

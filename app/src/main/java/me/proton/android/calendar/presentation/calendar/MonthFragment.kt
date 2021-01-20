@@ -331,6 +331,8 @@ class MonthFragment : BaseFragment() {
                 buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_disabled_oval)
             }
         }
+
+        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { }
     }
 
     private fun setToolbarMonthYearTitle(localDate: LocalDate) {
