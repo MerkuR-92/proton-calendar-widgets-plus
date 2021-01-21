@@ -26,7 +26,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     override val layoutResourceId: Int
         get() = R.layout.fragment_settings
 
-    override val navigateUp = false
+    override val navigateUp = true
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
 
