@@ -75,22 +75,23 @@ class HandleServerEventsUseCase(
 
             val justDeletedCalendarIds = eventsResponse.calendars?.mapNotNull { if (it.action == ServerEvent.Action.DELETE.value) it.id else null } ?: emptyList()
 
-            var checkCalendarFlags = false
+            // TODO Uncomment check calendar once key reactivation is fixed
+//            var checkCalendarFlags = false
             eventsResponse.addresses?.forEach {
                 it.handleAction(
                     { usersRepository.deleteAddressById(it.id) },
                     { usersRepository.persistAddress(userId.id, it.address!!) },
                     {
-                        if (!checkCalendarFlags && usersRepository.hasReactivatedAddressKeys(it.address!!)) checkCalendarFlags = true
+//                        if (!checkCalendarFlags && usersRepository.hasReactivatedAddressKeys(it.address!!)) checkCalendarFlags = true
                         usersRepository.updateAddress(userId.id, it.address!!)
                         calendarsRepository.refreshCalendarsFlagsForAddress(it.address.email, it.address.status, userId.id)
                     }
                 )
             }
 
-            if (checkCalendarFlags) {
-                calendarsRepository.refreshCalendars(userId)
-            }
+//            if (checkCalendarFlags) {
+//                calendarsRepository.refreshCalendars(userId)
+//            }
 
             eventsResponse.calendarEvents?.let {
                 handleEventsMetadataUseCase.execute(userId, it)

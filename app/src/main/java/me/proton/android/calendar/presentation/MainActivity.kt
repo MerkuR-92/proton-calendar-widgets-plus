@@ -466,25 +466,28 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.inactiveCalendars.observe(this@MainActivity) { inactiveCalendars ->
                 inactiveCalendars ?: return@observe
 
-                if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null) {
-                    handleUpdatePassphrase(inactiveCalendars)
-                }
+                // TODO Uncomment once calendar key reactivation has been fixed
+//                if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
+//                    handleUpdatePassphrase()
+//                }
             }
         }
     }
 
     private lateinit var inactiveCalendarsJob: Job
-    private fun handleUpdatePassphrase(inactiveCalendars: List<CalendarEntity>) {
+    private fun handleUpdatePassphrase() {
         if (this::inactiveCalendarsJob.isInitialized && inactiveCalendarsJob.isActive) {
             inactiveCalendarsJob.cancel()
         }
         inactiveCalendarsJob = lifecycleScope.launch {
             delay(UPDATE_PASSPHRASE_CALENDARS_DELAY.toMillis())
+            val calendarsToUpdate = calendarViewModel.inactiveCalendars.value?.filter { it.hasUpdatePassphrase } ?: return@launch
+            calendarViewModel.updatingCalendarPassphrase = true
             this@MainActivity.displayCalendarListMaterialDialog(
                 R.string.bootstrap_error_update_passphrase_title,
                 R.string.bootstrap_error_update_passphrase_message,
                 false,
-                inactiveCalendars.filter { it.hasUpdatePassphrase }) { _, _ ->
+                calendarsToUpdate) { _, _ ->
                 lifecycleScope.launch {
                     calendarViewModel.updateInactiveCalendarsPassphrase()
                 }

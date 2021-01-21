@@ -58,7 +58,7 @@ class CryptoImpl(private val logger: Logger) : Crypto {
             keyring.verifyDetached(PlainMessage(plainText), PGPSignature(armoredSignature), 0L) // TODO handle actual error? use different method?
             true
         } catch (e: Exception) {
-            logger.i("verifyTextDetached failed", e)
+//            logger.i("verifyTextDetached failed", e)
             false
         }
     }
@@ -95,7 +95,7 @@ class CryptoImpl(private val logger: Logger) : Crypto {
 
             keyring.decrypt(PGPMessage(cipherText), null, 0L).string
         } catch (e: Exception) {
-            logger.i("decrypt failed", e)
+//            logger.i("decrypt failed", e)
             null
         } finally {
             keyring?.clearPrivateParams()

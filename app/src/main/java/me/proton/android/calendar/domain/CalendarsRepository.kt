@@ -35,7 +35,7 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarById(id: String)
 
-    suspend fun refreshCalendars(userId: UserId)
+    suspend fun refreshCalendars(userId: UserId): Boolean
 
     suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
 

@@ -90,6 +90,7 @@ class CalendarViewModel(
     val fetchingEvents: MutableLiveData<String> = MutableLiveData(null)
 
     private var updateTimeZoneDialogLastShown: LocalDate? = null
+    var updatingCalendarPassphrase: Boolean = false
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
@@ -515,6 +516,7 @@ class CalendarViewModel(
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel updateInactiveCalendarsPassphrase")
+            updatingCalendarPassphrase = false
             return
         }
 
@@ -526,7 +528,8 @@ class CalendarViewModel(
             }
         }
 
-        calendarsRepository.refreshCalendars(userId)
+        val refreshResult = calendarsRepository.refreshCalendars(userId)
+        updatingCalendarPassphrase = false
     }
 
     suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
