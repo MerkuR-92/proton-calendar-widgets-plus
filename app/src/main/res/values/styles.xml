@@ -76,6 +76,10 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="Text.DefaultSmall.Strong.Weak">
+        <item name="android:textColor">@color/text_weak</item>
+    </style>
+
     <style name="Text.DefaultSmall.Strong.Inverted">
         <item name="android:textColor">@color/text_inverted</item>
     </style>

@@ -46,9 +46,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO Remove feature flags
-        settings_week_numbers.visibleOrGone(FeatureFlag.SETTINGS_WEEK_NUMBERS)
-
         settings_week_numbers_press.setOnClickListener {
             settings_week_numbers_switch.performClick()
         }

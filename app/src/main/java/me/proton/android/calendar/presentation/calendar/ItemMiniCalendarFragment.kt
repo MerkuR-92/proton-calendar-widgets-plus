@@ -78,7 +78,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         }
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
-            view.findViewById<LinearLayout>(R.id.ll_weekdays).visibleOrGone(FeatureFlag.SETTINGS_WEEK_NUMBERS && displayWeekNumber)
+            view.findViewById<LinearLayout>(R.id.ll_weekdays).visibleOrGone(displayWeekNumber)
         }
     }
 
