@@ -124,14 +124,20 @@ class TransformEventUseCase(
         if (iCalendar == null || iCalendar.events.isEmpty() || iCalendar.events.first().sanitise() == false) return null
 
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
+        var currentUserAttendeeId: String? = null
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
+            val userEmails = database.addressesDao().select(userId).map { it.email }
             val attendees = eventEntity.attendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter(X_PM_TOKEN)
-                val status = attendees.find { it.token == attendeeToken }?.participationStatus
-                if (status != null) attendee.participationStatus = status
+                val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
+                if (attendeeStatusEvent != null) {
+                    val status = attendeeStatusEvent.participationStatus
+                    if (userEmails.contains(attendee.email)) currentUserAttendeeId = attendeeStatusEvent.id
+                    attendee.participationStatus = status
+                }
             }
         }
 
@@ -170,7 +176,8 @@ class TransformEventUseCase(
                     Event.DecryptionStatus.FAILURE
                 }
                 else -> null
-            }
+            },
+            currentUserAttendeeId = currentUserAttendeeId
         )
 
     }

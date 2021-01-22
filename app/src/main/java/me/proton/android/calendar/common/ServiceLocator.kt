@@ -63,7 +63,7 @@ val viewModelModule = module {
             get()
         )
     }
-    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
@@ -92,6 +92,7 @@ val useCaseModule = module {
     factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
+    factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get()) }
 }
 
 fun coreModule(

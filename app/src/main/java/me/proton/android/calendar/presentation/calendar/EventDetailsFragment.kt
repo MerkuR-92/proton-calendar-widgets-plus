@@ -22,6 +22,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.work.Operation
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
 import biweekly.property.Attendee
@@ -38,6 +39,7 @@ import kotlinx.android.synthetic.main.item_change_answer_button.view.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -343,13 +345,73 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
         }
-        section_location.image_button_action.setOnSingleClickListener() {
+        section_location.image_button_action.setOnSingleClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
                 if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
                 } else {
                     logger.i("could not copy to clipboard")
                 }
+            }
+        }
+        section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
+            val userEmails = calendarViewModel.userEmails.value
+            userEmails?.let { // TODO Handle error
+                val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
+                if (participationStatus != ParticipationStatus.ACCEPTED) {
+                    updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
+                }
+            }
+        }
+        section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
+            val userEmails = calendarViewModel.userEmails.value
+            userEmails?.let { // TODO Handle error
+                val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
+                if (participationStatus != ParticipationStatus.DECLINED) {
+                    updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
+                }
+            }
+        }
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
+            val userEmails = calendarViewModel.userEmails.value
+            userEmails?.let { // TODO Handle error
+                val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
+                if (participationStatus != ParticipationStatus.TENTATIVE) {
+                    updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
+                }
+            }
+        }
+    }
+
+    private fun updateAttendeeParticipationStatus(participationStatus: ParticipationStatus, userEmails: List<String>) {
+        lifecycleScope.launch {
+            val event = eventViewModel.eventLiveData.value
+            if (event == null) {
+                view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                return@launch
+            }
+            val calendarId = event.calendar.id
+            val eventId = event.id
+            val attendeeId = event.currentUserAttendeeId
+            if (attendeeId.isNullOrEmpty()) {
+                view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                return@launch
+            }
+
+            // Display loading state for new value
+            displayAttendeeAnswerState(participationStatus, event.isPartOfChain(), true)
+
+            if (eventViewModel.updateParticipationStatus(
+                    calendarId,
+                    eventId,
+                    attendeeId,
+                    participationStatus
+                )) {
+                eventViewModel.handleParticipationStatus(userEmails, participationStatus)
+            } else {
+                // TODO Use custom error messages depending on error ("Cannot send to organizer: ${sendPreferenceErrorMessage}")
+                view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), event.isPartOfChain(), false)
             }
         }
     }
@@ -492,8 +554,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 val userEmails = calendarViewModel.userEmails.value
                 userEmails?.let {
-                    updateAttendeeAnswerState(
-                        event.getParticipationStatus(userEmails)
+                    displayAttendeeAnswerState(
+                        event.getParticipationStatus(userEmails),
+                        event.isPartOfChain()
                     )
                 }
             }
@@ -622,15 +685,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun updateAttendeeAnswerState(participationStatus: ParticipationStatus?) {
+    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, isPartOfChain: Boolean, loading: Boolean = false) {
 
-        section_answer.visibleOrGone(participationStatus != null)
+        // TODO Remove isPartOfChain once single edit and recurring are handled
+        section_answer.visibleOrGone(participationStatus != null && !isPartOfChain)
 
-        section_answer.item_change_answer_button_yes.item_change_answer_button_title.backgroundTintList =
+        section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
-        section_answer.item_change_answer_button_no.item_change_answer_button_title.backgroundTintList =
+        section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.backgroundTintList =
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_title.setTextColor(
@@ -643,27 +707,40 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             resources.getColor(R.color.white, null)
         )
 
+        section_answer.item_change_answer_button_yes.item_change_answer_button_title.visibleOrInvisible(true)
+        section_answer.item_change_answer_button_yes.item_change_answer_button_loader.visibleOrGone(false)
+        section_answer.item_change_answer_button_no.item_change_answer_button_title.visibleOrInvisible(true)
+        section_answer.item_change_answer_button_no.item_change_answer_button_loader.visibleOrGone(false)
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.visibleOrInvisible(true)
+        section_answer.item_change_answer_button_maybe.item_change_answer_button_loader.visibleOrGone(false)
+
         when (participationStatus) {
             ParticipationStatus.ACCEPTED -> {
-                section_answer.item_change_answer_button_yes.item_change_answer_button_title.backgroundTintList =
+                section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
                     ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 section_answer.item_change_answer_button_yes.item_change_answer_button_title.setTextColor(
                     resources.getColor(R.color.woodsmoke, null)
                 )
+                section_answer.item_change_answer_button_yes.item_change_answer_button_title.visibleOrInvisible(!loading)
+                section_answer.item_change_answer_button_yes.item_change_answer_button_loader.visibleOrGone(loading)
             }
             ParticipationStatus.DECLINED -> {
-                section_answer.item_change_answer_button_no.item_change_answer_button_title.backgroundTintList =
+                section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
                     ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 section_answer.item_change_answer_button_no.item_change_answer_button_title.setTextColor(
                     resources.getColor(R.color.woodsmoke, null)
                 )
+                section_answer.item_change_answer_button_no.item_change_answer_button_title.visibleOrInvisible(!loading)
+                section_answer.item_change_answer_button_no.item_change_answer_button_loader.visibleOrGone(loading)
             }
             ParticipationStatus.TENTATIVE -> {
-                section_answer.item_change_answer_button_maybe.item_change_answer_button_title.backgroundTintList =
+                section_answer.item_change_answer_button_maybe.item_change_answer_button_layout.backgroundTintList =
                     ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 section_answer.item_change_answer_button_maybe.item_change_answer_button_title.setTextColor(
                     resources.getColor(R.color.woodsmoke, null)
                 )
+                section_answer.item_change_answer_button_maybe.item_change_answer_button_title.visibleOrInvisible(!loading)
+                section_answer.item_change_answer_button_maybe.item_change_answer_button_loader.visibleOrGone(loading)
             }
         }
 

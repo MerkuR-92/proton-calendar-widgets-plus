@@ -6,6 +6,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.protonApi.GenericResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Path
 
 interface CalendarsApi {
 
@@ -109,4 +110,8 @@ interface CalendarsApi {
      */
     suspend fun getPassphrases(userId: UserId, calendarId: String): ApiResponse<PassphrasesApiResponse>
 
+    /**
+     * Update the participation status of a given event attendee.
+     */
+    suspend fun updateParticipationStatus(userId: UserId, calendarId: String, eventId: String, attendeeId: String, status: Int): ApiResponse<AttendeeApiResponse>
 }

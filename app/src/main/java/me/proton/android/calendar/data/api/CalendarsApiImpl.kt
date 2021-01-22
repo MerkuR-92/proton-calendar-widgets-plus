@@ -81,6 +81,12 @@ interface CalendarsApiService : BaseRetrofitApi {
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/keys/{keyId}")
     suspend fun reenableKey(@Path("calendarId") calendarId: String, @Path("keyId") keyId: String, @Body body: ReenableKeyApiRequest) : ReenableKeyApiResponse
 
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/attendees/{attendeeId}")
+    suspend fun updateParticipationStatus(@Path("calendarId") calendarId: String,
+                                          @Path("eventId") eventId: String,
+                                          @Path("attendeeId") attendeeId: String,
+                                          @Body body: UpdateParticipationStatusApiRequest) : AttendeeApiResponse
+
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -93,7 +99,7 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
     override suspend fun getCalendar(userId: UserId, calendarId: String): ApiResponse<CalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getCalendar(calendarId)
-    }.toApiResponse()
+        }.toApiResponse()
 
     override suspend fun getEvents(
         userId: UserId,
@@ -207,6 +213,18 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getPassphrases(calendarId)
         }.toApiResponse()
+
+    override suspend fun updateParticipationStatus(
+        userId: UserId,
+        calendarId: String,
+        eventId: String,
+        attendeeId: String,
+        status: Int
+    ): ApiResponse<AttendeeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        updateParticipationStatus(calendarId, eventId, attendeeId, UpdateParticipationStatusApiRequest(
+            status, (System.currentTimeMillis() / 1000L).toInt())
+        )
+    }.toApiResponse()
 }
 
 @Serializable
@@ -459,4 +477,30 @@ data class ReenableKeyApiResponse(
 data class ReenableKeyApiRequest(
     @SerialName("PrivateKey")
     val privateKey: String
+)
+
+@Serializable
+data class AttendeeApiResponse(
+    @SerialName("Attendee")
+    val attendee: AttendeeStatusApiResponse
+)
+
+@Serializable
+data class AttendeeStatusApiResponse(
+    @SerialName("ID")
+    val id: String,
+    @SerialName("Token")
+    val token: String,
+    @SerialName("Status")
+    val status: Int, // 0: Unanswered, 1: Maybe, 2: No, 3: Yes
+    @SerialName("UpdateTime")
+    val updateTime: Int?
+)
+
+@Serializable
+data class UpdateParticipationStatusApiRequest(
+    @SerialName("Status")
+    val status: Int, // 0: Unanswered, 1: Maybe, 2: No, 3: Yes
+    @SerialName("UpdateTime")
+    val updateTime: Int?
 )

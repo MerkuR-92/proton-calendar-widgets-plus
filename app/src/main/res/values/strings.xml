@@ -188,6 +188,7 @@
     <string name="snack_maximum_participants_reached">The maximum number of participants has been reached.</string>
     <string name="snack_add_participant_error">Error while adding the participant</string>
     <string name="snack_add_participant_invalid_email">Invalid email</string>
+    <string name="snack_change_attendee_answer_error">Error sending answer, please try again later</string>
 
     <!-- Dialogs -->
     <string name="error_event_doesnt_exist">Event doesn\'t exist</string>

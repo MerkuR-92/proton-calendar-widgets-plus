@@ -1,11 +1,14 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.*
 import biweekly.ICalendar
 import biweekly.component.VAlarm
+import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Related
 import biweekly.parameter.Role
 import biweekly.property.Action
@@ -43,12 +46,14 @@ import kotlin.collections.ArrayList
 import kotlin.coroutines.coroutineContext
 
 class EventViewModel(
+    private val context: Context,
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val createEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
+    private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val logger: Logger,
     private val json: Json
 ) : ViewModel() {
@@ -1312,5 +1317,30 @@ class EventViewModel(
             }
         }
         _event.postValue(event)
+    }
+
+    fun handleParticipationStatus(userEmails: List<String>, participationStatus: ParticipationStatus) {
+        event.updateParticipationStatus(userEmails, participationStatus)
+        _event.postValue(event)
+    }
+
+    suspend fun updateParticipationStatus(
+        calendarId: String,
+        eventId: String,
+        attendeeId: String,
+        participationStatus: ParticipationStatus
+    ) : Boolean {
+        val status = when (participationStatus) {
+            ParticipationStatus.NEEDS_ACTION -> 0
+            ParticipationStatus.TENTATIVE -> 1
+            ParticipationStatus.DECLINED -> 2
+            ParticipationStatus.ACCEPTED -> 3
+            else -> 0
+        }
+        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(userId, calendarId, eventId, attendeeId, status)
+        if (updateParticipationStatusUseCaseResult != UseCase.Result.Success) {
+            return false
+        }
+        return true
     }
 }

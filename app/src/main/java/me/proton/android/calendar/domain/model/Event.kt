@@ -30,7 +30,8 @@ data class Event(
     val calendar: Calendar,
     val iCalendar: ICalendar,
     val verificationStatus: SignatureVerification? = null,
-    val decryptionStatus: DecryptionStatus? = null
+    val decryptionStatus: DecryptionStatus? = null,
+    val currentUserAttendeeId: String? = null
 ) : BaseModel() {
 
     var occurrence: Occurrence? = null
@@ -96,6 +97,14 @@ data class Event(
                 attendee.extractEmail().equals(userEmail, ignoreCase = true)
             } != null
         }?.participationStatus
+    }
+
+    fun updateParticipationStatus(userEmails: List<String>, status: ParticipationStatus) {
+        iCalEvent.attendees.find { attendee ->
+            userEmails.firstOrNull { userEmail ->
+                attendee.extractEmail().equals(userEmail, ignoreCase = true)
+            } != null
+        }?.participationStatus = status
     }
 
     /**
@@ -757,6 +766,8 @@ data class Event(
 
     @Serializable
     data class AttendeeStatusEvent(
+        @SerialName("ID")
+        val id: String,
         @SerialName("Token")
         val token: String,
         @SerialName("Status")
