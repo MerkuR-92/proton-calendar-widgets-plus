@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_attendee.view.*
@@ -54,25 +55,37 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
         private val attendeeItemOptional: TextView = view.item_attendee_optional
 
         fun bind(attendee : Attendee, position : Int) {
-            val description = if (!attendee.commonName.isNullOrEmpty()) (attendee.extractEmail() ?: "") else ""
-            val title = if (description.isEmpty()) (attendee.extractEmail() ?: "") else attendee.commonName
-            attendeeItemTitle.text = title
+            // If has common name use it, else use email and hide description field
+            val title =
+                if (attendee.commonName.isNullOrEmpty()) attendee.extractEmail() ?: ""
+                else attendee.commonName
+            val description =
+                if (attendee.commonName.isNullOrEmpty() ||
+                    attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
+                else attendee.extractEmail() ?: ""
 
+            attendeeItemTitle.text = title
             attendeeItemDescription.visibleOrGone(description.isNotEmpty())
             if (description.isNotEmpty()) attendeeItemDescription.text = description
 
-            // TODO Handle common name and picture when contacts are implemented
-            attendeeItemDescription.visibleOrGone(false)
             attendeeItemInitials.text = getInitials(title)
 
-            if (attendee.rsvp != null && !attendee.rsvp) {
-                attendeeItemOptional.visibleOrGone(true)
-                // If has Optional label, we need to clear LinearLayout constraint
-                //  to bottom of view to keep the same spacing
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(attendeeItemLayout)
-                constraintSet.clear(attendeeItemTextLayout.id, ConstraintSet.BOTTOM)
-                constraintSet.applyTo(attendeeItemLayout)
+            if (attendee.participationLevel != null && attendee.participationLevel == ParticipationLevel.OPTIONAL) {
+                if (attendeeItemDescription.visibility != View.VISIBLE) {
+                    // Use description to display optional label if we only have the title,
+                    //  in order to keep the correct alignment
+                    attendeeItemOptional.visibleOrGone(false)
+                    attendeeItemDescription.visibleOrGone(true)
+                    attendeeItemDescription.text = view.context.getString(R.string.event_attendee_optional)
+                } else {
+                    attendeeItemOptional.visibleOrGone(true)
+                    // If has Optional label, we need to clear LinearLayout constraint
+                    //  to bottom of view to keep the same spacing
+                    val constraintSet = ConstraintSet()
+                    constraintSet.clone(attendeeItemLayout)
+                    constraintSet.clear(attendeeItemTextLayout.id, ConstraintSet.BOTTOM)
+                    constraintSet.applyTo(attendeeItemLayout)
+                }
             } else {
                 attendeeItemOptional.visibleOrGone(false)
             }
