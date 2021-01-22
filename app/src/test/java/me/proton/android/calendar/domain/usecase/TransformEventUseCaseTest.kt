@@ -15,10 +15,7 @@ import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarKeyEntity
-import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.data.entity.PassphraseEntity
+import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
@@ -114,6 +111,8 @@ internal class TransformEventUseCaseTest {
                 database.publicKeysDao().select(any())
             } returns listOf()
 
+            coEvery { database.addressesDao().select(any()) } returns listOf(AddressEntity("id", "calendarSingle9@proton.dev", 1, mockk()))
+
             val useCase = TransformEventUseCase(
                 json,
                 database,
@@ -127,6 +126,9 @@ internal class TransformEventUseCaseTest {
             assertThat(event?.iCalEvent).isNotNull()
             assertThat(event?.iCalEvent?.attendees.isNullOrEmpty()).isFalse()
             assertThat(event?.iCalEvent?.attendees?.size).isEqualTo(3)
+
+            assertThat(event?.currentUserAttendeeId).isNotNull()
+            assertThat(event?.currentUserAttendeeId).isEqualTo("6C5v4OC-Jhs8syzxmNwhyjZi1YG4USc2DLI7i_mnj6Mm6p6CK8s1mHn5RBb4tJ0XFACjVB-c4qXltm1ErQRY8w==")
 
             // Test cross reference logic between unencrypted Attendees and encrypted AttendeesEvents data
             assertThat(event?.iCalEvent?.attendees!![0].email).isEqualTo("calendarsingle9@proton.dev")

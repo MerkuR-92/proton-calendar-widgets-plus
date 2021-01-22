@@ -15,6 +15,7 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import java.util.*
 
 
 class TransformEventUseCase(
@@ -135,7 +136,7 @@ class TransformEventUseCase(
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (userEmails.contains(attendee.email)) currentUserAttendeeId = attendeeStatusEvent.id
+                    if (userEmails.map { it.toLowerCase(Locale.ROOT) }.contains(attendee.email.toLowerCase(Locale.ROOT))) currentUserAttendeeId = attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }
             }
