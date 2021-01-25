@@ -399,7 +399,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // Display loading state for new value
-            displayAttendeeAnswerState(participationStatus, event.isPartOfChain(), true)
+            displayAttendeeAnswerState(participationStatus, event.isPartOfChain(), event.calendar.isActive, true)
 
             if (eventViewModel.updateParticipationStatus(
                     calendarId,
@@ -411,7 +411,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO Use custom error messages depending on error ("Cannot send to organizer: ${sendPreferenceErrorMessage}")
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), event.isPartOfChain(), false)
+                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), event.isPartOfChain(), event.calendar.isActive, false)
             }
         }
     }
@@ -556,7 +556,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 userEmails?.let {
                     displayAttendeeAnswerState(
                         event.getParticipationStatus(userEmails),
-                        event.isPartOfChain()
+                        event.isPartOfChain(),
+                        event.calendar.isActive
                     )
                 }
             }
@@ -685,10 +686,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, isPartOfChain: Boolean, loading: Boolean = false) {
+    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, isPartOfChain: Boolean, isActive: Boolean, loading: Boolean = false) {
 
         // TODO Remove isPartOfChain once single edit and recurring are handled
-        section_answer.visibleOrGone(participationStatus != null && !isPartOfChain)
+        section_answer.visibleOrGone(participationStatus != null && !isPartOfChain && isActive)
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
