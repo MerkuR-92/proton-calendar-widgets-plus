@@ -61,14 +61,22 @@ class DeleteEventUseCase( // TODO TESTS
             }
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
-                val occurrenceStart = event.generateOccurrence(occurrenceNumber!!, if (event.isAllDay()) ZoneId.systemDefault().id else event.iCalendar.iCalTimeZone(event.iCalEvent.dateStart).id)?.startDateTime ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
+                val rootEvent =
+                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
+                        ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+                    else event
+                val occurrenceStart = rootEvent.generateOccurrence(
+                        occurrenceNumber!!,
+                        if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
+                    )?.startDateTime
+                        ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
 
-                event.handleDeleteThisAndFuture(occurrenceNumber)
-                val editResult = editCreateEventUseCase.execute(userId, event.calendar.id, event)
+                rootEvent.handleDeleteThisAndFuture(occurrenceNumber)
+                val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
                 editResult.ifSuccessAndLogErrors(logger) {}
 
                 // delete single edits happening after this occurrence
-                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, occurrenceStart)
+                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, occurrenceStart.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
                 if ((editResult is UseCase.Result.Success) && (deleteSingleEditsResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and future< events")
@@ -77,11 +85,15 @@ class DeleteEventUseCase( // TODO TESTS
             EventEditDeleteOption.ALL_EVENTS -> {
 
                 // delete single edits and the original event as the last one
+                val rootEvent =
+                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
+                        ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+                    else event
 
                 // TODO maybe merge this into one request
-                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, event.id, event.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
+                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, rootEvent.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
-                val deleteResult = deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
 
                 if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >all< events")
@@ -130,7 +142,7 @@ class DeleteEventUseCase( // TODO TESTS
         return deleteSingleEditsAfter(userId, eventId, recurrenceIdIsAfter)
     }
 
-        private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+    private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
         val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("event $eventId doesn't exist in DB")
         val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("event $eventId could not be transformed")
