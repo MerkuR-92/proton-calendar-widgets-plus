@@ -92,7 +92,7 @@ val useCaseModule = module {
     factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
-    factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get()) }
+    factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get()) }
 }
 
 fun coreModule(
