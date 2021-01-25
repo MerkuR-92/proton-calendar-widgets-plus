@@ -188,11 +188,22 @@ class MonthFragment : BaseFragment() {
         }
     }
 
+    private var showAutoDetectPrimaryTimezone = true
+    private var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
     override fun onResume() {
         super.onResume()
 
-        lifecycleScope.launch {
-            calendarViewModel.checkLocalTimezone(requireContext())
+        showAutoDetectPrimaryTimezone = true
+        initialAutoDetectPrimaryTimezoneValue = null
+        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
+            autoDetectPrimaryTimezone ?: return@observe
+
+            // Use initial value to avoid showing dialog when user changes it in app settings. We only show the dialog when opening the app.
+            if (initialAutoDetectPrimaryTimezoneValue == null) initialAutoDetectPrimaryTimezoneValue = autoDetectPrimaryTimezone
+            if (showAutoDetectPrimaryTimezone && autoDetectPrimaryTimezone && initialAutoDetectPrimaryTimezoneValue == true) {
+                calendarViewModel.checkLocalTimezone(requireContext())
+                showAutoDetectPrimaryTimezone = false
+            }
         }
 
         // make sure currently selected month always has desired height, even if adjacent pages make
@@ -331,8 +342,6 @@ class MonthFragment : BaseFragment() {
                 buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_disabled_oval)
             }
         }
-
-        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { }
     }
 
     private fun setToolbarMonthYearTitle(localDate: LocalDate) {

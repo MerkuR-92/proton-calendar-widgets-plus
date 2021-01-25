@@ -545,9 +545,8 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId)?.toBoolean() ?: true
     }
 
-    suspend fun checkLocalTimezone(context: Context) {
-        val autoDetectPrimaryTimezone = getCalendarUserSettingsAutoDetectPrimaryTimezone()
-        if (!autoDetectPrimaryTimezone|| LocalDate.now() == updateTimeZoneDialogLastShown) return
+    fun checkLocalTimezone(context: Context) {
+        if (LocalDate.now() == updateTimeZoneDialogLastShown) return
 
         updateTimeZoneDialogLastShown = LocalDate.now()
         val timeZoneId = timeZoneId.value
