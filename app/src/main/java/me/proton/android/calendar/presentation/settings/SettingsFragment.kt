@@ -75,7 +75,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 if (defaultTimeZone == null) -1
                 else formattedTimeZoneIds.indexOf(ICalUtils.formatTimeZoneId(defaultTimeZone, forInstant))
 
-            AndroidUtils.displaySingleChoicePicker(requireContext(), null, formattedTimeZoneIds, selectedIndex) {
+            AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
                 lifecycleScope.launch {
                     calendarViewModel.updatePrimaryTimezone(formattedTimeZoneIds[it].formattedTimeZoneToId())
                 }
