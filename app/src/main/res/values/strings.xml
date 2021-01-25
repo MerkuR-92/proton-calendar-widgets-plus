@@ -65,7 +65,7 @@
     <string name="event_attendee_no">%d no</string>
     <string name="event_attendee_unanswered">%d unanswered</string>
     <string name="event_attendee_is_organizer">You are the organiser</string>
-    <string name="event_attendee_organizer">Organiser</string>
+    <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
 
     <string name="event_decryption_error_dialog_title">Event failed to decrypt</string>
