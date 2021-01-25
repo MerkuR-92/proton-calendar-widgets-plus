@@ -122,6 +122,7 @@ class EventViewModel(
         originalDbEvent = null
         recurrenceManuallyEdited = false
         singleEditsInfo = null
+        tempRecurrenceUntilLocalDate = null
 
         this.userId = userId
 
