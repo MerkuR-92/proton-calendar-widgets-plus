@@ -76,8 +76,8 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Text.DefaultSmall.Strong.Weak">
-        <item name="android:textColor">@color/text_weak</item>
+    <style name="Text.DefaultSmall.Weak.Italic">
+        <item name="android:textStyle">italic</item>
     </style>
 
     <style name="Text.DefaultSmall.Strong.Inverted">
