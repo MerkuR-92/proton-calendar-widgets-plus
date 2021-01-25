@@ -64,7 +64,7 @@
     <string name="event_attendee_maybe">%d maybe</string>
     <string name="event_attendee_no">%d no</string>
     <string name="event_attendee_unanswered">%d unanswered</string>
-    <string name="event_attendee_is_organizer">You are the organiser</string>
+    <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
 

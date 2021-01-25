@@ -92,6 +92,9 @@ class CalendarViewModel(
     private var updateTimeZoneDialogLastShown: LocalDate? = null
     var updatingCalendarPassphrase: Boolean = false
 
+    var showAutoDetectPrimaryTimezone = true
+    var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
+
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
         if (userId == null) {
@@ -545,7 +548,7 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId)?.toBoolean() ?: true
     }
 
-    fun checkLocalTimezone(context: Context) {
+    private fun checkLocalTimezone(context: Context) {
         if (LocalDate.now() == updateTimeZoneDialogLastShown) return
 
         updateTimeZoneDialogLastShown = LocalDate.now()
@@ -584,6 +587,16 @@ class CalendarViewModel(
                         }
                     }
             }
+        }
+    }
+
+    fun handleAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone: Boolean, context: Context) {
+        // Use initial value to avoid showing dialog when user changes it in app settings. We only show the dialog when opening the app.
+        if (initialAutoDetectPrimaryTimezoneValue == null) initialAutoDetectPrimaryTimezoneValue =
+            autoDetectPrimaryTimezone
+        if (showAutoDetectPrimaryTimezone && autoDetectPrimaryTimezone && initialAutoDetectPrimaryTimezoneValue == true) {
+            checkLocalTimezone(context)
+            showAutoDetectPrimaryTimezone = false
         }
     }
 

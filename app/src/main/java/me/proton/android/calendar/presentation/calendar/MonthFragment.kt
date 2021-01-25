@@ -188,27 +188,23 @@ class MonthFragment : BaseFragment() {
         }
     }
 
-    private var showAutoDetectPrimaryTimezone = true
-    private var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
     override fun onResume() {
         super.onResume()
-
-        showAutoDetectPrimaryTimezone = true
-        initialAutoDetectPrimaryTimezoneValue = null
-        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
-            autoDetectPrimaryTimezone ?: return@observe
-
-            // Use initial value to avoid showing dialog when user changes it in app settings. We only show the dialog when opening the app.
-            if (initialAutoDetectPrimaryTimezoneValue == null) initialAutoDetectPrimaryTimezoneValue = autoDetectPrimaryTimezone
-            if (showAutoDetectPrimaryTimezone && autoDetectPrimaryTimezone && initialAutoDetectPrimaryTimezoneValue == true) {
-                calendarViewModel.checkLocalTimezone(requireContext())
-                showAutoDetectPrimaryTimezone = false
-            }
-        }
 
         // make sure currently selected month always has desired height, even if adjacent pages make
         //  entire ViewPager to have different height
         if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        calendarViewModel.showAutoDetectPrimaryTimezone = true
+        calendarViewModel.initialAutoDetectPrimaryTimezoneValue = null
+        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
+            autoDetectPrimaryTimezone ?: return@observe
+            calendarViewModel.handleAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone, requireContext())
+        }
     }
 
     override fun onPause() {
