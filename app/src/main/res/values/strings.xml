@@ -78,6 +78,11 @@
     <string name="event_decryption_error_dialog_confirmation">Delete event</string>
     <string name="event_decryption_error_dialog_close">Close</string>
 
+    <string name="event_change_answer_recurring_title">Update recurring event</string>
+    <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
+    <string name="event_change_answer_recurring_cancel">Cancel</string>
+    <string name="event_change_answer_recurring_confirm">Update</string>
+
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>

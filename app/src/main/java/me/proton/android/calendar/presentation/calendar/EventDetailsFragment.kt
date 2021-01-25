@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -359,7 +360,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             userEmails?.let { // TODO Handle error
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.ACCEPTED) {
-                    updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
+                    if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
+                        showChangeAnswerRecurringDialog { _, _ ->
+                            updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
+                        }
+                    } else {
+                        updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
+                    }
                 }
             }
         }
@@ -368,7 +375,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             userEmails?.let { // TODO Handle error
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.DECLINED) {
-                    updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
+                    if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
+                        showChangeAnswerRecurringDialog { _, _ ->
+                            updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
+                        }
+                    } else {
+                        updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
+                    }
                 }
             }
         }
@@ -377,10 +390,25 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             userEmails?.let { // TODO Handle error
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.TENTATIVE) {
-                    updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
+                    if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
+                        showChangeAnswerRecurringDialog { _, _ ->
+                            updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
+                        }
+                    } else {
+                        updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
+                    }
                 }
             }
         }
+    }
+
+    private fun showChangeAnswerRecurringDialog(callback: DialogInterface.OnClickListener) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.event_change_answer_recurring_title)
+            .setMessage(R.string.event_change_answer_recurring_description)
+            .setPositiveButton(R.string.event_change_answer_recurring_confirm, callback)
+            .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ -> }
+            .show()
     }
 
     private fun updateAttendeeParticipationStatus(participationStatus: ParticipationStatus, userEmails: List<String>) {
@@ -399,7 +427,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // Display loading state for new value
-            displayAttendeeAnswerState(participationStatus, event.isPartOfChain(), event.calendar.isActive, true)
+            displayAttendeeAnswerState(participationStatus, event.isSingleEdit(), event.calendar.isActive, true)
 
             if (eventViewModel.updateParticipationStatus(
                     calendarId,
@@ -412,7 +440,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO Use custom error messages depending on error ("Cannot send to organizer: ${sendPreferenceErrorMessage}")
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), event.isPartOfChain(), event.calendar.isActive, false)
+                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), event.isSingleEdit(), event.calendar.isActive, false)
             }
         }
     }
@@ -557,7 +585,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 userEmails?.let {
                     displayAttendeeAnswerState(
                         event.getParticipationStatus(userEmails),
-                        event.isPartOfChain(),
+                        event.isSingleEdit(),
                         event.calendar.isActive
                     )
                 }
@@ -687,10 +715,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, isPartOfChain: Boolean, isActive: Boolean, loading: Boolean = false) {
+    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, isSingleEdit: Boolean, isActive: Boolean, loading: Boolean = false) {
 
-        // TODO Remove isPartOfChain once single edit and recurring are handled
-        section_answer.visibleOrGone(participationStatus != null && !isPartOfChain && isActive)
+        section_answer.visibleOrGone(participationStatus != null && !isSingleEdit && isActive)
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
