@@ -139,7 +139,6 @@ class BootstrapCalendarsUseCase( // TODO TEST
         val failedCalendarIds = mutableListOf<String>()
 
         calendarsResponse.data.calendars.forEach { calendarEntity ->
-            if (!calendarEntity.isActive) return@forEach
             when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
                 is ApiResponse.Success -> {
                     logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
