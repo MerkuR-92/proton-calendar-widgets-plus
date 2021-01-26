@@ -8,24 +8,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.proton.gopenpgp.constants.Constants
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.visibleOrGone
 import me.proton.android.calendar.domain.Logger
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.w3c.dom.Text
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.temporal.ChronoField
+import java.time.*
+import java.time.temporal.IsoFields
 
 
 class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
@@ -106,6 +101,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
         // setup week numbers
         view?.findViewById<LinearLayout>(R.id.ll_weekdays)?.run {
+            this.removeAllViews()
             val fullWeeksInMonth = MiniCalendarItemAdapter.calculateFullWeeksInMonth(immutableDate, startWeekOn)
             for (i in 0 until fullWeeksInMonth) {
                 val weekdayView = LayoutInflater.from(this.context).inflate(
@@ -113,7 +109,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                     this,
                     false
                 )
-                (weekdayView as TextView).text = "${immutableDate.plusWeeks(i.toLong()).get(ChronoField.ALIGNED_WEEK_OF_YEAR)}"
+                (weekdayView as TextView).text = "${immutableDate.plusWeeks(i.toLong()).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}"
                 addView(weekdayView)
             }
         }
