@@ -18,11 +18,13 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
+import java.time.temporal.IsoFields
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -555,6 +557,23 @@ fun VEvent.wrapInICalendar(): ICalendar {
 // TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
 fun ICalendar.printToString() : String {
     return Biweekly.write(this).go().replace("TZID=/", "TZID=")
+}
+
+/**
+ * Calculate ISO week number for given date, taking custom week start into account.
+ */
+fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int {
+
+    val firstDayOfTheWeekNumber = this.dayOfWeek.value - startWeekOn.value
+    val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+
+    var monday: LocalDate = this.minusDays(firstDayOfTheWeekOffset.toLong())
+    while (monday.dayOfWeek != DayOfWeek.MONDAY) {
+        monday = monday.plusDays(1)
+    }
+
+    return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+
 }
 
 fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())

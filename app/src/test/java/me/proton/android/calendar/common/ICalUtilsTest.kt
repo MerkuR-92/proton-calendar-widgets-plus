@@ -17,12 +17,15 @@ import me.proton.android.calendar.common.ICalUtils.generateProtonUid
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoField
+import java.time.temporal.IsoFields
 import java.util.*
 
 
@@ -92,6 +95,63 @@ internal class ICalUtilsTest {
 
     }
 
+    @Test
+    fun `calculate ISO week number for a date`() {
+
+        assertThat(
+            LocalDate.of(2020, 12, 26).weekNumber(java.time.DayOfWeek.SATURDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2020, 12, 31).weekNumber(java.time.DayOfWeek.SATURDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2021, 1, 1).weekNumber(java.time.DayOfWeek.SATURDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2021, 1, 2).weekNumber(java.time.DayOfWeek.SATURDAY)
+        ).isEqualTo(1)
+
+        assertThat(
+            LocalDate.of(2021, 7, 31).weekNumber(java.time.DayOfWeek.SATURDAY)
+        ).isEqualTo(31)
+
+        assertThat(
+            LocalDate.of(2021, 8, 1).weekNumber(java.time.DayOfWeek.SATURDAY)
+        ).isEqualTo(31)
+
+        assertThat(
+            LocalDate.of(2020, 12, 27).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(52)
+
+        assertThat(
+            LocalDate.of(2020, 12, 28).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2020, 12, 31).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2021, 1, 1).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2021, 1, 3).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(53)
+
+        assertThat(
+            LocalDate.of(2021, 1, 4).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(1)
+
+        assertThat(
+            LocalDate.of(2022, 8, 1).weekNumber(java.time.DayOfWeek.MONDAY)
+        ).isEqualTo(31)
+
+    }
+
     // TODO check out how we can fallback for timezones that are not handled on the device
     //  this test fails on the CI which means it will fail on random devices as well
     @Disabled
@@ -108,7 +168,6 @@ internal class ICalUtilsTest {
 
     }
 
-    @Disabled
     @Test
     fun `fallback to allowed timezone`() {
 

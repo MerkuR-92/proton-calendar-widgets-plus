@@ -15,6 +15,7 @@ import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.weekNumber
 import me.proton.android.calendar.domain.Logger
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -109,7 +110,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                     this,
                     false
                 )
-                (weekdayView as TextView).text = "${immutableDate.plusWeeks(i.toLong()).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}"
+                (weekdayView as TextView).text = "${immutableDate.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
                 addView(weekdayView)
             }
         }
