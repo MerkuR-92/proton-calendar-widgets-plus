@@ -1328,7 +1328,8 @@ class EventViewModel(
         calendarId: String,
         eventId: String,
         attendeeId: String,
-        participationStatus: ParticipationStatus
+        participationStatus: ParticipationStatus,
+        userEmails: List<String>
     ) : Boolean {
         val status = when (participationStatus) {
             ParticipationStatus.NEEDS_ACTION -> 0
@@ -1337,7 +1338,30 @@ class EventViewModel(
             ParticipationStatus.ACCEPTED -> 3
             else -> 0
         }
-        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(userId, calendarId, eventId, attendeeId, status)
+
+        val personalPartICalString =
+            if (participationStatus == ParticipationStatus.DECLINED) {
+                // if changes to NO, remove all notifications
+                ""
+            } else if (event.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED &&
+                (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
+                event.iCalEvent.alarms.isNullOrEmpty()) {
+                // if changes from NO to YES/MAYBE add default calendar notifications
+                if (loadSettingsForCalendar(calendarId)) {
+                    getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
+                        // TODO Remove alarm type check once other types are handled
+                        if (it.action == Action.display()) event.iCalEvent.addAlarm(it)
+                    }
+                    val calendarSplit = ICalUtils.splitICalendarIntoParts(event.iCalendar)
+                    calendarSplit.personalPart?.printToString()
+                } else null
+            } else {
+                // else keep notifications as it is
+                null
+            }
+
+        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(userId, calendarId, eventId, attendeeId, status, personalPartICalString)
+        updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
         if (updateParticipationStatusUseCaseResult != UseCase.Result.Success) {
             return false
         }

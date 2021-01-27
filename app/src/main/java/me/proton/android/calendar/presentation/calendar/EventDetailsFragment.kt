@@ -405,7 +405,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     calendarId,
                     eventId,
                     attendeeId,
-                    participationStatus
+                    participationStatus,
+                    userEmails
                 )) {
                 eventViewModel.handleParticipationStatus(userEmails, participationStatus)
             } else {

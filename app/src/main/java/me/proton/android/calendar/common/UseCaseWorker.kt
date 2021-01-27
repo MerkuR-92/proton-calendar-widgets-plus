@@ -51,6 +51,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_DISPLAY_WEEK_NUMBER = "INPUT_DISPLAY_WEEK_NUMBER"
         const val INPUT_TIME_FORMAT = "INPUT_TIME_FORMAT"
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
+        const val INPUT_PERSONAL_ICAL_STRING = "INPUT_PERSONAL_ICAL_STRING"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -170,7 +171,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
                     inputData.getString(INPUT_EVENT_ID) ?: return Result.failure(),
                     inputData.getString(INPUT_ATTENDEE_ID) ?: return Result.failure(),
-                    inputData.getInt(INPUT_PARTICIPATION_STATUS, 0))
+                    inputData.getInt(INPUT_PARTICIPATION_STATUS, 0),
+                    inputData.getString(INPUT_PERSONAL_ICAL_STRING))
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

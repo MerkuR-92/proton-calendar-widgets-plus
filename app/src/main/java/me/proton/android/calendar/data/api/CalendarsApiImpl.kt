@@ -87,6 +87,10 @@ interface CalendarsApiService : BaseRetrofitApi {
                                           @Path("attendeeId") attendeeId: String,
                                           @Body body: UpdateParticipationStatusApiRequest) : AttendeeApiResponse
 
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/personal")
+    suspend fun updateEventPersonalPart(@Path("calendarId") calendarId: String,
+                                          @Path("eventId") eventId: String,
+                                          @Body body: UpdateEventPersonalPartApiRequest) : EventApiResponse
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -224,6 +228,15 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
         updateParticipationStatus(calendarId, eventId, attendeeId, UpdateParticipationStatusApiRequest(
             status, (System.currentTimeMillis() / 1000L).toInt())
         )
+    }.toApiResponse()
+
+    override suspend fun updateEventPersonalPart(
+        userId: UserId,
+        calendarId: String,
+        eventId: String,
+        body: UpdateEventPersonalPartApiRequest
+    ): ApiResponse<EventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        updateEventPersonalPart(calendarId, eventId, body)
     }.toApiResponse()
 }
 
@@ -503,4 +516,22 @@ data class UpdateParticipationStatusApiRequest(
     val status: Int, // 0: Unanswered, 1: Maybe, 2: No, 3: Yes
     @SerialName("UpdateTime")
     val updateTime: Int?
+)
+
+@Serializable
+data class UpdateEventPersonalPartApiRequest(
+    @SerialName("MemberID")
+    val memberID: String,
+    @SerialName("PersonalEventContent")
+    val personalEventContent: PersonalEventContentApiRequest? = null
+)
+
+@Serializable
+data class PersonalEventContentApiRequest(
+    @SerialName("Type")
+    val type: Int,
+    @SerialName("Data")
+    val data: String,
+    @SerialName("Signature")
+    val signature: String
 )
