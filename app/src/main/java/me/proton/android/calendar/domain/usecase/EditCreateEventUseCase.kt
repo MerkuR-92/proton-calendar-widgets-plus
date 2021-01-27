@@ -106,10 +106,7 @@ class EditCreateEventUseCase(
         val signatureOfPersonalPart = personalPartICalString?.run { crypto.signTextDetached(personalPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())  }
 
         // 8. encrypt Attendees Part (optional)
-
-        val calendarId = newEvent.calendar.id // TODO get all members for this calendar and get 1st one
-        val TODOmemberId = calendarId // TODO TAKE IT FROM MEMBER!!!
-
+        // TODO
 
         // 9. assemble API request, depending on action we're taking
         val sharedEventContent = listOf(
@@ -152,7 +149,7 @@ class EditCreateEventUseCase(
                 personalPartICalString,
                 signatureOfPersonalPart,
                 "", // on server, "author" will be extracted from MemberID and this value ignored
-                TODOmemberId // TODO
+                member.id
             )
         } else null
 
@@ -161,7 +158,7 @@ class EditCreateEventUseCase(
             if (oldEventEntity == null) return UseCase.Result.InvalidParams("could not get old Event from DB for edit")
 
             SyncEventsUpdateApiRequest(
-                memberId = TODOmemberId, // TODO
+                memberId = member.id,
                 events = listOf(
                     SyncEventUpdateContainer(
                         id = newEvent.id,
@@ -179,7 +176,7 @@ class EditCreateEventUseCase(
 
         } else { // CREATE
             SyncEventsUpdateApiRequest(
-                memberId = TODOmemberId, // TODO
+                memberId = member.id,
                 events = listOf(
                     SyncEventCreateContainer(
                         event = SyncEvent(
