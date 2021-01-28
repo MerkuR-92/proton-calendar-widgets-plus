@@ -1340,8 +1340,9 @@ class EventViewModel(
         }
 
         val personalPartICalString =
-            if (participationStatus == ParticipationStatus.DECLINED) {
-                // if changes to NO, remove all notifications
+            if (participationStatus == ParticipationStatus.DECLINED &&
+                event.iCalEvent.alarms != null && event.iCalEvent.alarms.isNotEmpty()) {
+                // if changes to NO, remove all notifications if there are any
                 ""
             } else if (event.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED &&
                 (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
