@@ -427,7 +427,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // Display loading state for new value
-            displayAttendeeAnswerState(participationStatus, event.isSingleEdit(), event.calendar.isActive, true)
+            displayAttendeeAnswerState(participationStatus, true)
 
             if (eventViewModel.updateParticipationStatus(
                     calendarId,
@@ -440,7 +440,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO Use custom error messages depending on error ("Cannot send to organizer: ${sendPreferenceErrorMessage}")
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), event.isSingleEdit(), event.calendar.isActive, false)
+                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), false)
             }
         }
     }
@@ -583,11 +583,17 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 val userEmails = calendarViewModel.userEmails.value
                 userEmails?.let {
-                    displayAttendeeAnswerState(
-                        event.getParticipationStatus(userEmails),
-                        event.isSingleEdit(),
-                        event.calendar.isActive
-                    )
+                    lifecycleScope.launch {
+                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
+                        val hasExDates = eventViewModel.hasExDates()
+                        val isActive = event.calendar.isActive
+                        val participationStatus = event.getParticipationStatus(userEmails)
+
+                        if (participationStatus != null && hasSingleEdit == false && !hasExDates && isActive) {
+                            section_answer.visibleOrGone(true)
+                            displayAttendeeAnswerState(participationStatus)
+                        } else section_answer.visibleOrGone(false)
+                    }
                 }
             }
         })
@@ -715,9 +721,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, isSingleEdit: Boolean, isActive: Boolean, loading: Boolean = false) {
-
-        section_answer.visibleOrGone(participationStatus != null && !isSingleEdit && isActive)
+    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean = false) {
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
