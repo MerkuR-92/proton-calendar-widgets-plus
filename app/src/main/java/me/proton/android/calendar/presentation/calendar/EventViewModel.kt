@@ -1366,6 +1366,36 @@ class EventViewModel(
         if (updateParticipationStatusUseCaseResult != UseCase.Result.Success) {
             return false
         }
+
+        // TODO If has single edits, set their part stat to unanswered
+        if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
+            clearSingleEditsParticipationStatus(calendarId, event.uid)
+        }
+
         return true
     }
+
+    private fun clearSingleEditsParticipationStatus(
+        calendarId: String,
+        eventUid: String
+    ) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
+                    UseCaseWorker.INPUT_USER_ID to userId.id,
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
+                    UseCaseWorker.INPUT_EVENT_UID to eventUid
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT, ExistingWorkPolicy.REPLACE, work).state
+    }
+
 }

@@ -33,6 +33,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
             const val UPDATE_PARTICIPATION_STATUS = UpdateParticipationStatusUseCase.WORKER_ID
+            const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
         }
     }
 
@@ -52,6 +53,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_TIME_FORMAT = "INPUT_TIME_FORMAT"
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
         const val INPUT_PERSONAL_ICAL_STRING = "INPUT_PERSONAL_ICAL_STRING"
+        const val INPUT_EVENT_UID = "INPUT_EVENT_UID"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -80,6 +82,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_TIME_FORMAT = "UPDATE_TIME_FORMAT"
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
             const val UPDATE_PARTICIPATION_STATUS = "UPDATE_PARTICIPATION_STATUS"
+            const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
         }
     }
 
@@ -173,6 +176,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_ATTENDEE_ID) ?: return Result.failure(),
                     inputData.getInt(INPUT_PARTICIPATION_STATUS, 0),
                     inputData.getString(INPUT_PERSONAL_ICAL_STRING))
+            }
+            UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT -> {
+                val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase = get()
+                updateParticipationStatusUseCase.executeClearSingleEdits(
+                    userId,
+                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
+                    inputData.getString(INPUT_EVENT_UID) ?: return Result.failure())
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

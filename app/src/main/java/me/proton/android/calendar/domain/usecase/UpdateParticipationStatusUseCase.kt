@@ -1,9 +1,11 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.parameter.ParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 
 class UpdateParticipationStatusUseCase(
@@ -15,6 +17,7 @@ class UpdateParticipationStatusUseCase(
 
     companion object {
         const val WORKER_ID = "WORKER_ID_UPDATE_PARTICIPATION_STATUS"
+        const val WORKER_ID_SINGLE_EDIT = "WORKER_ID_UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
     }
 
     suspend fun execute(userId: UserId, calendarId: String, eventId: String, attendeeId: String, status: Int, personalPartICalString: String?): UseCase.Result {
@@ -54,5 +57,42 @@ class UpdateParticipationStatusUseCase(
                 UseCase.Result.Error("api error updating participation status: ${updateParticipationStatusResponse.exception.message ?: "(no exception message)"}")
             }
         }
+    }
+
+    suspend fun executeClearSingleEdits(userId: UserId, calendarId: String, eventUid: String): UseCase.Result {
+
+        val singleEdits = calendarsRepository.getSingleEdits(userId, eventUid)
+
+        var singleEditsClearedSuccessfully = true
+        singleEdits?.forEach { event ->
+            if (event.currentUserAttendeeId == null) return@forEach
+            when (val updateParticipationStatusResponse =
+                calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, 0) // 0 == NEEDS_ACTION
+            ) {
+                is ApiResponse.Error -> {
+                    singleEditsClearedSuccessfully = false
+                    logger.e("api error updating single edit participation status: ${updateParticipationStatusResponse.error}")
+                }
+                is ApiResponse.Exception -> {
+                    singleEditsClearedSuccessfully = false
+                    logger.e("api error updating single edit participation status: ${updateParticipationStatusResponse.exception.message ?: "(no exception message)"}")
+                }
+            }
+        }
+
+        when (val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100)) {
+            is ApiResponse.Success -> {
+                calendarsRepository.persistEvents(*eventsSharingUidResponse.data.events.toTypedArray())
+            }
+            is ApiResponse.Error -> {
+                logger.e("api error fetching events by uid: ${eventsSharingUidResponse.error}")
+            }
+            is ApiResponse.Exception -> {
+                logger.e("api error fetching events by uid: ${eventsSharingUidResponse.exception.message ?: "(no exception message)"}")
+            }
+        }
+
+        return if (singleEditsClearedSuccessfully) UseCase.Result.Success
+        else UseCase.Result.Error("Failed to update participation status for one or more single edits")
     }
 }
