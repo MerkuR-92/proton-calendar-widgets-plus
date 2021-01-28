@@ -80,6 +80,7 @@
 
     <string name="event_change_answer_recurring_title">Update recurring event</string>
     <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
+    <string name="event_change_answer_recurring_overwrite_description">Would you like to change your answer for all the events in this series?\nYour answers to occurrences previously updated by the organizer will be lost.</string>
     <string name="event_change_answer_recurring_cancel">Cancel</string>
     <string name="event_change_answer_recurring_confirm">Update</string>
 

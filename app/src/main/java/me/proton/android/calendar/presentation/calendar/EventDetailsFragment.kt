@@ -317,6 +317,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
 
             if (viewModeInitStatus == EventViewModel.Result.Success) {
+                launch {
+                    eventViewModel.getSingleEditsInfo()
+                }
                 observeEventLiveData()
                 attachActionHandlers()
             } else {
@@ -355,17 +358,22 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
         }
+
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
             val userEmails = calendarViewModel.userEmails.value
             userEmails?.let { // TODO Handle error
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.ACCEPTED) {
-                    if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
-                        showChangeAnswerRecurringDialog { _, _ ->
+                    lifecycleScope.launch {
+                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
+                        val hasExDates = eventViewModel.hasExDates()
+                        if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
+                            showChangeAnswerRecurringDialog(hasSingleEdit == true || hasExDates) { _, _ ->
+                                updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
+                            }
+                        } else {
                             updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
                         }
-                    } else {
-                        updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
                     }
                 }
             }
@@ -375,12 +383,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             userEmails?.let { // TODO Handle error
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.DECLINED) {
-                    if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
-                        showChangeAnswerRecurringDialog { _, _ ->
+                    lifecycleScope.launch {
+                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
+                        val hasExDates = eventViewModel.hasExDates()
+                        if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
+                            showChangeAnswerRecurringDialog(hasSingleEdit == true || hasExDates) { _, _ ->
+                                updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
+                            }
+                        } else {
                             updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
                         }
-                    } else {
-                        updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
                     }
                 }
             }
@@ -390,22 +402,29 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             userEmails?.let { // TODO Handle error
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.TENTATIVE) {
-                    if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
-                        showChangeAnswerRecurringDialog { _, _ ->
+                    lifecycleScope.launch {
+                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
+                        val hasExDates = eventViewModel.hasExDates()
+                        if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
+                            showChangeAnswerRecurringDialog(hasSingleEdit == true || hasExDates) { _, _ ->
+                                updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
+                            }
+                        } else {
                             updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
                         }
-                    } else {
-                        updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
                     }
                 }
             }
         }
     }
 
-    private fun showChangeAnswerRecurringDialog(callback: DialogInterface.OnClickListener) {
+    private fun showChangeAnswerRecurringDialog(overwrite: Boolean = false, callback: DialogInterface.OnClickListener) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.event_change_answer_recurring_title)
-            .setMessage(R.string.event_change_answer_recurring_description)
+            .setMessage(
+                if (overwrite) R.string.event_change_answer_recurring_overwrite_description
+                else R.string.event_change_answer_recurring_description
+            )
             .setPositiveButton(R.string.event_change_answer_recurring_confirm, callback)
             .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ -> }
             .show()
@@ -584,12 +603,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 val userEmails = calendarViewModel.userEmails.value
                 userEmails?.let {
                     lifecycleScope.launch {
-                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
-                        val hasExDates = eventViewModel.hasExDates()
                         val isActive = event.calendar.isActive
                         val participationStatus = event.getParticipationStatus(userEmails)
 
-                        if (participationStatus != null && hasSingleEdit == false && !hasExDates && isActive) {
+                        if (participationStatus != null && isActive) {
                             section_answer.visibleOrGone(true)
                             displayAttendeeAnswerState(participationStatus)
                         } else section_answer.visibleOrGone(false)
