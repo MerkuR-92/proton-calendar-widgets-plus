@@ -13,6 +13,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase.Companion.NOTIFICATION_ID_SYNC_SERVICE
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.domain.entity.UserId
 import org.koin.android.ext.android.inject
 
@@ -27,8 +28,14 @@ class SyncService : Service() {
 
     private suspend fun syncServerEvents() {
 
-        database.usersDao().select().forEach {
-            syncServerEventsUseCase.execute(UserId(it.id))
+        try {
+
+            database.usersDao().select().forEach {
+                syncServerEventsUseCase.execute(UserId(it.id)).ifSuccessAndLogErrors(logger) {}
+            }
+
+        } catch (e: Exception) {
+            logger.e("exception in syncServerEvents()", e)
         }
 
     }

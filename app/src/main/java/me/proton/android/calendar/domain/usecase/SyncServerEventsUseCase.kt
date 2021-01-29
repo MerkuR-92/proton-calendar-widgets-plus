@@ -6,6 +6,7 @@ import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
+import java.lang.Exception
 
 class SyncServerEventsUseCase(
     private val logger: Logger,
@@ -50,18 +51,29 @@ class SyncServerEventsUseCase(
                             logger.v("next Proton Events ID is saved as $lastProtonEventId")
                             UseCase.Result.Success
                         }
-                        is UseCase.Result.InvalidParams -> UseCase.Result.InvalidParams("invalid params handling server events: ${result.message}")
+                        is UseCase.Result.InvalidParams -> {
+                            logger.e("invalid params handling server events: ${result.message}")
+                            UseCase.Result.InvalidParams("invalid params handling server events: ${result.message}")
+                        }
                         is UseCase.Result.Error -> {
-                            logger.d("handleServerEventsResult error ${result.message}")
-
-                            UseCase.Result.Error("error handling server events: ${result.message}")
+                            logger.e("handleServerEventsResult error ${result.message}, ${result.error}")
+                            UseCase.Result.Error("error handling server events: ${result.message}, ${result.error}")
                         }
                     }
 
-                    logger.d("handleServerEventsResult ${handleServerEventsResult}")
+                    if (handleServerEventsResult !is UseCase.Result.Success) {
+                        return handleServerEventsResult
+                    }
+
                 }
-                is ApiResponse.Error -> return UseCase.Result.Error("api error getting server events: $eventsReponse")
-                is ApiResponse.Exception -> return UseCase.Result.Error("exception getting server events: $eventsReponse")
+                is ApiResponse.Error -> {
+                    logger.e("error in SyncServerEvents: ${eventsReponse}")
+                    return UseCase.Result.Error("api error getting server events: $eventsReponse")
+                }
+                is ApiResponse.Exception -> {
+                    logger.e("Exception in SyncServerEvents: ${eventsReponse}")
+                    return UseCase.Result.Error("exception getting server events: $eventsReponse")
+                }
             }
 
         } while (moreEvents)
