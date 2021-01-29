@@ -112,10 +112,10 @@ class TransformEventUseCase(
             }
 
             listOf(processedSharedEvents, processedCalendarEvents, processedPersonalEvents, processedAttendeesEvemts)
-                .awaitAll().flatten().filterNotNull().forEach {
-                    calendarParts.add(it.plainText)
-                    decryptionStatuses.add(it.decryptionStatus)
-                    verificationStatuses.add(it.signatureVerification)
+                .awaitAll().flatten().forEach { processResult ->
+                    processResult.plainText?.let { calendarParts.add(it) }
+                    decryptionStatuses.add(processResult.decryptionStatus)
+                    verificationStatuses.add(processResult.signatureVerification)
                 }
 
         }
@@ -179,7 +179,7 @@ class TransformEventUseCase(
     }
 
     private data class ProcessResult(
-        val plainText: String,
+        val plainText: String?,
         val decryptionStatus: Event.DecryptionStatus,
         val signatureVerification: Event.SignatureVerification
     )
@@ -191,7 +191,7 @@ class TransformEventUseCase(
                                      privateKeys: List<String>,
                                      keyPassphrase: String,
                                      eventPart: Event.EventPart
-    ): ProcessResult? {
+    ): ProcessResult {
 
         // decrypt if necessary
         val plainText = if (eventPart.isEncrypted) {
@@ -241,7 +241,7 @@ class TransformEventUseCase(
 
             ProcessResult(plainText, Event.DecryptionStatus.SUCCESS, signatureVerification)
         } else {
-            null
+            ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
         }
 
     }
