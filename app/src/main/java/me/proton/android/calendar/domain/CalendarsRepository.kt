@@ -86,6 +86,8 @@ interface CalendarsRepository {
 
     suspend fun getSingleEdits(userId: UserId, eventUid: String, stopAfter: ZonedDateTime? = null,  timeZoneId: String? = null): List<Event>?
 
+    suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String): Boolean?
+
     suspend fun persistEvents(vararg events: EventEntity)
 
     suspend fun deleteEventsById(ids: List<String>)

@@ -627,6 +627,15 @@ class CalendarsRepositoryImpl(
         } else return null
     }
 
+    override suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String): Boolean? {
+        // Check if single edit is the only occurrence of a recurring event
+        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
+        return if (eventsSharingUidResponse is ApiResponse.Success) {
+            // If no other event matches UID then it is a standalone single edit
+            eventsSharingUidResponse.data.events.size == 1
+        } else return null
+    }
+
     override suspend fun persistEvents(vararg events: EventEntity) {
         logger.v("persist Event: ")
         events.forEach { logger.v("${it.id}") }

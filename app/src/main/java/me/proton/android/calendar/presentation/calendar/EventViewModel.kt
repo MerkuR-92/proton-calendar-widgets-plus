@@ -71,6 +71,7 @@ class EventViewModel(
     private var timeEndBackup: LocalTime? = null
 
     private var eventEdited = false
+    private var editMode = false
 
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -126,6 +127,8 @@ class EventViewModel(
         recurrenceManuallyEdited = false
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
+
+        this.editMode = editMode
 
         this.userId = userId
 
@@ -300,9 +303,9 @@ class EventViewModel(
         return Result.Success
     }
 
-    data class SingleEditsInfo(val hasSingleEdit: Boolean, val hasFutureSingleEdit: Boolean)
+    data class SingleEditsInfo(val hasSingleEdit: Boolean, val hasFutureSingleEdit: Boolean, val hasAnsweredSingleEdit: Boolean)
 
-    suspend fun getSingleEditsInfo(): SingleEditsInfo? {
+    suspend fun getSingleEditsInfo(userEmails: List<String>? = null): SingleEditsInfo? {
 
         if (singleEditsInfo == null) {
 
@@ -311,6 +314,7 @@ class EventViewModel(
 
             var hasSingleEdit: Boolean = false
             var hasFutureSingleEdit: Boolean = false
+            var hasAnsweredSingleEdit: Boolean = false
 
             val occurrenceStart = event.getActualStart(eventTimeZoneId)
             val occurrence = event.occurrence
@@ -318,6 +322,8 @@ class EventViewModel(
                 occurrence?.occurrenceNumber != null &&
                         occurrence.occurrenceNumber > 1 &&
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
+
+            val hasAttendees = !event.iCalEvent.attendees.isNullOrEmpty()
 
             // We check for single edits only once and in initialise because it may require API calls
             hasSingleEdit =
@@ -327,14 +333,32 @@ class EventViewModel(
                     dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
                 } else {
                     // TODO Decide behavior if API call was an error and method returns null
-                    val singleEdits = calendarsRepository.getSingleEdits(userId, dbEvent.uid, occurrenceStart, eventTimeZoneId)
-                    hasFutureSingleEdit = singleEdits?.firstOrNull { singleEdit ->
-                        singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) ?: false
-                    } != null
+                    val singleEdits = calendarsRepository.getSingleEdits(
+                        userId,
+                        dbEvent.uid,
+                        if (editMode || !hasAttendees && userEmails != null)
+                            occurrenceStart
+                        else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
+                        if (editMode || !hasAttendees && userEmails != null)
+                            eventTimeZoneId
+                        else null
+                    )
+                    singleEdits?.forEach { singleEdit ->
+                        if (singleEdit.getStart(eventTimeZoneId)?.isAfter(occurrenceStart) == true) {
+                            hasFutureSingleEdit = true
+                        }
+                        // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
+                        if (!editMode && hasAttendees && userEmails != null &&
+                            (singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.ACCEPTED ||
+                                    singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED ||
+                                    singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.TENTATIVE)) {
+                            hasAnsweredSingleEdit = true
+                        }
+                    }
                     !singleEdits.isNullOrEmpty()
                 }
 
-            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit)
+            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit, hasAnsweredSingleEdit)
         }
 
         return singleEditsInfo
@@ -1339,21 +1363,24 @@ class EventViewModel(
             else -> 0
         }
 
+        val eventCopy = event.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar)
         val personalPartICalString =
             if (participationStatus == ParticipationStatus.DECLINED &&
                 event.iCalEvent.alarms != null && event.iCalEvent.alarms.isNotEmpty()) {
                 // if changes to NO, remove all notifications if there are any
+                eventCopy.iCalEvent.alarms.clear()
                 ""
-            } else if (event.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED &&
+            } else if ((event.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED ||
+                        event.getParticipationStatus(userEmails) == ParticipationStatus.NEEDS_ACTION) &&
                 (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
                 event.iCalEvent.alarms.isNullOrEmpty()) {
                 // if changes from NO to YES/MAYBE add default calendar notifications
                 if (loadSettingsForCalendar(calendarId)) {
                     getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
                         // TODO Remove alarm type check once other types are handled
-                        if (it.action == Action.display()) event.iCalEvent.addAlarm(it)
+                        if (it.action == Action.display()) eventCopy.iCalEvent.addAlarm(it)
                     }
-                    val calendarSplit = ICalUtils.splitICalendarIntoParts(event.iCalendar)
+                    val calendarSplit = ICalUtils.splitICalendarIntoParts(eventCopy.iCalendar)
                     calendarSplit.personalPart?.printToString()
                 } else null
             } else {
@@ -1367,11 +1394,13 @@ class EventViewModel(
             return false
         }
 
-        // TODO If has single edits, set their part stat to unanswered
         if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
+            // If chain has single edits, update their part stat to NEEDS_ACTION
             clearSingleEditsParticipationStatus(calendarId, event.uid)
         }
 
+        // Apply alarms modifications
+        event = eventCopy
         return true
     }
 
@@ -1398,4 +1427,7 @@ class EventViewModel(
         return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT, ExistingWorkPolicy.REPLACE, work).state
     }
 
+    suspend fun isStandaloneSingleEdit(): Boolean {
+        return calendarsRepository.isStandaloneSingleEdit(userId, event.uid) == true
+    }
 }

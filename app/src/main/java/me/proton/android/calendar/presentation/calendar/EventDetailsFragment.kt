@@ -318,7 +318,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             if (viewModeInitStatus == EventViewModel.Result.Success) {
                 launch {
-                    eventViewModel.getSingleEditsInfo()
+                    eventViewModel.getSingleEditsInfo(calendarViewModel.userEmails.value)
                 }
                 observeEventLiveData()
                 attachActionHandlers()
@@ -361,73 +361,65 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
             val userEmails = calendarViewModel.userEmails.value
-            userEmails?.let { // TODO Handle error
+            userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.ACCEPTED) {
-                    lifecycleScope.launch {
-                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
-                        val hasExDates = eventViewModel.hasExDates()
-                        if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
-                            showChangeAnswerRecurringDialog(hasSingleEdit == true || hasExDates) { _, _ ->
-                                updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
-                            }
-                        } else {
-                            updateAttendeeParticipationStatus(ParticipationStatus.ACCEPTED, userEmails)
-                        }
-                    }
+                    handleChangeAnswer(ParticipationStatus.ACCEPTED, userEmails)
                 }
             }
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
             val userEmails = calendarViewModel.userEmails.value
-            userEmails?.let { // TODO Handle error
+            userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.DECLINED) {
-                    lifecycleScope.launch {
-                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
-                        val hasExDates = eventViewModel.hasExDates()
-                        if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
-                            showChangeAnswerRecurringDialog(hasSingleEdit == true || hasExDates) { _, _ ->
-                                updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
-                            }
-                        } else {
-                            updateAttendeeParticipationStatus(ParticipationStatus.DECLINED, userEmails)
-                        }
-                    }
+                    handleChangeAnswer(ParticipationStatus.DECLINED, userEmails)
                 }
             }
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
             val userEmails = calendarViewModel.userEmails.value
-            userEmails?.let { // TODO Handle error
+            userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.TENTATIVE) {
-                    lifecycleScope.launch {
-                        val hasSingleEdit = eventViewModel.getSingleEditsInfo()?.hasSingleEdit
-                        val hasExDates = eventViewModel.hasExDates()
-                        if (eventViewModel.eventLiveData.value?.isRecurring() == true) {
-                            showChangeAnswerRecurringDialog(hasSingleEdit == true || hasExDates) { _, _ ->
-                                updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
-                            }
-                        } else {
-                            updateAttendeeParticipationStatus(ParticipationStatus.TENTATIVE, userEmails)
-                        }
-                    }
+                    handleChangeAnswer(ParticipationStatus.TENTATIVE, userEmails)
                 }
             }
         }
     }
 
-    private fun showChangeAnswerRecurringDialog(overwrite: Boolean = false, callback: DialogInterface.OnClickListener) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.event_change_answer_recurring_title)
-            .setMessage(
-                if (overwrite) R.string.event_change_answer_recurring_overwrite_description
-                else R.string.event_change_answer_recurring_description
-            )
-            .setPositiveButton(R.string.event_change_answer_recurring_confirm, callback)
-            .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ -> }
-            .show()
+    private fun handleChangeAnswer(participationStatus: ParticipationStatus, userEmails: List<String>) {
+        lifecycleScope.launch {
+            if (eventViewModel.eventLiveData.value?.isPartOfChain() == true) {
+
+                val isSingleEdit = eventViewModel.eventLiveData.value?.isSingleEdit() ?: false
+                val isStandaloneSingleEdit = if (isSingleEdit) eventViewModel.isStandaloneSingleEdit() else false
+                val overwrite =
+                    if (isSingleEdit) false
+                    else eventViewModel.getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit == true
+
+                if (isStandaloneSingleEdit) {
+                    updateAttendeeParticipationStatus(participationStatus, userEmails)
+                } else {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.event_change_answer_recurring_title)
+                        .setMessage(
+                            when {
+                                overwrite -> R.string.event_change_answer_recurring_overwrite_description
+                                isSingleEdit -> R.string.event_change_answer_recurring_single_edit_description
+                                else -> R.string.event_change_answer_recurring_description
+                            }
+                        )
+                        .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
+                            updateAttendeeParticipationStatus(participationStatus, userEmails)
+                        }
+                        .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ -> }
+                        .show()
+                }
+            } else {
+                updateAttendeeParticipationStatus(participationStatus, userEmails)
+            }
+        }
     }
 
     private fun updateAttendeeParticipationStatus(participationStatus: ParticipationStatus, userEmails: List<String>) {
@@ -567,11 +559,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     )
                 }
 
+            section_alarms.visibleOrGone(alarmLabels.isNotEmpty())
             if (alarmLabels.isNotEmpty()) {
                 with(section_alarms) {
                     text_header.text = alarmLabels.joinToString(separator = "\n")
                     image_icon.setImageResource(R.drawable.ic_bell)
-                    visibleOrGone(true)
                 }
             }
 
