@@ -598,7 +598,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         val isActive = event.calendar.isActive
                         val participationStatus = event.getParticipationStatus(userEmails)
 
-                        if (participationStatus != null && isActive) {
+                        if (participationStatus != null && isActive && !event.isCancelled()) {
                             section_answer.visibleOrGone(true)
                             displayAttendeeAnswerState(participationStatus)
                         } else section_answer.visibleOrGone(false)
