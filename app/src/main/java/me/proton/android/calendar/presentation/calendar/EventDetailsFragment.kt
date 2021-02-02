@@ -81,6 +81,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private val accountViewModel: AccountViewModel by sharedViewModel()
     private val mainViewModel: MainViewModel by sharedViewModel()
 
+    private var changeAnswerLoading = false
+
     override fun onBackPressedCustom() {
 
         // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
@@ -360,37 +362,59 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
+            if (changeAnswerLoading) return@setOnSingleClickListener
             val userEmails = calendarViewModel.userEmails.value
             userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.ACCEPTED) {
-                    handleChangeAnswer(ParticipationStatus.ACCEPTED, userEmails)
+                    handleChangeAnswer(
+                        ParticipationStatus.ACCEPTED,
+                        participationStatus ?: ParticipationStatus.NEEDS_ACTION,
+                        userEmails
+                    )
                 }
             }
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
+            if (changeAnswerLoading) return@setOnSingleClickListener
             val userEmails = calendarViewModel.userEmails.value
             userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.DECLINED) {
-                    handleChangeAnswer(ParticipationStatus.DECLINED, userEmails)
+                    handleChangeAnswer(
+                        ParticipationStatus.DECLINED,
+                        participationStatus ?: ParticipationStatus.NEEDS_ACTION,
+                        userEmails
+                    )
                 }
             }
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
+            if (changeAnswerLoading) return@setOnSingleClickListener
             val userEmails = calendarViewModel.userEmails.value
             userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.TENTATIVE) {
-                    handleChangeAnswer(ParticipationStatus.TENTATIVE, userEmails)
+                    handleChangeAnswer(
+                        ParticipationStatus.TENTATIVE,
+                        participationStatus ?: ParticipationStatus.NEEDS_ACTION,
+                        userEmails
+                    )
                 }
             }
         }
     }
 
-    private fun handleChangeAnswer(participationStatus: ParticipationStatus, userEmails: List<String>) {
+    private fun handleChangeAnswer(
+        participationStatus: ParticipationStatus,
+        currentParticipationStatus: ParticipationStatus,
+        userEmails: List<String>
+    ) {
         lifecycleScope.launch {
             if (eventViewModel.eventLiveData.value?.isPartOfChain() == true) {
+
+                // Display loading state for new value
+                displayAttendeeAnswerState(participationStatus, true)
 
                 val isSingleEdit = eventViewModel.eventLiveData.value?.isSingleEdit() ?: false
                 val isStandaloneSingleEdit = if (isSingleEdit) eventViewModel.isStandaloneSingleEdit() else false
@@ -399,7 +423,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     else eventViewModel.getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit == true
 
                 if (isStandaloneSingleEdit) {
-                    updateAttendeeParticipationStatus(participationStatus, userEmails)
+                    updateAttendeeParticipationStatus(participationStatus, currentParticipationStatus, userEmails)
                 } else {
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.event_change_answer_recurring_title)
@@ -411,21 +435,31 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             }
                         )
                         .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
-                            updateAttendeeParticipationStatus(participationStatus, userEmails)
+                            updateAttendeeParticipationStatus(participationStatus, currentParticipationStatus, userEmails)
                         }
-                        .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ -> }
+                        .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ ->
+                            displayAttendeeAnswerState(currentParticipationStatus, false)
+                        }
+                        .setOnCancelListener {
+                            displayAttendeeAnswerState(currentParticipationStatus, false)
+                        }
                         .show()
                 }
             } else {
-                updateAttendeeParticipationStatus(participationStatus, userEmails)
+                updateAttendeeParticipationStatus(participationStatus, currentParticipationStatus, userEmails)
             }
         }
     }
 
-    private fun updateAttendeeParticipationStatus(participationStatus: ParticipationStatus, userEmails: List<String>) {
+    private fun updateAttendeeParticipationStatus(
+        participationStatus: ParticipationStatus,
+        currentParticipationStatus: ParticipationStatus,
+        userEmails: List<String>
+    ) {
         lifecycleScope.launch {
             val event = eventViewModel.eventLiveData.value
             if (event == null) {
+                displayAttendeeAnswerState(currentParticipationStatus, false)
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                 return@launch
             }
@@ -433,12 +467,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val eventId = event.id
             val attendeeId = event.currentUserAttendeeId
             if (attendeeId.isNullOrEmpty()) {
+                displayAttendeeAnswerState(currentParticipationStatus, false)
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                 return@launch
             }
-
-            // Display loading state for new value
-            displayAttendeeAnswerState(participationStatus, true)
 
             if (eventViewModel.updateParticipationStatus(
                     calendarId,
@@ -451,7 +483,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             } else {
                 // TODO Use custom error messages depending on error ("Cannot send to organizer: ${sendPreferenceErrorMessage}")
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                displayAttendeeAnswerState(event.getParticipationStatus(userEmails), false)
+                displayAttendeeAnswerState(currentParticipationStatus, false)
             }
         }
     }
@@ -731,6 +763,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean = false) {
+        changeAnswerLoading = loading
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
@@ -785,8 +818,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 section_answer.item_change_answer_button_maybe.item_change_answer_button_loader.visibleOrGone(loading)
             }
         }
-
-
     }
 
 }

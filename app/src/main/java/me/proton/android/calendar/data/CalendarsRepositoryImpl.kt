@@ -631,9 +631,12 @@ class CalendarsRepositoryImpl(
         // Check if single edit is the only occurrence of a recurring event
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
-            // If no other event matches UID then it is a standalone single edit
-            eventsSharingUidResponse.data.events.size == 1
-        } else return null
+            // If an event with the same UID has no recurrenceId then we have occurrence(s) of the main series
+            eventsSharingUidResponse.data.events.firstOrNull {
+                val event = transformEventUseCase.execute(it)
+                event?.iCalEvent?.recurrenceId == null
+            } == null
+        } else null
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

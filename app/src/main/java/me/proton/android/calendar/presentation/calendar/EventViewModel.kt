@@ -1376,10 +1376,7 @@ class EventViewModel(
                 event.iCalEvent.alarms.isNullOrEmpty()) {
                 // if changes from NO to YES/MAYBE add default calendar notifications
                 if (loadSettingsForCalendar(calendarId)) {
-                    getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
-                        // TODO Remove alarm type check once other types are handled
-                        if (it.action == Action.display()) eventCopy.iCalEvent.addAlarm(it)
-                    }
+                    setDefaultAlarms(eventCopy, calendarSettings)
                     val calendarSplit = ICalUtils.splitICalendarIntoParts(eventCopy.iCalendar)
                     calendarSplit.personalPart?.printToString()
                 } else null
@@ -1400,7 +1397,15 @@ class EventViewModel(
         }
 
         // Apply alarms modifications
-        event = eventCopy
+        if (personalPartICalString?.isEmpty() == true) {
+            // clear alarms
+            event.iCalEvent.alarms.clear()
+            _event.postValue(event)
+        } else if (personalPartICalString?.isNotEmpty() == true) {
+            // add default alarms
+            setDefaultAlarms(event, calendarSettings)
+            _event.postValue(event)
+        }
         return true
     }
 
