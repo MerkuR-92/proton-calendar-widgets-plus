@@ -40,6 +40,7 @@ const val MAX_ANIM_DURATION = 500L
 
 object FeatureFlag {
     const val SETTINGS_DRAWER = true
+    const val ADD_ATTENDEES = true
 }
 
 object SharedPreferencesKeys {

@@ -1,6 +1,8 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.Manifest
 import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -9,6 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
@@ -26,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
@@ -179,7 +184,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     if (shouldShowConfirmationPicker) {
                         val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
                                 (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(dbEvent,
-                                            eventViewModel.displayTimeZoneId) == false)
+                                    eventViewModel.displayTimeZoneId) == false)
                         AndroidUtils.displaySingleChoiceConfirmationPicker(
                             requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
                                 getString(R.string.event_recurring_edit_this),
@@ -599,11 +604,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
-        //TODO Attendees
-        //press_attendees.setOnSingleClickListener {
-        //    findNavController().navigate(R.id.nav_event_form_attendees)
-        //}
+        event_form_participant_press.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+        }
     }
+
+
 
     private fun displayAlarms() {
         event_form_alarm_list.removeAllViews()

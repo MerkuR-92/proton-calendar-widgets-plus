@@ -5,27 +5,104 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_start_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="50dp" />
-
-
+    <ImageView
+        android:id="@+id/nav_event_form_attendees_search_icon"
+        style="@style/Icon.Form"
+        android:src="@drawable/ic_search"
+        app:layout_constraintTop_toTopOf="@id/nav_event_form_attendees_search_input"
+        app:layout_constraintBottom_toBottomOf="@id/nav_event_form_attendees_search_input"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/event_form_attendees_title"
+        android:id="@+id/nav_event_form_attendees_search_input"
+        style="@style/Text.Default"
+        android:textColorHint="@color/text_hint"
+        android:paddingStart="@dimen/default_margin_text_start"
+        android:paddingTop="@dimen/spacing_page"
+        android:paddingBottom="@dimen/spacing_page"
         android:layout_width="0dp"
-        android:layout_height="92dp"
-        android:gravity="start|top"
-        android:hint="@string/event_hint_title"
-        android:inputType="textMultiLine"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/event_text_add_participants"
+        android:inputType="textEmailAddress"
+        android:scrollHorizontally="false"
+        android:maxLength="255"
+        android:singleLine="false"
+        android:maxLines="1"
+        android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="My test event title"
-        android:text="FRAGMENT ATTENDEES"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/nav_event_form_attendees_done"/>
 
+    <include
+        android:id="@+id/nav_event_form_attendees_done"
+        layout="@layout/toolbar_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:selectableItemBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/nav_event_form_attendees_search_separator"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/nav_event_form_attendees_search_clear"
+        style="@style/Icon.Form"
+        android:src="@drawable/ic_cross_close"
+        android:layout_marginEnd="@dimen/spacing_page"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/nav_event_form_attendees_search_input"
+        app:layout_constraintBottom_toBottomOf="@id/nav_event_form_attendees_search_input"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/nav_event_form_attendees_search_separator"
+        style="@style/Separator"
+        app:layout_constraintTop_toBottomOf="@+id/nav_event_form_attendees_search_input"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/nav_event_form_attendees_search_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        tools:listitem="@layout/item_add_attendee"
+        tools:itemCount="6"
+        android:visibility="gone"
+        android:overScrollMode="never"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nav_event_form_attendees_search_separator"/>
+
+    <LinearLayout
+        android:id="@+id/nav_event_form_attendees_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nav_event_form_attendees_search_separator">
+
+        <TextView
+            android:id="@+id/nav_event_form_attendees_list_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/event_text_participants"
+            style="@style/Text.DefaultSmall.Weak"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:layout_marginStart="@dimen/default_margin_text_start"
+            android:layout_marginBottom="@dimen/spacing_element_small"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/nav_event_form_attendees_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            tools:listitem="@layout/item_add_attendee"
+            tools:itemCount="8"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
