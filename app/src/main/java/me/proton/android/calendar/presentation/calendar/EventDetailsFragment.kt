@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -23,7 +22,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.work.Operation
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
 import biweekly.property.Attendee
@@ -40,7 +38,6 @@ import kotlinx.android.synthetic.main.item_change_answer_button.view.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -320,7 +317,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             if (viewModeInitStatus == EventViewModel.Result.Success) {
                 launch {
-                    eventViewModel.getSingleEditsInfo(calendarViewModel.userEmails.value)
+                    eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
                 observeEventLiveData()
                 attachActionHandlers()
@@ -363,7 +360,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
             if (changeAnswerLoading) return@setOnSingleClickListener
-            val userEmails = calendarViewModel.userEmails.value
+            val userEmails = calendarViewModel.getUserEmails()
             userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.ACCEPTED) {
@@ -377,7 +374,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
             if (changeAnswerLoading) return@setOnSingleClickListener
-            val userEmails = calendarViewModel.userEmails.value
+            val userEmails = calendarViewModel.getUserEmails()
             userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.DECLINED) {
@@ -391,7 +388,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
             if (changeAnswerLoading) return@setOnSingleClickListener
-            val userEmails = calendarViewModel.userEmails.value
+            val userEmails = calendarViewModel.getUserEmails()
             userEmails?.let {
                 val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
                 if (participationStatus != ParticipationStatus.TENTATIVE) {
@@ -411,11 +408,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         userEmails: List<String>
     ) {
         lifecycleScope.launch {
+            // Display loading state for new value
+            displayAttendeeAnswerState(participationStatus, true)
             if (eventViewModel.eventLiveData.value?.isPartOfChain() == true) {
-
-                // Display loading state for new value
-                displayAttendeeAnswerState(participationStatus, true)
-
                 val isSingleEdit = eventViewModel.eventLiveData.value?.isSingleEdit() ?: false
                 val isStandaloneSingleEdit = if (isSingleEdit) eventViewModel.isStandaloneSingleEdit() else false
                 val overwrite =
@@ -624,18 +619,20 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 initAttendeeList(attendeeList, organizerAttendee)
 
-                val userEmails = calendarViewModel.userEmails.value
-                userEmails?.let {
+                val userEmails = calendarViewModel.getUserEmails()
+                val userAddresses = calendarViewModel.userAddresses.value
+                if (userAddresses != null && userEmails != null) {
                     lifecycleScope.launch {
                         val isActive = event.calendar.isActive
+                        val isAddressActive = event.isUserInvitedAddressEnabled(userAddresses)
                         val participationStatus = event.getParticipationStatus(userEmails)
 
-                        if (participationStatus != null && isActive && !event.isCancelled()) {
+                        if (participationStatus != null && isActive && isAddressActive && !event.isCancelled()) {
                             section_answer.visibleOrGone(true)
                             displayAttendeeAnswerState(participationStatus)
                         } else section_answer.visibleOrGone(false)
                     }
-                }
+                } else section_answer.visibleOrGone(false)
             }
         })
     }
@@ -700,7 +697,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
-        val userEmails = calendarViewModel.userEmails.value
+        val userEmails = calendarViewModel.getUserEmails()
         event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
         if (userEmails?.contains(organizer.extractEmail()) == true) {
             event_attendee_organizer_layout.item_attendee_title.text =

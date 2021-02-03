@@ -48,9 +48,9 @@ class UsersRepositoryImpl(
         return database.usersDao().selectUserById(userId)?.toUser()
     }
 
-    override suspend fun getUserEmails(userId: String): List<String>? {
+    override suspend fun getUserAddresses(userId: String): List<Address>? {
         return database.addressesDao().select(userId).map {
-            it.email
+            it.toAddress(json)
         }
     }
 

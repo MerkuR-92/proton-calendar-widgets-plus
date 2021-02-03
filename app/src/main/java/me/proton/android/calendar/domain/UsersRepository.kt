@@ -23,7 +23,7 @@ interface UsersRepository {
 
     suspend fun selectUserById(userId: String): User?
 
-    suspend fun getUserEmails(userId: String): List<String>?
+    suspend fun getUserAddresses(userId: String): List<Address>?
 
     // addresses
     fun addressesFlow(userId: String): Flow<List<Address>>

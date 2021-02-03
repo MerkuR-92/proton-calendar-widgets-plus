@@ -92,7 +92,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
 
-            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, calendarViewModel.userEmails.value) {
+            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, calendarViewModel.getUserEmails()) {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(

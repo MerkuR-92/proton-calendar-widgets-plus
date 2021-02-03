@@ -45,6 +45,7 @@ data class AddressEntity(
         return Address(
             id = this.id,
             email = this.email,
+            status = this.status,
             keys = this.keys.map {
                 json.decodeFromJsonElement<AddressKey>(it)
             }

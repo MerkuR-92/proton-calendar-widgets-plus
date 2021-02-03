@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
+import me.proton.android.calendar.data.entity.AddressStatus
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -97,6 +98,18 @@ data class Event(
                 attendee.extractEmail().equals(userEmail, ignoreCase = true)
             } != null
         }?.participationStatus
+    }
+
+    fun isUserInvitedAddressEnabled(userAddresses: List<Address>): Boolean {
+        iCalEvent.attendees.forEach { attendee ->
+            val userAddress = userAddresses.firstOrNull { userAddress ->
+                attendee.extractEmail().equals(userAddress.email, ignoreCase = true)
+            }
+            userAddress?.let {
+                return it.status == AddressStatus.ENABLED.value
+            }
+        }
+        return false
     }
 
     fun updateParticipationStatus(userEmails: List<String>, status: ParticipationStatus) {

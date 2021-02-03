@@ -27,6 +27,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
@@ -69,8 +70,8 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
-    private val _userEmails: MutableLiveData<List<String>> = MutableLiveData()
-    val userEmails: LiveData<List<String>> = _userEmails
+    private val _userAddresses: MutableLiveData<List<Address>> = MutableLiveData()
+    val userAddresses: LiveData<List<Address>> = _userAddresses
 
     var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
@@ -137,7 +138,7 @@ class CalendarViewModel(
                 return@flow
             }
 
-            _userEmails.postValue(usersRepository.getUserEmails(userId.id))
+            _userAddresses.postValue(usersRepository.getUserAddresses(userId.id))
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {
                 if (it != null) {
@@ -619,5 +620,9 @@ class CalendarViewModel(
         return calendarsRepository.selectMembers(calendarId).firstOrNull {
             it.hasPermission(MemberEntity.Permission.SUPEROWNER)
         }?.email
+    }
+
+    fun getUserEmails(): List<String>? {
+        return userAddresses.value?.map { it.email }
     }
 }
