@@ -327,7 +327,7 @@ class EventViewModel(
 
             // We check for single edits only once and in initialise because it may require API calls
             hasSingleEdit =
-                if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture) {
+                if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture && (editMode || !hasAttendees && userEmails != null)) {
                     // We don't have option "this and future" when updating first event in chain
                     // TODO Decide behavior if API call was an error and method returns null
                     dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
@@ -348,7 +348,7 @@ class EventViewModel(
                             hasFutureSingleEdit = true
                         }
                         // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
-                        if (!editMode && hasAttendees && userEmails != null &&
+                        if (!editMode && hasAttendees && userEmails != null && !singleEdit.isCancelled() &&
                             (singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.ACCEPTED ||
                                     singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED ||
                                     singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.TENTATIVE)) {

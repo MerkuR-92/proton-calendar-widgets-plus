@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.displaySnackBar
 import me.proton.android.calendar.common.visibleOrInvisible
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -72,27 +73,36 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        calendarViewModel.userAddresses.observe(viewLifecycleOwner) { userAddresses ->
+            userAddresses ?: return@observe
+            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
+            val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
+            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour, userAddresses)
+        }
+
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
             zoneId ?: return@observe
             val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
-            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour)
+            val userAddresses = calendarViewModel.userAddresses.value ?: return@observe
+            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour, userAddresses)
         }
 
         calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
             timeFormat ?: return@observe
             val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, calendarViewModel.timeFormatIs24Hour(requireContext()))
+            val userAddresses = calendarViewModel.userAddresses.value ?: return@observe
+            setupItemMiniCalendarContent(zoneId.id, calendarViewModel.timeFormatIs24Hour(requireContext()), userAddresses)
         }
     }
 
-    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean) {
+    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<Address>) {
         val immutableDate = date ?: return
         logger.d("onViewCreated: $immutableDate")
 
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
 
-            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, calendarViewModel.getUserEmails()) {
+            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, userAddresses.map { it.email }) {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(

@@ -20,11 +20,11 @@
         layout="@layout/item_change_answer_button" />
 
     <include
-        android:id="@+id/item_change_answer_button_no"
+        android:id="@+id/item_change_answer_button_maybe"
         layout="@layout/item_change_answer_button" />
 
     <include
-        android:id="@+id/item_change_answer_button_maybe"
+        android:id="@+id/item_change_answer_button_no"
         layout="@layout/item_change_answer_button" />
 
 </LinearLayout>

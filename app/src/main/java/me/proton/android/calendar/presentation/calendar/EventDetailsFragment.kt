@@ -54,6 +54,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
@@ -318,6 +319,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (viewModeInitStatus == EventViewModel.Result.Success) {
                 launch {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
+                }
+                calendarViewModel.userAddresses.observe(viewLifecycleOwner) {
+                    handleAttendeeAnswerViewVisibility()
                 }
                 observeEventLiveData()
                 attachActionHandlers()
@@ -607,7 +611,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            val attendeeList = event.iCalEvent.attendees
+            // Make a copy of the list so we can freely remove organizer if also is an attendee
+            val attendeeList = ArrayList(event.iCalEvent.attendees)
             section_attendees.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
             if (attendeeList.isNotEmpty()) {
                 initParticipantsItem(attendeeList)
@@ -619,22 +624,27 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 initAttendeeList(attendeeList, organizerAttendee)
 
-                val userEmails = calendarViewModel.getUserEmails()
-                val userAddresses = calendarViewModel.userAddresses.value
-                if (userAddresses != null && userEmails != null) {
-                    lifecycleScope.launch {
-                        val isActive = event.calendar.isActive
-                        val isAddressActive = event.isUserInvitedAddressEnabled(userAddresses)
-                        val participationStatus = event.getParticipationStatus(userEmails)
-
-                        if (participationStatus != null && isActive && isAddressActive && !event.isCancelled()) {
-                            section_answer.visibleOrGone(true)
-                            displayAttendeeAnswerState(participationStatus)
-                        } else section_answer.visibleOrGone(false)
-                    }
-                } else section_answer.visibleOrGone(false)
+                handleAttendeeAnswerViewVisibility()
             }
         })
+    }
+
+    private fun handleAttendeeAnswerViewVisibility() {
+        val event = eventViewModel.eventLiveData.value
+        val userEmails = calendarViewModel.getUserEmails()
+        val userAddresses = calendarViewModel.userAddresses.value
+        if (event != null && userAddresses != null && userEmails != null) {
+            lifecycleScope.launch {
+                val isActive = event.calendar.isActive
+                val isAddressActive = event.isUserInvitedAddressEnabled(userAddresses)
+                val participationStatus = event.getParticipationStatus(userEmails)
+
+                if (participationStatus != null && isActive && isAddressActive && !event.isCancelled()) {
+                    section_answer.visibleOrGone(true)
+                    displayAttendeeAnswerState(participationStatus)
+                } else section_answer.visibleOrGone(false)
+            }
+        } else section_answer.visibleOrGone(false)
     }
 
     private fun initParticipantsItem(attendeeList: List<Attendee>) {

@@ -70,9 +70,6 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
-    private val _userAddresses: MutableLiveData<List<Address>> = MutableLiveData()
-    val userAddresses: LiveData<List<Address>> = _userAddresses
-
     var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var inactiveCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
@@ -82,6 +79,8 @@ class CalendarViewModel(
     var autoDetectPrimaryTimezone: LiveData<Boolean> = MutableLiveData()
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
+
+    var userAddresses: LiveData<List<Address>> = MutableLiveData()
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -138,7 +137,7 @@ class CalendarViewModel(
                 return@flow
             }
 
-            _userAddresses.postValue(usersRepository.getUserAddresses(userId.id))
+            userAddresses = usersRepository.addressesFlow(userId.id).asLiveData(Dispatchers.Default)
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {
                 if (it != null) {
