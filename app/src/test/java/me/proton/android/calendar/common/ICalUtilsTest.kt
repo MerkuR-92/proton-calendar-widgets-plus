@@ -2938,6 +2938,8 @@ internal class ICalUtilsTest {
 
         assertThat(attendees[9].extractEmail()).isNull()
 
+        assertThat(eventIcal.events.first().organizer.extractEmail()).isEqualTo("adamtst@protonmail.com")
+
     }
 
 }

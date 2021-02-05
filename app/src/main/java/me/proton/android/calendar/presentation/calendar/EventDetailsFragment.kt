@@ -475,7 +475,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 initParticipantsItem(attendeeList)
 
                 // Check if organizer is also an attendee to display its status
-                val organizerAttendee = attendeeList.find { it.email.equals(event.iCalEvent.organizer.email ?: event.iCalEvent.organizer.commonName, ignoreCase = true) }
+                val organizerAttendee = attendeeList.find { it.email.equals(event.iCalEvent.organizer.extractEmail(), ignoreCase = true) }
                 val organizer = event.iCalEvent.organizer
                 if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
 
@@ -546,16 +546,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         // TODO stop using field from Activity once we have actual user management
         val userEmails = calendarViewModel.userEmails.value
         event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
-        if (userEmails?.contains(organizer.email ?: organizer.commonName) == true) {
+        if (userEmails?.contains(organizer.extractEmail()) == true) {
             event_attendee_organizer_layout.item_attendee_title.text =
                 resources.getString(R.string.event_attendee_is_organizer)
-            event_attendee_organizer_layout.item_attendee_description.text = organizer.email ?: organizer.commonName
+            event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
         } else {
-            event_attendee_organizer_layout.item_attendee_title.text = organizer.email ?: organizer.commonName
+            event_attendee_organizer_layout.item_attendee_title.text = organizer.extractEmail()
             event_attendee_organizer_layout.item_attendee_description.text =
                 resources.getString(R.string.event_attendee_organizer)
         }
-        event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.email ?: organizer.commonName)
+        event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.extractEmail() ?: "")
 
         val organizerStatus = event_attendee_organizer_layout.item_attendee_status
         if (organizerAttendee != null && organizerAttendee.participationStatus != null) {

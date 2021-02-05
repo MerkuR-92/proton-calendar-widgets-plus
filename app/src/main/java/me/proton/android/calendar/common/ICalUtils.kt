@@ -6,10 +6,7 @@ import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
-import biweekly.property.Attendee
-import biweekly.property.ICalProperty
-import biweekly.property.RecurrenceRule
-import biweekly.property.Status
+import biweekly.property.*
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
@@ -728,6 +725,17 @@ fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
 }
 
 fun Attendee.extractEmail(): String? {
+
+    val uri = if (this.uri?.contains("@") == true) this.uri.substringAfter("mailto:") else null
+
+    val email = if (this.email?.contains("@") == true) this.email else null
+
+    val cn = if (this.commonName?.contains("@") == true) this.commonName else null
+
+    return uri ?: email ?: cn
+}
+
+fun Organizer.extractEmail(): String? {
 
     val uri = if (this.uri?.contains("@") == true) this.uri.substringAfter("mailto:") else null
 
