@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -139,68 +140,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
         val failedCalendarIds = mutableListOf<String>()
 
         calendarsResponse.data.calendars.forEach { calendarEntity ->
-            when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
-                is ApiResponse.Success -> {
-                    logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
-                    calendarsRepository.apply {
-                        persistCalendar(userId.id, calendarEntity)
-                        persistCalendarSettings(bootstrapResponse.data.calendarSettings)
-                        persistPassphrase(bootstrapResponse.data.passphrase)
-                        bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }
-                        bootstrapResponse.data.members.forEach { persistMember(it) }
-                    }
-
-                    // TODO cached calendar passphrase will be invalidated when I reset my password and I was the only member of this calendar
-                    // when calendar is shared it might get invalidated while I'm still logged in -- you can have only 1 ACTIVE calendar passphrase
-                    // for this calendar at the same time, this will be sent in the event loop automatically
-
-                    // extract passphrase for just saved Calendar
-                    val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
-                    when (cachePassphraseResult) {
-                        UseCase.Result.Success -> {
-                            // fetch events
-                            val displayTimeZoneId =
-                                calendarUserSettingsResponse.data.calendarUserSettings.primaryTimezone
-                            val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
-                            val fetchEventsResult = fetchEventsUseCase.execute(
-                                userId,
-                                listOf(calendarEntity.id),
-                                now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
-                                now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
-                                displayTimeZoneId
-                            )
-
-                            fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
-                                if (fetchEventsResult.second == null) {
-                                    logger.e("fetchEventsResult: null event list when Sucess")
-                                } else {
-                                    fetchEventsResult.second?.let {
-                                        logger.v("persisting events in bootstrap: ${it.size}")
-                                        calendarsRepository.persistEvents(*it.toTypedArray())
-                                        updateAlarmsUseCase.execute(userId.id, it.map { it.id })
-                                    }
-                                }
-                            }
-
-                        }
-                        is UseCase.Result.InvalidParams -> {
-                            failedCalendarIds.add(calendarEntity.id)
-                            logger.e("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
-                        }
-                        is UseCase.Result.Error -> {
-                            failedCalendarIds.add(calendarEntity.id)
-                            logger.e("cachePassphraseResult error: ${cachePassphraseResult.message}")
-                        }
-                    }
-                }
-                is ApiResponse.Error -> {
-                    logger.e("api error getting calendar bootstrap: $bootstrapResponse")
-                    failedCalendarIds.add(calendarEntity.id)
-                }
-                is ApiResponse.Exception -> {
-                    logger.e("api exception getting calendar bootstrap: $bootstrapResponse")
-                    failedCalendarIds.add(calendarEntity.id)
-                }
+            val executeBootstrapResult = executeBootstrap(calendarEntity, userId, calendarUserSettingsResponse.data.calendarUserSettings.primaryTimezone)
+            executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+            if (executeBootstrapResult !is UseCase.Result.Success) {
+                failedCalendarIds.add(calendarEntity.id)
             }
         }
 
@@ -225,6 +168,67 @@ class BootstrapCalendarsUseCase( // TODO TEST
             }
 
             UseCase.Result.Success
+        }
+    }
+
+    suspend fun executeBootstrap(calendarEntity: CalendarEntity, userId: UserId, displayTimeZoneId: String): UseCase.Result {
+        when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
+            is ApiResponse.Success -> {
+                logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
+                calendarsRepository.apply {
+                    persistCalendar(userId.id, calendarEntity)
+                    persistCalendarSettings(bootstrapResponse.data.calendarSettings)
+                    persistPassphrase(bootstrapResponse.data.passphrase)
+                    bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }
+                    bootstrapResponse.data.members.forEach { persistMember(it) }
+                }
+
+                // TODO cached calendar passphrase will be invalidated when I reset my password and I was the only member of this calendar
+                // when calendar is shared it might get invalidated while I'm still logged in -- you can have only 1 ACTIVE calendar passphrase
+                // for this calendar at the same time, this will be sent in the event loop automatically
+
+                // extract passphrase for just saved Calendar
+                val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
+                when (cachePassphraseResult) {
+                    UseCase.Result.Success -> {
+                        // fetch events
+                        val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
+                        val fetchEventsResult = fetchEventsUseCase.execute(
+                            userId,
+                            listOf(calendarEntity.id),
+                            now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
+                            now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
+                            displayTimeZoneId
+                        )
+
+                        fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
+                            if (fetchEventsResult.second == null) {
+                                logger.e("fetchEventsResult: null event list when Sucess")
+                            } else {
+                                fetchEventsResult.second?.let {
+                                    logger.v("persisting events in bootstrap: ${it.size}")
+                                    calendarsRepository.persistEvents(*it.toTypedArray())
+                                    updateAlarmsUseCase.execute(userId.id, it.map { it.id })
+                                }
+                            }
+                        }
+
+                        return UseCase.Result.Success
+                    }
+                    is UseCase.Result.InvalidParams -> {
+                        return UseCase.Result.InvalidParams("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
+                    }
+                    is UseCase.Result.Error -> {
+                        return UseCase.Result.Error("cachePassphraseResult error: ${cachePassphraseResult.message}")
+                    }
+                }
+            }
+            is ApiResponse.Error -> {
+                return UseCase.Result.Error("api error getting calendar bootstrap: $bootstrapResponse")
+            }
+            is ApiResponse.Exception -> {
+                return UseCase.Result.Error("api exception getting calendar bootstrap: $bootstrapResponse")
+            }
         }
     }
 

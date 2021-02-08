@@ -21,6 +21,7 @@ class HandleServerEventsUseCase(
     private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase,
     private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
     private val keySetupUseCase: KeySetupUseCase,
+    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val calendarsApi: CalendarsApi) : UseCase {
 
     suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: UserId) : UseCase.Result {
@@ -53,7 +54,11 @@ class HandleServerEventsUseCase(
                                         logger.e("error getting calendar from API in HandleServerEventsUseCase")
                                         calendarsRepository.persistCalendar(userId.id, it.calendar)
                                     } else {
-                                        calendarsRepository.persistCalendar(userId.id, calendarResponse.data.calendar)
+                                        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+                                        if (timezone != null) {
+                                            val executeBootstrapResult = bootstrapCalendarsUseCase.executeBootstrap(calendarResponse.data.calendar, userId, timezone)
+                                            executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                                        } else calendarsRepository.persistCalendar(userId.id, it.calendar)
                                     }
                                 }
                                 is UseCase.Result.InvalidParams -> {
