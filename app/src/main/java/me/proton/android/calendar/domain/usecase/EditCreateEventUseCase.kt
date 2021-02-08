@@ -37,18 +37,18 @@ class EditCreateEventUseCase(
         //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
         // 2. get Member's AddressKey for signing
-        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("there is no valid first Member when creating Event")
+        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member when creating Event")
         val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(json) } // TODO in the future we will have dropdown with memberID, but now we take first
-        val memberAddressKey = userAddresses.firstOrNull()?.primaryKey ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when creating Event") // TODO how to select address? how to select address-key?
+        val memberAddressKey = userAddresses.firstOrNull()?.primaryKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid AddressKey for Member when creating Event") // TODO how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
         val calendarKeys = database.calendarKeysDao().select(calendarId)
-        if (calendarKeys.isNullOrEmpty()) return UseCase.Result.InvalidParams("there are no keys for calendar when creating Event")
+        if (calendarKeys.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no keys for calendar when creating Event")
         val calendarKey = calendarKeys.first { it.isActiveAndPrimary }
         val calendarPassphraseList = database.passphrasesDao().select(calendarId)
-        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("there are no passphrase for calendar when creating Event")
+        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar when creating Event")
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("there is no valid cached Calendar Passphrase")
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid cached Calendar Passphrase")
 
         // 4. get Session Keys if they were already present in old Event
         var oldSharedSessionKey: SessionKey? = null
@@ -72,10 +72,6 @@ class EditCreateEventUseCase(
         // 5. sign and encrypt Shared Parts
         val sharedPartICalString = calendarSplit.sharedPart.printToString()
 
-//        logger.v("shared part: ${sharedPartICalString}")
-
-//        return UseCase.Result.Error("TODO")
-
         val signatureOfSharedPart = crypto.signTextDetached(sharedPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
 
         val sharedPartToEncryptICalString = calendarSplit.sharedPartToEncrypt.printToString()
@@ -84,7 +80,8 @@ class EditCreateEventUseCase(
             val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, oldSharedSessionKey)
             Ciphertext.from(null, encryptedSharedPart!!)
         } else {
-            val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, crypto.getArmoredPublicKey(calendarKey.privateKey) ?: return UseCase.Result.InvalidParams("could not extract Calendar Public Key for encrypting"))
+            val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, crypto.getArmoredPublicKey(calendarKey.privateKey)
+                ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
             Ciphertext.from(encryptedSharedPart!!)
         }
         val signatureOfEncryptedSharedPart = crypto.signTextDetached(sharedPartToEncryptICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
@@ -99,7 +96,8 @@ class EditCreateEventUseCase(
                 val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, oldCalendarSessionKey)
                 Ciphertext.from(null, encryptedCalendarPart!!)
             } else {
-                val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, crypto.getArmoredPublicKey(calendarKey.privateKey) ?: return UseCase.Result.InvalidParams("could not extract Calendar Public Key for encrypting"))
+                val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, crypto.getArmoredPublicKey(calendarKey.privateKey)
+                    ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
                 Ciphertext.from(encryptedCalendarPart!!)
             }
         } else null
@@ -159,7 +157,7 @@ class EditCreateEventUseCase(
 
         val syncRequestBody = if (newEvent.isSyncedWithApi()) { // UPDATE
 
-            if (oldEventEntity == null) return UseCase.Result.InvalidParams("could not get old Event from DB for edit")
+            if (oldEventEntity == null) return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old Event from DB for edit")
 
             SyncEventsUpdateApiRequest(
                 memberId = member.id,
@@ -202,7 +200,7 @@ class EditCreateEventUseCase(
                     if (it.response.isSuccessful) {
                         it.response.event
                     } else {
-                        logger.e("error in sync: ${it.response.code}: ${it.response.error}")
+                        logger.e("EditCreateEventUseCase: error in sync: ${it.response.code}: ${it.response.error}: ${it.response.errorDescription}")
                         null
                     }
                 }
@@ -226,13 +224,13 @@ class EditCreateEventUseCase(
 
                 // TODO collect and handle multiple errors
                 if (syncResponse.data.responses.any { !it.response.isSuccessful }) {
-                    UseCase.Result.Error("TODO one of sync responses is an error")
+                    UseCase.Result.Error("EditCreateEventUseCase: TODO one of sync responses is an error")
                 } else {
                     UseCase.Result.Success
                 }
             }
-            is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)
-            is ApiResponse.Exception -> UseCase.Result.Error(syncResponse.exception.message ?: "(no exception message)")
+            is ApiResponse.Error -> UseCase.Result.Error("EditCreateEventUseCase: error in sync events: ${syncResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("EditCreateEventUseCase: error in sync events: ${syncResponse.exception.message ?: "(no exception message)"}")
         }
 
     }

@@ -25,10 +25,10 @@ class DeleteEventUseCase( // TODO TESTS
 
         logger.v("executing DeleteEventUseCase $userId, $eventId, $deleteOption, $occurrenceNumber")
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("event $eventId doesn't exist in DB")
-        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("event $eventId could not be transformed")
+        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId doesn't exist in DB")
+        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId could not be transformed")
 
-        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
+        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: could not get Member for calendar ${event.calendar.id}")
 
         // We need timezone when adding ex dates to handle DST
         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
@@ -44,7 +44,7 @@ class DeleteEventUseCase( // TODO TESTS
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 } else if (event.isSingleEdit()) {
 
-                    val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+                    val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: root event for $eventId doesn't exist in DB")
 
                     // add EXDATE to root event
                     rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
@@ -63,13 +63,13 @@ class DeleteEventUseCase( // TODO TESTS
 
                 val rootEvent =
                     if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
-                        ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+                        ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: root event for $eventId doesn't exist in DB")
                     else event
                 val occurrenceStart = rootEvent.generateOccurrence(
                         occurrenceNumber!!,
                         if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
                     )?.startDateTime
-                        ?: return UseCase.Result.Error("could not generate occurrence in >delete this and following< events")
+                        ?: return UseCase.Result.Error("DeleteEventUseCase: could not generate occurrence in >delete this and following< events")
 
                 rootEvent.handleDeleteThisAndFuture(occurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
@@ -79,7 +79,7 @@ class DeleteEventUseCase( // TODO TESTS
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, occurrenceStart.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((editResult is UseCase.Result.Success) && (deleteSingleEditsResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >this and future< events")
+                if ((editResult is UseCase.Result.Success) && (deleteSingleEditsResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("DeleteEventUseCase: error deleting >this and future< events")
 
             }
             EventEditDeleteOption.ALL_EVENTS -> {
@@ -87,7 +87,7 @@ class DeleteEventUseCase( // TODO TESTS
                 // delete single edits and the original event as the last one
                 val rootEvent =
                     if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
-                        ?: return UseCase.Result.InvalidParams("root event for $eventId doesn't exist in DB")
+                        ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: root event for $eventId doesn't exist in DB")
                     else event
 
                 // TODO maybe merge this into one request
@@ -96,7 +96,7 @@ class DeleteEventUseCase( // TODO TESTS
                 val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("error deleting >all< events")
+                if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("DeleteEventUseCase: error deleting >all< events")
             }
         }
 
@@ -129,11 +129,11 @@ class DeleteEventUseCase( // TODO TESTS
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success
                 } else {
-                    UseCase.Result.Error("there were errors when deleting events")
+                    UseCase.Result.Error("DeleteEventUseCase: there were errors when deleting events")
                 }
             }
-            is ApiResponse.Error -> UseCase.Result.Error(syncResponse.error)
-            is ApiResponse.Exception -> UseCase.Result.Error(syncResponse.exception.message ?: "(no exception message)")
+            is ApiResponse.Error -> UseCase.Result.Error("DeleteEventUseCase: error in sync events: ${syncResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("DeleteEventUseCase: error in sync events: ${syncResponse.exception.message ?: "(no exception message)"}")
         }
     }
 
@@ -144,10 +144,10 @@ class DeleteEventUseCase( // TODO TESTS
 
     private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("event $eventId doesn't exist in DB")
-        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("event $eventId could not be transformed")
+        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId doesn't exist in DB")
+        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId could not be transformed")
 
-        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("could not get Member for calendar ${event.calendar.id}")
+        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: could not get Member for calendar ${event.calendar.id}")
 
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, event.uid, 0, 100) // TODO paging
         val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return UseCase.Result.Error("error fetching events sharing UID")

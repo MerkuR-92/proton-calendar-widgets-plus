@@ -43,7 +43,7 @@ class SyncAlarmsUseCase(
             if (lastSuccessfulSyncDate.plus(ALARMS_CACHE_OVERLAP_WINDOW_SIZE).isBefore(syncStartDate)) {
                 logger.v("have to sync alarms calendar ${it.name}, at $syncStartDate")
                 val result = handleCalendarAlarms(userId, it)
-                if (result == UseCase.Result.Success) {
+                result.ifSuccessAndLogErrors(logger) {
                     logger.v("success syncing alarms for calendar ${it.name}, writing timestamp $syncStartDate")
                     valueStore.putLongInSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id, syncStartDate.toEpochSecond())
                 }
@@ -65,7 +65,7 @@ class SyncAlarmsUseCase(
         return if (success) {
             UseCase.Result.Success
         } else {
-            results.firstOrNull { it !is UseCase.Result.Success } ?: UseCase.Result.Error("error getting result from SyncAlarmsUseCase")
+            results.firstOrNull { it !is UseCase.Result.Success } ?: UseCase.Result.Error("SyncAlarmsUseCase: error getting result from SyncAlarmsUseCase")
         }
     }
 
@@ -110,7 +110,7 @@ class SyncAlarmsUseCase(
 
                         if (!calendarsRepository.hasCalendar(alarmEntity.calendarId))           {
                             // Calendar doesn't exist locally, silently fail
-                            logger.e("calendar ${alarmEntity.calendarId} doesn't exist in DB, can't insert alarm")
+                            logger.e("SyncAlarmsUseCase: calendar ${alarmEntity.calendarId} doesn't exist in DB, can't insert alarm")
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
                             logger.v("event ${alarmEntity.eventId} for alarm doesn't exist in DB")
                             // event doesn't exist locally, fetch and save it before inserting alarm
@@ -122,10 +122,9 @@ class SyncAlarmsUseCase(
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                 is ApiResponse.Error -> {
-                                    logger.e("couldn't fetch event for alarm: ${event.errorCode}, ${event.error} in SyncAlarmsUseCase")
-                                    return UseCase.Result.Error("could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
+                                    return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
                                 }
-                                is ApiResponse.Exception -> return UseCase.Result.Error("could not fetch missing event for alarm: ${event.exception}")
+                                is ApiResponse.Exception -> return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.exception}")
                             }
                         } else {
                             calendarsRepository.persistEventAlarm(alarmEntity)
@@ -146,13 +145,13 @@ class SyncAlarmsUseCase(
                 }
                 is ApiResponse.Error -> {
                     return if (alarmsResponse.httpCode == 404) {
-                        logger.e("404 requesting alarms for calendar in handleCalendarAlarms")
+                        logger.e("SyncAlarmsUseCase: 404 requesting alarms for calendar in handleCalendarAlarms")
                         UseCase.Result.Success
                     } else {
-                        UseCase.Result.Error("api error getting server events: $alarmsResponse")
+                        UseCase.Result.Error("SyncAlarmsUseCase: api error getting server events: $alarmsResponse")
                     }
                 }
-                is ApiResponse.Exception -> return UseCase.Result.Error("exception getting server events: $alarmsResponse")
+                is ApiResponse.Exception -> return UseCase.Result.Error("SyncAlarmsUseCase: exception getting server events: $alarmsResponse")
             }
 
         } while (hasMore)

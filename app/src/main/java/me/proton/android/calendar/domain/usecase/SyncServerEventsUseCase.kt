@@ -26,7 +26,7 @@ class SyncServerEventsUseCase(
 
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         var lastProtonEventId = valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)
-            ?: return UseCase.Result.InvalidParams("no last server event id")
+            ?: return UseCase.Result.InvalidParams("SyncServerEventsUseCase: no last server event id")
 
         do {
             var moreEvents = false
@@ -52,12 +52,10 @@ class SyncServerEventsUseCase(
                             UseCase.Result.Success
                         }
                         is UseCase.Result.InvalidParams -> {
-                            logger.e("invalid params handling server events: ${result.message}")
-                            UseCase.Result.InvalidParams("invalid params handling server events: ${result.message}")
+                            UseCase.Result.InvalidParams("SyncServerEventsUseCase: invalid params handling server events: ${result.message}")
                         }
                         is UseCase.Result.Error -> {
-                            logger.e("handleServerEventsResult error ${result.message}, ${result.error}")
-                            UseCase.Result.Error("error handling server events: ${result.message}, ${result.error}")
+                            UseCase.Result.Error("SyncServerEventsUseCase: error handling server events: ${result.message}, ${result.error}")
                         }
                     }
 
@@ -67,12 +65,10 @@ class SyncServerEventsUseCase(
 
                 }
                 is ApiResponse.Error -> {
-                    logger.e("error in SyncServerEvents: ${eventsReponse}")
-                    return UseCase.Result.Error("api error getting server events: $eventsReponse")
+                    return UseCase.Result.Error("SyncServerEventsUseCase: api error getting server events: $eventsReponse")
                 }
                 is ApiResponse.Exception -> {
-                    logger.e("Exception in SyncServerEvents: ${eventsReponse}")
-                    return UseCase.Result.Error("exception getting server events: $eventsReponse")
+                    return UseCase.Result.Error("SyncServerEventsUseCase: exception getting server events: $eventsReponse")
                 }
             }
 

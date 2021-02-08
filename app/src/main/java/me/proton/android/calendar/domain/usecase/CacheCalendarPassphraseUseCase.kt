@@ -29,7 +29,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         // Passphrase is linked to Calendar and is used by all CalendarKeys of that Calendar
 
-        val member = calendarMembers.firstOrNull() ?: return UseCase.Result.InvalidParams("there is no calendar member in CacheCalendarPassphraseUseCase")
+        val member = calendarMembers.firstOrNull() ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no calendar member in ")
         // TODO change to multiple members
         // TODO also something to keep in mind is that you can have multiple members for the user in the same calendar
         // you can join a calendar using Address1 and Address2
@@ -37,10 +37,10 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
 
         val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(json) }
         val address = userAddresses.firstOrNull()
-            ?: return UseCase.Result.InvalidParams("there is no user address in CacheCalendarPassphraseUseCase") // TODO probably it will be multiple for more members
+            ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no user address") // TODO probably it will be multiple for more members
 
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
-            ?: return UseCase.Result.InvalidParams("there is no user address in CacheCalendarPassphraseUseCase")
+            ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no user address")
 
 
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
@@ -66,7 +66,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         }
 
         if (decryptedPassphrase.isNullOrBlank()) {
-            return UseCase.Result.InvalidParams("could not decrypt passhprase in CacheCalendarPassphraseUseCase")
+            return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: could not decrypt passhprase")
         }
 
         decryptedPassphrase?.let {

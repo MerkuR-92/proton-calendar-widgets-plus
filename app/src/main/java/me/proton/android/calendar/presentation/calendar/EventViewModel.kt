@@ -32,10 +32,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
-import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
-import me.proton.android.calendar.domain.usecase.TransformEventUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import java.time.*
 import java.time.temporal.ChronoField
@@ -549,10 +546,8 @@ class EventViewModel(
                 val eventId = if (dbEvent.isSingleEdit()) immutableOriginalDbEvent!!.id else event.id
                 val deleteStartDate = if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(1)
                 val deleteSingleEditsResult = deleteEventUseCase.execute(userId, eventId, deleteStartDate)
-                if (deleteSingleEditsResult != UseCase.Result.Success) {
-                    logger.e("deleteSingleEditsResult != UseCase.Result.Success")
-                    return false
-                }
+                deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
+                if (deleteSingleEditsResult != UseCase.Result.Success) return false
 
                 // update original event:
                 // - change COUNT to ((current occurrence number) - 1)
@@ -691,10 +686,8 @@ class EventViewModel(
 
                 val deleteSingleEditsResult =
                     deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
-                if (deleteSingleEditsResult != UseCase.Result.Success) {
-                    logger.e("deleteSingleEditsResult != UseCase.Result.Success ALL_EVENTS")
-                    return false
-                }
+                deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
+                if (deleteSingleEditsResult != UseCase.Result.Success) return false
 
                 // delete all single deletions
                 event.iCalEvent.exceptionDates.clear()

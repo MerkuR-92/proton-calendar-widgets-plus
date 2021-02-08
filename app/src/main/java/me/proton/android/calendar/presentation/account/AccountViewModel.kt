@@ -33,7 +33,7 @@ class AccountViewModel(
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
-    private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase
+    private val logger: Logger
 ) : ViewModel() {
 
     sealed class State {
@@ -223,6 +223,7 @@ class AccountViewModel(
             val userId = getPrimaryUserId() ?: return@launch
 
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
+            resetCalendarsKeyResult.ifSuccessAndLogErrors(logger) { }
             if (resetCalendarsKeyResult !is UseCase.Result.Success) {
                 removeUser(userId)
                 return@launch

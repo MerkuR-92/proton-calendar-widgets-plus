@@ -40,15 +40,14 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
         var calendarsResponse = calendarsApi.getCalendars(userId)
         if (calendarsResponse !is ApiResponse.Success) {
-            logger.e("error getting calendars from API in BootstrapCalendarsUseCase")
-            return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
+            logger.e("BootstrapCalendarsUseCase: error getting calendars from API")
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API: $calendarsResponse")
         } else if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
-            return UseCase.Result.Error("error reset needed for calendar", UseCase.Error.RESET_NEEDED)
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error reset needed for calendar", UseCase.Error.RESET_NEEDED)
         } else if (calendarsResponse.data.calendars.isNotEmpty() &&
             calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
-            logger.e("error no active calendar in BootstrapCalendarsUseCase")
-            return UseCase.Result.Error("error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
         }
 
         var redoGetCalendars = false
@@ -78,7 +77,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
             }
 
             if (createDefaultCalendarResult !is UseCase.Result.Success) {
-                return UseCase.Result.Error("error unable to create default calendar for user")
+                logger.e("BootstrapCalendarsUseCase: error unable to create default calendar for user")
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: error unable to create default calendar for user")
             }
             redoGetCalendars = true
         }
@@ -97,7 +97,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 // Handle flag UPDATE_PASSPHRASE
 
                 // Skip confirmation dialog if we just handled flag RESET_NEEDED
-                if (showConfirmationDialog) return UseCase.Result.Error("error update passphrase for calendar", UseCase.Error.UPDATE_PASSPHRASE)
+                if (showConfirmationDialog) return UseCase.Result.Error("BootstrapCalendarsUseCase: error update passphrase for calendar", UseCase.Error.UPDATE_PASSPHRASE)
 
                 val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id)
 
@@ -111,20 +111,21 @@ class BootstrapCalendarsUseCase( // TODO TEST
             // GET the calendar list again after creating default one or fixing incomplete setup
             calendarsResponse = calendarsApi.getCalendars(userId)
             if (calendarsResponse !is ApiResponse.Success) {
-                logger.e("error getting calendars from API after creating default calendar")
-                return UseCase.Result.Error("error getting calendars from API: $calendarsResponse")
+                logger.e("BootstrapCalendarsUseCase: error getting calendars from API after creating default calendar: $calendarsResponse")
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API: $calendarsResponse")
             } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
-                logger.e("still no calendar after creating default calendar")
-                return UseCase.Result.Error("error user has no calendar", UseCase.Error.NO_CALENDAR)
+                logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no calendar", UseCase.Error.NO_CALENDAR)
             } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
-                logger.e("still no active calendar after creating default calendar")
-                return UseCase.Result.Error("error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
+                logger.e("BootstrapCalendarsUseCase: still no active calendar after creating default calendar")
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
             }
         }
 
         val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId) // TODO this will have a value if we have at least 1 calendar
         if (calendarUserSettingsResponse !is ApiResponse.Success) {
-            return UseCase.Result.Error("error getting calendar user settings from API: $calendarUserSettingsResponse")
+            logger.e("BootstrapCalendarsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
         calendarsRepository.persistCalendarUserSettings(
             userId.id,
@@ -133,7 +134,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
         val userSettingsResponse = settingsApi.getUserSettings(userId)
         if (userSettingsResponse !is ApiResponse.Success) {
-            return UseCase.Result.Error("error getting user settings from API: $userSettingsResponse")
+            logger.e("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponse")
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponse")
         }
         usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
 
@@ -163,9 +165,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
         } else {
 
             // sync alarms right after downloading calendars and events
-            syncAlarmsUseCase.execute(userId).ifSuccessAndLogErrors(logger) {
-                logger.v("syncAlarmsUseCase in bootstrap success")
-            }
+            syncAlarmsUseCase.execute(userId).ifSuccessAndLogErrors(logger) { }
 
             UseCase.Result.Success
         }
@@ -216,18 +216,18 @@ class BootstrapCalendarsUseCase( // TODO TEST
                         return UseCase.Result.Success
                     }
                     is UseCase.Result.InvalidParams -> {
-                        return UseCase.Result.InvalidParams("cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
+                        return UseCase.Result.InvalidParams("BootstrapCalendarsUseCase: cachePassphraseResult invalid params: ${cachePassphraseResult.message}")
                     }
                     is UseCase.Result.Error -> {
-                        return UseCase.Result.Error("cachePassphraseResult error: ${cachePassphraseResult.message}")
+                        return UseCase.Result.Error("BootstrapCalendarsUseCase: cachePassphraseResult error: ${cachePassphraseResult.message}")
                     }
                 }
             }
             is ApiResponse.Error -> {
-                return UseCase.Result.Error("api error getting calendar bootstrap: $bootstrapResponse")
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: api error getting calendar bootstrap: $bootstrapResponse")
             }
             is ApiResponse.Exception -> {
-                return UseCase.Result.Error("api exception getting calendar bootstrap: $bootstrapResponse")
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: api exception getting calendar bootstrap: $bootstrapResponse")
             }
         }
     }

@@ -22,8 +22,8 @@ class CreateCalendarUseCase(
     suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1) : UseCase.Result {
 
         val user = usersRepository.selectUserById(userId.id)
-        val email = user?.email ?: return UseCase.Result.Error("Email for user was null in CreateCalendarUseCase")
-        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json) ?: return UseCase.Result.Error("No address id found in CreateCalendarUseCase")
+        val email = user?.email ?: return UseCase.Result.Error("CreateCalendarUseCase: Email for user was null")
+        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json) ?: return UseCase.Result.Error("CreateCalendarUseCase: No address id found")
 
         val createCalendarApiRequest =
             CreateCalendarApiRequest(
@@ -44,7 +44,7 @@ class CreateCalendarUseCase(
                 return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
                     is ApiResponse.Success -> {
 
-                        val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("memberId was null in CreateCalendarUseCase")
+                        val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("CreateCalendarUseCase: memberId was null")
 
                         val keySetupResult = keySetupUseCase.execute(
                             userId,
@@ -54,18 +54,18 @@ class CreateCalendarUseCase(
                             memberId)
 
                         when (keySetupResult) {
-                            is UseCase.Result.InvalidParams -> { logger.e("InvalidParams in CreateCalendarUseCase: ${keySetupResult.message}") }
-                            is UseCase.Result.Error -> { logger.e("Error in CreateCalendarUseCase: ${keySetupResult.message}") }
+                            is UseCase.Result.InvalidParams -> { logger.e("CreateCalendarUseCase: InvalidParams in KeySetupUseCase: ${keySetupResult.message}") }
+                            is UseCase.Result.Error -> { logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}") }
                         }
 
                         return keySetupResult
                     }
-                    is ApiResponse.Error -> UseCase.Result.Error(memberListApiResponse.error)
-                    is ApiResponse.Exception -> UseCase.Result.Error(memberListApiResponse.exception.message ?: "(no exception message)")
+                    is ApiResponse.Error -> UseCase.Result.Error("CreateCalendarUseCase: error fetching members: ${memberListApiResponse.error}")
+                    is ApiResponse.Exception -> UseCase.Result.Error("CreateCalendarUseCase: error fetching members: ${memberListApiResponse.exception.message ?: "(no exception message)"}")
                 }
             }
-            is ApiResponse.Error -> UseCase.Result.Error(createCalendarApiResponse.error)
-            is ApiResponse.Exception -> UseCase.Result.Error(createCalendarApiResponse.exception.message ?: "(no exception message)")
+            is ApiResponse.Error -> UseCase.Result.Error("CreateCalendarUseCase: error creating calendar: ${createCalendarApiResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("CreateCalendarUseCase: error creating calendar: ${createCalendarApiResponse.exception.message ?: "(no exception message)"}")
         }
     }
 }

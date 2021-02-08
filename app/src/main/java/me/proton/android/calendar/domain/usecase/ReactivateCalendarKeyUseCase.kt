@@ -23,29 +23,25 @@ class ReactivateCalendarKeyUseCase(
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         val userPassphrase = valueStore.getString(ValueKey.USER_PASSPHRASE)
         if (userPassphrase == null) {
-            logger.e("user passphrase is empty in ResetCalendarKeysUseCase")
-            return UseCase.Result.Error("error empty user passphrase")
+            return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error empty user passphrase")
         }
 
         // Get all keys
         val keysResponse = calendarsApi.getKeys(userId, calendarId)
         if (keysResponse !is ApiResponse.Success) {
-            logger.e("error getting keys from API in ReactivateCalendarKeyUseCase")
-            return UseCase.Result.Error("error getting keys from API: $keysResponse")
+            return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error getting keys from API: $keysResponse")
         }
 
         // Get all the passphrase
         val passphrasesResponse = calendarsApi.getPassphrases(userId, calendarId)
         if (passphrasesResponse !is ApiResponse.Success) {
-            logger.e("error getting passphrases from API in ReactivateCalendarKeyUseCase")
-            return UseCase.Result.Error("error getting passphrases from API: $passphrasesResponse")
+            return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error getting passphrases from API: $passphrasesResponse")
         }
 
         // Get all members
         val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)
         if (memberListApiResponse !is ApiResponse.Success) {
-            logger.e("error getting members from API in ReactivateCalendarKeyUseCase")
-            return UseCase.Result.Error("error getting members from API: $memberListApiResponse")
+            return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error getting members from API: $memberListApiResponse")
         }
 
         val reenableKeyResponses = arrayListOf<ApiResponse<ReenableKeyApiResponse>>()
@@ -144,8 +140,7 @@ class ReactivateCalendarKeyUseCase(
         }
 
         if (reenableKeyResponses.any { it !is ApiResponse.Success }) {
-            logger.e("error reenabling one or more key from API in ReactivateCalendarKeyUseCase")
-            return UseCase.Result.Error("error reenabling one or more key from API")
+            return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error reenabling one or more key from API")
         }
 
         return UseCase.Result.Success

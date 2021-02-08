@@ -28,8 +28,7 @@ class ResetCalendarsKeyUseCase(
         // Get all the calendars to be reset
         val resetInfoResponse = calendarsApi.getResetInfo(userId)
         if (resetInfoResponse !is ApiResponse.Success) {
-            logger.e("error getting calendars to reset from API in ResetCalendarKeysUseCase")
-            return UseCase.Result.Error("error getting calendars to reset from API: $resetInfoResponse")
+            return UseCase.Result.Error("ResetCalendarsKeyUseCase: error getting calendars to reset from API: $resetInfoResponse")
         }
 
         val setupKeyApiRequestMap = hashMapOf<String, SetupKeyApiRequest>()
@@ -46,23 +45,23 @@ class ResetCalendarsKeyUseCase(
                     val adminMember = memberListApiResponse.data.members.firstOrNull { memberEntity ->
                         // TODO Take admin member that has decryptable key
                         memberEntity.hasPermission(MemberEntity.Permission.ADMIN)
-                    } ?: return UseCase.Result.Error("no admin member in ResetCalendarKeysUseCase")
+                    } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: no admin member")
 
                     val address =
                         database.addressesDao().select(userId.id, adminMember.email).firstOrNull()?.toAddress(json)
-                            ?: return UseCase.Result.Error("No address id found in ResetCalendarKeysUseCase")
+                            ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: No address id found")
 
-                    val memberAddressKey = address.primaryKey ?: address.keys.firstOrNull { it.isActive } ?: return UseCase.Result.Error("memberAddressKey was null in ResetCalendarKeysUseCase")
+                    val memberAddressKey = address.primaryKey ?: address.keys.firstOrNull { it.isActive } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: memberAddressKey was null")
                     setupKeyApiRequestMap[calendarId] = getSetupKeyApiRequest(
                         userId,
                         address.id,
                         memberAddressKey,
                         it.members
-                    ) ?: return UseCase.Result.Error("getSetupKeyApiRequest was null in ResetCalendarKeysUseCase")
+                    ) ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: getSetupKeyApiRequest was null")
                 }
-                is ApiResponse.Error -> UseCase.Result.Error(memberListApiResponse.error)
+                is ApiResponse.Error -> UseCase.Result.Error("ResetCalendarsKeyUseCase: error fetching members: ${memberListApiResponse.error}")
                 is ApiResponse.Exception -> UseCase.Result.Error(
-                    memberListApiResponse.exception.message ?: "(no exception message)"
+                    "ResetCalendarsKeyUseCase: error fetching members: ${memberListApiResponse.exception.message ?: "(no exception message)"}"
                 )
             }
         }
@@ -73,11 +72,11 @@ class ResetCalendarsKeyUseCase(
                 UseCase.Result.Success
             }
             is ApiResponse.Error -> {
-                UseCase.Result.Error(resetCalendarApiResponse.error)
+                UseCase.Result.Error("ResetCalendarsKeyUseCase: error in reset calendar: ${resetCalendarApiResponse.error}")
             }
             is ApiResponse.Exception -> {
                 UseCase.Result.Error(
-                    resetCalendarApiResponse.exception.message ?: "(no exception message)"
+                    "ResetCalendarsKeyUseCase: error in reset calendar: ${resetCalendarApiResponse.exception.message ?: "(no exception message)"}"
                 )
             }
         }
@@ -92,7 +91,7 @@ class ResetCalendarsKeyUseCase(
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
         val userPassphrase = valueStore.getString(ValueKey.USER_PASSPHRASE)
         if (userPassphrase == null) {
-            logger.e("user passphrase is empty in ResetCalendarKeysUseCase")
+            logger.e("ResetCalendarsKeyUseCase: user passphrase is empty")
             return null
         }
 
@@ -104,7 +103,7 @@ class ResetCalendarsKeyUseCase(
         val calendarPrivateKey =
             crypto.generateEccKey("not-a-name", "not-an-email@example.tld", calendarPassphrase.toByteArray())
         if (calendarPrivateKey == null) {
-            logger.e("generateEncryptedKey was null in ResetCalendarKeysUseCase")
+            logger.e("ResetCalendarsKeyUseCase: generateEncryptedKey was null")
             return null
         }
 
@@ -115,7 +114,7 @@ class ResetCalendarsKeyUseCase(
             userPassphrase.toByteArray()
         )
         if (tokenSignature == null) {
-            logger.e("signature was null in ResetCalendarKeysUseCase")
+            logger.e("ResetCalendarsKeyUseCase: signature was null")
             return null
         }
 
@@ -134,7 +133,7 @@ class ResetCalendarsKeyUseCase(
         }
 
         if (keyPackets.isNullOrEmpty()) {
-            logger.e("keyPackets was null or empty in ResetCalendarKeysUseCase")
+            logger.e("ResetCalendarsKeyUseCase: keyPackets was null or empty")
             return null
         }
 
