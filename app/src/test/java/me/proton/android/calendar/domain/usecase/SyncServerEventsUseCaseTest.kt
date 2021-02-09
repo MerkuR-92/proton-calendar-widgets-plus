@@ -37,6 +37,7 @@ internal class SyncServerEventsUseCaseTest {
     private val calendarsApi: CalendarsApi = mockk()
     private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
+    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase = mockk()
 
     private val userId = UserId("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
@@ -111,6 +112,7 @@ internal class SyncServerEventsUseCaseTest {
             coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
             coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
             coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
+            coEvery { bootstrapCalendarsUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success
             coEvery { calendarsApi.getEvent(any(), any(), any()) } returns ApiResponse.Success(
                 EventApiResponse(EventEntity(
                     "id",
@@ -127,7 +129,7 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList()))
             )
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCase, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, calendarsApi)
+            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCase, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, bootstrapCalendarsUseCase, calendarsApi)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
