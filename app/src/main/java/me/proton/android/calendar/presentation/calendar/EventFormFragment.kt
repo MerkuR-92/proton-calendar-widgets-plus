@@ -21,11 +21,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import biweekly.property.Action
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,6 +59,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
+    override val isScrollable = false
 
     override val navigateUp = false
 
@@ -370,7 +373,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
 
             if (viewModeInitStatus == EventViewModel.Result.Success) {
-                if (navigationArguments.eventId == null) event_form_title.requestFocus()
+                if (navigationArguments.eventId == null) {
+                    event_form_title.requestFocus()
+                    requireContext().showKeyboard()
+                }
                 launch {
                     eventViewModel.getSingleEditsInfo()
                 }
@@ -420,6 +426,12 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     event_form_alarm_list.getChildAt(i).findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !savingEvent
                 }
             })
+        }
+
+        event_form_scroll_view.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (oldScrollY - scrollY < 0) {
+                requireActivity().clearFocusAndHideKeyboard(view)
+            }
         }
     }
 

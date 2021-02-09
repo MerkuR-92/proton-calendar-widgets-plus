@@ -109,7 +109,7 @@ class AddAttendeeListAdapter(
             attendeeItemIconCheck.visibleOrGone(searchList && added)
             attendeeItemIconLoading.visibleOrGone(false)
 
-            attendeeItemIconDelete.visibleOrGone(!searchList)
+            attendeeItemIconDelete.visibleOrGone(!searchList && organizerEmail != attendee.extractEmail())
             attendeeItemIconDelete.setOnSingleClickListener {
                 if (!searchList) clickListener(attendee)
             }
@@ -117,7 +117,7 @@ class AddAttendeeListAdapter(
             attendeeItemPress.visibleOrGone(searchList && !added)
             attendeeItemPress.setOnSingleClickListener {
                 if (searchList) {
-                    if (!userEmails.isNullOrEmpty() && userEmails.firstOrNull { it.equals(attendee.extractEmail(), true) } != null) {
+                    if (userEmails.firstOrNull { it.equals(attendee.extractEmail(), true) } != null) {
                         view.displaySnackBar(view.context.getString(R.string.snack_add_self_as_participant))
                         return@setOnSingleClickListener
                     }
@@ -136,5 +136,10 @@ class AddAttendeeListAdapter(
     private var query: String = ""
     fun setQuery(query: String) {
         this.query = query
+    }
+
+    private var organizerEmail: String = ""
+    fun setOrganizerEmail(organizerEmail: String) {
+        this.organizerEmail = organizerEmail
     }
 }

@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/event_text_add_participants"
+        android:imeOptions="actionDone"
         android:inputType="textEmailAddress"
         android:scrollHorizontally="false"
         android:maxLength="255"
@@ -78,17 +79,18 @@
     <LinearLayout
         android:id="@+id/nav_event_form_attendees_list_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nav_event_form_attendees_search_separator">
+        app:layout_constraintTop_toBottomOf="@+id/nav_event_form_attendees_search_separator"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/nav_event_form_attendees_list_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_text_participants"
+            android:animateLayoutChanges="false"
             style="@style/Text.DefaultSmall.Weak"
             android:layout_marginTop="@dimen/spacing_large"
             android:layout_marginStart="@dimen/default_margin_text_start"
@@ -98,20 +100,11 @@
             android:id="@+id/nav_event_form_attendees_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:animateLayoutChanges="false"
             android:overScrollMode="never"
             tools:listitem="@layout/item_add_attendee"
-            tools:itemCount="8"/>
+            tools:itemCount="10"/>
 
     </LinearLayout>
-
-    <include
-        android:id="@+id/nav_event_form_attendees_organizer"
-        layout="@layout/item_add_attendee"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/nav_event_form_attendees_list_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
