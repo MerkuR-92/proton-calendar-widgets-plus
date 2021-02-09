@@ -128,7 +128,7 @@
         <item name="boxBackgroundColor">@color/background_secondary</item>
     </style>
 
-    <style name="Chip" parent="@style/Widget.MaterialComponents.Chip.Choice">
+    <style name="DayOfWeekChip" parent="@style/Widget.MaterialComponents.Chip.Choice">
         <item name="chipBackgroundColor">@color/chip_background_state_list</item>
         <item name="rippleColor">@color/chip_ripple_state_list</item>
         <item name="android:textColor">@color/chip_text_state_list</item>
@@ -143,6 +143,18 @@
         <item name="chipStartPadding">0dp</item>
         <item name="textStartPadding">0dp</item>
         <item name="textEndPadding">0dp</item>
+    </style>
+
+    <style name="AttendeeChip" parent="@style/Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/interaction_weak</item>
+        <item name="android:textColor">@color/text_norm</item>
+        <item name="android:textAppearance">@style/Text.Default</item>
+        <item name="android:textAlignment">center</item>
+        <item name="chipMinTouchTargetSize">1dp</item>
+        <item name="chipEndPadding">0dp</item>
+        <item name="chipStartPadding">0dp</item>
+        <item name="textStartPadding">12dp</item>
+        <item name="textEndPadding">12dp</item>
     </style>
 
     <!-- PICKER DIALOG -->

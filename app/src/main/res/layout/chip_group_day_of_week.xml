@@ -20,49 +20,49 @@
             android:orientation="horizontal">
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:text="Mon" />
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:text="Mon"/>
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:text="Mon"/>
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:text="Mon"/>
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:text="Mon"/>
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     tools:text="Mon"/>
 
                 <com.google.android.material.chip.Chip
-                    style="@style/Chip"
+                    style="@style/DayOfWeekChip"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

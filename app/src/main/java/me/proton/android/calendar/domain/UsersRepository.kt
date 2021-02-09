@@ -5,6 +5,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.entity.*
+import me.proton.core.domain.entity.UserId
 
 /**
  * Manages Users, UserKeys, Addresses etc.
@@ -48,4 +49,5 @@ interface UsersRepository {
 
     fun flowWeekStart(userId: String): Flow<Int?>
 
+    suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): List<Pair<String, String>>?
 }

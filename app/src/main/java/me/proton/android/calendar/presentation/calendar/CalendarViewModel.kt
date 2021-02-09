@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -606,5 +607,20 @@ class CalendarViewModel(
             2 -> false
             else -> DateFormat.is24HourFormat(context)
         }
+    }
+
+    suspend fun getCanonicalEmails(emails: List<String>): List<Pair<String, String>>? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getCanonicalEmails")
+            return null
+        }
+        return usersRepository.getCanonicalAddresses(userId, emails)
+    }
+
+    suspend fun getCalendarDefaultEmail(calendarId: String): String? {
+        return calendarsRepository.selectMembers(calendarId).firstOrNull {
+            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+        }?.email
     }
 }

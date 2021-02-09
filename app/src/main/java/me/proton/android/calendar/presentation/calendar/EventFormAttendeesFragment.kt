@@ -10,14 +10,15 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
+import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import kotlinx.android.synthetic.main.toolbar_action_text.view.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.domain.model.Participant
+import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.core.presentation.utils.InputValidationResult.Companion.EMAIL_VALIDATION_PATTERN
 import me.proton.core.presentation.utils.onTextChange
@@ -34,20 +35,25 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val eventViewModel: EventViewModel by sharedViewModel()
 
     private lateinit var attendeeListAdapter: AddAttendeeListAdapter
     private lateinit var searchAttendeeListAdapter: AddAttendeeListAdapter
 
     private val regex = EMAIL_VALIDATION_PATTERN.toRegex(RegexOption.IGNORE_CASE)
 
+    // TODO Move to VM ?
+    private val _searchAttendeeList: MutableLiveData<List<Attendee>> = MutableLiveData()
+    private val searchAttendeeList: LiveData<List<Attendee>> = _searchAttendeeList
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         dialog_appbar.visibleOrGone(false)
         nav_event_form_attendees_done.toolbar_action_text.text = getString(R.string.action_done)
+        nav_event_form_attendees_list_header.text = getString(R.string.event_text_participants, 0, ATTENDEE_MAX_ALLOWED)
 
         nav_event_form_attendees_done.toolbar_action_text.setOnSingleClickListener {
-            // TODO Handle save
             findNavController().navigateUp()
         }
 
@@ -55,25 +61,18 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
             nav_event_form_attendees_done.visibleOrInvisible(query.isEmpty())
             nav_event_form_attendees_search_clear.visibleOrGone(query.isNotEmpty())
 
-            nav_event_form_attendees_list_layout.visibleOrGone(query.isEmpty())
+            val attendeeList = eventViewModel.eventLiveData.value?.iCalEvent?.attendees
+            nav_event_form_attendees_list_layout.visibleOrGone(query.isEmpty() && !attendeeList.isNullOrEmpty())
+            nav_event_form_attendees_organizer.visibleOrGone(query.isEmpty() && !attendeeList.isNullOrEmpty())
             if (query.isEmpty()) nav_event_form_attendees_search_list.visibleOrGone(false)
 
             if (query.isNotEmpty()) {
                 searchAttendeeListAdapter.setQuery(query.toString())
-                val contacts = contactsList.value?.filter {
-                    val match = it.email.contains(query, true) || it.commonName?.contains(query, true) == true
-                    if (match) it.added = attendeeList.value?.contains(it) == true
-                    match
-                }
 
                 val searchResult =
                     when {
-                        contacts?.isNotEmpty() == true -> contacts
                         regex.matches(query) -> {
-                            val participant = Participant(query.toString())
-                            if (attendeeList.value?.firstOrNull { it.email.equals(query.toString(), true) } != null) {
-                                participant.added = true
-                            }
+                            val participant = Attendee("", query.toString())
                             listOf(participant)
                         }
                         else -> listOf()
@@ -89,23 +88,12 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
             nav_event_form_attendees_search_input.text.clear()
         }
 
-        // TODO Remove
-//        setMockedContactsList()
-
         val userEmails = calendarViewModel.userEmails.value ?: listOf()
 
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_list.layoutManager = attendeesLayoutManager
         attendeeListAdapter = AddAttendeeListAdapter(false, userEmails) {
-            val tmpList = ArrayList(attendeeList.value ?: listOf<Participant>())
-            tmpList.remove(it)
-            _attendeeList.postValue(tmpList)
-
-            val contacts = contactsList.value ?: return@AddAttendeeListAdapter
-            val index = contacts.indexOf(it)
-            if (index == -1) return@AddAttendeeListAdapter
-            contacts[index].added = false
-            _contactsList.postValue(contacts)
+            eventViewModel.handleAttendee(it, false)
         }
         (nav_event_form_attendees_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         nav_event_form_attendees_list.adapter = attendeeListAdapter
@@ -114,67 +102,62 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
         nav_event_form_attendees_search_list.layoutManager = searchAttendeesLayoutManager
         searchAttendeeListAdapter = AddAttendeeListAdapter(true, userEmails) {
             lifecycleScope.launch {
-                // TODO Remove launch and delay
-                delay(1000)
+                val tmpAttendeeList = ArrayList(eventViewModel.eventLiveData.value?.iCalEvent?.attendees ?: listOf<Attendee>())
 
-                val tmpAttendeeList = ArrayList(attendeeList.value ?: listOf<Participant>())
+                if (tmpAttendeeList.size >= ATTENDEE_MAX_ALLOWED) {
+                    view.displaySnackBar(getString(R.string.snack_maximum_participants_reached))
+                    searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
+                    return@launch
+                }
+
+                val email = it.extractEmail()
+                email?.let {
+                    // TODO Use get canonical route for second validation ? What are the actual error cases ?
+                    val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.first()?.second
+                }
+
                 tmpAttendeeList.add(it)
-                _attendeeList.postValue(tmpAttendeeList)
 
                 nav_event_form_attendees_search_input.text.clear()
 
-                val contacts = contactsList.value ?: return@launch
-                val index = contacts.indexOf(it)
-                if (index == -1) return@launch
-                contacts[index].added = true
-                _contactsList.postValue(contacts)
+                eventViewModel.handleAttendee(it)
+
+                if (tmpAttendeeList.size >= ATTENDEE_MAX_ALLOWED) { // Warn the user once max is reached
+                    view.displaySnackBar(getString(R.string.snack_maximum_participants_reached))
+                }
             }
         }
         (nav_event_form_attendees_search_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         nav_event_form_attendees_search_list.adapter = searchAttendeeListAdapter
 
-        contactsList.observe(viewLifecycleOwner, { contactsList ->
-
-        })
         searchAttendeeList.observe(viewLifecycleOwner, { searchAttendeeList ->
             searchAttendeeListAdapter.submitList(searchAttendeeList.sortedBy { it.commonName })
             searchAttendeeListAdapter.notifyDataSetChanged()
         })
-        attendeeList.observe(viewLifecycleOwner, { attendeeList ->
-            attendeeListAdapter.submitList(attendeeList.sortedBy { it.commonName })
+        eventViewModel.eventLiveData.observe(viewLifecycleOwner, { event ->
+            val attendeeList = event.iCalEvent.attendees
+            searchAttendeeListAdapter.setAttendeeList(attendeeList)
+            attendeeListAdapter.submitList(attendeeList.reversed()) // Last added at the top, first at the bottom
             attendeeListAdapter.notifyDataSetChanged()
-            nav_event_form_attendees_list_header.visibleOrGone(!attendeeList.isNullOrEmpty())
-            // Change visibility of list here if empty to avoid any delay between header and list visibility change
-            if (attendeeList.isNullOrEmpty()) nav_event_form_attendees_list_layout.visibleOrGone(false)
+            nav_event_form_attendees_list_header.visibleOrGone(attendeeList.isNotEmpty())
+            nav_event_form_attendees_list_header.text = getString(R.string.event_text_participants, attendeeList.size, ATTENDEE_MAX_ALLOWED)
+            nav_event_form_attendees_list_layout.visibleOrGone(attendeeList.isNotEmpty())
+            nav_event_form_attendees_organizer.visibleOrGone(attendeeList.isNotEmpty())
+
+            lifecycleScope.launch {
+                val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id)
+                organizerEmail?.let {
+                    nav_event_form_attendees_organizer.item_add_attendee_title.text = getString(R.string.event_current_user_organizer)
+                    nav_event_form_attendees_organizer.item_add_attendee_press.visibleOrGone(false)
+                    nav_event_form_attendees_organizer.item_add_attendee_description.visibleOrGone(true)
+                    nav_event_form_attendees_organizer.item_add_attendee_description.text = organizerEmail
+                    nav_event_form_attendees_organizer.item_add_attendee_initials.text = getInitials(organizerEmail)
+                }
+            }
         })
     }
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
-    }
-
-
-
-    // TODO Remove mocks and move LiveData to VM
-
-    private val _contactsList: MutableLiveData<List<Participant>> = MutableLiveData()
-    private val contactsList: LiveData<List<Participant>> = _contactsList
-
-    private val _attendeeList: MutableLiveData<List<Participant>> = MutableLiveData()
-    private val attendeeList: LiveData<List<Participant>> = _attendeeList
-
-    private val _searchAttendeeList: MutableLiveData<List<Participant>> = MutableLiveData()
-    private val searchAttendeeList: LiveData<List<Participant>> = _searchAttendeeList
-
-    private fun setMockedContactsList() {
-        val contacts = arrayListOf<Participant>()
-        contacts.add(Participant("john.doe@pm.me", "John Doe"))
-        contacts.add(Participant("waterloo@pm.me", "Napoleon B."))
-        contacts.add(Participant("hamlet@pm.me", "William Shakespeare"))
-        contacts.add(Participant("potus@pm.me", "Abraham Lincoln"))
-        contacts.add(Participant("moonboy@pm.me", "Neil Armstrong"))
-        contacts.add(Participant("appletree@pm.me", "Isaac Newton"))
-        contacts.add(Participant("veryveryveryveryveryveryveryverylongemailaddressveryveryveryveryveryveryveryverylongemailaddress@pm.me", "Annoying Case"))
-        _contactsList.postValue(contacts)
     }
 }

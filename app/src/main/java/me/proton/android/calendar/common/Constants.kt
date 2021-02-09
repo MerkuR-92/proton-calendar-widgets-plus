@@ -97,6 +97,9 @@ object FormValidation {
 
     const val ATTENDEE_SHOW_TRESHOLD = 5
 
+    const val ATTENDEE_MAX_ALLOWED = 100
+    const val ATTENDEE_MAX_CHIP_ALLOWED = 4
+
 }
 
 object FragmentArguments {

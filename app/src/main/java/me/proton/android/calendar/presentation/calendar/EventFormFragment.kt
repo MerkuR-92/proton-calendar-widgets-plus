@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.property.Action
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
+import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
@@ -433,9 +435,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event.description?.let { event_form_description.setText(it) }
 
             if (event_form_location.text.isEmpty())
-                ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
+                ImageViewCompat.setImageTintList(
+                    event_form_location_icon,
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint))
+                )
             if (event_form_description.text.isEmpty())
-                ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
+                ImageViewCompat.setImageTintList(
+                    event_form_description_icon,
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint))
+                )
 
             event_form_all_day_switch.isChecked = event.isAllDay()
             event_form_all_day_switch.jumpDrawablesToCurrentState()
@@ -448,28 +456,96 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 event_form_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
                 event_form_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
             } else {
-                event_form_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
-                event_form_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.textColorValidationError))
+                event_form_start_date.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.textColorValidationError
+                    )
+                )
+                event_form_start_time.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.textColorValidationError
+                    )
+                )
             }
 
-            val formattedStart = event.formatStart(eventViewModel.eventTimeZoneId, eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())))
+            val formattedStart = event.formatStart(
+                eventViewModel.eventTimeZoneId,
+                eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+            )
             event_form_start_date.text = formattedStart.first ?: ""
             event_form_start_time.text = formattedStart.second ?: ""
 
-            val formattedEnd = event.formatEnd(eventViewModel.eventTimeZoneId, eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())))
+            val formattedEnd = event.formatEnd(
+                eventViewModel.eventTimeZoneId,
+                eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+            )
             event_form_end_date.text = formattedEnd.first ?: ""
             event_form_end_time.text = formattedEnd.second ?: ""
 
-            event_form_timezone.text = ICalUtils.formatTimeZoneId(event.defaultTimeZone!!, eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!) // TimeZone picked by user is saved in iCalendar's Default Timezone
+            event_form_timezone.text = ICalUtils.formatTimeZoneId(
+                event.defaultTimeZone!!,
+                eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!
+            ) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             event_form_calendar.text = event.calendar.name
-            ImageViewCompat.setImageTintList(event_form_calendar_icon, ColorStateList.valueOf(Color.parseColor(event.calendar.color)))
+            ImageViewCompat.setImageTintList(
+                event_form_calendar_icon,
+                ColorStateList.valueOf(Color.parseColor(event.calendar.color))
+            )
 
-            event_form_recurrence.text = AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+            event_form_recurrence.text =
+                AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId)
+                    ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
 
+            event_form_participant_chip_group.removeAllViews()
+            var count = 0
+            for (attendee in event.iCalEvent.attendees) {
+                val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
+                chipTitle?.let {
+                    addAttendeeChip(chipTitle)
+                }
+                count++
+                if (count >= ATTENDEE_MAX_CHIP_ALLOWED) break
+            }
+            if (!event.iCalEvent.attendees.isNullOrEmpty()) {
+                addAttendeeChip(getString(R.string.event_current_user_organizer))
+
+                if (event.iCalEvent.attendees.size > ATTENDEE_MAX_CHIP_ALLOWED) {
+                    addAttendeeChip(
+                        getString(
+                            R.string.event_max_attendee_chip,
+                            event.iCalEvent.attendees.size - ATTENDEE_MAX_CHIP_ALLOWED
+                        )
+                    )
+                }
+            }
+            ImageViewCompat.setImageTintList(
+                event_form_participant_icon, ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (event.iCalEvent.attendees.isNullOrEmpty()) R.color.icon_hint
+                        else R.color.icon_norm
+                    )
+                )
+            )
+            event_form_participant.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty())
+            event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
+
         })
+    }
+
+    private fun addAttendeeChip(title: String) {
+        val chip = layoutInflater.inflate(R.layout.item_attendee_chip, event_form_participant_chip_group, false) as Chip
+        chip.text = title
+        chip.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+        }
+        event_form_participant_chip_group.addView(chip)
     }
 
     private fun attachActionHandlers() {

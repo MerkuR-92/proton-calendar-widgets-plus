@@ -8,6 +8,7 @@ import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Action
+import biweekly.property.Attendee
 import biweekly.property.Trigger
 import biweekly.util.*
 import biweekly.util.DayOfWeek
@@ -1280,5 +1281,17 @@ class EventViewModel(
             if (event.isSingleEdit()) originalDbEvent
             else dbEvent
         return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
+    }
+
+    fun handleAttendee(attendee: Attendee, addAttendee: Boolean = true) {
+        markEventAsEdited()
+        if (addAttendee) {
+            event.iCalEvent.addAttendee(
+                Attendee(attendee.commonName, attendee.extractEmail()) // TODO email or canonical email ?
+            )
+        } else {
+            event.iCalEvent.attendees.remove(attendee)
+        }
+        _event.postValue(event)
     }
 }

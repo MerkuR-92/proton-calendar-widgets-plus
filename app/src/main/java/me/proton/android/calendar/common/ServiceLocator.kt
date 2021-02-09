@@ -50,7 +50,7 @@ val networkModule = module {
 
 val repositoryModule = module {
     single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get(), get()) }
-    single<UsersRepository> { UsersRepositoryImpl(get(), get()) }
+    single<UsersRepository> { UsersRepositoryImpl(get(), get(), get(), get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
 }

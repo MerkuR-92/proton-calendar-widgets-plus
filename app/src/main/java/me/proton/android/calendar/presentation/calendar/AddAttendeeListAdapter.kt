@@ -15,23 +15,23 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.domain.model.Participant
 
 class AddAttendeeListAdapter(
     private val searchList: Boolean = false,
     private val userEmails: List<String>,
-    private val clickListener: (Participant) -> Unit
-) : ListAdapter<Participant, AddAttendeeListAdapter.ViewHolder>(AddAttendeeDiffCallback()) {
+    private val clickListener: (Attendee) -> Unit
+) : ListAdapter<Attendee, AddAttendeeListAdapter.ViewHolder>(AddAttendeeDiffCallback()) {
 
-    class AddAttendeeDiffCallback : DiffUtil.ItemCallback<Participant>() {
-        override fun areItemsTheSame(oldItem: Participant, newItem: Participant): Boolean {
-            return oldItem.email == newItem.email
+    class AddAttendeeDiffCallback : DiffUtil.ItemCallback<Attendee>() {
+        override fun areItemsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
+            return oldItem.extractEmail() == newItem.extractEmail()
         }
 
-        override fun areContentsTheSame(oldItem: Participant, newItem: Participant): Boolean {
+        override fun areContentsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
             return oldItem == newItem
         }
     }
@@ -57,15 +57,15 @@ class AddAttendeeListAdapter(
         private val attendeeItemPress: View = view.item_add_attendee_press
         private val attendeeItemSeparator: View = view.item_add_attendee_separator
 
-        fun bind(participant : Participant, position : Int) {
+        fun bind(attendee : Attendee, position : Int) {
             // If has common name use it, else use email and hide description field
             val title =
-                if (participant.commonName.isNullOrEmpty()) participant.email ?: ""
-                else participant.commonName
+                if (attendee.commonName.isNullOrEmpty()) attendee.extractEmail() ?: ""
+                else attendee.commonName
             val description =
-                if (participant.commonName.isNullOrEmpty() ||
-                    participant.commonName.equals(participant.email, ignoreCase = true)) ""
-                else participant.email
+                if (attendee.commonName.isNullOrEmpty() ||
+                    attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
+                else attendee.extractEmail() ?: ""
 
             if (query.isNotEmpty() && title.contains(query)) {
                 val spannableStringBuilder = SpannableStringBuilder(title)
@@ -104,26 +104,33 @@ class AddAttendeeListAdapter(
 
             attendeeItemInitials.text = getInitials(title)
 
-            attendeeItemIconCheck.visibleOrGone(searchList && participant.added)
+            val added = attendeeList.firstOrNull { it.extractEmail().equals(attendee.extractEmail(), true) } != null
+
+            attendeeItemIconCheck.visibleOrGone(searchList && added)
             attendeeItemIconLoading.visibleOrGone(false)
 
             attendeeItemIconDelete.visibleOrGone(!searchList)
             attendeeItemIconDelete.setOnSingleClickListener {
-                if (!searchList) clickListener(participant)
+                if (!searchList) clickListener(attendee)
             }
 
-            attendeeItemPress.visibleOrGone(searchList && !participant.added)
+            attendeeItemPress.visibleOrGone(searchList && !added)
             attendeeItemPress.setOnSingleClickListener {
                 if (searchList) {
-                    if (!userEmails.isNullOrEmpty() && userEmails.firstOrNull { it.equals(participant.email, true) } != null) {
+                    if (!userEmails.isNullOrEmpty() && userEmails.firstOrNull { it.equals(attendee.extractEmail(), true) } != null) {
                         view.displaySnackBar(view.context.getString(R.string.snack_add_self_as_participant))
                         return@setOnSingleClickListener
                     }
                     attendeeItemIconLoading.visibleOrGone(true)
-                    clickListener(participant)
+                    clickListener(attendee)
                 }
             }
         }
+    }
+
+    private var attendeeList: List<Attendee> = arrayListOf()
+    fun setAttendeeList(attendeeList: List<Attendee>) {
+        this.attendeeList = attendeeList
     }
 
     private var query: String = ""

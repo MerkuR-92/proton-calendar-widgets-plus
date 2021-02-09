@@ -10,13 +10,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.ResetCalendarApiRequest
 import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.api.AddressesApi
+import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.domain.entity.UserId
 import timber.log.Timber
 
 // TODO better name? move to separate package?
 class UsersRepositoryImpl(
     private val database: AppDatabase /*TODO probably will need more than 1 API here*/,
-    private val json: Json
+    private val json: Json,
+    private val addressesApi: AddressesApi,
+    private val logger: Logger
 ) : UsersRepository {
 
     override fun usersFlow(): Flow<List<UserEntity>> {
@@ -101,4 +109,23 @@ class UsersRepositoryImpl(
         return database.userSettingsDao().flowWeekStart(userId).distinctUntilChanged()
     }
 
+    override suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): List<Pair<String, String>>? {
+        return when (val canonicalResult = addressesApi.getCanonicalEmails(userId, emails)) {
+            is ApiResponse.Success -> {
+                val emailPairs = ArrayList<Pair<String, String>>()
+                canonicalResult.data.canonicalEmailsResponses.forEach {
+                    emailPairs.add(Pair(it.email, it.canonicalEmailResponse.canonicalEmail))
+                }
+                emailPairs
+            }
+            is ApiResponse.Error -> {
+                logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.error}")
+                null
+            }
+            is ApiResponse.Exception -> {
+                logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.exception.message ?: "(no exception message)"}")
+                null
+            }
+        }
+    }
 }
