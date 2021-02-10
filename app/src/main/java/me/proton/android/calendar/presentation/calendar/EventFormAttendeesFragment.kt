@@ -2,7 +2,9 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.AbsListView
+import androidx.core.view.isVisible
 import androidx.databinding.adapters.AbsListViewBindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -103,6 +105,20 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
                 nav_event_form_attendees_search_list.visibleOrGone(searchResult.isNotEmpty())
                 _searchAttendeeList.postValue(searchResult)
             }
+        }
+
+        nav_event_form_attendees_search_input.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && regex.matches(nav_event_form_attendees_search_input.text)) {
+                val query = nav_event_form_attendees_search_input.text.toString()
+                val index = searchAttendeeListAdapter.currentList.indexOfFirst {
+                    it.extractEmail().equals(query, true)
+                }
+                if (index != -1) {
+                    val itemPress = nav_event_form_attendees_search_list.getChildAt(index).item_add_attendee_press
+                    if (itemPress.isVisible) itemPress.performClick()
+                }
+            }
+            false
         }
 
         nav_event_form_attendees_search_clear.setOnSingleClickListener {
