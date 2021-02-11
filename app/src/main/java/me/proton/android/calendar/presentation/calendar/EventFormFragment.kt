@@ -7,11 +7,11 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -21,10 +21,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
+import androidx.preference.PreferenceManager
 import biweekly.property.Action
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.dialog_checkbox.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
@@ -38,7 +39,6 @@ import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWE
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.ext.android.inject
@@ -67,6 +67,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private lateinit var loadingAction: View
     private lateinit var buttonSave: View
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+        }
 
     override fun onBackPressedCustom() {
         val immutableSavingEvent = eventViewModel.savingEvent.value
@@ -554,8 +561,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         val chip = layoutInflater.inflate(R.layout.item_attendee_chip, event_form_participant_chip_group, false) as Chip
         chip.text = title
         chip.setOnSingleClickListener {
-            requireActivity().clearFocusAndHideKeyboard(view)
-            if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+            navigateToAttendees()
         }
         event_form_participant_chip_group.addView(chip)
     }
@@ -692,13 +698,73 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
+        event_form_participant_layout.visibleOrGone(navigationArguments.eventId == null)
         event_form_participant_press.setOnSingleClickListener {
-            requireActivity().clearFocusAndHideKeyboard(view)
-            if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+            navigateToAttendees()
         }
     }
 
+    private fun shouldShowContactsPermissionsDialog(): Boolean {
+        return PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(SharedPreferencesKeys.SHOW_CONTACTS_PERMISSIONS_DIALOG, true)
+    }
 
+    private fun changeContactsPermissionsPreferences(showDialog: Boolean) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(SharedPreferencesKeys.SHOW_CONTACTS_PERMISSIONS_DIALOG, showDialog)
+        editor.apply()
+    }
+
+    private fun navigateToAttendees() {
+        requireActivity().clearFocusAndHideKeyboard(view)
+
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)
+                    && shouldShowContactsPermissionsDialog() -> {
+                val view = LayoutInflater.from(context)
+                    .inflate(R.layout.dialog_checkbox, null, false)
+
+                view.dialog_checkbox_header.text = getString(R.string.contacts_permission_dialog_message)
+                view.dialog_checkbox_press.setOnClickListener {
+                    view.dialog_checkbox.performClick()
+                }
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.contacts_permission_dialog_title)
+                    .setView(view)
+                    .setPositiveButton(R.string.contacts_permission_dialog_confirmation) { _, _ ->
+                        requestPermissionLauncher.launch(
+                            Manifest.permission.READ_CONTACTS)
+                    }
+                    .setNegativeButton(R.string.contacts_permission_dialog_cancel) { _, _ ->
+                        if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+                    }
+                    .setOnCancelListener {
+                        if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+                    }
+                    .setOnDismissListener {
+                        if (view.dialog_checkbox.isChecked) {
+                            changeContactsPermissionsPreferences(false)
+                        }
+                    }
+                    .show()
+            }
+            shouldShowContactsPermissionsDialog() -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.READ_CONTACTS)
+            }
+            else -> {
+                if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+            }
+        }
+    }
 
     private fun displayAlarms() {
         event_form_alarm_list.removeAllViews()

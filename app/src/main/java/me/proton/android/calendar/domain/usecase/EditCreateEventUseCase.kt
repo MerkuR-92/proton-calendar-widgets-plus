@@ -107,8 +107,13 @@ class EditCreateEventUseCase(
         val personalPartICalString = calendarSplit.personalPart?.printToString()
         val signatureOfPersonalPart = personalPartICalString?.run { crypto.signTextDetached(personalPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())  }
 
-        // 8. encrypt Attendees Part (optional)
+        // 8. sign and encrypt Attendees Part (optional)
         // TODO
+        //  Get all canonized emails
+        //  Generate tokens for each
+        //  Make AttendeeStatusEvent part (clear text) with token + part stat of attendee (default 0 NEEDS ACTION)
+        //  Make Attendee part (signed and encrypted using Shared session key in SharedKeyPacket) with ICS part containing all the attendees
+        //  Add Organizer in the Shared section ORGANIZER;CN={$emailAddress}:mailto:{$emailAddress}
 
         // 9. assemble API request, depending on action we're taking
         val sharedEventContent = listOf(

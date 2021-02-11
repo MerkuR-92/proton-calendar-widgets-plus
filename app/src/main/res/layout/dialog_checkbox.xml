@@ -9,7 +9,7 @@
     android:paddingBottom="@dimen/spacing_page">
 
     <TextView
-        android:id="@+id/dialog_update_timezone_header"
+        android:id="@+id/dialog_checkbox_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Text.Default"
@@ -22,26 +22,26 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <include
-        android:id="@+id/dialog_update_timezone_checkbox_press"
+        android:id="@+id/dialog_checkbox_press"
         layout="@layout/view_press_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="@+id/dialog_update_timezone_checkbox"
-        app:layout_constraintEnd_toEndOf="@+id/dialog_update_timezone_title"
-        app:layout_constraintTop_toTopOf="@+id/dialog_update_timezone_title"
-        app:layout_constraintBottom_toBottomOf="@+id/dialog_update_timezone_title"/>
+        app:layout_constraintStart_toStartOf="@+id/dialog_checkbox"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_checkbox_title"
+        app:layout_constraintTop_toTopOf="@+id/dialog_checkbox_title"
+        app:layout_constraintBottom_toBottomOf="@+id/dialog_checkbox_title"/>
 
     <CheckBox
-        android:id="@+id/dialog_update_timezone_checkbox"
+        android:id="@+id/dialog_checkbox"
         android:layout_width="37dp"
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/dialog_update_timezone_title"
-        app:layout_constraintBottom_toBottomOf="@+id/dialog_update_timezone_title"/>
+        app:layout_constraintTop_toTopOf="@+id/dialog_checkbox_title"
+        app:layout_constraintBottom_toBottomOf="@+id/dialog_checkbox_title"/>
 
     <TextView
-        android:id="@+id/dialog_update_timezone_title"
+        android:id="@+id/dialog_checkbox_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/settings_update_timezone_checkbox"
@@ -50,8 +50,8 @@
         android:layout_marginEnd="@dimen/spacing_element"
         android:paddingTop="@dimen/spacing_element_small"
         android:paddingBottom="@dimen/spacing_element_small"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_update_timezone_header"
-        app:layout_constraintStart_toEndOf="@+id/dialog_update_timezone_checkbox"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_checkbox_header"
+        app:layout_constraintStart_toEndOf="@+id/dialog_checkbox"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

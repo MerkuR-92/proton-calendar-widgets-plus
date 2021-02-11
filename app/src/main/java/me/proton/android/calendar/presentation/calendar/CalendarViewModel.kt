@@ -11,7 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
-import kotlinx.android.synthetic.main.dialog_update_timezone.view.*
+import kotlinx.android.synthetic.main.dialog_checkbox.view.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,6 @@ import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
-import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -35,11 +34,9 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toBoolean
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -568,11 +565,11 @@ class CalendarViewModel(
                 }
 
                 val view = LayoutInflater.from(context)
-                    .inflate(R.layout.dialog_update_timezone, null, false)
+                    .inflate(R.layout.dialog_checkbox, null, false)
 
-                view.dialog_update_timezone_header.text = dialogMessage
-                view.dialog_update_timezone_checkbox_press.setOnClickListener {
-                    view.dialog_update_timezone_checkbox.performClick()
+                view.dialog_checkbox_header.text = dialogMessage
+                view.dialog_checkbox_press.setOnClickListener {
+                    view.dialog_checkbox.performClick()
                 }
 
                 MaterialAlertDialogBuilder(context)
@@ -583,7 +580,7 @@ class CalendarViewModel(
                     }
                     .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
                     .show().setOnDismissListener {
-                        if (view.dialog_update_timezone_checkbox.isChecked) {
+                        if (view.dialog_checkbox.isChecked) {
                             updateAutoDetectPrimaryTimezone(false)
                         }
                     }

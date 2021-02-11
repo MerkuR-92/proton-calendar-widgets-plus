@@ -1,14 +1,20 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.database.Cursor
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.AbsListView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.databinding.adapters.AbsListViewBindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
+import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,9 +25,7 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
 import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import kotlinx.android.synthetic.main.toolbar_action_text.view.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
@@ -32,7 +36,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 
 
-class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, LoaderManager.LoaderCallbacks<Cursor> {
 
     override val TAG = "EventFormAttendeesFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_attendees
@@ -51,6 +55,21 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
     // TODO Move to VM ?
     private val _searchAttendeeList: MutableLiveData<List<Attendee>> = MutableLiveData()
     private val searchAttendeeList: LiveData<List<Attendee>> = _searchAttendeeList
+
+    private var contactsAccessGranted = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        contactsAccessGranted = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (contactsAccessGranted) {
+            LoaderManager.getInstance(this).initLoader(0, null, this)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -91,19 +110,26 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
             if (query.isEmpty()) nav_event_form_attendees_search_list.visibleOrGone(false)
 
             if (query.isNotEmpty()) {
+                nav_event_form_attendees_search_list.visibleOrGone(true)
                 searchAttendeeListAdapter.setQuery(query.toString())
 
-                val searchResult =
-                    when {
-                        regex.matches(query) -> {
-                            val participant = Attendee("", query.toString())
-                            listOf(participant)
+                if (contactsAccessGranted) {
+                    val args = Bundle()
+                    args.putString(CONTACTS_SEARCH_QUERY, query.toString())
+                    LoaderManager.getInstance(this).restartLoader(0, args, this)
+                } else {
+                    val searchResult =
+                        when {
+                            regex.matches(query) -> {
+                                val participant = Attendee("", query.toString())
+                                listOf(participant)
+                            }
+                            else -> listOf()
                         }
-                        else -> listOf()
-                    }
 
-                nav_event_form_attendees_search_list.visibleOrGone(searchResult.isNotEmpty())
-                _searchAttendeeList.postValue(searchResult)
+                    nav_event_form_attendees_search_list.visibleOrGone(searchResult.isNotEmpty())
+                    _searchAttendeeList.postValue(searchResult)
+                }
             }
         }
 
@@ -211,4 +237,75 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent {
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
     }
+
+    // Loader and callbacks for contacts search
+
+    companion object {
+        private const val ANDROID_ORDER_BY = ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY + " ASC"
+        private const val ANDROID_SELECTION = (
+                ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY + " LIKE ?" + " OR " + ContactsContract.CommonDataKinds.Email.ADDRESS + " LIKE ?" + " OR "
+                        + ContactsContract.CommonDataKinds.Email.DATA + " LIKE ?")
+        private val ANDROID_PROJECTION = arrayOf(ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY,
+            ContactsContract.CommonDataKinds.Email.ADDRESS,
+            ContactsContract.CommonDataKinds.Email.DATA)
+    }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        val searchString = args?.getString(CONTACTS_SEARCH_QUERY) ?: ""
+        val selectionArgs = arrayOf("%$searchString%", "%$searchString%", "%$searchString%")
+        return CursorLoader(
+            requireContext(),
+            ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+            ANDROID_PROJECTION,
+            ANDROID_SELECTION,
+            selectionArgs,
+            ANDROID_ORDER_BY
+        )
+    }
+
+    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
+        if(data.isBeforeFirst) {
+            val attendees = data.getAttendeeList()
+            if (attendees.isNotEmpty()) {
+                _searchAttendeeList.postValue(attendees)
+            } else {
+                // If no results in contacts, suggest email
+                val query = nav_event_form_attendees_search_input.text
+                val searchResult =
+                    when {
+                        regex.matches(query) -> {
+                            val participant = Attendee("", query.toString())
+                            listOf(participant)
+                        }
+                        else -> listOf()
+                    }
+                _searchAttendeeList.postValue(searchResult)
+            }
+        }
+    }
+
+    override fun onLoaderReset(loader: Loader<Cursor>) {
+        _searchAttendeeList.postValue(emptyList())
+    }
+
+    private fun Cursor.extractAttendee(): Attendee {
+        val name = getString(getColumnIndex(ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY))
+        val email = getString(getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS))
+        return Attendee(
+            name,
+            email
+        )
+    }
+
+    private fun Cursor.getAttendeeList(): List<Attendee> {
+        val contactsList = mutableListOf<Attendee>()
+        this.apply {
+            while(moveToNext()) {
+                val contactItem = extractAttendee()
+                contactsList.add(contactItem)
+            }
+        }
+        return contactsList
+    }
 }
+

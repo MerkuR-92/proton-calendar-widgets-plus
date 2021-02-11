@@ -191,6 +191,11 @@
     <string name="update_timezone_dialog_confirmation">Update</string>
     <string name="update_timezone_dialog_cancel">Cancel</string>
 
+    <string name="contacts_permission_dialog_title">Allow Proton Calendar to access your contact?</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar needs access to your phone contacts to help you easily add them to your events.</string>
+    <string name="contacts_permission_dialog_confirmation">Allow</string>
+    <string name="contacts_permission_dialog_cancel">Deny</string>
+
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
     <string name="notification_channel_sync">Calendar Synchronisation</string>

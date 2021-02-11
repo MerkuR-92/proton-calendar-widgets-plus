@@ -38,6 +38,8 @@ const val ICAL_UID_PREFIX = "UID:"
 
 const val MAX_ANIM_DURATION = 500L
 
+const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
+
 object FeatureFlag {
     const val SETTINGS_DRAWER = true
     const val ADD_ATTENDEES = true
@@ -45,6 +47,7 @@ object FeatureFlag {
 
 object SharedPreferencesKeys {
     const val THEME = "theme"
+    const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
 }
 
 enum class AppTheme(val value: Int) {
