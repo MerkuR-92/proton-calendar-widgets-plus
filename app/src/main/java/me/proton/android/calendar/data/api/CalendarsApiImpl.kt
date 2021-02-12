@@ -370,7 +370,11 @@ data class SyncEvent(
     @SerialName("SharedEventContent")
     val sharedEventContent: List<Event.EventPart.Shared>,
     @SerialName("PersonalEventContent")
-    val personalEventContent: Event.EventPart.Personal? = null
+    val personalEventContent: Event.EventPart.Personal? = null,
+    @SerialName("AttendeesEventContent")
+    val attendeesEventContent: List<Event.EventPart.Attendee>? = null,
+    @SerialName("Attendees")
+    val attendees: List<Event.AttendeeStatusEvent>? = null
 )
 
 @Serializable

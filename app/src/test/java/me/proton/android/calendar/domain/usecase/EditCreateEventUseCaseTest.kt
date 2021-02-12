@@ -35,11 +35,13 @@ internal class EditCreateEventUseCaseTest {
             addComment("Comment no 1")
             addComment("Comment no 2")
             setTransparency(true)
+            addAttendee(Attendee("John Doe", "john.doe@pm.me"))
+            setOrganizer(Organizer("organizer@pm.me", "organizer@pm.me"))
         }
 
         TestsLogger.d("original event: ${event.wrapInICalendar().printToString()}")
 
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(event.wrapInICalendar())
+        val calendarSplit = ICalUtils.splitICalendarIntoParts(event.wrapInICalendar(), mapOf(Pair("john.doe@pm.me", "johndoe@pm.me")))
 
         TestsLogger.d("raw shared split:\n${Biweekly.write(calendarSplit.sharedPart).go()}")
         TestsLogger.d("raw shared encrypted split:\n${Biweekly.write(calendarSplit.sharedPartToEncrypt).go()}")
@@ -64,6 +66,7 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.alarms).isEmpty()
             assertThat(this.comments).isEmpty()
             assertThat(calendarSplit.sharedPart.timezoneInfo.timezones).isEmpty()
+            assertThat(this.organizer).isEqualTo(Organizer("organizer@pm.me", "organizer@pm.me"))
         }
 
         with (calendarSplit.sharedPartToEncrypt.events[0]) {
@@ -106,6 +109,15 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.alarms[1].trigger.duration.hours).isEqualTo(2)
         }
 
+        with (calendarSplit.attendeesPart!!.events[0]) {
+            assertThat(this.uid).isEqualTo(event.uid)
+            assertThat(this.created).isEqualTo(event.created)
+            assertThat(this.lastModified).isEqualTo(event.lastModified)
+            assertThat(this.attendees.size).isEqualTo(1)
+            assertThat(this.attendees[0].email).isEqualTo("john.doe@pm.me")
+            assertThat(this.attendees[0].commonName).isEqualTo("John Doe")
+            assertThat(this.attendees[0].getParameter("X-PM-TOKEN")).isNotNull()
+        }
         // TODO Attendees Part
         
         // TODO sequence

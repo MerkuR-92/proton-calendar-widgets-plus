@@ -9,6 +9,7 @@ import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Action
 import biweekly.property.Attendee
+import biweekly.property.Organizer
 import biweekly.property.Trigger
 import biweekly.util.*
 import biweekly.util.DayOfWeek
@@ -24,10 +25,7 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
-import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
-import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
-import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
@@ -1283,14 +1281,23 @@ class EventViewModel(
         return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
     }
 
-    fun handleAttendee(attendee: Attendee, addAttendee: Boolean = true) {
+    suspend fun handleAttendee(attendee: Attendee, addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {
             event.iCalEvent.addAttendee(
                 Attendee(attendee.commonName, attendee.extractEmail()) // TODO email or canonical email ?
             )
+            if (event.iCalEvent.organizer == null) {
+                val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
+                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+                }?.email
+                event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
+            }
         } else {
             event.iCalEvent.attendees.remove(attendee)
+            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
+                event.iCalEvent.organizer = null
+            }
         }
         _event.postValue(event)
     }

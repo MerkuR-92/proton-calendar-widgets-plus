@@ -7,15 +7,18 @@ import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
 import biweekly.property.*
+import biweekly.parameter.Role
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
+import com.google.crypto.tink.subtle.Hex
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
+import java.security.MessageDigest
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -234,7 +237,7 @@ object ICalUtils {
     /**
      * Takes one iCalendar object and splits it according to "the matrix".
      */
-    fun splitICalendarIntoParts(originalCalendar: ICalendar): CalendarSplit {
+    fun splitICalendarIntoParts(originalCalendar: ICalendar, attendeesCanonizedEmails: Map<String, String>? = null): CalendarSplit {
 
         // TODO Attendees Part
 
@@ -316,8 +319,33 @@ object ICalUtils {
                     }
                     wrapInICalendar()
                 }
+            } else null,
+            attendeesPart = if (originalEvent.attendees.isNotEmpty()) {
+                VEvent().run {
+                    setUid(originalEvent.uid)
+                    setCreated(originalEvent.created)
+                    setLastModified(originalEvent.lastModified)
+                    originalEvent.attendees.forEach {
+                        it.role = it.role ?: Role.ATTENDEE
+                        it.rsvp = it.rsvp ?: true
+                        attendeesCanonizedEmails?.let { canonizedEmailsMap ->
+                            val canonizedEmail = canonizedEmailsMap[it.extractEmail()] ?: return@let
+                            val token = generateXPmToken(canonizedEmail, originalEvent.uid.value)
+                            it.addParameter("X-PM-TOKEN", token)
+                        }
+                        addAttendee(it)
+                    }
+                    wrapInICalendar()
+                }
             } else null
         )
+    }
+
+    fun generateXPmToken(email: String, uid: String): String {
+        val messageDigest = MessageDigest.getInstance("SHA-1")
+        messageDigest.update((uid + email).toByteArray())
+        val token = messageDigest.digest()
+        return Hex.encode(token)
     }
 
     /**
@@ -538,7 +566,8 @@ data class CalendarSplit(
     val sharedPartToEncrypt: ICalendar,
     val calendarPart: ICalendar?,
     val calendarPartToEncrypt: ICalendar?, // TODO all the other properties not mentioned in matrix should be here
-    val personalPart: ICalendar?
+    val personalPart: ICalendar?,
+    val attendeesPart: ICalendar?
 )
 
 /**

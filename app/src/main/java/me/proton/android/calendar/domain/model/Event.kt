@@ -757,8 +757,6 @@ data class Event(
 
     @Serializable
     data class AttendeeStatusEvent(
-        @SerialName("ID")
-        val id: String,
         @SerialName("Token")
         val token: String,
         @SerialName("Status")

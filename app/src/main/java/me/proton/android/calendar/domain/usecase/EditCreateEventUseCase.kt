@@ -1,8 +1,10 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.common.extractEmail
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
@@ -17,11 +19,12 @@ class EditCreateEventUseCase(
     private val calendarsApi: CalendarsApi,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val calendarsRepository: CalendarsRepository,
+    private val usersRepository: UsersRepository,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
     private val database: AppDatabase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
-    ): UseCase {
+): UseCase {
 
     suspend fun execute(userId: UserId, calendarId: String, newEvent: Event) : UseCase.Result {
 
@@ -32,7 +35,9 @@ class EditCreateEventUseCase(
         logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
 
         // 1. split original event according to the matrix
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
+        val attendeesEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }
+        val attendeesCanonizedEmails = usersRepository.getCanonicalAddresses(userId, attendeesEmails)
+        val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar, attendeesCanonizedEmails)
 
         //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
@@ -114,6 +119,29 @@ class EditCreateEventUseCase(
         //  Make AttendeeStatusEvent part (clear text) with token + part stat of attendee (default 0 NEEDS ACTION)
         //  Make Attendee part (signed and encrypted using Shared session key in SharedKeyPacket) with ICS part containing all the attendees
         //  Add Organizer in the Shared section ORGANIZER;CN={$emailAddress}:mailto:{$emailAddress}
+        val attendeesPartICalString = calendarSplit.attendeesPart?.printToString()
+
+        val attendeesEventContent =
+            if (attendeesPartICalString != null) {
+                val encryptedAttendeesPartCiphertext = if (oldSharedSessionKey != null) {
+                    val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, oldSharedSessionKey)
+                    Ciphertext.from(null, encryptedAttendeesPart!!)
+                } else {
+                    val sharedSessionKey = crypto.decryptSessionKey(encryptedSharedPartCiphertext.encodedKeyPacket ?: return UseCase.Result.InvalidParams("encoded shared key packet was null when encrypting attendees"), calendarKey.privateKey, keyPassphrase.toByteArray())
+                    val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, sharedSessionKey ?: return UseCase.Result.InvalidParams("shared session key was null when encrypting attendees"))
+                    Ciphertext.from(null, encryptedAttendeesPart!!)
+                }
+                val signatureOfEncryptedAttendeesPart = crypto.signTextDetached(attendeesPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
+
+                listOf(
+                    Event.EventPart.Attendee(
+                        3,
+                        encryptedAttendeesPartCiphertext.encodedDataPacket,
+                        signatureOfEncryptedAttendeesPart!!, // TODO
+                        "" // on server, "author" will be extracted from MemberID and this value ignored
+                    )
+                )
+            } else null
 
         // 9. assemble API request, depending on action we're taking
         val sharedEventContent = listOf(
@@ -160,6 +188,23 @@ class EditCreateEventUseCase(
             )
         } else null
 
+        val attendees = arrayListOf<Event.AttendeeStatusEvent>()
+        if (attendeesEventContent != null) {
+            newEvent.iCalEvent.attendees.forEach {
+                val canonizedEmail = attendeesCanonizedEmails?.get(it.extractEmail()) ?: return@forEach
+                val token = ICalUtils.generateXPmToken(canonizedEmail, newEvent.uid)
+                val status = when (it.participationStatus) {
+                    ParticipationStatus.TENTATIVE -> 1
+                    ParticipationStatus.DECLINED -> 2
+                    ParticipationStatus.ACCEPTED -> 3
+                    else -> 0
+                }
+                attendees.add(
+                    Event.AttendeeStatusEvent(token, status)
+                )
+            }
+        }
+
         val syncRequestBody = if (newEvent.isSyncedWithApi()) { // UPDATE
 
             if (oldEventEntity == null) return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old Event from DB for edit")
@@ -175,7 +220,9 @@ class EditCreateEventUseCase(
                             sharedEventContent = sharedEventContent,
                             calendarKeyPacket = if (oldCalendarSessionKey == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
                             calendarEventContent = calendarEventContent,
-                            personalEventContent = personalEventContent
+                            personalEventContent = personalEventContent,
+                            attendeesEventContent = attendeesEventContent,
+                            attendees = if (attendees.isNotEmpty()) attendees else null
                         )
                     )
                 )
@@ -192,7 +239,9 @@ class EditCreateEventUseCase(
                             sharedEventContent = sharedEventContent,
                             calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                             calendarEventContent = calendarEventContent,
-                            personalEventContent = personalEventContent
+                            personalEventContent = personalEventContent,
+                            attendeesEventContent = attendeesEventContent,
+                            attendees = if (attendees.isNotEmpty()) attendees else null
                         )
                     )
                 )

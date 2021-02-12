@@ -157,7 +157,9 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_list.layoutManager = attendeesLayoutManager
         attendeeListAdapter = AddAttendeeListAdapter(false, userEmails) {
-            eventViewModel.handleAttendee(it, false)
+            lifecycleScope.launch {
+                eventViewModel.handleAttendee(it, false)
+            }
         }
         (nav_event_form_attendees_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         nav_event_form_attendees_list.adapter = attendeeListAdapter
@@ -219,7 +221,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             val email = attendee.extractEmail()
             email?.let {
                 // TODO Use get canonical route for second validation ? What are the actual error cases ?
-                val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.first()?.second
+                val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.get(email)
             }
 
             tmpAttendeeList.add(attendee)

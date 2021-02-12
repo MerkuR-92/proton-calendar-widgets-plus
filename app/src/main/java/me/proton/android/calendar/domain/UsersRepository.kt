@@ -49,5 +49,5 @@ interface UsersRepository {
 
     fun flowWeekStart(userId: String): Flow<Int?>
 
-    suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): List<Pair<String, String>>?
+    suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): Map<String, String>?
 }

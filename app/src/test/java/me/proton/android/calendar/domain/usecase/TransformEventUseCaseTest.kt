@@ -142,9 +142,9 @@ internal class TransformEventUseCaseTest {
 
     private fun getMockedAttendees(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
-        list.add(Json.decodeFromString<JsonElement>("{\"ID\":\"6C5v4OC-Jhs8syzxmNwhyjZi1YG4USc2DLI7i_mnj6Mm6p6CK8s1mHn5RBb4tJ0XFACjVB-c4qXltm1ErQRY8w==\",\"Token\":\"905eb4e54055cdb47d9edf7e8f6a778bca369a97\",\"Status\":1}\n"))
-        list.add(Json.decodeFromString<JsonElement>("{\"ID\":\"1dPOFXdenTUVKinAVwaoxfHFVuJYO6VF58YzI6Xn7RZJV208mN5ZZUZj_oG-A4h3q6O6QnH5HibkEymNuROiGg==\",\"Token\":\"5651702a13a167b23fc30583c230d3dfd272a966\",\"Status\":2}\n"))
-        list.add(Json.decodeFromString<JsonElement>("{\"ID\":\"8TjWIH0KrE_-9271lO0tPNn8T6UF-0SBCtzuK-31IUp_3y6eOuM_Ysi7Gp78nlM0hmhHrQha51FFwxk2CBORXA==\",\"Token\":\"cfc28ea87394a21df6456bbe059b3805bfc09fb8\",\"Status\":0}\n"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Token\":\"905eb4e54055cdb47d9edf7e8f6a778bca369a97\",\"Status\":1}\n"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Token\":\"5651702a13a167b23fc30583c230d3dfd272a966\",\"Status\":2}\n"))
+        list.add(Json.decodeFromString<JsonElement>("{\"Token\":\"cfc28ea87394a21df6456bbe059b3805bfc09fb8\",\"Status\":0}\n"))
         return list
     }
 

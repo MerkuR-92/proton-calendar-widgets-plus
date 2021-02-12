@@ -109,12 +109,12 @@ class UsersRepositoryImpl(
         return database.userSettingsDao().flowWeekStart(userId).distinctUntilChanged()
     }
 
-    override suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): List<Pair<String, String>>? {
+    override suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): Map<String, String>? {
         return when (val canonicalResult = addressesApi.getCanonicalEmails(userId, emails)) {
             is ApiResponse.Success -> {
-                val emailPairs = ArrayList<Pair<String, String>>()
+                val emailPairs = HashMap<String, String>()
                 canonicalResult.data.canonicalEmailsResponses.forEach {
-                    emailPairs.add(Pair(it.email, it.canonicalEmailResponse.canonicalEmail))
+                    emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
                 }
                 emailPairs
             }

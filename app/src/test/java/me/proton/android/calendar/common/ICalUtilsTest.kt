@@ -14,6 +14,7 @@ import me.proton.android.calendar.common.ICalUtils.createNewEvent
 import me.proton.android.calendar.common.ICalUtils.eventStartZonedDateTimeToDate
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.generateProtonUid
+import me.proton.android.calendar.common.ICalUtils.generateXPmToken
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Event
@@ -2939,6 +2940,20 @@ internal class ICalUtilsTest {
         assertThat(attendees[9].extractEmail()).isNull()
 
         assertThat(eventIcal.events.first().organizer.extractEmail()).isEqualTo("adamtst@protonmail.com")
+
+    }
+
+    @Test
+    fun `generate X-Pm-Token`() {
+
+        assertThat(generateXPmToken("james@pm.me", "uid@proton.me")).isEqualTo("584945fd1f202647248d1aac43c2aaebf7bf0f94")
+        assertThat(generateXPmToken("jamesbond@pm.me", "uid@proton.me")).isEqualTo("591af07df4d58e4e640ed4293a50ca903f595f08")
+        assertThat(generateXPmToken("james@gmail.com", "uid@proton.me")).isEqualTo("711905af5ec3b29c67ffb84da544a4e80f25c52f")
+        assertThat(generateXPmToken("jamesbond@gmail.com", "uid@proton.me")).isEqualTo("af9000a902eb9fcc40d4793b6b26b38d9f5615ae")
+        assertThat(generateXPmToken("james@outlook.com", "uid@proton.me")).isEqualTo("b7e62dd16b37de316176b6ba23cb210e89d1676e")
+        assertThat(generateXPmToken("james.bond@outlook.com", "uid@proton.me")).isEqualTo("7196c985e9fce3bfe4de1c22ec16e2ec118c56dc")
+        assertThat(generateXPmToken("james@random.com", "uid@proton.me")).isEqualTo("601518c01345d39a9457d861862f0c72f7661977")
+        assertThat(generateXPmToken("james.bond@random.com", "uid@proton.me")).isEqualTo("2f883b6cd35132c0c24a428c54bad5c87ede7ddd")
 
     }
 
