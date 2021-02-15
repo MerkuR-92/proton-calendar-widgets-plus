@@ -72,7 +72,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+            findNavController().navigate(R.id.nav_event_form_attendees)
         }
 
     override fun onBackPressedCustom() {
@@ -698,7 +698,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
-        event_form_participant_layout.visibleOrGone(navigationArguments.eventId == null)
+        event_form_participant_layout.visibleOrGone(navigationArguments.eventId == null && ADD_ATTENDEES) // TODO Remove feature flag
         event_form_participant_press.setOnSingleClickListener {
             navigateToAttendees()
         }
@@ -724,7 +724,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 requireContext(),
                 Manifest.permission.READ_CONTACTS
             ) == PackageManager.PERMISSION_GRANTED -> {
-                if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+                findNavController().navigate(R.id.nav_event_form_attendees)
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)
                     && shouldShowContactsPermissionsDialog() -> {
@@ -744,10 +744,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             Manifest.permission.READ_CONTACTS)
                     }
                     .setNegativeButton(R.string.contacts_permission_dialog_cancel) { _, _ ->
-                        if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+                        findNavController().navigate(R.id.nav_event_form_attendees)
                     }
                     .setOnCancelListener {
-                        if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+                        findNavController().navigate(R.id.nav_event_form_attendees)
                     }
                     .setOnDismissListener {
                         if (view.dialog_checkbox.isChecked) {
@@ -761,7 +761,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     Manifest.permission.READ_CONTACTS)
             }
             else -> {
-                if (ADD_ATTENDEES) findNavController().navigate(R.id.nav_event_form_attendees)
+                findNavController().navigate(R.id.nav_event_form_attendees)
             }
         }
     }
