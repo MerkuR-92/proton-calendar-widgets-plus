@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -630,6 +631,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun handleAttendeeAnswerViewVisibility() {
+        if (!CHANGE_ANSWER) {
+            // TODO Remove feature flag
+            section_answer.visibleOrGone(false)
+            return
+        }
         val event = eventViewModel.eventLiveData.value
         val userEmails = calendarViewModel.getUserEmails()
         val userAddresses = calendarViewModel.userAddresses.value

@@ -45,6 +45,7 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 object FeatureFlag {
     const val SETTINGS_DRAWER = true
     const val ADD_ATTENDEES = false
+    const val CHANGE_ANSWER = false
 }
 
 object SharedPreferencesKeys {
