@@ -14,6 +14,7 @@ import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.MainViewModel
 import java.time.Instant
@@ -24,7 +25,8 @@ class ShowNotificationUseCase(
     private val logger: Logger,
     private val context: Context,
     private val transformEventUseCase: TransformEventUseCase,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val usersRepository: UsersRepository
 ) {
 
     suspend fun execute(eventAlarms: List<EventAlarmEntity>, userId: String) {
@@ -39,6 +41,13 @@ class ShowNotificationUseCase(
 
         if (displayTimeZoneId == null) {
             logger.e("empty displayTimeZoneId in ShowNotificationUseCase")
+        }
+
+        val is24Hour = when (usersRepository.selectTimeFormat(userId)) {
+            0 -> null
+            1 -> true
+            2 -> false
+            else -> null
         }
 
         eventAlarms.forEach { eventAlarm ->
@@ -88,7 +97,8 @@ class ShowNotificationUseCase(
 
                     val text = (eventWithOccurrence ?: dbEvent).formatStartForNotification(
                         systemDefaultZoneId.id,
-                        context.resources
+                        context.resources,
+                        is24Hour
                     ) // formatting in phone's timezone
 
                     notificationBuilder

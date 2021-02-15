@@ -42,6 +42,8 @@ interface UsersRepository {
 
     suspend fun hasReactivatedAddressKeys(address: AddressEntity): Boolean
 
+    suspend fun selectTimeFormat(userId: String): Int?
+
     fun flowTimeFormat(userId: String): Flow<Int?>
 
     fun flowWeekStart(userId: String): Flow<Int?>

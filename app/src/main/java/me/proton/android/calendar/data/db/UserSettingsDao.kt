@@ -19,6 +19,9 @@ abstract class UserSettingsDao : BaseDao<UserSettingsEntity> {
     abstract suspend fun deleteByUserId(userId: String)
 
     @Query("SELECT timeFormat FROM user_settings WHERE fkUserId = :userId")
+    abstract suspend fun selectTimeFormat(userId: String): Int?
+
+    @Query("SELECT timeFormat FROM user_settings WHERE fkUserId = :userId")
     abstract fun flowTimeFormat(userId: String): Flow<Int?>
 
     @Query("SELECT weekStart FROM user_settings WHERE fkUserId = :userId")

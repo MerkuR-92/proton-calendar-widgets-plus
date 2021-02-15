@@ -126,14 +126,14 @@ data class Event(
 
     fun formatStart(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour, this.isAllDay())
 
-    fun formatStartForNotification(timeZoneId: String, resources: Resources) : String {
+    fun formatStartForNotification(timeZoneId: String, resources: Resources, is24Hour: Boolean?) : String {
 
         val startDate = this.getStart(timeZoneId)?.toLocalDate()
         val today = LocalDate.now(ZoneId.of(timeZoneId))
 
         if (startDate == null) return ""
 
-        val formattedDateTime = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour = null, this.isAllDay())
+        val formattedDateTime = formatDateOrDateTimeProperty(iCalEvent.dateStart, timeZoneId, is24Hour, this.isAllDay())
 
         return if (this.isAllDay()) {
 

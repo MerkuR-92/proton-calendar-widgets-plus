@@ -89,6 +89,10 @@ class UsersRepositoryImpl(
         return false
     }
 
+    override suspend fun selectTimeFormat(userId: String): Int? {
+        return database.userSettingsDao().selectTimeFormat(userId)
+    }
+
     override fun flowTimeFormat(userId: String): Flow<Int?> {
         return database.userSettingsDao().flowTimeFormat(userId).distinctUntilChanged()
     }
