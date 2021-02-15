@@ -72,6 +72,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
+            // We navigate even though contacts permission is not granted
             findNavController().navigate(R.id.nav_event_form_attendees)
         }
 
@@ -437,6 +438,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         event_form_scroll_view.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (oldScrollY - scrollY < 0) {
+                // Hide keyboard on scroll down
                 requireActivity().clearFocusAndHideKeyboard(view)
             }
         }

@@ -113,13 +113,4 @@
 
     </LinearLayout>
 
-    <!-- Hide separator until decided otherwise -->
-    <View
-        android:id="@+id/item_add_attendee_separator"
-        style="@style/Separator"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

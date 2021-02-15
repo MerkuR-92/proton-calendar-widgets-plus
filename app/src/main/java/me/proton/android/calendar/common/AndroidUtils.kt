@@ -49,6 +49,7 @@ import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.presentation.utils.InputValidationResult
 import okhttp3.internal.toHexString
 import java.text.SimpleDateFormat
 import java.time.*
@@ -1179,4 +1180,9 @@ fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {
     6 -> java.time.DayOfWeek.SATURDAY
     7 -> java.time.DayOfWeek.SUNDAY
     else -> WeekFields.of(getDefault()).firstDayOfWeek
+}
+
+fun validateEmail(email: CharSequence): Boolean {
+    val regex = InputValidationResult.EMAIL_VALIDATION_PATTERN.toRegex(RegexOption.IGNORE_CASE)
+    return regex.matches(email)
 }

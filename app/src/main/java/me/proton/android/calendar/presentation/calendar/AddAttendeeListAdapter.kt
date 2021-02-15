@@ -26,6 +26,10 @@ class AddAttendeeListAdapter(
     private val clickListener: (Attendee) -> Unit
 ) : ListAdapter<Attendee, AddAttendeeListAdapter.ViewHolder>(AddAttendeeDiffCallback()) {
 
+    private var attendeeList: List<Attendee> = arrayListOf()
+    private var query: String = ""
+    private var organizerEmail: String = ""
+
     class AddAttendeeDiffCallback : DiffUtil.ItemCallback<Attendee>() {
         override fun areItemsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
             return oldItem.extractEmail() == newItem.extractEmail()
@@ -55,7 +59,6 @@ class AddAttendeeListAdapter(
         private val attendeeItemIconLoading: ProgressBar = view.item_add_attendee_loading_icon
         private val attendeeItemIconCheck: ImageView = view.item_add_attendee_check_icon
         private val attendeeItemPress: View = view.item_add_attendee_press
-        private val attendeeItemSeparator: View = view.item_add_attendee_separator
 
         fun bind(attendee : Attendee, position : Int) {
             // If has common name use it, else use email and hide description field
@@ -128,17 +131,14 @@ class AddAttendeeListAdapter(
         }
     }
 
-    private var attendeeList: List<Attendee> = arrayListOf()
     fun setAttendeeList(attendeeList: List<Attendee>) {
         this.attendeeList = attendeeList
     }
 
-    private var query: String = ""
     fun setQuery(query: String) {
         this.query = query
     }
 
-    private var organizerEmail: String = ""
     fun setOrganizerEmail(organizerEmail: String) {
         this.organizerEmail = organizerEmail
     }

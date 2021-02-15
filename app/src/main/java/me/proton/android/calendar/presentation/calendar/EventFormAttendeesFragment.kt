@@ -47,14 +47,11 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
 
-    private lateinit var attendeeListAdapter: AddAttendeeListAdapter
-    private lateinit var searchAttendeeListAdapter: AddAttendeeListAdapter
-
-    private val regex = EMAIL_VALIDATION_PATTERN.toRegex(RegexOption.IGNORE_CASE)
-
-    // TODO Move to VM ?
     private val _searchAttendeeList: MutableLiveData<List<Attendee>> = MutableLiveData()
     private val searchAttendeeList: LiveData<List<Attendee>> = _searchAttendeeList
+
+    private lateinit var attendeeListAdapter: AddAttendeeListAdapter
+    private lateinit var searchAttendeeListAdapter: AddAttendeeListAdapter
 
     private var contactsAccessGranted = false
 
@@ -87,6 +84,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
+                    // Hide keyboard on scroll down
                     requireActivity().clearFocusAndHideKeyboard(view)
                 }
             }
@@ -96,6 +94,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
+                    // Hide keyboard on scroll down
                     requireActivity().clearFocusAndHideKeyboard(view)
                 }
             }
@@ -120,7 +119,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 } else {
                     val searchResult =
                         when {
-                            regex.matches(query) -> {
+                            validateEmail(query) -> {
                                 val participant = Attendee("", query.toString())
                                 listOf(participant)
                             }
@@ -134,7 +133,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         }
 
         nav_event_form_attendees_search_input.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE && regex.matches(nav_event_form_attendees_search_input.text)) {
+            if (actionId == EditorInfo.IME_ACTION_DONE && validateEmail(nav_event_form_attendees_search_input.text)) {
                 val query = nav_event_form_attendees_search_input.text.toString()
                 val index = searchAttendeeListAdapter.currentList.indexOfFirst {
                     it.extractEmail().equals(query, true)
@@ -275,7 +274,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val query = nav_event_form_attendees_search_input.text
                 val searchResult =
                     when {
-                        regex.matches(query) -> {
+                        validateEmail(query) -> {
                             val participant = Attendee("", query.toString())
                             listOf(participant)
                         }
@@ -310,4 +309,3 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         return contactsList
     }
 }
-

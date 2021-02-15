@@ -36,7 +36,7 @@ class EditCreateEventUseCase(
 
         // 1. split original event according to the matrix
         val attendeesEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }
-        val attendeesCanonizedEmails = usersRepository.getCanonicalAddresses(userId, attendeesEmails)
+        val attendeesCanonizedEmails = if (attendeesEmails.isEmpty()) null else usersRepository.getCanonicalAddresses(userId, attendeesEmails)
         val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar, attendeesCanonizedEmails)
 
         //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
@@ -113,12 +113,6 @@ class EditCreateEventUseCase(
         val signatureOfPersonalPart = personalPartICalString?.run { crypto.signTextDetached(personalPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())  }
 
         // 8. sign and encrypt Attendees Part (optional)
-        // TODO
-        //  Get all canonized emails
-        //  Generate tokens for each
-        //  Make AttendeeStatusEvent part (clear text) with token + part stat of attendee (default 0 NEEDS ACTION)
-        //  Make Attendee part (signed and encrypted using Shared session key in SharedKeyPacket) with ICS part containing all the attendees
-        //  Add Organizer in the Shared section ORGANIZER;CN={$emailAddress}:mailto:{$emailAddress}
         val attendeesPartICalString = calendarSplit.attendeesPart?.printToString()
 
         val attendeesEventContent =
@@ -222,7 +216,7 @@ class EditCreateEventUseCase(
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
                             attendeesEventContent = attendeesEventContent,
-                            attendees = if (attendees.isNotEmpty()) attendees else null
+                            attendees = if (attendees.isNotEmpty()) attendees else null // TODO If remove all attendees from an event do we send empty part ?
                         )
                     )
                 )
@@ -241,7 +235,7 @@ class EditCreateEventUseCase(
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
                             attendeesEventContent = attendeesEventContent,
-                            attendees = if (attendees.isNotEmpty()) attendees else null
+                            attendees = if (attendees.isNotEmpty()) attendees else null // TODO If remove all attendees from an event do we send empty part ?
                         )
                     )
                 )

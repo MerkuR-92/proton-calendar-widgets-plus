@@ -1285,7 +1285,7 @@ class EventViewModel(
         markEventAsEdited()
         if (addAttendee) {
             event.iCalEvent.addAttendee(
-                Attendee(attendee.commonName, attendee.extractEmail()) // TODO email or canonical email ?
+                Attendee(attendee.commonName, attendee.extractEmail())
             )
             if (event.iCalEvent.organizer == null) {
                 val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
