@@ -14,7 +14,9 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
+import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.network.data.ApiProvider
+import me.proton.core.user.domain.UserManager
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -64,7 +66,7 @@ val viewModelModule = module {
         )
     }
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
@@ -99,7 +101,9 @@ val useCaseModule = module {
 fun coreModule(
     apiProvider: ApiProvider,
     accountManager: AccountManager,
-    authOrchestrator: AuthOrchestrator
+    authOrchestrator: AuthOrchestrator,
+    userManager: UserManager,
+    keyStoreCrypto: KeyStoreCrypto
 ) = module {
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
     single<ApiProvider> { apiProvider }
@@ -107,4 +111,6 @@ fun coreModule(
     single<AccountManager> { accountManager }
     // TODO: Remove when AccountViewModel will be provided by a Dagger module.
     single<AuthOrchestrator> { authOrchestrator }
+    single<UserManager> { userManager }
+    single<KeyStoreCrypto> { keyStoreCrypto }
 }

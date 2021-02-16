@@ -116,10 +116,13 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
 
     // Proton Core libraries.
+    implementation "me.proton.core:crypto:${rootProject.ext.version.proton_core_crypto}"
     implementation "me.proton.core:account:${rootProject.ext.version.proton_core_account}"
     implementation "me.proton.core:account-manager:${rootProject.ext.version.proton_core_account_manager}"
     implementation "me.proton.core:account-manager-dagger:${rootProject.ext.version.proton_core_account_manager_dagger}"
     implementation "me.proton.core:auth:${rootProject.ext.version.proton_core_auth}"
+    implementation "me.proton.core:user:${rootProject.ext.version.proton_core_user}"
+    implementation "me.proton.core:key:${rootProject.ext.version.proton_core_key}"
     implementation "me.proton.core:human-verification:${rootProject.ext.version.proton_core_human_verification}"
     implementation "me.proton.core:data:${rootProject.ext.version.proton_core_data}"
     implementation "me.proton.core:domain:${rootProject.ext.version.proton_core_domain}"

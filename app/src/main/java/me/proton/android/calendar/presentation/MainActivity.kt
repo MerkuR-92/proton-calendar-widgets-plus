@@ -14,6 +14,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -176,9 +177,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         with(accountViewModel) {
-            init(this@MainActivity, savedInstanceState == null)
+            init(this@MainActivity)
 
-            state.observe(this@MainActivity, Observer { state ->
+            state.distinctUntilChanged().observe(this@MainActivity, Observer { state ->
                 if (errorReport.value == null) {
                     handleAccountState(this, state)
                 }

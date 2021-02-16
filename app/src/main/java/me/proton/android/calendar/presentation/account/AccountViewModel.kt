@@ -1,31 +1,28 @@
 package me.proton.android.calendar.presentation.account
 
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.usecase.*
-import me.proton.core.account.domain.entity.AccountState
-import me.proton.core.account.domain.entity.SessionState
+import me.proton.core.account.domain.entity.Account
+import me.proton.core.account.domain.entity.AccountType
+import me.proton.core.account.domain.entity.isReady
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.accountmanager.domain.getAccounts
-import me.proton.core.accountmanager.presentation.observe
-import me.proton.core.accountmanager.presentation.onAccountDisabled
-import me.proton.core.accountmanager.presentation.onAccountRemoved
-import me.proton.core.accountmanager.presentation.onAccountTwoPassModeFailed
-import me.proton.core.auth.domain.entity.AccountType
+import me.proton.core.accountmanager.presentation.*
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.onLoginResult
-import me.proton.core.auth.presentation.onUserResult
+import me.proton.core.crypto.common.keystore.KeyStoreCrypto
+import me.proton.core.crypto.common.keystore.decryptWith
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.extension.primary
+import me.proton.core.user.domain.UserManager
 
 class AccountViewModel(
     private val accountManager: AccountManager,
+    private val userManager: UserManager,
     private val authOrchestrator: AuthOrchestrator,
     private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
@@ -33,6 +30,7 @@ class AccountViewModel(
     private val usersRepository: UsersRepository,
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
+    private val keyStoreCrypto: KeyStoreCrypto,
     private val logger: Logger
 ) : ViewModel() {
 
@@ -49,54 +47,42 @@ class AccountViewModel(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    init {
-        // General state handling.
-        accountManager.observe(viewModelScope)
-            .onAccountDisabled { removeUser(it.userId) }
-            .onAccountTwoPassModeFailed { removeUser(it.userId) }
-            .onAccountRemoved { cleanUser(it.userId) }
+    private fun Account.isSavedForSetup(): Boolean {
+        val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+        return valueStore.getString(ValueKey.USER_ID) == userId.id
+    }
 
-        // Check if we already have Ready accounts.
-        viewModelScope.launch {
-            val initialReadyAccounts = accountManager.getAccounts(AccountState.Ready).first()
-            if (initialReadyAccounts.isNotEmpty() && _state.value != State.Processing) {
-                _state.postValue(State.Ready)
-            }
+    private fun Account.isBootstrapped(): Boolean {
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
+        return valueStore.getBoolean(ValueKey.IS_BOOTSTRAPPED) ?: false
+    }
+
+    private suspend fun saveAccountInfo(account: Account) {
+        if (!account.isSavedForSetup()) {
+            val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+
+            val userId = account.userId
+            valueStore.putString(ValueKey.USER_ID, userId.id)
+
+            val eventId = checkNotNull(account.details.session?.initialEventId)
+            valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
+
+            val user = userManager.getUser(userId, refresh = true)
+            val passphrase = user.keys.primary()?.privateKey?.passphrase
+            val decryptedPassphrase = checkNotNull(passphrase).decryptWith(keyStoreCrypto)
+            valueStore.putString(ValueKey.USER_PASSPHRASE, String(decryptedPassphrase.array))
+
+            setupUser()
         }
-
-        // Raise LoginNeeded if no accounts, at anytime.
-        accountManager.getAccounts().onEach { accounts ->
-            if (accounts.isEmpty()) _state.postValue(State.LoginNeeded)
-        }.launchIn(viewModelScope)
-
-        // Observe primary user id.
-        accountManager.getPrimaryUserId().onEach { userId ->
-            _hasPrimary.postValue(userId != null)
-        }.launchIn(viewModelScope)
-
-        // Observe for human verification requirement from the API
-        accountManager.onHumanVerificationNeeded().onEach { (account, details) ->
-            authOrchestrator.startHumanVerificationWorkflow(account.sessionId!!, details)
-        }.launchIn(viewModelScope)
     }
 
-    private fun saveEventId(eventId: String) {
-        val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
-        valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
-    }
-
-    private fun saveUser(userId: UserId, passphrase: ByteArray) {
-        val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
-        valueStore.putString(ValueKey.USER_ID, userId.id)
-        valueStore.putString(ValueKey.USER_PASSPHRASE, String(passphrase))
-    }
-
-    private fun trySetupUser(showConfirmationDialog: Boolean = true) {
+    private suspend fun setupUser(showConfirmationDialog: Boolean = true) {
         val tempValueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
-        val eventId = tempValueStore.getString(ValueKey.LAST_SERVER_EVENT_ID) ?: return
-        val userIdString = tempValueStore.getString(ValueKey.USER_ID) ?: return
+        val eventId = checkNotNull(tempValueStore.getString(ValueKey.LAST_SERVER_EVENT_ID))
+        val userIdString = checkNotNull(tempValueStore.getString(ValueKey.USER_ID))
+        val passphrase = checkNotNull(tempValueStore.getString(ValueKey.USER_PASSPHRASE))
+
         val userId = UserId(userIdString)
-        val passphrase = tempValueStore.getString(ValueKey.USER_PASSPHRASE) ?: return
 
         _state.postValue(State.Processing)
 
@@ -104,27 +90,29 @@ class AccountViewModel(
         valueStore.putString(ValueKey.USER_PASSPHRASE, passphrase)
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
-        viewModelScope.launch {
-            val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId) // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
-            if (fetchResult !is UseCase.Result.Success<*>) {
-                if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
-                removeUser(userId)
-                return@launch
-            }
-
-            val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
-            if (bootstrapResult !is UseCase.Result.Success<*>) {
-                if (bootstrapResult is UseCase.Result.Error) {
-                    _errorReport.postValue(bootstrapResult.error)
-                    if (bootstrapResult.error == UseCase.Error.RESET_NEEDED ||
-                        bootstrapResult.error == UseCase.Error.UPDATE_PASSPHRASE) return@launch
-                }
-                removeUser(userId)
-                return@launch
-            }
-
-            _state.postValue(State.Ready)
+        // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
+        val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId)
+        if (fetchResult !is UseCase.Result.Success<*>) {
+            if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
+            removeUser(userId)
+            return
         }
+
+        val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
+        if (bootstrapResult !is UseCase.Result.Success<*>) {
+            if (bootstrapResult is UseCase.Result.Error) {
+                _errorReport.postValue(bootstrapResult.error)
+                if (bootstrapResult.error == UseCase.Error.RESET_NEEDED ||
+                    bootstrapResult.error == UseCase.Error.UPDATE_PASSPHRASE
+                ) return
+            }
+            removeUser(userId)
+            return
+        }
+
+        valueStore.putBoolean(ValueKey.IS_BOOTSTRAPPED, true)
+
+        _state.postValue(State.Ready)
     }
 
     private suspend fun removeUser(userId: UserId) {
@@ -152,53 +140,41 @@ class AccountViewModel(
     val errorReport: LiveData<UseCase.Error?> = _errorReport
     val hasPrimary: LiveData<Boolean> = _hasPrimary
 
-    fun init(context: ComponentActivity, newActivity: Boolean) {
+    fun init(context: ComponentActivity) {
         // Make sure we clear error on init
         clearError()
 
         defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
 
-        // Wait on mandatory parameters.
         with(authOrchestrator) {
             register(context)
-            onLoginResult { result ->
-                result?.let {
-                    saveEventId(result.session.eventId)
-                    trySetupUser()
-                } ?: finishAppIfNoAccount(context)
-            }
-            onUserResult { result ->
-                result?.let {
-                    saveUser(UserId(result.id), result.passphrase!!)
-                    trySetupUser()
-                }
-            }
+            // Close app if Login screen has been closed.
+            onLoginResult { result -> if (result == null) finishAppIfNoAccount(context) }
+            // General state handling.
+            accountManager.observe(context.lifecycleScope)
+                .onAccountReady { saveAccountInfo(it) }
+                .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
+                .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
+                .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }
+                .onSessionHumanVerificationNeeded { startHumanVerificationWorkflow(it) }
+                .onAccountTwoPassModeFailed { removeUser(it.userId) }
+                .onAccountCreateAddressFailed { removeUser(it.userId) }
+                .onAccountDisabled { removeUser(it.userId) }
+                .onAccountRemoved { cleanUser(it.userId) }
         }
 
-        // Clean any unrecoverable Account.
-        viewModelScope.launch {
-            accountManager.getAccounts().first()
-                .filter { account ->
+        // Check if we already have Ready accounts.
+        accountManager.getAccounts().onEach { accounts ->
+            when {
+                accounts.isEmpty() -> _state.postValue(State.LoginNeeded)
+                accounts.any { it.isReady() && it.isBootstrapped() } -> _state.postValue(State.Ready)
+            }
+        }.launchIn(context.lifecycleScope)
 
-                    val isAccountUnrecoverable = when (account.state) {
-                        AccountState.Removed,
-                        AccountState.Disabled,
-                        AccountState.TwoPassModeFailed -> true
-                        AccountState.TwoPassModeNeeded -> newActivity
-                        else -> false
-                    }
-
-                    val isSessionUnrecoverable = when (account.sessionState) {
-                        SessionState.SecondFactorNeeded -> newActivity // TODO wait for core to actually relaunch the login process
-                        else -> false
-                    }
-
-                    isAccountUnrecoverable || isSessionUnrecoverable
-                }
-                .forEach {
-                    removeUser(it.userId)
-                }
-        }
+        // Observe primary user id.
+        accountManager.getPrimaryUserId().onEach { userId ->
+            _hasPrimary.postValue(userId != null)
+        }.launchIn(context.lifecycleScope)
     }
 
     fun startLoginWorkflow() {
@@ -229,11 +205,13 @@ class AccountViewModel(
                 return@launch
             }
 
-            trySetupUser(false)
+            setupUser(false)
         }
     }
 
     fun updatePassphrase() {
-        trySetupUser(false)
+        viewModelScope.launch {
+            setupUser(false)
+        }
     }
 }
