@@ -157,7 +157,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         nav_event_form_attendees_list.layoutManager = attendeesLayoutManager
         attendeeListAdapter = AddAttendeeListAdapter(false, userEmails) {
             lifecycleScope.launch {
-                eventViewModel.handleAttendee(it, false)
+                eventViewModel.handleAttendee(it, addAttendee = false)
             }
         }
         (nav_event_form_attendees_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -221,16 +221,20 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             email?.let {
                 // TODO Use get canonical route for second validation ? What are the actual error cases ?
                 val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.get(email)
-            }
+                if (canonicalEmail == null) {
+                    view?.displaySnackBar(getString(R.string.snack_add_participant_error))
+                    return@launch
+                }
 
-            tmpAttendeeList.add(attendee)
+                tmpAttendeeList.add(attendee)
 
-            nav_event_form_attendees_search_input.text.clear()
+                nav_event_form_attendees_search_input.text.clear()
 
-            eventViewModel.handleAttendee(attendee)
+                eventViewModel.handleAttendee(attendee, canonicalEmail)
 
-            if (tmpAttendeeList.size >= ATTENDEE_MAX_ALLOWED) { // Warn the user once max is reached
-                view?.displaySnackBar(getString(R.string.snack_maximum_participants_reached))
+                if (tmpAttendeeList.size >= ATTENDEE_MAX_ALLOWED) { // Warn the user once max is reached
+                    view?.displaySnackBar(getString(R.string.snack_maximum_participants_reached))
+                }
             }
         }
     }

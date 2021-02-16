@@ -2,10 +2,13 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.Manifest
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -435,13 +438,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 }
             })
         }
-
-        event_form_scroll_view.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            if (oldScrollY - scrollY < 0) {
-                // Hide keyboard on scroll down
-                requireActivity().clearFocusAndHideKeyboard(view)
-            }
-        }
     }
 
     private fun observeEventLiveData() {
@@ -730,42 +726,54 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)
                     && shouldShowContactsPermissionsDialog() -> {
-                val view = LayoutInflater.from(context)
-                    .inflate(R.layout.dialog_checkbox, null, false)
-
-                view.dialog_checkbox_header.text = getString(R.string.contacts_permission_dialog_message)
-                view.dialog_checkbox_press.setOnClickListener {
-                    view.dialog_checkbox.performClick()
-                }
-
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.contacts_permission_dialog_title)
-                    .setView(view)
-                    .setPositiveButton(R.string.contacts_permission_dialog_confirmation) { _, _ ->
-                        requestPermissionLauncher.launch(
-                            Manifest.permission.READ_CONTACTS)
-                    }
-                    .setNegativeButton(R.string.contacts_permission_dialog_cancel) { _, _ ->
-                        findNavController().navigate(R.id.nav_event_form_attendees)
-                    }
-                    .setOnCancelListener {
-                        findNavController().navigate(R.id.nav_event_form_attendees)
-                    }
-                    .setOnDismissListener {
-                        if (view.dialog_checkbox.isChecked) {
-                            changeContactsPermissionsPreferences(false)
-                        }
-                    }
-                    .show()
+                displayCustomPermissionDialog(false)
             }
             shouldShowContactsPermissionsDialog() -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.READ_CONTACTS)
+                displayCustomPermissionDialog(true)
             }
             else -> {
                 findNavController().navigate(R.id.nav_event_form_attendees)
             }
         }
+    }
+
+    private fun displayCustomPermissionDialog(openSettings: Boolean) {
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.dialog_checkbox, null, false)
+
+        view.dialog_checkbox_header.text = getString(R.string.contacts_permission_dialog_message)
+        view.dialog_checkbox_press.setOnClickListener {
+            view.dialog_checkbox.performClick()
+        }
+        val positiveButtonText =
+            if (openSettings) R.string.contacts_permission_dialog_open_settings
+            else R.string.contacts_permission_dialog_allow
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.contacts_permission_dialog_title)
+            .setView(view)
+            .setPositiveButton(positiveButtonText) { _, _ ->
+                if (openSettings) {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.data = Uri.fromParts("package", requireContext().packageName, null)
+                    startActivity(intent)
+                } else {
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.READ_CONTACTS)
+                }
+            }
+            .setNegativeButton(R.string.contacts_permission_dialog_cancel) { _, _ ->
+                findNavController().navigate(R.id.nav_event_form_attendees)
+            }
+            .setOnCancelListener {
+                findNavController().navigate(R.id.nav_event_form_attendees)
+            }
+            .setOnDismissListener {
+                if (view.dialog_checkbox.isChecked) {
+                    changeContactsPermissionsPreferences(false)
+                }
+            }
+            .show()
     }
 
     private fun displayAlarms() {

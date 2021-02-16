@@ -10,6 +10,7 @@ import biweekly.parameter.Related
 import biweekly.property.*
 import biweekly.util.Duration
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import org.junit.jupiter.api.Test
 import java.time.*
 import java.util.*
@@ -35,13 +36,17 @@ internal class EditCreateEventUseCaseTest {
             addComment("Comment no 1")
             addComment("Comment no 2")
             setTransparency(true)
-            addAttendee(Attendee("John Doe", "john.doe@pm.me"))
+
+            val attendee = Attendee("John Doe", "john.doe@pm.me")
+            attendee.addParameter(X_PM_TOKEN, "X-PM-TOKEN")
+            addAttendee(attendee)
+
             setOrganizer(Organizer("organizer@pm.me", "organizer@pm.me"))
         }
 
         TestsLogger.d("original event: ${event.wrapInICalendar().printToString()}")
 
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(event.wrapInICalendar(), mapOf(Pair("john.doe@pm.me", "johndoe@pm.me")))
+        val calendarSplit = ICalUtils.splitICalendarIntoParts(event.wrapInICalendar())
 
         TestsLogger.d("raw shared split:\n${Biweekly.write(calendarSplit.sharedPart).go()}")
         TestsLogger.d("raw shared encrypted split:\n${Biweekly.write(calendarSplit.sharedPartToEncrypt).go()}")
@@ -116,7 +121,7 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.attendees.size).isEqualTo(1)
             assertThat(this.attendees[0].email).isEqualTo("john.doe@pm.me")
             assertThat(this.attendees[0].commonName).isEqualTo("John Doe")
-            assertThat(this.attendees[0].getParameter("X-PM-TOKEN")).isNotNull()
+            assertThat(this.attendees[0].getParameter("X-PM-TOKEN")).isEqualTo("X-PM-TOKEN")
         }
         // TODO Attendees Part
         

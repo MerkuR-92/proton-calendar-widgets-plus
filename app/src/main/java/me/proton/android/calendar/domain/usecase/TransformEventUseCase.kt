@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.common.adjustIncomingAllDayEvent
@@ -128,7 +129,7 @@ class TransformEventUseCase(
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
-                val attendeeToken = attendee.getParameter("X-PM-TOKEN")
+                val attendeeToken = attendee.getParameter(X_PM_TOKEN)
                 val status = attendees.find { it.token == attendeeToken }?.participationStatus
                 if (status != null) attendee.participationStatus = status
             }

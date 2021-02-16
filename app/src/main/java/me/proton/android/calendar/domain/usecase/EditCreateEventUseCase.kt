@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.extractEmail
 import me.proton.android.calendar.common.printToString
@@ -12,6 +13,7 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
+import me.proton.core.util.kotlin.takeIfNotEmpty
 
 class EditCreateEventUseCase(
     private val logger: Logger,
@@ -35,9 +37,7 @@ class EditCreateEventUseCase(
         logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
 
         // 1. split original event according to the matrix
-        val attendeesEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }
-        val attendeesCanonizedEmails = if (attendeesEmails.isEmpty()) null else usersRepository.getCanonicalAddresses(userId, attendeesEmails)
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar, attendeesCanonizedEmails)
+        val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
 
         //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
@@ -185,8 +185,6 @@ class EditCreateEventUseCase(
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
         if (attendeesEventContent != null) {
             newEvent.iCalEvent.attendees.forEach {
-                val canonizedEmail = attendeesCanonizedEmails?.get(it.extractEmail()) ?: return@forEach
-                val token = ICalUtils.generateXPmToken(canonizedEmail, newEvent.uid)
                 val status = when (it.participationStatus) {
                     ParticipationStatus.TENTATIVE -> 1
                     ParticipationStatus.DECLINED -> 2
@@ -194,7 +192,7 @@ class EditCreateEventUseCase(
                     else -> 0
                 }
                 attendees.add(
-                    Event.AttendeeStatusEvent(token, status)
+                    Event.AttendeeStatusEvent(it.getParameter(X_PM_TOKEN), status)
                 )
             }
         }
@@ -216,7 +214,7 @@ class EditCreateEventUseCase(
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
                             attendeesEventContent = attendeesEventContent,
-                            attendees = if (attendees.isNotEmpty()) attendees else null // TODO If remove all attendees from an event do we send empty part ?
+                            attendees = attendees.takeIfNotEmpty() // TODO If remove all attendees from an event do we send empty part ?
                         )
                     )
                 )
@@ -235,7 +233,7 @@ class EditCreateEventUseCase(
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
                             attendeesEventContent = attendeesEventContent,
-                            attendees = if (attendees.isNotEmpty()) attendees else null // TODO If remove all attendees from an event do we send empty part ?
+                            attendees = attendees.takeIfNotEmpty()
                         )
                     )
                 )

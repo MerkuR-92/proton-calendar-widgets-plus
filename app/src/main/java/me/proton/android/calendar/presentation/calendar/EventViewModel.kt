@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.Related
+import biweekly.parameter.Role
 import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Organizer
@@ -19,6 +20,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
@@ -1281,11 +1283,15 @@ class EventViewModel(
         return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
     }
 
-    suspend fun handleAttendee(attendee: Attendee, addAttendee: Boolean = true) {
+    suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {
+            attendee.rsvp = true
+            attendee.role = Role.ATTENDEE
+            val token = ICalUtils.generateXPmToken(canonicalEmail, event.uid)
+            attendee.addParameter(X_PM_TOKEN, token)
             event.iCalEvent.addAttendee(
-                Attendee(attendee.commonName, attendee.extractEmail())
+                attendee
             )
             if (event.iCalEvent.organizer == null) {
                 val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {

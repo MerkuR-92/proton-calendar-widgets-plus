@@ -42,7 +42,7 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 object FeatureFlag {
     const val SETTINGS_DRAWER = true
-    const val ADD_ATTENDEES = false
+    const val ADD_ATTENDEES = true
 }
 
 object SharedPreferencesKeys {
@@ -108,6 +108,14 @@ object FormValidation {
 object FragmentArguments {
     const val POSITION_ARG = "POSITION_ARG"
     const val DATE_ARG = "DATE_ARG"
+}
+
+object CustomICalPropertyParameter {
+    const val X_PM_TOKEN = "X-PM-TOKEN"
+}
+
+object MessageDigestHashType {
+    const val SHA1 = "SHA-1"
 }
 
 val allowedTimezoneIds = listOf(

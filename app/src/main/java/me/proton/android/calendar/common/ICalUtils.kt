@@ -15,6 +15,7 @@ import com.google.crypto.tink.subtle.Hex
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
+import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
@@ -237,7 +238,7 @@ object ICalUtils {
     /**
      * Takes one iCalendar object and splits it according to "the matrix".
      */
-    fun splitICalendarIntoParts(originalCalendar: ICalendar, attendeesCanonizedEmails: Map<String, String>? = null): CalendarSplit {
+    fun splitICalendarIntoParts(originalCalendar: ICalendar): CalendarSplit {
 
         // TODO Attendees Part
 
@@ -326,13 +327,6 @@ object ICalUtils {
                     setCreated(originalEvent.created)
                     setLastModified(originalEvent.lastModified)
                     originalEvent.attendees.forEach {
-                        it.role = it.role ?: Role.ATTENDEE
-                        it.rsvp = it.rsvp ?: true
-                        attendeesCanonizedEmails?.let { canonizedEmailsMap ->
-                            val canonizedEmail = canonizedEmailsMap[it.extractEmail()] ?: return@let
-                            val token = generateXPmToken(canonizedEmail, originalEvent.uid.value)
-                            it.addParameter("X-PM-TOKEN", token)
-                        }
                         addAttendee(it)
                     }
                     wrapInICalendar()
@@ -341,8 +335,11 @@ object ICalUtils {
         )
     }
 
+    /**
+     * The token is calculated by doing SHA1(EventUID + canonizedAttendeeAddress)
+     */
     fun generateXPmToken(email: String, uid: String): String {
-        val messageDigest = MessageDigest.getInstance("SHA-1")
+        val messageDigest = MessageDigest.getInstance(SHA1)
         messageDigest.update((uid + email).toByteArray())
         val token = messageDigest.digest()
         return Hex.encode(token)
