@@ -458,7 +458,7 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="@dimen/spacing_element"
                 android:layout_gravity="center_horizontal"
-                tools:text="ProtonCalendar 2.0.0"/>
+                tools:text="Proton Calendar 2.0.0"/>
 
         </LinearLayout>
 

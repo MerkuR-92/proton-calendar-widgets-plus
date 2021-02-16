@@ -2899,7 +2899,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `extract attendee email`() {
+    fun `extract email`() {
 
         val iCalString = """
     BEGIN:VCALENDAR

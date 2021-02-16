@@ -725,25 +725,20 @@ fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
 }
 
 fun Attendee.extractEmail(): String? {
-
-    val uri = if (this.uri?.contains("@") == true) this.uri.substringAfter("mailto:") else null
-
-    val email = if (this.email?.contains("@") == true) this.email else null
-
-    val cn = if (this.commonName?.contains("@") == true) this.commonName else null
-
-    return uri ?: email ?: cn
+    return extractEmail(this.uri, this.email, this.commonName)
 }
 
 fun Organizer.extractEmail(): String? {
+    return extractEmail(this.uri, this.email, this.commonName)
+}
 
-    val uri = if (this.uri?.contains("@") == true) this.uri.substringAfter("mailto:") else null
-
-    val email = if (this.email?.contains("@") == true) this.email else null
-
-    val cn = if (this.commonName?.contains("@") == true) this.commonName else null
-
-    return uri ?: email ?: cn
+private fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
+    return when {
+        uri?.contains("@") == true -> uri.substringAfter("mailto:")
+        email?.contains("@") == true -> email
+        commonName?.contains("@") == true -> commonName
+        else -> null
+    }
 }
 
 /**
