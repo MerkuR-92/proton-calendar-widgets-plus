@@ -755,6 +755,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             .setPositiveButton(positiveButtonText) { _, _ ->
                 if (openSettings) {
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     intent.data = Uri.fromParts("package", requireContext().packageName, null)
                     startActivity(intent)
                 } else {
