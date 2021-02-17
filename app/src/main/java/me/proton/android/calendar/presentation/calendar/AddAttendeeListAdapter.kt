@@ -22,7 +22,6 @@ import me.proton.android.calendar.common.*
 
 class AddAttendeeListAdapter(
     private val searchList: Boolean = false,
-    private val userEmails: List<String>,
     private val clickListener: (Attendee) -> Unit
 ) : ListAdapter<Attendee, AddAttendeeListAdapter.ViewHolder>(AddAttendeeDiffCallback()) {
 
@@ -120,10 +119,6 @@ class AddAttendeeListAdapter(
             attendeeItemPress.visibleOrGone(searchList && !added)
             attendeeItemPress.setOnSingleClickListener {
                 if (searchList) {
-                    if (userEmails.firstOrNull { it.equals(attendee.extractEmail(), true) } != null) {
-                        view.displaySnackBar(view.context.getString(R.string.snack_add_self_as_participant))
-                        return@setOnSingleClickListener
-                    }
                     attendeeItemIconLoading.visibleOrGone(true)
                     clickListener(attendee)
                 }

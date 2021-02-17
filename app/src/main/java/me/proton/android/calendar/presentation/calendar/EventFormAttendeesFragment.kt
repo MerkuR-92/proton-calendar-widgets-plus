@@ -155,7 +155,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_list.layoutManager = attendeesLayoutManager
-        attendeeListAdapter = AddAttendeeListAdapter(false, userEmails) {
+        attendeeListAdapter = AddAttendeeListAdapter(false) {
             lifecycleScope.launch {
                 eventViewModel.handleAttendee(it, addAttendee = false)
             }
@@ -165,8 +165,8 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
         val searchAttendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_search_list.layoutManager = searchAttendeesLayoutManager
-        searchAttendeeListAdapter = AddAttendeeListAdapter(true, userEmails) {
-            addAttendee(it)
+        searchAttendeeListAdapter = AddAttendeeListAdapter(true) {
+            addAttendee(it, userEmails)
         }
         (nav_event_form_attendees_search_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         nav_event_form_attendees_search_list.adapter = searchAttendeeListAdapter
@@ -207,7 +207,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         requireContext().showKeyboard()
     }
 
-    private fun addAttendee(attendee: Attendee) {
+    private fun addAttendee(attendee: Attendee, userEmails: List<String>) {
         lifecycleScope.launch {
             val tmpAttendeeList = ArrayList(eventViewModel.eventLiveData.value?.iCalEvent?.attendees ?: listOf<Attendee>())
 
@@ -223,6 +223,12 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.get(email)
                 if (canonicalEmail == null) {
                     view?.displaySnackBar(getString(R.string.snack_add_participant_error))
+                    return@launch
+                }
+
+                if (userEmails.firstOrNull { it.equals(canonicalEmail, true) } != null) {
+                    view?.displaySnackBar(getString(R.string.snack_add_self_as_participant))
+                    searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
                     return@launch
                 }
 
