@@ -83,12 +83,12 @@ class AddAttendeeListAdapter(
             val textLayoutParams = attendeeItemTextLayout.layoutParams as ConstraintLayout.LayoutParams
             if (description.isEmpty()) {
                 // Update margins if description is hidden
-                textLayoutParams.topMargin = view.context.dpToPixel(18)
-                textLayoutParams.bottomMargin = view.context.dpToPixel(18)
+                textLayoutParams.topMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin_large)
+                textLayoutParams.bottomMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin_large)
             } else {
                 // Update margins if description is visible
-                textLayoutParams.topMargin = view.context.dpToPixel(14)
-                textLayoutParams.bottomMargin = view.context.dpToPixel(14)
+                textLayoutParams.topMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin)
+                textLayoutParams.bottomMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin)
             }
             attendeeItemTextLayout.layoutParams = textLayoutParams
 

@@ -173,6 +173,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
         searchAttendeeList.observe(viewLifecycleOwner, { searchAttendeeList ->
             searchAttendeeListAdapter.submitList(searchAttendeeList.sortedBy { it.commonName })
+            // TODO Try to find a way to refresh the highlighted text and icons visibility without calling notifyDataSetChanged
             searchAttendeeListAdapter.notifyDataSetChanged()
         })
 

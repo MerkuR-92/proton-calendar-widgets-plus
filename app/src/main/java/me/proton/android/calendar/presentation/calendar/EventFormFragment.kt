@@ -519,14 +519,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             displayAlarms()
 
             event_form_participant_chip_group.removeAllViews()
-            var count = 0
-            for (attendee in event.iCalEvent.attendees) {
+            event.iCalEvent.attendees.take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
                 val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
                 chipTitle?.let {
                     addAttendeeChip(chipTitle)
                 }
-                count++
-                if (count >= ATTENDEE_MAX_CHIP_ALLOWED) break
             }
             if (!event.iCalEvent.attendees.isNullOrEmpty()) {
                 addAttendeeChip(getString(R.string.event_current_user_organizer))
