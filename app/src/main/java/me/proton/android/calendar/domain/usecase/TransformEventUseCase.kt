@@ -25,9 +25,6 @@ class TransformEventUseCase(
     private val iCal: ICalUtils
 ) : UseCase { // TODO ADD TEST
 
-    private lateinit var verificationStatuses: MutableList<Event.SignatureVerification>
-    private lateinit var decryptionStatuses: MutableList<Event.DecryptionStatus>
-
     suspend fun execute(eventEntity: EventEntity) : Event? {
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
@@ -49,9 +46,8 @@ class TransformEventUseCase(
         }
 
         val calendarParts = mutableListOf<String>()
-
-        verificationStatuses = mutableListOf()
-        decryptionStatuses = mutableListOf()
+        val verificationStatuses: MutableList<Event.SignatureVerification> = mutableListOf()
+        val decryptionStatuses: MutableList<Event.DecryptionStatus> = mutableListOf()
 
         coroutineScope {
 
