@@ -40,6 +40,12 @@ class SyncService : Service() {
 
     }
 
+    override fun onCreate() {
+        super.onCreate()
+
+        startForeground(NOTIFICATION_ID_SYNC_SERVICE, createNotification())
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         startForeground(NOTIFICATION_ID_SYNC_SERVICE, createNotification())
