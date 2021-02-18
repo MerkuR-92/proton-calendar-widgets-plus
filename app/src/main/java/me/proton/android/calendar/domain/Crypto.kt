@@ -83,7 +83,7 @@ interface Crypto {
      */
     fun decryptSessionKey(
         encodedKeyPacket: String,
-        armoredPrivateKey: String,
+        armoredPrivateKeys: List<String>,
         passphrase: ByteArray
     ): SessionKey?
 

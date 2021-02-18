@@ -110,7 +110,7 @@ class CryptoImplTest {
 
         val plainText = "Proton"
         val encodedKeyPacket = "wV4DP+KI9zrxP8QSAQdAiDyH8M+RGVtpZSOXJUvV+EpRvLk8PdmolbxMX83MYFowMr3hUsQyNQzUZt7SzgDzWpA9+hd3eUp6gfUIfDHH6xreSRa6ALfhVKkEjuhGxrtv"
-        val sessionKey = crypto.decryptSessionKey(encodedKeyPacket, calendarPrivateKey, calendarPrivateKeyPassphrase.toByteArray())!!
+        val sessionKey = crypto.decryptSessionKey(encodedKeyPacket, listOf(calendarPrivateKey), calendarPrivateKeyPassphrase.toByteArray())!!
 
         val encrypted = crypto.encryptText(plainText, sessionKey)
 
@@ -121,7 +121,7 @@ class CryptoImplTest {
     fun decrypt_session_key() {
         val encodedKeyPacket = "wV4DP+KI9zrxP8QSAQdAiDyH8M+RGVtpZSOXJUvV+EpRvLk8PdmolbxMX83MYFowMr3hUsQyNQzUZt7SzgDzWpA9+hd3eUp6gfUIfDHH6xreSRa6ALfhVKkEjuhGxrtv"
 
-        assertNotNull(crypto.decryptSessionKey(encodedKeyPacket, calendarPrivateKey, calendarPrivateKeyPassphrase.toByteArray()))
+        assertNotNull(crypto.decryptSessionKey(encodedKeyPacket, listOf(calendarPrivateKey), calendarPrivateKeyPassphrase.toByteArray()))
     }
 
     val memberPassphrase = """

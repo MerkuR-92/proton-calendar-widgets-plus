@@ -81,24 +81,24 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         armoredPrivateKeys: List<String>,
         passphrase: ByteArray
     ): String? {
-        var keyring: KeyRing? = null
+        var keyRing: KeyRing? = null
         return try {
-            keyring = newKeyRing(null)
+            keyRing = newKeyRing(null)
             armoredPrivateKeys.forEach {
                 try {
                     val unlockedKey = newKeyFromArmored(it).unlock(passphrase)
-                    keyring.addKey(unlockedKey)
+                    keyRing.addKey(unlockedKey)
                 } catch (e: Exception) {
                     logger.i("Unlocking key failed", e)
                 }
             }
 
-            keyring.decrypt(PGPMessage(cipherText), null, 0L).string
+            keyRing.decrypt(PGPMessage(cipherText), null, 0L).string
         } catch (e: Exception) {
-//            logger.i("decrypt failed", e)
+            logger.i("decrypt failed", e)
             null
         } finally {
-            keyring?.clearPrivateParams()
+            keyRing?.clearPrivateParams()
         }
     }
 
@@ -197,15 +197,26 @@ class CryptoImpl(private val logger: Logger) : Crypto {
 
     override fun decryptSessionKey(
         encodedKeyPacket: String,
-        armoredPrivateKey: String,
+        armoredPrivateKeys: List<String>,
         passphrase: ByteArray
     ): SessionKey? {
+        val keyRing = newKeyRing(null)
         return try {
-            val keyRing = createAndUnlockKeyring(armoredPrivateKey, passphrase)
+            armoredPrivateKeys.forEach {
+                try {
+                    val unlockedKey = newKeyFromArmored(it).unlock(passphrase)
+                    keyRing.addKey(unlockedKey)
+                } catch (e: Exception) {
+                    logger.i("Unlocking key failed", e)
+                }
+            }
+
             keyRing.decryptSessionKey(Base64.decode(encodedKeyPacket, Base64.DEFAULT))
         } catch (e: Exception) {
             logger.i("decryptSessionKey failed", e)
             null
+        } finally {
+            keyRing?.clearPrivateParams()
         }
     }
 

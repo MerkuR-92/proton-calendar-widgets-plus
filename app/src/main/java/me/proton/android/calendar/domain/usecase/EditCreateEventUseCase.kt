@@ -47,9 +47,8 @@ class EditCreateEventUseCase(
         val memberAddressKey = userAddresses.firstOrNull()?.primaryKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid AddressKey for Member when creating Event") // TODO how to select address? how to select address-key?
 
         // 3. get CalendarKey for encrypting
-        val calendarKeys = database.calendarKeysDao().select(calendarId)
-        if (calendarKeys.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no keys for calendar when creating Event")
-        val calendarKey = calendarKeys.first { it.isActiveAndPrimary }
+        val calendarPrimaryPrivateKey = database.calendarKeysDao().select(calendarId).firstOrNull { it.isActiveAndPrimary }?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no active primary key for calendar when creating Event")
+        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no active keys for calendar when creating Event")
         val calendarPassphraseList = database.passphrasesDao().select(calendarId)
         if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar when creating Event")
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
@@ -61,10 +60,16 @@ class EditCreateEventUseCase(
 
         val oldEventEntity = database.eventsDao().selectById(newEvent.id)
         if (oldEventEntity != null) {
-            oldSharedSessionKey = crypto.decryptSessionKey(oldEventEntity.sharedKeyPacket, calendarKey.privateKey, keyPassphrase.toByteArray())
+            oldSharedSessionKey = crypto.decryptSessionKey(oldEventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())
             oldCalendarSessionKey = if (oldEventEntity.calendarKeyPacket != null) {
-                crypto.decryptSessionKey(oldEventEntity.calendarKeyPacket, calendarKey.privateKey, keyPassphrase.toByteArray())
+                crypto.decryptSessionKey(oldEventEntity.calendarKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())
             } else null
+            if (oldSharedSessionKey == null && oldEventEntity.sharedKeyPacket.isNotBlank()) {
+                logger.e("EditCreateEventUseCase: failed to decrypt old shared session key")
+            }
+            if (oldCalendarSessionKey == null && oldEventEntity.calendarKeyPacket.isNullOrBlank()) {
+                logger.e("EditCreateEventUseCase: failed to decrypt old calendar session key")
+            }
         }
 
         logger.d("old event entity: $oldEventEntity")
@@ -85,7 +90,7 @@ class EditCreateEventUseCase(
             val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, oldSharedSessionKey)
             Ciphertext.from(null, encryptedSharedPart!!)
         } else {
-            val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, crypto.getArmoredPublicKey(calendarKey.privateKey)
+            val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, crypto.getArmoredPublicKey(calendarPrimaryPrivateKey)
                 ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
             Ciphertext.from(encryptedSharedPart!!)
         }
@@ -101,7 +106,7 @@ class EditCreateEventUseCase(
                 val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, oldCalendarSessionKey)
                 Ciphertext.from(null, encryptedCalendarPart!!)
             } else {
-                val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, crypto.getArmoredPublicKey(calendarKey.privateKey)
+                val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, crypto.getArmoredPublicKey(calendarPrimaryPrivateKey)
                     ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
                 Ciphertext.from(encryptedCalendarPart!!)
             }
@@ -121,7 +126,7 @@ class EditCreateEventUseCase(
                     val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, oldSharedSessionKey)
                     Ciphertext.from(null, encryptedAttendeesPart!!)
                 } else {
-                    val sharedSessionKey = crypto.decryptSessionKey(encryptedSharedPartCiphertext.encodedKeyPacket ?: return UseCase.Result.InvalidParams("encoded shared key packet was null when encrypting attendees"), calendarKey.privateKey, keyPassphrase.toByteArray())
+                    val sharedSessionKey = crypto.decryptSessionKey(encryptedSharedPartCiphertext.encodedKeyPacket ?: return UseCase.Result.InvalidParams("encoded shared key packet was null when encrypting attendees"), calendarPrivateKeys, keyPassphrase.toByteArray())
                     val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, sharedSessionKey ?: return UseCase.Result.InvalidParams("shared session key was null when encrypting attendees"))
                     Ciphertext.from(null, encryptedAttendeesPart!!)
                 }
