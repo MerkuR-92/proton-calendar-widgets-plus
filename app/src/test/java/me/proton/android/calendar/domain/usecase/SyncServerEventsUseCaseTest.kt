@@ -1,23 +1,23 @@
 package me.proton.android.calendar.domain.usecase
 
+import android.util.Log
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import me.proton.android.calendar.common.TestsLogger
-import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.ServerEventsApiResponse
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.data.api.EventApiResponse
+import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 
@@ -29,15 +29,17 @@ internal class SyncServerEventsUseCaseTest {
     private val calendarsRepositoryMock: CalendarsRepository = mockk()
     private val usersRepositoryMock: UsersRepository = mockk()
     private val valueStoreMock: ValueStore = mockk()
+    private lateinit var appDatabaseMock: AppDatabase
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val cacheCalendarPassphraseUseCaseMock: CacheCalendarPassphraseUseCase = mockk()
     private val calendarUserSettingsChangedUseCaseMock: CalendarUserSettingsChangedUseCase = mockk()
     private val keySetupUseCaseMock: KeySetupUseCase = mockk()
-    private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase = mockk()
-    private val calendarsApi: CalendarsApi = mockk()
+    private val handleEventsMetadataUseCaseMock: HandleEventsMetadataUseCase = mockk()
+    private val calendarsApiMock: CalendarsApi = mockk()
     private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
-    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase = mockk()
+    private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
+    private val bootstrapCalendarsUseCaseMock: BootstrapCalendarsUseCase = mockk()
 
     private val userId = UserId("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
@@ -47,76 +49,152 @@ internal class SyncServerEventsUseCaseTest {
     @BeforeEach
     fun `before each`() {
         clearAllMocks()
+        mockkStatic(Log::class)
+        coEvery { Log.isLoggable(any(), any()) } returns true
+        appDatabaseMock = mockk()
+
+        coEvery { cacheCalendarPassphraseUseCaseMock.execute(userId, any()) } returns UseCase.Result.Success
+
+        coEvery { calendarsRepositoryMock.persistCalendar(userId.id, any()) } just Runs
+        coEvery { calendarsRepositoryMock.updateCalendar(userId.id, any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistEvents(any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistEvents(any(), captureCoroutine()) } just Runs
+        coEvery { calendarsRepositoryMock.deleteEventsById(any()) } just Runs
+        coEvery { calendarsRepositoryMock.selectEventAlarm(any()) } returns EventAlarmEntity("", 0L, "", 2, "", "", "")
+        coEvery { calendarsRepositoryMock.deleteEventAlarmsByEventIdAndOccurrence(any(), any()) } just Runs
+        coEvery { calendarsRepositoryMock.hasEvent(any(), any()) } returns true
+        coEvery { calendarsRepositoryMock.refreshCalendarsFlagsForAddress(any(), any(), any()) } just Runs
+        coEvery { calendarsRepositoryMock.refreshCalendars(any()) } returns true
+        coEvery { usersRepositoryMock.hasReactivatedAddressKeys(any()) } returns true
+        coEvery { usersRepositoryMock.persistAddress(userId.id, any()) } just Runs
+        coEvery { usersRepositoryMock.persistUser(any()) } just Runs
+        coEvery { usersRepositoryMock.updateUser(any()) } just Runs
+        coEvery { usersRepositoryMock.persistUserSettings(any(), any()) } just Runs
+        coEvery { usersRepositoryMock.updateAddress(any(), any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistEventAlarm(any()) } just Runs
+        coEvery { calendarsRepositoryMock.deleteEventAlarmById(any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistCalendarKey(any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistMember(any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
+        coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
+        coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
+        coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
+        coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
+        coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
+        coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
+        coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
+        coEvery { bootstrapCalendarsUseCaseMock.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success
+
+        every { valueStoreProviderMock.provideValueStore(userId.id) } returns valueStoreMock
+        every { valueStoreMock.putString(any(), any()) } just Runs
+        every { valueStoreMock.putStringInSet(any(), any(), any()) } just Runs
     }
 
     @Test
-    fun `handle chain of proton events`() {
+    fun `handle chain of core server events`() {
         runBlocking {
-            every { valueStoreProviderMock.provideValueStore(userId.id) } returns valueStoreMock
 
-            every { valueStoreMock.getString(ValueKey.LAST_SERVER_EVENT_ID) } returns "l_o7TdJpH3UCfYn-0xBWaJVlZ633baHNvjyZFvuX7TD6lFPaOzy-3YkSorWafW5nKivpxfZ1YaU66_d25R58-Q=="
-            every { valueStoreMock.putString(any(), any()) } just Runs
+            val newCalendarId = "iy-qX4FUDKVvivBrwQI_AEfVEkCu5maUqxoFNzmyak9YkG5Ijsvtv25l3V2BNCDMtdYaMFQuAbQb956KoPDIDA=="
 
-            // TODO "CalendarEvents" list looks differently now, it contains no shared/calendar/personal-Events and we need to fetch them
-            //  separately, by calling CalendarsApi
+            every { valueStoreMock.getString(ValueKey.LAST_SERVER_EVENT_ID) } returns "a74ab-bdMtoz8yqIFalPabc6TdsL6pIgdig2CRK9PVcBjM3my8FnZ_JICEqaTRwKnAFdi71swYmFOKaZMECv4Q=="
+
+            // ignore calendar events in this test
+            coEvery {
+                serverEventsApiMock.getLatestServerCalendarEvent(userId, any())
+            } returns ApiResponse.Success(LatestServerCalendarEventApiResponse("latest calendar event ID"))
+            coEvery { appDatabaseMock.calendarsDao().selectCalendars(userId.id) } returns emptyList()
 
             coEvery {
-                serverEventsApiMock.getServerEvents(userId, "l_o7TdJpH3UCfYn-0xBWaJVlZ633baHNvjyZFvuX7TD6lFPaOzy-3YkSorWafW5nKivpxfZ1YaU66_d25R58-Q==")
+                serverEventsApiMock.getServerCoreEventsSince(userId, "a74ab-bdMtoz8yqIFalPabc6TdsL6pIgdig2CRK9PVcBjM3my8FnZ_JICEqaTRwKnAFdi71swYmFOKaZMECv4Q==")
             } returns ApiResponse.Success(
-                json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_1.json").readText())
+                json.decodeFromString<ServerCoreEventsApiResponse>(File("src/test/resources/get_server_core_events_1.json").readText()).toServerEventsApiResponse()
             )
 
             coEvery {
-                serverEventsApiMock.getServerEvents(userId, "KiQ9JV0gXPgyz5wA0T8dFOzHIzD-fFVLEnog3En_ySlO3JjwlsPOn7zJHbbqkUh81kYofB14MuhrbCtMXNSEDQ==")
+                serverEventsApiMock.getServerCoreEventsSince(userId, "tuSVNffjJ-X7oNoI3o56uToDlTKy6AIvF0XVh9AIz0CN9j60PoE9mZJMSJzqCPpaPBphecjDWUbOrx4-HpuzdQ==")
             } returns ApiResponse.Success(
-                json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_2.json").readText())
+                json.decodeFromString<ServerCoreEventsApiResponse>(File("src/test/resources/get_server_core_events_2.json").readText()).toServerEventsApiResponse()
             )
+
+            val handleServerEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCaseMock, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, bootstrapCalendarsUseCaseMock, calendarsApiMock, valueStoreProviderMock, serverEventsApiMock)
+
+            val useCase = SyncServerEventsUseCase(
+                testsLogger,
+                valueStoreProviderMock,
+                serverEventsApiMock,
+                appDatabaseMock,
+                handleServerEventsUseCase
+            )
+
+            // TODO handle incomplete key setup case: KeySetupUseCase.kt
+
+            assertThat(useCase.execute(userId)).isEqualTo(UseCase.Result.Success)
+
+            coVerify(exactly = 1) {
+                calendarsRepositoryMock.persistCalendar(userId.id, any())
+            }
+            coVerify(exactly = 1) {
+                calendarsRepositoryMock.persistMember(any())
+            }
+            coVerify(exactly = 1) {
+                serverEventsApiMock.getLatestServerCalendarEvent(userId, newCalendarId)
+            }
+            coVerify(exactly = 1) {
+                calendarsRepositoryMock.updateCalendar(userId.id, any())
+            }
+            coVerify(exactly = 1) {
+                usersRepositoryMock.updateAddress(userId.id, any())
+            }
+            coVerify(exactly = 1) {
+                usersRepositoryMock.persistUserSettings(userId.id, any())
+            }
+            coVerify(exactly = 1) {
+                usersRepositoryMock.updateUser(any())
+            }
+            coVerify(exactly = 1) {
+                calendarUserSettingsChangedUseCaseMock.execute(userId.id, any())
+            }
+        }
+    }
+
+    @Test
+    fun `handle chain of calendar server events`() {
+        runBlocking {
+
+            val calendarId = "ZusVacxuoQZqP-z0j3eiNZsilZrVLZ7HNOBSJCFEQi6lONDqiCvi0QdF6eOk5HOWVE2esdadMUe1M4569ZNLzA=="
+            val lastEventId = "5qoyO4yM2Ytj-vsj6mMjJ7BBAqP53GMa_LHoYfCr7fSutsj6CtJDFFqva-EclKgerkhZ2lZ-Fs3vfRYFKwDQTQ=="
+
+            // ignore core events in this test
+            every { valueStoreMock.getString(ValueKey.LAST_SERVER_EVENT_ID) } returns "latest core event ID"
+            coEvery {
+                serverEventsApiMock.getServerCoreEventsSince(userId, "latest core event ID")
+            } returns ApiResponse.Success(
+                json.decodeFromString<ServerCoreEventsApiResponse>(File("src/test/resources/get_server_events_empty_result.json").readText()).toServerEventsApiResponse()
+            )
+
+            every { valueStoreMock.getStringFromSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, calendarId) } returns lastEventId
 
             coEvery {
-                serverEventsApiMock.getServerEvents(userId, "deZCqTHUuob80ZGgsyTwXxhJka4LD0soPisUvyeTcXKej5UnbTqI_0Qp3bUZfNjcI1gVZs2tZqqcnHCj5zXVYQ==")
+                serverEventsApiMock.getServerCalendarEventsSince(userId, lastEventId, calendarId)
             } returns ApiResponse.Success(
-                json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_3_after_creating_calendar.json").readText())
+                json.decodeFromString<ServerCalendarEventsApiResponse>(File("src/test/resources/get_server_calendar_events_1.json").readText()).toServerEventsApiResponse()
             )
+
+            val secondEventsId = "yZvpJj3vgcog2h4hMy73NPlMTJJq_wdiiAqxa31sF3UxBUSpM4qMtVDZU6WDFskEVUh2eUlMNJLO6Oqb1wVMSg=="
 
             coEvery {
-                serverEventsApiMock.getServerEvents(userId, "OYludcH6yhRe9X4Hgsxa9yeEOD-yMAsQVzehHyOxOgEf2owoLdVmWD1v_yzq_WuPWf3CX0fqpmIpqg-7PYxhIg==")
+                serverEventsApiMock.getServerCalendarEventsSince(userId, secondEventsId, calendarId)
             } returns ApiResponse.Success(
-                json.decodeFromString<ServerEventsApiResponse>(File("src/test/resources/get_server_events_4.json").readText())
+                json.decodeFromString<ServerCalendarEventsApiResponse>(File("src/test/resources/get_server_calendar_events_2.json").readText()).toServerEventsApiResponse()
             )
 
-            coEvery { cacheCalendarPassphraseUseCaseMock.execute(userId, any()) } returns UseCase.Result.Success
+            coEvery { appDatabaseMock.calendarsDao().selectCalendars(userId.id) } returns listOf(CalendarEntity(calendarId, "", "", "", 0))
+            coEvery { calendarsRepositoryMock.selectCalendars(userId.id) } returns listOf(CalendarEntity(calendarId, "", "", "", 0))
 
-            coEvery { calendarsRepositoryMock.persistCalendar(userId.id, any()) } just Runs
-            coEvery { calendarsRepositoryMock.updateCalendar(userId.id, any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistEvents(any()) } just Runs
-            coEvery { calendarsRepositoryMock.selectEventAlarm(any()) } returns EventAlarmEntity("", 0L, "", 2, "", "", "")
-            coEvery { calendarsRepositoryMock.deleteEventAlarmsByEventIdAndOccurrence(any(), any()) } just Runs
-            coEvery { calendarsRepositoryMock.hasEvent(any(), any()) } returns true
-            coEvery { calendarsRepositoryMock.refreshCalendarsFlagsForAddress(any(), any(), any()) } just Runs
-            coEvery { calendarsRepositoryMock.refreshCalendars(any()) } returns true
-            coEvery { usersRepositoryMock.hasReactivatedAddressKeys(any()) } returns true
-            coEvery { usersRepositoryMock.persistAddress(userId.id, any()) } just Runs
-            coEvery { usersRepositoryMock.persistUser(any()) } just Runs
-            coEvery { usersRepositoryMock.updateUser(any()) } just Runs
-            coEvery { usersRepositoryMock.persistUserSettings(any(), any()) } just Runs
-            coEvery { usersRepositoryMock.updateAddress(any(), any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistEventAlarm(any()) } just Runs
-            coEvery { calendarsRepositoryMock.deleteEventAlarmById(any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistCalendarKey(any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistMember(any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
-            coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
-            coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
-            coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
-            coEvery { handleEventsMetadataUseCase.execute(any(), any()) } returns UseCase.Result.Success
-            coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
-            coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
-            coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
-            coEvery { bootstrapCalendarsUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success
-            coEvery { calendarsApi.getEvent(any(), any(), any()) } returns ApiResponse.Success(
+            coEvery { calendarsApiMock.getEvent(userId, calendarId, "zhcfa9p3xUcoTmTt2nqYF5nW7BtS93OgtDKkBk9erBfrZXrOmfn-AGcS4p8iu1xcJVrh7_6AVssvpWtFe8VcQw==") } returns ApiResponse.Success(
                 EventApiResponse(EventEntity(
-                    "id",
-                    "calendarId",
+                    "event id 1",
+                    calendarId,
                     "calendarKeyPacket",
                     0L,
                     0L,
@@ -129,74 +207,72 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList()))
             )
 
-            val handleProtonEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCase, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, bootstrapCalendarsUseCase, calendarsApi)
+            coEvery { calendarsApiMock.getEvent(userId, calendarId, "KEZDgiuT4MIsCMCH9aPPXJ9NpDNnKRr3-fY1dh8shzeAri-GLWVjb0sexZAc6hpRJUDTV2ljNfapsxEy-47WBQ==") } returns ApiResponse.Success(
+                EventApiResponse(EventEntity(
+                    "event id 2",
+                    calendarId,
+                    "calendarKeyPacket",
+                    0L,
+                    0L,
+                    0,
+                    "sharedKeyPacket",
+                    emptyList(),
+                    emptyList(),
+                    emptyList(),
+                    emptyList(),
+                    emptyList()))
+            )
+
+            val handleEventsMetadataUseCase = HandleEventsMetadataUseCase(
+                testsLogger,
+                calendarsApiMock,
+                updateAlarmsUseCaseMock,
+                calendarsRepositoryMock,
+                fetchPublicKeysUseCaseMock
+            )
+
+            val handleServerEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCase, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, bootstrapCalendarsUseCaseMock, calendarsApiMock, valueStoreProviderMock, serverEventsApiMock)
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
                 valueStoreProviderMock,
                 serverEventsApiMock,
-                handleProtonEventsUseCase
+                appDatabaseMock,
+                handleServerEventsUseCase
             )
 
             assertThat(useCase.execute(userId)).isEqualTo(UseCase.Result.Success)
 
             coVerify(exactly = 1) {
-                cacheCalendarPassphraseUseCaseMock.execute(userId, any())
+                calendarsRepositoryMock.persistEvents(any(), captureCoroutine())
             }
 
-            verify {
-                valueStoreMock.getString(ValueKey.LAST_SERVER_EVENT_ID)
-            }
             coVerify(exactly = 1) {
-                calendarsRepositoryMock.persistCalendar(userId.id, any())
+                calendarsRepositoryMock.deleteEventsById(any())
             }
+
+            coVerify(exactly = 1) {
+                fetchPublicKeysUseCaseMock.execute(any(), any())
+            }
+
+            coVerify(exactly = 1) {
+                calendarsRepositoryMock.persistCalendarSettings(any())
+            }
+
+            // 1 for metadata usecase, 1 for created alarm
             coVerify(exactly = 2) {
-                calendarsRepositoryMock.updateCalendar(userId.id, any())
-            }
-            coVerify(exactly = 2) {
-                handleEventsMetadataUseCase.execute(any(), any())
-            }
-            coVerify(exactly = 5) {
                 updateAlarmsUseCaseMock.execute(userId.id, any())
             }
-            coVerify(exactly = 2) {
-                usersRepositoryMock.updateAddress(userId.id, any())
-            }
-            coVerify(exactly = 1) {
-                usersRepositoryMock.persistUserSettings(userId.id, any())
-            }
-            coVerify(exactly = 1) {
-                usersRepositoryMock.updateUser(any())
-            }
-            coVerify(exactly = 5) {
-                calendarsRepositoryMock.persistEventAlarm(any())
-            }
-            coVerify(exactly = 3) {
-                calendarsRepositoryMock.deleteEventAlarmsByEventIdAndOccurrence(any(), any())
-            }
+
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.persistCalendarKey(any())
             }
-            coVerify(exactly = 1) {
-                calendarsRepositoryMock.persistMember(any())
-            }
+
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.persistPassphrase(any())
             }
-            coVerify(exactly = 2) {
-                calendarsRepositoryMock.persistCalendarSettings(any())
-            }
+
         }
     }
-
-    @Disabled
-    @Test
-    fun `handle chain of proton events with network error`() {
-
-        // TODO
-        TODO()
-
-    }
-
 
 }

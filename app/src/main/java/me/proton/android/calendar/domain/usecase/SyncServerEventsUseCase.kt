@@ -1,23 +1,24 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
+import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
-import java.lang.Exception
 
 class SyncServerEventsUseCase(
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val serverEventsApi: ServerEventsApi,
+    private val database: AppDatabase,
     private val handleServerEventsUseCase: HandleServerEventsUseCase
 ): UseCase {
 
     companion object {
         const val WORKER_ID = "SYNC_SERVER_EVENTS"
-        const val WORKER_PERIODIC_ID = "SYNC_SERVER_EVENTS_PERIODIC"
     }
 
     suspend fun execute(userId: UserId): UseCase.Result {
@@ -25,37 +26,92 @@ class SyncServerEventsUseCase(
         logger.v("executing SyncServerEventsUseCase for $userId")
 
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
-        var lastProtonEventId = valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)
-            ?: return UseCase.Result.InvalidParams("SyncServerEventsUseCase: no last server event id")
+
+        val syncResults = mutableListOf<UseCase.Result>()
+
+        // sync core proton events
+        syncResults.add(sync(userId))
+
+        // sync each calendar
+        database.calendarsDao().selectCalendars(userId.id).forEach { calendarEntity ->
+
+            if (valueStore.getStringFromSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, calendarEntity.id) == null) {
+                val latestEventIdResponse = serverEventsApi.getLatestServerCalendarEvent(userId, calendarEntity.id)
+                if (latestEventIdResponse is ApiResponse.Success) {
+                    valueStore.putStringInSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, calendarEntity.id, latestEventIdResponse.data.calendarEventId)
+                } else {
+                    logger.e("could not get latest calendar server event ID response in SyncServerEventsUseCase")
+                }
+            }
+
+            syncResults.add(sync(userId, calendarEntity.id))
+        }
+
+        return syncResults.firstOrNull { it !is UseCase.Result.Success } ?: UseCase.Result.Success
+    }
+
+    /**
+     * Sync "core" or "calendar" server events.
+     */
+    private suspend fun sync(userId: UserId, calendarId: String? = null): UseCase.Result {
+
+        logger.v("sync for calendarId: $calendarId")
+
+        val valueStore = valueStoreProvider.provideValueStore(userId.id)
+        var lastServerEventId = if (calendarId != null) {
+            valueStore.getStringFromSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, calendarId)
+                ?: return UseCase.Result.InvalidParams("SyncServerEventsUseCase: no last server calendar event id")
+        } else {
+            valueStore.getString(ValueKey.LAST_SERVER_EVENT_ID)
+                ?: return UseCase.Result.InvalidParams("SyncServerEventsUseCase: no last server event id")
+        }
+
+        logger.v("with lastServerEventId: $lastServerEventId")
 
         do {
             var moreEvents = false
 
-            // TODO we need to properly authorize all API requests for specific users!!!
-            when (val eventsReponse = serverEventsApi.getServerEvents(userId, lastProtonEventId)) {
+            val eventsReponse = if (calendarId != null) {
+                serverEventsApi.getServerCalendarEventsSince(userId, lastServerEventId, calendarId)
+            } else {
+                serverEventsApi.getServerCoreEventsSince(userId, lastServerEventId)
+            }
+
+            when (eventsReponse) {
                 is ApiResponse.Success -> {
-                    logger.v("fetched Server Events for ID: $lastProtonEventId")
-                    // TODO handle eventsReponse.data.refresh, I think it's "force wipe database"?????
-                    moreEvents = eventsReponse.data.more == 1 // TODO parse as boolean
+                    logger.v("fetched Server Events for ID: $lastServerEventId")
+                    moreEvents = eventsReponse.data.more == 1
                     logger.v("moreEvents: $moreEvents")
 
                     val handleServerEventsResult = when (val result =
                         handleServerEventsUseCase.execute(eventsReponse.data, userId)) {
                         UseCase.Result.Success -> {
-                            logger.v("correctly handled Proton Events $lastProtonEventId")
-                            lastProtonEventId = eventsReponse.data.eventId
-                            valueStore.putString(
-                                ValueKey.LAST_SERVER_EVENT_ID,
-                                eventsReponse.data.eventId
-                            )
-                            logger.v("next Proton Events ID is saved as $lastProtonEventId")
+                            logger.v("correctly handled Server Events $lastServerEventId")
+                            lastServerEventId = eventsReponse.data.eventId
+
+                            if (calendarId != null) {
+                                valueStore.putStringInSet(
+                                    ValueSet.LAST_SERVER_CALENDAR_EVENT_ID,
+                                    calendarId,
+                                    eventsReponse.data.eventId
+                                )
+                            } else {
+                                valueStore.putString(
+                                    ValueKey.LAST_SERVER_EVENT_ID,
+                                    eventsReponse.data.eventId
+                                )
+                            }
+
+                            logger.v("next Server Events ID for calendar $calendarId is saved as $lastServerEventId")
                             UseCase.Result.Success
                         }
                         is UseCase.Result.InvalidParams -> {
-                            UseCase.Result.InvalidParams("SyncServerEventsUseCase: invalid params handling server events: ${result.message}")
+                            logger.e("SyncServerEventsUseCase: invalid params handling server events: ${result.message}")
+                            UseCase.Result.InvalidParams("invalid params handling server events: ${result.message}")
                         }
                         is UseCase.Result.Error -> {
-                            UseCase.Result.Error("SyncServerEventsUseCase: error handling server events: ${result.message}, ${result.error}")
+                            logger.e("SyncServerEventsUseCase: handleServerEventsResult error ${result.message}, ${result.error}")
+                            UseCase.Result.Error("error handling server events: ${result.message}, ${result.error}")
                         }
                     }
 
@@ -65,18 +121,21 @@ class SyncServerEventsUseCase(
 
                 }
                 is ApiResponse.Error -> {
-                    return UseCase.Result.Error("SyncServerEventsUseCase: api error getting server events: $eventsReponse")
+                    logger.e("error in SyncServerEvents: ${eventsReponse}")
+                    return UseCase.Result.Error("api error getting server events: $eventsReponse")
                 }
                 is ApiResponse.Exception -> {
-                    return UseCase.Result.Error("SyncServerEventsUseCase: exception getting server events: $eventsReponse")
+                    logger.e("Exception in SyncServerEvents: ${eventsReponse}")
+                    return UseCase.Result.Error("exception getting server events: $eventsReponse")
                 }
             }
 
         } while (moreEvents)
 
-        logger.v("success syncing Proton Events, ID saved for later is $lastProtonEventId")
+        logger.v("success syncing Server Events, ID saved for later is $lastServerEventId")
 
         return UseCase.Result.Success
+
     }
 
 }

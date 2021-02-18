@@ -4,10 +4,9 @@ import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarFlags
-import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.domain.entity.UserId
@@ -31,7 +30,9 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val syncAlarmsUseCase: SyncAlarmsUseCase,
     private val keySetupUseCase: KeySetupUseCase,
-    private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase
+    private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
+    private val serverEventsApi: ServerEventsApi,
+    private val valueStoreProvider: ValueStoreProvider
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String, showConfirmationDialog: Boolean): UseCase.Result {
@@ -212,6 +213,16 @@ class BootstrapCalendarsUseCase( // TODO TEST
                                 }
                             }
                         }
+
+                        // for each bootstrapped calendar, get its latest Event ID
+                        val valueStore = valueStoreProvider.provideValueStore(userId.id)
+                        val latestEventIdResponse = serverEventsApi.getLatestServerCalendarEvent(userId, calendarEntity.id)
+                        if (latestEventIdResponse is ApiResponse.Success) {
+                            valueStore.putStringInSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, calendarEntity.id, latestEventIdResponse.data.calendarEventId)
+                        } else {
+                            logger.e("could not get latest calendar server event ID response in BootstrapCalendarsUseCase")
+                        }
+
 
                         return UseCase.Result.Success
                     }

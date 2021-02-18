@@ -1,18 +1,23 @@
 package me.proton.android.calendar.domain.api
 
-import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.LatestServerEventApiResponse
-import me.proton.android.calendar.data.api.ServerEventsApiResponse
+import me.proton.android.calendar.data.api.*
 import me.proton.core.domain.entity.UserId
 
 interface ServerEventsApi {
     /**
      * Gets latest event ID, only use with empty cache to bootstrap event stream.
      */
-    suspend fun getLatestServerEvent(userId: UserId): ApiResponse<LatestServerEventApiResponse> // TODO remove because we don't need to use it
+    suspend fun getLatestServerCoreEvent(userId: UserId): ApiResponse<LatestServerCoreEventApiResponse>
+
+    suspend fun getLatestServerCalendarEvent(userId: UserId, calendarId: String): ApiResponse<LatestServerCalendarEventApiResponse>
 
     /**
-     * Gets events since last event ID.
+     * Gets core events since last event ID.
      */
-    suspend fun getServerEvents(userId: UserId, sinceServerEventId: String): ApiResponse<ServerEventsApiResponse>
+    suspend fun getServerCoreEventsSince(userId: UserId, serverEventId: String): ApiResponse<ServerEventsApiResponse>
+
+    /**
+     * Gets calendar events since last event ID.
+     */
+    suspend fun getServerCalendarEventsSince(userId: UserId, serverEventId: String, calendarId: String): ApiResponse<ServerEventsApiResponse>
 }

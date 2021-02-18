@@ -4,10 +4,9 @@ import android.database.sqlite.SQLiteConstraintException
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
-import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
 
@@ -22,13 +21,20 @@ class HandleServerEventsUseCase(
     private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
     private val keySetupUseCase: KeySetupUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
-    private val calendarsApi: CalendarsApi) : UseCase {
+    private val calendarsApi: CalendarsApi,
+    private val valueStoreProvider: ValueStoreProvider,
+    private val serverEventsApi: ServerEventsApi
+
+) : UseCase {
 
     suspend fun execute(eventsResponse: ServerEventsApiResponse, userId: UserId) : UseCase.Result {
 
         logger.v("handling server events in usecase")
 
         return try {
+
+            val valueStore = valueStoreProvider.provideValueStore(userId.id)
+
             eventsResponse.user?.let {
                 usersRepository.updateUser(it)
             }
@@ -43,6 +49,15 @@ class HandleServerEventsUseCase(
                 it.handleAction(
                     { calendarsRepository.deleteCalendarById(it.id) },
                     {
+
+                        // for newly created calendar, get its latest Event ID
+                        val latestEventIdResponse = serverEventsApi.getLatestServerCalendarEvent(userId, it.id)
+                        if (latestEventIdResponse is ApiResponse.Success) {
+                            valueStore.putStringInSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, it.id, latestEventIdResponse.data.calendarEventId)
+                        } else {
+                            logger.e("could not get latest calendar server event ID response in HandleServerEventsUseCase")
+                        }
+
                         if (it.calendar?.hasIncompleteKeySetup == true) {
                             // Try to complete key setup for calendar:
                             // - we persist newly updated calendar fetched from API if it succeeds

@@ -2,6 +2,7 @@ package me.proton.android.calendar.data.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
@@ -15,34 +16,93 @@ import retrofit2.http.Path
 interface ServerEventsApiService : BaseRetrofitApi {
 
     @GET("events/latest")
-    suspend fun getLatestProtonEvent(): LatestServerEventApiResponse
+    suspend fun getLatestServerEvent(): LatestServerCoreEventApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/modelevents/latest")
+    suspend fun getLatestServerEvent(@Path("calendarId") calendarId: String): LatestServerCalendarEventApiResponse
 
     @GET("events/{eventId}")
-    suspend fun getProtonEvents(@Path("eventId") sinceProtonEventId: String): ServerEventsApiResponse
+    suspend fun getServerCoreEventsSince(@Path("eventId") serverEventId: String): ServerCoreEventsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/modelevents/{eventId}")
+    suspend fun getServerCalendarEventsSince(@Path("eventId") serverEventId: String, @Path("calendarId") calendarId: String): ServerCalendarEventsApiResponse
+
 }
 
 class ServerEventsApiImpl(private val apiProvider: ApiProvider) : ServerEventsApi {
 
-    override suspend fun getLatestServerEvent(userId: UserId): ApiResponse<LatestServerEventApiResponse> =
+    override suspend fun getLatestServerCoreEvent(userId: UserId): ApiResponse<LatestServerCoreEventApiResponse> =
         apiProvider.get<ServerEventsApiService>(userId).invoke {
-            getLatestProtonEvent()
+            getLatestServerEvent()
         }.toApiResponse()
 
-    override suspend fun getServerEvents(userId: UserId, sinceServerEventId: String): ApiResponse<ServerEventsApiResponse> =
+    override suspend fun getLatestServerCalendarEvent(
+        userId: UserId,
+        calendarId: String
+    ): ApiResponse<LatestServerCalendarEventApiResponse> =
         apiProvider.get<ServerEventsApiService>(userId).invoke {
-            getProtonEvents(sinceServerEventId)
+            getLatestServerEvent(calendarId)
+        }.toApiResponse()
+
+    override suspend fun getServerCoreEventsSince(userId: UserId, serverEventId: String): ApiResponse<ServerEventsApiResponse> =
+        apiProvider.get<ServerEventsApiService>(userId).invoke {
+            getServerCoreEventsSince(serverEventId).toServerEventsApiResponse()
+        }.toApiResponse()
+
+    override suspend fun getServerCalendarEventsSince(
+        userId: UserId,
+        serverEventId: String,
+        calendarId: String
+    ): ApiResponse<ServerEventsApiResponse> =
+        apiProvider.get<ServerEventsApiService>(userId).invoke {
+            getServerCalendarEventsSince(serverEventId, calendarId).toServerEventsApiResponse()
         }.toApiResponse()
 
 }
 
 @Serializable
-data class LatestServerEventApiResponse(
+data class LatestServerCoreEventApiResponse(
     @SerialName("EventID")
     val eventId: String
 )
 
 @Serializable
+data class LatestServerCalendarEventApiResponse(
+    @SerialName("CalendarModelEventID")
+    val calendarEventId: String
+)
+
 data class ServerEventsApiResponse(
+    val eventId: String, // new eventId to send with next request
+    val refresh: Int, // bitmap, 255 means throw out client cache and reload everything from server, 1 is mail, 2 is contacts
+    val more: Int, // 0 or 1 if more events exist and should be fetched
+    val user: UserEntity? = null, // doesn't contain "Action", it's always "update"
+    val userSettings: UserSettingsEntity? = null,
+    val addresses: List<ServerEvent.AddressesApiResponse>? = null,
+    val calendars: List<ServerEvent.CalendarsApiResponse>? = null,
+    val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>? = null,
+    val calendarPassphrases: List<ServerEvent.PassphrasesApiResponse>? = null,
+    val calendarMembers: List<ServerEvent.MembersApiResponse>? = null,
+    val calendarEvents: List<ServerEvent.EventsApiResponse>? = null,
+    val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null,
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
+    val calendarUserSettings: CalendarUserSettingsEntity? = null
+)
+
+fun ServerCoreEventsApiResponse.toServerEventsApiResponse() = ServerEventsApiResponse(
+    eventId = this.eventId,
+    refresh = this.refresh,
+    more = this.more,
+    user = this.user,
+    userSettings = this.userSettings,
+    addresses = this.addresses,
+    calendars = this.calendars,
+    calendarMembers = this.calendarMembers,
+    calendarUserSettings = this.calendarUserSettings
+)
+
+@Serializable
+data class ServerCoreEventsApiResponse(
     @SerialName("EventID")
     val eventId: String, // new eventId to send with next request
     @SerialName("Refresh")
@@ -57,21 +117,43 @@ data class ServerEventsApiResponse(
     val addresses: List<ServerEvent.AddressesApiResponse>? = null,
     @SerialName("Calendars")
     val calendars: List<ServerEvent.CalendarsApiResponse>? = null,
+    @SerialName("CalendarMembers")
+    val calendarMembers: List<ServerEvent.MembersApiResponse>? = null,
+    @SerialName("CalendarUserSettings")
+    val calendarUserSettings: CalendarUserSettingsEntity? = null
+)
+
+fun ServerCalendarEventsApiResponse.toServerEventsApiResponse() = ServerEventsApiResponse(
+    eventId = this.calendarModelEventId,
+    refresh = this.refresh,
+    more = this.more,
+    calendarKeys = this.calendarKeys,
+    calendarPassphrases = this.calendarPassphrases,
+    calendarEvents = this.calendarEvents,
+    calendarSettings = this.calendarSettings,
+    calendarAlarms = this.calendarAlarms
+)
+
+@Serializable
+data class ServerCalendarEventsApiResponse(
+    @SerialName("CalendarModelEventID")
+    val calendarModelEventId: String, // new eventId to send with next request
+    @SerialName("Refresh")
+    val refresh: Int, // bitmap, 255 means throw out client cache and reload everything from server, 1 is mail, 2 is contacts
+    @SerialName("More")
+    val more: Int, // 0 or 1 if more events exist and should be fetched
     @SerialName("CalendarKeys")
     val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>? = null,
     @SerialName("CalendarPassphrases")
     val calendarPassphrases: List<ServerEvent.PassphrasesApiResponse>? = null,
-    @SerialName("CalendarMembers")
-    val calendarMembers: List<ServerEvent.MembersApiResponse>? = null,
     @SerialName("CalendarEvents")
     val calendarEvents: List<ServerEvent.EventsApiResponse>? = null,
     @SerialName("CalendarSettings")
     val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null,
     @SerialName("CalendarAlarms")
-    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
-    @SerialName("CalendarUserSettings")
-    val calendarUserSettings: CalendarUserSettingsEntity? = null
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null
 )
+
 
 // TODO HANDLE ACTIONS AND CREATE TESTS FOR THAT!!!!!!!!!!!!!!!!!!
 

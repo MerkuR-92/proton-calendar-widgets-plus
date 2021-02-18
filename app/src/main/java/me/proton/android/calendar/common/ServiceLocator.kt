@@ -72,13 +72,13 @@ val useCaseModule = module {
     factory<FetchUserUseCase> { FetchUserUseCase(get(), get(), get(), get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get()) }
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get()) }
-    factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get()) }
+    factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get()) }
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
     factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get()) }
