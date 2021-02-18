@@ -65,10 +65,10 @@ class EditCreateEventUseCase(
                 crypto.decryptSessionKey(oldEventEntity.calendarKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())
             } else null
             if (oldSharedSessionKey == null && oldEventEntity.sharedKeyPacket.isNotBlank()) {
-                logger.e("EditCreateEventUseCase: failed to decrypt old shared session key")
+                return UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt old shared session key")
             }
             if (oldCalendarSessionKey == null && oldEventEntity.calendarKeyPacket.isNullOrBlank()) {
-                logger.e("EditCreateEventUseCase: failed to decrypt old calendar session key")
+                return UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt old calendar session key")
             }
         }
 
