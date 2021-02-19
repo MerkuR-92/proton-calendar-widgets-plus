@@ -224,6 +224,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.get(email)
                 if (canonicalEmail == null) {
                     view?.displaySnackBar(getString(R.string.snack_add_participant_error))
+                    searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
                     return@launch
                 }
 
@@ -241,6 +242,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
                 if (tmpAttendeeList.size >= ATTENDEE_MAX_ALLOWED) { // Warn the user once max is reached
                     view?.displaySnackBar(getString(R.string.snack_maximum_participants_reached))
+                    searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
                 }
             }
         }
