@@ -43,7 +43,12 @@ object ICalUtils {
 
     private fun normaliseICalendar(calendar: ICalendar) {
 
-        // TODO manipulate calendar, like add DTEND?
+        // TODO replace this with global validation of all properties from biweekly
+        calendar.events?.forEach { vEvent ->
+            vEvent?.attendees?.forEach {
+                it.commonName = it.commonName?.replace("\"", "")
+            }
+        }
 
     }
 
