@@ -242,8 +242,9 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
                 if (tmpAttendeeList.size >= ATTENDEE_MAX_ALLOWED) { // Warn the user once max is reached
                     view?.displaySnackBar(getString(R.string.snack_maximum_participants_reached))
-                    searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
                 }
+
+                searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
             }
         }
     }
