@@ -182,6 +182,7 @@
     <string name="snack_add_self_as_participant">Self invitation not allowed</string>
     <string name="snack_maximum_participants_reached">The maximum number of participants has been reached.</string>
     <string name="snack_add_participant_error">Error while adding the participant</string>
+    <string name="snack_add_participant_invalid_email">Invalid email</string>
 
     <!-- Dialogs -->
     <string name="error_event_doesnt_exist">Event doesn\'t exist</string>

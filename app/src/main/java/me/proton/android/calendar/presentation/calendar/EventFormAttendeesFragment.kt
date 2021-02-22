@@ -223,7 +223,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 // TODO Use get canonical route for second validation ? What are the actual error cases ?
                 val canonicalEmail = calendarViewModel.getCanonicalEmails(listOf(email))?.get(email)
                 if (canonicalEmail == null) {
-                    view?.displaySnackBar(getString(R.string.snack_add_participant_error))
+                    view?.displaySnackBar(getString(R.string.snack_add_participant_invalid_email))
                     searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
                     return@launch
                 }
