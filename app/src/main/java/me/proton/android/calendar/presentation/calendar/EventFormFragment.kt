@@ -87,35 +87,45 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
-                // Reinitialise event view model data when user chooses to discard modifications
-                lifecycleScope.launch {
-                    val userId = accountViewModel.getPrimaryUserId()
-                    val viewModeInitStatus =
-                        if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
-                        else eventViewModel.initialise(
-                            userId,
-                            editMode = false,
-                            navigationArguments.eventId,
-                            if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                            null,
-                            null,
-                        )
-                    if (viewModeInitStatus == EventViewModel.Result.Success) {
-                        findNavController().navigateUp()
-                    } else {
-                        when (viewModeInitStatus) {
-                            EventViewModel.Result.OccurrenceDoesntExist -> {
-                                AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_doesnt_exist))
+                if (navigationArguments.eventId == null) {
+                    jumpToMonthView()
+                } else {
+                    // Reinitialise event view model data when user chooses to discard modifications
+                    lifecycleScope.launch {
+                        val userId = accountViewModel.getPrimaryUserId()
+                        val viewModeInitStatus =
+                            if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                            else eventViewModel.initialise(
+                                userId,
+                                editMode = false,
+                                navigationArguments.eventId,
+                                if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                                null,
+                                null,
+                            )
+                        if (viewModeInitStatus == EventViewModel.Result.Success) {
+                            findNavController().navigateUp()
+                        } else {
+                            when (viewModeInitStatus) {
+                                EventViewModel.Result.OccurrenceDoesntExist -> {
+                                    AndroidUtils.displaySimpleOkAlert(
+                                        requireContext(),
+                                        getString(R.string.error_occurrence_doesnt_exist)
+                                    )
+                                }
+                                EventViewModel.Result.EventDoesntExist -> {
+                                    AndroidUtils.displaySimpleOkAlert(
+                                        requireContext(),
+                                        getString(R.string.error_event_doesnt_exist)
+                                    )
+                                }
+                                is EventViewModel.Result.Error -> {
+                                    logger.e(viewModeInitStatus.message)
+                                    requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
+                                }
                             }
-                            EventViewModel.Result.EventDoesntExist -> {
-                                AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_doesnt_exist))
-                            }
-                            is EventViewModel.Result.Error -> {
-                                logger.e(viewModeInitStatus.message)
-                                requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
-                            }
+                            jumpToMonthView()
                         }
-                        jumpToMonthView()
                     }
                 }
             }
