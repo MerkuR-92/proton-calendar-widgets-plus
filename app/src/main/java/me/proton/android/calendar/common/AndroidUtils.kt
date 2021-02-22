@@ -51,6 +51,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.presentation.utils.InputValidationResult
 import okhttp3.internal.toHexString
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -1185,4 +1186,10 @@ fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {
 fun validateEmail(email: CharSequence): Boolean {
     val regex = InputValidationResult.EMAIL_VALIDATION_PATTERN.toRegex(RegexOption.IGNORE_CASE)
     return regex.matches(email)
+}
+
+fun removeAccents(string: CharSequence): String {
+    val regex = "\\p{InCombiningDiacriticalMarks}+".toRegex()
+    val temp = Normalizer.normalize(string, Normalizer.Form.NFD)
+    return regex.replace(temp, "")
 }

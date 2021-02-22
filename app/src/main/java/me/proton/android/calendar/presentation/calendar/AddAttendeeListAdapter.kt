@@ -69,12 +69,12 @@ class AddAttendeeListAdapter(
                     attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
                 else attendee.extractEmail() ?: ""
 
-            if (query.isNotEmpty() && title.contains(query)) {
+            if (query.isNotEmpty() && title.contains(query, true)) {
                 val spannableStringBuilder = SpannableStringBuilder(title)
                 spannableStringBuilder.setSpan(
                     StyleSpan(Typeface.BOLD),
-                    title.indexOf(query),
-                    title.indexOf(query) + query.length,
+                    title.indexOf(query, ignoreCase = true),
+                    title.indexOf(query, ignoreCase = true) + query.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 attendeeItemTitle.text = spannableStringBuilder
             } else attendeeItemTitle.text = title
@@ -93,12 +93,12 @@ class AddAttendeeListAdapter(
             attendeeItemTextLayout.layoutParams = textLayoutParams
 
             if (description.isNotEmpty()) {
-                if (query.isNotEmpty() && description.contains(query)) {
+                if (query.isNotEmpty() && description.contains(query, true)) {
                     val spannableStringBuilder = SpannableStringBuilder(description)
                     spannableStringBuilder.setSpan(
                         StyleSpan(Typeface.BOLD),
-                        description.indexOf(query),
-                        description.indexOf(query) + query.length,
+                        description.indexOf(query, ignoreCase = true),
+                        description.indexOf(query, ignoreCase = true) + query.length,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                     attendeeItemDescription.text = spannableStringBuilder
                 } else attendeeItemDescription.text = description
