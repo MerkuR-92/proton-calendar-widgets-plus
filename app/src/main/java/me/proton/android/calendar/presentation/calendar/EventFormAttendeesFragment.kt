@@ -21,17 +21,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.property.Attendee
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
 import kotlinx.android.synthetic.main.item_add_attendee.view.*
+import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.android.synthetic.main.toolbar_action_text.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.core.presentation.utils.InputValidationResult.Companion.EMAIL_VALIDATION_PATTERN
 import me.proton.core.presentation.utils.onTextChange
+import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 
@@ -179,11 +184,20 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, { event ->
             lifecycleScope.launch {
+                val user = withContext(Dispatchers.Default) {
+                    calendarViewModel.selectUser()
+                }
+                val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id)
+                val organizerName = user?.displayName ?: organizerEmail
                 val organizer = Attendee(
-                    getString(R.string.event_current_user_organizer),
-                    calendarViewModel.getCalendarDefaultEmail(event.calendar.id)
+                    organizerName,
+                    organizerEmail
                 )
-                if (organizer.email != null) attendeeListAdapter.setOrganizerEmail(organizer.email)
+
+                if (organizer.email != null) {
+                    attendeeListAdapter.setOrganizerEmail(organizer.email)
+                    searchAttendeeListAdapter.setOrganizerEmail(organizer.email)
+                }
                 val attendeeList = ArrayList(event.iCalEvent.attendees.reversed()) // Last added at the top, first at the bottom
                 if (!attendeeList.isNullOrEmpty() && organizer.email != null && !attendeeList.contains(organizer)) {
                     attendeeList.add(organizer)

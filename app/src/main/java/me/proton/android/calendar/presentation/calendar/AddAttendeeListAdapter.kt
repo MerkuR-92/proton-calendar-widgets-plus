@@ -60,10 +60,16 @@ class AddAttendeeListAdapter(
         private val attendeeItemPress: View = view.item_add_attendee_press
 
         fun bind(attendee : Attendee, position : Int) {
+            val isOrganizer = organizerEmail.equals(attendee.extractEmail(), true)
             // If has common name use it, else use email and hide description field
             val title =
-                if (attendee.commonName.isNullOrEmpty()) attendee.extractEmail() ?: ""
-                else attendee.commonName
+                when {
+                    !searchList && isOrganizer -> {
+                        view.context.getString(R.string.event_current_user_organizer)
+                    }
+                    attendee.commonName.isNullOrEmpty() -> attendee.extractEmail() ?: ""
+                    else -> attendee.commonName
+                }
             val description =
                 if (attendee.commonName.isNullOrEmpty() ||
                     attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
@@ -104,14 +110,16 @@ class AddAttendeeListAdapter(
                 } else attendeeItemDescription.text = description
             }
 
-            attendeeItemInitials.text = getInitials(title)
+            attendeeItemInitials.text =
+                if (!searchList && isOrganizer) getInitials(attendee.commonName)
+                else getInitials(title)
 
-            val added = attendeeList.firstOrNull { it.extractEmail().equals(attendee.extractEmail(), true) } != null
+            val added = attendeeList.firstOrNull { it.extractEmail().equals(attendee.extractEmail(), true) && !isOrganizer } != null
 
             attendeeItemIconCheck.visibleOrGone(searchList && added)
             attendeeItemIconLoading.visibleOrGone(false)
 
-            attendeeItemIconDelete.visibleOrGone(!searchList && organizerEmail != attendee.extractEmail())
+            attendeeItemIconDelete.visibleOrGone(!searchList && !isOrganizer)
             attendeeItemIconDelete.setOnSingleClickListener {
                 if (!searchList) clickListener(attendee)
             }
