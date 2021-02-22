@@ -874,6 +874,12 @@ class EventViewModel(
                 (!event.isAllDay() && eventCustomPartialDayAlarmsSave != null)
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
+            if (event.iCalEvent.organizer != null) {
+                val organizerEmail = calendarsRepository.selectMembers(calendar.id).firstOrNull {
+                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+                }?.email
+                event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
+            }
             event = event.copy(calendar = Calendar(calendar.id, calendar.name, calendar.color, calendar.flags, calendar.display == 1))
             if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)
             _event.postValue(event)
