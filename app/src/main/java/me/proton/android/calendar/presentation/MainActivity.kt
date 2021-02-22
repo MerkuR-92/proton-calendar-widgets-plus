@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
@@ -26,6 +27,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import biweekly.Biweekly
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,11 +49,13 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
+import me.proton.core.auth.presentation.ui.LoginActivity
 import me.proton.core.presentation.utils.showForceUpdate
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
+import java.io.*
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
@@ -305,6 +309,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
         when (state) {
             AccountViewModel.State.LoginNeeded -> {
+                val openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                if (openIcsIntent != null) {
+                    Toast.makeText(this, getString(R.string.snack_import_event_signed_out), Toast.LENGTH_LONG).show()
+                }
                 findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
                 accountViewModel.startLoginWorkflow()
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
@@ -331,6 +339,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
 
                 } else {
+                    val openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                    if (openIcsIntent != null) {
+                        // TODO Handle intent
+                    }
                     navigateTo(Navigation.Deeplink.toMonth())
                 }
             }
