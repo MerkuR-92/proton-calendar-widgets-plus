@@ -606,7 +606,7 @@ class CalendarViewModel(
         }
     }
 
-    suspend fun getCanonicalEmails(emails: List<String>): Map<String, String>? {
+    suspend fun getCanonicalEmails(emails: List<String>): Map<String, String?>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getCanonicalEmails")
