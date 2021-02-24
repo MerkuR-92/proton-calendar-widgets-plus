@@ -54,9 +54,7 @@ data class CanonicalEmailsResponses(
 @Serializable
 data class CanonicalEmailResponse(
     @SerialName("Code")
-    val code: Int,
+    override val code: Int,
     @SerialName("CanonicalEmail")
     val canonicalEmail: String? = null,
-    @SerialName("Error")
-    val error: String? = null
-)
+): BaseApiResponse()
