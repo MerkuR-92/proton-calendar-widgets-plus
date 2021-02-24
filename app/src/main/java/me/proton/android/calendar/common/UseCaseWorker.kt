@@ -178,8 +178,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 Result.failure()
             }
             is UseCase.Result.Error -> {
-                logger.i("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}")
-                Result.retry()
+                if (this.runAttemptCount >= WORKER_MAX_RETRY_COUNT) {
+                    logger.e("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}, max retry exceeded")
+                    Result.failure()
+                } else {
+                    logger.i("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}, retrying")
+                    Result.retry()
+                }
             }
         }
     }
