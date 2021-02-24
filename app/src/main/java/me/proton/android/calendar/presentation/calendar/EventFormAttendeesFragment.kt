@@ -156,7 +156,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             nav_event_form_attendees_search_input.text.clear()
         }
 
-        val userEmails = calendarViewModel.userEmails.value ?: listOf()
+        val userEmails = calendarViewModel.userAddresses.value?.map { it.email } ?: listOf()
 
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_list.layoutManager = attendeesLayoutManager

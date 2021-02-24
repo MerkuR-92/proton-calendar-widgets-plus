@@ -197,7 +197,7 @@ class EditCreateEventUseCase(
                     else -> 0
                 }
                 attendees.add(
-                    Event.AttendeeStatusEvent(it.getParameter(X_PM_TOKEN), status)
+                    Event.AttendeeStatusEvent(null, it.getParameter(X_PM_TOKEN), status)
                 )
             }
         }
