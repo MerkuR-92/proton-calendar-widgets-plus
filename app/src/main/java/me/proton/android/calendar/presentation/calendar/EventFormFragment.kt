@@ -140,9 +140,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
+                requireActivity().clearFocusAndHideKeyboard(view)
                 jumpToMonthView()
             }
-        } else jumpToMonthView()
+        } else {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            jumpToMonthView()
+        }
         return true
     }
 
