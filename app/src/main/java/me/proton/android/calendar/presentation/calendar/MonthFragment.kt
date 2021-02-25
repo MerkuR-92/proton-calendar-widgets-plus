@@ -1,12 +1,13 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +22,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.fragment_settings.*
@@ -36,6 +36,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.presentation.BaseFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -297,9 +298,13 @@ class MonthFragment : BaseFragment() {
                 }
             }
 
+            val notificationManager: NotificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             while(true) {
 
-                if (userId != null) {
+                val activeNotifications = notificationManager.activeNotifications
+                val isBackgroundSyncRunning = activeNotifications.any { it.id == ShowNotificationUseCase.NOTIFICATION_ID_SYNC_SERVICE }
+
+                if (userId != null && !isBackgroundSyncRunning) {
                     mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
                         if (it is Operation.State.IN_PROGRESS) {
                             setProgressBarVisibility(true)
