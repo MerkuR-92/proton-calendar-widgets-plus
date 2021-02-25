@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -78,6 +79,7 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
         coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
         coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
+        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(any()) } returns CalendarUserSettingsEntity(1, 1, 1, "Europe/Zurich", 1, null, 1, null)
         coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
         coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
         coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
@@ -94,7 +96,14 @@ internal class SyncServerEventsUseCaseTest {
     fun `handle chain of core server events`() {
         runBlocking {
 
-            val newCalendarId = "iy-qX4FUDKVvivBrwQI_AEfVEkCu5maUqxoFNzmyak9YkG5Ijsvtv25l3V2BNCDMtdYaMFQuAbQb956KoPDIDA=="
+            val newCalendarEntity = CalendarEntity(
+                "iy-qX4FUDKVvivBrwQI_AEfVEkCu5maUqxoFNzmyak9YkG5Ijsvtv25l3V2BNCDMtdYaMFQuAbQb956KoPDIDA==",
+                "Calendar for test",
+                "",
+                "#C793CA",
+                1,
+                1,
+            )
 
             every { valueStoreMock.getString(ValueKey.LAST_SERVER_EVENT_ID) } returns "a74ab-bdMtoz8yqIFalPabc6TdsL6pIgdig2CRK9PVcBjM3my8FnZ_JICEqaTRwKnAFdi71swYmFOKaZMECv4Q=="
 
@@ -131,13 +140,10 @@ internal class SyncServerEventsUseCaseTest {
             assertThat(useCase.execute(userId)).isEqualTo(UseCase.Result.Success)
 
             coVerify(exactly = 1) {
-                calendarsRepositoryMock.persistCalendar(userId.id, any())
+                bootstrapCalendarsUseCaseMock.executeBootstrap(newCalendarEntity, userId, "Europe/Zurich")
             }
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.persistMember(any())
-            }
-            coVerify(exactly = 1) {
-                serverEventsApiMock.getLatestServerCalendarEvent(userId, newCalendarId)
             }
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.updateCalendar(userId.id, any())
