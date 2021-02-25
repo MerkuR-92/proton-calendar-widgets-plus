@@ -63,7 +63,7 @@ class MainViewModel(private val context: Context, calendarsRepository: Calendars
             .build()
 
         // TODO work is unique per user-id, make sure different inputdata => different unique work
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS, ExistingWorkPolicy.KEEP, work).state
 
     }
 

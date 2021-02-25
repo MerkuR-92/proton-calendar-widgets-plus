@@ -4,11 +4,16 @@ import android.database.sqlite.SQLiteConstraintException
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.ServerEventsApiResponse
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.data.entity.CalendarFlags
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
+import java.time.ZoneId
 
 class HandleServerEventsUseCase(
     private val logger: Logger,
@@ -50,44 +55,50 @@ class HandleServerEventsUseCase(
                     { calendarsRepository.deleteCalendarById(it.id) },
                     {
 
-                        // for newly created calendar, get its latest Event ID
-                        val latestEventIdResponse = serverEventsApi.getLatestServerCalendarEvent(userId, it.id)
-                        if (latestEventIdResponse is ApiResponse.Success) {
-                            valueStore.putStringInSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, it.id, latestEventIdResponse.data.calendarEventId)
-                        } else {
-                            logger.e("could not get latest calendar server event ID response in HandleServerEventsUseCase")
-                        }
-
-                        if (it.calendar?.hasIncompleteKeySetup == true) {
-                            // Try to complete key setup for calendar:
-                            // - we persist newly updated calendar fetched from API if it succeeds
-                            // - we persist calendar from server event if it fails
+                        // Try to complete key setup for calendar:
+                        // - we persist newly updated calendar fetched from API if it succeeds
+                        // - we persist calendar from server event if it fails
+                        val calendarToPersist = if (it.calendar?.hasIncompleteKeySetup == true) {
                             when (val keySetupResult = keySetupUseCase.execute(userId, it.id)) {
                                 is UseCase.Result.Success -> {
                                     val calendarResponse = calendarsApi.getCalendar(userId, it.id)
                                     if (calendarResponse !is ApiResponse.Success) {
                                         logger.e("error getting calendar from API in HandleServerEventsUseCase")
-                                        calendarsRepository.persistCalendar(userId.id, it.calendar)
+
+                                        var calendarFlags = it.calendar.flags
+                                        calendarFlags -= CalendarFlags.INCOMPLETE_SETUP.value
+                                        // if calendar is inactive and no other error flags are set, make it active
+                                        if (calendarFlags == 0) calendarFlags = CalendarFlags.ACTIVE.value
+
+                                        it.calendar.copy(flags = calendarFlags)
                                     } else {
-                                        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
-                                        if (timezone != null) {
-                                            val executeBootstrapResult = bootstrapCalendarsUseCase.executeBootstrap(calendarResponse.data.calendar, userId, timezone)
-                                            executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
-                                        } else calendarsRepository.persistCalendar(userId.id, it.calendar)
+                                        calendarResponse.data.calendar
                                     }
                                 }
                                 is UseCase.Result.InvalidParams -> {
                                     logger.e("keySetupResult invalid params: ${keySetupResult.message}")
-                                    calendarsRepository.persistCalendar(userId.id, it.calendar)
+                                    it.calendar
                                 }
                                 is UseCase.Result.Error -> {
                                     logger.e("keySetupResult error: ${keySetupResult.message}")
-                                    calendarsRepository.persistCalendar(userId.id, it.calendar)
+                                    it.calendar
                                 }
                             }
                         } else {
-                            calendarsRepository.persistCalendar(userId.id, it.calendar!!)
+                            it.calendar!!
                         }
+
+                        // because of the separate event loops for calendars, we need to execute bootstrap
+                        // when new calendar is created
+                        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone ?: ZoneId.systemDefault().id
+                        val executeBootstrapResult = bootstrapCalendarsUseCase.executeBootstrap(calendarToPersist, userId, timezone)
+                        executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+
+                        // bootstrap persists CalendarEntity on its own
+                        if (executeBootstrapResult !is UseCase.Result.Success) {
+                            calendarsRepository.persistCalendar(userId.id, calendarToPersist)
+                        }
+
                     },
                     { calendarsRepository.updateCalendar(userId.id, it.calendar!!) }
                 )
