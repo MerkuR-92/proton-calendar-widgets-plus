@@ -34,6 +34,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
             const val UPDATE_PARTICIPATION_STATUS = UpdateParticipationStatusUseCase.WORKER_ID
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
+            const val FETCH_ADDRESSES = FetchUserUseCase.WORKER_ID
         }
     }
 
@@ -83,6 +84,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
             const val UPDATE_PARTICIPATION_STATUS = "UPDATE_PARTICIPATION_STATUS"
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
+            const val FETCH_ADDRESSES = "FETCH_ADDRESSES"
         }
     }
 
@@ -183,6 +185,12 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
                     inputData.getString(INPUT_EVENT_UID) ?: return Result.failure())
+            }
+            UseCaseId.FETCH_ADDRESSES -> {
+                val fetchUserUseCase: FetchUserUseCase = get()
+                fetchUserUseCase.executeGetAddresses(
+                    userId
+                )
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

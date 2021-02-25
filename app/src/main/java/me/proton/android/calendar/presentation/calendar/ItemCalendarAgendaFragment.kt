@@ -75,6 +75,12 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
         calendarViewModel.userAddresses.observe(viewLifecycleOwner) { userAddresses ->
             userAddresses ?: return@observe
+
+            if (userAddresses.firstOrNull { it.displayName == null } != null) {
+                // Refresh Addresses for user to fetch displayName values
+                calendarViewModel.refreshAddressesFromServer()
+            }
+
             val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
             val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
             setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour, userAddresses)

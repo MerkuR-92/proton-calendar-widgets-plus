@@ -109,12 +109,26 @@ class UsersRepositoryImpl(
         return database.userSettingsDao().flowWeekStart(userId).distinctUntilChanged()
     }
 
+    private val cachedCanonicalAddresses: HashMap<String, String> = hashMapOf()
+
     override suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): Map<String, String?>? {
+        // Try to use cache first
+        val cachedEmailPairs = HashMap<String, String?>()
+        emails.forEach { email ->
+            cachedEmailPairs[email] = cachedCanonicalAddresses[email] ?: return@forEach
+        }
+        if (cachedEmailPairs.size == emails.size) return cachedEmailPairs
+
+        // Fetch from BE
         return when (val canonicalResult = addressesApi.getCanonicalEmails(userId, emails)) {
             is ApiResponse.Success -> {
                 val emailPairs = HashMap<String, String?>()
                 canonicalResult.data.canonicalEmailsResponses.forEach {
                     emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
+                    if (it.canonicalEmailResponse.canonicalEmail != null) {
+                        // Cache canonized email
+                        cachedCanonicalAddresses[it.email] = it.canonicalEmailResponse.canonicalEmail
+                    }
                 }
                 emailPairs
             }

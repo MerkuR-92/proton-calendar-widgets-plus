@@ -30,10 +30,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.User
-import me.proton.android.calendar.domain.usecase.DeleteEventUseCase
-import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
+import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
@@ -50,6 +47,7 @@ class CalendarViewModel(
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
+    private val fetchUserUseCase: FetchUserUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger) : ViewModel() {
 
@@ -623,5 +621,23 @@ class CalendarViewModel(
 
     fun getUserEmails(): List<String>? {
         return userAddresses.value?.map { it.email }
+    }
+
+    fun refreshAddressesFromServer() : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_ADDRESSES,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_ADDRESSES, ExistingWorkPolicy.REPLACE, work).state
     }
 }

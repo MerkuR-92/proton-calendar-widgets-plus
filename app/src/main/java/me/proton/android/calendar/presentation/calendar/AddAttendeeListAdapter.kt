@@ -71,8 +71,8 @@ class AddAttendeeListAdapter(
                     else -> attendee.commonName
                 }
             val description =
-                if (attendee.commonName.isNullOrEmpty() ||
-                    attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
+                if (!isOrganizer && (attendee.commonName.isNullOrEmpty() ||
+                            attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true))) ""
                 else attendee.extractEmail() ?: ""
 
             if (query.isNotEmpty() && title.contains(query, true)) {

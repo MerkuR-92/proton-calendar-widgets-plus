@@ -16,7 +16,12 @@ class FetchUserUseCase(
     private val logger: Logger
 ) : UseCase {
 
-    suspend fun execute(userId: UserId): UseCase.Result {
+    companion object {
+        const val WORKER_ID = "FETCH_ADDRESSES"
+    }
+
+    // Fetch user and addresses
+    suspend fun executeFetchUserAndAddresses(userId: UserId): UseCase.Result {
         val userResponse = usersApi.getUser(userId)
         if (userResponse is ApiResponse.Success) {
             usersRepository.persistUser(userResponse.data.user)
@@ -36,6 +41,11 @@ class FetchUserUseCase(
 
         user.primaryKey ?: return UseCase.Result.Error("FetchUserUseCase: user has no primary key")
 
+        return executeGetAddresses(userId)
+    }
+
+    // Fetch addresses
+    suspend fun executeGetAddresses(userId: UserId): UseCase.Result {
         val addressesResponse = addressesApi.getAddresses(userId)
         if (addressesResponse is ApiResponse.Success) {
             addressesResponse.data.addresses.forEach {

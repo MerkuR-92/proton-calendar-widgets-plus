@@ -219,7 +219,7 @@ class EditCreateEventUseCase(
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
                             attendeesEventContent = attendeesEventContent,
-                            attendees = attendees.takeIfNotEmpty() // TODO If remove all attendees from an event do we send empty part ?
+                            attendees = attendees.takeIfNotEmpty() // TODO to remove all attendees from event, send null value
                         )
                     )
                 )

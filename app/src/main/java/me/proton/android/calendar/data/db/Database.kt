@@ -9,12 +9,13 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_ADDRESSES
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_USERS
 import me.proton.android.calendar.data.entity.*
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
-    version = 24
+    version = 25
 )
 @TypeConverters(DatabaseTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -66,7 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
                 //  in runtime than crash on startup and have no crash logs
                 .fallbackToDestructiveMigration()
                 .addMigrations(
-                    //MIGRATION_23_24
+                    MIGRATION_24_25
                 ).build()
     }
 }
@@ -80,6 +81,13 @@ abstract class AppDatabase : RoomDatabase() {
 //        database.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN displayName_nullable TEXT")
 //    }
 //}
+
+val MIGRATION_24_25 = object : Migration(24, 25) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+
+        database.execSQL("ALTER TABLE $TABLE_ADDRESSES ADD COLUMN displayName TEXT")
+    }
+}
 
 /**
  * Custom Type Converters for Room.

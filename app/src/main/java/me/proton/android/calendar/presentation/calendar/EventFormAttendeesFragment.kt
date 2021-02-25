@@ -188,9 +188,11 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                     calendarViewModel.selectUser()
                 }
                 val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id)
-                val organizerName = user?.displayName ?: organizerEmail
+                val userAddresses = calendarViewModel.userAddresses.value
+                val organizerAddress = userAddresses?.firstOrNull { it.email.equals(organizerEmail, true) }
+                val organizerName = organizerAddress?.displayName
                 val organizer = Attendee(
-                    organizerName,
+                    if (organizerName.isNullOrEmpty()) organizerEmail else organizerName,
                     organizerEmail
                 )
 

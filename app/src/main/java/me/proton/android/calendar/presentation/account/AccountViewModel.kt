@@ -105,7 +105,7 @@ class AccountViewModel(
         valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
         viewModelScope.launch {
-            val fetchResult = fetchUserUseCase.execute(userId) // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
+            val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId) // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
             if (fetchResult !is UseCase.Result.Success<*>) {
                 if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
                 removeUser(userId)

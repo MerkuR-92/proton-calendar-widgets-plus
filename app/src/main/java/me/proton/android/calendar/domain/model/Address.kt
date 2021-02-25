@@ -4,6 +4,7 @@ data class Address(
     override val id: String,
     val email: String,
     val status: Int,
+    val displayName: String?,
     val keys: List<AddressKey>
 ): BaseModel()
 

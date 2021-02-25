@@ -33,6 +33,8 @@ data class AddressEntity(
     val email: String,
     @SerialName("Status")
     val status: Int,
+    @SerialName("DisplayName")
+    val displayName: String?,
     @SerialName("Keys")
     val keys: List<JsonElement>
 ) {
@@ -46,6 +48,7 @@ data class AddressEntity(
             id = this.id,
             email = this.email,
             status = this.status,
+            displayName = this.displayName,
             keys = this.keys.map {
                 json.decodeFromJsonElement<AddressKey>(it)
             }
