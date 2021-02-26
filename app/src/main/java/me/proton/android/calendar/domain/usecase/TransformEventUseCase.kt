@@ -9,6 +9,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.common.adjustIncomingAllDayEvent
+import me.proton.android.calendar.common.canonizeProtonEmail
 import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -127,7 +128,7 @@ class TransformEventUseCase(
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
-            val userEmails = database.addressesDao().select(userId).map { it.email }
+            val canonizedUserEmails = database.addressesDao().select(userId).map { canonizeProtonEmail(it.email) }
             val attendees = eventEntity.attendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
@@ -136,7 +137,7 @@ class TransformEventUseCase(
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (userEmails.map { it.toLowerCase(Locale.ROOT) }.contains(attendee.email.toLowerCase(Locale.ROOT))) currentUserAttendeeId = attendeeStatusEvent.id
+                    if (canonizedUserEmails.map { it.toLowerCase(Locale.ROOT) }.contains(canonizeProtonEmail(attendee.email.toLowerCase(Locale.ROOT)))) currentUserAttendeeId = attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }
             }

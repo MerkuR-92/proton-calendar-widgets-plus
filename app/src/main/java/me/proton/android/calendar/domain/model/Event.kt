@@ -95,7 +95,8 @@ data class Event(
     fun getParticipationStatus(userEmails: List<String>): ParticipationStatus? {
         return iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
-                attendee.extractEmail().equals(userEmail, ignoreCase = true)
+                val attendeeEmail = attendee.extractEmail()
+                attendeeEmail != null && canonizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
         }?.participationStatus
     }
@@ -103,7 +104,8 @@ data class Event(
     fun isUserInvitedAddressEnabled(userAddresses: List<Address>): Boolean {
         iCalEvent.attendees.forEach { attendee ->
             val userAddress = userAddresses.firstOrNull { userAddress ->
-                attendee.extractEmail().equals(userAddress.email, ignoreCase = true)
+                val attendeeEmail = attendee.extractEmail()
+                attendeeEmail != null && canonizeProtonEmail(attendeeEmail).equals(userAddress.email, ignoreCase = true)
             }
             userAddress?.let {
                 return it.status == AddressStatus.ENABLED.value
@@ -115,7 +117,8 @@ data class Event(
     fun updateParticipationStatus(userEmails: List<String>, status: ParticipationStatus) {
         iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
-                attendee.extractEmail().equals(userEmail, ignoreCase = true)
+                val attendeeEmail = attendee.extractEmail()
+                attendeeEmail != null && canonizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
         }?.participationStatus = status
     }

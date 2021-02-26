@@ -187,9 +187,10 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val user = withContext(Dispatchers.Default) {
                     calendarViewModel.selectUser()
                 }
-                val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id)
+                // Get non canonized email
+                val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id) // TODO What is the behavior if we fail to get calendar default email
                 val userAddresses = calendarViewModel.userAddresses.value
-                val organizerAddress = userAddresses?.firstOrNull { it.email.equals(organizerEmail, true) }
+                val organizerAddress = userAddresses?.firstOrNull { organizerEmail != null && it.email.equals(canonizeProtonEmail(organizerEmail), true) }
                 val organizerName = organizerAddress?.displayName
                 val organizer = Attendee(
                     if (organizerName.isNullOrEmpty()) organizerEmail else organizerName,

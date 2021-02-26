@@ -485,7 +485,7 @@ class AndroidUtils(context: Context) {
                 TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
 
                 val onTheSameDay = !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
-                
+
                 // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
                 var daysFormatted: Int? = if (trigger.days != null) { // add 1 day if time of day exists and is different than midnight
                     trigger.days + (if ((trigger.hours != null && trigger.hours.toInt() != 0) || (trigger.minutes != null && trigger.minutes?.toInt() != 0)) 1 else 0)
@@ -1150,7 +1150,7 @@ private fun String.formattedTimeZoneToFloat(): Float {
 
 /**
  * Returns timezone id from formatted timezone with offset
-  */
+ */
 fun String.formattedTimeZoneToId(): String {
     return this.replace(
         Regex(" (\\(GMT[+-]\\d{1,2}:?(\\d{1,2})?\\))"),
@@ -1194,4 +1194,20 @@ fun removeAccents(string: CharSequence): String {
 
 inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
     if (this is T) block()
+}
+
+fun canonizeProtonEmails(emails: List<String>): Map<String, String> {
+    val canonizedEmails = hashMapOf<String, String>()
+    emails.forEach {
+        val canonizedEmail = canonizeProtonEmail(it)
+        canonizedEmails[it] = canonizedEmail
+    }
+    return canonizedEmails
+}
+
+fun canonizeProtonEmail(email:String): String {
+    val regex = Regex("(?:\\.|\\-|\\_|\\+.*)(?=.*@)")
+    val canonizedEmail = email.replace(regex, "").toLowerCase(getDefault())
+    TimberLogger.e("canonizeProtonEmails: valid ${validateEmail(canonizedEmail)} & value $canonizedEmail")
+    return canonizedEmail
 }

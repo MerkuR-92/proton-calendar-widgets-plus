@@ -20,9 +20,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.AndroidUtils
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.UseCaseWorker
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
@@ -78,7 +76,8 @@ class CalendarViewModel(
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
-    var userAddresses: LiveData<List<Address>> = MutableLiveData()
+    // Those addresses contain canonized email addresses
+    var userAddresses: LiveData<List<Address>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonized values
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -135,7 +134,14 @@ class CalendarViewModel(
                 return@flow
             }
 
-            userAddresses = usersRepository.addressesFlow(userId.id).asLiveData(Dispatchers.Default)
+            userAddresses = usersRepository.addressesFlow(userId.id).map {
+                val canonizedEmailsAddresses = arrayListOf<Address>()
+                it.forEach { address ->
+                    val canonizedEmailAddress = address.copy(email = canonizeProtonEmail(address.email))
+                    canonizedEmailsAddresses.add(canonizedEmailAddress)
+                }
+                canonizedEmailsAddresses
+            }.asLiveData(Dispatchers.Default)
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {
                 if (it != null) {

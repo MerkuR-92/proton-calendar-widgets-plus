@@ -715,7 +715,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         // TODO stop using field from Activity once we have actual user management
         val userEmails = calendarViewModel.getUserEmails()
         event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
-        if (userEmails?.contains(organizer.extractEmail()) == true) {
+        val organizerEmail = organizer.extractEmail()
+        if (organizerEmail != null && userEmails?.contains(canonizeProtonEmail(organizerEmail)) == true) {
             event_attendee_organizer_layout.item_attendee_title.text =
                 resources.getString(R.string.event_attendee_is_organizer)
             event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
