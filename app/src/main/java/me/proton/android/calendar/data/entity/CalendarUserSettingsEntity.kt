@@ -7,9 +7,6 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
-import java.time.DayOfWeek
-import java.time.temporal.WeekFields
-import java.util.*
 
 // User settings specific to Calendar
 

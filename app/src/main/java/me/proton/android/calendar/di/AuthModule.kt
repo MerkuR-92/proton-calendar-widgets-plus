@@ -5,8 +5,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import me.proton.core.auth.data.repository.AuthRepositoryImpl
 import me.proton.core.auth.domain.ClientSecret
 import me.proton.core.auth.domain.crypto.CryptoProvider
@@ -22,7 +22,7 @@ import me.proton.core.network.data.ApiProvider
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object AuthModule {
 
     @Provides
@@ -45,7 +45,7 @@ object AuthModule {
 }
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class AuthBindsModule {
 
     @Binds

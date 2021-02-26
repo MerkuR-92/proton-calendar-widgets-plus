@@ -261,9 +261,19 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
 
         // Init selected date
-        val navigationDate = try {
-            LocalDate.parse(navigationArguments.date, DateTimeFormatter.ISO_LOCAL_DATE)
-        } catch (e: DateTimeParseException) { null }
+        val navArgsDate = navigationArguments.date
+        val navigationDate = if (navArgsDate == null) {
+            null
+        } else {
+            try {
+                LocalDate.parse(
+                    navArgsDate,
+                    DateTimeFormatter.ISO_LOCAL_DATE
+                )
+            } catch (e: DateTimeParseException) {
+                null
+            }
+        }
         calendarViewModel.handleInitialDaySelection(navigationDate ?: calendarViewModel.initialToday)
 
         setToolbarMonthYearTitle(calendarViewModel.initialToday)
