@@ -716,7 +716,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         val userEmails = calendarViewModel.getUserEmails()
         event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
         val organizerEmail = organizer.extractEmail()
-        if (organizerEmail != null && userEmails?.contains(canonizeProtonEmail(organizerEmail)) == true) {
+        if (organizerEmail != null && userEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
             event_attendee_organizer_layout.item_attendee_title.text =
                 resources.getString(R.string.event_attendee_is_organizer)
             event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()

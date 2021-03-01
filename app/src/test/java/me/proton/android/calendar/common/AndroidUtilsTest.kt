@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Test
 internal class AndroidUtilsTest {
 
     @Test
-    fun `canonize proton emails`() {
+    fun `canonicalize proton emails`() {
         val emails = arrayListOf<String>()
         emails.add("Test.address-1_2+group@protonmail.com")
-        val canonizedEmails = canonizeProtonEmails(emails)
-        assertThat(canonizedEmails["Test.address-1_2+group@protonmail.com"]).isEqualTo("testaddress12@protonmail.com")
+        emails.add("Test.address-1_2+group@customdomain.com")
+        val canonicalEmails = canonicalizeProtonEmails(emails)
+        assertThat(canonicalEmails["Test.address-1_2+group@protonmail.com"]).isEqualTo("testaddress12@protonmail.com")
+        assertThat(canonicalEmails["Test.address-1_2+group@customdomain.com"]).isEqualTo("Test.address-1_2+group@customdomain.com")
     }
 }

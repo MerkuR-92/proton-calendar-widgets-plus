@@ -341,7 +341,7 @@ object ICalUtils {
     }
 
     /**
-     * The token is calculated by doing SHA1(EventUID + canonizedAttendeeAddress)
+     * The token is calculated by doing SHA1(EventUID + canonicalAttendeeAddress)
      */
     fun generateXPmToken(email: String, uid: String): String {
         val messageDigest = MessageDigest.getInstance(SHA1)

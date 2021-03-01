@@ -34,9 +34,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
 import me.proton.android.calendar.presentation.BaseDialogFragment
-import me.proton.core.presentation.utils.InputValidationResult.Companion.EMAIL_VALIDATION_PATTERN
 import me.proton.core.presentation.utils.onTextChange
-import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 
@@ -187,10 +185,10 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val user = withContext(Dispatchers.Default) {
                     calendarViewModel.selectUser()
                 }
-                // Get non canonized email
+                // Get non canonical email
                 val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id) // TODO What is the behavior if we fail to get calendar default email
                 val userAddresses = calendarViewModel.userAddresses.value
-                val organizerAddress = userAddresses?.firstOrNull { organizerEmail != null && it.email.equals(canonizeProtonEmail(organizerEmail), true) }
+                val organizerAddress = userAddresses?.firstOrNull { organizerEmail != null && it.email.equals(canonicalizeProtonEmail(organizerEmail), true) }
                 val organizerName = organizerAddress?.displayName
                 val organizer = Attendee(
                     if (organizerName.isNullOrEmpty()) organizerEmail else organizerName,

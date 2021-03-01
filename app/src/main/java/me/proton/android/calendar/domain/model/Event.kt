@@ -96,7 +96,7 @@ data class Event(
         return iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
         }?.participationStatus
     }
@@ -105,7 +105,7 @@ data class Event(
         iCalEvent.attendees.forEach { attendee ->
             val userAddress = userAddresses.firstOrNull { userAddress ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonizeProtonEmail(attendeeEmail).equals(userAddress.email, ignoreCase = true)
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userAddress.email, ignoreCase = true)
             }
             userAddress?.let {
                 return it.status == AddressStatus.ENABLED.value
@@ -118,7 +118,7 @@ data class Event(
         iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
         }?.participationStatus = status
     }

@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
-import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.dialog_checkbox.view.*
@@ -76,8 +75,8 @@ class CalendarViewModel(
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
-    // Those addresses contain canonized email addresses
-    var userAddresses: LiveData<List<Address>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonized values
+    // Those addresses contain canonical email addresses
+    var userAddresses: LiveData<List<Address>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -135,12 +134,12 @@ class CalendarViewModel(
             }
 
             userAddresses = usersRepository.addressesFlow(userId.id).map {
-                val canonizedEmailsAddresses = arrayListOf<Address>()
+                val canonicalEmailsAddresses = arrayListOf<Address>()
                 it.forEach { address ->
-                    val canonizedEmailAddress = address.copy(email = canonizeProtonEmail(address.email))
-                    canonizedEmailsAddresses.add(canonizedEmailAddress)
+                    val canonicalEmailAddress = address.copy(email = canonicalizeProtonEmail(address.email))
+                    canonicalEmailsAddresses.add(canonicalEmailAddress)
                 }
-                canonizedEmailsAddresses
+                canonicalEmailsAddresses
             }.asLiveData(Dispatchers.Default)
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {

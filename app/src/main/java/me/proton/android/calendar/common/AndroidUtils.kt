@@ -1196,18 +1196,26 @@ inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
     if (this is T) block()
 }
 
-fun canonizeProtonEmails(emails: List<String>): Map<String, String> {
-    val canonizedEmails = hashMapOf<String, String>()
+fun canonicalizeProtonEmails(emails: List<String>): Map<String, String> {
+    val canonicalEmails = hashMapOf<String, String>()
     emails.forEach {
-        val canonizedEmail = canonizeProtonEmail(it)
-        canonizedEmails[it] = canonizedEmail
+        val canonicalEmail = canonicalizeProtonEmail(it)
+        canonicalEmails[it] = canonicalEmail
     }
-    return canonizedEmails
+    return canonicalEmails
 }
 
-fun canonizeProtonEmail(email:String): String {
+fun canonicalizeProtonEmail(email:String): String {
+    // If user uses a custom domain, we don't apply any canonicalization
+    if (!isProtonDomain(email)) return email
+
     val regex = Regex("(?:\\.|\\-|\\_|\\+.*)(?=.*@)")
-    val canonizedEmail = email.replace(regex, "").toLowerCase(getDefault())
-    TimberLogger.e("canonizeProtonEmails: valid ${validateEmail(canonizedEmail)} & value $canonizedEmail")
-    return canonizedEmail
+    return email.replace(regex, "").toLowerCase(getDefault())
+}
+
+fun isProtonDomain(email: String): Boolean {
+    PROTON_MAIL_DOMAINS.forEach {
+        if (email.contains(it, true)) return true
+    }
+    return false
 }

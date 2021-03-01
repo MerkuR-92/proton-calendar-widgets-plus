@@ -126,7 +126,7 @@ class UsersRepositoryImpl(
                 canonicalResult.data.canonicalEmailsResponses.forEach {
                     emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
                     if (it.canonicalEmailResponse.canonicalEmail != null) {
-                        // Cache canonized email
+                        // Cache canonical email
                         cachedCanonicalAddresses[it.email] = it.canonicalEmailResponse.canonicalEmail
                     }
                 }
