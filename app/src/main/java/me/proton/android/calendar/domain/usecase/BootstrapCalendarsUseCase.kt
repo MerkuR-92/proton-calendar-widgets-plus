@@ -77,7 +77,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 }
             }
 
-            if (createDefaultCalendarResult !is UseCase.Result.Success) {
+            if (createDefaultCalendarResult !is UseCase.Result.Success<*>) {
                 logger.e("BootstrapCalendarsUseCase: error unable to create default calendar for user")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error unable to create default calendar for user")
             }
@@ -145,7 +145,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
         calendarsResponse.data.calendars.forEach { calendarEntity ->
             val executeBootstrapResult = executeBootstrap(calendarEntity, userId, calendarUserSettingsResponse.data.calendarUserSettings.primaryTimezone)
             executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
-            if (executeBootstrapResult !is UseCase.Result.Success) {
+            if (executeBootstrapResult !is UseCase.Result.Success<*>) {
                 failedCalendarIds.add(calendarEntity.id)
             }
         }
@@ -168,7 +168,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             // sync alarms right after downloading calendars and events
             syncAlarmsUseCase.execute(userId).ifSuccessAndLogErrors(logger) { }
 
-            UseCase.Result.Success
+            UseCase.Result.Success<Unit>()
         }
     }
 
@@ -191,7 +191,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 // extract passphrase for just saved Calendar
                 val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
                 when (cachePassphraseResult) {
-                    UseCase.Result.Success -> {
+                    is UseCase.Result.Success<*> -> {
                         // fetch events
                         val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
                         val fetchEventsResult = fetchEventsUseCase.execute(
@@ -224,7 +224,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                         }
 
 
-                        return UseCase.Result.Success
+                        return UseCase.Result.Success<Unit>()
                     }
                     is UseCase.Result.InvalidParams -> {
                         return UseCase.Result.InvalidParams("BootstrapCalendarsUseCase: cachePassphraseResult invalid params: ${cachePassphraseResult.message}")

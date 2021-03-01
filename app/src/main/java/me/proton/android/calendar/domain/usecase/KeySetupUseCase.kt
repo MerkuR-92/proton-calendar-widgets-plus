@@ -60,7 +60,7 @@ class KeySetupUseCase(
         )
         return when (val setupKeyApiResponse = calendarsApi.setupKey(userId, calendarId, setupKeyApiRequest)) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("KeySetupUseCase: error in setup key: ${setupKeyApiResponse.error}")

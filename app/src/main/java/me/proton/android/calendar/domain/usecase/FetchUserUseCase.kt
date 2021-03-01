@@ -46,6 +46,6 @@ class FetchUserUseCase(
             return UseCase.Result.Error("FetchUserUseCase: addresses request failed: $addressesResponse")
         }
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
     }
 }

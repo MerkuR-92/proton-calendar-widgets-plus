@@ -36,7 +36,7 @@ class UpdateCalendarUseCase(
 
         return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.error}")
             is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
@@ -65,7 +65,7 @@ class UpdateCalendarUseCase(
                         updateCalendarDisplayResponses.add(
                             when (val updateCalendarDisplayResponse = calendarsApi.updateCalendarDisplay(userId, it.key, UpdateCalendarDisplayApiRequest(display = it.value))) {
                                 is ApiResponse.Success -> {
-                                    UseCase.Result.Success
+                                    UseCase.Result.Success<Unit>()
                                 }
                                 is ApiResponse.Error ->
                                     UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar display: ${updateCalendarDisplayResponse.error}")
@@ -77,10 +77,10 @@ class UpdateCalendarUseCase(
                 }
 
                 updateCalendarDisplayResponses.forEach {
-                    if (it != UseCase.Result.Success) return it
+                    if (it !is UseCase.Result.Success<*>) return it
                 }
 
-                return UseCase.Result.Success
+                return UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: error in fetch calendars: ${calendarsResponse.error}")
             is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: error in fetch calendars: ${calendarsResponse.exception.message ?: "(no exception message)"}")

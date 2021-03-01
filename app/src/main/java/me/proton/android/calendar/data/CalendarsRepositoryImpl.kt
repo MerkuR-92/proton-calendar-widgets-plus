@@ -254,7 +254,7 @@ class CalendarsRepositoryImpl(
                 fetchWindow.timeZoneId
             )
 
-            if (fetchEventsResult.first is UseCase.Result.Success) {
+            if (fetchEventsResult.first is UseCase.Result.Success<*>) {
                 if (fetchEventsResult.second == null) {
                     logger.e("fetchEventsResult: null event list when Sucess")
                 }

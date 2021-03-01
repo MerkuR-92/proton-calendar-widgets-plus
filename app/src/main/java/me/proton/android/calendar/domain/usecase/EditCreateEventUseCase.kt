@@ -277,7 +277,7 @@ class EditCreateEventUseCase(
                 if (syncResponse.data.responses.any { !it.response.isSuccessful }) {
                     UseCase.Result.Error("EditCreateEventUseCase: TODO one of sync responses is an error")
                 } else {
-                    UseCase.Result.Success
+                    UseCase.Result.Success(eventsToInsertOrUpdate.map { it.id })
                 }
             }
             is ApiResponse.Error -> UseCase.Result.Error("EditCreateEventUseCase: error in sync events: ${syncResponse.error}")

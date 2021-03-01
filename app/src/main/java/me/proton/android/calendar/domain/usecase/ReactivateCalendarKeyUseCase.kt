@@ -143,7 +143,7 @@ class ReactivateCalendarKeyUseCase(
             return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error reenabling one or more key from API")
         }
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
     }
 
 }

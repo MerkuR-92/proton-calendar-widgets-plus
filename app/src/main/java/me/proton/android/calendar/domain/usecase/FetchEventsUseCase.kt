@@ -65,11 +65,11 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                                     events.addAll(eventsResponse.data.events)
 
-                                    UseCase.Result.Success
+                                    UseCase.Result.Success<Unit>()
                                 } else if (eventsResponse is ApiResponse.Error) {
                                     if (eventsResponse.httpCode == 404) {
                                         logger.e("404 requesting events in FetchEventsUseCase")
-                                        UseCase.Result.Success
+                                        UseCase.Result.Success<Unit>()
                                     } else {
                                         logger.e("error fetching events for calendar: $eventsResponse")
                                         UseCase.Result.Error("api error in FetchEventsUseCase: ${eventsResponse}")
@@ -96,8 +96,8 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
         }.awaitAll()
 
-        return if (combinedResults.all { it.first.all { it == UseCase.Result.Success } }) Pair(
-            UseCase.Result.Success,
+        return if (combinedResults.all { it.first.all { it is UseCase.Result.Success<*> } }) Pair(
+            UseCase.Result.Success<Unit>(),
             combinedResults.flatMap { it.second }) else Pair(
             UseCase.Result.Error("error fetching events"),
             null

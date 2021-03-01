@@ -60,7 +60,7 @@ class HandleServerEventsUseCase(
                         // - we persist calendar from server event if it fails
                         val calendarToPersist = if (it.calendar?.hasIncompleteKeySetup == true) {
                             when (val keySetupResult = keySetupUseCase.execute(userId, it.id)) {
-                                is UseCase.Result.Success -> {
+                                is UseCase.Result.Success<*> -> {
                                     val calendarResponse = calendarsApi.getCalendar(userId, it.id)
                                     if (calendarResponse !is ApiResponse.Success) {
                                         logger.e("error getting calendar from API in HandleServerEventsUseCase")
@@ -95,7 +95,7 @@ class HandleServerEventsUseCase(
                         executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
 
                         // bootstrap persists CalendarEntity on its own
-                        if (executeBootstrapResult !is UseCase.Result.Success) {
+                        if (executeBootstrapResult !is UseCase.Result.Success<*>) {
                             calendarsRepository.persistCalendar(userId.id, calendarToPersist)
                         }
 
@@ -236,7 +236,7 @@ class HandleServerEventsUseCase(
                 )
             }
 
-            UseCase.Result.Success
+            UseCase.Result.Success<Unit>()
         } catch (e: kotlinx.coroutines.CancellationException) {
             logger.e("CancellationException in HandleServerEventsUseCase")
             UseCase.Result.Error(e.message ?: "CancellationException")

@@ -47,7 +47,7 @@ class SyncServerEventsUseCase(
             syncResults.add(sync(userId, calendarEntity.id))
         }
 
-        return syncResults.firstOrNull { it !is UseCase.Result.Success } ?: UseCase.Result.Success
+        return syncResults.firstOrNull { it !is UseCase.Result.Success<*> } ?: UseCase.Result.Success<Unit>()
     }
 
     /**
@@ -85,7 +85,7 @@ class SyncServerEventsUseCase(
 
                     val handleServerEventsResult = when (val result =
                         handleServerEventsUseCase.execute(eventsReponse.data, userId)) {
-                        UseCase.Result.Success -> {
+                        is UseCase.Result.Success<*> -> {
                             logger.v("correctly handled Server Events $lastServerEventId")
                             lastServerEventId = eventsReponse.data.eventId
 
@@ -103,7 +103,7 @@ class SyncServerEventsUseCase(
                             }
 
                             logger.v("next Server Events ID for calendar $calendarId is saved as $lastServerEventId")
-                            UseCase.Result.Success
+                            UseCase.Result.Success<Unit>()
                         }
                         is UseCase.Result.InvalidParams -> {
                             logger.e("SyncServerEventsUseCase: invalid params handling server events: ${result.message}")
@@ -115,7 +115,7 @@ class SyncServerEventsUseCase(
                         }
                     }
 
-                    if (handleServerEventsResult !is UseCase.Result.Success) {
+                    if (handleServerEventsResult !is UseCase.Result.Success<*>) {
                         return handleServerEventsResult
                     }
 
@@ -134,7 +134,7 @@ class SyncServerEventsUseCase(
 
         logger.v("success syncing Server Events, ID saved for later is $lastServerEventId")
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
 
     }
 

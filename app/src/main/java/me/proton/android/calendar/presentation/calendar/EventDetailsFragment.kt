@@ -201,7 +201,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     // Post deleting event value to false to stop loading state
                     eventViewModel.savingEvent.postValue(false)
 
-                    if (deleteResult == UseCase.Result.Success) {
+                    if (deleteResult is UseCase.Result.Success<*>) {
                         requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                         // Use onBackPressedCustom to handle navigation when opening details from notification
                         onBackPressedCustom()
@@ -256,7 +256,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         // Post deleting event value to false to stop loading state
                         eventViewModel.savingEvent.postValue(false)
 
-                        if (deleteResult == UseCase.Result.Success) {
+                        if (deleteResult is UseCase.Result.Success<*>) {
                             requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                             // Use onBackPressedCustom to handle navigation when opening details from notification
                             onBackPressedCustom()

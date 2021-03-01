@@ -79,7 +79,7 @@ class DeleteEventUseCase( // TODO TESTS
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, occurrenceStart.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((editResult is UseCase.Result.Success) && (deleteSingleEditsResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("DeleteEventUseCase: error deleting >this and future< events")
+                if ((editResult is UseCase.Result.Success<*>) && (deleteSingleEditsResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("DeleteEventUseCase: error deleting >this and future< events")
 
             }
             EventEditDeleteOption.ALL_EVENTS -> {
@@ -96,7 +96,7 @@ class DeleteEventUseCase( // TODO TESTS
                 val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((deleteSingleEditsResult is UseCase.Result.Success) && (deleteResult is UseCase.Result.Success)) UseCase.Result.Success else UseCase.Result.Error("DeleteEventUseCase: error deleting >all< events")
+                if ((deleteSingleEditsResult is UseCase.Result.Success<*>) && (deleteResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("DeleteEventUseCase: error deleting >all< events")
             }
         }
 
@@ -127,7 +127,7 @@ class DeleteEventUseCase( // TODO TESTS
                 handleAlarmsUseCase.execute(userId)
 
                 if (errorEventIds.isEmpty()) {
-                    UseCase.Result.Success
+                    UseCase.Result.Success<Unit>()
                 } else {
                     UseCase.Result.Error("DeleteEventUseCase: there were errors when deleting events")
                 }
@@ -160,7 +160,7 @@ class DeleteEventUseCase( // TODO TESTS
 
         val deleteResult = if (eventsToDelete.isNotEmpty()) {
             deleteEvents(userId, eventsToDelete.map { it.id }, event.calendar.id, member.id)
-        } else UseCase.Result.Success
+        } else UseCase.Result.Success<Unit>()
 
         return deleteResult
     }

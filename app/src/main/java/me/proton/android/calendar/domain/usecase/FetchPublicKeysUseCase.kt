@@ -38,14 +38,14 @@ class FetchPublicKeysUseCase(
             return if (keysResponse is ApiResponse.Success) {
                 database.publicKeysDao().insert(*keysResponse.data.keys.map { PublicKeyEntity(email, it.flags, it.publicKey) }.toTypedArray())
                 logger.v("persisted public keys for $email -> ${keysResponse.data}")
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             } else {
                 UseCase.Result.Error("error fetching public keys for email: ")
             }
 
         }
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
 
     }
 
@@ -72,7 +72,7 @@ class FetchPublicKeysUseCase(
             requests.awaitAll()
         }
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
 
     }
 

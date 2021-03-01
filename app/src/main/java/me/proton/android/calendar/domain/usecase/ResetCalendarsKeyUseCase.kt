@@ -69,7 +69,7 @@ class ResetCalendarsKeyUseCase(
         // TODO: update ResetCalendarApiRequest and remove map once web has updated the route
         return when (val resetCalendarApiResponse = calendarsApi.resetCalendar(userId, ResetCalendarApiRequest(setupKeyApiRequestMap))) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("ResetCalendarsKeyUseCase: error in reset calendar: ${resetCalendarApiResponse.error}")

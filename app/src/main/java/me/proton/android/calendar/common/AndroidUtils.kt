@@ -1191,3 +1191,7 @@ fun removeAccents(string: CharSequence): String {
     val temp = Normalizer.normalize(string, Normalizer.Form.NFD)
     return regex.replace(temp, "")
 }
+
+inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
+    if (this is T) block()
+}

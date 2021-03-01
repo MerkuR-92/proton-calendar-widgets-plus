@@ -23,7 +23,7 @@ class UpdateUserSettingsUseCase(
         ) {
             is ApiResponse.Success -> {
                 usersRepository.persistUserSettings(userId.id, updateUserTimeFormatResponse.data.userSettings)
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 logger.e("api error updating user time format: $updateUserTimeFormatResponse")
@@ -42,7 +42,7 @@ class UpdateUserSettingsUseCase(
         ) {
             is ApiResponse.Success -> {
                 usersRepository.persistUserSettings(userId.id, updateUserWeekStartResponse.data.userSettings)
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 logger.e("api error updating user week start: $updateUserWeekStartResponse")

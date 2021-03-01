@@ -169,7 +169,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
 //        this.setProgressAsync(progressUpdate)
 
         return when (useCaseResult) {
-            UseCase.Result.Success -> {
+            is UseCase.Result.Success<*> -> {
                 logger.v("UseCaseId=$useCaseId success")
                 Result.success()
             }

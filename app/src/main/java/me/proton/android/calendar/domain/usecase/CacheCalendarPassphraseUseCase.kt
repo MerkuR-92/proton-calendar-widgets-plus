@@ -74,7 +74,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
             //  Passphrase for CalendarKey, not Calendar
             valueStore.putStringInSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id, it)
             logger.v("success decrypting and storing passphrase for calendar $calendarId")
-            return UseCase.Result.Success
+            return UseCase.Result.Success<Unit>()
         }
 
         return UseCase.Result.Error("CacheCalendarPassphraseUseCase should not happen")

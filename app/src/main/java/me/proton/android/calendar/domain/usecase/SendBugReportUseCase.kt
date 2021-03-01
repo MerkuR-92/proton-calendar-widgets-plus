@@ -41,7 +41,7 @@ class SendBugReportUseCase(
 
         return when (val reportsApiResponse = reportsApi.sendReport(userId, reportsApiRequest)) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error(reportsApiResponse.error)
             is ApiResponse.Exception -> UseCase.Result.Error(reportsApiResponse.exception.message ?: "(no exception message)")

@@ -93,7 +93,7 @@ class HandleEventsMetadataUseCase(
                 }
             }
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
     }
 
     /**

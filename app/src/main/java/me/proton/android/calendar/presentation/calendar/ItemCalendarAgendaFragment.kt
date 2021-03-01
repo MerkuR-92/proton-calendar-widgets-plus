@@ -112,7 +112,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                                         EventEditDeleteOption.ALL_EVENTS
                                     )
                                 }
-                                if (deleteResult == UseCase.Result.Success) {
+                                if (deleteResult is UseCase.Result.Success<*>) {
                                     requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                                 } else {
                                     if (deleteResult is UseCase.Result.Error) {

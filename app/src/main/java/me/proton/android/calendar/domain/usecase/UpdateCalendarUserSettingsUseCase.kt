@@ -50,7 +50,7 @@ class UpdateCalendarUserSettingsUseCase(
                     userId.id,
                     updateCalendarUserAutoDetectTimezoneResponse.data.calendarUserSettings.autoDetectPrimaryTimezone
                 )
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 logger.e("api error updating calendar user auto detect primary timezone: $updateCalendarUserAutoDetectTimezoneResponse")
@@ -73,7 +73,7 @@ class UpdateCalendarUserSettingsUseCase(
                     userId.id,
                     updateCalendarUserDisplayWeekNumberResponse.data.calendarUserSettings.displayWeekNumber
                 )
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 logger.e("api error updating calendar user display week number: $updateCalendarUserDisplayWeekNumberResponse")

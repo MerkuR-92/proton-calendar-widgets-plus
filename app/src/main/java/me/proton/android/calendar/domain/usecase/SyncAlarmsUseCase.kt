@@ -51,11 +51,11 @@ class SyncAlarmsUseCase(
                 result
             } else {
                 logger.v("no need for sync of calendar ${it.name} at $syncStartDate")
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
         }
 
-        val success = results.all { it is UseCase.Result.Success }
+        val success = results.all { it is UseCase.Result.Success<*> }
 
         logger.v("syncing alarms result = $results")
 
@@ -63,9 +63,9 @@ class SyncAlarmsUseCase(
         handleAlarmsUseCase.execute(userId)
 
         return if (success) {
-            UseCase.Result.Success
+            UseCase.Result.Success<Unit>()
         } else {
-            results.firstOrNull { it !is UseCase.Result.Success } ?: UseCase.Result.Error("SyncAlarmsUseCase: error getting result from SyncAlarmsUseCase")
+            results.firstOrNull { it !is UseCase.Result.Success<*> } ?: UseCase.Result.Error("SyncAlarmsUseCase: error getting result from SyncAlarmsUseCase")
         }
     }
 
@@ -146,7 +146,7 @@ class SyncAlarmsUseCase(
                 is ApiResponse.Error -> {
                     return if (alarmsResponse.httpCode == 404) {
                         logger.e("SyncAlarmsUseCase: 404 requesting alarms for calendar in handleCalendarAlarms")
-                        UseCase.Result.Success
+                        UseCase.Result.Success<Unit>()
                     } else {
                         UseCase.Result.Error("SyncAlarmsUseCase: api error getting server events: $alarmsResponse")
                     }
@@ -156,7 +156,7 @@ class SyncAlarmsUseCase(
 
         } while (hasMore)
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
     }
 
 }

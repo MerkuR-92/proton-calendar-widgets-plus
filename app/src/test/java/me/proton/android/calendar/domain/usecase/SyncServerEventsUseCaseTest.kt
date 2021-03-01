@@ -54,7 +54,7 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { Log.isLoggable(any(), any()) } returns true
         appDatabaseMock = mockk()
 
-        coEvery { cacheCalendarPassphraseUseCaseMock.execute(userId, any()) } returns UseCase.Result.Success
+        coEvery { cacheCalendarPassphraseUseCaseMock.execute(userId, any()) } returns UseCase.Result.Success<Unit>()
 
         coEvery { calendarsRepositoryMock.persistCalendar(userId.id, any()) } just Runs
         coEvery { calendarsRepositoryMock.updateCalendar(userId.id, any()) } just Runs
@@ -80,12 +80,12 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
         coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
         coEvery { calendarsRepositoryMock.selectCalendarUserSettings(any()) } returns CalendarUserSettingsEntity(1, 1, 1, "Europe/Zurich", 1, null, 1, null)
-        coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
+        coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success<Unit>()
         coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
-        coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
+        coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success<Unit>()
         coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
-        coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success
-        coEvery { bootstrapCalendarsUseCaseMock.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success
+        coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success<Unit>()
+        coEvery { bootstrapCalendarsUseCaseMock.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
         every { valueStoreProviderMock.provideValueStore(userId.id) } returns valueStoreMock
         every { valueStoreMock.putString(any(), any()) } just Runs
@@ -137,7 +137,7 @@ internal class SyncServerEventsUseCaseTest {
 
             // TODO handle incomplete key setup case: KeySetupUseCase.kt
 
-            assertThat(useCase.execute(userId)).isEqualTo(UseCase.Result.Success)
+            assert(useCase.execute(userId) is UseCase.Result.Success<*>)
 
             coVerify(exactly = 1) {
                 bootstrapCalendarsUseCaseMock.executeBootstrap(newCalendarEntity, userId, "Europe/Zurich")
@@ -247,7 +247,7 @@ internal class SyncServerEventsUseCaseTest {
                 handleServerEventsUseCase
             )
 
-            assertThat(useCase.execute(userId)).isEqualTo(UseCase.Result.Success)
+            assert(useCase.execute(userId) is UseCase.Result.Success<*>)
 
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.persistEvents(any(), captureCoroutine())

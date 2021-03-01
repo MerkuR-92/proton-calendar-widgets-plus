@@ -548,7 +548,7 @@ class EventViewModel(
                 val deleteStartDate = if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(1)
                 val deleteSingleEditsResult = deleteEventUseCase.execute(userId, eventId, deleteStartDate)
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
-                if (deleteSingleEditsResult != UseCase.Result.Success) return false
+                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return false
 
                 // update original event:
                 // - change COUNT to ((current occurrence number) - 1)
@@ -602,7 +602,7 @@ class EventViewModel(
                 }
 
                 val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
-                if (editOriginalEventResult != UseCase.Result.Success) {
+                if (editOriginalEventResult !is UseCase.Result.Success<*>) {
                     if (editOriginalEventResult is UseCase.Result.Error) {
                         logger.e("error editing event: ${editOriginalEventResult.message}")
                     } else if (editOriginalEventResult is UseCase.Result.Error) {
@@ -688,7 +688,7 @@ class EventViewModel(
                 val deleteSingleEditsResult =
                     deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
-                if (deleteSingleEditsResult != UseCase.Result.Success) return false
+                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return false
 
                 // delete all single deletions
                 event.iCalEvent.exceptionDates.clear()
@@ -820,7 +820,7 @@ class EventViewModel(
             logger.e("error in create event: ${createEventResult.message}")
         }
 
-        return createEventResult == UseCase.Result.Success
+        return createEventResult is UseCase.Result.Success<*>
 
     }
 
@@ -856,7 +856,7 @@ class EventViewModel(
         if (dbEvent.iCalEvent.sequence?.value == null) {
             dbEvent.iCalEvent.setSequence(0)
             val editOriginalEventResult = editCreateEventUseCase.execute(userId, dbEvent.calendar.id, dbEvent)
-            if (editOriginalEventResult != UseCase.Result.Success) {
+            if (editOriginalEventResult !is UseCase.Result.Success<*>) {
                 if (editOriginalEventResult is UseCase.Result.Error) {
                     logger.e("error editing event: ${editOriginalEventResult.message}")
                 } else if (editOriginalEventResult is UseCase.Result.Error) {

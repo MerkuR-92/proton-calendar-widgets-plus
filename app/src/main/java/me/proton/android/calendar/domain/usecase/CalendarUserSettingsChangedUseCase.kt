@@ -24,7 +24,7 @@ class CalendarUserSettingsChangedUseCase(
 
         handlePrimaryTimezone(userId, currentTimeZoneId, calendarUserSettings.primaryTimezone)
 
-        return UseCase.Result.Success
+        return UseCase.Result.Success<Unit>()
     }
 
     private suspend fun handlePrimaryTimezone(userId: String, oldTimeZoneId: String?, newTimeZoneId: String) {

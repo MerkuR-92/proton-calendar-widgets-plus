@@ -106,14 +106,14 @@ class AccountViewModel(
 
         viewModelScope.launch {
             val fetchResult = fetchUserUseCase.execute(userId) // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
-            if (fetchResult !is UseCase.Result.Success) {
+            if (fetchResult !is UseCase.Result.Success<*>) {
                 if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
                 removeUser(userId)
                 return@launch
             }
 
             val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
-            if (bootstrapResult !is UseCase.Result.Success) {
+            if (bootstrapResult !is UseCase.Result.Success<*>) {
                 if (bootstrapResult is UseCase.Result.Error) {
                     _errorReport.postValue(bootstrapResult.error)
                     if (bootstrapResult.error == UseCase.Error.RESET_NEEDED ||
@@ -224,7 +224,7 @@ class AccountViewModel(
 
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
             resetCalendarsKeyResult.ifSuccessAndLogErrors(logger) { }
-            if (resetCalendarsKeyResult !is UseCase.Result.Success) {
+            if (resetCalendarsKeyResult !is UseCase.Result.Success<*>) {
                 removeUser(userId)
                 return@launch
             }
