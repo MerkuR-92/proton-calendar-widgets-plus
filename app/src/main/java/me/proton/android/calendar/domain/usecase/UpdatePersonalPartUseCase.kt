@@ -63,7 +63,7 @@ class UpdatePersonalPartUseCase(
             )
         )) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("api error updating event personal part: $updateEventPersonalPartResponse")

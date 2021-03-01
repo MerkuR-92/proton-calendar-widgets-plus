@@ -1387,7 +1387,7 @@ class EventViewModel(
 
         val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(userId, calendarId, eventId, attendeeId, status, personalPartICalString)
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
-        if (updateParticipationStatusUseCaseResult != UseCase.Result.Success) {
+        if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
             return false
         }
 
