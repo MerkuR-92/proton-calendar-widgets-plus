@@ -80,8 +80,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private val accountViewModel: AccountViewModel by sharedViewModel()
     private val mainViewModel: MainViewModel by sharedViewModel()
 
-    private var changeAnswerLoading = false
-
     override fun onBackPressedCustom() {
 
         // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
@@ -364,45 +362,27 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
-            if (changeAnswerLoading) return@setOnSingleClickListener
-            val userEmails = calendarViewModel.getUserEmails()
-            userEmails?.let {
-                val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
-                if (participationStatus != ParticipationStatus.ACCEPTED) {
-                    handleChangeAnswer(
-                        ParticipationStatus.ACCEPTED,
-                        participationStatus ?: ParticipationStatus.NEEDS_ACTION,
-                        userEmails
-                    )
-                }
-            }
+            onChangeAnswerClick(ParticipationStatus.ACCEPTED)
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
-            if (changeAnswerLoading) return@setOnSingleClickListener
-            val userEmails = calendarViewModel.getUserEmails()
-            userEmails?.let {
-                val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
-                if (participationStatus != ParticipationStatus.DECLINED) {
-                    handleChangeAnswer(
-                        ParticipationStatus.DECLINED,
-                        participationStatus ?: ParticipationStatus.NEEDS_ACTION,
-                        userEmails
-                    )
-                }
-            }
+            onChangeAnswerClick(ParticipationStatus.DECLINED)
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
-            if (changeAnswerLoading) return@setOnSingleClickListener
-            val userEmails = calendarViewModel.getUserEmails()
-            userEmails?.let {
-                val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
-                if (participationStatus != ParticipationStatus.TENTATIVE) {
-                    handleChangeAnswer(
-                        ParticipationStatus.TENTATIVE,
-                        participationStatus ?: ParticipationStatus.NEEDS_ACTION,
-                        userEmails
-                    )
-                }
+            onChangeAnswerClick(ParticipationStatus.TENTATIVE)
+        }
+    }
+
+    private fun onChangeAnswerClick(newParticipationStatus: ParticipationStatus) {
+        if (eventViewModel.changeAnswerLoading.value == true) return
+        val userEmails = calendarViewModel.getUserEmails()
+        userEmails?.let {
+            val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
+            if (participationStatus != newParticipationStatus) {
+                handleChangeAnswer(
+                    newParticipationStatus,
+                    participationStatus ?: ParticipationStatus.NEEDS_ACTION,
+                    userEmails
+                )
             }
         }
     }
@@ -777,7 +757,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean = false) {
-        changeAnswerLoading = loading
+        eventViewModel.changeAnswerLoading.postValue(loading)
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))

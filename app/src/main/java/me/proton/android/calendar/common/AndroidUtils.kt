@@ -1214,8 +1214,7 @@ fun canonicalizeProtonEmail(email:String): String {
 }
 
 fun isProtonDomain(email: String): Boolean {
-    PROTON_MAIL_DOMAINS.forEach {
-        if (email.contains(it, true)) return true
+    return PROTON_MAIL_DOMAINS.any {
+        email.endsWith("@$it", true)
     }
-    return false
 }

@@ -10,6 +10,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.*
+import java.time.Instant
 
 interface CalendarsApiService : BaseRetrofitApi {
 
@@ -226,7 +227,7 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
         status: Int
     ): ApiResponse<AttendeeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         updateParticipationStatus(calendarId, eventId, attendeeId, UpdateParticipationStatusApiRequest(
-            status, (System.currentTimeMillis() / 1000L).toInt())
+            status, Instant.now().epochSecond.toInt())
         )
     }.toApiResponse()
 
@@ -507,7 +508,7 @@ data class AttendeeStatusApiResponse(
     @SerialName("Status")
     val status: Int, // 0: Unanswered, 1: Maybe, 2: No, 3: Yes
     @SerialName("UpdateTime")
-    val updateTime: Int?
+    val updateTime: Int? = null
 )
 
 @Serializable
@@ -515,7 +516,7 @@ data class UpdateParticipationStatusApiRequest(
     @SerialName("Status")
     val status: Int, // 0: Unanswered, 1: Maybe, 2: No, 3: Yes
     @SerialName("UpdateTime")
-    val updateTime: Int?
+    val updateTime: Int? = null
 )
 
 @Serializable

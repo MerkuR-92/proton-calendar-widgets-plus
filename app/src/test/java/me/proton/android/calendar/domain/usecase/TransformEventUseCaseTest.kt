@@ -111,7 +111,7 @@ internal class TransformEventUseCaseTest {
                 database.publicKeysDao().select(any())
             } returns listOf()
 
-            coEvery { database.addressesDao().select(any()) } returns listOf(AddressEntity("id", "calendarSingle9@proton.dev", 1, "calendarSingle9", mockk()))
+            coEvery { database.addressesDao().select(any()) } returns listOf(AddressEntity("id", "calendarsingle9@proton.dev", 1, "calendarsingle9", mockk()))
 
             val useCase = TransformEventUseCase(
                 json,

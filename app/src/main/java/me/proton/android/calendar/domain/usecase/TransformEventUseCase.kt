@@ -137,7 +137,7 @@ class TransformEventUseCase(
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (canonicalUserEmails.map { it.toLowerCase(Locale.ROOT) }.contains(canonicalizeProtonEmail(attendee.email.toLowerCase(Locale.ROOT)))) currentUserAttendeeId = attendeeStatusEvent.id
+                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.email) }) currentUserAttendeeId = attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }
             }

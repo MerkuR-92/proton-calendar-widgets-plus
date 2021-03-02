@@ -7,6 +7,8 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.ICalUtils
@@ -18,7 +20,6 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
@@ -36,7 +37,7 @@ class CalendarsRepositoryImpl(
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
-    private val settingsApi: SettingsApi
+    private val json: Json
 ) : CalendarsRepository {
 
     private val eventsMutex = Mutex()
@@ -632,9 +633,12 @@ class CalendarsRepositoryImpl(
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             // If an event with the same UID has no recurrenceId then we have occurrence(s) of the main series
-            eventsSharingUidResponse.data.events.firstOrNull {
-                val event = transformEventUseCase.execute(it)
-                event?.iCalEvent?.recurrenceId == null
+            eventsSharingUidResponse.data.events.firstOrNull { eventEntity ->
+                val sharedEvents = eventEntity.sharedEvents.map {
+                    json.decodeFromJsonElement<Event.EventPart.Shared>(it)
+                }
+                val iCal = ICalUtils.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
+                iCal?.events?.first()?.recurrenceId == null
             } == null
         } else null
     }

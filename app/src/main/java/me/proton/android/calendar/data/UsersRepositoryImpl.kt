@@ -1,21 +1,20 @@
 package me.proton.android.calendar.data
 
-import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.AddressEntity
-import me.proton.android.calendar.data.entity.UserEntity
-import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.model.Address
-import me.proton.android.calendar.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.MAX_EMAILS_PER_QUERY
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.ResetCalendarApiRequest
+import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.AddressEntity
+import me.proton.android.calendar.data.entity.UserEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.AddressesApi
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.model.Address
+import me.proton.android.calendar.domain.model.User
 import me.proton.core.domain.entity.UserId
 import timber.log.Timber
 
@@ -111,35 +110,46 @@ class UsersRepositoryImpl(
 
     private val cachedCanonicalAddresses: HashMap<String, String> = hashMapOf()
 
-    override suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): Map<String, String?>? {
+    override suspend fun getCanonicalAddresses(userId: UserId, emailList: List<String>): Map<String, String?>? {
         // Try to use cache first
-        val cachedEmailPairs = HashMap<String, String?>()
-        emails.forEach { email ->
-            cachedEmailPairs[email] = cachedCanonicalAddresses[email] ?: return@forEach
+        val emails = ArrayList(emailList)
+        val emailPairs = HashMap<String, String?>()
+
+        val iterator: Iterator<String> = emails.iterator()
+        while (iterator.hasNext()) {
+            val email = iterator.next()
+            emailPairs[email] = cachedCanonicalAddresses[email] ?: continue
+            emails.remove(email)
         }
-        if (cachedEmailPairs.size == emails.size) return cachedEmailPairs
+        if (emails.isEmpty()) return emailPairs
 
         // Fetch from BE
-        return when (val canonicalResult = addressesApi.getCanonicalEmails(userId, emails)) {
-            is ApiResponse.Success -> {
-                val emailPairs = HashMap<String, String?>()
-                canonicalResult.data.canonicalEmailsResponses.forEach {
-                    emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
-                    if (it.canonicalEmailResponse.canonicalEmail != null) {
-                        // Cache canonical email
-                        cachedCanonicalAddresses[it.email] = it.canonicalEmailResponse.canonicalEmail
+        val chunkedEmails = emails.chunked(MAX_EMAILS_PER_QUERY)
+
+        // TODO Optimize the chunks to send the most amount of emails per GET call
+
+        chunkedEmails.forEach { smallerEmailList ->
+            when (val canonicalResult = addressesApi.getCanonicalEmails(userId, smallerEmailList)) {
+                is ApiResponse.Success -> {
+                    canonicalResult.data.canonicalEmailsResponses.forEach {
+                        emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
+                        if (it.canonicalEmailResponse.canonicalEmail != null) {
+                            // Cache canonical email
+                            cachedCanonicalAddresses[it.email] = it.canonicalEmailResponse.canonicalEmail
+                        }
                     }
                 }
-                emailPairs
-            }
-            is ApiResponse.Error -> {
-                logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.error}")
-                null
-            }
-            is ApiResponse.Exception -> {
-                logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.exception.message ?: "(no exception message)"}")
-                null
+                is ApiResponse.Error -> {
+                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.error}")
+                    return null // TODO If one call fails, we return null and consider all as failed ?
+                }
+                is ApiResponse.Exception -> {
+                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.exception.message ?: "(no exception message)"}")
+                    return null // TODO If one call fails, we return null and consider all as failed ?
+                }
             }
         }
+
+        return emailPairs
     }
 }
