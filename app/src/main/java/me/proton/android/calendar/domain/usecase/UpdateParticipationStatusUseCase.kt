@@ -59,13 +59,19 @@ class UpdateParticipationStatusUseCase(
         }
     }
 
-    suspend fun executeClearSingleEdits(userId: UserId, calendarId: String, eventUid: String): UseCase.Result {
+    suspend fun executeClearSingleEdits(userId: UserId, calendarId: String, eventUid: String, userEmails: List<String>, mainChainStatus: Int): UseCase.Result {
 
         val singleEdits = calendarsRepository.getSingleEdits(userId, eventUid)
 
         var singleEditsClearedSuccessfully = true
         singleEdits?.forEach { event ->
-            if (event.currentUserAttendeeId == null) return@forEach
+            val mainChanParticipationStatus = when (mainChainStatus) {
+                1 -> ParticipationStatus.TENTATIVE
+                2 -> ParticipationStatus.DECLINED
+                3 -> ParticipationStatus.ACCEPTED
+                else -> ParticipationStatus.NEEDS_ACTION
+            }
+            if (event.currentUserAttendeeId == null || event.getParticipationStatus(userEmails) == mainChanParticipationStatus) return@forEach
             when (val updateParticipationStatusResponse =
                 calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, 0) // 0 == NEEDS_ACTION
             ) {

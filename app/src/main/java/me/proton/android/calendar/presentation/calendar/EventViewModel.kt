@@ -305,7 +305,10 @@ class EventViewModel(
         return Result.Success
     }
 
-    data class SingleEditsInfo(val hasSingleEdit: Boolean, val hasFutureSingleEdit: Boolean, val hasAnsweredSingleEdit: Boolean)
+    data class SingleEditsInfo(
+        val hasSingleEdit: Boolean,
+        val hasFutureSingleEdit: Boolean,
+        val hasAnsweredSingleEdit: Map<ParticipationStatus, Boolean>)
 
     suspend fun getSingleEditsInfo(userEmails: List<String>? = null): SingleEditsInfo? {
 
@@ -316,7 +319,7 @@ class EventViewModel(
 
             var hasSingleEdit: Boolean = false
             var hasFutureSingleEdit: Boolean = false
-            var hasAnsweredSingleEdit: Boolean = false
+            val hasAnsweredSingleEdit = hashMapOf<ParticipationStatus, Boolean>()
 
             val occurrenceStart = event.getActualStart(eventTimeZoneId)
             val occurrence = event.occurrence
@@ -350,11 +353,12 @@ class EventViewModel(
                             hasFutureSingleEdit = true
                         }
                         // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
-                        if (!editMode && hasAttendees && userEmails != null && !singleEdit.isCancelled() &&
-                            (singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.ACCEPTED ||
-                                    singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED ||
-                                    singleEdit.getParticipationStatus(userEmails) == ParticipationStatus.TENTATIVE)) {
-                            hasAnsweredSingleEdit = true
+                        if (!editMode && hasAttendees && userEmails != null && !singleEdit.isCancelled()) {
+                            when (singleEdit.getParticipationStatus(userEmails)) {
+                                ParticipationStatus.ACCEPTED -> hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] = true
+                                ParticipationStatus.DECLINED -> hasAnsweredSingleEdit[ParticipationStatus.DECLINED] = true
+                                ParticipationStatus.TENTATIVE -> hasAnsweredSingleEdit[ParticipationStatus.TENTATIVE] = true
+                            }
                         }
                     }
                     !singleEdits.isNullOrEmpty()
@@ -1395,7 +1399,7 @@ class EventViewModel(
 
         if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
             // If chain has single edits, update their part stat to NEEDS_ACTION
-            clearSingleEditsParticipationStatus(calendarId, event.uid)
+            clearSingleEditsParticipationStatus(calendarId, event.uid, userEmails, participationStatus)
         }
 
         // Apply alarms modifications
@@ -1413,8 +1417,18 @@ class EventViewModel(
 
     private fun clearSingleEditsParticipationStatus(
         calendarId: String,
-        eventUid: String
+        eventUid: String,
+        userEmails: List<String>,
+        mainChainParticipationStatus: ParticipationStatus
     ) : LiveData<Operation.State> {
+        val status = when (mainChainParticipationStatus) {
+            ParticipationStatus.NEEDS_ACTION -> 0
+            ParticipationStatus.TENTATIVE -> 1
+            ParticipationStatus.DECLINED -> 2
+            ParticipationStatus.ACCEPTED -> 3
+            else -> 0
+        }
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -1426,7 +1440,9 @@ class EventViewModel(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
                     UseCaseWorker.INPUT_USER_ID to userId.id,
                     UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_EVENT_UID to eventUid
+                    UseCaseWorker.INPUT_EVENT_UID to eventUid,
+                    UseCaseWorker.INPUT_USER_EMAILS to userEmails.toTypedArray(),
+                    UseCaseWorker.INPUT_PARTICIPATION_STATUS to status
                 )
             )
             .build()

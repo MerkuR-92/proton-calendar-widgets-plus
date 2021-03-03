@@ -11,6 +11,8 @@ import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import org.koin.core.inject
+import java.util.*
+import kotlin.collections.ArrayList
 
 class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
@@ -55,6 +57,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
         const val INPUT_PERSONAL_ICAL_STRING = "INPUT_PERSONAL_ICAL_STRING"
         const val INPUT_EVENT_UID = "INPUT_EVENT_UID"
+        const val INPUT_USER_EMAILS = "INPUT_USER_EMAILS"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -184,7 +187,9 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 updateParticipationStatusUseCase.executeClearSingleEdits(
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
-                    inputData.getString(INPUT_EVENT_UID) ?: return Result.failure())
+                    inputData.getString(INPUT_EVENT_UID) ?: return Result.failure(),
+                    inputData.getStringArray(INPUT_USER_EMAILS)?.toList() ?: return Result.failure(),
+                    inputData.getInt(INPUT_PARTICIPATION_STATUS, 0))
             }
             UseCaseId.FETCH_ADDRESSES -> {
                 val fetchUserUseCase: FetchUserUseCase = get()

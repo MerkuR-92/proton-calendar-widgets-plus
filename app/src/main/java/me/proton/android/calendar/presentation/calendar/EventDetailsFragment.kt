@@ -398,9 +398,24 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (eventViewModel.eventLiveData.value?.isPartOfChain() == true) {
                 val isSingleEdit = eventViewModel.eventLiveData.value?.isSingleEdit() ?: false
                 val isStandaloneSingleEdit = if (isSingleEdit) eventViewModel.isStandaloneSingleEdit() else false
+
+                val hasAnsweredSingleEdit = eventViewModel.getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
                 val overwrite =
                     if (isSingleEdit) false
-                    else eventViewModel.getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit == true
+                    else if (hasAnsweredSingleEdit?.isNotEmpty() == true) {
+                        when (participationStatus) {
+                            ParticipationStatus.ACCEPTED -> {
+                                hasAnsweredSingleEdit[ParticipationStatus.DECLINED] == true || hasAnsweredSingleEdit[ParticipationStatus.TENTATIVE] == true
+                            }
+                            ParticipationStatus.DECLINED -> {
+                                hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] == true || hasAnsweredSingleEdit[ParticipationStatus.TENTATIVE] == true
+                            }
+                            ParticipationStatus.TENTATIVE -> {
+                                hasAnsweredSingleEdit[ParticipationStatus.DECLINED] == true || hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] == true
+                            }
+                            else -> false
+                        }
+                    } else false
 
                 if (isStandaloneSingleEdit) {
                     updateAttendeeParticipationStatus(participationStatus, currentParticipationStatus, userEmails)
