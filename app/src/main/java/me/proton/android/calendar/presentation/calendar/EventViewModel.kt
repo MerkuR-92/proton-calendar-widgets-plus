@@ -354,6 +354,7 @@ class EventViewModel(
                         }
                         // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
                         if (!editMode && hasAttendees && userEmails != null && !singleEdit.isCancelled()) {
+                            // The only values we need are Accepted, Declined and Tentative
                             when (singleEdit.getParticipationStatus(userEmails)) {
                                 ParticipationStatus.ACCEPTED -> hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] = true
                                 ParticipationStatus.DECLINED -> hasAnsweredSingleEdit[ParticipationStatus.DECLINED] = true
@@ -1361,13 +1362,7 @@ class EventViewModel(
         participationStatus: ParticipationStatus,
         userEmails: List<String>
     ) : Boolean {
-        val status = when (participationStatus) {
-            ParticipationStatus.NEEDS_ACTION -> 0
-            ParticipationStatus.TENTATIVE -> 1
-            ParticipationStatus.DECLINED -> 2
-            ParticipationStatus.ACCEPTED -> 3
-            else -> 0
-        }
+        val status = participationStatus.toInt()
 
         val eventCopy = event.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar)
         val personalPartICalString =
@@ -1421,13 +1416,7 @@ class EventViewModel(
         userEmails: List<String>,
         mainChainParticipationStatus: ParticipationStatus
     ) : LiveData<Operation.State> {
-        val status = when (mainChainParticipationStatus) {
-            ParticipationStatus.NEEDS_ACTION -> 0
-            ParticipationStatus.TENTATIVE -> 1
-            ParticipationStatus.DECLINED -> 2
-            ParticipationStatus.ACCEPTED -> 3
-            else -> 0
-        }
+        val status = mainChainParticipationStatus.toInt()
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

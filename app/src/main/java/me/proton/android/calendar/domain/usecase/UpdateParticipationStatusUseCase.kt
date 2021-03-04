@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import biweekly.parameter.ParticipationStatus
+import me.proton.android.calendar.common.toParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -65,12 +66,7 @@ class UpdateParticipationStatusUseCase(
 
         var singleEditsClearedSuccessfully = true
         singleEdits?.forEach { event ->
-            val mainChanParticipationStatus = when (mainChainStatus) {
-                1 -> ParticipationStatus.TENTATIVE
-                2 -> ParticipationStatus.DECLINED
-                3 -> ParticipationStatus.ACCEPTED
-                else -> ParticipationStatus.NEEDS_ACTION
-            }
+            val mainChanParticipationStatus = mainChainStatus.toParticipationStatus()
             if (event.currentUserAttendeeId == null || event.getParticipationStatus(userEmails) == mainChanParticipationStatus) return@forEach
             when (val updateParticipationStatusResponse =
                 calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, 0) // 0 == NEEDS_ACTION

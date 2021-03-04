@@ -1218,3 +1218,22 @@ fun isProtonDomain(email: String): Boolean {
         email.endsWith("@$it", true)
     }
 }
+
+fun Int.toParticipationStatus(): ParticipationStatus {
+    return when (this) {
+        1 -> ParticipationStatus.TENTATIVE
+        2 -> ParticipationStatus.DECLINED
+        3 -> ParticipationStatus.ACCEPTED
+        else -> ParticipationStatus.NEEDS_ACTION
+    }
+}
+
+fun ParticipationStatus.toInt(): Int {
+    return when (this) {
+        ParticipationStatus.TENTATIVE -> 1
+        ParticipationStatus.DECLINED -> 2
+        ParticipationStatus.ACCEPTED -> 3
+        else -> 0
+    }
+}
+

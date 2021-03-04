@@ -7,6 +7,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.extractEmail
 import me.proton.android.calendar.common.printToString
+import me.proton.android.calendar.common.toInt
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -190,12 +191,7 @@ class EditCreateEventUseCase(
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
         if (attendeesEventContent != null) {
             newEvent.iCalEvent.attendees.forEach {
-                val status = when (it.participationStatus) {
-                    ParticipationStatus.TENTATIVE -> 1
-                    ParticipationStatus.DECLINED -> 2
-                    ParticipationStatus.ACCEPTED -> 3
-                    else -> 0
-                }
+                val status = it.participationStatus.toInt()
                 attendees.add(
                     Event.AttendeeStatusEvent(null, it.getParameter(X_PM_TOKEN), status)
                 )
