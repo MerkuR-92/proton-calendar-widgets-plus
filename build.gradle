@@ -22,14 +22,14 @@ buildscript {
                 "hilt_android": "2.29.1-alpha",
                 "hilt_androidx": "1.0.0-alpha03",
 
-                "proton_core_crypto": "1.0.1",
+                "proton_core_crypto": "1.0.2",
                 "proton_core_account": "1.0.1",
                 "proton_core_account_manager": "1.0.2",
                 "proton_core_account_manager_dagger": "1.0.2",
                 "proton_core_auth": "1.0",
                 "proton_core_user": "1.0.1",
-                "proton_core_key": "1.0.1",
-                "proton_core_human_verification": "0.2.5",
+                "proton_core_key": "1.0.3",
+                "proton_core_human_verification": "0.2.6",
                 "proton_core_data": "1.0",
                 "proton_core_domain": "1.0",
                 "proton_core_presentation": "0.5.7",
@@ -58,7 +58,6 @@ allprojects {
     repositories {
         google()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url = "https://dl.bintray.com/proton/Core-publishing" }
     }
 }
 

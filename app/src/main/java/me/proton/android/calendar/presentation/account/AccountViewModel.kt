@@ -54,7 +54,7 @@ class AccountViewModel(
 
     private fun Account.isBootstrapped(): Boolean {
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
-        return valueStore.getBoolean(ValueKey.IS_BOOTSTRAPPED) ?: false
+        return valueStore.getBoolean(ValueKey.TEMP_IS_BOOTSTRAPPED) ?: false
     }
 
     private suspend fun saveAccountInfo(account: Account) {
@@ -110,7 +110,7 @@ class AccountViewModel(
             return
         }
 
-        valueStore.putBoolean(ValueKey.IS_BOOTSTRAPPED, true)
+        valueStore.putBoolean(ValueKey.TEMP_IS_BOOTSTRAPPED, true)
 
         _state.postValue(State.Ready)
     }
