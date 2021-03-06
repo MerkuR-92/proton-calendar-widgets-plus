@@ -3,11 +3,8 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.extractEmail
-import me.proton.android.calendar.common.printToString
-import me.proton.android.calendar.common.toInt
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -15,6 +12,7 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.takeIfNotEmpty
+import me.proton.core.util.kotlin.toInt
 
 class EditCreateEventUseCase(
     private val logger: Logger,
@@ -192,11 +190,23 @@ class EditCreateEventUseCase(
         if (attendeesEventContent != null) {
             newEvent.iCalEvent.attendees.forEach {
                 val status = it.participationStatus.toInt()
+                val xpmToken = it.getParameter(X_PM_TOKEN) ?: ICalUtils.generateXPmToken(canonicalizeProtonEmail(it.email), newEvent.uid)
                 attendees.add(
-                    Event.AttendeeStatusEvent(null, it.getParameter(X_PM_TOKEN), status)
+                    Event.AttendeeStatusEvent(null, xpmToken, status)
                 )
             }
         }
+
+        val organizerEmail = newEvent.iCalEvent.organizer?.extractEmail()
+        val isOrganizer =
+            if (organizerEmail != null) {
+                val canonicalUserEmails = database.addressesDao().select(userId.id).map { canonicalizeProtonEmail(it.email) }
+                val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
+                (canonicalUserEmails.firstOrNull {
+                    canonicalOrganizerEmail == it
+                } != null).toInt()
+            } else if (newEvent.iCalEvent.attendees.isNullOrEmpty()) 1
+            else 0
 
         val syncRequestBody = if (newEvent.isSyncedWithApi()) { // UPDATE
 
@@ -209,6 +219,7 @@ class EditCreateEventUseCase(
                         id = newEvent.id,
                         event = SyncEvent(
                             permissions = 1,
+                            isOrganizer = isOrganizer,
                             sharedKeyPacket = null, // this is already present in existing event
                             sharedEventContent = sharedEventContent,
                             calendarKeyPacket = if (oldCalendarSessionKey == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
@@ -228,13 +239,18 @@ class EditCreateEventUseCase(
                     SyncEventCreateContainer(
                         event = SyncEvent(
                             permissions = 1,
+                            isOrganizer = isOrganizer,
                             sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
                             sharedEventContent = sharedEventContent,
                             calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
-                            attendeesEventContent = null, // We first create without attendees
-                            attendees = null // We first create without attendees
+                            attendeesEventContent =
+                            if (newEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
+                            else null, // We first create without attendees
+                            attendees =
+                            if (newEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
+                            else null // We first create without attendees
                         )
                     )
                 )

@@ -329,7 +329,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         null,
-                        null,
+                        null
                     )
                 }
 

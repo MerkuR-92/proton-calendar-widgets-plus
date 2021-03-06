@@ -394,6 +394,8 @@ data class SyncEventDeleteContainer(
 data class SyncEvent(
     @SerialName("Permissions")
     val permissions: Int,
+    @SerialName("IsOrganizer")
+    val isOrganizer: Int, // Default value is 1
     @SerialName("CalendarKeyPacket")
     val calendarKeyPacket: String? = null,
     @SerialName("CalendarEventContent")

@@ -105,7 +105,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 navigationArguments.eventId,
                                 if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                                 null,
-                                null,
+                                null
                             )
                         if (viewModeInitStatus == EventViewModel.Result.Success) {
                             findNavController().navigateUp()
@@ -516,7 +516,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                     navigationArguments.initStartDate,
-                    navigationArguments.initStartTime,
+                    navigationArguments.initStartTime
                 )
             }
 

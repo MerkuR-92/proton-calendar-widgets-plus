@@ -3,6 +3,7 @@ package me.proton.android.calendar.common
 import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 const val API_VERSION_CALENDAR = "v1"
@@ -73,6 +74,25 @@ enum class AppTheme(val value: Int) {
     LIGHT(0),
     DARK(1),
     SYSTEM_DEFAULT(2)
+}
+
+object IcsParsingValidation {
+    const val UID_MAX_LENGTH = 191
+    const val SUMMARY_MAX_LENGTH = 255
+    const val LOCATION_MAX_LENGTH = 255
+    const val DESCRIPTION_MAX_LENGTH = 3000
+
+    const val MAX_COUNT = 49
+    const val MAX_COUNT_INVITATION = 499
+    const val MAX_DAILY_INTERVAL = 999
+    const val MAX_WEEKLY_INTERVAL = 4999
+    const val MAX_MONTHLY_INTERVAL = 999
+    const val MAX_YEARLY_INTERVAL = 99
+    const val MAX_ATTENDEES = 100
+
+    val MIN_DATE = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+    val MAX_DATE = ZonedDateTime.of(2038, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+
 }
 
 object FormValidation {

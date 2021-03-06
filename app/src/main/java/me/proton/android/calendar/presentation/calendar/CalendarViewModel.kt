@@ -577,7 +577,7 @@ class CalendarViewModel(
         updateTimeZoneDialogLastShown = LocalDate.now()
         val timeZoneId = timeZoneId.value
         timeZoneId?.let {
-            val systemTimeZone = AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id)
+            val systemTimeZone = AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
             if (ICalUtils.areTimeZoneOffsetsDifferent(timeZoneId.id, systemTimeZone) == true) {
                 // We add tags to the timezone string argument directly because it is not supported otherwise
                 val dialogMessage: Spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

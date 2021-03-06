@@ -70,7 +70,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             createDefaultCalendarResult.ifSuccessAndLogErrors(logger) {
                 if (updateCalendarUserPrimaryTimezone) {
                     when (val updateCalendarUserPrimaryTimezoneResponse =
-                        settingsApi.updateCalendarUserPrimaryTimezone(userId, AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id))) {
+                        settingsApi.updateCalendarUserPrimaryTimezone(userId, AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!)) {
                         is ApiResponse.Error -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                         is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                     }

@@ -883,6 +883,13 @@ class CalendarsRepositoryImpl(
         } else null
     }
 
+    override suspend fun getEventsByUid(userId: UserId, eventUid: String): List<EventEntity>? {
+        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
+        return if (eventsSharingUidResponse is ApiResponse.Success) {
+            eventsSharingUidResponse.data.events
+        } else null
+    }
+
     override suspend fun persistEvents(vararg events: EventEntity) {
 
         logger.v("persist Event: ")

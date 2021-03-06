@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
@@ -173,7 +174,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
-        if (!isTaskRoot) {
+        if (!isTaskRoot && intent.action != Intent.ACTION_VIEW && intent.type != "text/calendar") {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
             //  at the top of the stack (ie: the last state of this task)
@@ -341,9 +342,45 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
                     if (openIcsIntent != null) {
-                        // TODO Handle intent
+                        logger.e("Intent = $openIcsIntent")
+                        val uri = openIcsIntent.data
+                        if (uri != null) {
+                            lifecycleScope.launch {
+                                val userId = accountViewModel.getPrimaryUserId() ?: return@launch // TODO Handle error
+                                displaySplashScreen(true, true, resources.getString(R.string.splash_init))
+                                val handleIcsImportResult = mainViewModel.handleIcsImport(uri, userId) ?: return@launch // TODO Handle error
+                                if (handleIcsImportResult is IcsSurgeryUtils.IcsParsingResult.Success) {
+                                    val eventId = handleIcsImportResult.eventId
+                                    logger.e("Test: eventId = $eventId")
+                                    if (eventId == null) {
+                                        this@MainActivity.displaySnackBar("Error")
+                                        navigateTo(Navigation.Deeplink.toMonth())
+                                    } else {
+                                        val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
+                                        navigateTo(eventDetailsDeepLink)
+                                    }
+                                } else {
+                                    when (handleIcsImportResult) {
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidVersion -> {
+                                            this@MainActivity.displaySnackBar("InvalidVersion")
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.ParsingFailed -> {
+                                            this@MainActivity.displaySnackBar("ParsingFailed")
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidCalscale -> {
+                                            this@MainActivity.displaySnackBar("InvalidCalscale")
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.NoDefaultCalendarFound -> {
+                                            this@MainActivity.displaySnackBar("NoDefaultCalendarFound")
+                                        }
+                                    }
+                                }
+                            }
+                        } else navigateTo(Navigation.Deeplink.toMonth())
+                    } else {
+                        logger.e("openIcsIntent is null")
+                        navigateTo(Navigation.Deeplink.toMonth())
                     }
-                    navigateTo(Navigation.Deeplink.toMonth())
                 }
             }
             AccountViewModel.State.LoginInProgress,

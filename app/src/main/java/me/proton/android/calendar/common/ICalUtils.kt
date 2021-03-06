@@ -833,7 +833,7 @@ fun Organizer.extractEmail(): String? {
     return extractEmail(this.uri, this.email, this.commonName)
 }
 
-private fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
+fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
     return when {
         uri?.contains("@") == true -> uri.substringAfter("mailto:")
         email?.contains("@") == true -> email

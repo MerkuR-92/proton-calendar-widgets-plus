@@ -712,7 +712,7 @@ class AndroidUtils(context: Context) {
         /**
          * If supplied TimeZone is not supported, fallback retaining UTC offset.
          */
-        fun fallbackTimeZone(timeZone: String): String {
+        fun fallbackTimeZone(timeZone: String, fallbackToDefault: Boolean = true): String? {
 
             return if (allowedTimezoneIds.contains(timeZone)) {
                 timeZone
@@ -725,16 +725,14 @@ class AndroidUtils(context: Context) {
 
                     val alternative = alternativeTimezones.firstOrNull { it.startsWith(timeZone.substringBefore("/")) } ?: alternativeTimezones.firstOrNull()
 
-                    alternative ?: TimeZone.getDefault().id
+                    alternative ?: if (fallbackToDefault) TimeZone.getDefault().id else null
                 } else {
-                    TimeZone.getDefault().id
+                    if (fallbackToDefault) TimeZone.getDefault().id
+                    else null
                 }
-
             }
         }
-
     }
-
 }
 
 fun Activity.clearFocusAndHideKeyboard(view: View?) {

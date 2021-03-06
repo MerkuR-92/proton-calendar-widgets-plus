@@ -117,6 +117,8 @@ interface CalendarsRepository {
 
     suspend fun deleteEventsById(ids: List<String>)
 
+    suspend fun getEventsByUid(userId: UserId, eventUid: String): List<EventEntity>?
+
     // calendar keys
     suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity>
 

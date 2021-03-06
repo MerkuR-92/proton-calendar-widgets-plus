@@ -32,13 +32,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter> <!-- TODO: Find scheme that works for opening PC <data android:scheme="content" />-->
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/calendar" />
                 <data android:pathPattern="\\*.ics" />
                 <data android:host="*" />
-<!--            TODO: Find scheme that allows opening PC <data android:scheme="content" />-->
             </intent-filter>
             <nav-graph android:value="@navigation/graph_main" />
         </activity>
