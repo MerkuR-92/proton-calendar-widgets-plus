@@ -34,6 +34,10 @@ const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/c
 
 const val DEFAULT_CALENDAR_COLOR = "#657EE4"
 
+const val INVITE_ICS_FILE_NAME = "invite.ics"
+const val INVITE_ICS_MIME_TYPE = "text/calendar"
+const val EMAIL_MIME_TYPE = "text/plain"
+
 const val ICAL_LINE_MAXIMUM_LENGTH = 75
 const val ICAL_LINE_SEPARATOR = "\\r\\n "
 const val ICAL_UID_PREFIX = "UID:"

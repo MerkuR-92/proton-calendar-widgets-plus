@@ -6,15 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
+import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.component.VAlarm
+import biweekly.component.VTimezone
 import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Related
 import biweekly.parameter.Role
-import biweekly.property.Action
-import biweekly.property.Attendee
-import biweekly.property.Organizer
-import biweekly.property.Trigger
+import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
@@ -28,6 +27,7 @@ import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.*
@@ -54,6 +54,7 @@ class EventViewModel(
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
+    private val sendEmailUseCase: SendEmailUseCase,
     private val logger: Logger,
     private val json: Json
 ) : ViewModel() {
@@ -856,6 +857,15 @@ class EventViewModel(
             logger.e("error in create event: ${createEventResult.message}")
         }
 
+
+        // TODO send email to attendees with the newly created event
+        // newEvent
+
+
+
+
+
+
         return createEventResult is UseCase.Result.Success<*>
 
     }
@@ -1360,9 +1370,13 @@ class EventViewModel(
         eventId: String,
         attendeeId: String,
         participationStatus: ParticipationStatus,
-        userEmails: List<String>
+        userAttendee: Attendee,
+        subject: String,
+        body: String
     ) : Boolean {
         val status = participationStatus.toInt()
+
+        val userParticipationStatus = userAttendee.participationStatus
 
         val eventCopy = event.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar)
         val personalPartICalString =
@@ -1371,8 +1385,8 @@ class EventViewModel(
                 // if changes to NO, remove all notifications if there are any
                 eventCopy.iCalEvent.alarms.clear()
                 ""
-            } else if ((event.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED ||
-                        event.getParticipationStatus(userEmails) == ParticipationStatus.NEEDS_ACTION) &&
+            } else if ((userParticipationStatus == ParticipationStatus.DECLINED ||
+                        userParticipationStatus == ParticipationStatus.NEEDS_ACTION) &&
                 (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
                 event.iCalEvent.alarms.isNullOrEmpty()) {
                 // if changes from NO to YES/MAYBE add default calendar notifications
@@ -1386,7 +1400,28 @@ class EventViewModel(
                 null
             }
 
-        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(userId, calendarId, eventId, attendeeId, status, personalPartICalString)
+        val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
+            userId,
+            userAttendee.email,
+            userAttendee.commonName,
+            event.iCalEvent.organizer.email,
+            getResponseIcs(userAttendee.copy(), participationStatus),
+            subject,
+            body
+        )
+        sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+        if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
+            return false
+        }
+
+        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
+            userId,
+            calendarId,
+            eventId,
+            attendeeId,
+            status,
+            personalPartICalString
+        )
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
         if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
             return false
@@ -1408,6 +1443,43 @@ class EventViewModel(
             _event.postValue(event)
         }
         return true
+    }
+
+    private fun getResponseIcs(
+        userAttendee: Attendee,
+        participationStatus: ParticipationStatus
+    ): String {
+        val responseICalendar = event.iCalendar.clone()
+
+        if (responseICalendar.productId == null) responseICalendar.setProductId(generateProtonProdId())
+        if (responseICalendar.version == null) responseICalendar.version = ICalVersion.V2_0
+
+        // METHOD:REPLY as we answer the REQUEST of the organizer
+        responseICalendar.setMethod(Method.REPLY)
+
+        if (responseICalendar.calendarScale == null) responseICalendar.calendarScale = CalendarScale.gregorian()
+
+        // Update user PARTSTAT and remove useless X_PM_TOKEN property
+        userAttendee.participationStatus = participationStatus
+        userAttendee.removeParameter(X_PM_TOKEN)
+
+        // The other attendees (not linked with the current users) have to be removed
+        responseICalendar.events.first().attendees.clear()
+        responseICalendar.events.first().addAttendee(userAttendee)
+
+        // Alarms should be dropped
+        responseICalendar.events.first().alarms.clear()
+
+        // The EXDATE must be filtered out
+        responseICalendar.events.first().exceptionDates.clear()
+
+        // Last-Modified should be dropped
+        responseICalendar.lastModified = null
+
+        // We set default timezone in EventVM, reset timezoneInfo to original values
+        responseICalendar.timezoneInfo = dbEvent?.iCalendar?.timezoneInfo
+
+        return responseICalendar.printToString()
     }
 
     private fun clearSingleEditsParticipationStatus(

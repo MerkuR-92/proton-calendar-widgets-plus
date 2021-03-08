@@ -1,19 +1,17 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.parameter.ParticipationStatus
 import me.proton.android.calendar.common.toParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 
 class UpdateParticipationStatusUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
-    private val updatePersonalPartUseCase: UpdatePersonalPartUseCase
+    private val updatePersonalPartUseCase: UpdatePersonalPartUseCase,
 ): UseCase {
 
     companion object {
@@ -21,13 +19,18 @@ class UpdateParticipationStatusUseCase(
         const val WORKER_ID_SINGLE_EDIT = "WORKER_ID_UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
     }
 
-    suspend fun execute(userId: UserId, calendarId: String, eventId: String, attendeeId: String, status: Int, personalPartICalString: String?): UseCase.Result {
+    suspend fun execute(
+        userId: UserId,
+        calendarId: String,
+        eventId: String,
+        attendeeId: String,
+        status: Int,
+        personalPartICalString: String?
+    ): UseCase.Result {
         return when (val updateParticipationStatusResponse =
             calendarsApi.updateParticipationStatus(userId, calendarId, eventId, attendeeId, status)
         ) {
             is ApiResponse.Success -> {
-
-                // TODO notify organizer by sending updated ics
 
                 // personalPartICalString == null ignore alarms update, personalPartICalString == "" clear alarms, else update event with new alarms
                 personalPartICalString?.let {

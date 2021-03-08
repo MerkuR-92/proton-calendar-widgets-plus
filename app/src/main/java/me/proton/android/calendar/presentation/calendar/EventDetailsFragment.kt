@@ -456,12 +456,33 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 return@launch
             }
 
+            val userAttendee = event.iCalEvent.attendees.find { attendee ->
+                userEmails.firstOrNull { userEmail ->
+                    val attendeeEmail = attendee.extractEmail()
+                    attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                } != null
+            }
+            if (userAttendee == null) {
+                displayAttendeeAnswerState(currentParticipationStatus, false)
+                view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                return@launch
+            }
+
+            val subject = getString(R.string.event_change_answer_mail_subject_accepted, event.summary ?: getString(R.string.default_event_summary))
+            val body = when (participationStatus) {
+                ParticipationStatus.ACCEPTED -> getString(R.string.event_change_answer_mail_body_accepted, userAttendee.email, event.summary ?: getString(R.string.default_event_summary))
+                ParticipationStatus.DECLINED -> getString(R.string.event_change_answer_mail_body_accepted, userAttendee.email, event.summary ?: getString(R.string.default_event_summary))
+                ParticipationStatus.TENTATIVE -> getString(R.string.event_change_answer_mail_body_accepted, userAttendee.email, event.summary ?: getString(R.string.default_event_summary))
+                else -> "" // TODO Shouldn't happen ?
+            }
             if (eventViewModel.updateParticipationStatus(
                     calendarId,
                     eventId,
                     attendeeId,
                     participationStatus,
-                    userEmails
+                    userAttendee,
+                    subject,
+                    body
                 )) {
                 eventViewModel.handleParticipationStatus(userEmails, participationStatus)
             } else {

@@ -84,6 +84,10 @@
     <string name="event_change_answer_recurring_single_edit_description">This event has been updated by the organizer. Would you like to change your answer only for this occurrence in this series?</string>
     <string name="event_change_answer_recurring_cancel">Cancel</string>
     <string name="event_change_answer_recurring_confirm">Update</string>
+    <string name="event_change_answer_mail_subject_accepted">Re: Invitation: %s</string>
+    <string name="event_change_answer_mail_body_accepted">%s has accepted your invitation to %s</string>
+    <string name="event_change_answer_mail_body_declined">%s has declined your invitation to %s</string>
+    <string name="event_change_answer_mail_body_tentative">%s has tentatively accepted your invitation to %s</string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
