@@ -15,6 +15,7 @@ import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
+import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
 import org.koin.android.ext.koin.androidApplication
@@ -94,7 +95,7 @@ val useCaseModule = module {
     factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
-    factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get()) }
+    factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get(), get()) }
     factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get(), get(), get()) }
 }
 
@@ -103,7 +104,8 @@ fun coreModule(
     accountManager: AccountManager,
     authOrchestrator: AuthOrchestrator,
     userManager: UserManager,
-    keyStoreCrypto: KeyStoreCrypto
+    keyStoreCrypto: KeyStoreCrypto,
+    sendEmailDirectUseCase: SendEmailDirect
 ) = module {
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
     single<ApiProvider> { apiProvider }
@@ -113,4 +115,5 @@ fun coreModule(
     single<AuthOrchestrator> { authOrchestrator }
     single<UserManager> { userManager }
     single<KeyStoreCrypto> { keyStoreCrypto }
+    single<SendEmailDirect> { sendEmailDirectUseCase }
 }

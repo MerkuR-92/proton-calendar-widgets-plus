@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
+import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
 import org.koin.android.ext.android.inject
@@ -37,6 +38,9 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var keyStoreCrypto: KeyStoreCrypto
 
+    @Inject
+    lateinit var sendEmailDirectUseCase: SendEmailDirect
+
     private val logger: Logger by inject()
 
     override fun onCreate() {
@@ -46,7 +50,7 @@ class ProtonCalendarApplication : Application() {
             androidContext(this@ProtonCalendarApplication)
             modules(
                 commonModule, viewModelModule, repositoryModule, networkModule, useCaseModule,
-                coreModule(apiProvider, accountManager, authOrchestrator, userManager, keyStoreCrypto)
+                coreModule(apiProvider, accountManager, authOrchestrator, userManager, keyStoreCrypto, sendEmailDirectUseCase)
             )
         }
 

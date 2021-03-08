@@ -129,6 +129,7 @@ dependencies {
     implementation "me.proton.core:presentation:${rootProject.ext.version.proton_core_presentation}"
     implementation "me.proton.core:network:${rootProject.ext.version.proton_core_networking}"
     implementation "me.proton.core:util-kotlin:${rootProject.ext.version.proton_core_util_kotlin}"
+    implementation "me.proton.core:mail-message:${rootProject.ext.version.proton_core_mail_message}"
 
     implementation "androidx.activity:activity-ktx:1.3.0-alpha03"
 
