@@ -1,10 +1,8 @@
 package me.proton.android.calendar.common
 
-import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.work.*
-import kotlinx.coroutines.delay
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
@@ -31,11 +29,7 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
 
         setForeground(createForegroundInfo())
 
-        logger.e("doWork after start foreground")
-
         syncServerEvents()
-
-        logger.e("end of doWork")
 
         return Result.success()
     }

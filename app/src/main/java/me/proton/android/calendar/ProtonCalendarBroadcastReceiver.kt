@@ -4,15 +4,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.common.SyncWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.lang.Exception
 
 class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
 
@@ -27,45 +28,41 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        // TODO for all users
-        var userId: UserId?
-        runBlocking(Dispatchers.Default) {
-            userId = accountManager.getPrimaryUserId().firstOrNull()
-        }
-
-        if (userId == null) {
-            logger.e("userId null in ProtonCalendarBroadcastReceiver")
-            return
-        }
-
         logger.v("intent in ProtonCalendarBroadcastReceiver: ${intent}")
 
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED -> {
-
                 if (context == null) {
                     logger.e("null Context in ProtonCalendarBroadcastReceiver")
                 } else {
                     SyncWorker.setup(context, logger)
                 }
 
-                runBlocking(Dispatchers.Default) {
-                    handleAlarmsUseCase.execute(userId!!)
+                try {
+                    GlobalScope.launch(Dispatchers.IO){
+                        handleAlarmsUseCase.execute(accountManager.getPrimaryUserId().firstOrNull()!!)
+                    }
+                } catch (e: Exception) {
+                    logger.e("ProtonCalendarBroadcastReceiver, boot completed handle alarms error", e)
                 }
             }
             INTENT_ACTION_EVENT_ALARM -> {
-                runBlocking(Dispatchers.Default) {
-                    handleAlarmsUseCase.execute(
-                        userId!!,
-                        if (intent.hasExtra(INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS)) intent.getLongExtra(
-                            INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS,
-                            0
-                        ) else null
-                    )
+                try {
+                    GlobalScope.launch(Dispatchers.IO){
+                        handleAlarmsUseCase.execute(
+                            accountManager.getPrimaryUserId().firstOrNull()!!,
+                            if (intent.hasExtra(INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS)) intent.getLongExtra(
+                                INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS,
+                                0
+                            ) else null
+                        )
+                    }
+                } catch (e: Exception) {
+                    logger.e("ProtonCalendarBroadcastReceiver, handle alarm intent error", e)
                 }
             }
             else -> {
-                logger.i("unknown intent action")
+                logger.e("ProtonCalendarBroadcastReceiver unknown intent action: ${intent.action}")
             }
         }
     }
