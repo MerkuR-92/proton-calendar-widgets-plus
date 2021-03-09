@@ -42,7 +42,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <service android:name=".domain.SyncService" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.AuthHelpActivity"
             android:screenOrientation="portrait"
