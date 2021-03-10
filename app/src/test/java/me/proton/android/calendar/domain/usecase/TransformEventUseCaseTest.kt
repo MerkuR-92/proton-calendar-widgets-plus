@@ -53,6 +53,7 @@ internal class TransformEventUseCaseTest {
             val eventEntity = EventEntity(
                 "id",
                 "calendarId",
+                "sharedEventId",
                 null,
                 0,
                 0,

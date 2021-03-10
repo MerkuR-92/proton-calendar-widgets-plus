@@ -201,6 +201,7 @@ internal class SyncServerEventsUseCaseTest {
                 EventApiResponse(EventEntity(
                     "event id 1",
                     calendarId,
+                    "sharedEventId",
                     "calendarKeyPacket",
                     0L,
                     0L,
@@ -217,6 +218,7 @@ internal class SyncServerEventsUseCaseTest {
                 EventApiResponse(EventEntity(
                     "event id 2",
                     calendarId,
+                    "sharedEventId",
                     "calendarKeyPacket",
                     0L,
                     0L,

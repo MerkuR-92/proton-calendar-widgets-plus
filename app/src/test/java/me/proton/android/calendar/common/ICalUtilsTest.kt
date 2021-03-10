@@ -2,10 +2,10 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.*
+import biweekly.ICalVersion
 import biweekly.component.ICalComponent
-import biweekly.property.Attendee
-import biweekly.property.ICalProperty
-import biweekly.property.RecurrenceRule
+import biweekly.parameter.ParticipationStatus
+import biweekly.property.*
 import biweekly.util.*
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
@@ -13,10 +13,12 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.createNewEvent
 import me.proton.android.calendar.common.ICalUtils.eventStartZonedDateTimeToDate
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.common.ICalUtils.generateProtonUid
 import me.proton.android.calendar.common.ICalUtils.generateXPmToken
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import org.junit.jupiter.api.Disabled
@@ -1171,10 +1173,10 @@ internal class ICalUtilsTest {
         val events = iCals.mapIndexed { index, iCal ->
             Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
-            "calendar",
-            "",
-            1,
-            true
+                "calendar",
+                "",
+                1,
+                true
             ), ICalUtils.parseICalString(iCal)!!, null)
         }
 
@@ -1306,10 +1308,10 @@ internal class ICalUtilsTest {
         val events = iCals.mapIndexed { index, iCal ->
             Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
-            "calendar",
-            "",
-            1,
-            true
+                "calendar",
+                "",
+                1,
+                true
             ), ICalUtils.parseICalString(iCal)!!, null)
         }
 
@@ -2662,10 +2664,10 @@ internal class ICalUtilsTest {
         val events = iCals.mapIndexed { index, iCal ->
             Event("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
-            "calendar",
-            "",
-            1,
-            true
+                "calendar",
+                "",
+                1,
+                true
             ), ICalUtils.parseICalString(iCal)!!, null)
         }
 
@@ -2944,17 +2946,109 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `generate X-Pm-Token`() {
+    fun `getResponseIcs test`() {
 
-        assertThat(generateXPmToken("james@pm.me", "uid@proton.me")).isEqualTo("584945fd1f202647248d1aac43c2aaebf7bf0f94")
-        assertThat(generateXPmToken("jamesbond@pm.me", "uid@proton.me")).isEqualTo("591af07df4d58e4e640ed4293a50ca903f595f08")
-        assertThat(generateXPmToken("james@gmail.com", "uid@proton.me")).isEqualTo("711905af5ec3b29c67ffb84da544a4e80f25c52f")
-        assertThat(generateXPmToken("jamesbond@gmail.com", "uid@proton.me")).isEqualTo("af9000a902eb9fcc40d4793b6b26b38d9f5615ae")
-        assertThat(generateXPmToken("james@outlook.com", "uid@proton.me")).isEqualTo("b7e62dd16b37de316176b6ba23cb210e89d1676e")
-        assertThat(generateXPmToken("james.bond@outlook.com", "uid@proton.me")).isEqualTo("7196c985e9fce3bfe4de1c22ec16e2ec118c56dc")
-        assertThat(generateXPmToken("james@random.com", "uid@proton.me")).isEqualTo("601518c01345d39a9457d861862f0c72f7661977")
-        assertThat(generateXPmToken("james.bond@random.com", "uid@proton.me")).isEqualTo("2f883b6cd35132c0c24a428c54bad5c87ede7ddd")
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20210105T120000
+    DTEND;TZID=Europe/Zurich:20210105T123000
+    ORGANIZER;CN=adamtst@protonmail.com:mailto:adamtst@protonmail.com
+    SEQUENCE:0
+    SUMMARY:Inviting BLT from adamtst
+    STATUS:CONFIRMED
+    DTSTAMP:20210105T101420Z
+    UID:GOmbzP5Ok3Uo7QYgYyb7LCCijGzS@proton.me
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:james@example.com
+    ATTENDEE;CN=james@pm.me;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james2@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=James;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;EMAIL=AmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=IAmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
 
+        val eventIcal = ICalUtils.parseICalString(iCalString)!!
+
+        val ics = getResponseIcs(eventIcal, eventIcal.events.first().attendees.first(), ParticipationStatus.ACCEPTED, null)
+
+        val responseICalendar = ICalUtils.parseICalString(ics)!!
+
+        assertThat(responseICalendar.productId.value).isEqualTo(generateProtonProdId())
+        assertThat(responseICalendar.version).isEqualTo(ICalVersion.V2_0)
+        assertThat(responseICalendar.method.value).isEqualTo(Method.REPLY)
+        assertThat(responseICalendar.calendarScale.value).isEqualTo(CalendarScale.GREGORIAN)
+        assertThat(responseICalendar.events.first().alarms.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.events.first().attendees.size).isEqualTo(1)
+        assertThat(responseICalendar.events.first().attendees.first().email).isEqualTo("james@example.com")
+        assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.ACCEPTED)
+        assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
+    }
+
+    @Test
+    fun `getInviteIcs test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20210105T120000
+    DTEND;TZID=Europe/Zurich:20210105T123000
+    ORGANIZER;CN=adamtst@protonmail.com:mailto:adamtst@protonmail.com
+    SEQUENCE:0
+    SUMMARY:Inviting BLT from adamtst
+    STATUS:CONFIRMED
+    DTSTAMP:20210105T101420Z
+    UID:GOmbzP5Ok3Uo7QYgYyb7LCCijGzS@proton.me
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:james@example.com
+    ATTENDEE;CN=james@pm.me;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james2@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=James;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;EMAIL=AmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=IAmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val eventIcal = ICalUtils.parseICalString(iCalString)!!
+
+        val ics = getInviteIcs(
+            Event("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true), eventIcal),
+            "sharedEventId",
+            "sharedSessionKey"
+        )
+
+        val responseICalendar = ICalUtils.parseICalString(ics)!!
+
+        assertThat(responseICalendar.productId.value).isEqualTo(generateProtonProdId())
+        assertThat(responseICalendar.version).isEqualTo(ICalVersion.V2_0)
+        assertThat(responseICalendar.method.value).isEqualTo(Method.REQUEST)
+        assertThat(responseICalendar.calendarScale.value).isEqualTo(CalendarScale.GREGORIAN)
+        assertThat(responseICalendar.events.first().alarms.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.events.first().attendees.size).isEqualTo(10)
+        assertThat(responseICalendar.events.first().attendees.first().email).isEqualTo("james@example.com")
+        assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
+        assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.getExperimentalProperty("X-PM-SESSION-KEY").value).isEqualTo("sharedSessionKey")
+        assertThat(responseICalendar.getExperimentalProperty("X-PM-SHARED-EVENT-ID").value).isEqualTo("sharedEventId")
     }
 
 }

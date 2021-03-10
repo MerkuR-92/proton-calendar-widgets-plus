@@ -25,6 +25,8 @@ data class EventEntity(
     val id: String,
     @SerialName("CalendarID")
     val calendarId: String,
+    @SerialName("SharedEventID")
+    val sharedEventId: String?,
     @SerialName("CalendarKeyPacket")
     val calendarKeyPacket: String?, // keypackets used to decrypt Type 3 CalendarEventData, to be armored with Data packets, base64
     @SerialName("CreateTime")

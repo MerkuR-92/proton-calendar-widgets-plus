@@ -1,11 +1,14 @@
 package me.proton.android.calendar.common
 
 import biweekly.Biweekly
+import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
+import biweekly.io.TimezoneInfo
+import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.parameter.Role
 import biweekly.util.Frequency
@@ -14,6 +17,9 @@ import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Hex
 import com.google.crypto.tink.subtle.Random
 import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
+import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
@@ -816,4 +822,74 @@ fun formatUidForICal(eventUid: String): String {
         eventUidValueLines.add(uid)
         return eventUidValueLines.joinToString(ICAL_LINE_SEPARATOR)
     } else eventUid
+}
+
+fun getResponseIcs(
+    responseICalendar: ICalendar,
+    userAttendee: Attendee,
+    participationStatus: ParticipationStatus,
+    originalTimeZoneInfo: TimezoneInfo?
+): String {
+
+    if (responseICalendar.productId == null) responseICalendar.setProductId(generateProtonProdId())
+    if (responseICalendar.version == null) responseICalendar.version = ICalVersion.V2_0
+
+    // METHOD:REPLY as we answer the REQUEST of the organizer
+    responseICalendar.setMethod(Method.REPLY)
+
+    if (responseICalendar.calendarScale == null) responseICalendar.calendarScale = CalendarScale.gregorian()
+
+    // Update user PARTSTAT and remove useless X_PM_TOKEN property
+    userAttendee.participationStatus = participationStatus
+    userAttendee.removeParameter(CustomICalPropertyParameter.X_PM_TOKEN)
+    userAttendee.participationLevel = null
+    userAttendee.rsvp = null
+
+    // The other attendees (not linked with the current users) have to be removed
+    responseICalendar.events.first().attendees.clear()
+    responseICalendar.events.first().addAttendee(userAttendee)
+
+    // Alarms should be dropped
+    responseICalendar.events.first().alarms.clear()
+
+    // The EXDATE must be filtered out
+    responseICalendar.events.first().exceptionDates.clear()
+
+    // Last-Modified should be dropped
+    responseICalendar.lastModified = null
+
+    // We set default timezone in EventVM, reset timezoneInfo to original values
+    originalTimeZoneInfo?.let { responseICalendar.timezoneInfo = it }
+
+    return responseICalendar.printToString()
+}
+
+fun getInviteIcs(
+    newEvent: Event,
+    sharedEventId: String,
+    sharedSessionKey: String,
+): String {
+
+    val inviteICalendar = newEvent.iCalendar.clone()
+
+    if (inviteICalendar.productId == null) inviteICalendar.setProductId(generateProtonProdId())
+    if (inviteICalendar.version == null) inviteICalendar.version = ICalVersion.V2_0
+
+    // METHOD:REPLY as we answer the REQUEST of the organizer
+    inviteICalendar.setMethod(Method.REQUEST)
+
+    if (inviteICalendar.calendarScale == null) inviteICalendar.calendarScale = CalendarScale.gregorian()
+
+    // Add base64 encoded session key
+    inviteICalendar.setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
+    // Add shared event ID
+    inviteICalendar.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+
+    // Alarms should be dropped
+    inviteICalendar.events.first().alarms.clear()
+
+    // The EXDATE must be filtered out
+    inviteICalendar.events.first().exceptionDates.clear()
+
+    return inviteICalendar.printToString()
 }

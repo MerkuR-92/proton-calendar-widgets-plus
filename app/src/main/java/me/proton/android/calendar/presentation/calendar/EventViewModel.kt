@@ -10,6 +10,7 @@ import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.component.VTimezone
+import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Related
 import biweekly.parameter.Role
@@ -34,10 +35,12 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -73,6 +76,7 @@ class EventViewModel(
 
     private var eventEdited = false
     private var editMode = false
+    private var isCreate = false
 
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -134,6 +138,8 @@ class EventViewModel(
         this.editMode = editMode
 
         this.userId = userId
+
+        this.isCreate = eventId == null
 
         var defaultCalendar: CalendarEntity? = null
         if (editMode) {
@@ -468,7 +474,11 @@ class EventViewModel(
 
 
 
-    suspend fun handleSave(editOption: EventEditDeleteOption? = null, occurrenceNumber: Int): Boolean { // create or edit
+    suspend fun handleSave(
+        editOption: EventEditDeleteOption? = null,
+        occurrenceNumber: Int,
+        subject: String? = null,
+        body: String? = null): Boolean { // create or edit
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
         logger.d("handleSave with editOption: $editOption")
@@ -847,7 +857,7 @@ class EventViewModel(
         // TODO run work manager
         logger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
-            createEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
+            createEventUseCase.execute(userId, newEvent.calendar.id, newEvent.copy(iCalendar = event.iCalendar.clone()))
         }.await()
 
         if (createEventResult is UseCase.Result.InvalidParams) {
@@ -859,15 +869,17 @@ class EventViewModel(
 
 
         // TODO send email to attendees with the newly created event
-        // newEvent
+        if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && createEventResult is UseCase.Result.Success<*>) {
+            createEventResult.returnValue.tryCast<List<String>> {
+                if (this.isNullOrEmpty()) return@tryCast
 
-
-
-
-
+                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!)
+                // If send email fails the event without attendees remains in the calendar
+                sendEmailResult.ifSuccessAndLogErrors(logger) { }
+            }
+        }
 
         return createEventResult is UseCase.Result.Success<*>
-
     }
 
     private fun handleSequence(dbEventWithOccurrence: Event? = null) {
@@ -1339,7 +1351,8 @@ class EventViewModel(
         markEventAsEdited()
         if (addAttendee) {
             attendee.rsvp = true
-            attendee.role = Role.ATTENDEE
+            attendee.participationLevel = ParticipationLevel.REQUIRED
+            attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
             val token = ICalUtils.generateXPmToken(canonicalEmail, event.uid)
             attendee.addParameter(X_PM_TOKEN, token)
             event.iCalEvent.addAttendee(
@@ -1402,10 +1415,11 @@ class EventViewModel(
 
         val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
             userId,
-            userAttendee.email,
-            userAttendee.commonName,
+            event.iCalendar.clone(),
+            dbEvent?.iCalendar?.timezoneInfo,
+            userAttendee.copy(),
             event.iCalEvent.organizer.email,
-            getResponseIcs(userAttendee.copy(), participationStatus),
+            participationStatus,
             subject,
             body
         )
@@ -1443,43 +1457,6 @@ class EventViewModel(
             _event.postValue(event)
         }
         return true
-    }
-
-    private fun getResponseIcs(
-        userAttendee: Attendee,
-        participationStatus: ParticipationStatus
-    ): String {
-        val responseICalendar = event.iCalendar.clone()
-
-        if (responseICalendar.productId == null) responseICalendar.setProductId(generateProtonProdId())
-        if (responseICalendar.version == null) responseICalendar.version = ICalVersion.V2_0
-
-        // METHOD:REPLY as we answer the REQUEST of the organizer
-        responseICalendar.setMethod(Method.REPLY)
-
-        if (responseICalendar.calendarScale == null) responseICalendar.calendarScale = CalendarScale.gregorian()
-
-        // Update user PARTSTAT and remove useless X_PM_TOKEN property
-        userAttendee.participationStatus = participationStatus
-        userAttendee.removeParameter(X_PM_TOKEN)
-
-        // The other attendees (not linked with the current users) have to be removed
-        responseICalendar.events.first().attendees.clear()
-        responseICalendar.events.first().addAttendee(userAttendee)
-
-        // Alarms should be dropped
-        responseICalendar.events.first().alarms.clear()
-
-        // The EXDATE must be filtered out
-        responseICalendar.events.first().exceptionDates.clear()
-
-        // Last-Modified should be dropped
-        responseICalendar.lastModified = null
-
-        // We set default timezone in EventVM, reset timezoneInfo to original values
-        responseICalendar.timezoneInfo = dbEvent?.iCalendar?.timezoneInfo
-
-        return responseICalendar.printToString()
     }
 
     private fun clearSingleEditsParticipationStatus(

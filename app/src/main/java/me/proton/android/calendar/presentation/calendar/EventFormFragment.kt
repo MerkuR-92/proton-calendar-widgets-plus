@@ -198,108 +198,135 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun onSaveClick() {
         if (eventViewModel.validateDateTime()) {
-            lifecycleScope.launch {
-                persistFormData()
+            persistFormData()
 
-                // Allow saving with no edition if creating an event
-                if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
-
-                    val dbEvent = eventViewModel.dbEvent
-                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
-                            (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
-                            !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
-
-                    val singleEditsInfo = eventViewModel.getSingleEditsInfo()
-
-                    if (shouldShowConfirmationPicker) {
-                        val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
-                                (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(dbEvent,
-                                    eventViewModel.displayTimeZoneId) == false)
-                        AndroidUtils.displaySingleChoiceConfirmationPicker(
-                            requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
-                                getString(R.string.event_recurring_edit_this),
-                                if (showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
-                                else null,
-                                getString(R.string.event_recurring_edit_all_events)
-                            ).toTypedArray(), 0
-                        ) {
-                            val eventEditDeleteOption =
-                                if (it == 0) {
-                                    EventEditDeleteOption.THIS_EVENT
-                                } else if (it == 1) {
-                                    if (showThisAndFuture) {
-                                        EventEditDeleteOption.THIS_EVENT_AND_FUTURE
-                                    } else {
-                                        EventEditDeleteOption.ALL_EVENTS
-                                    }
-                                } else { // it == 2
-                                    EventEditDeleteOption.ALL_EVENTS
-                                }
-
-                            // Display warning dialog for this event option if recurrence rule has been edited
-                            if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.recurrenceManuallyEdited && eventViewModel.hasRecurrenceRuleBeenEdited()) {
-                                displayUpdateRecurringEventDialog(R.string.event_recurring_update_this_description) { _, _ ->
-                                    handleSaveWithOption(eventEditDeleteOption)
-                                }
-                            }
-                            // Display warning dialog for all events option if has ex dates or single edits
-                            else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates() || (singleEditsInfo?.hasSingleEdit == true))) {
-                                displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
-                                    handleSaveWithOption(eventEditDeleteOption)
-                                }
-                            }
-                            // Display warning dialog for all events option if has ex dates or single edits
-                            else if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT_AND_FUTURE && (eventViewModel.hasExDates(true) || (singleEditsInfo?.hasFutureSingleEdit == true))) {
-                                displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
-                                    handleSaveWithOption(eventEditDeleteOption)
-                                }
-                            }
-                            else {
-                                handleSaveWithOption(eventEditDeleteOption)
-                            }
-                        }
-
-                    } else { // TODO merge this with code above
-                        val success = withContext(Dispatchers.IO) {
-                            eventViewModel.handleSave(
-                                editOption =
-                                if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true)
-                                    EventEditDeleteOption.ALL_EVENTS
-                                else
-                                    null,
-                                occurrenceNumber = 1)
-                        }
-                        withContext(Dispatchers.Default) {
-                            val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
-                            handleAlarmsUseCase.execute(userId)
-                        }
-                        // Post saving event value to false to stop loading state
-                        eventViewModel.savingEvent.postValue(false)
-
-                        if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
-                            if (success) {
-                                onSuccessEventUpdateCalendarDisplay()
-                                requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
-                                setMonthViewSelectedDay()
-                                jumpToMonthView()
-                            } else {
-                                view?.displaySnackBar(getString(R.string.snack_event_updated_error))
-                            }
-                        } else {
-                            if (success) {
-                                onSuccessEventUpdateCalendarDisplay()
-                                requireActivity().displaySnackBar(getString(R.string.snack_event_created))
-                                setMonthViewSelectedDay()
-                                jumpToMonthView()
-                            } else {
-                                view?.displaySnackBar(getString(R.string.snack_event_created_error))
-                            }
-                        }
+            if (navigationArguments.eventId.isNullOrEmpty() && !eventViewModel.eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty()) {
+                // Show send invitation dialog
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.event_send_invite_dialog_title)
+                    .setMessage(R.string.event_send_invite_dialog_description)
+                    .setPositiveButton(R.string.event_send_invite_dialog_confirm) { _, _ ->
+                        saveEvent()
                     }
-                } else findNavController().navigateUp()
-            }
+                    .setNegativeButton(R.string.event_send_invite_dialog_cancel) { _, _ -> }
+                    .show()
+            } else saveEvent()
+
         } else {
             AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.event_alert_invalid_start_end_date))
+        }
+    }
+
+    private fun saveEvent() {
+        lifecycleScope.launch {
+
+            // Allow saving with no edition if creating an event
+            if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
+
+                val dbEvent = eventViewModel.dbEvent
+                val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
+                        (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
+                        !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
+
+                val singleEditsInfo = eventViewModel.getSingleEditsInfo()
+
+
+                val event = eventViewModel.eventLiveData.value
+                var subject: String? = null
+                var body: String? = null
+                if (event != null && !event.iCalEvent.attendees.isNullOrEmpty() && navigationArguments.eventId.isNullOrEmpty()) {
+                    subject = getInviteMailSubject(event)
+                    body = getInviteMailBody(event)
+                }
+
+                if (shouldShowConfirmationPicker) {
+                    val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
+                            (dbEvent != null && eventViewModel.eventLiveData.value?.isEventFirstOccurrence(dbEvent,
+                                eventViewModel.displayTimeZoneId) == false)
+                    AndroidUtils.displaySingleChoiceConfirmationPicker(
+                        requireContext(), getString(R.string.event_text_edit_event), listOfNotNull(
+                            getString(R.string.event_recurring_edit_this),
+                            if (showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
+                            else null,
+                            getString(R.string.event_recurring_edit_all_events)
+                        ).toTypedArray(), 0
+                    ) {
+                        val eventEditDeleteOption =
+                            if (it == 0) {
+                                EventEditDeleteOption.THIS_EVENT
+                            } else if (it == 1) {
+                                if (showThisAndFuture) {
+                                    EventEditDeleteOption.THIS_EVENT_AND_FUTURE
+                                } else {
+                                    EventEditDeleteOption.ALL_EVENTS
+                                }
+                            } else { // it == 2
+                                EventEditDeleteOption.ALL_EVENTS
+                            }
+
+                        // Display warning dialog for this event option if recurrence rule has been edited
+                        if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.recurrenceManuallyEdited && eventViewModel.hasRecurrenceRuleBeenEdited()) {
+                            displayUpdateRecurringEventDialog(R.string.event_recurring_update_this_description) { _, _ ->
+                                handleSaveWithOption(eventEditDeleteOption, subject, body)
+                            }
+                        }
+                        // Display warning dialog for all events option if has ex dates or single edits
+                        else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates() || (singleEditsInfo?.hasSingleEdit == true))) {
+                            displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
+                                handleSaveWithOption(eventEditDeleteOption, subject, body)
+                            }
+                        }
+                        // Display warning dialog for all events option if has ex dates or single edits
+                        else if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT_AND_FUTURE && (eventViewModel.hasExDates(true) || (singleEditsInfo?.hasFutureSingleEdit == true))) {
+                            displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
+                                handleSaveWithOption(eventEditDeleteOption, subject, body)
+                            }
+                        }
+                        else {
+                            handleSaveWithOption(eventEditDeleteOption, subject, body)
+                        }
+                    }
+
+                } else { // TODO merge this with code above
+                    val success = withContext(Dispatchers.IO) {
+                        eventViewModel.handleSave(
+                            editOption =
+                            if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true)
+                                EventEditDeleteOption.ALL_EVENTS
+                            else
+                                null,
+                            occurrenceNumber = 1,
+                            subject,
+                            body)
+                    }
+                    withContext(Dispatchers.Default) {
+                        val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
+                        handleAlarmsUseCase.execute(userId)
+                    }
+                    // Post saving event value to false to stop loading state
+                    eventViewModel.savingEvent.postValue(false)
+
+                    if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
+                        if (success) {
+                            onSuccessEventUpdateCalendarDisplay()
+                            requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
+                            setMonthViewSelectedDay()
+                            jumpToMonthView()
+                        } else {
+                            view?.displaySnackBar(getString(R.string.snack_event_updated_error))
+                        }
+                    } else {
+                        if (success) {
+                            onSuccessEventUpdateCalendarDisplay()
+                            requireActivity().displaySnackBar(getString(R.string.snack_event_created))
+                            setMonthViewSelectedDay()
+                            jumpToMonthView()
+                        } else {
+                            view?.displaySnackBar(getString(R.string.snack_event_created_error))
+                        }
+                    }
+                }
+            } else findNavController().navigateUp()
         }
     }
 
@@ -314,6 +341,58 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    private fun getInviteMailSubject(event: Event): String {
+        // TODO Move to UseCase once we can use strings resources there
+        val timezone = event.defaultTimeZone!!
+
+        return if (!event.isAllDay()) {
+            val dateTimeStart =
+                event.formatStart(timezone, calendarViewModel.timeFormatIs24Hour(requireContext()))
+            getString(
+                R.string.event_send_invite_mail_subject_part_day,
+                dateTimeStart.first,
+                dateTimeStart.second
+            )
+        } else if (!event.spansSingleDay(timeZoneId = timezone)) {
+            getString(
+                R.string.event_send_invite_mail_subject_all_day_multiple,
+                event.formatStart(
+                    timezone,
+                    calendarViewModel.timeFormatIs24Hour(requireContext())
+                ).first
+            )
+        } else {
+            getString(
+                R.string.event_send_invite_mail_subject_all_day,
+                event.formatStart(
+                    timezone,
+                    calendarViewModel.timeFormatIs24Hour(requireContext())
+                ).first
+            )
+        }
+    }
+
+    private fun getInviteMailBody(event: Event): String {
+        // TODO Move to UseCase once we can use strings resources there
+        val timezone = event.defaultTimeZone!!
+        val formattedDate = event.formatStart(timezone, calendarViewModel.timeFormatIs24Hour(requireContext()))
+        var body = getString(
+            R.string.event_send_invite_mail_body,
+            event.summary ?: getString(R.string.default_event_summary),
+            if (formattedDate.second != null) formattedDate.first + ", " + formattedDate.second
+            else formattedDate.first
+        )
+        if (event.location != null) body += getString(
+            R.string.event_send_invite_mail_body_where,
+            event.location
+        )
+        if (event.description != null) body += getString(
+            R.string.event_send_invite_mail_body_description,
+            event.description
+        )
+        return body
+    }
+
     private fun displayUpdateRecurringEventDialog(message: Int, callback: DialogInterface.OnClickListener) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.event_recurring_update_this_title)
@@ -323,12 +402,17 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             .show()
     }
 
-    private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption) {
+    private fun handleSaveWithOption(
+        eventEditDeleteOption: EventEditDeleteOption,
+        subject: String? = null,
+        body: String? = null) {
         lifecycleScope.launch {
             val success = withContext(Dispatchers.IO) {
                 eventViewModel.handleSave(
                     eventEditDeleteOption,
-                    navigationArguments.occurrenceNumber
+                    navigationArguments.occurrenceNumber,
+                    subject,
+                    body
                 )
             }
             withContext(Dispatchers.Default) {

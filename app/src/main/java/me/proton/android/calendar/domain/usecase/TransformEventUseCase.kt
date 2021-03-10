@@ -179,7 +179,8 @@ class TransformEventUseCase(
                 }
                 else -> null
             },
-            currentUserAttendeeId = currentUserAttendeeId
+            currentUserAttendeeId = currentUserAttendeeId,
+            sharedEventId = eventEntity.sharedEventId
         )
 
     }

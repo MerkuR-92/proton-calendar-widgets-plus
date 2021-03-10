@@ -233,8 +233,8 @@ class EditCreateEventUseCase(
                             calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                             calendarEventContent = calendarEventContent,
                             personalEventContent = personalEventContent,
-                            attendeesEventContent = attendeesEventContent,
-                            attendees = attendees.takeIfNotEmpty()
+                            attendeesEventContent = null, // We first create without attendees
+                            attendees = null // We first create without attendees
                         )
                     )
                 )

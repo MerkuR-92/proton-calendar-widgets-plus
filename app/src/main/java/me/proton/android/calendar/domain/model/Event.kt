@@ -32,7 +32,8 @@ data class Event(
     val iCalendar: ICalendar,
     val verificationStatus: SignatureVerification? = null,
     val decryptionStatus: DecryptionStatus? = null,
-    val currentUserAttendeeId: String? = null
+    val currentUserAttendeeId: String? = null,
+    val sharedEventId: String? = null
 ) : BaseModel() {
 
     var occurrence: Occurrence? = null

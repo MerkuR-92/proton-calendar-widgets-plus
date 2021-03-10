@@ -10,12 +10,13 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_ADDRESSES
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_USERS
 import me.proton.android.calendar.data.entity.*
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
-    version = 25
+    version = 26
 )
 @TypeConverters(DatabaseTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -67,7 +68,8 @@ abstract class AppDatabase : RoomDatabase() {
                 //  in runtime than crash on startup and have no crash logs
                 .fallbackToDestructiveMigration()
                 .addMigrations(
-                    MIGRATION_24_25
+                    MIGRATION_24_25,
+                    MIGRATION_25_26
                 ).build()
     }
 }
@@ -86,6 +88,13 @@ val MIGRATION_24_25 = object : Migration(24, 25) {
     override fun migrate(database: SupportSQLiteDatabase) {
 
         database.execSQL("ALTER TABLE $TABLE_ADDRESSES ADD COLUMN displayName TEXT")
+    }
+}
+
+val MIGRATION_25_26 = object : Migration(25, 26) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+
+        database.execSQL("ALTER TABLE $TABLE_EVENTS ADD COLUMN sharedEventId TEXT")
     }
 }
 

@@ -36,7 +36,7 @@ const val DEFAULT_CALENDAR_COLOR = "#657EE4"
 
 const val INVITE_ICS_FILE_NAME = "invite.ics"
 const val INVITE_ICS_MIME_TYPE = "text/calendar"
-const val EMAIL_MIME_TYPE = "text/plain"
+const val INVITE_EMAIL_MIME_TYPE = "text/plain"
 
 const val ICAL_LINE_MAXIMUM_LENGTH = 75
 const val ICAL_LINE_SEPARATOR = "\\r\\n "
@@ -123,6 +123,8 @@ object FragmentArguments {
 
 object CustomICalPropertyParameter {
     const val X_PM_TOKEN = "X-PM-TOKEN"
+    const val X_PM_SESSION_KEY = "X-PM-SESSION-KEY"
+    const val X_PM_SHARED_EVENT_ID = "X-PM-SHARED-EVENT-ID"
 }
 
 object MessageDigestHashType {

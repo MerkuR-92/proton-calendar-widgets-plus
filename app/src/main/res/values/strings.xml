@@ -167,6 +167,18 @@
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
 
+    <string name="event_send_invite_mail_subject_all_day">Invitation for an event on %s</string>
+    <string name="event_send_invite_mail_subject_all_day_multiple">Invitation for an event starting on %s</string>
+    <string name="event_send_invite_mail_subject_part_day">Invitation for an event starting on %s, %s</string>
+    <string name="event_send_invite_mail_body">You are invited to %s\nWhen: %s</string>
+    <string name="event_send_invite_mail_body_where">\nWhere: %s</string>
+    <string name="event_send_invite_mail_body_description">\nEvent description: %s</string>
+
+    <string name="event_send_invite_dialog_title">Send invitation</string>
+    <string name="event_send_invite_dialog_description">An invitation will be sent to added participants.</string>
+    <string name="event_send_invite_dialog_confirm">Send</string>
+    <string name="event_send_invite_dialog_cancel">Cancel</string>
+
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendars</string>
     <string name="nav_view_disabled_calendars">Disabled calendars</string>
