@@ -71,6 +71,12 @@ class UpdateParticipationStatusUseCase(
             when (val updateParticipationStatusResponse =
                 calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, 0) // 0 == NEEDS_ACTION
             ) {
+                is ApiResponse.Success -> {
+                    // Clear alarms
+                    // TODO Ignore update alarms errors or display snack ?
+                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, event.id, "")
+                    updatePersonalPartUseCaseUseCaseResult.ifSuccessAndLogErrors(logger) { }
+                }
                 is ApiResponse.Error -> {
                     singleEditsClearedSuccessfully = false
                     logger.e("api error updating single edit participation status: ${updateParticipationStatusResponse.error}")
