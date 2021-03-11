@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:gravity="center_horizontal"
     android:background="@color/woodsmoke">
 
     <TextView
@@ -11,7 +12,6 @@
         android:layout_height="wrap_content"
         android:text="@string/event_answer_attending"
         style="@style/Text.DefaultSmall.Weak.Dark"
-        android:layout_marginStart="@dimen/default_margin_text_start"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="14dp"/>
 
