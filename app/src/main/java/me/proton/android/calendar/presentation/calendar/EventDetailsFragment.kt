@@ -476,6 +476,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     attendeeId,
                     participationStatus,
                     userAttendee,
+                    userEmails,
                     subject,
                     body
                 )) {

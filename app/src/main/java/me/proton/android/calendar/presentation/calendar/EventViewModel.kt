@@ -1384,6 +1384,7 @@ class EventViewModel(
         attendeeId: String,
         participationStatus: ParticipationStatus,
         userAttendee: Attendee,
+        userEmails: List<String>,
         subject: String,
         body: String
     ) : Boolean {
