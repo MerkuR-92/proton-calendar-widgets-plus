@@ -147,7 +147,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
 
-        calendarViewModel.eventsLiveData(immutableDate, immutableDate).observe(viewLifecycleOwner) {
+        calendarViewModel.eventsLiveData(immutableDate, immutableDate, timeZoneId).observe(viewLifecycleOwner) {
             logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it?.size}")
 
             if (it == null) {

@@ -97,7 +97,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 calendarViewModel.handleDaySelected(it)
             }
 
-            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise()
+            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise(timeZoneId)
         }
 
         // setup week numbers

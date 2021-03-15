@@ -251,15 +251,10 @@ class CalendarViewModel(
 
     }
 
-    private fun calculateCalendarIndicators(events: List<Event>): Map<LocalDate, List<String>> {
+    private fun calculateCalendarIndicators(events: List<Event>, timeZoneId: String): Map<LocalDate, List<String>> {
 
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
-        val timeZoneId = timeZoneId.value?.id
-        if (timeZoneId == null) {
-            logger.e("timeZoneId was null in CalendarViewModel calculateCalendarIndicators")
-            return HashMap()
-        }
         events.forEach { event ->
             var start = event.getActualStart(timeZoneId)!!.toLocalDate()
             val end = event.getActualEnd(timeZoneId)!!.toLocalDate()
@@ -279,21 +274,16 @@ class CalendarViewModel(
         return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
     }
 
-    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate): LiveData<List<Event>?> {
+    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<List<Event>?> {
         return liveData<List<Event>?> {
-            val timeZoneId = timeZoneId.value?.id
-            if (timeZoneId == null) {
-                logger.e("timeZoneId was null in CalendarViewModel calculateCalendarIndicators")
-                return@liveData
-            }
             emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId).asLiveData(Dispatchers.Default))
         }
     }
 
-    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate): LiveData<Map<LocalDate, List<String>>> {
-        return eventsLiveData(fromDate, toDate).map {
+    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
+        return eventsLiveData(fromDate, toDate, timeZoneId).map {
             it?.let {
-                calculateCalendarIndicators(it)
+                calculateCalendarIndicators(it, timeZoneId)
             } ?: emptyMap()
         }
     }
@@ -321,7 +311,7 @@ class CalendarViewModel(
         // TODO ÜBER IMPORTANT -- FIXME, PUT INTO WORKER!!!!!!!
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            logger.e("User ID was null in CalendarViewModel handleDeleteEvent")
             return UseCase.Result.Error("User ID was null in CalendarViewModel handleDeleteEvent")
         }
 
@@ -341,7 +331,7 @@ class CalendarViewModel(
     suspend fun updateCalendar(calendarEntity: CalendarEntity) {
         val userId = userId.value?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            logger.e("User ID was null in CalendarViewModel updateCalendar")
             return
         }
         withContext(Dispatchers.IO) {

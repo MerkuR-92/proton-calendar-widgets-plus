@@ -139,19 +139,19 @@ class EventViewModel(
         var defaultCalendar: CalendarEntity? = null
         if (editMode) {
             var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
-                ?: return Result.Error("could not get default calendar ID")
+                ?: return Result.Error("EventViewModel: could not get default calendar ID")
             defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
             if (defaultCalendar == null || !defaultCalendar.isActive) {
                 defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull()
-                    ?: return Result.Error("no active calendars for user")
+                    ?: return Result.Error("EventViewModel: no active calendars for user")
                 defaultCalendarId = defaultCalendar.id
             }
 
-            if (!loadSettingsForCalendar(defaultCalendarId)) return Result.Error("could not get CalendarSettings")
+            if (!loadSettingsForCalendar(defaultCalendarId)) return Result.Error("EventViewModel: could not get CalendarSettings")
         }
 
-        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return Result.Error("could not get Calendar User Settings")
-        userSettings = usersRepository.selectUserSettings(userId.id) ?: return Result.Error("could not get User Settings")
+        calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id) ?: return Result.Error("EventViewModel: could not get Calendar User Settings")
+        userSettings = usersRepository.selectUserSettings(userId.id) ?: return Result.Error("EventViewModel: could not get User Settings")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
@@ -163,7 +163,7 @@ class EventViewModel(
 
         event = if (eventId == null) {
 
-            if (defaultCalendar == null) return Result.Error("could not get default calendar")
+            if (defaultCalendar == null) return Result.Error("EventViewModel: could not get default calendar")
 
             eventTimeZoneId = displayTimeZoneId
 
@@ -299,7 +299,7 @@ class EventViewModel(
 
                 adjustedEvent
 
-            } else return Result.Error("could not generate event with occurrence in EventViewModel")
+            } else return Result.Error("EventViewModel: could not generate event with occurrence in EventViewModel")
         }
 
         _event.postValue(event)

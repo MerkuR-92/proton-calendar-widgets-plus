@@ -40,7 +40,7 @@ class MiniCalendarItemAdapter(
     private var indicators: Map<LocalDate, List<String>>? = null
     private val indicatorsMediator = MediatorLiveData<List<MiniCalendarItem>>()
 
-    fun initialise() {
+    fun initialise(timeZoneId: String) {
 
         val firstDayOfTheMonth = forDate.withDayOfMonth(1)
         val firstDayOfTheWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
@@ -64,7 +64,7 @@ class MiniCalendarItemAdapter(
 
         // subscribe for calendar indicators and selected date
 
-        indicatorsMediator.addSource(calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()))) {
+        indicatorsMediator.addSource(calendarViewModel.calendarIndicators(firstDayOfTheMonth, firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()), timeZoneId)) {
             indicators = it
 
             if (indicators != null && selectedDate != null) {
