@@ -127,7 +127,7 @@ class HandleEventsMetadataUseCase(
             val now = Instant.now()
             val alarmInstant = Instant.ofEpochSecond(alarm.occurrence)
 
-            return !now.plus(120, ChronoUnit.DAYS).isBefore(alarmInstant)
+            return !now.plus(30, ChronoUnit.DAYS).isBefore(alarmInstant)
 
         }
     }
