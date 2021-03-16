@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
 import me.proton.core.user.domain.UserManager
@@ -78,7 +79,9 @@ class SendEmailUseCase(
         eventId: String,
         attendees: List<Attendee>,
         subject: String,
-        body: String
+        body: String,
+        isCreate: Boolean,
+        editedEvent: Event? = null
     ): UseCase.Result {
         val newEventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to select event entity")
         val sharedEventId = newEventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees sharedEventID was null")
@@ -92,11 +95,15 @@ class SendEmailUseCase(
 
         val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(newEventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
 
-        val event = transformEventUseCase.execute(newEventEntity) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to transform event entity")
+        val event =
+            if (isCreate) transformEventUseCase.execute(newEventEntity) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to transform event entity")
+            else editedEvent ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees edited event was null")
 
-        // Add attendees
-        attendees.forEach {
-            event.iCalEvent.addAttendee(it)
+        if (isCreate) {
+            // Add attendees
+            attendees.forEach {
+                event.iCalEvent.addAttendee(it)
+            }
         }
 
         val ics = getInviteIcs(
@@ -135,6 +142,9 @@ class SendEmailUseCase(
 
         return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments)) {
             is SendEmailDirect.Result.Success -> {
+
+                if (!isCreate) return UseCase.Result.Success<Unit>()
+
                 // Edit same event to add attendees if mail(s) have been sent
 
                 val editEventResult = editCreateEventUseCase.execute(userId, calendarId, event)

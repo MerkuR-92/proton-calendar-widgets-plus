@@ -179,6 +179,12 @@
     <string name="event_send_invite_dialog_confirm">Send</string>
     <string name="event_send_invite_dialog_cancel">Cancel</string>
 
+    <string name="event_add_participants_dialog_title">Add participants</string>
+    <string name="event_add_participants_dialog_description">An invitation will be sent to added participants for all the events in this series.</string>
+    <string name="event_add_participants_overwrite_dialog_description">An invitation will be sent to added participants for all the events in this series.\nPrevious modifications on this series will be lost.</string>
+    <string name="event_add_participants_dialog_confirm">Send</string>
+    <string name="event_add_participants_dialog_cancel">Cancel</string>
+
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendars</string>
     <string name="nav_view_disabled_calendars">Disabled calendars</string>

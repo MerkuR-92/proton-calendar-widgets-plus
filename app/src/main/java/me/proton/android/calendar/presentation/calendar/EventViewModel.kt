@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.content.Context
+import android.content.res.Resources
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
@@ -477,8 +479,8 @@ class EventViewModel(
     suspend fun handleSave(
         editOption: EventEditDeleteOption? = null,
         occurrenceNumber: Int,
-        subject: String? = null,
-        body: String? = null): Boolean { // create or edit
+        resources: Resources,
+        timeFormatIs24Hours: Boolean): Boolean { // create or edit
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
         logger.d("handleSave with editOption: $editOption")
@@ -853,11 +855,31 @@ class EventViewModel(
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
 
+        var subject: String? = null
+        var body: String? = null
+        if (!newEvent.iCalEvent.attendees.isNullOrEmpty()) {
+            subject = getInviteMailSubject(newEvent, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
+            body = getInviteMailBody(newEvent, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
+        }
+
+        if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
+            val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, newEvent.id, newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, newEvent)
+            sendEmailResult.ifSuccessAndLogErrors(logger) { }
+
+            if (sendEmailResult is UseCase.Result.InvalidParams) {
+                logger.e("invalid params in send email: ${sendEmailResult.message}")
+                return false
+            }
+            if (sendEmailResult is UseCase.Result.Error) {
+                logger.e("error in send email: ${sendEmailResult.message}")
+                return false
+            }
+        }
 
         // TODO run work manager
         logger.d(("calling edit event use case with ${newEvent.iCalendar.printToString()}"))
         val createEventResult = viewModelScope.async(Dispatchers.IO) {
-            createEventUseCase.execute(userId, newEvent.calendar.id, newEvent.copy(iCalendar = event.iCalendar.clone()))
+            createEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
         }.await()
 
         if (createEventResult is UseCase.Result.InvalidParams) {
@@ -867,19 +889,67 @@ class EventViewModel(
             logger.e("error in create event: ${createEventResult.message}")
         }
 
-
-        // TODO send email to attendees with the newly created event
         if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && createEventResult is UseCase.Result.Success<*>) {
             createEventResult.returnValue.tryCast<List<String>> {
                 if (this.isNullOrEmpty()) return@tryCast
 
-                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!)
+                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!, isCreate)
                 // If send email fails the event without attendees remains in the calendar
                 sendEmailResult.ifSuccessAndLogErrors(logger) { }
             }
         }
 
         return createEventResult is UseCase.Result.Success<*>
+    }
+
+    private fun getInviteMailSubject(event: Event, timezone: String, resources: Resources, timeFormatIs24Hours: Boolean): String {
+        // TODO Move to UseCase once we can use strings resources there
+
+        return if (!event.isAllDay()) {
+            val dateTimeStart =
+                event.formatStart(timezone, timeFormatIs24Hours)
+            resources.getString(
+                R.string.event_send_invite_mail_subject_part_day,
+                dateTimeStart.first,
+                dateTimeStart.second
+            )
+        } else if (!event.spansSingleDay(timeZoneId = timezone)) {
+            resources.getString(
+                R.string.event_send_invite_mail_subject_all_day_multiple,
+                event.formatStart(
+                    timezone,
+                    timeFormatIs24Hours
+                ).first
+            )
+        } else {
+            resources.getString(
+                R.string.event_send_invite_mail_subject_all_day,
+                event.formatStart(
+                    timezone,
+                    timeFormatIs24Hours
+                ).first
+            )
+        }
+    }
+
+    private fun getInviteMailBody(event: Event, timezone: String, resources: Resources, timeFormatIs24Hours: Boolean): String {
+        // TODO Move to UseCase once we can use strings resources there
+        val formattedDate = event.formatStart(timezone, timeFormatIs24Hours)
+        var body = resources.getString(
+            R.string.event_send_invite_mail_body,
+            event.summary ?: resources.getString(R.string.default_event_summary),
+            if (formattedDate.second != null) formattedDate.first + ", " + formattedDate.second
+            else formattedDate.first
+        )
+        if (event.location != null) body += resources.getString(
+            R.string.event_send_invite_mail_body_where,
+            event.location
+        )
+        if (event.description != null) body += resources.getString(
+            R.string.event_send_invite_mail_body_description,
+            event.description
+        )
+        return body
     }
 
     private fun handleSequence(dbEventWithOccurrence: Event? = null) {
