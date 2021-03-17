@@ -47,7 +47,8 @@ class SendEmailUseCase(
         }.firstOrNull()?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
 
         // TODO remove hack with overwriting sender email & name
-        val senderAddress = userManager.getAddresses(userId).find {
+        // TODO Check with core if refresh true can be removed
+        val senderAddress = userManager.getAddresses(userId, refresh = true).find {
             it.addressId.id == senderAddressesId
         }?.copy(email = userAttendee.email, displayName = userAttendee.commonName) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
 
@@ -118,7 +119,8 @@ class SendEmailUseCase(
         }.firstOrNull()?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address ID for sender") // TODO better error
 
         // TODO remove hack with overwriting sender email & name
-        val senderAddress = userManager.getAddresses(userId).find {
+        // TODO Check with core if refresh true can be removed
+        val senderAddress = userManager.getAddresses(userId, refresh = true).find {
             it.addressId.id == senderAddressesId
         }?.copy(email = member.email) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address for sender") // TODO better error
 

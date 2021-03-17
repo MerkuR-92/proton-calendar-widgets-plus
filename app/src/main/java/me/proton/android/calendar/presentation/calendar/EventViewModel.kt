@@ -860,6 +860,7 @@ class EventViewModel(
             body = getInviteMailBody(newEvent, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
         }
 
+        // TODO Refactor and move into UseCase
         if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
             val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, newEvent.id, newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, newEvent)
             sendEmailResult.ifSuccessAndLogErrors(logger) { }
@@ -887,6 +888,7 @@ class EventViewModel(
             logger.e("error in create event: ${createEventResult.message}")
         }
 
+        // TODO Refactor and move into UseCase
         if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && createEventResult is UseCase.Result.Success<*>) {
             createEventResult.returnValue.tryCast<List<String>> {
                 if (this.isNullOrEmpty()) return@tryCast
@@ -904,7 +906,6 @@ class EventViewModel(
 
     private fun getInviteMailSubject(event: Event, timezone: String, resources: Resources, timeFormatIs24Hours: Boolean): String {
         // TODO Move to UseCase once we can use strings resources there
-
         return if (!event.isAllDay()) {
             val dateTimeStart =
                 event.formatStart(timezone, timeFormatIs24Hours)
