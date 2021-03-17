@@ -153,6 +153,17 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        with(accountViewModel) {
+            val state = state.value
+            if (state == AccountViewModel.State.Ready && navController.currentDestination?.id == R.id.rootFragment) {
+                logger.i("MainActivity onResume force handleAccountState to get out of limbo")
+                handleAccountState(this, state)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         handleAppTheme()
         super.onCreate(savedInstanceState)
