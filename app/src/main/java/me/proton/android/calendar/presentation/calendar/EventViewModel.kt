@@ -7,14 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.*
-import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.component.VAlarm
-import biweekly.component.VTimezone
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Related
-import biweekly.parameter.Role
 import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
@@ -30,25 +27,21 @@ import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
-import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.coroutines.coroutineContext
 
 class EventViewModel(
     private val context: Context,
@@ -474,13 +467,18 @@ class EventViewModel(
         this.tempAlarmTime = LocalTime.of(9, 0)
     }
 
-
+    enum class HandleSaveResult {
+        SUCCESS,
+        CREATE_ERROR_SEND_MAIL,
+        EDIT_ERROR_SEND_MAIL,
+        ERROR
+    }
 
     suspend fun handleSave(
         editOption: EventEditDeleteOption? = null,
         occurrenceNumber: Int,
         resources: Resources,
-        timeFormatIs24Hours: Boolean): Boolean { // create or edit
+        timeFormatIs24Hours: Boolean): HandleSaveResult { // create or edit
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
         logger.d("handleSave with editOption: $editOption")
@@ -525,10 +523,10 @@ class EventViewModel(
 
                     if (dbEventWithOccurrenceStartDate == null) {
                         logger.e("dbEventWithOccurrenceStartDate == null")
-                        return false
+                        return HandleSaveResult.ERROR
                     }
 
-                    if (!handleOriginalEventNullSequence(dbEvent)) return false
+                    if (!handleOriginalEventNullSequence(dbEvent)) return HandleSaveResult.ERROR
 
                     val eventToCreate = event.copy( // TODO move to helper method?
                         id = ICalUtils.generateOfflineEventId(),
@@ -563,7 +561,7 @@ class EventViewModel(
 
                 } else if (dbEvent?.isSingleEdit() == true) {
                     immutableOriginalDbEvent?.let {
-                        if (!handleOriginalEventNullSequence(it)) return false
+                        if (!handleOriginalEventNullSequence(it)) return HandleSaveResult.ERROR
                     }
 
                     val eventToCreate = event.copy(iCalendar = event.iCalendar.clone())
@@ -580,16 +578,16 @@ class EventViewModel(
                 // TODO THIS NEEDS TO BE FIXED, WE PROBABLY CAN'T FIND EVENTS IN DB
                 if (dbEvent == null) {
                     logger.e("dbEvent == null")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
                 if (!dbEvent.isSingleEdit() && dbEventWithOccurrenceStartDate == null) {
                     logger.e("dbEventWithOccurrenceStartDate == null")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
                 if (dbEvent.isSingleEdit() && (immutableOriginalDbEvent == null || dbEventStartDate == null)) {
                     if (immutableOriginalDbEvent == null) logger.e("originalDbEvent == null")
                     if (dbEventStartDate == null) logger.e("dbEventStartDate == null")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
 
                 // delete single edits starting with just edited occurrence / single edit
@@ -597,7 +595,7 @@ class EventViewModel(
                 val deleteStartDate = if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(1)
                 val deleteSingleEditsResult = deleteEventUseCase.execute(userId, eventId, deleteStartDate)
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
-                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return false
+                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return HandleSaveResult.ERROR
 
                 // update original event:
                 // - change COUNT to ((current occurrence number) - 1)
@@ -657,7 +655,7 @@ class EventViewModel(
                     } else if (editOriginalEventResult is UseCase.Result.Error) {
                         logger.e("error editing event: ${editOriginalEventResult.message}")
                     }
-                    return false
+                    return HandleSaveResult.ERROR
                 }
 
                 // TODO delete exdates after this occurrence?
@@ -714,7 +712,7 @@ class EventViewModel(
 
                 if (dbEvent?.isSingleEdit() == true && immutableOriginalDbEvent == null) {
                     logger.e("Edit all events: originalEventStartDate was null for single edit")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
 
                 // delete all single edits
@@ -727,17 +725,17 @@ class EventViewModel(
 
                 if (originalEventStartDate == null) {
                     logger.e("Edit all events: originalEventStartDate was null")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
                 if (originalEventId == null) {
                     logger.e("Edit all events: originalEventId was null")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
 
                 val deleteSingleEditsResult =
                     deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
-                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return false
+                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return HandleSaveResult.ERROR
 
                 // delete all single deletions
                 event.iCalEvent.exceptionDates.clear()
@@ -752,7 +750,7 @@ class EventViewModel(
 
                 if (originalEventWithOccurrence == null) {
                     logger.e("Edit all events: originalEventWithOccurrence was null")
-                    return false
+                    return HandleSaveResult.ERROR
                 }
 
                 val hasDayChanged =
@@ -768,7 +766,7 @@ class EventViewModel(
                     if (dbEvent?.isSingleEdit() == true) {
                         if (immutableOriginalDbEvent == null) {
                             logger.e("Edit all events: dbEvent was null")
-                            return false
+                            return HandleSaveResult.ERROR
                         }
 
                         val newEvent = event.copy(
@@ -804,7 +802,7 @@ class EventViewModel(
                     } else {
                         if (dbEvent == null) {
                             logger.e("Edit all events: dbEvent was null")
-                            return false
+                            return HandleSaveResult.ERROR
                         }
                         val eventSpan = ChronoUnit.DAYS.between(event.getStart(event.defaultTimeZone!!), event.getEnd(event.defaultTimeZone!!))
                         if (event.isAllDay()) {
@@ -868,11 +866,11 @@ class EventViewModel(
 
             if (sendEmailResult is UseCase.Result.InvalidParams) {
                 logger.e("invalid params in send email: ${sendEmailResult.message}")
-                return false
+                return HandleSaveResult.EDIT_ERROR_SEND_MAIL
             }
             if (sendEmailResult is UseCase.Result.Error) {
                 logger.e("error in send email: ${sendEmailResult.message}")
-                return false
+                return HandleSaveResult.EDIT_ERROR_SEND_MAIL
             }
         }
 
@@ -896,10 +894,12 @@ class EventViewModel(
                 val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!, isCreate)
                 // If send email fails the event without attendees remains in the calendar
                 sendEmailResult.ifSuccessAndLogErrors(logger) { }
+
+                if (sendEmailResult !is UseCase.Result.Success<*>) return HandleSaveResult.CREATE_ERROR_SEND_MAIL
             }
         }
 
-        return createEventResult is UseCase.Result.Success<*>
+        return HandleSaveResult.SUCCESS
     }
 
     private fun getInviteMailSubject(event: Event, timezone: String, resources: Resources, timeFormatIs24Hours: Boolean): String {

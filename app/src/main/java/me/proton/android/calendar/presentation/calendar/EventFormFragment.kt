@@ -309,7 +309,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
 
         } else { // TODO merge this with code above
-            val success = withContext(Dispatchers.IO) {
+            val handleSaveResult = withContext(Dispatchers.IO) {
                 eventViewModel.handleSave(
                     editOption =
                     if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true)
@@ -328,18 +328,22 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             eventViewModel.savingEvent.postValue(false)
 
             if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
-                if (success) {
+                if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) {
                     onSuccessEventUpdateCalendarDisplay()
                     requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
                     setMonthViewSelectedDay()
                     jumpToMonthView()
+                } else if (handleSaveResult == EventViewModel.HandleSaveResult.EDIT_ERROR_SEND_MAIL) {
+                    view?.displaySnackBar(getString(R.string.snack_event_updated_error_failed_mail))
                 } else {
                     view?.displaySnackBar(getString(R.string.snack_event_updated_error))
                 }
             } else {
-                if (success) {
+                if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS || handleSaveResult == EventViewModel.HandleSaveResult.CREATE_ERROR_SEND_MAIL) {
                     onSuccessEventUpdateCalendarDisplay()
-                    requireActivity().displaySnackBar(getString(R.string.snack_event_created))
+                    requireActivity().displaySnackBar(getString(
+                        if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) R.string.snack_event_created
+                        else R.string.snack_event_created_failed_mail))
                     setMonthViewSelectedDay()
                     jumpToMonthView()
                 } else {
@@ -371,7 +375,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption) {
         lifecycleScope.launch {
-            val success = withContext(Dispatchers.IO) {
+            val handleSaveResult = withContext(Dispatchers.IO) {
                 eventViewModel.handleSave(
                     eventEditDeleteOption,
                     navigationArguments.occurrenceNumber,
@@ -386,15 +390,16 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             // Post saving event value to false to stop loading state
             eventViewModel.savingEvent.postValue(false)
 
-            if (success) { // TODO remove duplicated code here and below
+            if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) { // TODO remove duplicated code here and below
                 onSuccessEventUpdateCalendarDisplay()
                 requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
                 setMonthViewSelectedDay()
                 jumpToMonthView()
+            } else if (handleSaveResult == EventViewModel.HandleSaveResult.EDIT_ERROR_SEND_MAIL) {
+                view?.displaySnackBar(getString(R.string.snack_event_updated_error_failed_mail))
             } else {
                 view?.displaySnackBar(getString(R.string.snack_event_updated_error))
             }
-
         }
     }
 
