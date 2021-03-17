@@ -52,11 +52,6 @@ class AccountViewModel(
         return valueStore.getString(ValueKey.USER_ID) == userId.id
     }
 
-    private fun Account.isBootstrapped(): Boolean {
-        val valueStore = valueStoreProvider.provideValueStore(userId.id)
-        return valueStore.getBoolean(ValueKey.TEMP_IS_BOOTSTRAPPED) ?: false
-    }
-
     private suspend fun saveAccountInfo(account: Account) {
         if (!account.isSavedForSetup()) {
             val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
@@ -109,8 +104,6 @@ class AccountViewModel(
             removeUser(userId)
             return
         }
-
-        valueStore.putBoolean(ValueKey.TEMP_IS_BOOTSTRAPPED, true)
 
         _state.postValue(State.Ready)
     }
@@ -167,7 +160,9 @@ class AccountViewModel(
         accountManager.getAccounts().onEach { accounts ->
             when {
                 accounts.isEmpty() -> _state.postValue(State.LoginNeeded)
-                accounts.any { it.isReady() && it.isBootstrapped() } -> _state.postValue(State.Ready)
+                accounts.any {
+                    it.isReady() && usersRepository.selectUserSettings(it.userId.id) != null
+                } -> _state.postValue(State.Ready)
             }
         }.launchIn(context.lifecycleScope)
 
