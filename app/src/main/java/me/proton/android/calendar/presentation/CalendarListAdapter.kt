@@ -50,13 +50,16 @@ class CalendarListAdapter(
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
 
-            calendarEntityItemOverlay.setOnSingleClickListener {
-                calendarEntityItemCheckBox.isChecked = !calendarEntityItemCheckBox.isChecked
+            calendarEntityItemCheckBox.setOnSingleClickListener {
                 listener(
                     calendarEntity.copy(
                         display = calendarEntityItemCheckBox.isChecked.toInt()
                     )
                 )
+            }
+
+            calendarEntityItemOverlay.setOnSingleClickListener {
+                calendarEntityItemCheckBox.performClick()
             }
         }
     }
