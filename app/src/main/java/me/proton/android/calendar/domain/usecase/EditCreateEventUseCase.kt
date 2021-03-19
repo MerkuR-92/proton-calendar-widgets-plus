@@ -208,7 +208,7 @@ class EditCreateEventUseCase(
                     SyncEventUpdateContainer(
                         id = newEvent.id,
                         event = SyncEvent(
-                            permissions = 6,
+                            permissions = 1,
                             sharedKeyPacket = null, // this is already present in existing event
                             sharedEventContent = sharedEventContent,
                             calendarKeyPacket = if (oldCalendarSessionKey == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
@@ -227,7 +227,7 @@ class EditCreateEventUseCase(
                 events = listOf(
                     SyncEventCreateContainer(
                         event = SyncEvent(
-                            permissions = 6,
+                            permissions = 1,
                             sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
                             sharedEventContent = sharedEventContent,
                             calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
