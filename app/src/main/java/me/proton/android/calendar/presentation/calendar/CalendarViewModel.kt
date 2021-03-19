@@ -26,6 +26,7 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
@@ -34,7 +35,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.collections.HashMap
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -280,11 +280,38 @@ class CalendarViewModel(
         }
     }
 
+    fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+        return calendarsRepository.getSkeletonEventsForIndicators(userId.value!!, fromDate, toDate, timeZoneId).asLiveData()
+    }
+
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
-        return eventsLiveData(fromDate, toDate, timeZoneId).map {
-            it?.let {
-                calculateCalendarIndicators(it, timeZoneId)
-            } ?: emptyMap()
+
+        return if (FeatureFlag.NEW_EVENT_DECRYPTION) {
+
+            skeletonEventsForIndicatorsLiveData(fromDate, toDate, timeZoneId).map { skeletonResult ->
+                when (skeletonResult) {
+                    CalendarsRepository.GetEventsResult.InProgress -> {
+                        emptyMap()
+                    }
+                    is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
+                        skeletonResult.events,
+                        timeZoneId
+                    )
+                    is CalendarsRepository.GetEventsResult.Exception -> {
+                        logger.e("exception getting skeletonEventsLiveData", skeletonResult.throwable)
+                        emptyMap()
+                    }
+                }
+            }
+
+        } else {
+
+            eventsLiveData(fromDate, toDate, timeZoneId).map {
+                it?.let {
+                    calculateCalendarIndicators(it, timeZoneId)
+                } ?: emptyMap()
+            }
+
         }
     }
 
@@ -302,6 +329,10 @@ class CalendarViewModel(
         withContext(Dispatchers.IO) {
             calendarsRepository.fetchEvents(userId, fromDate, toDate, timeZoneId)
         }
+    }
+
+    fun getEvents(userId: UserId, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<Event>> {
+        return calendarsRepository.getEvents(userId, fromDate, toDate, timeZoneId).asLiveData()
     }
 
     suspend fun handleDeleteEvent(eventId: String,

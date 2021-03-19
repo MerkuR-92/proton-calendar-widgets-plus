@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
+import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 import java.time.ZoneId
@@ -65,6 +66,29 @@ interface CalendarsRepository {
         toDate: LocalDate,
         timeZoneId: String
     )
+
+    sealed class GetEventsResult<out T> {
+        object InProgress: GetEventsResult<Nothing>()
+        data class Success<T>(val events: List<T>): GetEventsResult<T>()
+        data class Exception(val throwable: Throwable): GetEventsResult<Nothing>()
+    }
+
+    fun getEvents(
+        userId: UserId,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<GetEventsResult<Event>>
+
+    /**
+     * @return SkeletonEvents with correct Calendar Color.
+     */
+    fun getSkeletonEventsForIndicators(
+        userId: UserId,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<GetEventsResult<SkeletonEvent>>
 
     suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean
 

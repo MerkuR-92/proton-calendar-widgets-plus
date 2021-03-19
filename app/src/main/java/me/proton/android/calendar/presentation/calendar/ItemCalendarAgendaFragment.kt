@@ -15,18 +15,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
-import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.common.displaySnackBar
-import me.proton.android.calendar.common.visibleOrInvisible
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.presentation.MainActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -147,21 +144,74 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
 
-        calendarViewModel.eventsLiveData(immutableDate, immutableDate, timeZoneId).observe(viewLifecycleOwner) {
-            logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it?.size}")
+        if (FeatureFlag.NEW_EVENT_DECRYPTION) {
 
-            if (it == null) {
-                list_view_status.visibleOrInvisible(true)
-                list_view_status.text = resources.getString(R.string.agenda_loading_events)
-            } else if (it.isEmpty()) {
-                list_view_status.visibleOrInvisible(true)
-                list_view_status.text = resources.getString(R.string.agenda_no_events)
-            } else {
-                list_view_status.visibleOrInvisible(false)
+            // TODO can we get UserID synchronously?
+            calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
+
+                userId?.let {
+                    calendarViewModel.getEvents(userId, immutableDate, immutableDate, timeZoneId)
+                        .observe(viewLifecycleOwner) { eventsResult ->
+
+                            //logger.e("got events for $immutableDate: $eventsResult")
+
+                            eventsResult?.let {
+                                when (it) {
+                                    CalendarsRepository.GetEventsResult.InProgress -> {
+                                        list_view_status.visibleOrInvisible(true)
+                                        list_view_status.text = resources.getString(R.string.agenda_loading_events)
+                                    }
+                                    is CalendarsRepository.GetEventsResult.Success -> {
+
+                                        if (it.events.isEmpty()) {
+                                            list_view_status.visibleOrInvisible(true)
+                                            list_view_status.text = resources.getString(R.string.agenda_no_events)
+                                        } else {
+                                            list_view_status.visibleOrInvisible(false)
+                                        }
+                                        (rv_agenda.adapter as? EventAdapter)?.submitList(
+                                            listOf(fakeHeaderEvent).plus(it.events.sortForAgendaView(timeZoneId))
+                                        )
+
+                                    }
+                                    is CalendarsRepository.GetEventsResult.Exception -> {
+                                        list_view_status.visibleOrInvisible(true)
+                                        list_view_status.text =
+                                            resources.getString(R.string.agenda_loading_events_error)
+
+                                        (rv_agenda.adapter as? EventAdapter)?.submitList(
+                                            listOf(fakeHeaderEvent)
+                                        )
+                                    }
+                                }
+
+                            }
+
+                        }
+                }
+
             }
-            (rv_agenda.adapter as? EventAdapter)?.submitList(
-                listOf(fakeHeaderEvent).plus(it ?: emptyList())
-            )
+
+        } else {
+
+            calendarViewModel.eventsLiveData(immutableDate, immutableDate, timeZoneId).observe(viewLifecycleOwner) {
+                logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it?.size}")
+
+                if (it == null) {
+                    list_view_status.visibleOrInvisible(true)
+                    list_view_status.text = resources.getString(R.string.agenda_loading_events)
+                } else if (it.isEmpty()) {
+                    list_view_status.visibleOrInvisible(true)
+                    list_view_status.text = resources.getString(R.string.agenda_no_events)
+                } else {
+                    list_view_status.visibleOrInvisible(false)
+                }
+                (rv_agenda.adapter as? EventAdapter)?.submitList(
+                    listOf(fakeHeaderEvent).plus(it ?: emptyList())
+                )
+            }
+
         }
+
     }
 }

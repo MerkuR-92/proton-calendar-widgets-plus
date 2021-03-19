@@ -14,6 +14,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events")
     abstract fun selectEvents(): List<EventEntity>
 
+    @Query("SELECT * FROM events")
+    abstract fun selectEventsFlow(): Flow<List<EventEntity>>
+
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")
     abstract fun flowEvents(calendarIds: List<String>): Flow<List<EventEntity>>
 

@@ -439,7 +439,7 @@ object ICalUtils {
     fun generateOfflineAlarmId() = "$OFFLINE_ALARM_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
 
     /**
-     * Returns iCal Events with already applied DTSTART/DTEND according to Occurrence.
+     * Returns iCal Events with Occurrence, but does not overwrite the DTSTART/DTEND. See [withOccurrence]
      * Takes single edits into account.
      *
      * @param events all single edits selected by UID
@@ -459,7 +459,7 @@ object ICalUtils {
         return occurrences.map { occurrence ->
             val event = events.find {
                 it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(occurrence.startDateTime, originalEvent.isAllDay())
-            }?.copy() ?: originalEvent.copy()//.withOccurrence(occurrence)!!
+            }?.copy() ?: originalEvent.copy()
             event.occurrence = occurrence
             event
         }
@@ -776,6 +776,23 @@ private fun extractEmail(uri: String?, email: String?, commonName: String?): Str
         commonName?.contains("@") == true -> commonName
         else -> null
     }
+}
+
+/**
+ * Groups all-day and spanning multiple days Events first.
+ */
+fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event> {
+    val groupedByAllDayEvents = this.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
+    val result = mutableListOf<Event>()
+    result.addAll(
+        groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
+            ?: emptyList()
+    )
+    result.addAll(
+        groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
+            ?: emptyList()
+    )
+    return result
 }
 
 /**
