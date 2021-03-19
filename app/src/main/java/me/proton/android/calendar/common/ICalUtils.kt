@@ -855,6 +855,9 @@ fun getResponseIcs(
     // The EXDATE must be filtered out
     responseICalendar.events.first().exceptionDates.clear()
 
+    // DTSTAMP should be the time at which the email was sent
+    responseICalendar.events.first().setDateTimeStamp(Date.from(Instant.now()))
+
     // Last-Modified should be dropped
     responseICalendar.lastModified = null
 
