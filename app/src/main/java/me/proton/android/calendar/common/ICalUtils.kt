@@ -830,43 +830,38 @@ fun getResponseIcs(
     participationStatus: ParticipationStatus,
     originalTimeZoneInfo: TimezoneInfo?
 ): String {
-
-    if (responseICalendar.productId == null) responseICalendar.setProductId(generateProtonProdId())
-    if (responseICalendar.version == null) responseICalendar.version = ICalVersion.V2_0
-
-    // METHOD:REPLY as we answer the REQUEST of the organizer
-    responseICalendar.setMethod(Method.REPLY)
-
-    if (responseICalendar.calendarScale == null) responseICalendar.calendarScale = CalendarScale.gregorian()
-
     // Update user PARTSTAT and remove useless X_PM_TOKEN property
     userAttendee.participationStatus = participationStatus
     userAttendee.removeParameter(CustomICalPropertyParameter.X_PM_TOKEN)
     userAttendee.participationLevel = null
     userAttendee.rsvp = null
-
-    // The other attendees (not linked with the current users) have to be removed
-    responseICalendar.events.first().attendees.clear()
-    // Replace common name with email
     userAttendee.commonName = userAttendee.extractEmail()
-    responseICalendar.events.first().addAttendee(userAttendee)
 
-    // Alarms should be dropped
-    responseICalendar.events.first().alarms.clear()
+    val iCalendar = ICalendar()
+    iCalendar.setProductId(generateProtonProdId())
+    iCalendar.version = ICalVersion.V2_0
+    iCalendar.setMethod(Method.REPLY)
+    iCalendar.calendarScale = CalendarScale.gregorian()
+    originalTimeZoneInfo?.let {
+        iCalendar.timezoneInfo = originalTimeZoneInfo
+    }
 
-    // The EXDATE must be filtered out
-    responseICalendar.events.first().exceptionDates.clear()
+    val event = VEvent()
+    event.addAttendee(userAttendee)
+    event.organizer = responseICalendar.events.first().organizer
+    event.uid = responseICalendar.events.first().uid
+    event.dateStart = responseICalendar.events.first().dateStart
+    event.dateEnd = responseICalendar.events.first().dateEnd
+    event.sequence = responseICalendar.events.first().sequence
+    event.recurrenceId = responseICalendar.events.first().recurrenceId
+    event.recurrenceRule = responseICalendar.events.first().recurrenceRule
+    event.location = responseICalendar.events.first().location
+    event.summary = responseICalendar.events.first().summary
+    event.setDateTimeStamp(Date.from(Instant.now()))
 
-    // DTSTAMP should be the time at which the email was sent
-    responseICalendar.events.first().setDateTimeStamp(Date.from(Instant.now()))
+    iCalendar.addEvent(event)
 
-    // Last-Modified should be dropped
-    responseICalendar.lastModified = null
-
-    // We set default timezone in EventVM, reset timezoneInfo to original values
-    originalTimeZoneInfo?.let { responseICalendar.timezoneInfo = it }
-
-    return responseICalendar.printToString()
+    return iCalendar.printToString()
 }
 
 fun getInviteIcs(
