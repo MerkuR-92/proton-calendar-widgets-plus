@@ -80,8 +80,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private val accountViewModel: AccountViewModel by sharedViewModel()
     private val mainViewModel: MainViewModel by sharedViewModel()
 
-    override fun onBackPressedCustom() {
-
+    private fun jumpToMonthView() {
         // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
         //  1. see if nested graphs work when we get rid of dialogs in favor of fragments
         //  2. see if handling deeplink straight from notification (not indirectly from MainActivity and navigating manually)
@@ -91,6 +90,22 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         } else {
             findNavController().navigateUp()
         }
+    }
+
+    override fun onBackPressedCustom() {
+
+        val immutableChangeAnswerLoading = eventViewModel.changeAnswerLoading.value
+        val immutableDeletingEvent = eventViewModel.deletingEvent.value
+        if (immutableChangeAnswerLoading != null && immutableChangeAnswerLoading) {
+            view?.displaySnackBar(getString(R.string.snack_event_changing_answer))
+            return
+        }
+        if (immutableDeletingEvent != null && immutableDeletingEvent) {
+            view?.displaySnackBar(getString(R.string.snack_event_deleting))
+            return
+        }
+
+        jumpToMonthView()
     }
 
     override fun onNavigationIconClicked(): Boolean {
@@ -175,7 +190,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 lifecycleScope.launch {
 
                     // Post deleting event value to true to display loading state
-                    eventViewModel.savingEvent.postValue(true)
+                    eventViewModel.deletingEvent.postValue(true)
 
                     val deleteResult = withContext(Dispatchers.IO) {
                         if (it == 0) {
@@ -206,12 +221,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     }
 
                     // Post deleting event value to false to stop loading state
-                    eventViewModel.savingEvent.postValue(false)
+                    eventViewModel.deletingEvent.postValue(false)
 
                     if (deleteResult is UseCase.Result.Success<*>) {
                         requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
-                        // Use onBackPressedCustom to handle navigation when opening details from notification
-                        onBackPressedCustom()
+                        // Use jumpToMonthView to handle navigation when opening details from notification
+                        jumpToMonthView()
                     } else {
 
                         if (deleteResult is UseCase.Result.Error) {
@@ -242,7 +257,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     lifecycleScope.launch { // TODO
 
                         // Post deleting event value to true to display loading state
-                        eventViewModel.savingEvent.postValue(true)
+                        eventViewModel.deletingEvent.postValue(true)
 
                         val deleteResult = withContext(Dispatchers.Default) {
                             if (eventViewModel.dbEvent?.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId) == true
@@ -261,12 +276,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         }
 
                         // Post deleting event value to false to stop loading state
-                        eventViewModel.savingEvent.postValue(false)
+                        eventViewModel.deletingEvent.postValue(false)
 
                         if (deleteResult is UseCase.Result.Success<*>) {
                             requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
-                            // Use onBackPressedCustom to handle navigation when opening details from notification
-                            onBackPressedCustom()
+                            // Use jumpToMonthView to handle navigation when opening details from notification
+                            jumpToMonthView()
                         } else {
 
                             if (deleteResult is UseCase.Result.Error) {
@@ -337,8 +352,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                     }
                 }
-                // Use onBackPressedCustom to handle navigation when opening details from notification
-                onBackPressedCustom()
+                // Use jumpToMonthView to handle navigation when opening details from notification
+                jumpToMonthView()
             }
         }
     }
@@ -509,7 +524,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
             (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
-            eventViewModel.savingEvent.observe(viewLifecycleOwner, Observer { savingEvent: Boolean ->
+            eventViewModel.deletingEvent.observe(viewLifecycleOwner, Observer { savingEvent: Boolean ->
                 // Update action bar buttons visibility
                 loadingAction.visibleOrGone(savingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented

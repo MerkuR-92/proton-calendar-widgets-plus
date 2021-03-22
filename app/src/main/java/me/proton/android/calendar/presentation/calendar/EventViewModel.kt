@@ -103,6 +103,7 @@ class EventViewModel(
     private var singleEditsInfo: SingleEditsInfo? = null
 
     var savingEvent = MutableLiveData(false)
+    var deletingEvent = MutableLiveData(false)
     var changeAnswerLoading = MutableLiveData(false)
 
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
@@ -123,6 +124,7 @@ class EventViewModel(
         eventCustomPartialDayAlarmsSave = null
         eventCustomAllDayAlarmsSave = null
         savingEvent.postValue(false)
+        deletingEvent.postValue(false)
         changeAnswerLoading.postValue(false)
         dbEvent = null
         originalDbEvent = null

@@ -202,6 +202,8 @@
     <string name="snack_event_deleted_error">Error deleting event</string>
     <string name="snack_event_opening_error">Error opening event</string>
     <string name="snack_event_saving">Saving event</string>
+    <string name="snack_event_deleting">Deleting event</string>
+    <string name="snack_event_changing_answer">Updating answer</string>
     <string name="snack_event_updated">Event updated</string>
     <string name="snack_event_updated_error_failed_mail">Invitation failed to be sent</string>
     <string name="snack_event_updated_error">Error updating event</string>
