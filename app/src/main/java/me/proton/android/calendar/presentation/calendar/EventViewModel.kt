@@ -883,9 +883,11 @@ class EventViewModel(
 
         if (createEventResult is UseCase.Result.InvalidParams) {
             logger.e("invalid params in create event: ${createEventResult.message}")
+            return HandleSaveResult.ERROR
         }
         if (createEventResult is UseCase.Result.Error) {
             logger.e("error in create event: ${createEventResult.message}")
+            return HandleSaveResult.ERROR
         }
 
         // TODO Refactor and move into UseCase
