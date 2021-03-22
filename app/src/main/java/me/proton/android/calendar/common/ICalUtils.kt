@@ -847,6 +847,8 @@ fun getResponseIcs(
 
     // The other attendees (not linked with the current users) have to be removed
     responseICalendar.events.first().attendees.clear()
+    // Replace common name with email
+    userAttendee.commonName = userAttendee.extractEmail()
     responseICalendar.events.first().addAttendee(userAttendee)
 
     // Alarms should be dropped
@@ -887,6 +889,11 @@ fun getInviteIcs(
     inviteICalendar.setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
     // Add shared event ID
     inviteICalendar.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+
+    // Replace common names with emails
+    inviteICalendar.events.first().attendees.forEach {
+        it.commonName = it.extractEmail()
+    }
 
     // Alarms should be dropped
     inviteICalendar.events.first().alarms.clear()

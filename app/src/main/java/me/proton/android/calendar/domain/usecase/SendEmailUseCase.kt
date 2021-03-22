@@ -50,7 +50,7 @@ class SendEmailUseCase(
         // TODO Check with core if refresh true can be removed
         val senderAddress = userManager.getAddresses(userId, refresh = true).find {
             it.addressId.id == senderAddressesId
-        }?.copy(email = userAttendee.email, displayName = userAttendee.commonName) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
+        }?.copy(email = userAttendee.email) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
 
         val attachmentBytes = ics.toByteArray()
 
