@@ -1489,7 +1489,7 @@ class EventViewModel(
 
         val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
             userId,
-            event.iCalendar.clone(),
+            eventCopy.iCalendar,
             dbEvent?.iCalendar?.timezoneInfo,
             userAttendee.copy(),
             event.iCalEvent.organizer.email,

@@ -48,6 +48,9 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
 
+val PROTON_UID = "@proton.me"
+val PROTON_OLD_UID = "proton-calendar"
+
 const val MAX_EMAILS_PER_QUERY: Int = 8
 
 object FeatureFlag {

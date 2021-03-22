@@ -619,7 +619,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 )
             )
 
-            event_form_participant.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty())
+            event_form_participant.visibleOrGone(event.hasProtonUid)
+            event_form_participant_layout.visibleOrGone(ADD_ATTENDEES && event.hasProtonUid) // TODO Remove feature flag
             event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
         })
     }
@@ -763,7 +764,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
-        event_form_participant_layout.visibleOrGone(ADD_ATTENDEES) // TODO Remove feature flag
         event_form_participant_press.setOnSingleClickListener {
             navigateToAttendees()
         }

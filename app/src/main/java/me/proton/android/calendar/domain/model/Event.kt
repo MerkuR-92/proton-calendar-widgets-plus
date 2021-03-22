@@ -48,6 +48,8 @@ data class Event(
 
     val status: Status? get() = iCalEvent.status
 
+    val hasProtonUid: Boolean get() = uid.endsWith(PROTON_UID) || uid.startsWith(PROTON_OLD_UID)
+
     // TODO FIXME if we're not always setting it, it will be null!!!!!!!!!!!!!!!!!!
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
 

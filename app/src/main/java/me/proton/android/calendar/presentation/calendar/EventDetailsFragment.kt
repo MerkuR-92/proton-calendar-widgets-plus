@@ -498,8 +498,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         // TODO Move to UseCase once we can use strings resources there
         return when (participationStatus) {
             ParticipationStatus.ACCEPTED -> getString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
-            ParticipationStatus.DECLINED -> getString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
-            ParticipationStatus.TENTATIVE -> getString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
+            ParticipationStatus.DECLINED -> getString(R.string.event_change_answer_mail_body_declined, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
+            ParticipationStatus.TENTATIVE -> getString(R.string.event_change_answer_mail_body_tentative, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
             else -> "" // TODO Shouldn't happen ?
         }
     }
