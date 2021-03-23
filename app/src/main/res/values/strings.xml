@@ -169,10 +169,13 @@
 
     <string name="event_send_invite_mail_subject_all_day">Invitation for an event on %s</string>
     <string name="event_send_invite_mail_subject_all_day_multiple">Invitation for an event starting on %s</string>
-    <string name="event_send_invite_mail_subject_part_day">Invitation for an event starting on %s, %s</string>
+    <string name="event_send_invite_mail_subject_part_day">Invitation for an event starting on %s at %s %s</string>
     <string name="event_send_invite_mail_body">You are invited to %s\nWhen: %s</string>
+    <string name="event_send_invite_mail_body_all_day_single">%s (all day)</string>
+    <string name="event_send_invite_mail_body_all_day_multiple">%s - %s</string>
+    <string name="event_send_invite_mail_body_part_day">%s at %s %s - %s at %s %s</string>
     <string name="event_send_invite_mail_body_where">\nWhere: %s</string>
-    <string name="event_send_invite_mail_body_description">\nEvent description: %s</string>
+    <string name="event_send_invite_mail_body_description">\nDescription: %s</string>
 
     <string name="event_send_invite_dialog_title">Send invitation</string>
     <string name="event_send_invite_dialog_description">An invitation will be sent to added participants.</string>

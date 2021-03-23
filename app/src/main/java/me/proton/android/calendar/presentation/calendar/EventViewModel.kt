@@ -27,6 +27,7 @@ import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtils.formatTimeZoneId
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.data.entity.*
@@ -106,6 +107,8 @@ class EventViewModel(
     var deletingEvent = MutableLiveData(false)
     var changeAnswerLoading = MutableLiveData(false)
 
+    var adjustedEndDate = false
+
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
     //  Check if any case require us to pass through it again or if we keep the init data we had from details
     suspend fun initialise(
@@ -131,6 +134,7 @@ class EventViewModel(
         recurrenceManuallyEdited = false
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
+        adjustedEndDate = false
 
         this.editMode = editMode
 
@@ -489,10 +493,11 @@ class EventViewModel(
         // Post saving event value to true to trigger loading state
         savingEvent.postValue(true)
 
-        if (event.isAllDay()) {
+        if (event.isAllDay() && !adjustedEndDate) {
             event.iCalendar.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
+            adjustedEndDate = true
             logger.d("calendar for all-day: " + event.iCalendar.printToString())
-        } else {
+        } else if (!event.isAllDay()) {
             event.iCalendar.adjustStartEndTimeZones(eventTimeZoneId, event.defaultTimeZone!!)
             logger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
@@ -858,8 +863,17 @@ class EventViewModel(
         var subject: String? = null
         var body: String? = null
         if (!newEvent.iCalEvent.attendees.isNullOrEmpty()) {
-            subject = getInviteMailSubject(newEvent, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
-            body = getInviteMailBody(newEvent, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
+            val eventCopy = newEvent.copy(iCalendar = newEvent.iCalendar.clone() as ICalendar)
+            if (eventCopy.isAllDay()) {
+                eventCopy.iCalEvent.setDateEnd(
+                    ICalDate(
+                        eventCopy.iCalEvent.getEnd(event.defaultTimeZone!!)?.toLocalDate()?.minusDays(1)?.toDate(event.defaultTimeZone!!),
+                        false
+                    )
+                )
+            }
+            subject = getInviteMailSubject(eventCopy, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
+            body = getInviteMailBody(eventCopy, event.defaultTimeZone!!, resources, timeFormatIs24Hours)
         }
 
         // TODO Refactor and move into UseCase
@@ -916,9 +930,10 @@ class EventViewModel(
             resources.getString(
                 R.string.event_send_invite_mail_subject_part_day,
                 dateTimeStart.first,
-                dateTimeStart.second
+                dateTimeStart.second,
+                formatTimeZoneId(timezone, event.iCalEvent.dateStart.value.toInstant(), displayId = false)
             )
-        } else if (!event.spansSingleDay(timeZoneId = timezone)) {
+        } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
             resources.getString(
                 R.string.event_send_invite_mail_subject_all_day_multiple,
                 event.formatStart(
@@ -939,12 +954,33 @@ class EventViewModel(
 
     private fun getInviteMailBody(event: Event, timezone: String, resources: Resources, timeFormatIs24Hours: Boolean): String {
         // TODO Move to UseCase once we can use strings resources there
-        val formattedDate = event.formatStart(timezone, timeFormatIs24Hours)
+        val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
+        val formattedDateEnd = event.formatEnd(timezone, timeFormatIs24Hours)
         var body = resources.getString(
             R.string.event_send_invite_mail_body,
             event.summary ?: resources.getString(R.string.default_event_summary),
-            if (formattedDate.second != null) formattedDate.first + ", " + formattedDate.second
-            else formattedDate.first
+            if (event.isAllDay() && !event.spansSingleDay(true, timeZoneId = timezone)) {
+                resources.getString(
+                    R.string.event_send_invite_mail_body_all_day_multiple,
+                    formattedDateStart.first,
+                    formattedDateEnd.first
+                )
+            } else if (event.isAllDay()) {
+                resources.getString(
+                    R.string.event_send_invite_mail_body_all_day_single,
+                    formattedDateStart.first
+                )
+            } else {
+                resources.getString(
+                    R.string.event_send_invite_mail_body_part_day,
+                    formattedDateStart.first,
+                    formattedDateStart.second,
+                    formatTimeZoneId(timezone, event.iCalEvent.dateStart.value.toInstant(), displayId = false),
+                    formattedDateEnd.first,
+                    formattedDateEnd.second,
+                    formatTimeZoneId(timezone, event.iCalEvent.dateEnd.value.toInstant(), displayId = false)
+                )
+            }
         )
         if (event.location != null) body += resources.getString(
             R.string.event_send_invite_mail_body_where,
@@ -1051,6 +1087,7 @@ class EventViewModel(
 
     fun handleEndDate(newDate: LocalDate) {
         markEventAsEdited()
+        adjustedEndDate = false
         val old = event.getEnd(eventTimeZoneId)!!
         if (event.isAllDay()) {
             event.iCalEvent.setEnd(newDate)

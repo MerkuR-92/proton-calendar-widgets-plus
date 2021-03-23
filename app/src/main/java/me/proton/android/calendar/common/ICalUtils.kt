@@ -58,13 +58,13 @@ object ICalUtils {
 
     }
 
-    fun formatTimeZoneId(timeZoneId: String, forInstant: Instant): String {
+    fun formatTimeZoneId(timeZoneId: String, forInstant: Instant, displayId: Boolean = true): String {
         val rawOffset = TimeZone.getTimeZone(timeZoneId).getOffset(Date.from(forInstant).time).toLong()
         val offsetLocalTime = LocalTime.MIDNIGHT.plus(if (rawOffset < 0) -rawOffset else rawOffset, ChronoUnit.MILLIS)
 
         val offset = "${offsetLocalTime.hour}${if (offsetLocalTime.minute > 0) ":${offsetLocalTime.minute}" else ""}"
 
-        return "${timeZoneId} (GMT${if (rawOffset < 0) "-" else "+"}${offset})"
+        return "${if (displayId) "$timeZoneId " else ""}(GMT${if (rawOffset < 0) "-" else "+"}${offset})"
     }
 
     fun areTimeZoneOffsetsDifferent(timeZoneIdA: String, timeZoneIdB: String, forInstant: Instant? = null): Boolean? {
