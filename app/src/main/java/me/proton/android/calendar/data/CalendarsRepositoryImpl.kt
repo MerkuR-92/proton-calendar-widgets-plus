@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.sanitise
@@ -145,14 +146,19 @@ class CalendarsRepositoryImpl(
 
     override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
 
+        val flow = MutableStateFlow<CalendarsRepository.InitingState>(CalendarsRepository.InitingState.Initing)
+
+        if (FeatureFlag.NEW_EVENT_DECRYPTION) {
+            flow.value = CalendarsRepository.InitingState.Finished
+            return flow
+        }
+
         // TODO temporary solution for being stuck on expandEventsToDateChannel.send
         shutdown()
 
         logger.v("initForUser $userId")
 
         eventsExpandedUntil = ZonedDateTime.now(timeZoneId)
-
-        val flow = MutableStateFlow<CalendarsRepository.InitingState>(CalendarsRepository.InitingState.Initing)
 
         if (coroutineScope.isActive) {
             logger.v("scope active, cancelling")
@@ -316,6 +322,11 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun shutdown() {
+
+        if (FeatureFlag.NEW_EVENT_DECRYPTION) {
+            return
+        }
+
         logger.v("shutdown calendarepository")
 
         if (coroutineScope.isActive) {
@@ -827,11 +838,14 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {
+
         logger.v("persist Event: ")
         events.forEach { logger.v("${it.id}") }
 
         // update local database first
         database.eventsDao().updateOrInsert(*events)
+
+        if (FeatureFlag.NEW_EVENT_DECRYPTION) return // TODO REMOVE EVERYTHING BELOW, BECAUSE WE DON'T USE THE EXPANDED CACHE ANYMORE
 
         // now update local events cache
 
@@ -890,6 +904,11 @@ class CalendarsRepositoryImpl(
     override suspend fun deleteEventsById(ids: List<String>) {
 
         database.eventsDao().deleteByIds(ids)
+
+        if (FeatureFlag.NEW_EVENT_DECRYPTION) return // TODO REMOVE EVERYTHING BELOW, BECAUSE WE DON'T USE THE EXPANDED CACHE ANYMORE
+
+        // TODO deleting alarms makes no sense, because they have just been deleted by foreign key on Event
+
         ids.forEach {
             database.eventAlarmsDao().deleteAllByEventId(it)
         }
