@@ -44,6 +44,10 @@ class CalendarsRepositoryImpl(
     private val json: Json
 ) : CalendarsRepository {
 
+    private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
+    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(100)
+    private val DEBOUNCE_EVENTS_UPDATE = Duration.ofMillis(100)
+
     private val eventsMutex = Mutex()
 
     // decrypted Events existing in database
@@ -69,10 +73,10 @@ class CalendarsRepositoryImpl(
     private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
-    private var coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val allCalendarsFlow = database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).distinctUntilChanged()
+    private val allEventsFlow = database.eventsDao().selectEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis()).distinctUntilChanged()
 
-    private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
-    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(500)
+    private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
         return this.filter {
@@ -567,8 +571,6 @@ class CalendarsRepositoryImpl(
 
             coroutineScope {
 
-                // TODO FILTER ONLY IN DISPLAYED CALENDARS
-
                 // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
                 // all we need to do is decrypt EventEntity and return full Events with correct occurrences
                 val transformedEvents = eventEntitiesAndSkeletons.mapNotNull { mapEntry ->
@@ -602,6 +604,8 @@ class CalendarsRepositoryImpl(
     /**
      * Returns all database EventEntities mapped to expanded SkeletonEvents. Each SkeletonEvent on the list contains
      * correct Occurrence matching the given arguments and correct DTSTART/DTEND.
+     *
+     * Filters out all Events from hidden Calendars.
      */
     private fun eventEntitiesAndSkeletonsFlow(
         fromDate: LocalDate,
@@ -609,13 +613,14 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ): Flow<Map<EventEntity, List<SkeletonEvent>>> {
 
-        return database.eventsDao().selectEventsFlow().distinctUntilChanged()
-            .transform<List<EventEntity>, Map<EventEntity, List<SkeletonEvent>>> { eventEntities ->
+        return allEventsFlow.combineTransform(allCalendarsFlow) { eventEntities, calendarEntities ->
 
                 val result = mutableMapOf<EventEntity, List<SkeletonEvent>>()
 
+                val visibileCalendarIds = calendarEntities.filterVisible().map { it.id }
+
                 // create Skeleton Events out of all EventEntities
-                val skeletonEvents = eventEntities.map { it.toSkeletonEvent() }
+                val skeletonEvents = eventEntities.map { if (visibileCalendarIds.contains(it.calendarId)) it.toSkeletonEvent() else null }
                 val skeletonEventsNonNulls = skeletonEvents.filterNotNull()
 
                 skeletonEvents.forEachIndexed { index, skeletonEvent ->
@@ -658,8 +663,6 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
 
-        // TODO FILTER ONLY IN DISPLAYED CALENDARS
-
         return eventEntitiesAndSkeletonsFlow(fromDate, toDate, timeZoneId).transform<Map<EventEntity, List<SkeletonEvent>>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventEntitiesAndSkeletons ->
 
             emit(CalendarsRepository.GetEventsResult.Success(eventEntitiesAndSkeletons.values.flatten()))
@@ -682,7 +685,7 @@ class CalendarsRepositoryImpl(
         toDate: LocalDate,
         timeZoneId: String
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-        return database.calendarsDao().flowCalendars(userId.id).combineTransform(getSkeletonEvents(userId, fromDate, toDate, timeZoneId)) { calendarEntities, skeletonResult ->
+        return allCalendarsFlow.combineTransform(getSkeletonEvents(userId, fromDate, toDate, timeZoneId)) { calendarEntities, skeletonResult ->
 
             if (skeletonResult is CalendarsRepository.GetEventsResult.Success) {
                 emit(skeletonResult.copy(events = skeletonResult.events.map { skeletonEvent ->
