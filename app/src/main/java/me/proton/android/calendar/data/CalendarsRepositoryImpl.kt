@@ -79,6 +79,9 @@ class CalendarsRepositoryImpl(
 
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    private val getEventsCache = mutableMapOf<EventsWindow, Flow<CalendarsRepository.GetEventsResult<Event>>>()
+    private val getSkeletonEventsCache = mutableMapOf<EventsWindow, Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>>>()
+
     private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
         return this.filter {
             it.display == 1 && (it.isActive || it.isDisabled)
@@ -567,18 +570,13 @@ class CalendarsRepositoryImpl(
             } else null
         }
 
-    override fun getEvents(
-        userId: UserId,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<CalendarsRepository.GetEventsResult<Event>> {
+    private fun createEventsFlow(eventsWindow: EventsWindow): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
-        return eventEntitiesAndSkeletonsFlow(
-            fromDate,
-            toDate,
-            timeZoneId
+        return createEventEntitiesAndSkeletonsFlow(
+            eventsWindow
         ).transform<Map<EventEntity, List<SkeletonEvent>>, CalendarsRepository.GetEventsResult<Event>> { eventEntitiesAndSkeletons ->
+
+            logger.v("executing create events flow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
 
             coroutineScope {
 
@@ -606,11 +604,30 @@ class CalendarsRepositoryImpl(
         }.onStart {
             emit(CalendarsRepository.GetEventsResult.InProgress)
         }.catch {
-            logger.e("Exception in getEvents() while transforming", it)
+            logger.e("Exception in createEventsFlow while transforming", it)
             emit(CalendarsRepository.GetEventsResult.Exception(it))
         }.flowOn(Dispatchers.Default).distinctUntilChanged()
 
     }
+
+    override fun getEvents(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<CalendarsRepository.GetEventsResult<Event>> {
+
+        val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
+
+        return getEventsCache.getOrPut(eventsWindow) {
+            createEventsFlow(eventsWindow).shareIn(coroutineScope, SharingStarted.Lazily, 1)
+        }
+    }
+
+    private data class EventsWindow(
+        val fromDate: LocalDate,
+        val toDate: LocalDate,
+        val timeZoneId: String
+    )
 
     /**
      * Returns all database EventEntities mapped to expanded SkeletonEvents. Each SkeletonEvent on the list contains
@@ -618,13 +635,13 @@ class CalendarsRepositoryImpl(
      *
      * Filters out all Events from hidden Calendars.
      */
-    private fun eventEntitiesAndSkeletonsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
+    private fun createEventEntitiesAndSkeletonsFlow(
+        eventsWindow: EventsWindow
     ): Flow<Map<EventEntity, List<SkeletonEvent>>> {
 
         return allEventsFlow.combineTransform(allCalendarsFlow) { eventEntities, calendarEntities ->
+
+            logger.v("eventEntitiesAndSkeletonsFlow combineTransform for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
                 val result = mutableMapOf<EventEntity, List<SkeletonEvent>>()
 
@@ -641,9 +658,9 @@ class CalendarsRepositoryImpl(
                         val expandedSkeletonEvents = expandDbEvent(
                             skeletonEvent,
                             skeletonEventsNonNulls,
-                            ZonedDateTime.of(toDate.plusDays(1).atStartOfDay(), ZoneId.of(timeZoneId))
+                            ZonedDateTime.of(eventsWindow.toDate.plusDays(1).atStartOfDay(), ZoneId.of(eventsWindow.timeZoneId))
                         ).filter {
-                            it.overlapsWithFullDayRange(fromDate, toDate, timeZoneId)
+                            it.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)
                         }
 
                         // apply occurrences to SkeletonEvents (overwrite DTSTART/DTEND)
@@ -667,14 +684,31 @@ class CalendarsRepositoryImpl(
 
     }
 
+    private fun createSkeletonEventsFlow(eventsWindow: EventsWindow): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+
+        return allCalendarsFlow.combineTransform(getSkeletonEvents(eventsWindow)) { calendarEntities, skeletonResult ->
+
+            logger.v("createSkeletonEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
+
+            if (skeletonResult is CalendarsRepository.GetEventsResult.Success) {
+                emit(skeletonResult.copy(events = skeletonResult.events.map { skeletonEvent ->
+                    val calendarColor = calendarEntities.firstOrNull { it.id == skeletonEvent.calendar.id }?.color ?: "#00FFFFFF"
+                    skeletonEvent.copy(calendar = skeletonEvent.calendar.copy(color = calendarColor))
+                }))
+            } else {
+                emit(skeletonResult)
+            }
+        }
+
+    }
+
     private fun getSkeletonEvents(
-        userId: UserId,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
+        eventsWindow: EventsWindow
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
 
-        return eventEntitiesAndSkeletonsFlow(fromDate, toDate, timeZoneId).transform<Map<EventEntity, List<SkeletonEvent>>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventEntitiesAndSkeletons ->
+        return createEventEntitiesAndSkeletonsFlow(eventsWindow).transform<Map<EventEntity, List<SkeletonEvent>>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventEntitiesAndSkeletons ->
+
+            logger.v("getSkeletonEvents for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
             emit(CalendarsRepository.GetEventsResult.Success(eventEntitiesAndSkeletons.values.flatten()))
 
@@ -691,21 +725,17 @@ class CalendarsRepositoryImpl(
      * Get Skeleton Events with correct Calendar Colors.
      */
     override fun getSkeletonEventsForIndicators(
-        userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-        return allCalendarsFlow.combineTransform(getSkeletonEvents(userId, fromDate, toDate, timeZoneId)) { calendarEntities, skeletonResult ->
 
-            if (skeletonResult is CalendarsRepository.GetEventsResult.Success) {
-                emit(skeletonResult.copy(events = skeletonResult.events.map { skeletonEvent ->
-                    val calendarColor = calendarEntities.firstOrNull { it.id == skeletonEvent.calendar.id }?.color ?: "#00FFFFFF"
-                    skeletonEvent.copy(calendar = skeletonEvent.calendar.copy(color = calendarColor))
-                }))
-            } else {
-                emit(skeletonResult)
-            }
+        logger.v("calling getSkeletonEventsForIndicators")
+
+        val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
+
+        return getSkeletonEventsCache.getOrPut(eventsWindow) {
+            createSkeletonEventsFlow(eventsWindow).shareIn(coroutineScope, SharingStarted.Lazily, 1)
         }
     }
 

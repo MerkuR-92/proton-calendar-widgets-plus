@@ -73,8 +73,10 @@ interface CalendarsRepository {
         data class Exception(val throwable: Throwable): GetEventsResult<Nothing>()
     }
 
+    /**
+     * @return Transformed Events.
+     */
     fun getEvents(
-        userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
@@ -84,7 +86,6 @@ interface CalendarsRepository {
      * @return SkeletonEvents with correct Calendar Color.
      */
     fun getSkeletonEventsForIndicators(
-        userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String

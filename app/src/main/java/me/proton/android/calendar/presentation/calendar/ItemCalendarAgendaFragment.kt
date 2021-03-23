@@ -146,11 +146,11 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
 
-            // TODO can we get UserID synchronously?
+            // TODO remove UserID livedata
             calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
 
                 userId?.let {
-                    calendarViewModel.getEvents(userId, immutableDate, immutableDate, timeZoneId)
+                    calendarViewModel.getEvents(immutableDate, immutableDate, timeZoneId)
                         .observe(viewLifecycleOwner) { eventsResult ->
 
                             //logger.e("got events for $immutableDate: $eventsResult")

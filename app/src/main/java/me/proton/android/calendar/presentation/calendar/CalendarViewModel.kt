@@ -281,7 +281,7 @@ class CalendarViewModel(
     }
 
     fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-        return calendarsRepository.getSkeletonEventsForIndicators(userId.value!!, fromDate, toDate, timeZoneId).asLiveData()
+        return calendarsRepository.getSkeletonEventsForIndicators(fromDate, toDate, timeZoneId).asLiveData()
     }
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
@@ -331,8 +331,8 @@ class CalendarViewModel(
         }
     }
 
-    fun getEvents(userId: UserId, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<Event>> {
-        return calendarsRepository.getEvents(userId, fromDate, toDate, timeZoneId).asLiveData()
+    fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<Event>> {
+        return calendarsRepository.getEvents(fromDate, toDate, timeZoneId).asLiveData()
     }
 
     suspend fun handleDeleteEvent(eventId: String,
