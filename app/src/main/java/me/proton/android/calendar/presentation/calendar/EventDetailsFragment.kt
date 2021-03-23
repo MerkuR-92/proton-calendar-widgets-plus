@@ -778,18 +778,25 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
         val sortedAttendeeList = attendeeList.sortedWith(compareBy { getParticipationStatusPriorityValue(it.participationStatus) })
         attendeeListAdapter.submitList(sortedAttendeeList)
+
+        // Reset LayoutParams
+        event_attendee_list.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
+        event_attendee_list.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
+
+        if (attendeesListHeight == null) {
+            if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
+                event_attendee_list.visibleOrGone(true)
+                rotateArrowUpward(event_attendees_button, 0)
+            } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
+                event_attendee_list.visibleOrGone(false)
+                event_attendees_button.visibleOrGone(false)
+                event_attendees_press.visibleOrGone(false)
+                return
+            }
+        }
+
         // Reset view height
         attendeesListHeight = null
-
-        if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
-            event_attendee_list.visibleOrGone(true)
-            rotateArrowUpward(event_attendees_button, 0)
-        } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
-            event_attendee_list.visibleOrGone(false)
-            event_attendees_button.visibleOrGone(false)
-            event_attendees_press.visibleOrGone(false)
-            return
-        }
 
         event_attendees_press.setOnClickListener {
             if (event_attendee_list.isVisible) {
@@ -801,7 +808,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // TODO: Workaround for special case where desired height is not properly calculated.
                 //  Passing 0 skips the animation.
                 //  It means that List with more than 5 items will not have expand animation on first expand.
-                expand(event_attendee_list, height = attendeesListHeight?: 0)
+                expand(event_attendee_list, height = attendeesListHeight ?: 0)
                 rotateArrowUpward(event_attendees_button)
             }
         }
