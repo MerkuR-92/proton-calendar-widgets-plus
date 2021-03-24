@@ -23,7 +23,7 @@ object CoreLogger : Logger {
                 HTTP_ERROR_UNAUTHORIZED -> false
                 HTTP_ERROR_NOT_FOUND -> false
                 HTTP_ERROR_UNPROCESSABLE_ENTITY -> when (error.protonData.code) {
-                    PROTON_ERROR_INVALID_REFRESH_TOKEN -> false
+                    PROTON_ERROR_INVALID_REFRESH_TOKEN -> true // TODO Set to false once random logout issue is fixed
                     PROTON_ERROR_INCORRECT_LOGIN_CREDENTIALS -> false
                     PROTON_ERROR_PUBLIC_KEYS_ADDRESS_DOESNT_EXIST -> false
                     else -> true
