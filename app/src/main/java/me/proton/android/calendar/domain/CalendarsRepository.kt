@@ -85,7 +85,7 @@ interface CalendarsRepository {
     /**
      * @return SkeletonEvents with correct Calendar Color.
      */
-    fun getSkeletonEventsForIndicators(
+    fun getSkeletonEvents(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String

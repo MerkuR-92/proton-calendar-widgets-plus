@@ -46,7 +46,7 @@ class CalendarsRepositoryImpl(
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
-    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(100)
+    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(500)
     private val DEBOUNCE_EVENTS_UPDATE = Duration.ofMillis(100)
 
     private val eventsMutex = Mutex()
@@ -553,15 +553,15 @@ class CalendarsRepositoryImpl(
     }
 
     /**
-     * Skeleton Event contains only data created using plaintext Shared Part and valid calendarId,
-     * but the rest is dummy data.
+     * Skeleton Event contains only data created using plaintext Shared Part,
+     * valid Calendar ID and Calendar Color, but the rest is dummy data.
      */
-    private fun EventEntity.toSkeletonEvent(): SkeletonEvent? =
+    private fun EventEntity.toSkeletonEvent(calendarColor: String? = null): SkeletonEvent? =
         this.toICalendarFromPlaintextSharedPart()?.let {
             if (it.events.first().sanitise()) {
                 SkeletonEvent(
                     this.id,
-                    Calendar(this.calendarId, "", "", 0, false), // TODO
+                    Calendar(this.calendarId, "", calendarColor ?: "", 0, false),
                     it,
                     null,
                     null,
@@ -645,10 +645,14 @@ class CalendarsRepositoryImpl(
 
                 val result = mutableMapOf<EventEntity, List<SkeletonEvent>>()
 
-                val visibileCalendarIds = calendarEntities.filterVisible().map { it.id }
+                val visibileCalendars = calendarEntities.filterVisible()
 
-                // create Skeleton Events out of all EventEntities
-                val skeletonEvents = eventEntities.map { if (visibileCalendarIds.contains(it.calendarId)) it.toSkeletonEvent() else null }
+                // create Skeleton Events out of all EventEntities, keep the nulls
+                val skeletonEvents = eventEntities.map { eventEntity ->
+                    val calendar = visibileCalendars.firstOrNull { it.id == eventEntity.calendarId }
+                    calendar?.run { eventEntity.toSkeletonEvent(this.color) }
+                }
+
                 val skeletonEventsNonNulls = skeletonEvents.filterNotNull()
 
                 skeletonEvents.forEachIndexed { index, skeletonEvent ->
@@ -684,24 +688,6 @@ class CalendarsRepositoryImpl(
 
     }
 
-    private fun createSkeletonEventsFlow(eventsWindow: EventsWindow): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-
-        return allCalendarsFlow.combineTransform(getSkeletonEvents(eventsWindow)) { calendarEntities, skeletonResult ->
-
-            logger.v("createSkeletonEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
-
-            if (skeletonResult is CalendarsRepository.GetEventsResult.Success) {
-                emit(skeletonResult.copy(events = skeletonResult.events.map { skeletonEvent ->
-                    val calendarColor = calendarEntities.firstOrNull { it.id == skeletonEvent.calendar.id }?.color ?: "#00FFFFFF"
-                    skeletonEvent.copy(calendar = skeletonEvent.calendar.copy(color = calendarColor))
-                }))
-            } else {
-                emit(skeletonResult)
-            }
-        }
-
-    }
-
     private fun getSkeletonEvents(
         eventsWindow: EventsWindow
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
@@ -724,7 +710,7 @@ class CalendarsRepositoryImpl(
     /**
      * Get Skeleton Events with correct Calendar Colors.
      */
-    override fun getSkeletonEventsForIndicators(
+    override fun getSkeletonEvents(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
@@ -735,7 +721,7 @@ class CalendarsRepositoryImpl(
         val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
 
         return getSkeletonEventsCache.getOrPut(eventsWindow) {
-            createSkeletonEventsFlow(eventsWindow).shareIn(coroutineScope, SharingStarted.Lazily, 1)
+            getSkeletonEvents(eventsWindow).shareIn(coroutineScope, SharingStarted.Lazily, 1)
         }
     }
 

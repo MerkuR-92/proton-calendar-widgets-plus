@@ -281,7 +281,7 @@ class CalendarViewModel(
     }
 
     fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-        return calendarsRepository.getSkeletonEventsForIndicators(fromDate, toDate, timeZoneId).asLiveData()
+        return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId).asLiveData()
     }
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
