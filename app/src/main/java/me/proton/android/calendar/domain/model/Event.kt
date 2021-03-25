@@ -280,7 +280,7 @@ data class Event(
     }
 
     /**
-     * Occurrence should always be expressed in timezone we format or display the calenendar with.
+     * Occurrence should always be expressed in timezone we format or display the calendar with.
      */
     data class Occurrence(val startDateTime: ZonedDateTime, val endDateTime: ZonedDateTime, val occurrenceNumber: Int)
 
@@ -594,6 +594,7 @@ data class Event(
         return generateOccurrences(timeZoneId, null, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
     }
 
+    // TODO remove nullability from dateTimeStart/End and use function from ICalUtils
     fun overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
 
         val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
@@ -612,13 +613,7 @@ data class Event(
      * range [fromDate]-[toDate].
      */
     fun startEndOverlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Boolean {
-
-        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
-        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
-
-        return (startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
-                || (endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
-                || ((startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBefore(fromDateTime) ?: false) && endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isAfter(toDateTime)) // starts before or ends after range, but happens during range
+        return ICalUtils.startEndOverlapsWithFullDayRange(startDateTime, endDateTime, fromDate, toDate, timeZoneId)
     }
 
 
@@ -707,7 +702,7 @@ data class Event(
     }
 
     /**
-     * Overwrites start & end datetime with [Occurrence] values.
+     * Returns copy of an [Event] with overwritten start & end datetime with [Occurrence] values.
      */
     fun withOccurrence(occurrence: Occurrence): Event {
         return this.copy(iCalendar = this.iCalendar.copy() as ICalendar).apply {

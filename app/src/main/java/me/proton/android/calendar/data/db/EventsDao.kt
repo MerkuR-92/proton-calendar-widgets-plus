@@ -3,6 +3,7 @@ package me.proton.android.calendar.data.db
 import androidx.room.*
 import me.proton.android.calendar.data.entity.EventEntity
 import kotlinx.coroutines.flow.Flow
+import me.proton.android.calendar.data.entity.SkeletonEventEntity
 
 @Dao
 abstract class EventsDao : BaseDao<EventEntity> {
@@ -12,10 +13,13 @@ abstract class EventsDao : BaseDao<EventEntity> {
 //    @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds) AND (sharedEvents LIKE '%' || :sharedEventsFieldSubstring || '%')")
 
     @Query("SELECT * FROM events")
-    abstract fun selectEvents(): List<EventEntity>
+    abstract suspend fun selectEvents(): List<EventEntity>
 
     @Query("SELECT * FROM events")
     abstract fun selectEventsFlow(): Flow<List<EventEntity>>
+
+    @Query("SELECT ID, CalendarID, SharedEvents FROM events")
+    abstract fun selectSkeletonEventsFlow(): Flow<List<SkeletonEventEntity>>
 
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")
     abstract fun flowEvents(calendarIds: List<String>): Flow<List<EventEntity>>
@@ -31,6 +35,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
     @Query("SELECT * FROM events WHERE id = :id")
     abstract suspend fun selectById(id: String): EventEntity?
+
+    @Query("SELECT * FROM events WHERE id IN (:eventIds)")
+    abstract suspend fun selectAllById(eventIds: List<String>): List<EventEntity>
 
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%DTSTART;VALUE=DATE:%'")
     abstract suspend fun selectAllDayOnly(): List<EventEntity>

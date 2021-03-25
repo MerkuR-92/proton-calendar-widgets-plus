@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,6 +41,11 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     private val fakeHeaderEvent = Event("", Calendar("", "", "", 1, true), ICalendar())
 
+    private var timeZoneId: String? = null
+    private var timeFormatIs24Hour: Boolean? = null
+    private var userAddresses: List<Address>? = null
+    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<Address>>>()
+
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment{
             return ItemCalendarAgendaFragment().apply {
@@ -70,37 +76,40 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        calendarViewModel.userAddresses.observe(viewLifecycleOwner) { userAddresses ->
-            userAddresses ?: return@observe
+        agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
+            timeZoneId = value?.id
 
-            if (userAddresses.firstOrNull { it.displayName == null } != null) {
+            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
+                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            }
+        }
+        agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
+            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(requireContext()) }
+
+            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
+                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            }
+        }
+        agendaMediator.addSource(calendarViewModel.userAddresses) { value ->
+            userAddresses = value
+
+            if (userAddresses?.firstOrNull { it.displayName == null } != null) {
                 // Refresh Addresses for user to fetch displayName values
                 calendarViewModel.refreshAddressesFromServer()
             }
 
-            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
-            val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour, userAddresses)
+            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
+                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            }
         }
-
-        calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            zoneId ?: return@observe
-            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
-            val userAddresses = calendarViewModel.userAddresses.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, timeFormatIs24Hour, userAddresses)
-        }
-
-        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
-            timeFormat ?: return@observe
-            val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
-            val userAddresses = calendarViewModel.userAddresses.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, calendarViewModel.timeFormatIs24Hour(requireContext()), userAddresses)
+        agendaMediator.observe(viewLifecycleOwner) {
+            it?.let { setupItemMiniCalendarContent(it.first, it.second, it.third) }
         }
     }
 
     private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<Address>) {
         val immutableDate = date ?: return
-        logger.d("onViewCreated: $immutableDate")
+        logger.v("setupItemMiniCalendarContent: $immutableDate")
 
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)

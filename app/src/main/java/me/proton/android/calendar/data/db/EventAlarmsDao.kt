@@ -12,7 +12,7 @@ abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
     abstract fun selectByEventId(eventId: String): Flow<List<EventAlarmEntity>>
 
     @Query("SELECT * FROM event_alarms WHERE id = :id")
-    abstract fun select(id: String): EventAlarmEntity?
+    abstract suspend fun select(id: String): EventAlarmEntity?
 
     @Query("SELECT * FROM event_alarms WHERE occurrence = (SELECT MIN(occurrence) FROM event_alarms WHERE occurrence >= :timestampSeconds)")
     abstract suspend fun selectUpcoming(timestampSeconds: Long): List<EventAlarmEntity>

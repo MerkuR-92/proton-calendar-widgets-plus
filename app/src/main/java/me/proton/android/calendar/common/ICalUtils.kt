@@ -10,12 +10,14 @@ import biweekly.io.TimezoneAssignment
 import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
-import biweekly.parameter.Role
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import com.google.crypto.tink.subtle.Hex
 import com.google.crypto.tink.subtle.Random
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
@@ -23,6 +25,8 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.SkeletonEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.security.MessageDigest
@@ -466,6 +470,57 @@ object ICalUtils {
 
     }
 
+    fun startEndOverlapsWithFullDayRange(startDateTime: ZonedDateTime, endDateTime: ZonedDateTime, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
+
+        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
+        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
+
+        return (startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
+                || (endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
+                || ((startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBefore(fromDateTime)) && endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isAfter(toDateTime)) // starts before or ends after range, but happens during range
+    }
+
+    /**
+     * Generated Event objects contain distinct Occurrence properties, but they point to the same ICalendar object!
+     */
+    fun expandOccurrencesWithSingleEdits(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): List<Event>? {
+
+        val occurrences = originalEvent.generateOccurrencesUntil(toDate, timeZoneId)?.filterFromTheEnd {
+            startEndOverlapsWithFullDayRange(it.startDateTime, it.endDateTime, fromDate, toDate, timeZoneId)
+        } ?: return null
+
+        return occurrences.map { occurrence ->
+            val event = eventsSharingUid.find {
+                it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
+                    occurrence.startDateTime,
+                    originalEvent.isAllDay()
+                )
+            }?.copy() ?: originalEvent.copy()
+            event.occurrence = occurrence
+            event
+        }
+
+    }
+
+    /**
+     * Creates ICalendar using only plaintext shared event part.
+     */
+    fun toICalendarFromPlaintextSharedPart(json: Json, sharedEvents: List<JsonElement>): ICalendar? {
+
+        val sharedPlainTextPart = sharedEvents.asSequence().map { json.decodeFromJsonElement<Event.EventPart.Shared>(it) }.firstOrNull { !it.isEncrypted }
+
+        return sharedPlainTextPart?.let {
+            parseICalString(it.data)
+        }
+
+    }
+
     /**
      * Given original Event, filter out all occurrences that are excluded by EXDATE
      */
@@ -793,6 +848,26 @@ fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event> {
             ?: emptyList()
     )
     return result
+}
+
+/**
+ * Assumes that elements matching the predicate will be continous in the list,
+ * so it breaks the loop eagerly.
+ */
+fun <T> List<T>.filterFromTheEnd(predicate: (T) -> Boolean): List<T> {
+
+    val filtered = mutableListOf<T>()
+    var insideWindow = false
+    for (i in (this.size - 1) downTo 0) {
+        if (predicate.invoke(this[i])) {
+            insideWindow = true
+            filtered.add(0, this[i])
+        } else {
+            if (insideWindow) break
+        }
+    }
+
+    return filtered
 }
 
 /**

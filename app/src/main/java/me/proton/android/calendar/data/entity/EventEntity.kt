@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 
-@Entity(tableName = AppDatabase.TABLE_EVENTS,
+@Entity(
+    tableName = AppDatabase.TABLE_EVENTS,
     foreignKeys = [ForeignKey(
         entity = CalendarEntity::class,
         parentColumns = ["id"],
@@ -50,6 +51,4 @@ data class EventEntity(
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
     val attendees: List<JsonElement>
-) {
-
-}
+)

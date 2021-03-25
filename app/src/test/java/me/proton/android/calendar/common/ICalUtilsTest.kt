@@ -185,6 +185,26 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `filter from the end of list`() {
+
+        val list1 = listOf(0, 0, 1, 0, 0)
+        assertThat(list1.filterFromTheEnd { it == 1 }).isEqualTo(listOf(1))
+
+        val list2 = listOf(0, 0, 1, 1, 1)
+        assertThat(list2.filterFromTheEnd { it == 1 }).isEqualTo(listOf(1, 1, 1))
+
+        val list3 = listOf(1, 0, 0, 0, 0)
+        assertThat(list3.filterFromTheEnd { it == 1 }).isEqualTo(listOf(1))
+
+        val list4 = listOf(1, 1, 1, 1, 1)
+        assertThat(list4.filterFromTheEnd { it == 1 }).isEqualTo(listOf(1, 1, 1, 1, 1))
+
+        val list5 = listOf(5, 4, 3, 2, 1)
+        assertThat(list5.filterFromTheEnd { it > 2 }).isEqualTo(listOf(5, 4, 3))
+
+    }
+
+    @Test
     fun `all-day event has no time and no timezone property`() {
 
         val event = ICalUtils.createNewEvent()
@@ -1012,6 +1032,54 @@ internal class ICalUtilsTest {
         assertThat(occurrences.first().occurrenceNumber).isEqualTo(6)
         assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 1, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
         assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 2, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
+    fun `generate multiple occurrences of full-day event within full-day range`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200626
+    DTEND;VALUE=DATE:20200627
+    RRULE:FREQ=DAILY;COUNT=20
+    SUMMARY:recurring every day 20 times
+    UID:EGVy407XddW2_ESpoOVn7oN1qc9V@proton.me
+    DTSTAMP:20200625T143822Z
+    BEGIN:VALARM
+    TRIGGER:-PT15H
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)
+
+        val displayRangeFrom = LocalDate.of(2020, 7, 1)
+        val displayRangeTo = LocalDate.of(2020, 7, 5)
+
+        val occurrences = event.generateOccurrencesInFullDayRange(displayRangeFrom, displayRangeTo, displayTimeZoneId)
+
+        assertThat(occurrences!!.size).isEqualTo(5)
+
+        assertThat(occurrences.first().occurrenceNumber).isEqualTo(6)
+        assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 1, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 2, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences.last().occurrenceNumber).isEqualTo(10)
+        assertThat(occurrences.last().startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.last().endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 6, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
     }
 

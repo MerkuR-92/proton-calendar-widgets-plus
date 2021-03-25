@@ -74,13 +74,23 @@ class CalendarsRepositoryImpl(
     private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
-    private val allCalendarsFlow = database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).distinctUntilChanged()
-    private val allEventsFlow = database.eventsDao().selectEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis()).distinctUntilChanged()
-
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
-    private val getEventsCache = mutableMapOf<EventsWindow, Flow<CalendarsRepository.GetEventsResult<Event>>>()
-    private val getSkeletonEventsCache = mutableMapOf<EventsWindow, Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>>>()
+    private val allCalendarEntitiesFlow = database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
+    private val allEventEntitiesFlow = database.eventsDao().selectEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis()).distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
+
+    private val visibleSkeletonEventsFlow = database.eventsDao().selectSkeletonEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis()).combineTransform(allCalendarEntitiesFlow) { skeletonEventEntities, calendarEntities ->
+
+            val visibileCalendars = calendarEntities.filterVisible()
+
+            val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
+                val calendar = visibileCalendars.firstOrNull { it.id == skeletonEventEntity.calendarId }
+                calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color) }
+            }
+
+            emit(skeletonEvents)
+
+    }.distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
     private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
         return this.filter {
@@ -537,72 +547,46 @@ class CalendarsRepositoryImpl(
 
     }
 
-    /**
-     * Creates ICalendar using only plaintext shared event part.
-     */
-    private fun EventEntity?.toICalendarFromPlaintextSharedPart(): ICalendar? {
-
-        if (this == null) return null
-
-        val sharedPlainTextPart = this.sharedEvents.asSequence().map { json.decodeFromJsonElement<Event.EventPart.Shared>(it) }.firstOrNull { !it.isEncrypted }
-
-        return sharedPlainTextPart?.let {
-            ICalUtils.parseICalString(it.data)
-        }
-
-    }
-
-    /**
-     * Skeleton Event contains only data created using plaintext Shared Part,
-     * valid Calendar ID and Calendar Color, but the rest is dummy data.
-     */
-    private fun EventEntity.toSkeletonEvent(calendarColor: String? = null): SkeletonEvent? =
-        this.toICalendarFromPlaintextSharedPart()?.let {
-            if (it.events.first().sanitise()) {
-                SkeletonEvent(
-                    this.id,
-                    Calendar(this.calendarId, "", calendarColor ?: "", 0, false),
-                    it,
-                    null,
-                    null,
-                    null
-                )
-            } else null
-        }
-
     private fun createEventsFlow(eventsWindow: EventsWindow): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
-        return createEventEntitiesAndSkeletonsFlow(
-            eventsWindow
-        ).transform<Map<EventEntity, List<SkeletonEvent>>, CalendarsRepository.GetEventsResult<Event>> { eventEntitiesAndSkeletons ->
+        return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->
 
-            logger.v("executing create events flow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
+            logger.v("createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
 
             coroutineScope {
 
                 // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
                 // all we need to do is decrypt EventEntity and return full Events with correct occurrences
-                val transformedEvents = eventEntitiesAndSkeletons.mapNotNull { mapEntry ->
+
+                val eventEntities = database.eventsDao().selectAllById(eventSkeletons.map { it.id })
+
+                val transformedEvents = eventEntities.map { eventEntity ->
                     async {
-                        val transformedEvent = transformEventUseCase.execute(mapEntry.key)
+                        val transformedEvent = transformEventUseCase.execute(eventEntity)
+
+                        val skeletons = eventSkeletons.filter { it.id == eventEntity.id }
 
                         if (transformedEvent != null) {
-                            mapEntry.value.map { skeletonEvent ->
-                                if (skeletonEvent.occurrence == null) { // non-recurring event
+                            skeletons.map {
+                                if (it.occurrence == null) { // non-recurring event
                                     transformedEvent
                                 } else { // recurring event, apply occurrence
-                                    transformedEvent.withOccurrence(skeletonEvent.occurrence!!)
+                                    transformedEvent.withOccurrence(it.occurrence!!)
                                 }
                             }
                         } else null
                     }
+
                 }.awaitAll().filterNotNull().flatten()
 
                 emit(CalendarsRepository.GetEventsResult.Success(transformedEvents))
+
             }
 
         }.onStart {
             emit(CalendarsRepository.GetEventsResult.InProgress)
+        }.retry(1) {
+            logger.e("retrying in createEventsFlow because of exception $it"); true
         }.catch {
             logger.e("Exception in createEventsFlow while transforming", it)
             emit(CalendarsRepository.GetEventsResult.Exception(it))
@@ -618,9 +602,7 @@ class CalendarsRepositoryImpl(
 
         val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
 
-        return getEventsCache.getOrPut(eventsWindow) {
-            createEventsFlow(eventsWindow).shareIn(coroutineScope, SharingStarted.Lazily, 1)
-        }
+        return createEventsFlow(eventsWindow)
     }
 
     private data class EventsWindow(
@@ -629,62 +611,23 @@ class CalendarsRepositoryImpl(
         val timeZoneId: String
     )
 
-    /**
-     * Returns all database EventEntities mapped to expanded SkeletonEvents. Each SkeletonEvent on the list contains
-     * correct Occurrence matching the given arguments and correct DTSTART/DTEND.
-     *
-     * Filters out all Events from hidden Calendars.
-     */
-    private fun createEventEntitiesAndSkeletonsFlow(
+    private fun createSkeletonsFlow(
         eventsWindow: EventsWindow
-    ): Flow<Map<EventEntity, List<SkeletonEvent>>> {
+    ): Flow<List<SkeletonEvent>> {
 
-        return allEventsFlow.combineTransform(allCalendarsFlow) { eventEntities, calendarEntities ->
+        return visibleSkeletonEventsFlow.map { visibleSkeletonEvents ->
 
-            logger.v("eventEntitiesAndSkeletonsFlow combineTransform for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
+            logger.v("createSkeletonsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
-                val result = mutableMapOf<EventEntity, List<SkeletonEvent>>()
+            visibleSkeletonEvents.map { skeletonEvent ->
+                expandSkeletonEventsAndFilterInWindow(
+                    skeletonEvent,
+                    visibleSkeletonEvents,
+                    eventsWindow
+                )
+            }.flatten()
 
-                val visibileCalendars = calendarEntities.filterVisible()
-
-                // create Skeleton Events out of all EventEntities, keep the nulls
-                val skeletonEvents = eventEntities.map { eventEntity ->
-                    val calendar = visibileCalendars.firstOrNull { it.id == eventEntity.calendarId }
-                    calendar?.run { eventEntity.toSkeletonEvent(this.color) }
-                }
-
-                val skeletonEventsNonNulls = skeletonEvents.filterNotNull()
-
-                skeletonEvents.forEachIndexed { index, skeletonEvent ->
-
-                    skeletonEvent?.let {
-                        // expand SkeletonEvent and filter out occurrences outside given arguments
-                        val expandedSkeletonEvents = expandDbEvent(
-                            skeletonEvent,
-                            skeletonEventsNonNulls,
-                            ZonedDateTime.of(eventsWindow.toDate.plusDays(1).atStartOfDay(), ZoneId.of(eventsWindow.timeZoneId))
-                        ).filter {
-                            it.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)
-                        }
-
-                        // apply occurrences to SkeletonEvents (overwrite DTSTART/DTEND)
-                        val withOccurrences = expandedSkeletonEvents.map {
-                            if (it.occurrence == null) { // non-recurring event
-                                it
-                            } else { // recurring event, apply occurrence
-                                it.withOccurrence(it.occurrence!!)
-                            }
-                        }
-
-                        if (withOccurrences.isNotEmpty()) {
-                            result[eventEntities[index]] = withOccurrences
-                        }
-                    }
-
-                }
-
-                emit(result)
-            }.flowOn(Dispatchers.Default).distinctUntilChanged()
+        }.flowOn(Dispatchers.Default).distinctUntilChanged()
 
     }
 
@@ -692,14 +635,16 @@ class CalendarsRepositoryImpl(
         eventsWindow: EventsWindow
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
 
-        return createEventEntitiesAndSkeletonsFlow(eventsWindow).transform<Map<EventEntity, List<SkeletonEvent>>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventEntitiesAndSkeletons ->
+        return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventSkeletons ->
 
             logger.v("getSkeletonEvents for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
-            emit(CalendarsRepository.GetEventsResult.Success(eventEntitiesAndSkeletons.values.flatten()))
+            emit(CalendarsRepository.GetEventsResult.Success(eventSkeletons))
 
         }.onStart {
             emit(CalendarsRepository.GetEventsResult.InProgress)
+        }.retry(1) {
+            logger.e("retrying getSkeletonEvents events because of exception $it"); true
         }.catch {
             logger.e("Exception in getSkeletonEvents() while transforming", it)
             emit(CalendarsRepository.GetEventsResult.Exception(it))
@@ -716,13 +661,11 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
 
-        logger.v("calling getSkeletonEventsForIndicators")
+        logger.v("calling getSkeletonEventsForIndicators $fromDate - $toDate")
 
         val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
 
-        return getSkeletonEventsCache.getOrPut(eventsWindow) {
-            getSkeletonEvents(eventsWindow).shareIn(coroutineScope, SharingStarted.Lazily, 1)
-        }
+        return getSkeletonEvents(eventsWindow)
     }
 
     override suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean =
@@ -776,6 +719,34 @@ class CalendarsRepositoryImpl(
             }
         } else {
             listOf(event)
+        }
+    }
+
+    private fun expandSkeletonEventsAndFilterInWindow(event: Event, allEvents: List<Event>, eventsWindow: EventsWindow): List<Event> {
+
+        return if (event.isRecurring()) {
+            // occurrences are already filtered for time window
+            val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(
+                event,
+                allEvents.filter { it.uid == event.uid },
+                eventsWindow.fromDate,
+                eventsWindow.toDate,
+                eventsWindow.timeZoneId
+            )!!
+            val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event, eventsWindow.timeZoneId)
+
+            filteredByExdates
+        } else if (event.isSingleEdit()) {
+            // single edits are already generated when expanding above ^
+            //  however, orphaned single edits (without original recurring event)
+            //  have to be added to the list manually
+            if (allEvents.find { it.uid == event.uid && it.isRecurring() } != null) {
+                emptyList()
+            } else {
+                if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event) else emptyList()
+            }
+        } else {
+            if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event) else emptyList()
         }
     }
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.coroutines.launch
@@ -30,6 +31,10 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val logger: Logger by inject()
+
+    private var timeZoneId: String? = null
+    private var weekStart: DayOfWeek? = null
+    private val miniCalendarMediator = MediatorLiveData<Pair<String, DayOfWeek>>()
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemMiniCalendarFragment{
@@ -61,16 +66,22 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            zoneId ?: return@observe
-            val weekStart = calendarViewModel.weekStart.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, getWeekStartDayOfWeek(weekStart))
-        }
+        miniCalendarMediator.addSource(calendarViewModel.timeZoneId) { value ->
+            timeZoneId = value?.id
 
-        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
-            weekStart ?: return@observe
-            val zoneId = calendarViewModel.timeZoneId.value ?: return@observe
-            setupItemMiniCalendarContent(zoneId.id, getWeekStartDayOfWeek(weekStart))
+            if (timeZoneId != null && weekStart != null) {
+                miniCalendarMediator.value = Pair(timeZoneId!!, weekStart!!)
+            }
+        }
+        miniCalendarMediator.addSource(calendarViewModel.weekStart) { value ->
+            weekStart = value?.let { getWeekStartDayOfWeek(it) }
+
+            if (timeZoneId != null && weekStart != null) {
+                miniCalendarMediator.value = Pair(timeZoneId!!, weekStart!!)
+            }
+        }
+        miniCalendarMediator.observe(viewLifecycleOwner) {
+            it?.let { setupItemMiniCalendarContent(it.first, it.second) }
         }
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->

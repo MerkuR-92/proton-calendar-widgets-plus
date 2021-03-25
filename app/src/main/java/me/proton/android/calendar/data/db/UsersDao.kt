@@ -14,7 +14,7 @@ abstract class UsersDao : BaseDao<UserEntity> {
     abstract fun usersFlow(): Flow<List<UserEntity>>
 
     @Query("SELECT * FROM users")
-    abstract fun select(): List<UserEntity>
+    abstract suspend fun select(): List<UserEntity>
 
     @Query("SELECT * FROM users WHERE id = :userId")
     abstract suspend fun selectUserById(userId: String): UserEntity?
