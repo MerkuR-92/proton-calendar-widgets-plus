@@ -993,6 +993,21 @@ class EventViewModel(
         return body
     }
 
+    private fun getReplyMailSubject(resources: Resources, summary: String?): String {
+        // TODO Move to UseCase once we can use strings resources there
+        return resources.getString(R.string.event_change_answer_mail_subject_accepted, summary ?: resources.getString(R.string.default_event_summary))
+    }
+
+    private fun getReplyMailBody(resources: Resources, participationStatus: ParticipationStatus, userAttendeeEmail: String, summary: String?): String {
+        // TODO Move to UseCase once we can use strings resources there
+        return when (participationStatus) {
+            ParticipationStatus.ACCEPTED -> resources.getString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail, summary ?: resources.getString(R.string.default_event_summary))
+            ParticipationStatus.DECLINED -> resources.getString(R.string.event_change_answer_mail_body_declined, userAttendeeEmail, summary ?: resources.getString(R.string.default_event_summary))
+            ParticipationStatus.TENTATIVE -> resources.getString(R.string.event_change_answer_mail_body_tentative, userAttendeeEmail, summary ?: resources.getString(R.string.default_event_summary))
+            else -> "" // TODO Shouldn't happen ?
+        }
+    }
+
     private fun handleSequence(dbEventWithOccurrence: Event? = null) {
         // Bump sequence when event is new or following changes :
         // - Status
@@ -1497,8 +1512,7 @@ class EventViewModel(
         participationStatus: ParticipationStatus,
         userAttendee: Attendee,
         userEmails: List<String>,
-        subject: String,
-        body: String
+        resources: Resources
     ) : Boolean {
         val status = participationStatus.toInt()
 
@@ -1526,6 +1540,8 @@ class EventViewModel(
                 null
             }
 
+        val subject = getReplyMailSubject(resources, event.summary)
+        val body = getReplyMailBody(resources, participationStatus, userAttendee.email, event.summary)
         val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
             userId,
             eventCopy.iCalendar,

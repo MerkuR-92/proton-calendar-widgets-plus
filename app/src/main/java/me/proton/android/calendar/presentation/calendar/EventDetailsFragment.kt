@@ -483,8 +483,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 return@launch
             }
 
-            val subject = getReplyMailSubject(event.summary)
-            val body = getReplyMailBody(participationStatus, userAttendee.email, event.summary)
             if (eventViewModel.updateParticipationStatus(
                     calendarId,
                     eventId,
@@ -492,8 +490,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     participationStatus,
                     userAttendee,
                     userEmails,
-                    subject,
-                    body
+                    resources
                 )) {
                 eventViewModel.handleParticipationStatus(userEmails, participationStatus)
             } else {
@@ -501,21 +498,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                 displayAttendeeAnswerState(currentParticipationStatus, false)
             }
-        }
-    }
-
-    private fun getReplyMailSubject(summary: String?): String {
-        // TODO Move to UseCase once we can use strings resources there
-        return getString(R.string.event_change_answer_mail_subject_accepted, summary ?: getString(R.string.default_event_summary))
-    }
-
-    private fun getReplyMailBody(participationStatus: ParticipationStatus, userAttendeeEmail: String, summary: String?): String {
-        // TODO Move to UseCase once we can use strings resources there
-        return when (participationStatus) {
-            ParticipationStatus.ACCEPTED -> getString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
-            ParticipationStatus.DECLINED -> getString(R.string.event_change_answer_mail_body_declined, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
-            ParticipationStatus.TENTATIVE -> getString(R.string.event_change_answer_mail_body_tentative, userAttendeeEmail, summary ?: getString(R.string.default_event_summary))
-            else -> "" // TODO Shouldn't happen ?
         }
     }
 
