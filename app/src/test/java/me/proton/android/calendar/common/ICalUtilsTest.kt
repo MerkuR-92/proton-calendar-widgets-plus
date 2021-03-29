@@ -180,7 +180,7 @@ internal class ICalUtilsTest {
 
         assertThat(AndroidUtils.fallbackTimeZone("Europe/Zurich")).isEqualTo("Europe/Zurich")
 
-        assertThat(AndroidUtils.fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Amsterdam")
+        assertThat(AndroidUtils.fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Athens")
 
     }
 

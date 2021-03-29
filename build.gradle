@@ -33,7 +33,7 @@ buildscript {
                 "proton_core_data": "1.0",
                 "proton_core_domain": "1.0",
                 "proton_core_presentation": "0.5.7",
-                "proton_core_networking": "1.0",
+                "proton_core_networking": "1.0.2",
                 "proton_core_util_kotlin": "0.2.4",
                 "proton_core_mail_message": "0.1.1"
         ]
