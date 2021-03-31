@@ -1,6 +1,5 @@
 package me.proton.android.calendar.data
 
-import biweekly.ICalendar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -15,7 +14,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.common.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
@@ -23,7 +21,6 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
@@ -76,21 +73,23 @@ class CalendarsRepositoryImpl(
 
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
-    private val allCalendarEntitiesFlow = database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis()).distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
-    private val allEventEntitiesFlow = database.eventsDao().selectEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis()).distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
+    private val visibleCalendarEntitiesFlow =
+        database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
+            .map { it.filterVisible() }.distinctUntilChanged()
+            .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
-    private val visibleSkeletonEventsFlow = database.eventsDao().selectSkeletonEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis()).combineTransform(allCalendarEntitiesFlow) { skeletonEventEntities, calendarEntities ->
+    private val visibleSkeletonEventsFlow =
+        database.eventsDao().selectSkeletonEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
+            .combineTransform(visibleCalendarEntitiesFlow) { skeletonEventEntities, calendarEntities ->
 
-            val visibileCalendars = calendarEntities.filterVisible()
+                val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
+                    val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
+                    calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color) }
+                }
 
-            val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
-                val calendar = visibileCalendars.firstOrNull { it.id == skeletonEventEntity.calendarId }
-                calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color) }
-            }
+                emit(skeletonEvents)
 
-            emit(skeletonEvents)
-
-    }.distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
+            }.distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
     private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
         return this.filter {
