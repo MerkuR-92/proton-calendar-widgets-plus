@@ -54,7 +54,7 @@ val PROTON_OLD_UID = "proton-calendar"
 const val MAX_EMAILS_PER_QUERY: Int = 8
 
 object FeatureFlag {
-    const val NEW_EVENT_DECRYPTION = false
+    const val NEW_EVENT_DECRYPTION = true
     const val SETTINGS_DRAWER = true
     const val ADD_ATTENDEES = false
     const val CHANGE_ANSWER = false
