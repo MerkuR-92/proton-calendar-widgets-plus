@@ -160,6 +160,14 @@ class CalendarsRepositoryImpl(
 
         val flow = MutableStateFlow<CalendarsRepository.InitingState>(CalendarsRepository.InitingState.Initing)
 
+        // TODO make sure we also migrate the calendar fetching for new event decryption
+        coroutineScope.launch {
+            fetchEventsChannel.consumeEach {
+            logger.v("consuming: $it")
+                fetchEventsInWindow(it)
+            }
+        }
+
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
             flow.value = CalendarsRepository.InitingState.Finished
             return flow
@@ -287,6 +295,7 @@ class CalendarsRepositoryImpl(
                 }
 
                 fetchEventsResult.second?.let {
+                    logger.v("fetchEventsResult success: ${it.size}")
                     persistEvents(*it.toTypedArray())
                     updateAlarmsUseCase.execute(fetchWindow.userId.id, it.map { it.id })
                     fetchedWindows.add(fetchWindow)
@@ -334,6 +343,11 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun shutdown() {
+
+        fetchedWindows.clear()
+        fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+        fetchingState.value = CalendarsRepository.FetchingState.Finished
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
             return
@@ -537,10 +551,10 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ) {
 
-        val expandUntilDateTime = ZonedDateTime.of(LocalDateTime.of(toDate, LocalTime.MIDNIGHT), ZoneId.of(timeZoneId))
-        expandEventsToDateChannel.send(expandUntilDateTime)
+//        val expandUntilDateTime = ZonedDateTime.of(LocalDateTime.of(toDate, LocalTime.MIDNIGHT), ZoneId.of(timeZoneId))
+//        expandEventsToDateChannel.send(expandUntilDateTime)
 
-        val calendarIds = dbCalendars.value.filter { it.fkUserId == userId.id }.map { it.id }
+        val calendarIds = database.calendarsDao().selectCalendars(userId.id).map { it.id }
 
         fetchEventsChannel.send(FetchWindow(userId, calendarIds, fromDate, toDate, timeZoneId))
 
