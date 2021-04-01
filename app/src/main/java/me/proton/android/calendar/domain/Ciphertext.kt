@@ -12,10 +12,7 @@ data class Ciphertext(
     val encodedDataPacket: String = com.google.crypto.tink.subtle.Base64.encode(dataPacket)
 
     fun asArmoredPGPMessage(): String {
-        val binaryData = com.google.crypto.tink.subtle.Base64.decode(encodedKeyPacket, com.google.crypto.tink.subtle.Base64.DEFAULT) +
-                com.google.crypto.tink.subtle.Base64.decode(encodedDataPacket, com.google.crypto.tink.subtle.Base64.DEFAULT)
-        return Armor.armorWithType(binaryData, "PGP MESSAGE")
-//        return PGPSplitMessage(keyPacket, dataPacket).armored
+        return Armor.armorWithType(if (keyPacket == null) dataPacket else keyPacket + dataPacket, com.proton.gopenpgp.constants.Constants.PGPMessageHeader)
     }
 
     companion object {
