@@ -280,7 +280,7 @@ class CalendarViewModel(
         }
     }
 
-    fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+    private fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
         return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId).asLiveData()
     }
 
@@ -331,8 +331,8 @@ class CalendarViewModel(
         }
     }
 
-    fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<Event>> {
-        return calendarsRepository.getEvents(fromDate, toDate, timeZoneId).asLiveData()
+    fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<Event>> {
+        return calendarsRepository.getEvents(fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
     }
 
     suspend fun handleDeleteEvent(eventId: String,

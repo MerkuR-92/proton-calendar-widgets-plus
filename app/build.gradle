@@ -160,6 +160,7 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${rootProject.ext.version.androidx}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${rootProject.ext.version.androidx}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${rootProject.ext.version.androidx}"
 //    For LifecycleScope, use androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-alpha01 or higher.
 //    For liveData, use androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha01 or higher.
     //noinspection GradleDependency

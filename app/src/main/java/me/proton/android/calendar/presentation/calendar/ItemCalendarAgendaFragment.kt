@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,7 @@ import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -45,6 +48,9 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private var timeFormatIs24Hour: Boolean? = null
     private var userAddresses: List<Address>? = null
     private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<Address>>>()
+
+    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
+    private var selectedDate: LocalDate? = null
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment{
@@ -109,7 +115,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<Address>) {
         val immutableDate = date ?: return
-        logger.v("setupItemMiniCalendarContent: $immutableDate")
 
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
@@ -156,47 +161,11 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
 
             // TODO remove UserID livedata
+
             calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
 
                 userId?.let {
-                    calendarViewModel.getEvents(immutableDate, immutableDate, timeZoneId)
-                        .observe(viewLifecycleOwner) { eventsResult ->
-
-                            //logger.e("got events for $immutableDate: $eventsResult")
-
-                            eventsResult?.let {
-                                when (it) {
-                                    CalendarsRepository.GetEventsResult.InProgress -> {
-                                        list_view_status.visibleOrInvisible(true)
-                                        list_view_status.text = resources.getString(R.string.agenda_loading_events)
-                                    }
-                                    is CalendarsRepository.GetEventsResult.Success -> {
-
-                                        if (it.events.isEmpty()) {
-                                            list_view_status.visibleOrInvisible(true)
-                                            list_view_status.text = resources.getString(R.string.agenda_no_events)
-                                        } else {
-                                            list_view_status.visibleOrInvisible(false)
-                                        }
-                                        (rv_agenda.adapter as? EventAdapter)?.submitList(
-                                            listOf(fakeHeaderEvent).plus(it.events.sortForAgendaView(timeZoneId))
-                                        )
-
-                                    }
-                                    is CalendarsRepository.GetEventsResult.Exception -> {
-                                        list_view_status.visibleOrInvisible(true)
-                                        list_view_status.text =
-                                            resources.getString(R.string.agenda_loading_events_error)
-
-                                        (rv_agenda.adapter as? EventAdapter)?.submitList(
-                                            listOf(fakeHeaderEvent)
-                                        )
-                                    }
-                                }
-
-                            }
-
-                        }
+                    getEvents(immutableDate, timeZoneId)
                 }
 
             }
@@ -222,5 +191,80 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
         }
 
+        calendarViewModel.selectedDate.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDate ->
+            if (this.selectedDate == null) {
+                // View pager creates fragment for selectedDate + 2 when you start swiping, so comparing immutableDate
+                //  and selectedDate would make us remove the observer for the flow we just created on start.
+                // To avoid this case we skip the first observed value of selectedDate.
+                this.selectedDate = selectedDate
+                return@observe
+            }
+            this.selectedDate = selectedDate
+            if (eventsLiveData.hasActiveObservers() &&
+                immutableDate != selectedDate &&
+                immutableDate != selectedDate.minusDays(1) &&
+                immutableDate != selectedDate.plusDays(1)) {
+                logger.v("events flow: remove observer for $immutableDate. Selected date is $selectedDate")
+                eventsLiveData.removeObservers(viewLifecycleOwner)
+            } else if (!eventsLiveData.hasActiveObservers() &&
+                (immutableDate == selectedDate ||
+                        immutableDate == selectedDate.minusDays(1) ||
+                        immutableDate == selectedDate.plusDays(1))) {
+                logger.v("events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
+                getEvents(immutableDate, timeZoneId)
+            }
+        }
+    }
+
+    private fun getEvents(immutableDate: LocalDate, timeZoneId: String) {
+        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+            logger.v("events flow: remove already existing observer for $immutableDate")
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+        eventsLiveData = calendarViewModel.getEvents(immutableDate, immutableDate, timeZoneId, this.lifecycle)
+        eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
+
+            eventsResult?.let {
+                when (it) {
+                    CalendarsRepository.GetEventsResult.InProgress -> {
+                        val currentList = (rv_agenda.adapter as? EventAdapter)?.currentList
+                        if (currentList == null || currentList.size <= 1) {
+                            list_view_status.visibleOrInvisible(true)
+                            list_view_status.text = resources.getString(R.string.agenda_loading_events)
+                        }
+                    }
+                    is CalendarsRepository.GetEventsResult.Success -> {
+
+                        if (it.events.isEmpty()) {
+                            list_view_status.visibleOrInvisible(true)
+                            list_view_status.text = resources.getString(R.string.agenda_no_events)
+                        } else {
+                            list_view_status.visibleOrInvisible(false)
+                        }
+                        (rv_agenda.adapter as? EventAdapter)?.submitList(
+                            listOf(fakeHeaderEvent).plus(it.events.sortForAgendaView(timeZoneId))
+                        )
+
+                    }
+                    is CalendarsRepository.GetEventsResult.Exception -> {
+                        list_view_status.visibleOrInvisible(true)
+                        list_view_status.text =
+                            resources.getString(R.string.agenda_loading_events_error)
+
+                        (rv_agenda.adapter as? EventAdapter)?.submitList(
+                            listOf(fakeHeaderEvent)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (eventsLiveData.hasObservers()) {
+            logger.v("events flow: remove observers in on destroy for $date")
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
     }
 }

@@ -564,7 +564,7 @@ class CalendarsRepositoryImpl(
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->
 
-            logger.v("createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
+            logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
 
             coroutineScope {
 
