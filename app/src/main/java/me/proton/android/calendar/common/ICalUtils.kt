@@ -943,21 +943,19 @@ fun getResponseIcs(
     iCalendar.version = ICalVersion.V2_0
     iCalendar.setMethod(Method.REPLY)
     iCalendar.calendarScale = CalendarScale.gregorian()
-    originalTimeZoneInfo?.let {
-        iCalendar.timezoneInfo = originalTimeZoneInfo
-    }
+    originalTimeZoneInfo?.let { iCalendar.timezoneInfo = originalTimeZoneInfo }
 
     val event = VEvent()
     event.addAttendee(userAttendee)
-    event.organizer = responseICalendar.events.first().organizer
-    event.uid = responseICalendar.events.first().uid
-    event.dateStart = responseICalendar.events.first().dateStart
-    event.dateEnd = responseICalendar.events.first().dateEnd
-    event.sequence = responseICalendar.events.first().sequence
-    event.recurrenceId = responseICalendar.events.first().recurrenceId
-    event.recurrenceRule = responseICalendar.events.first().recurrenceRule
-    event.location = responseICalendar.events.first().location
-    event.summary = responseICalendar.events.first().summary
+    responseICalendar.events.first().organizer?.let { event.organizer = it }
+    responseICalendar.events.first().uid?.let { event.uid = it }
+    responseICalendar.events.first().dateStart?.let { event.dateStart = it }
+    responseICalendar.events.first().dateEnd?.let { event.dateEnd = it }
+    responseICalendar.events.first().sequence?.let { event.sequence = it }
+    responseICalendar.events.first().recurrenceId?.let { event.recurrenceId = it }
+    responseICalendar.events.first().recurrenceRule?.let { event.recurrenceRule = it }
+    responseICalendar.events.first().location?.let { if (!it.value.isNullOrEmpty()) event.location = it }
+    responseICalendar.events.first().summary?.let { if (!it.value.isNullOrEmpty()) event.summary = it }
     event.setDateTimeStamp(Date.from(Instant.now()))
 
     iCalendar.addEvent(event)
