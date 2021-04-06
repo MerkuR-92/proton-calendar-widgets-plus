@@ -619,7 +619,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 )
             )
 
-            event_form_participant.visibleOrGone(event.hasProtonUid)
+            event_form_participant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
             event_form_participant_layout.visibleOrGone(ADD_ATTENDEES && event.hasProtonUid) // TODO Remove feature flag
             event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
         })
