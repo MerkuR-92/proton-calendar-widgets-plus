@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import me.proton.android.calendar.common.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -24,7 +25,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val database: AppDatabase
 ) : UseCase {
-
+    
     suspend fun execute(
         userId: UserId,
         calendarIds: List<String>,
@@ -43,10 +44,14 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                         async {
                             var page = 0
+                            var pageSize = 64 // initial page size has to be power of 2, because it's going to be divided by 2 if needed
+                            var shouldRetryOnTimeout = false
                             val results = mutableListOf<UseCase.Result>()
                             val events = mutableListOf<EventEntity>()
 
                             do {
+
+                                shouldRetryOnTimeout = false
 
                                 val eventsResponse = calendarsApi.getEvents(
                                     userId,
@@ -56,7 +61,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                                     timeZoneId,
                                     type,
                                     page++,
-                                    100
+                                    pageSize
                                 )
 
                                 val result = if (eventsResponse is ApiResponse.Success) {
@@ -70,8 +75,23 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                                     if (eventsResponse.httpCode == 404) {
                                         logger.e("404 requesting events in FetchEventsUseCase")
                                         UseCase.Result.Success<Unit>()
+                                    } else if (eventsResponse.isTimeout()) {
+
+                                        pageSize = pageSize / 2
+                                        // subtract 2 in order to go back "1 previous page" == "2 new pages"
+                                        page = page * 2 - 2
+
+                                        shouldRetryOnTimeout = pageSize > 1
+
+                                        if (shouldRetryOnTimeout) {
+                                            continue // don't add timeout error to "results" just yet
+                                        } else {
+                                            logger.e("timeout fetching events for calendar with pageSize $pageSize")
+                                            UseCase.Result.Error("timeout fetching events")
+                                        }
+
                                     } else {
-                                        logger.e("error fetching events for calendar: $eventsResponse")
+                                        logger.e("api error fetching events for calendar: $eventsResponse")
                                         UseCase.Result.Error("api error in FetchEventsUseCase: ${eventsResponse}")
                                     }
                                 } else {
@@ -81,7 +101,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                                 results.add(result)
 
-                            } while (eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
+                            } while (shouldRetryOnTimeout || eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
 
                             Pair(results, events)
                         }
