@@ -44,7 +44,7 @@ class CalendarsRepositoryImpl(
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
     private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(500)
-    private val DEBOUNCE_EVENTS_UPDATE = Duration.ofMillis(100)
+    private val DEBOUNCE_EVENTS_UPDATE = Duration.ofMillis(200)
 
     private val eventsMutex = Mutex()
 
@@ -72,6 +72,14 @@ class CalendarsRepositoryImpl(
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    // caches already calculated Events for EventsWindow to quickly show them when resubscribing to flow
+    private val eventsCache = mutableMapOf<EventsWindow, List<Event>>()
+    private val eventsCacheMutex = Mutex()
+
+    // cache for SkeletonEvents
+    private val skeletonEventsCache = mutableMapOf<EventsWindow, List<SkeletonEvent>>()
+    private val skeletonEventsCacheMutex = Mutex()
 
     private val visibleCalendarEntitiesFlow =
         database.calendarsDao().flowCalendars().debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
@@ -349,6 +357,14 @@ class CalendarsRepositoryImpl(
 
         fetchingState.value = CalendarsRepository.FetchingState.Finished
 
+        skeletonEventsCacheMutex.withLock {
+            skeletonEventsCache.clear()
+        }
+
+        eventsCacheMutex.withLock {
+            eventsCache.clear()
+        }
+
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
             return
         }
@@ -594,10 +610,24 @@ class CalendarsRepositoryImpl(
 
                 emit(CalendarsRepository.GetEventsResult.Success(transformedEvents))
 
+                eventsCacheMutex.withLock {
+                    eventsCache[eventsWindow] = transformedEvents
+                }
+
             }
 
         }.onStart {
-            emit(CalendarsRepository.GetEventsResult.InProgress)
+            
+            eventsCacheMutex.withLock {
+                val cachedEvents = eventsCache[eventsWindow]
+
+                if (cachedEvents != null) {
+                    emit(CalendarsRepository.GetEventsResult.Success(cachedEvents))
+                } else {
+                    emit(CalendarsRepository.GetEventsResult.InProgress)
+                }
+            }
+
         }.retry(1) {
             logger.e("retrying in createEventsFlow because of exception $it"); true
         }.catch {
@@ -654,8 +684,22 @@ class CalendarsRepositoryImpl(
 
             emit(CalendarsRepository.GetEventsResult.Success(eventSkeletons))
 
+            skeletonEventsCacheMutex.withLock {
+                skeletonEventsCache[eventsWindow] = eventSkeletons
+            }
+
         }.onStart {
-            emit(CalendarsRepository.GetEventsResult.InProgress)
+
+            skeletonEventsCacheMutex.withLock {
+                val cachedSkeletonEvents = skeletonEventsCache[eventsWindow]
+
+                if (cachedSkeletonEvents != null) {
+                    emit(CalendarsRepository.GetEventsResult.Success(cachedSkeletonEvents))
+                } else {
+                    emit(CalendarsRepository.GetEventsResult.InProgress)
+                }
+            }
+
         }.retry(1) {
             logger.e("retrying getSkeletonEvents events because of exception $it"); true
         }.catch {
