@@ -128,10 +128,13 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                         )
                     )
                 } else {
+                    val confirmationMessage =
+                        if (it.isRecurring()) R.string.event_decryption_error_dialog_confirmation_recurring
+                        else R.string.event_decryption_error_dialog_confirmation
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.event_decryption_error_dialog_title)
                         .setMessage(R.string.event_decryption_error_dialog_message)
-                        .setPositiveButton(R.string.event_decryption_error_dialog_confirmation) { _, _ ->
+                        .setPositiveButton(confirmationMessage) { _, _ ->
                             lifecycleScope.launch { // TODO
                                 val deleteResult = withContext(Dispatchers.Default) {
                                     calendarViewModel.handleDeleteEvent(
