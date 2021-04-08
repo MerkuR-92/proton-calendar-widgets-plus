@@ -491,9 +491,14 @@ object ICalUtils {
         timeZoneId: String
     ): List<Event>? {
 
-        val occurrences = originalEvent.generateOccurrencesUntil(toDate, timeZoneId)?.filterFromTheEnd {
-            startEndOverlapsWithFullDayRange(it.startDateTime, it.endDateTime, fromDate, toDate, timeZoneId)
-        } ?: return null
+        val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
+        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
+            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
+        } else {
+            toDate
+        }
+
+        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
             val event = eventsSharingUid.find {
@@ -504,6 +509,10 @@ object ICalUtils {
             }?.copy() ?: originalEvent.copy()
             event.occurrence = occurrence
             event
+        }.filterFromTheEnd {
+            val actualStart = it.getActualStart(timeZoneId) ?: return@filterFromTheEnd false
+            val actualEnd = it.getActualEnd(timeZoneId) ?: return@filterFromTheEnd false
+            startEndOverlapsWithFullDayRange(actualStart, actualEnd, fromDate, toDate, timeZoneId)
         }
 
     }
