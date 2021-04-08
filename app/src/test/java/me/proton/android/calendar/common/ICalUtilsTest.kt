@@ -3,7 +3,6 @@ package me.proton.android.calendar.common
 import assertk.assertThat
 import assertk.assertions.*
 import biweekly.ICalVersion
-import biweekly.component.ICalComponent
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.util.*
@@ -15,20 +14,16 @@ import me.proton.android.calendar.common.ICalUtils.eventStartZonedDateTimeToDate
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
 import me.proton.android.calendar.common.ICalUtils.generateProtonUid
-import me.proton.android.calendar.common.ICalUtils.generateXPmToken
 import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoField
-import java.time.temporal.IsoFields
 import java.util.*
 
 
@@ -1393,17 +1388,36 @@ internal class ICalUtilsTest {
         // 9: 12:00-12:30 [occ 7], 13:30-14:00 [occ 6], 18:30-19:00 [occ8]
         // last "ghost occurrence" is on 10th but it was moved to 9th
 
-        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
+        val mappedOld = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
 
         // there are 7 occurrences until 2020-08-09 and one additional that was moved from 2020-08-10 to 2020-08-09
-        assertThat(mapped.size).isEqualTo(8)
+        assertThat(mappedOld.size).isEqualTo(8)
 
-        val filteredByExdates = mapped.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
+        val filteredByExdates = mappedOld.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
 
         // one of the occurrences should be filtered out by exdate
         assertThat(filteredByExdates.size).isEqualTo(7)
         assertThat(filteredByExdates.find { it.occurrence!!.occurrenceNumber == 5 }).isNull()
 
+        // new approach -- all visible in window spanning all events
+        val mappedAll = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 2), displayRangeTo, displayTimeZoneId)!!
+        val filteredByExdatesAll = mappedAll.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
+
+        assertThat(filteredByExdatesAll.size).isEqualTo(7)
+        assertThat(filteredByExdatesAll.find { it.occurrence!!.occurrenceNumber == 5 }).isNull()
+
+        // new approach -- nothing visible in window spanning no events
+        val mappedNone = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 7), LocalDate.of(2020, 8, 8), displayTimeZoneId)!!
+        val filteredByExdatesMappedNone = mappedNone.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
+
+        assertThat(filteredByExdatesMappedNone.size).isEqualTo(0)
+
+        // new approach -- only events from given window visible
+        val mappedSingleEditBeforeFirstOccurrence = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 2), LocalDate.of(2020, 8, 2), displayTimeZoneId)!!
+        val filteredByExdatesmappedSingleEditBeforeFirstOccurrence = mappedSingleEditBeforeFirstOccurrence.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
+
+        assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence.size).isEqualTo(1)
+        assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence[0].occurrence!!.occurrenceNumber == 1)
 
     }
 
