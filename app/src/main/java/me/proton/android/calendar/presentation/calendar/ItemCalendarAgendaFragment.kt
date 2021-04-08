@@ -200,13 +200,13 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                 return@observe
             }
             this.selectedDate = selectedDate
-            if (eventsLiveData.hasActiveObservers() &&
+            if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers() &&
                 immutableDate != selectedDate &&
                 immutableDate != selectedDate.minusDays(1) &&
                 immutableDate != selectedDate.plusDays(1)) {
                 logger.v("events flow: remove observer for $immutableDate. Selected date is $selectedDate")
                 eventsLiveData.removeObservers(viewLifecycleOwner)
-            } else if (!eventsLiveData.hasActiveObservers() &&
+            } else if (this::eventsLiveData.isInitialized && !eventsLiveData.hasActiveObservers() &&
                 (immutableDate == selectedDate ||
                         immutableDate == selectedDate.minusDays(1) ||
                         immutableDate == selectedDate.plusDays(1))) {
@@ -262,7 +262,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (eventsLiveData.hasObservers()) {
+        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
             logger.v("events flow: remove observers in on destroy for $date")
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
