@@ -14,6 +14,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
@@ -597,7 +598,7 @@ class CalendarsRepositoryImpl(
 
                         if (transformedEvent != null) {
                             skeletons.map {
-                                if (it.occurrence == null) { // non-recurring event
+                                if (it.occurrence == null || it.isSingleEdit()) { // non-recurring event or single edit
                                     transformedEvent
                                 } else { // recurring event, apply occurrence
                                     transformedEvent.withOccurrence(it.occurrence!!)
