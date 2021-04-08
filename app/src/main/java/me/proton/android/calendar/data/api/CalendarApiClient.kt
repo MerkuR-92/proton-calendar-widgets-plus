@@ -20,6 +20,7 @@ class CalendarApiClient @Inject constructor(
     override val shouldUseDoh get() = true
     override val userAgent: String
         get() = "${USER_AGENT_NAME}/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.RELEASE}; ${Build.BRAND} ${Build.MODEL})"
+    override val timeoutSeconds: Long get() = 20L
 
     /**
      * Tells client to force update (this client will no longer be accepted by the API).
