@@ -39,8 +39,15 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
                 }
 
                 try {
-                    GlobalScope.launch(Dispatchers.IO){
-                        handleAlarmsUseCase.execute(accountManager.getPrimaryUserId().firstOrNull()!!)
+                    GlobalScope.launch(Dispatchers.IO) {
+
+                        val userId = accountManager.getPrimaryUserId().firstOrNull()
+                        if (userId == null) {
+                            logger.i("null userId in ProtonCalendarBroadcastReceiver ACTION_BOOT_COMPLETED")
+                        } else {
+                            handleAlarmsUseCase.execute(userId)
+                        }
+
                     }
                 } catch (e: Exception) {
                     logger.e("ProtonCalendarBroadcastReceiver, boot completed handle alarms error", e)
@@ -49,13 +56,19 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
             INTENT_ACTION_EVENT_ALARM -> {
                 try {
                     GlobalScope.launch(Dispatchers.IO){
-                        handleAlarmsUseCase.execute(
-                            accountManager.getPrimaryUserId().firstOrNull()!!,
-                            if (intent.hasExtra(INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS)) intent.getLongExtra(
-                                INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS,
-                                0
-                            ) else null
-                        )
+
+                        val alarmTimestamp = if (intent.hasExtra(INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS)) intent.getLongExtra(
+                            INTENT_EXTRA_EVENT_ALARM_TIMESTAMP_SECONDS,
+                            0
+                        ) else null
+
+                        val userId = accountManager.getPrimaryUserId().firstOrNull()
+                        if (userId == null) {
+                            logger.i("null userId in ProtonCalendarBroadcastReceiver INTENT_ACTION_EVENT_ALARM")
+                        } else {
+                            handleAlarmsUseCase.execute(userId, alarmTimestamp)
+                        }
+
                     }
                 } catch (e: Exception) {
                     logger.e("ProtonCalendarBroadcastReceiver, handle alarm intent error", e)
