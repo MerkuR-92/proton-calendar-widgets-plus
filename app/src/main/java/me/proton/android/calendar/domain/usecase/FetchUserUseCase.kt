@@ -34,6 +34,8 @@ class FetchUserUseCase(
         // Limit users
         // User's payment failed or expired
         if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error("FetchUserUseCase: user is delinquent", UseCase.Error.DELINQUENT_USER)
+        // User has a free account
+        if (user.isFree) return UseCase.Result.Error("FetchUserUseCase: user is free", UseCase.Error.FREE_USER)
         // User reached storage quota: creation of event is disabled
         if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error("FetchUserUseCase: user reached storage quota", UseCase.Error.STORAGE_QUOTA_REACHED)
 
