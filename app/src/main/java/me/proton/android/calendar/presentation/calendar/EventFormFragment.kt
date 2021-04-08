@@ -793,10 +793,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)
                     && shouldShowContactsPermissionsDialog() -> {
-                displayCustomPermissionDialog(false)
+                displayCustomPermissionDialog(true)
             }
             shouldShowContactsPermissionsDialog() -> {
-                displayCustomPermissionDialog(true)
+                requestPermissionLauncher.launch(
+                    Manifest.permission.READ_CONTACTS)
             }
             else -> {
                 findNavController().navigate(R.id.nav_event_form_attendees)
