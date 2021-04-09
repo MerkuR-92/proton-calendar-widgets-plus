@@ -183,9 +183,10 @@ class EventViewModel(
             // if there is no requested start time, we calculate it according to "now"
             val startTime =
                 if (initStartTime != null) LocalTime.parse(initStartTime)
-                else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).plusMinutes(
-                    this.calendarSettings.defaultEventDuration.toLong()
-                ).truncatedTo(ChronoUnit.HOURS).toLocalTime()
+                else ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
+                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
+                    .truncatedTo(ChronoUnit.HOURS)
+                    .toLocalTime()
             // end Zoned Date Time according to default event duration
             val endZonedDateTime = ZonedDateTime.of(
                 startDate,
@@ -270,9 +271,7 @@ class EventViewModel(
                 if (editMode) {
                     // Setup event time backup values
                     if (this.isAllDay()) {
-                        val startTime = ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                            .plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
-                            .truncatedTo(ChronoUnit.HOURS).toLocalTime()
+                        val startTime = ICalUtils.generateEventStartTime(ZoneId.of(eventTimeZoneId))
                         timeStartBackup = startTime
                         timeEndBackup =
                             startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
