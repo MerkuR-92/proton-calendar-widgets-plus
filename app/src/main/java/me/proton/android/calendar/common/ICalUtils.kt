@@ -509,9 +509,9 @@ object ICalUtils {
             }?.copy() ?: originalEvent.copy()
             event.occurrence = occurrence
             event
-        }.filterFromTheEnd {
-            val actualStart = it.getActualStart(timeZoneId) ?: return@filterFromTheEnd false
-            val actualEnd = it.getActualEnd(timeZoneId) ?: return@filterFromTheEnd false
+        }.filter { // TODO filterFromEnd doesn't work if there are gaps in occurrences caused by single edits
+            val actualStart = it.getActualStart(timeZoneId) ?: return@filter false
+            val actualEnd = it.getActualEnd(timeZoneId) ?: return@filter false
             startEndOverlapsWithFullDayRange(actualStart, actualEnd, fromDate, toDate, timeZoneId)
         }
 
