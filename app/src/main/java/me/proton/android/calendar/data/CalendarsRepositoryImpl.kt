@@ -598,7 +598,10 @@ class CalendarsRepositoryImpl(
 
                         if (transformedEvent != null) {
                             skeletons.map {
-                                if (it.occurrence == null || it.isSingleEdit()) { // non-recurring event or single edit
+                                if (it.occurrence == null) { // non-recurring event
+                                    transformedEvent
+                                } else if (it.isSingleEdit()) { // single edits, copy occurrence it replaces
+                                    transformedEvent.occurrence = it.occurrence
                                     transformedEvent
                                 } else { // recurring event, apply occurrence
                                     transformedEvent.withOccurrence(it.occurrence!!)

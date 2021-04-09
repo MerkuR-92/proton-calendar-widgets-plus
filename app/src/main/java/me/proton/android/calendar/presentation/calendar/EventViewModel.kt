@@ -739,18 +739,6 @@ class EventViewModel(
                     return HandleSaveResult.ERROR
                 }
 
-                val deleteSingleEditsResult =
-                    deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
-                deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
-                if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return HandleSaveResult.ERROR
-
-                // delete all single deletions
-                event.iCalEvent.exceptionDates.clear()
-
-                // TWO SEPARATE THINGS:
-                // - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
-                // - the same DAY but different TIME
-
                 val originalEventWithOccurrence =
                     if (dbEvent?.isSingleEdit() == true) immutableOriginalDbEvent?.withOccurrence(occurrenceNumber, event.defaultTimeZone!!)
                     else dbEventWithOccurrence
@@ -759,6 +747,13 @@ class EventViewModel(
                     logger.e("Edit all events: originalEventWithOccurrence was null")
                     return HandleSaveResult.ERROR
                 }
+
+                // delete all single deletions
+                event.iCalEvent.exceptionDates.clear()
+
+                // TWO SEPARATE THINGS:
+                // - if event.isAllDay != dbEvent.isAllDay() it means there was a conversion all-day-part-day
+                // - the same DAY but different TIME
 
                 val hasDayChanged =
                     (if (dbEvent?.isSingleEdit() == true) dbEventStartDate
@@ -775,6 +770,11 @@ class EventViewModel(
                             logger.e("Edit all events: dbEvent was null")
                             return HandleSaveResult.ERROR
                         }
+
+                        val deleteSingleEditsResult =
+                            deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                        deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
+                        if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return HandleSaveResult.ERROR
 
                         val newEvent = event.copy(
                             id = immutableOriginalDbEvent.id,
@@ -811,6 +811,12 @@ class EventViewModel(
                             logger.e("Edit all events: dbEvent was null")
                             return HandleSaveResult.ERROR
                         }
+
+                        val deleteSingleEditsResult =
+                            deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                        deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
+                        if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return HandleSaveResult.ERROR
+
                         val eventSpan = ChronoUnit.DAYS.between(event.getStart(event.defaultTimeZone!!), event.getEnd(event.defaultTimeZone!!))
                         if (event.isAllDay()) {
                             event.also {
