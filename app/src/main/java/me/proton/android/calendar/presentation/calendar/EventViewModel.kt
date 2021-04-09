@@ -770,6 +770,7 @@ class EventViewModel(
                             return HandleSaveResult.ERROR
                         }
 
+                        // TODO Remove duplicated code
                         val deleteSingleEditsResult =
                             deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
                         deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
@@ -811,6 +812,7 @@ class EventViewModel(
                             return HandleSaveResult.ERROR
                         }
 
+                        // TODO Remove duplicated code
                         val deleteSingleEditsResult =
                             deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
                         deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
@@ -841,6 +843,12 @@ class EventViewModel(
                 } else {
                     // update the original event's DTSTART with date and time
                     //  which means no changes to just edited event, but it will overwrite the original event
+
+                    // TODO Remove duplicated code
+                    val deleteSingleEditsResult =
+                        deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                    deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
+                    if (deleteSingleEditsResult !is UseCase.Result.Success<*>) return HandleSaveResult.ERROR
 
                     if (dbEvent?.isSingleEdit() == true) {
 
