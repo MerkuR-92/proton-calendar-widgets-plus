@@ -755,11 +755,14 @@ class EventViewModel(
                 // - the same DAY but different TIME
 
                 val hasDayChanged =
-                    (if (dbEvent?.isSingleEdit() == true) dbEventStartDate
-                    else dbEventWithOccurrenceStartDate)?.truncatedTo(ChronoUnit.DAYS) != event.getStart(event.defaultTimeZone!!)?.truncatedTo(ChronoUnit.DAYS)
+                    (if (dbEvent?.isSingleEdit() == true) {
+                        dbEventStartDate
+                    }
+                    else {
+                        dbEventWithOccurrenceStartDate
+                    })?.truncatedTo(ChronoUnit.DAYS) != event.getStart(event.defaultTimeZone!!)?.truncatedTo(ChronoUnit.DAYS)
 
-                if (!hasDayChanged &&
-                    originalEventWithOccurrence.iCalEvent.recurrenceRule == event.iCalEvent.recurrenceRule) {
+                if (!hasDayChanged && !recurrenceManuallyEdited) {
 
                     // update the original event's DTSTART only with new time (leave day the same)
 
