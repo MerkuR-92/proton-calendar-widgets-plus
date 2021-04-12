@@ -4,9 +4,11 @@ import android.content.*
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.work.*
 import biweekly.parameter.ParticipationStatus
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
@@ -175,7 +177,8 @@ class MainViewModel(
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
-        } ?: return IcsSurgeryUtils.IcsParsingResult.Error.PartyCrasher
+        }
+        userAttendee ?: return IcsSurgeryUtils.IcsParsingResult.Error.PartyCrasher
 
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
             ?: return IcsSurgeryUtils.IcsParsingResult.Error.NoDefaultCalendarFound // TODO Handle error
@@ -204,10 +207,6 @@ class MainViewModel(
                 }
             }
         }
-
-        logger.d("${newEvent}")
-
-        // TODO Check if event is new
 
         val eventsSharingUidResponse = calendarsRepository.getEventsByUid(userId, newEvent.uid)
 //        logger.e("eventsSharingUidResponse = $eventsSharingUidResponse")
@@ -240,6 +239,14 @@ class MainViewModel(
                     editCreateEventResult.returnValue.tryCast<List<String>> {
                         eventId = this.firstOrNull()
                     }
+
+                    if (defaultCalendar.display != 1) {
+                        // 1. Update in DB
+                        calendarViewModel.updateCalendarVisibility(defaultCalendar.id, display = 1)
+                        // 2. Update on Server
+                        calendarViewModel.updateServerCalendar(defaultCalendar.id)
+                    }
+
 //                    logger.e("Created event id: $eventId")
                     return IcsSurgeryUtils.IcsParsingResult.Success(eventId = eventId ?: return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError)
                 }

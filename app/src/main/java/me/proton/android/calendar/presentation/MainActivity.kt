@@ -361,19 +361,54 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                     }
                                 } else {
                                     when (handleIcsImportResult) {
-                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidVersion -> {
-                                            this@MainActivity.displaySnackBar("InvalidVersion")
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.DefaultError -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error))
                                         }
                                         is IcsSurgeryUtils.IcsParsingResult.Error.ParsingFailed -> {
-                                            this@MainActivity.displaySnackBar("ParsingFailed")
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error))
                                         }
-                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidCalscale -> {
-                                            this@MainActivity.displaySnackBar("InvalidCalscale")
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.UnsupportedMethod -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error))
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.PartyCrasher -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error))
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.MissingUid -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error))
                                         }
                                         is IcsSurgeryUtils.IcsParsingResult.Error.NoDefaultCalendarFound -> {
-                                            this@MainActivity.displaySnackBar("NoDefaultCalendarFound")
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error))
                                         }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.DurationNotSupported -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error))
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.TooManyEvents -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error))
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.NoEvents -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error))
+                                        }
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidVersion,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidCalscale,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidDateOrDateTimeProperty,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidDateStart,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidDateEnd,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidDescription,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidLocation,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidSummary,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidRRule,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidRecurrenceId,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidExDate,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidSequence,
+                                        is IcsSurgeryUtils.IcsParsingResult.Error.InvalidAttendees -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error))
+                                        }
+                                        else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
                                     }
+                                    navigateTo(Navigation.Deeplink.toMonth())
                                 }
                             }
                         } else navigateTo(Navigation.Deeplink.toMonth())
