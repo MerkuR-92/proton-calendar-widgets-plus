@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.account
 
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -47,43 +48,33 @@ class AccountViewModel(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    private fun Account.isSavedForSetup(): Boolean {
-        val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
-        return valueStore.getString(ValueKey.USER_ID) == userId.id
-    }
+    private suspend fun Account.isBootstrapped() = usersRepository.selectUserSettings(userId.id) != null
 
-    private suspend fun saveAccountInfo(account: Account) {
-        if (!account.isSavedForSetup()) {
-            val valueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
+    private suspend fun checkAccount(account: Account) {
+        runCatching {
+            if (account.isBootstrapped()) return
 
-            val userId = account.userId
-            valueStore.putString(ValueKey.USER_ID, userId.id)
-
+            val valueStore = valueStoreProvider.provideValueStore(account.userId.id)
             val eventId = checkNotNull(account.details.session?.initialEventId)
-            valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
-            val user = userManager.getUser(userId, refresh = true)
+            val user = userManager.getUser(account.userId, refresh = true)
             val passphrase = user.keys.primary()?.privateKey?.passphrase
             val decryptedPassphrase = checkNotNull(passphrase).decryptWith(keyStoreCrypto)
+
+            valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
             valueStore.putString(ValueKey.USER_PASSPHRASE, String(decryptedPassphrase.array))
 
-            setupUser()
+            setupUser(account.userId)
+        }.onFailure {
+            logger.e("checkAccount failed, removing user.", it)
+            removeUser(account.userId)
+
+            if (it is CancellationException) throw it
         }
     }
 
-    private suspend fun setupUser(showConfirmationDialog: Boolean = true) {
-        val tempValueStore = valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET)
-        val eventId = checkNotNull(tempValueStore.getString(ValueKey.LAST_SERVER_EVENT_ID))
-        val userIdString = checkNotNull(tempValueStore.getString(ValueKey.USER_ID))
-        val passphrase = checkNotNull(tempValueStore.getString(ValueKey.USER_PASSPHRASE))
-
-        val userId = UserId(userIdString)
-
+    private suspend fun setupUser(userId: UserId, showConfirmationDialog: Boolean = true) {
         _state.postValue(State.Processing)
-
-        val valueStore = valueStoreProvider.provideValueStore(userId.id)
-        valueStore.putString(ValueKey.USER_PASSPHRASE, passphrase)
-        valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
         // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
         val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId)
@@ -111,7 +102,6 @@ class AccountViewModel(
     private suspend fun removeUser(userId: UserId) {
         accountManager.removeAccount(userId)
         valueStoreProvider.provideValueStore(userId.id).clearAll()
-        valueStoreProvider.provideValueStore(ValueSet.TEMP_LOGIN_SET).clearAll()
     }
 
     private suspend fun cleanUser(userId: UserId) {
@@ -145,7 +135,7 @@ class AccountViewModel(
             onLoginResult { result -> if (result == null) finishAppIfNoAccount(context) }
             // General state handling.
             accountManager.observe(context.lifecycleScope)
-                .onAccountReady { saveAccountInfo(it) }
+                .onAccountReady { checkAccount(it) }
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
                 .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }
@@ -161,9 +151,7 @@ class AccountViewModel(
         accountManager.getAccounts().onEach { accounts ->
             when {
                 accounts.isEmpty() -> _state.postValue(State.LoginNeeded)
-                accounts.any {
-                    it.isReady() && usersRepository.selectUserSettings(it.userId.id) != null
-                } -> _state.postValue(State.Ready)
+                accounts.any { it.isReady() && it.isBootstrapped() } -> _state.postValue(State.Ready)
             }
         }.launchIn(context.lifecycleScope)
 
@@ -190,10 +178,8 @@ class AccountViewModel(
         _errorReport.postValue(null)
     }
 
-    fun resetCalendarsKey() {
+    fun resetCalendarsKey(userId: UserId) {
         viewModelScope.launch {
-            val userId = getPrimaryUserId() ?: return@launch
-
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
             resetCalendarsKeyResult.ifSuccessAndLogErrors(logger) { }
             if (resetCalendarsKeyResult !is UseCase.Result.Success<*>) {
@@ -201,13 +187,13 @@ class AccountViewModel(
                 return@launch
             }
 
-            setupUser(false)
+            setupUser(userId, false)
         }
     }
 
-    fun updatePassphrase() {
+    fun updatePassphrase(userId: UserId) {
         viewModelScope.launch {
-            setupUser(false)
+            setupUser(userId, false)
         }
     }
 }

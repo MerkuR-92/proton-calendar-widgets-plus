@@ -250,10 +250,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         ) { _, _ ->
                             if (errorReport == UseCase.Error.RESET_NEEDED) {
                                 clearError()
-                                accountViewModel.resetCalendarsKey()
+                                userId?.let { accountViewModel.resetCalendarsKey(it) }
                             } else if (errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
                                 clearError()
-                                accountViewModel.updatePassphrase()
+                                userId?.let { accountViewModel.updatePassphrase(it) }
                             }
                         }
                     }
