@@ -288,10 +288,6 @@ class EventViewModel(
                             ?.let { transformEventUseCase.execute(it) }
                         this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
                     }
-
-                    dbEvent?.let { dbEvent ->
-                        hasExDates(true)
-                    }
                 }
 
             }
