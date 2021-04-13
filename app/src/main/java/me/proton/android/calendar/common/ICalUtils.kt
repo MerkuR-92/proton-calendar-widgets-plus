@@ -552,7 +552,7 @@ object ICalUtils {
     }
 
     fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
-        return this.distinctBy { "${it.eventId}${it.occurrence}" }
+        return this.distinctBy { "${it.eventId} ${it.occurrence} ${it.trigger} ${it.action}" }
     }
 
     /**

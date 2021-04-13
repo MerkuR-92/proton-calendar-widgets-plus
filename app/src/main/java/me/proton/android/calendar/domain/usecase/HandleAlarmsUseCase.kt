@@ -32,10 +32,10 @@ class HandleAlarmsUseCase(
 
         val maxHandledAlarmOccurrenceSeconds = if (alarmEpochSeconds != null) { // handle only event alarms we were supposed to show for this timestamp
 
-            logger.v("alarms to display at alarmEpochSeconds ${alarmEpochSeconds}")
-
             // get only those alarms that we were supposed to show for this use case execution
             val alarmsToDisplayNow = database.eventAlarmsDao().selectUpcoming(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds }
+
+            logger.v("alarms to display at alarmEpochSeconds $alarmEpochSeconds: $alarmsToDisplayNow")
 
             if (alarmsToDisplayNow.isNotEmpty()) {
                 showNotificationUseCase.execute(alarmsToDisplayNow.filterOutDuplicates(), userId.id)
