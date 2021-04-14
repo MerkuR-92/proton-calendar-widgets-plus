@@ -6,12 +6,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.work.*
+import biweekly.ICalendar
 import biweekly.parameter.ParticipationStatus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
@@ -169,7 +172,7 @@ class MainViewModel(
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.IcsParsingResult.Error.ParsingFailed
 
         // TODO Remove this once other methods are handled
-        if (!iCalendar.method.isRequest) return IcsSurgeryUtils.IcsParsingResult.Error.UnsupportedMethod
+        if (!iCalendar.method.isRequest && !iCalendar.method.isCancel) return IcsSurgeryUtils.IcsParsingResult.Error.UnsupportedMethod
 
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { it.email }
         val userAttendee = iCalendar.events.first().attendees.find { attendee ->
@@ -233,35 +236,46 @@ class MainViewModel(
         if (isNew) {
             logger.d("Create event in default calendar")
 
-            when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)) {
-                is UseCase.Result.Success<*> -> {
-                    var eventId: String? = null
-                    editCreateEventResult.returnValue.tryCast<List<String>> {
-                        eventId = this.firstOrNull()
-                    }
-
-                    if (defaultCalendar.display != 1) {
-                        // 1. Update in DB
-                        calendarViewModel.updateCalendarVisibility(defaultCalendar.id, display = 1)
-                        // 2. Update on Server
-                        calendarViewModel.updateServerCalendar(defaultCalendar.id)
-                    }
-
-//                    logger.e("Created event id: $eventId")
-                    return IcsSurgeryUtils.IcsParsingResult.Success(eventId = eventId ?: return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError)
-                }
-                is UseCase.Result.InvalidParams -> {
-                    logger.e("MainViewModel: invalid params in create event: ${editCreateEventResult.message}")
-                    return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError
-                }
-                is UseCase.Result.Error -> {
-                    logger.e("MainViewModel: error in create event: ${editCreateEventResult.message}")
-                    return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError
-                }
-            }
+            return editCreateEventFromIcs(userId, defaultCalendar, newEvent)
         } else {
             logger.d("Event already exists")
+
+            if (newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
+                logger.d("ICS is an update")
+
+                return editCreateEventFromIcs(userId, defaultCalendar, existingEvent?.copy(iCalendar = newEvent.iCalendar.clone()) ?: return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError)
+            }
+
             return IcsSurgeryUtils.IcsParsingResult.Success(eventId = existingEvent?.id)
+        }
+    }
+
+    private suspend fun editCreateEventFromIcs(userId: UserId, defaultCalendar: CalendarEntity, newEvent: Event): IcsSurgeryUtils.IcsParsingResult {
+        when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)) {
+            is UseCase.Result.Success<*> -> {
+                var eventId: String? = null
+                editCreateEventResult.returnValue.tryCast<List<String>> {
+                    eventId = this.firstOrNull()
+                }
+
+                if (defaultCalendar.display != 1) {
+                    // 1. Update in DB
+                    calendarViewModel.updateCalendarVisibility(defaultCalendar.id, display = 1)
+                    // 2. Update on Server
+                    calendarViewModel.updateServerCalendar(defaultCalendar.id)
+                }
+
+//                    logger.e("Created event id: $eventId")
+                return IcsSurgeryUtils.IcsParsingResult.Success(eventId = eventId ?: return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError)
+            }
+            is UseCase.Result.InvalidParams -> {
+                logger.e("MainViewModel: invalid params in create event: ${editCreateEventResult.message}")
+                return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError
+            }
+            is UseCase.Result.Error -> {
+                logger.e("MainViewModel: error in create event: ${editCreateEventResult.message}")
+                return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError
+            }
         }
     }
 }
