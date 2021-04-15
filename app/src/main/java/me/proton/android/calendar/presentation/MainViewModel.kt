@@ -23,6 +23,7 @@ import me.proton.core.domain.entity.UserId
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class MainViewModel(
@@ -230,21 +231,21 @@ class MainViewModel(
         if (isNew) {
             logger.d("Create event in default calendar")
 
-            return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, userId, defaultCalendar, newEvent)
+            return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, userId, newEvent)
         } else {
             logger.d("Event already exists")
 
             if (newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
                 logger.d("ICS is an update")
 
-                return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT, userId, defaultCalendar, existingEvent?.copy(iCalendar = newEvent.iCalendar.clone()) ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError)
+                return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT, userId, existingEvent?.copy(iCalendar = newEvent.iCalendar.clone()) ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError)
             }
 
             return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
         }
     }
 
-    private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, defaultCalendar: CalendarEntity, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
+    private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
         when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)) {
             is UseCase.Result.Success<*> -> {
                 var eventId: String? = null
@@ -252,11 +253,11 @@ class MainViewModel(
                     eventId = this.firstOrNull()
                 }
 
-                if (defaultCalendar.display != 1) {
+                if (!newEvent.calendar.display) {
                     // 1. Update in DB
-                    calendarViewModel.updateCalendarVisibility(defaultCalendar.id, display = 1)
+                    calendarViewModel.updateCalendarVisibility(newEvent.calendar.id, display = 1)
                     // 2. Update on Server
-                    calendarViewModel.updateServerCalendar(defaultCalendar.id)
+                    calendarViewModel.updateServerCalendar(newEvent.calendar.id)
                 }
 
 //                    logger.e("Created event id: $eventId")
