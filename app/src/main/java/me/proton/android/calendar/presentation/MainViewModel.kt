@@ -4,13 +4,8 @@ import android.content.*
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.work.*
-import biweekly.ICalendar
-import biweekly.parameter.ParticipationStatus
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
@@ -25,7 +20,6 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.core.domain.entity.UserId
-import me.proton.core.util.kotlin.toInt
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
@@ -159,20 +153,20 @@ class MainViewModel(
         }
     }
 
-    suspend fun handleIcsImport(uri: Uri, userId: UserId): IcsSurgeryUtils.IcsParsingResult {
+    suspend fun handleIcsFile(uri: Uri, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
         val bufferedReader = BufferedReader(InputStreamReader(context.contentResolver.openInputStream(uri)))
         val iCalString = bufferedReader.use { it.readText() }
 
         val cleanIcsResult = cleanIcs(iCalString)
 
-        if (cleanIcsResult !is IcsSurgeryUtils.IcsParsingResult.Success) {
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             return cleanIcsResult
         }
 
-        val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.IcsParsingResult.Error.ParsingFailed
+        val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         // TODO Remove this once other methods are handled
-        if (!iCalendar.method.isRequest && !iCalendar.method.isCancel) return IcsSurgeryUtils.IcsParsingResult.Error.UnsupportedMethod
+        if (!iCalendar.method.isRequest) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod
 
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { it.email }
         val userAttendee = iCalendar.events.first().attendees.find { attendee ->
@@ -181,14 +175,14 @@ class MainViewModel(
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
         }
-        userAttendee ?: return IcsSurgeryUtils.IcsParsingResult.Error.PartyCrasher
+        userAttendee ?: return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
-            ?: return IcsSurgeryUtils.IcsParsingResult.Error.NoDefaultCalendarFound // TODO Handle error
+            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound // TODO Handle error
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         if (defaultCalendar == null || !defaultCalendar.isActive) {
             defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull()
-                ?: return IcsSurgeryUtils.IcsParsingResult.Error.NoDefaultCalendarFound // TODO Handle error
+                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound // TODO Handle error
         }
 
         val newEvent = Event(ICalUtils.generateOfflineEventId(), Calendar(
@@ -203,8 +197,8 @@ class MainViewModel(
             newEvent.iCalEvent.attendees.forEach {
                 if (it.getParameter(CustomICalPropertyParameter.X_PM_TOKEN) == null) {
                     val canonicalEmail = usersRepository.getCanonicalAddresses(userId,
-                        listOf(it.extractEmail() ?: return IcsSurgeryUtils.IcsParsingResult.Error.DefaultError)
-                    )?.get(it.extractEmail()) ?: return IcsSurgeryUtils.IcsParsingResult.Error.DefaultError
+                        listOf(it.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError)
+                    )?.get(it.extractEmail()) ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
                     val token = ICalUtils.generateXPmToken(canonicalEmail, newEvent.uid)
                     it.addParameter(CustomICalPropertyParameter.X_PM_TOKEN, token)
                 }
@@ -236,21 +230,21 @@ class MainViewModel(
         if (isNew) {
             logger.d("Create event in default calendar")
 
-            return editCreateEventFromIcs(userId, defaultCalendar, newEvent)
+            return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, userId, defaultCalendar, newEvent)
         } else {
             logger.d("Event already exists")
 
             if (newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
                 logger.d("ICS is an update")
 
-                return editCreateEventFromIcs(userId, defaultCalendar, existingEvent?.copy(iCalendar = newEvent.iCalendar.clone()) ?: return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError)
+                return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT, userId, defaultCalendar, existingEvent?.copy(iCalendar = newEvent.iCalendar.clone()) ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError)
             }
 
-            return IcsSurgeryUtils.IcsParsingResult.Success(eventId = existingEvent?.id)
+            return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
         }
     }
 
-    private suspend fun editCreateEventFromIcs(userId: UserId, defaultCalendar: CalendarEntity, newEvent: Event): IcsSurgeryUtils.IcsParsingResult {
+    private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, defaultCalendar: CalendarEntity, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
         when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)) {
             is UseCase.Result.Success<*> -> {
                 var eventId: String? = null
@@ -266,15 +260,15 @@ class MainViewModel(
                 }
 
 //                    logger.e("Created event id: $eventId")
-                return IcsSurgeryUtils.IcsParsingResult.Success(eventId = eventId ?: return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError)
+                return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action)
             }
             is UseCase.Result.InvalidParams -> {
                 logger.e("MainViewModel: invalid params in create event: ${editCreateEventResult.message}")
-                return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError
+                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }
             is UseCase.Result.Error -> {
                 logger.e("MainViewModel: error in create event: ${editCreateEventResult.message}")
-                return IcsSurgeryUtils.IcsParsingResult.Error.EditCreateEventError
+                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }
         }
     }

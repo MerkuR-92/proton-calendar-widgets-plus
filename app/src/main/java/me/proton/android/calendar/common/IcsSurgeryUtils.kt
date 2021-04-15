@@ -32,17 +32,27 @@ import java.util.concurrent.TimeUnit
 
 object IcsSurgeryUtils {
 
-    sealed class IcsParsingResult {
+    enum class HandleIcsAction {
+        OPEN_EVENT,
+        UPDATE_EVENT,
+        CREATE_EVENT
+    }
+
+    sealed class HandleIcsResult {
         data class Success(
-            val iCalendar: ICalendar? = null,
-            val eventId: String? = null
-        ): IcsParsingResult()
+            val eventId: String,
+            val action: HandleIcsAction
+        ): HandleIcsResult()
+
+        data class ParsingSuccessful(
+            val iCalendar: ICalendar? = null
+        ): HandleIcsResult()
 
         data class RawParsingSuccessful(
             val cleanICalString: String
-        ): IcsParsingResult()
+        ): HandleIcsResult()
 
-        sealed class Error: IcsParsingResult() {
+        sealed class Error: HandleIcsResult() {
             object DefaultError: Error()
             object EditCreateEventError: Error()
             object ParsingFailed: Error()
@@ -69,65 +79,65 @@ object IcsSurgeryUtils {
         }
     }
 
-    fun cleanIcs(iCalString: String, allowMultipleEvents: Boolean = false): IcsParsingResult {
+    fun cleanIcs(iCalString: String, allowMultipleEvents: Boolean = false): HandleIcsResult {
         // Clean the iCal String first to check for invalid Date or DateTime Properties
         val cleanRawIcsResult = iCalString.cleanRawIcs()
 
-        if (cleanRawIcsResult !is IcsParsingResult.RawParsingSuccessful) return cleanRawIcsResult
+        if (cleanRawIcsResult !is HandleIcsResult.RawParsingSuccessful) return cleanRawIcsResult
 
-        val importedICalendars = Biweekly.parse(cleanRawIcsResult.cleanICalString).all() ?: return IcsParsingResult.Error.ParsingFailed
+        val importedICalendars = Biweekly.parse(cleanRawIcsResult.cleanICalString).all() ?: return HandleIcsResult.Error.ParsingFailed
 
         // We only allow importing one calendar at a time for now
-        if (importedICalendars.size > 1) return IcsParsingResult.Error.TooManyEvents
+        if (importedICalendars.size > 1) return HandleIcsResult.Error.TooManyEvents
 
-        if (importedICalendars.isEmpty()) return IcsParsingResult.Error.NoEvents
+        if (importedICalendars.isEmpty()) return HandleIcsResult.Error.NoEvents
 
-        val iCalendar = importedICalendars.first() ?: return IcsParsingResult.Error.ParsingFailed
+        val iCalendar = importedICalendars.first() ?: return HandleIcsResult.Error.ParsingFailed
 
-        if (iCalendar.events.isEmpty()) return IcsParsingResult.Error.NoEvents
+        if (iCalendar.events.isEmpty()) return HandleIcsResult.Error.NoEvents
 
         // We only allow importing one event at a time for now
         if (iCalendar.events.size > 1 && !allowMultipleEvents) {
             // TODO If is an invitation we take first event only
-            return IcsParsingResult.Error.TooManyEvents
+            return HandleIcsResult.Error.TooManyEvents
         }
 
         /* Calendar properties */
 
-        if (!iCalendar.cleanMethod()) return IcsParsingResult.Error.UnsupportedMethod
+        if (!iCalendar.cleanMethod()) return HandleIcsResult.Error.UnsupportedMethod
 
-        if (!iCalendar.cleanCalscale()) return IcsParsingResult.Error.InvalidCalscale
+        if (!iCalendar.cleanCalscale()) return HandleIcsResult.Error.InvalidCalscale
 
         iCalendar.cleanXWrTimezone()
 
-        if (!iCalendar.cleanTimezones()) return IcsParsingResult.Error.InvalidDateOrDateTimeProperty
+        if (!iCalendar.cleanTimezones()) return HandleIcsResult.Error.InvalidDateOrDateTimeProperty
 
         /* Event properties */
 
         iCalendar.events.forEach { event ->
-            if (!event.cleanUid()) return IcsParsingResult.Error.MissingUid
+            if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
 
-            if (!event.cleanDtStart()) return IcsParsingResult.Error.InvalidDateStart
+            if (!event.cleanDtStart()) return HandleIcsResult.Error.InvalidDateStart
 
-            if (!event.cleanDuration()) return IcsParsingResult.Error.DurationNotSupported
+            if (!event.cleanDuration()) return HandleIcsResult.Error.DurationNotSupported
 
-            if (!event.cleanDtEnd()) return IcsParsingResult.Error.InvalidDateEnd
+            if (!event.cleanDtEnd()) return HandleIcsResult.Error.InvalidDateEnd
 
-            if (!event.cleanDescription()) return IcsParsingResult.Error.InvalidDescription
+            if (!event.cleanDescription()) return HandleIcsResult.Error.InvalidDescription
 
-            if (!event.cleanLocation()) return IcsParsingResult.Error.InvalidLocation
+            if (!event.cleanLocation()) return HandleIcsResult.Error.InvalidLocation
 
-            if (!event.cleanSummary()) return IcsParsingResult.Error.InvalidSummary
+            if (!event.cleanSummary()) return HandleIcsResult.Error.InvalidSummary
 
-            if (!event.cleanRRule(iCalendar)) return IcsParsingResult.Error.InvalidRRule
+            if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.InvalidRRule
 
-            if (!event.cleanRecurrenceId(iCalendar.method == Method.reply())) return IcsParsingResult.Error.InvalidRecurrenceId
+            if (!event.cleanRecurrenceId(iCalendar.method == Method.reply())) return HandleIcsResult.Error.InvalidRecurrenceId
 
-            if (!event.cleanExDate()) return IcsParsingResult.Error.InvalidExDate
+            if (!event.cleanExDate()) return HandleIcsResult.Error.InvalidExDate
 
-            if (!event.cleanSequence()) return IcsParsingResult.Error.InvalidSequence
+            if (!event.cleanSequence()) return HandleIcsResult.Error.InvalidSequence
 
-            if (!event.cleanAttendees()) return IcsParsingResult.Error.InvalidAttendees
+            if (!event.cleanAttendees()) return HandleIcsResult.Error.InvalidAttendees
 
             if ((iCalendar.method?.isReply == true || iCalendar.method?.isRequest == true || iCalendar.method?.isCancel == true) && !event.alarms.isNullOrEmpty()) {
                 // We drop alarms for invites as those would be the personal alarms of the organizer
@@ -135,14 +145,14 @@ object IcsSurgeryUtils {
             }
         }
 
-        return IcsParsingResult.Success(iCalendar)
+        return HandleIcsResult.ParsingSuccessful(iCalendar)
     }
 
-    fun String.cleanRawIcs(): IcsParsingResult {
+    fun String.cleanRawIcs(): HandleIcsResult {
         var cleanICalString = this
 
         // VERSION: We don't support iCal versions other than 2.0.
-        if (!cleanICalString.contains(Regex("VERSION:2\\.0\\r?\\n"))) return IcsParsingResult.Error.InvalidVersion
+        if (!cleanICalString.contains(Regex("VERSION:2\\.0\\r?\\n"))) return HandleIcsResult.Error.InvalidVersion
 
         // DATETIME or DATE properties
 
@@ -153,15 +163,15 @@ object IcsSurgeryUtils {
         cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}[Z]?"), "")
 
         // If the type DATE is not specified for an all-day event, we currently reject (as invalid) the event.
-        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\n"))) return IcsParsingResult.Error.InvalidDateOrDateTimeProperty
+        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\n"))) return HandleIcsResult.Error.InvalidDateOrDateTimeProperty
 
         // 2) For part day events
 
         // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), reject (as unsupported) the event if there is no X-WR-TIMEZONE.
         if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}T\\d{6}\\n"))
-            && !cleanICalString.contains(Regex("X-WR-TIMEZONE:.+\\n"))) return IcsParsingResult.Error.InvalidDateOrDateTimeProperty
+            && !cleanICalString.contains(Regex("X-WR-TIMEZONE:.+\\n"))) return HandleIcsResult.Error.InvalidDateOrDateTimeProperty
 
-        return IcsParsingResult.RawParsingSuccessful(cleanICalString)
+        return HandleIcsResult.RawParsingSuccessful(cleanICalString)
     }
 
     fun ICalendar.cleanCalscale(): Boolean {
