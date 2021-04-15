@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
@@ -116,15 +117,22 @@ class DeleteEventUseCase( // TODO TESTS
 
                 // TODO check .isSuccessful on Proton Responses, this will still crash in case of malformed request etc.
 
-                syncResponse.data.responses.forEach {
-                    //logger.e("error deleting event on server: ${it.response.code} ${it.response.error}")
+                val errorEventIds = syncResponse.data.responses.mapNotNull {
+                    if (it.response.code == ApiResponseCode.EVENT_DOESN_NOT_EXIST) {
+                        // ignore error if event didn't exist on server
+                        logger.i("DeleteEventUseCase event didn't exist on server anymore")
+                        null
+                    } else {
+                        logger.e("error deleting event on server: ${it.response.code} ${it.response.error}")
+                        eventIds[it.index]
+                    }
                 }
 
-                val errorEventIds = syncResponse.data.responses.map { eventIds[it.index] }
-
-                calendarsRepository.deleteEventsById(eventIds.filterNot { it in errorEventIds })
-
-                handleAlarmsUseCase.execute(userId)
+                val succesEventIds = eventIds.filterNot { it in errorEventIds }
+                if (succesEventIds.isNotEmpty()) {
+                    calendarsRepository.deleteEventsById(succesEventIds)
+                    handleAlarmsUseCase.execute(userId)
+                }
 
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success<Unit>()

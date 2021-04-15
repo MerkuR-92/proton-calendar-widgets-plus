@@ -60,6 +60,10 @@ object FeatureFlag {
     const val CHANGE_ANSWER = false
 }
 
+object ApiResponseCode {
+    const val EVENT_DOESN_NOT_EXIST = 2501
+}
+
 object SharedPreferencesKeys {
     const val THEME = "theme"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
