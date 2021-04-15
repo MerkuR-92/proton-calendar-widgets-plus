@@ -79,7 +79,7 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { calendarsRepositoryMock.persistPassphrase(any()) } just Runs
         coEvery { calendarsRepositoryMock.persistCalendarSettings(any()) } just Runs
         coEvery { calendarsRepositoryMock.isCalendarDisplayUpToDate(any(), any()) } returns true
-        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(any()) } returns CalendarUserSettingsEntity(1, 1, 1, "Europe/Zurich", 1, null, 1, null)
+        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(any()) } returns CalendarUserSettingsEntity("fkUserId", 1, 1, 1, "Europe/Zurich", 1, null, 1, null)
         coEvery { calendarUserSettingsChangedUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success<Unit>()
         coEvery { handleAlarmsUseCaseMock.execute(any()) } just Runs
         coEvery { keySetupUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success<Unit>()

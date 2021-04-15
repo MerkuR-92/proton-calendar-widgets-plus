@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data.entity
 
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
@@ -36,12 +37,11 @@ data class AddressEntity(
     @SerialName("DisplayName")
     val displayName: String?,
     @SerialName("Keys")
-    val keys: List<JsonElement>
-) {
-
-    //@Expose(serialize = false, deserialize = false)
+    val keys: List<JsonElement>,
+    @NonNull
     @kotlinx.serialization.Transient
-    lateinit var fkUserId: String
+    val fkUserId: String = "" // TODO Split in two classes: One RemoteEntity and one DBEntity
+) {
 
     fun toAddress(json: Json): Address {
         return Address(

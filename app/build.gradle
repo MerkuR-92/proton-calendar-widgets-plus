@@ -50,6 +50,12 @@ android {
         versionName "0.19.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation":"$projectDir/schemas".toString()]
+            }
+        }
     }
 
     signingConfigs {
@@ -127,6 +133,7 @@ dependencies {
     implementation "me.proton.core:data:${rootProject.ext.version.proton_core_data}"
     implementation "me.proton.core:domain:${rootProject.ext.version.proton_core_domain}"
     implementation "me.proton.core:presentation:${rootProject.ext.version.proton_core_presentation}"
+    implementation "me.proton.core:country:${rootProject.ext.version.proton_core_country}"
     implementation "me.proton.core:network:${rootProject.ext.version.proton_core_networking}"
     implementation "me.proton.core:util-kotlin:${rootProject.ext.version.proton_core_util_kotlin}"
     implementation "me.proton.core:mail-message:${rootProject.ext.version.proton_core_mail_message}"

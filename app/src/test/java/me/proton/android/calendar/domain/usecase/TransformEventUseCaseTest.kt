@@ -73,8 +73,8 @@ internal class TransformEventUseCaseTest {
                 "description",
                 "color",
                 1,
-                1)
-            calendarEntity.fkUserId = "fkUserId"
+                1,
+                fkUserId = "fkUserId")
             coEvery { database.calendarsDao().selectById(any()) } returns calendarEntity
 
             // calendarKey

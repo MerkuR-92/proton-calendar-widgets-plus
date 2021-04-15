@@ -420,14 +420,12 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
-        calendar.fkUserId = userId
         //  TODO make sure we have "flags" set!!!!!
-        database.calendarsDao().updateOrInsert(calendar)
+        database.calendarsDao().updateOrInsert(calendar.copy(fkUserId = userId))
     }
 
     override suspend fun updateCalendar(userId: String, calendar: CalendarEntity) {
-        calendar.fkUserId = userId
-        database.calendarsDao().update(calendar)
+        database.calendarsDao().update(calendar.copy(fkUserId = userId))
     }
 
     override suspend fun deleteCalendarById(id: String) {
@@ -1054,8 +1052,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity) {
-        calendarUserSettings.fkUserId = userId
-        database.calendarUserSettingsDao().updateOrInsert(calendarUserSettings)
+        database.calendarUserSettingsDao().updateOrInsert(calendarUserSettings.copy(fkUserId = userId))
     }
 
     override suspend fun deleteCalendarUserSettingsByUserId(userId: String) {

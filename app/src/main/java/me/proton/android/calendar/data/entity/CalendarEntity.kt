@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data.entity
 
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
@@ -33,12 +34,11 @@ data class CalendarEntity(
     @SerialName("Display")
     val display: Int, // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
     @SerialName("Flags")
-    val flags: Int = 1 // Flag not returned for Update/Create calendar. Default for create is 1 but on Update we keep the previous value
-) {
-
-    //@Expose(serialize = false, deserialize = false)
+    val flags: Int = 1, // Flag not returned for Update/Create calendar. Default for create is 1 but on Update we keep the previous value
+    @NonNull
     @kotlinx.serialization.Transient
-    lateinit var fkUserId: String
+    val fkUserId: String = "" // TODO Split in two classes: One RemoteEntity and one DBEntity
+) {
 
     //Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled
     val isActive: Boolean get() = flags == 1

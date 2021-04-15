@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data.entity
 
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -21,7 +22,10 @@ import me.proton.android.calendar.data.db.AppDatabase
 )
 @Serializable
 data class CalendarUserSettingsEntity(
-
+    @PrimaryKey
+    @kotlinx.serialization.Transient
+    @NonNull
+    val fkUserId: String = "", // TODO Split in two classes: One RemoteEntity and one DBEntity
     @SerialName("WeekLength")
     val weekLength: Int, // 0 - 7 days, 1 - 5 days
     @SerialName("DisplayWeekNumber")
@@ -43,9 +47,4 @@ data class CalendarUserSettingsEntity(
 
 //    @PrimaryKey(autoGenerate = true)
 //    var _id: Int = 0
-
-    @PrimaryKey
-    @kotlinx.serialization.Transient
-    lateinit var fkUserId: String
-
 }

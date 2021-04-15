@@ -15,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
+import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -1237,3 +1238,19 @@ fun ParticipationStatus.toInt(): Int {
     }
 }
 
+/** Execute the [listener] on [TextWatcher.onTextChanged] */
+inline fun EditText.onTextChange(crossinline listener: (CharSequence) -> Unit): TextWatcher {
+    val watcher = object : TextWatcher {
+        override fun afterTextChanged(editable: Editable) {
+            /* Do nothing */
+        }
+        override fun beforeTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {
+            /* Do nothing */
+        }
+        override fun onTextChanged(text: CharSequence, start: Int, before: Int, count: Int) {
+            listener(text)
+        }
+    }
+    addTextChangedListener(watcher)
+    return watcher
+}

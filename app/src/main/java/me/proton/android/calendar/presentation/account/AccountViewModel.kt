@@ -154,6 +154,7 @@ class AccountViewModel(
                 .onAccountCreateAddressFailed { removeUser(it.userId) }
                 .onAccountDisabled { removeUser(it.userId) }
                 .onAccountRemoved { cleanUser(it.userId) }
+                .disableInitialNotReadyAccounts()
         }
 
         // Check if we already have Ready accounts.

@@ -65,13 +65,11 @@ class UsersRepositoryImpl(
 
     override suspend fun persistAddress(userId: String, address: AddressEntity) {
         Timber.d("persisting address entity for user ${userId} -> ${address}")
-        address.fkUserId = userId // TODO if we scope repository with userId, this will not be needed
-        database.addressesDao().insert(address)
+        database.addressesDao().insert(address.copy(fkUserId = userId)) // TODO if we scope repository with userId, this will not be needed
     }
 
     override suspend fun updateAddress(userId: String, address: AddressEntity) {
-        address.fkUserId = userId // TODO if we scope repository with userId, this will not be needed
-        database.addressesDao().update(address)
+        database.addressesDao().update(address.copy(fkUserId = userId)) // TODO if we scope repository with userId, this will not be needed
     }
 
     override suspend fun deleteAddressById(id: String) {
@@ -83,8 +81,7 @@ class UsersRepositoryImpl(
     }
 
     override suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity) {
-        userSettings.fkUserId = userId
-        database.userSettingsDao().updateOrInsert(userSettings)
+        database.userSettingsDao().updateOrInsert(userSettings.copy(fkUserId = userId))
     }
 
     override suspend fun hasReactivatedAddressKeys(address: AddressEntity): Boolean {
