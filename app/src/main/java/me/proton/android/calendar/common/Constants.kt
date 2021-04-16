@@ -61,7 +61,7 @@ object FeatureFlag {
 }
 
 object ApiResponseCode {
-    const val EVENT_DOESN_NOT_EXIST = 2501
+    const val EVENT_DOES_NOT_EXIST = 2501
 }
 
 object SharedPreferencesKeys {

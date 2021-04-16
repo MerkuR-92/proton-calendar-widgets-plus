@@ -118,7 +118,7 @@ class DeleteEventUseCase( // TODO TESTS
                 // TODO check .isSuccessful on Proton Responses, this will still crash in case of malformed request etc.
 
                 val errorEventIds = syncResponse.data.responses.mapNotNull {
-                    if (it.response.code == ApiResponseCode.EVENT_DOESN_NOT_EXIST) {
+                    if (it.response.code == ApiResponseCode.EVENT_DOES_NOT_EXIST) {
                         // ignore error if event didn't exist on server
                         logger.i("DeleteEventUseCase event didn't exist on server anymore")
                         null
