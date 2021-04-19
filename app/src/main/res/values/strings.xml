@@ -246,7 +246,8 @@
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_create_error">Error creating event</string>
     <string name="snack_ics_parsing_error">Error reading calendar</string>
-    <string name="snack_ics_unsupported_method_error">The method property value is not supported</string>
+    <string name="snack_ics_unsupported_method_error">This event type is not supported yet</string>
+    <string name="snack_ics_unsupported_add_error">Adding occurrences to an event is not supported for the moment</string>
     <string name="snack_ics_party_crasher_error">Your email is not on the participant list</string>
     <string name="snack_ics_missing_uid_error">The event is missing UID</string>
     <string name="snack_ics_no_active_calendar_error">There are no active calendars</string>

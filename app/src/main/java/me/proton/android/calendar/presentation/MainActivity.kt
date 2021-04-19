@@ -369,6 +369,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                         is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod -> {
                                             this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error))
                                         }
+                                        is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd -> {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error))
+                                        }
                                         is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher -> {
                                             this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error))
                                         }

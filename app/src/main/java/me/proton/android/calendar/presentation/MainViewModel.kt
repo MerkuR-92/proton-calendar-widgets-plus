@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.work.*
 import biweekly.parameter.ParticipationStatus
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
@@ -14,6 +15,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
@@ -167,17 +169,26 @@ class MainViewModel(
 
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
-        // TODO Remove this once other methods are handled
-        if (!iCalendar.method.isRequest) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod
+        if (iCalendar.method.isAdd) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd // TODO Remove once ADD is handled
+        if (!iCalendar.method.isRequest) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod // TODO Remove once other methods are handled
 
-        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { it.email }
+
+        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
+            canonicalizeProtonEmail(address.email)
+        }
+        val organizerEmail = iCalendar.events.first().organizer.extractEmail()
+        val isOrganizerMode =
+            if (organizerEmail != null) {
+                val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
+                userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
+            } else false
         val userAttendee = iCalendar.events.first().attendees.find { attendee ->
             userEmails?.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null
         }
-        userAttendee ?: return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+        if (!isOrganizerMode && userAttendee == null) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
             ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound // TODO Handle error
@@ -208,7 +219,6 @@ class MainViewModel(
         }
 
         val eventsSharingUidResponse = calendarsRepository.getEventsByUid(userId, newEvent.uid)
-//        logger.e("eventsSharingUidResponse = $eventsSharingUidResponse")
 
         var existingEvent: Event? = null
         eventsSharingUidResponse?.let {
@@ -220,7 +230,6 @@ class MainViewModel(
                 }
             }
         }
-//        logger.e("existingEvent = $existingEvent")
 
         val isNew =
             eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null ||
@@ -229,20 +238,17 @@ class MainViewModel(
                         event?.iCalEvent?.recurrenceId == null || event.iCalEvent.recurrenceId != newEvent.iCalEvent.recurrenceId
                     } != null)
 
-        if (isNew) {
-            logger.d("Create event in default calendar")
-
+        if (isNew && !isOrganizerMode) {
+            // Create brand new event
             return editCreateEventFromIcs(
                 IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
                 userId,
                 newEvent
             )
         } else {
-            logger.d("Event already exists")
-
-            if (newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
-                logger.d("ICS is an update")
-
+            // Event already exists, check if we need to update it using the ics content
+            // TODO Remove isOrganizerMode condition once we handle opening participants answers
+            if (!isOrganizerMode && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
                 val newICalendar = newEvent.iCalendar.clone()
 
                 userEmails?.let {
@@ -263,6 +269,7 @@ class MainViewModel(
                 )
             }
 
+            // If no update is needed, return the existing event id
             return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
         }
     }
@@ -282,7 +289,6 @@ class MainViewModel(
                     calendarViewModel.updateServerCalendar(newEvent.calendar.id)
                 }
 
-//                    logger.e("Created event id: $eventId")
                 return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action)
             }
             is UseCase.Result.InvalidParams -> {

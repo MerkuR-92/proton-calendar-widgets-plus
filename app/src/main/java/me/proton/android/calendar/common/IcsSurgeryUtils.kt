@@ -57,6 +57,7 @@ object IcsSurgeryUtils {
             object EditCreateEventError: Error()
             object ParsingFailed: Error()
             object UnsupportedMethod: Error()
+            object UnsupportedAdd: Error()
             object PartyCrasher: Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
