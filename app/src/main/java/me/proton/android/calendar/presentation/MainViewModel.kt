@@ -6,11 +6,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
 import biweekly.parameter.ParticipationStatus
+import biweekly.property.Method
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -220,6 +224,21 @@ class MainViewModel(
 
         val eventsSharingUidResponse = calendarsRepository.getEventsByUid(userId, newEvent.uid)
 
+        // IMPORTANT: We need parent event to clean recurrence id
+        val parentEventEntity = eventsSharingUidResponse?.firstOrNull { eventEntity ->
+            eventEntity.sharedEvents.any {
+                try {
+                    // only root event contains RRULE
+                    it.jsonObject.get("Data")?.jsonPrimitive?.content?.contains("RRULE:") == true
+                } catch (e: IllegalArgumentException) {
+                    false
+                }
+            }
+        }
+        val parentEvent = if (parentEventEntity != null) transformEventUseCase.execute(parentEventEntity) else null
+        // IMPORTANT: Unlike the rest of the surgery, clean recurrence id is called outside of cleanIcs, but it is still mandatory
+        if (!iCalendar.cleanRecurrenceId(iCalendar.method == Method.reply(), parentEvent?.iCalendar)) return IcsSurgeryUtils.HandleIcsResult.Error.InvalidRecurrenceId
+
         var existingEvent: Event? = null
         eventsSharingUidResponse?.let {
             for (eventEntity in eventsSharingUidResponse) {
@@ -232,11 +251,7 @@ class MainViewModel(
         }
 
         val isNew =
-            eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null ||
-                    (newEvent.iCalEvent.recurrenceId != null && eventsSharingUidResponse.firstOrNull {
-                        val event = transformEventUseCase.execute(it)
-                        event?.iCalEvent?.recurrenceId == null || event.iCalEvent.recurrenceId != newEvent.iCalEvent.recurrenceId
-                    } != null)
+            eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
 
         if (isNew && !isOrganizerMode) {
             // Create brand new event

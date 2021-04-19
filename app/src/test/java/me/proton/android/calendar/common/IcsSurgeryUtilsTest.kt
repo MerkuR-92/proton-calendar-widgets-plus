@@ -21,6 +21,8 @@ import me.proton.android.calendar.common.IcsSurgeryUtils.cleanSummary
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanTimezones
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanUid
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanXWrTimezone
+import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -1406,30 +1408,47 @@ internal class IcsSurgeryUtilsTest {
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanRecurrenceId(iCalendar.method?.isReply == true)).isFalse()
-        }
+        assertThat(iCalendar.cleanRecurrenceId(iCalendar.method?.isReply == true)).isFalse()
     }
 
     @Test
     fun `cleanRecurrenceId datetime type RECURRENCE-ID for all day event test`() {
 
-        val iCalString = """
+        val parentICalString = """
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
     BEGIN:VEVENT
     DTSTART;VALUE=DATE:20210320
     DTEND;VALUE=DATE:20210320
-    RECURRENCE-ID;TZID=Europe/Paris:20210320T120000
+    RRULE:FREQ=DAILY
     SEQUENCE:0
-    SUMMARY:Recurring with SE 1
+    SUMMARY:Recurring
     STATUS:CONFIRMED
     DTSTAMP:20210317T105458Z
     UID:lOIY56JOStapy1PUGuN4WiN67oBQ@proton.me
     END:VEVENT
     END:VCALENDAR
     """.trimIndent()
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210420
+    DTEND;VALUE=DATE:20210420
+    RECURRENCE-ID;TZID=Europe/Paris:20210420T120000
+    SEQUENCE:1
+    SUMMARY:Recurring with SE 1
+    STATUS:CONFIRMED
+    DTSTAMP:20210317T105558Z
+    UID:lOIY56JOStapy1PUGuN4WiN67oBQ@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val parentICal = ICalUtils.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
         assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
@@ -1438,23 +1457,38 @@ internal class IcsSurgeryUtilsTest {
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanRecurrenceId(iCalendar.method?.isReply == true)).isTrue()
-            assertThat(event.recurrenceId.value.hasTime()).isFalse()
-        }
+        assertThat(iCalendar.cleanRecurrenceId(iCalendar.method?.isReply == true, parentICal)).isTrue()
+        assertThat(iCalendar.events.first().recurrenceId.value.hasTime()).isFalse()
     }
 
     @Test
     fun `cleanRecurrenceId date type RECURRENCE-ID for part day event test`() {
 
-        val iCalString = """
+        val parentICalString = """
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
     BEGIN:VEVENT
     DTSTART;TZID=Europe/Paris:20210320T120000
     DTEND;TZID=Europe/Paris:20210320T123000
-    RECURRENCE-ID;VALUE=DATE:20210320
+    RRULE:FREQ=DAILY
+    SEQUENCE:0
+    SUMMARY:Recurring
+    STATUS:CONFIRMED
+    DTSTAMP:20210317T105458Z
+    UID:lOIY56JOStapy1PUGuN4WiN67oBQ@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Paris:20210420T120000
+    DTEND;TZID=Europe/Paris:20210420T123000
+    RECURRENCE-ID;VALUE=DATE:20210420
     RRULE:FREQ=WEEKLY;UNTIL=20210328;BYDAY=SU
     SEQUENCE:0
     SUMMARY:Recurring with SE 1
@@ -1465,6 +1499,8 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
+        val parentICal = ICalUtils.parseICalString(parentICalString)
+
         val cleanRawIcsResult = iCalString.cleanRawIcs()
         assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
         if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
@@ -1472,9 +1508,58 @@ internal class IcsSurgeryUtilsTest {
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanRecurrenceId(iCalendar.method?.isReply == true)).isFalse()
-        }
+        assertThat(iCalendar.cleanRecurrenceId(iCalendar.method?.isReply == true, parentICal)).isFalse()
+    }
+
+    @Test
+    fun `cleanRecurrenceId RECURRENCE-ID timezone different from the parent DTSTART test`() {
+
+        val parentICalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Athens:20210320T120000
+    DTEND;TZID=Europe/Athens:20210320T123000
+    RRULE:FREQ=DAILY
+    SEQUENCE:0
+    SUMMARY:Recurring
+    STATUS:CONFIRMED
+    DTSTAMP:20210317T105458Z
+    UID:lOIY56JOStapy1PUGuN4WiN67oBQ@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210420
+    DTEND;VALUE=DATE:20210420
+    RECURRENCE-ID;TZID=Europe/Paris:20210420T120000
+    SEQUENCE:1
+    SUMMARY:Recurring with SE 1
+    STATUS:CONFIRMED
+    DTSTAMP:20210317T105558Z
+    UID:lOIY56JOStapy1PUGuN4WiN67oBQ@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        // TODO
+        val parentICal = ICalUtils.parseICalString(parentICalString)
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        assertThat(iCalendar.cleanRecurrenceId(false, parentICal)).isTrue()
+        assertThat(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().recurrenceId).timeZone.id).isEqualTo("Europe/Athens")
     }
 
     @Test

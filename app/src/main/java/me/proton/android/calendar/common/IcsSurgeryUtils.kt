@@ -24,6 +24,8 @@ import me.proton.android.calendar.common.IcsParsingValidation.MAX_YEARLY_INTERVA
 import me.proton.android.calendar.common.IcsParsingValidation.MIN_DATE
 import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanTimezones
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -131,8 +133,6 @@ object IcsSurgeryUtils {
             if (!event.cleanSummary()) return HandleIcsResult.Error.InvalidSummary
 
             if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.InvalidRRule
-
-            if (!event.cleanRecurrenceId(iCalendar.method == Method.reply())) return HandleIcsResult.Error.InvalidRecurrenceId
 
             if (!event.cleanExDate()) return HandleIcsResult.Error.InvalidExDate
 
@@ -355,20 +355,27 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun VEvent.cleanRecurrenceId(isReply: Boolean): Boolean {
-        if (this.recurrenceId == null) return true
+    fun ICalendar.cleanRecurrenceId(isReply: Boolean, parentCalendar: ICalendar? = null): Boolean {
+        val event = this.events.first()
+
+        if (event.recurrenceId == null) return true
 
         // RECURRENCE-ID: If the event contains both a RECURRENCE-ID and an RRULE, it is rejected (as unsupported) unless it's an invitation with REPLY method.
-        if (!isReply && this.recurrenceId != null && this.recurrenceRule != null) return false
+        if (!isReply && event.recurrenceId != null && event.recurrenceRule != null) return false
 
-        // If RECURRENCE-ID is of type DATE-TIME for an all-day event, convert to type DATE by keeping just the date part.
-        if (this.recurrenceId.value.hasTime() && !this.dateStart.value.hasTime()) {
-            this.recurrenceId.value = ICalDate(this.recurrenceId.value, false)
+        // If RECURRENCE-ID is of type DATE-TIME for a parent all-day event, convert to type DATE by keeping just the date part.
+        if (event.recurrenceId.value.hasTime() && parentCalendar?.events?.first()?.dateStart?.value?.hasTime() == false) {
+            event.recurrenceId.value = ICalDate(event.recurrenceId.value, false)
         }
 
-        // If RECURRENCE-ID is of type DATE for a part-day event then we cannot recover and reject (as invalid).
-        if (!this.recurrenceId.value.hasTime() && this.dateStart.value.hasTime()) {
+        // If RECURRENCE-ID is of type DATE for a parent part-day event then we cannot recover and reject (as invalid).
+        if (!event.recurrenceId.value.hasTime() && parentCalendar?.events?.first()?.dateStart?.value?.hasTime() == true) {
             return false
+        }
+
+        // If RECURRENCE-ID has a timezone different from the parent DTSTART one, re-localize in the parent DTSTART timezone.
+        if (event.recurrenceId.value != null && this.timezoneInfo.getTimezone(event.recurrenceId) != parentCalendar?.timezoneInfo?.getTimezone(parentCalendar.events.first().dateStart)) {
+            this.timezoneInfo.setTimezone(event.recurrenceId, parentCalendar?.timezoneInfo?.getTimezone(parentCalendar.events.first().dateStart))
         }
 
         return true
@@ -457,9 +464,6 @@ object IcsSurgeryUtils {
             it.dateEnd?.localizeZuluTimeDate(this, it)
             it.recurrenceId?.localizeZuluTimeDate(this, it)
         }
-
-        // If RECURRENCE-ID has a timezone different from the parent DTSTART one, re-localize in the parent DTSTART timezone. IMPORTANT!! Notice that to do this you need access to the parent event.
-        // TODO
 
         return true
     }
