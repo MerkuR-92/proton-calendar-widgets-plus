@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
+import biweekly.parameter.ParticipationStatus
 import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.ICalUtils.clone
@@ -231,14 +232,35 @@ class MainViewModel(
         if (isNew) {
             logger.d("Create event in default calendar")
 
-            return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, userId, newEvent)
+            return editCreateEventFromIcs(
+                IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
+                userId,
+                newEvent
+            )
         } else {
             logger.d("Event already exists")
 
             if (newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
                 logger.d("ICS is an update")
 
-                return editCreateEventFromIcs(IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT, userId, existingEvent?.copy(iCalendar = newEvent.iCalendar.clone()) ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError)
+                val newICalendar = newEvent.iCalendar.clone()
+
+                userEmails?.let {
+                    val currentParticipationStatus = existingEvent?.getParticipationStatus(userEmails) ?: return@let
+
+                    val currentSequence = existingEvent?.iCalEvent?.sequence?.value
+                    if (currentSequence != null && currentSequence < newEvent.iCalEvent.sequence.value) {
+                        newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus = ParticipationStatus.NEEDS_ACTION
+                    } else {
+                        newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus = currentParticipationStatus
+                    }
+                }
+
+                return editCreateEventFromIcs(
+                    IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT,
+                    userId,
+                    existingEvent?.copy(iCalendar = newICalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                )
             }
 
             return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
