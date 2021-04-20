@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.work.*
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Method
+import biweekly.property.Status
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.jsonObject
@@ -174,7 +175,7 @@ class MainViewModel(
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         if (iCalendar.method.isAdd) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd // TODO Remove once ADD is handled
-        if (!iCalendar.method.isRequest) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod // TODO Remove once other methods are handled
+        if (!iCalendar.method.isRequest && !iCalendar.method.isCancel) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod // TODO Remove once other methods are handled
 
 
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
@@ -253,7 +254,7 @@ class MainViewModel(
         val isNew =
             eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
 
-        if (isNew && !isOrganizerMode) {
+        if (isNew && !isOrganizerMode && !iCalendar.method.isCancel) {
             // Create brand new event
             return editCreateEventFromIcs(
                 IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
@@ -263,24 +264,38 @@ class MainViewModel(
         } else {
             // Event already exists, check if we need to update it using the ics content
             // TODO Remove isOrganizerMode condition once we handle opening participants answers
-            if (!isOrganizerMode && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
+            if (!isOrganizerMode && existingEvent != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
                 val newICalendar = newEvent.iCalendar.clone()
 
-                userEmails?.let {
-                    val currentParticipationStatus = existingEvent?.getParticipationStatus(userEmails) ?: return@let
+                val updatedEvent = if (newICalendar.method.isCancel) {
+                    // TODO Cancel just one occurrence: if the ICS contains a RECURRENCE-ID which matches an occurrence of the series for which no previous single edit exists.
+                    //  In that case you have to create a single edit with status CANCELLED and no alarms.
 
-                    val currentSequence = existingEvent?.iCalEvent?.sequence?.value
-                    if (currentSequence != null && currentSequence < newEvent.iCalEvent.sequence.value) {
-                        newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus = ParticipationStatus.NEEDS_ACTION
-                    } else {
-                        newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus = currentParticipationStatus
+                    // Cancel the event via the sync route by changing STATUS, DTSTAMP (update with the ICS DTSTAMP), and drop the alarms
+                    existingEvent?.iCalEvent?.status = Status.cancelled()
+                    existingEvent?.iCalEvent?.alarms?.clear()
+                    existingEvent?.iCalEvent?.dateTimeStamp = newICalendar.events.first().dateTimeStamp
+                    existingEvent
+                } else {
+                    userEmails?.let {
+                        val currentParticipationStatus = existingEvent?.getParticipationStatus(userEmails) ?: return@let
+
+                        val currentSequence = existingEvent?.iCalEvent?.sequence?.value
+                        if (currentSequence != null && currentSequence < newEvent.iCalEvent.sequence.value) {
+                            newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus =
+                                ParticipationStatus.NEEDS_ACTION
+                        } else {
+                            newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus =
+                                currentParticipationStatus
+                        }
                     }
+                    existingEvent?.copy(iCalendar = newICalendar)
                 }
 
                 return editCreateEventFromIcs(
                     IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT,
                     userId,
-                    existingEvent?.copy(iCalendar = newICalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                    updatedEvent ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
                 )
             }
 
