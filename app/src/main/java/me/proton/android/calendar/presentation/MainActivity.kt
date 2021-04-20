@@ -337,79 +337,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
                     if (openIcsIntent != null) {
-                        logger.e("Intent = $openIcsIntent")
                         val uri = openIcsIntent.data
                         if (uri != null) {
-                            lifecycleScope.launch {
-                                val userId = accountViewModel.getPrimaryUserId() ?: return@launch // TODO Handle error
-                                displaySplashScreen(true, true, resources.getString(R.string.splash_init))
-                                val handleIcsImportResult = mainViewModel.handleIcsFile(uri, userId) ?: return@launch // TODO Handle error
-                                if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
-                                    val eventId = handleIcsImportResult.eventId
-                                    logger.e("Test: eventId = $eventId")
-                                    when (handleIcsImportResult.action) {
-                                        IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT ->
-                                            Toast.makeText(this@MainActivity, getString(R.string.snack_event_created), Toast.LENGTH_LONG).show()
-                                        IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT ->
-                                            Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
-                                    }
-                                    val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
-                                    navigateTo(eventDetailsDeepLink)
-                                } else {
-                                    when (handleIcsImportResult) {
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.DefaultError -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.MissingUid -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.DurationNotSupported -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.TooManyEvents -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.NoEvents -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error))
-                                        }
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidCalscale,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateOrDateTimeProperty,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateStart,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateEnd,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDescription,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidLocation,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSummary,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidRRule,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidRecurrenceId,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidExDate,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSequence,
-                                        is IcsSurgeryUtils.HandleIcsResult.Error.InvalidAttendees -> {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error))
-                                        }
-                                        else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
-                                    }
-                                    navigateTo(Navigation.Deeplink.toMonth())
-                                }
-                            }
+                            handleOpenIcsIntent(uri)
                         } else navigateTo(Navigation.Deeplink.toMonth())
                     } else {
                         logger.e("openIcsIntent is null")
@@ -420,6 +350,88 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             AccountViewModel.State.LoginInProgress,
             AccountViewModel.State.Processing -> {
                 displaySplashScreen(true, true, resources.getString(R.string.splash_after_login_init))
+            }
+        }
+    }
+
+    private fun handleOpenIcsIntent(uri: Uri) {
+        // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
+        val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
+        lifecycleScope.launch {
+            val userId = accountViewModel.getPrimaryUserId() ?: return@launch // TODO Handle error
+            displaySplashScreen(
+                display = true,
+                spinner = true,
+                spinnerText = resources.getString(R.string.splash_init)
+            )
+
+            val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader, userId)
+            if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
+                when (handleIcsImportResult.action) {
+                    // We use Toast because we do not have the EventDetails view required for SnackBar to be displayed
+                    IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT ->
+                        Toast.makeText(this@MainActivity, getString(R.string.snack_event_created), Toast.LENGTH_LONG).show()
+                    IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT ->
+                        Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
+                }
+
+                val eventId = handleIcsImportResult.eventId
+                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
+                navigateTo(eventDetailsDeepLink)
+            } else {
+                when (handleIcsImportResult) {
+                    is IcsSurgeryUtils.HandleIcsResult.Error.DefaultError -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.MissingUid -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.DurationNotSupported -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.TooManyEvents -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.NoEvents -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidCalscale,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateOrDateTimeProperty,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateStart,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateEnd,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDescription,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidLocation,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSummary,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidRRule,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidRecurrenceId,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidExDate,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSequence,
+                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidAttendees -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error))
+                    }
+                    else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
+                }
+
+                navigateTo(Navigation.Deeplink.toMonth())
             }
         }
     }

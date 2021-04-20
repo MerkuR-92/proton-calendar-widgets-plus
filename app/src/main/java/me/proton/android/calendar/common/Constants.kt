@@ -93,6 +93,8 @@ object IcsParsingValidation {
     val MIN_DATE = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
     val MAX_DATE = ZonedDateTime.of(2038, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
 
+    const val X_WR_TIMEZONE = "X-WR-TIMEZONE"
+    const val TZID = "TZID"
 }
 
 object FormValidation {

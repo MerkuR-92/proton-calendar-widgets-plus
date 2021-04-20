@@ -162,8 +162,7 @@ class MainViewModel(
         }
     }
 
-    suspend fun handleIcsFile(uri: Uri, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
-        val bufferedReader = BufferedReader(InputStreamReader(context.contentResolver.openInputStream(uri)))
+    suspend fun handleIcsFile(bufferedReader: BufferedReader, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
         val iCalString = bufferedReader.use { it.readText() }
 
         val cleanIcsResult = cleanIcs(iCalString)

@@ -23,7 +23,9 @@ import me.proton.android.calendar.common.IcsParsingValidation.MAX_WEEKLY_INTERVA
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_YEARLY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MIN_DATE
 import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
+import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
+import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanTimezones
 import java.time.LocalTime
@@ -192,20 +194,20 @@ object IcsSurgeryUtils {
 
     fun ICalendar.cleanXWrTimezone(): Boolean {
         // X-WR-TIMEZONE: This one is not an official iCal property, but if present, we should try to convert it into a supported timezone, and use it to localize some UTC dates in the ICS.
-        val xWrTimezone = this.getExperimentalProperty("X-WR-TIMEZONE")
+        val xWrTimezone = this.getExperimentalProperty(X_WR_TIMEZONE)
         if (xWrTimezone != null) {
             val timezoneId = AndroidUtils.fallbackTimeZone(xWrTimezone.value, fallbackToDefault = false)
             if (timezoneId != null) {
-                this.setExperimentalProperty("X-WR-TIMEZONE", timezoneId)
+                this.setExperimentalProperty(X_WR_TIMEZONE, timezoneId)
             } else {
-                this.removeExperimentalProperties("X-WR-TIMEZONE")
+                this.removeExperimentalProperties(X_WR_TIMEZONE)
             }
         }
         return true
     }
 
     fun ICalendar.getXWrTimezone(): String? {
-        return this.getExperimentalProperty("X-WR-TIMEZONE")?.value
+        return this.getExperimentalProperty(X_WR_TIMEZONE)?.value
     }
 
     fun VEvent.cleanUid(): Boolean {
@@ -234,7 +236,7 @@ object IcsSurgeryUtils {
                 ), true
             )
         }
-        this.setParameter("TZID", timezone)
+        this.setParameter(TZID, timezone)
     }
 
     fun VEvent.cleanDtStart(): Boolean {
@@ -470,8 +472,8 @@ object IcsSurgeryUtils {
 
     private fun ICalendar.extractTzid(date: DateOrDateTimeProperty?): Boolean {
         // Extract TZID parameter to timezoneInfo if Biweekly didn't process it during parsing
-        if (date != null && !date.getParameter("TZID").isNullOrEmpty()) {
-            val supportedTzid = AndroidUtils.fallbackTimeZone(date.getParameter("TZID"), fallbackToDefault = false) ?: return false
+        if (date != null && !date.getParameter(TZID).isNullOrEmpty()) {
+            val supportedTzid = AndroidUtils.fallbackTimeZone(date.getParameter(TZID), fallbackToDefault = false) ?: return false
             this.timezoneInfo.setTimezone(date, TimezoneAssignment(TimeZone.getTimeZone(supportedTzid), supportedTzid))
         }
         return true
