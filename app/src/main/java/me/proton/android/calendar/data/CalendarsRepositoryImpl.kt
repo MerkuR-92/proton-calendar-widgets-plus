@@ -98,7 +98,7 @@ class CalendarsRepositoryImpl(
 
                 emit(skeletonEvents)
 
-            }.distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
+            }.shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
     private fun List<CalendarEntity>.filterVisible(): List<CalendarEntity> {
         return this.filter {
@@ -662,7 +662,7 @@ class CalendarsRepositoryImpl(
 
         return visibleSkeletonEventsFlow.map { visibleSkeletonEvents ->
 
-            logger.v("createSkeletonsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
+            logger.v("events flow: createSkeletonsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
             visibleSkeletonEvents.map { skeletonEvent ->
                 expandSkeletonEventsAndFilterInWindow(
@@ -672,7 +672,7 @@ class CalendarsRepositoryImpl(
                 )
             }.flatten()
 
-        }.flowOn(Dispatchers.Default).distinctUntilChanged()
+        }.flowOn(Dispatchers.Default)
 
     }
 
