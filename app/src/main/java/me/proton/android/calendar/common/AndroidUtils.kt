@@ -822,6 +822,7 @@ fun EditText.doAfterFilteredIntValueChanged(
                     onValueChanged(count)
                 }
             }
+            this.setSelection(this.text.toString().length)
         }
     }
 }
