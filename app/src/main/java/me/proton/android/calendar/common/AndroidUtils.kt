@@ -1086,20 +1086,20 @@ fun Context.showToast(text: String) {
 }
 
 // Call this method to display SnackBar in a Fragment
-fun Activity.displaySnackBar(message: String) {
+fun Activity.displaySnackBar(message: String, length: Int? = null) {
     Snackbar.make(
         this.findViewById<View>(android.R.id.content),
         message,
-        Snackbar.LENGTH_SHORT
+        length ?: Snackbar.LENGTH_SHORT
     ).show()
 }
 
 // Call this method to display SnackBar in a DialogFragment
-fun View.displaySnackBar(message: String) {
+fun View.displaySnackBar(message: String, length: Int? = null) {
     Snackbar.make(
         this,
         message,
-        Snackbar.LENGTH_SHORT
+        length ?: Snackbar.LENGTH_SHORT
     ).show()
 }
 

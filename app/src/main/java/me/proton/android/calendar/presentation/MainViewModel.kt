@@ -257,6 +257,10 @@ class MainViewModel(
             }
         }
 
+        if (existingEvent?.calendar?.isActive == false) {
+            return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar
+        }
+
         val isNew =
             eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
 

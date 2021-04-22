@@ -255,6 +255,7 @@
     <string name="snack_ics_too_many_events_error">Multiple events are not yet supported</string>
     <string name="snack_ics_no_events_error">This calendar does not contain any event</string>
     <string name="snack_ics_invalid_error">This invitation is invalid</string>
+    <string name="snack_ics_disabled_calendar_error">This invitation is saved in a disabled calendar</string>
 
     <string name="snack_event_attendee_accepted_answer">%s accepted your invitation</string>
     <string name="snack_event_attendee_tentative_answer">%s tentatively accepted your invitation</string>

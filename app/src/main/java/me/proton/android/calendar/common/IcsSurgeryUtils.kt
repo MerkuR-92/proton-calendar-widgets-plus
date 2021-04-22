@@ -67,6 +67,7 @@ object IcsSurgeryUtils {
             object PartyCrasher: Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
+            object DisabledCalendar: Error()
             object DurationNotSupported: Error()
             object TooManyEvents: Error()
             object NoEvents: Error()

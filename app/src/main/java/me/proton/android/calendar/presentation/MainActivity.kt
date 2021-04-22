@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_root.*
@@ -393,37 +394,40 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             } else {
                 when (handleIcsImportResult) {
                     is IcsSurgeryUtils.HandleIcsResult.Error.DefaultError -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.MissingUid -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.DurationNotSupported -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.TooManyEvents -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.NoEvents -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_disabled_calendar_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion,
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidCalscale,
@@ -438,9 +442,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidExDate,
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSequence,
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidAttendees -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error))
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error), Snackbar.LENGTH_LONG)
                     }
-                    else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error))
+                    else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
                 }
 
                 navigateTo(Navigation.Deeplink.toMonth())
