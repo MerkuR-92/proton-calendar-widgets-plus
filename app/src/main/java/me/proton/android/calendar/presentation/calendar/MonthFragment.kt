@@ -276,8 +276,6 @@ class MonthFragment : BaseFragment() {
         }
         calendarViewModel.handleInitialDaySelection(navigationDate ?: calendarViewModel.initialToday)
 
-        setToolbarMonthYearTitle(calendarViewModel.initialToday)
-        
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
             setToolbarMonthYearTitle(it)
         }
