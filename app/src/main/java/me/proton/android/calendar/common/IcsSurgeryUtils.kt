@@ -64,6 +64,9 @@ object IcsSurgeryUtils {
             object ParsingFailed: Error()
             object UnsupportedMethod: Error()
             object UnsupportedAdd: Error()
+            object UnsupportedRefresh: Error()
+            object UnsupportedCounter: Error()
+            object UnsupportedPublish: Error()
             object PartyCrasher: Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
@@ -111,8 +114,6 @@ object IcsSurgeryUtils {
         }
 
         /* Calendar properties */
-
-        if (!iCalendar.cleanMethod()) return HandleIcsResult.Error.UnsupportedMethod
 
         if (!iCalendar.cleanCalscale()) return HandleIcsResult.Error.InvalidCalscale
 
@@ -183,16 +184,6 @@ object IcsSurgeryUtils {
     fun ICalendar.cleanCalscale(): Boolean {
         // CALSCALE: The calendar scale must be either 'Gregorian' or empty.
         return this.calendarScale == null || this.calendarScale.isGregorian
-    }
-
-    fun ICalendar.cleanMethod(): Boolean {
-        // TODO Update once more methods are supported
-        // METHOD: We support REPLY, REQUEST, CANCEL, PUBLISH.
-        return this.method == null || (this.method != null &&
-                (this.method == Method.reply() ||
-                        this.method == Method.request() ||
-                        this.method == Method.cancel() ||
-                        this.method == Method.publish()))
     }
 
     fun ICalendar.cleanXWrTimezone(): Boolean {

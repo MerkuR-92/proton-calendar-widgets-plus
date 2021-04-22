@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
+import biweekly.ICalendar
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Method
 import biweekly.property.Status
@@ -176,7 +177,11 @@ class MainViewModel(
 
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
+        // METHOD: We support REQUEST, CANCEL, REPLY.
         if (iCalendar.method.isAdd) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd // TODO Remove once ADD is handled
+        if (iCalendar.method.isCounter) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedCounter // TODO Remove once COUNTER is handled
+        if (iCalendar.method.isRefresh) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedRefresh // TODO Remove once REFRESH is handled
+        if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedPublish // TODO Remove once PUBLISH is handled
         if (!iCalendar.method.isRequest &&
             !iCalendar.method.isCancel &&
             !iCalendar.method.isReply) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod // TODO Remove once other methods are handled

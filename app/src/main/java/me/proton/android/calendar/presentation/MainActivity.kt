@@ -408,6 +408,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd -> {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error), Snackbar.LENGTH_LONG)
                     }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedCounter -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_counter_error), Snackbar.LENGTH_LONG)
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedRefresh -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_refresh_error), Snackbar.LENGTH_LONG)
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedPublish -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
+                    }
                     is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher -> {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error), Snackbar.LENGTH_LONG)
                     }
