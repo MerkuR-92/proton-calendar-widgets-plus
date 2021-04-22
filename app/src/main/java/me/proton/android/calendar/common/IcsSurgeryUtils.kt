@@ -61,6 +61,7 @@ object IcsSurgeryUtils {
         sealed class Error: HandleIcsResult() {
             object DefaultError: Error()
             object EditCreateEventError: Error()
+            object EventDeleted: Error()
             object ParsingFailed: Error()
             object UnsupportedMethod: Error()
             object UnsupportedAdd: Error()
@@ -70,7 +71,7 @@ object IcsSurgeryUtils {
             object PartyCrasher: Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
-            object DisabledCalendar: Error()
+            data class DisabledCalendar(val eventId: String? = null): Error()
             object DurationNotSupported: Error()
             object TooManyEvents: Error()
             object NoEvents: Error()

@@ -392,6 +392,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
                 navigateTo(eventDetailsDeepLink)
             } else {
+                var navigatedToDetails = false
                 when (handleIcsImportResult) {
                     is IcsSurgeryUtils.HandleIcsResult.Error.DefaultError -> {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
@@ -436,7 +437,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_disabled_calendar_error), Snackbar.LENGTH_LONG)
+                        if (handleIcsImportResult.eventId != null) {
+                            Toast.makeText(this@MainActivity, getString(R.string.snack_ics_disabled_calendar_error), Toast.LENGTH_LONG).show()
+                            val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(handleIcsImportResult.eventId)
+                            navigateTo(eventDetailsDeepLink)
+                            navigatedToDetails = true
+                        } else this@MainActivity.displaySnackBar(getString(R.string.snack_ics_disabled_calendar_error), Snackbar.LENGTH_LONG)
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted -> {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion,
                     is IcsSurgeryUtils.HandleIcsResult.Error.InvalidCalscale,
@@ -456,7 +465,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
                 }
 
-                navigateTo(Navigation.Deeplink.toMonth())
+                if (!navigatedToDetails) navigateTo(Navigation.Deeplink.toMonth())
             }
         }
     }

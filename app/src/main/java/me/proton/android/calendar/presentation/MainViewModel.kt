@@ -263,7 +263,7 @@ class MainViewModel(
         }
 
         if (existingEvent?.calendar?.isActive == false) {
-            return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar
+            return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
         }
 
         val isNew =
@@ -353,6 +353,8 @@ class MainViewModel(
                         }
                     }
                 }
+            } else if (isOrganizerMode && existingEvent == null) {
+                return IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted
             }
         }
 
