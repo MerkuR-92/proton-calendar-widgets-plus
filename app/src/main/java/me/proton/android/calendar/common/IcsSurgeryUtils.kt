@@ -4,6 +4,7 @@ import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.io.TimezoneAssignment
+import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.Method
@@ -45,7 +46,8 @@ object IcsSurgeryUtils {
     sealed class HandleIcsResult {
         data class Success(
             val eventId: String,
-            val action: HandleIcsAction
+            val action: HandleIcsAction,
+            val newAttendeeStatus: Pair<String, ParticipationStatus>? = null
         ): HandleIcsResult()
 
         data class ParsingSuccessful(

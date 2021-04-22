@@ -790,7 +790,9 @@ data class Event(
         @SerialName("Token")
         val token: String,
         @SerialName("Status")
-        val status: Int
+        val status: Int,
+        @SerialName("UpdateTime")
+        val updateTime: Int? = null
     ) {
         val participationStatus: ParticipationStatus get() = when (status) {
             1 -> ParticipationStatus.TENTATIVE

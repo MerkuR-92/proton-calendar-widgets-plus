@@ -5,18 +5,14 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.sanitise
-import me.proton.android.calendar.common.adjustIncomingAllDayEvent
-import me.proton.android.calendar.common.canonicalizeProtonEmail
-import me.proton.android.calendar.common.printToString
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import java.util.*
 
 
 class TransformEventUseCase(

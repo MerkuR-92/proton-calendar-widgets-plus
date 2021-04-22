@@ -256,6 +256,10 @@
     <string name="snack_ics_no_events_error">This calendar does not contain any event</string>
     <string name="snack_ics_invalid_error">This invitation is invalid</string>
 
+    <string name="snack_event_attendee_accepted_answer">%s accepted your invitation</string>
+    <string name="snack_event_attendee_tentative_answer">%s tentatively accepted your invitation</string>
+    <string name="snack_event_attendee_declined_answer">%s declined your invitation</string>
+
     <!-- Dialogs -->
     <string name="error_event_doesnt_exist">Event doesn\'t exist</string>
     <string name="error_occurrence_doesnt_exist">Occurrence doesn\'t exist</string>

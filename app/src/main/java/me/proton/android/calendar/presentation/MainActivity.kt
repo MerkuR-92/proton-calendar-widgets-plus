@@ -26,6 +26,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -370,9 +371,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 when (handleIcsImportResult.action) {
                     // We use Toast because we do not have the EventDetails view required for SnackBar to be displayed
                     IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT ->
-                        Toast.makeText(this@MainActivity, getString(R.string.snack_event_created), Toast.LENGTH_LONG).show()
-                    IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT ->
-                        Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, getString(R.string.snack_event_created), Toast.LENGTH_LONG)
+                            .show()
+                    IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT -> {
+                        when (handleIcsImportResult.newAttendeeStatus?.second) {
+                            ParticipationStatus.ACCEPTED ->
+                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_accepted_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
+                            ParticipationStatus.TENTATIVE ->
+                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_tentative_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
+                            ParticipationStatus.DECLINED ->
+                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_declined_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
+                            else ->
+                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
 
                 val eventId = handleIcsImportResult.eventId

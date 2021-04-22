@@ -192,7 +192,7 @@ class EditCreateEventUseCase(
                 val status = it.participationStatus.toInt()
                 val xpmToken = it.getParameter(X_PM_TOKEN) ?: ICalUtils.generateXPmToken(canonicalizeProtonEmail(it.email), newEvent.uid)
                 attendees.add(
-                    Event.AttendeeStatusEvent(null, xpmToken, status)
+                    Event.AttendeeStatusEvent(null, xpmToken, status, null)
                 )
             }
         }

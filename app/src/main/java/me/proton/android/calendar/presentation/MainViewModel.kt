@@ -10,6 +10,8 @@ import biweekly.property.Method
 import biweekly.property.Status
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
@@ -17,15 +19,14 @@ import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
-import me.proton.android.calendar.domain.usecase.TransformEventUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.core.domain.entity.UserId
 import java.io.BufferedReader
@@ -41,7 +42,9 @@ class MainViewModel(
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val usersRepository: UsersRepository,
     private val calendarViewModel: CalendarViewModel,
-    private val transformEventUseCase: TransformEventUseCase
+    private val transformEventUseCase: TransformEventUseCase,
+    private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
+    private val json: Json
 ) : ViewModel() {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -174,7 +177,9 @@ class MainViewModel(
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         if (iCalendar.method.isAdd) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd // TODO Remove once ADD is handled
-        if (!iCalendar.method.isRequest && !iCalendar.method.isCancel) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod // TODO Remove once other methods are handled
+        if (!iCalendar.method.isRequest &&
+            !iCalendar.method.isCancel &&
+            !iCalendar.method.isReply) return IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod // TODO Remove once other methods are handled
 
 
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
@@ -240,11 +245,13 @@ class MainViewModel(
         if (!iCalendar.cleanRecurrenceId(iCalendar.method == Method.reply(), parentEvent?.iCalendar)) return IcsSurgeryUtils.HandleIcsResult.Error.InvalidRecurrenceId
 
         var existingEvent: Event? = null
+        var existingEventEntity: EventEntity? = null
         eventsSharingUidResponse?.let {
             for (eventEntity in eventsSharingUidResponse) {
                 val event = transformEventUseCase.execute(eventEntity)
                 if (event?.iCalEvent?.recurrenceId == newEvent.iCalEvent.recurrenceId) {
                     existingEvent = event
+                    existingEventEntity = eventEntity
                     break
                 }
             }
@@ -262,8 +269,9 @@ class MainViewModel(
             )
         } else {
             // Event already exists, check if we need to update it using the ics content
-            // TODO Remove isOrganizerMode condition once we handle opening participants answers
             if (!isOrganizerMode && existingEvent != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
+                // Update existing event as an attendee
+
                 val newICalendar = newEvent.iCalendar.clone()
 
                 val updatedEvent = if (newICalendar.method.isCancel) {
@@ -296,11 +304,51 @@ class MainViewModel(
                     userId,
                     updatedEvent ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
                 )
-            }
+            } else if (isOrganizerMode && existingEvent != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
+                // Update existing event as an organizer
 
-            // If no update is needed, return the existing event id
-            return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+                val attendees = existingEventEntity?.attendees?.map {
+                    json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
+                }
+                existingEvent?.iCalEvent?.attendees?.forEach { attendee ->
+                    val updatedAttendee = iCalendar.events.first().attendees.firstOrNull()
+                    val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                    if (attendee.extractEmail() == updatedAttendeeEmail) {
+                        val attendeeToken = attendee.getParameter(CustomICalPropertyParameter.X_PM_TOKEN)
+                        val attendeeStatusEvent = attendees?.find { it.token == attendeeToken }
+
+                        val existingUpdateTime = attendeeStatusEvent?.updateTime
+                        val newUpdateTime = TimeUnit.MILLISECONDS.toSeconds(iCalendar.events.first().dateTimeStamp.value.time).toInt()
+
+                        if (existingUpdateTime == null || existingUpdateTime < newUpdateTime) {
+
+                            val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
+                                userId,
+                                existingEvent?.calendar?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
+                                existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
+                                attendeeStatusEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
+                                updatedAttendee.participationStatus.toInt(),
+                                null,
+                                newUpdateTime
+                            )
+                            updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
+                            if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
+                                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                            }
+
+                            return IcsSurgeryUtils.HandleIcsResult.Success(
+                                eventId = existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
+                                IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT,
+                                Pair(updatedAttendeeEmail, updatedAttendee.participationStatus)
+                            )
+                        }
+                    }
+                }
+            }
         }
+
+        // If no update is needed, return the existing event id
+        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
     }
 
     private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
