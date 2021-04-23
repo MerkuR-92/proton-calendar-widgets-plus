@@ -69,6 +69,7 @@ object IcsSurgeryUtils {
             object UnsupportedCounter: Error()
             object UnsupportedPublish: Error()
             object PartyCrasher: Error()
+            data class  ReplyPartyCrasher(val eventId: String? = null): Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
             data class DisabledCalendar(val eventId: String? = null): Error()

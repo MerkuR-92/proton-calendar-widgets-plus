@@ -34,6 +34,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.HashMap
 
 
 class MainViewModel(
@@ -353,6 +354,12 @@ class MainViewModel(
                         }
                     }
                 }
+
+                // Handle party crashers in replies
+                val updatedAttendee = iCalendar.events.first().attendees.firstOrNull()
+                val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                if (existingEvent?.iCalEvent?.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent?.id)
+
             } else if (isOrganizerMode && existingEvent == null) {
                 return IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted
             }

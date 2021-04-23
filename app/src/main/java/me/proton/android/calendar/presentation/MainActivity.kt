@@ -437,12 +437,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar -> {
-                        if (handleIcsImportResult.eventId != null) {
-                            Toast.makeText(this@MainActivity, getString(R.string.snack_ics_disabled_calendar_error), Toast.LENGTH_LONG).show()
-                            val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(handleIcsImportResult.eventId)
-                            navigateTo(eventDetailsDeepLink)
-                            navigatedToDetails = true
-                        } else this@MainActivity.displaySnackBar(getString(R.string.snack_ics_disabled_calendar_error), Snackbar.LENGTH_LONG)
+                        navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_disabled_calendar_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher -> {
+                        navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted -> {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
@@ -467,6 +465,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 if (!navigatedToDetails) navigateTo(Navigation.Deeplink.toMonth())
             }
+        }
+    }
+
+    private fun displayErrorAndOpenDetails(eventId: String?, errorMessage: String): Boolean {
+        return if (eventId != null) {
+            Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_LONG).show()
+            val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
+            navigateTo(eventDetailsDeepLink)
+            true
+        } else {
+            this@MainActivity.displaySnackBar(errorMessage, Snackbar.LENGTH_LONG)
+            false
         }
     }
 
