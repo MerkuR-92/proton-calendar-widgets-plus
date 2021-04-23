@@ -43,6 +43,17 @@
                 <data android:scheme="content" android:host="*" android:mimeType="text/calendar" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="calendar.protonmail.com"
+                    android:pathPrefix="/event" />
+            </intent-filter>
             <nav-graph android:value="@navigation/graph_main" />
         </activity>
         <receiver
@@ -53,6 +64,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name="me.proton.core.auth.presentation.ui.AuthHelpActivity"
             android:screenOrientation="portrait"

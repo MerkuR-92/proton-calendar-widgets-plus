@@ -68,6 +68,7 @@ object FeatureFlag {
     const val CHANGE_ANSWER = true
     const val OPEN_ICS = true
     const val OPEN_ICS_FILES = false
+    const val APP_LINKS = false
 }
 
 object ApiResponseCode {
@@ -107,6 +108,12 @@ object IcsParsingValidation {
 
     const val X_WR_TIMEZONE = "X-WR-TIMEZONE"
     const val TZID = "TZID"
+}
+
+object AppLinksQueryParameters {
+    const val EVENT_ID = "EventID"
+    const val CALENDAR_ID = "CalendarID"
+    const val RECURRENCE_ID = "RecurrenceID"
 }
 
 object FormValidation {

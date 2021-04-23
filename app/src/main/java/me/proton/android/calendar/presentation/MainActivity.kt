@@ -48,6 +48,10 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
+import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
+import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
+import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
+import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
@@ -55,6 +59,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
+import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.presentation.utils.showForceUpdate
 import me.proton.core.util.kotlin.nullIfBlank
@@ -81,6 +86,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
     private val calendarViewModel: CalendarViewModel by viewModel()
+    private val eventViewModel: EventViewModel by viewModel()
     private val mainViewModel: MainViewModel by viewModel()
     private val accountViewModel: AccountViewModel by viewModel()
     private lateinit var activeCalendarListAdapter: CalendarListAdapter
@@ -355,25 +361,101 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
 
                 } else {
-                    var openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
-                    if (openIcsIntent == null && OPEN_ICS_FILES) {
-                        openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
-                    }
+                    val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
-                        val uri = openIcsIntent.data
-                        if (uri != null) {
-                            val senderEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_SENDER_EMAIL)
-                            val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)
-                            handleOpenIcsIntent(uri, senderEmail, recipientEmail)
+                        handleIcsIntent(openIcsIntent)
+                    } else if (openIcsIntent == null && OPEN_ICS_FILES || APP_LINKS) {
+                        val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && OPEN_ICS_FILES) {
+                            // Handle ics file
+                            handleIcsIntent(actionViewIntent)
+                        } else if (actionViewIntent != null && APP_LINKS) {
+                            // Handle app link
+                            val appLinkData: Uri? = actionViewIntent.data
+                            val eventId = appLinkData?.getQueryParameter(EVENT_ID)
+                            if (eventId != null) {
+                                val calendarId = appLinkData.getQueryParameter(CALENDAR_ID) // TODO Unused for now ?
+                                val recurrenceId = appLinkData.getQueryParameter(RECURRENCE_ID)
+                                handleAppLinkIntent(eventId, recurrenceId)
+                            } else {
+                                this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                                navigateTo(Navigation.Deeplink.toMonth())
+                            }
                         } else navigateTo(Navigation.Deeplink.toMonth())
-                    } else {
-                        navigateTo(Navigation.Deeplink.toMonth())
-                    }
+                    } else navigateTo(Navigation.Deeplink.toMonth())
                 }
             }
             AccountViewModel.State.LoginInProgress,
             AccountViewModel.State.Processing -> {
-                displaySplashScreen(true, true, resources.getString(R.string.splash_after_login_init))
+                displaySplashScreen(
+                    display = true,
+                    spinner = true,
+                    spinnerText = resources.getString(R.string.splash_after_login_init)
+                )
+            }
+        }
+    }
+
+    private fun handleIcsIntent(openIcsIntent: Intent) {
+        val uri = openIcsIntent.data
+        if (uri != null) {
+            val senderEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_SENDER_EMAIL)
+            val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)
+            handleOpenIcsIntent(uri, senderEmail, recipientEmail)
+        } else navigateTo(Navigation.Deeplink.toMonth())
+    }
+
+    private fun handleAppLinkIntent(eventId: String, recurrenceId: String?) {
+        lifecycleScope.launch {
+            val userId = accountViewModel.getPrimaryUserId()
+            if (userId == null) {
+                navigateTo(Navigation.Deeplink.toMonth())
+                return@launch // TODO Display error ?
+            }
+            when (val handleEventLinkResult = eventViewModel.handleEventLink(userId, eventId, recurrenceId)) {
+                is EventViewModel.EventLinkResult.Success -> {
+                    val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, handleEventLinkResult.occurrenceNumber)
+                    navigateTo(eventDetailsDeepLink)
+                }
+                is EventViewModel.EventLinkResult.DecryptionFailed -> {
+                    navigateTo(Navigation.Deeplink.toMonth())
+                    val confirmationMessage =
+                        if (handleEventLinkResult.event.isRecurring()) R.string.event_decryption_error_dialog_confirmation_recurring
+                        else R.string.event_decryption_error_dialog_confirmation
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle(R.string.event_decryption_error_dialog_title)
+                        .setMessage(R.string.event_decryption_error_dialog_message)
+                        .setPositiveButton(confirmationMessage) { _, _ ->
+                            lifecycleScope.launch { // TODO
+                                val deleteResult = withContext(Dispatchers.Default) {
+                                    calendarViewModel.handleDeleteEvent(
+                                        eventId,
+                                        EventEditDeleteOption.ALL_EVENTS
+                                    )
+                                }
+                                if (deleteResult is UseCase.Result.Success<*>) {
+                                    this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
+                                } else {
+                                    if (deleteResult is UseCase.Result.Error) {
+                                        logger.e("Error deleting event: ${deleteResult.message}")
+                                    } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                    }
+                                    this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted_error))
+                                }
+                            }
+                        }
+                        .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
+                        .show()
+                }
+                is EventViewModel.EventLinkResult.EventDoesNotExist -> {
+                    this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                    navigateTo(Navigation.Deeplink.toMonth())
+                }
+                is EventViewModel.EventLinkResult.Error -> {
+                    this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_error))
+                    navigateTo(Navigation.Deeplink.toMonth())
+                }
             }
         }
     }

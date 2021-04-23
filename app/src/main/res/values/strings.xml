@@ -277,9 +277,12 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s tentatively accepted your invitation</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s declined your invitation</string>
 
+    <string name="snack_app_link_invalid">Invalid link to the event</string>
+    <string name="snack_app_link_error">Error opening event</string>
+
     <!-- Dialogs -->
-    <string name="error_event_doesnt_exist">Event doesn\'t exist</string>
-    <string name="error_occurrence_doesnt_exist">Occurrence doesn\'t exist</string>
+    <string name="error_event_does_not_exist">The event does not exist</string>
+    <string name="error_occurrence_does_not_exist">The occurrence does not exist</string>
 
     <string name="update_timezone_dialog_title">Time zone changed</string>
     <string name="update_timezone_dialog_message">Your system time zone seems to have changed to %1$s. Do you want to update your time zone preference?</string>

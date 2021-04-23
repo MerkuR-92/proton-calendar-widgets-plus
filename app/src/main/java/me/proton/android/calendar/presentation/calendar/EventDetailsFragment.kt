@@ -255,13 +255,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     EventViewModel.Result.OccurrenceDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(
                             requireContext(),
-                            getString(R.string.error_occurrence_doesnt_exist)
+                            getString(R.string.error_occurrence_does_not_exist)
                         )
                     }
                     EventViewModel.Result.EventDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(
                             requireContext(),
-                            getString(R.string.error_event_doesnt_exist)
+                            getString(R.string.error_event_does_not_exist)
                         )
                     }
                     is EventViewModel.Result.Error -> {

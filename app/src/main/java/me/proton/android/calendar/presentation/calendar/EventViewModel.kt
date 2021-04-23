@@ -26,6 +26,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
+import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.EventUtilsImpl.updateParticipationStatus
 import me.proton.android.calendar.common.ICalUtilsImpl.adjustRRuleToStartDate
@@ -1539,5 +1540,37 @@ class EventViewModel(
             return false
         }
         return !user.isFree || !(user.isFree && isShortDomainAddress(email))
+    }
+
+    sealed class EventLinkResult {
+        class Success(val occurrenceNumber: Int) : EventLinkResult()
+        class DecryptionFailed(val event: Event) : EventLinkResult()
+        object EventDoesNotExist : EventLinkResult()
+        object Error : EventLinkResult()
+    }
+
+    suspend fun handleEventLink(userId: UserId, eventId: String, recurrenceIdTimestamp: String?): EventLinkResult {
+        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return EventLinkResult.EventDoesNotExist
+        val event = transformEventUseCase.execute(eventEntity) ?: return EventLinkResult.Error
+        if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
+        if (!event.calendar.display) {
+            // 1. Update in DB
+            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
+            // 2. Update on Server
+            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
+        }
+        return if (recurrenceIdTimestamp != null) {
+            val calendarUserSettings =
+                calendarsRepository.selectCalendarUserSettings(userId.id) ?: return EventLinkResult.Error
+            val timeZoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
+                ?: calendarUserSettings.primaryTimezone
+            val occurrences = event.generateOccurrencesUntil(
+                ZonedDateTime.ofInstant(Instant.ofEpochSecond(recurrenceIdTimestamp.toLong()), ZoneId.of(timeZoneId))
+                    .toLocalDate(),
+                timeZoneId
+            )
+            if (occurrences.isNullOrEmpty()) EventLinkResult.Success(0)
+            else EventLinkResult.Success(occurrences.lastIndex + 1)
+        } else EventLinkResult.Success(0)
     }
 }
