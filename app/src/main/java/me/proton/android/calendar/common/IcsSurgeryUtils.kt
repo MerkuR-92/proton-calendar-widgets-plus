@@ -72,6 +72,7 @@ object IcsSurgeryUtils {
             data class  ReplyPartyCrasher(val eventId: String? = null): Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
+            data class DecryptionFailed(val eventId: String? = null, val isRecurring: Boolean? = null): Error()
             data class DisabledCalendar(val eventId: String? = null): Error()
             object DurationNotSupported: Error()
             object TooManyEvents: Error()

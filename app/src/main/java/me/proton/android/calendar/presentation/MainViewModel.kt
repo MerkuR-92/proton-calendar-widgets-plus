@@ -263,9 +263,8 @@ class MainViewModel(
             }
         }
 
-        if (existingEvent?.calendar?.isActive == false) {
-            return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
-        }
+        if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.isRecurring())
+        if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
 
         val isNew =
             eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
@@ -332,9 +331,10 @@ class MainViewModel(
 
                         if (existingUpdateTime == null || existingUpdateTime < newUpdateTime) {
 
+                            val calendarId = existingEvent?.calendar?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
                             val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
                                 userId,
-                                existingEvent?.calendar?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
+                                calendarId,
                                 existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
                                 attendeeStatusEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
                                 updatedAttendee.participationStatus.toInt(),
@@ -344,6 +344,13 @@ class MainViewModel(
                             updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
                             if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
                                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                            }
+
+                            if (existingEvent?.calendar?.display == false) {
+                                // 1. Update in DB
+                                calendarViewModel.updateCalendarVisibility(calendarId, display = 1)
+                                // 2. Update on Server
+                                calendarViewModel.updateServerCalendar(calendarId)
                             }
 
                             return IcsSurgeryUtils.HandleIcsResult.Success(

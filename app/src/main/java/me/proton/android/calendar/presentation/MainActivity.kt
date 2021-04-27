@@ -47,6 +47,7 @@ import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.presentation.utils.showForceUpdate
 import me.proton.core.util.kotlin.nullIfBlank
@@ -441,6 +442,38 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher -> {
                         navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
+                    }
+                    is IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed -> {
+                        if (handleIcsImportResult.eventId != null) {
+                            val confirmationMessage =
+                                if (handleIcsImportResult.isRecurring == true) R.string.event_decryption_error_dialog_confirmation_recurring
+                                else R.string.event_decryption_error_dialog_confirmation
+                            MaterialAlertDialogBuilder(this@MainActivity)
+                                .setTitle(R.string.event_decryption_error_dialog_title)
+                                .setMessage(R.string.event_decryption_error_dialog_message)
+                                .setPositiveButton(confirmationMessage) { _, _ ->
+                                    lifecycleScope.launch { // TODO
+                                        val deleteResult = withContext(Dispatchers.Default) {
+                                            calendarViewModel.handleDeleteEvent(
+                                                handleIcsImportResult.eventId,
+                                                EventEditDeleteOption.ALL_EVENTS
+                                            )
+                                        }
+                                        if (deleteResult is UseCase.Result.Success<*>) {
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
+                                        } else {
+                                            if (deleteResult is UseCase.Result.Error) {
+                                                logger.e("Error deleting event: ${deleteResult.message}")
+                                            } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                                logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                            }
+                                            this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted_error))
+                                        }
+                                    }
+                                }
+                                .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
+                                .show()
+                        } else this@MainActivity.displaySnackBar(getString(R.string.event_decryption_error_dialog_title), Snackbar.LENGTH_LONG)
                     }
                     is IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted -> {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
