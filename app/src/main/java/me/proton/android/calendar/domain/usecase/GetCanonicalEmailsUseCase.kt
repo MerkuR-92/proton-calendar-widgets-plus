@@ -1,0 +1,50 @@
+package me.proton.android.calendar.domain.usecase
+
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.api.AddressesApi
+import me.proton.core.domain.entity.UserId
+
+private const val MAX_EMAILS_PER_QUERY: Int = 8
+
+// TODO move this class to core
+
+class GetCanonicalEmailsUseCase(
+    private val addressesApi: AddressesApi,
+    private val logger: Logger
+) {
+
+    /**
+     * Returns Map of <Email String, canonical version of Email String> getting rid of address aliases,
+     * different capitalisations, etc. according to server rules.
+     *
+     * @return Email mapped to null if it canonicalization failed, or no Email in the map in case of other error
+     */
+    suspend operator fun invoke(userId: UserId, emails: List<String>): Map<String, String?> {
+
+        val emailPairs = HashMap<String, String?>()
+
+        // TODO Optimize the chunks to send the most amount of emails per GET call
+        val chunkedEmails = emails.chunked(MAX_EMAILS_PER_QUERY)
+
+        chunkedEmails.forEach { smallerEmailList ->
+            when (val canonicalResult = addressesApi.getCanonicalEmails(userId, smallerEmailList)) {
+                is ApiResponse.Success -> {
+                    canonicalResult.data.canonicalEmailsResponses.forEach {
+                        emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
+                    }
+                }
+                is ApiResponse.Error -> {
+                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.error}")
+                }
+                is ApiResponse.Exception -> {
+                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.exception.message ?: "(no exception message)"}")
+                }
+            }
+        }
+
+        return emailPairs
+
+    }
+
+}
