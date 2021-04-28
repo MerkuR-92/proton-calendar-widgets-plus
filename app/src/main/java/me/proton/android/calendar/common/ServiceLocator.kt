@@ -49,6 +49,7 @@ val networkModule = module {
     single<ServerEventsApi> { ServerEventsApiImpl(get()) }
     single<SettingsApi> { SettingsApiImpl(get()) }
     single<ReportsApi> { ReportsApiImpl(get()) }
+    single<MailSettingsApi> { MailSettingsApiImpl(get()) }
 }
 
 val repositoryModule = module {
