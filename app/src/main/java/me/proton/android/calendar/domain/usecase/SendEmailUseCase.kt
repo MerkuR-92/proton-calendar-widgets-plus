@@ -11,7 +11,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
-import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
+import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.io.ByteArrayInputStream
@@ -69,8 +69,8 @@ class SendEmailUseCase(
             )
         )
 
-        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments)) {
-            is SendEmailDirect.Result.Success -> return UseCase.Result.Success<Unit>()
+        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments, emptyMap() /*TODO FIXME*/)) {
+            is me.proton.android.calendar.domain.usecase.SendEmailDirect.Result.Success -> return UseCase.Result.Success<Unit>()
             else -> UseCase.Result.Error("SendEmailUseCase executeToOrganizer failed to send email to organizer: $sendEmailResult")
         }
     }
@@ -82,7 +82,8 @@ class SendEmailUseCase(
         subject: String,
         body: String,
         isCreate: Boolean,
-        editedEvent: Event? = null
+        editedEvent: Event? = null,
+        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
     ): UseCase.Result {
         val newEventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to select event entity")
         val sharedEventId = newEventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees sharedEventID was null")
@@ -127,6 +128,7 @@ class SendEmailUseCase(
         val attachmentBytes = ics.toByteArray()
 
         val attendeeEmails = attendees.mapNotNull { it.extractEmail() }
+
         val sendEmailArguments = SendEmailDirect.Arguments(
             subject,
             body,
@@ -142,8 +144,8 @@ class SendEmailUseCase(
             )
         )
 
-        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments)) {
-            is SendEmailDirect.Result.Success -> {
+        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments, sendPreferences)) {
+            is me.proton.android.calendar.domain.usecase.SendEmailDirect.Result.Success -> {
 
                 if (!isCreate) return UseCase.Result.Success<Unit>()
 

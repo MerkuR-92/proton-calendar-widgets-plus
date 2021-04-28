@@ -890,7 +890,7 @@ class EventViewModel(
 
         // TODO Refactor and move into UseCase
         if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
-            val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, newEvent.id, newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, newEvent)
+            val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, newEvent.id, newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, newEvent, emptyMap() /*TODO FIXME*/)
             sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
             if (sendEmailResult is UseCase.Result.InvalidParams) {
@@ -923,7 +923,7 @@ class EventViewModel(
             createEventResult.returnValue.tryCast<List<String>> {
                 if (this.isNullOrEmpty()) return@tryCast
 
-                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!, isCreate)
+                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, null, emptyMap() /*TODO FIXME*/)
                 // If send email fails the event without attendees remains in the calendar
                 sendEmailResult.ifSuccessAndLogErrors(logger) { }
 

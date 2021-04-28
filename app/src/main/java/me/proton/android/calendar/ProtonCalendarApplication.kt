@@ -6,11 +6,14 @@ import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
+import me.proton.core.contact.domain.repository.ContactRepository
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
-import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
+import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
 import org.koin.android.ext.android.inject
@@ -39,7 +42,16 @@ class ProtonCalendarApplication : Application() {
     lateinit var keyStoreCrypto: KeyStoreCrypto
 
     @Inject
-    lateinit var sendEmailDirectUseCase: SendEmailDirect
+    lateinit var getRecipientPublicAddresses: GetRecipientPublicAddresses
+
+    @Inject
+    lateinit var contactEmailsRepository: ContactRepository
+
+    @Inject
+    lateinit var cryptoContext: CryptoContext
+
+    @Inject
+    lateinit var sendEmailDirect: SendEmailDirect
 
     private val logger: Logger by inject()
 
@@ -50,7 +62,7 @@ class ProtonCalendarApplication : Application() {
             androidContext(this@ProtonCalendarApplication)
             modules(
                 commonModule, viewModelModule, repositoryModule, networkModule, useCaseModule,
-                coreModule(apiProvider, accountManager, authOrchestrator, userManager, keyStoreCrypto, sendEmailDirectUseCase)
+                coreModule(apiProvider, accountManager, authOrchestrator, userManager, keyStoreCrypto, getRecipientPublicAddresses, contactEmailsRepository, cryptoContext, sendEmailDirect)
             )
         }
 

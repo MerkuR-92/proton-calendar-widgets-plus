@@ -1,0 +1,241 @@
+package me.proton.android.calendar.domain.usecase
+
+import androidx.annotation.VisibleForTesting
+import ezvcard.VCard
+import me.proton.android.calendar.common.extractSignedVCard
+import me.proton.android.calendar.common.getGroupForEmail
+import me.proton.android.calendar.common.getKeysForGroup
+import me.proton.android.calendar.common.getProperty
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.api.MailSettingsApi
+import me.proton.android.calendar.domain.model.MailSettings
+import me.proton.android.calendar.domain.model.PackageType
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase.SendPreferences
+import me.proton.core.contact.domain.repository.ContactRepository
+import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.entity.key.PublicAddress
+import me.proton.core.key.domain.entity.key.Recipient
+import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
+import me.proton.core.user.domain.UserManager
+import me.proton.core.util.kotlin.equalsNoCase
+import me.proton.core.util.kotlin.filterNullValues
+
+/**
+ * Combines User's default MailSettings, Contact VCard data and Composer preferences
+ * into [SendPreferences] used when sending emails.
+ */
+class ObtainSendPreferencesUseCase(
+    private val logger: Logger,
+    private val contactEmailsRepository: ContactRepository,
+    private val userManager: UserManager,
+    private val mailSettingsApi: MailSettingsApi,
+    private val cryptoContext: CryptoContext,
+    private val getRecipientPublicAddresses: GetRecipientPublicAddresses
+) : UseCase {
+
+    sealed class Result {
+        data class Success(val sendPreferences: SendPreferences) : Result()
+
+        sealed class Error : Result() {
+            object AddressDisabled : Error()
+            object GettingContactPreferences : Error()
+            object NetworkError : Error()
+        }
+    }
+
+    data class SendPreferences(
+        val encrypt: Boolean,
+        val sign: Boolean,
+        val pgpScheme: PackageType,
+        val mimeType: String, // 'text/html' | 'text/plain' | 'multipart/mixed'
+        val publicKey: String?
+    )
+
+    suspend fun execute(
+        userId: UserId,
+        canonicalEmails: Map<Email, Email>
+    ): Map<Email, Result> {
+
+        // 1. get User's Mail Settings
+        val mailSettings = mailSettingsApi.getMailSettings(userId).valueOrNullAndLogErrors(
+            logger,
+            "ObtainSendPreferencesUseCase, get Mail Settings"
+        )?.mailSettings?.toMailSettings()
+
+        // 2. get all User's contacts
+        val contactEmails =
+            kotlin.runCatching { contactEmailsRepository.getContactEmails(userId, refresh = true) }.getOrNull()
+
+        if (mailSettings == null || contactEmails == null) {
+            return canonicalEmails.mapValues { Result.Error.NetworkError }
+        }
+
+        val result = HashMap<Email, Result>()
+
+        // 3. get public addresses for recipients
+        val publicAddresses = getRecipientPublicAddresses.invoke(userId, canonicalEmails.keys.toList())
+        publicAddresses.forEach {
+            if (it.value == null && !result.containsKey(it.key)) result[it.key] = Result.Error.AddressDisabled
+        }
+
+        // 4. filter those contacts that have custom Send Preferences
+        val contactEmailsWithCustomPreferences = canonicalEmails.mapValues { entry ->
+            contactEmails.firstOrNull { it.canonicalEmail == entry.value && it.defaults == 0 }
+        }.filterNullValues()
+
+        // 5. fetch full Contact info for those contacts
+        val fullContactsWithCustomPreferences = contactEmailsWithCustomPreferences.mapValues { entry ->
+            kotlin.runCatching { contactEmailsRepository.getContact(userId, entry.value.contactId, refresh = true) }
+                .getOrNull()
+        }
+        fullContactsWithCustomPreferences.forEach {
+            if (it.value == null && !result.containsKey(it.key)) result[it.key] = Result.Error.NetworkError
+        }
+
+        // 6. obtain VCards for those contacts
+        val user = userManager.getUser(userId)
+        val validVCards = fullContactsWithCustomPreferences.filterNullValues().mapValues { entry ->
+            entry.value.extractSignedVCard(user, cryptoContext, logger)
+        }
+
+        // 7. parse VCards to get custom Contact preferences
+        // skip emails with errors and create SendPreferences for the rest
+        canonicalEmails.filterNot { result.containsKey(it.key) }.forEach { entry ->
+
+            val publicAddress = publicAddresses[entry.key]
+            val vCard = validVCards[entry.key]
+            val vCardEmail = contactEmailsWithCustomPreferences[entry.key]?.email
+
+            val sendPreferences = if (vCardEmail != null && publicAddress != null && vCard != null) {
+                createCustomSendPreferences(vCardEmail, publicAddress, vCard, mailSettings)
+            } else if (publicAddress != null) {
+                createDefaultSendPreferences(publicAddress, mailSettings)
+            } else null
+
+            result[entry.key] = sendPreferences?.let { Result.Success(it) } ?: Result.Error.GettingContactPreferences
+
+        }
+
+        return result
+    }
+
+    // TODO TEST
+    /**
+     * @param vCardEmail it has to be contact email in the vCard, not necessarily canonical version (can be aliased)
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun createCustomSendPreferences(
+        vCardEmail: String,
+        publicAddress: PublicAddress,
+        vCard: VCard,
+        defaultMailSettings: MailSettings
+    ): SendPreferences? {
+
+        val isInternal = publicAddress.recipient == Recipient.Internal
+        val publicKey = publicAddress.keys.firstOrNull { it.publicKey.isPrimary }?.publicKey?.key
+
+        val propertyGroup = vCard.getGroupForEmail(vCardEmail) ?: return null
+
+        val vCardEncrypt = vCard.getProperty(propertyGroup, "x-pm-encrypt")
+        val vCardSign = vCard.getProperty(propertyGroup, "x-pm-sign")
+        val vCardMime = vCard.getProperty(propertyGroup, "x-pm-mime")
+        val vCardScheme = vCard.getProperty(propertyGroup, "x-pm-scheme")
+        val vCardPublicKeys = vCard.getKeysForGroup(propertyGroup)
+
+        // TODO in theory we should only get keys that are valid for sending
+        val pinnedPublicKey = vCardPublicKeys.firstOrNull()
+
+        val encrypt = if (vCardEncrypt != null) (vCardEncrypt.value?.equalsNoCase("true") == true) else false
+        val sign = if (vCardSign != null) (vCardSign.value?.equalsNoCase("true") == true) else defaultMailSettings.sign
+        val scheme = PackageType.fromScheme(vCardScheme?.value ?: "", encrypt, sign) ?: defaultMailSettings.pgpScheme
+        val mime = if (vCardMime?.value != null) vCardMime.value else defaultMailSettings.draftMimeType
+
+        // we have to encrypt but there's no valid pinned public key
+        if (encrypt && pinnedPublicKey == null) return null
+
+        return if (isInternal) {
+            if (pinnedPublicKey == null && publicKey == null) {
+                null
+            } else {
+                SendPreferences(
+                    encrypt = true,
+                    sign = true,
+                    pgpScheme = PackageType.ProtonMail,
+                    mimeType = mime,
+                    publicKey = pinnedPublicKey ?: publicKey
+                )
+            }
+        } else {
+            if (pinnedPublicKey == null) {
+                null
+            } else {
+                SendPreferences(
+                    encrypt = encrypt,
+                    sign = if (encrypt) true else sign,
+                    pgpScheme = scheme,
+                    mimeType = mime,
+                    publicKey = pinnedPublicKey
+                )
+            }
+
+        }
+    }
+
+    // TODO TEST
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun createDefaultSendPreferences(
+        publicAddress: PublicAddress,
+        defaultMailSettings: MailSettings
+    ): SendPreferences? {
+
+        val isInternal = publicAddress.recipient == Recipient.Internal
+        val publicKey = publicAddress.keys.firstOrNull { it.publicKey.isPrimary }?.publicKey?.key
+
+        return if (isInternal) {
+
+            if (publicKey != null) {
+                SendPreferences(
+                    encrypt = true,
+                    sign = true,
+                    pgpScheme = PackageType.ProtonMail,
+                    mimeType = defaultMailSettings.draftMimeType,
+                    publicKey = publicKey
+                )
+            } else {
+                null // can't encrypt without Public Key
+            }
+
+        } else {
+
+            val defaultPgpScheme =
+                if (defaultMailSettings.pgpScheme == PackageType.PgpMime) PackageType.PgpMime else PackageType.Cleartext
+
+            val defaultMimeType =
+                if (defaultPgpScheme == PackageType.PgpMime) "multipart/mixed" else "text/plain"
+
+            if (publicKey != null) {
+                SendPreferences(
+                    encrypt = true,
+                    sign = true,
+                    pgpScheme = defaultPgpScheme,
+                    mimeType = defaultMimeType,
+                    publicKey = publicKey
+                )
+            } else {
+                SendPreferences(
+                    encrypt = false,
+                    sign = defaultMailSettings.sign,
+                    pgpScheme = defaultPgpScheme,
+                    mimeType = defaultMimeType,
+                    publicKey = null
+                )
+            }
+
+        }
+
+    }
+
+}

@@ -14,8 +14,10 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
+import me.proton.core.contact.domain.repository.ContactRepository
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
-import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
+import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
 import org.koin.android.ext.koin.androidApplication
@@ -108,7 +110,10 @@ fun coreModule(
     authOrchestrator: AuthOrchestrator,
     userManager: UserManager,
     keyStoreCrypto: KeyStoreCrypto,
-    sendEmailDirectUseCase: SendEmailDirect
+    getRecipientPublicAddresses: GetRecipientPublicAddresses,
+    contactEmailsRepository: ContactRepository,
+    cryptoContext: CryptoContext,
+    sendEmailDirect: SendEmailDirect
 ) = module {
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
     single<ApiProvider> { apiProvider }
@@ -118,5 +123,7 @@ fun coreModule(
     single<AuthOrchestrator> { authOrchestrator }
     single<UserManager> { userManager }
     single<KeyStoreCrypto> { keyStoreCrypto }
-    single<SendEmailDirect> { sendEmailDirectUseCase }
+    single<CryptoContext> { cryptoContext }
+    factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), contactEmailsRepository, get(), get(), get(), getRecipientPublicAddresses) }
+    factory<SendEmailDirect> { sendEmailDirect /*SendEmailDirect(get(), get(), get(), get())*/ }
 }
