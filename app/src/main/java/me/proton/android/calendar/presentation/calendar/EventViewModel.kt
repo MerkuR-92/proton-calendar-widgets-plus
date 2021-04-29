@@ -1561,6 +1561,8 @@ class EventViewModel(
                 null
             }
 
+        val updateTime = Instant.now()
+
         if (sendPreferences.isNotEmpty()) {
             val subject = getReplyMailSubject(resources, event.summary)
             val body = getReplyMailBody(resources, participationStatus, userAttendee.email, event.summary)
@@ -1573,7 +1575,8 @@ class EventViewModel(
                 participationStatus,
                 subject,
                 body,
-                sendPreferences
+                sendPreferences,
+                Date.from(updateTime)
             )
             sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
             if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
@@ -1587,7 +1590,8 @@ class EventViewModel(
             eventId,
             attendeeId,
             status,
-            personalPartICalString
+            personalPartICalString,
+            updateTime.epochSecond.toInt()
         )
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
         if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {

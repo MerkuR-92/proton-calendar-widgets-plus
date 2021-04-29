@@ -224,10 +224,11 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
         calendarId: String,
         eventId: String,
         attendeeId: String,
-        status: Int
+        status: Int,
+        updateTime: Int?
     ): ApiResponse<AttendeeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         updateParticipationStatus(calendarId, eventId, attendeeId, UpdateParticipationStatusApiRequest(
-            status, Instant.now().epochSecond.toInt())
+            status, updateTime ?: Instant.now().epochSecond.toInt())
         )
     }.toApiResponse()
 

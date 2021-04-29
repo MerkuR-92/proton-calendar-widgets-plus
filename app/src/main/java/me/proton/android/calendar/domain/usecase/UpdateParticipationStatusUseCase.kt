@@ -25,10 +25,11 @@ class UpdateParticipationStatusUseCase(
         eventId: String,
         attendeeId: String,
         status: Int,
-        personalPartICalString: String?
+        personalPartICalString: String?,
+        updateTime: Int? = null
     ): UseCase.Result {
         return when (val updateParticipationStatusResponse =
-            calendarsApi.updateParticipationStatus(userId, calendarId, eventId, attendeeId, status)
+            calendarsApi.updateParticipationStatus(userId, calendarId, eventId, attendeeId, status, updateTime)
         ) {
             is ApiResponse.Success -> {
 

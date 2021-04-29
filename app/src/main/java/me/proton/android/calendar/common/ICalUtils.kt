@@ -929,7 +929,8 @@ fun getResponseIcs(
     responseICalendar: ICalendar,
     userAttendee: Attendee,
     participationStatus: ParticipationStatus,
-    originalTimeZoneInfo: TimezoneInfo?
+    originalTimeZoneInfo: TimezoneInfo?,
+    dtStamp: Date
 ): String {
     // Update user PARTSTAT and remove useless X_PM_TOKEN property
     userAttendee.participationStatus = participationStatus
@@ -956,7 +957,7 @@ fun getResponseIcs(
     responseICalendar.events.first().recurrenceRule?.let { event.recurrenceRule = it }
     responseICalendar.events.first().location?.let { if (!it.value.isNullOrEmpty()) event.location = it }
     responseICalendar.events.first().summary?.let { if (!it.value.isNullOrEmpty()) event.summary = it }
-    event.setDateTimeStamp(Date.from(Instant.now()))
+    event.setDateTimeStamp(dtStamp)
 
     iCalendar.addEvent(event)
 

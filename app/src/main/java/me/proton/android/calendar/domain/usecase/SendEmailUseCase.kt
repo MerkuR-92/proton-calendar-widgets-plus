@@ -15,6 +15,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
+import java.util.*
 
 class SendEmailUseCase(
     private val logger: Logger,
@@ -38,10 +39,11 @@ class SendEmailUseCase(
         participationStatus: ParticipationStatus,
         subject: String,
         body: String,
-        sendPreferences: Map<Email, SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>,
+        dtStamp: Date
     ): UseCase.Result {
 
-        val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo)
+        val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp)
 
         val senderAddressesId = database.addressesDao().select(userId.id, canonicalizeProtonEmail(userAttendee.email)).map {
             it.toAddress(json)

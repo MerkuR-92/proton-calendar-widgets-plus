@@ -113,7 +113,7 @@ interface CalendarsApi {
     /**
      * Update the participation status of a given event attendee.
      */
-    suspend fun updateParticipationStatus(userId: UserId, calendarId: String, eventId: String, attendeeId: String, status: Int): ApiResponse<AttendeeApiResponse>
+    suspend fun updateParticipationStatus(userId: UserId, calendarId: String, eventId: String, attendeeId: String, status: Int, updateTime: Int? = null): ApiResponse<AttendeeApiResponse>
 
     /**
      * For an attendee to update event's personal part
