@@ -104,49 +104,4 @@ class UsersRepositoryImpl(
     override fun flowWeekStart(userId: String): Flow<Int?> {
         return database.userSettingsDao().flowWeekStart(userId).distinctUntilChanged()
     }
-
-    private val cachedCanonicalAddresses: HashMap<String, String> = hashMapOf()
-
-    override suspend fun getCanonicalAddresses(userId: UserId, emailList: List<String>): Map<String, String?>? {
-        // Try to use cache first
-        val emails = ArrayList(emailList)
-        val emailPairs = HashMap<String, String?>()
-
-        val iterator: Iterator<String> = emails.iterator()
-        while (iterator.hasNext()) {
-            val email = iterator.next()
-            emailPairs[email] = cachedCanonicalAddresses[email] ?: continue
-            emails.remove(email)
-        }
-        if (emails.isEmpty()) return emailPairs
-
-        // Fetch from BE
-        val chunkedEmails = emails.chunked(MAX_EMAILS_PER_QUERY)
-
-        // TODO Optimize the chunks to send the most amount of emails per GET call
-
-        chunkedEmails.forEach { smallerEmailList ->
-            when (val canonicalResult = addressesApi.getCanonicalEmails(userId, smallerEmailList)) {
-                is ApiResponse.Success -> {
-                    canonicalResult.data.canonicalEmailsResponses.forEach {
-                        emailPairs[it.email] = it.canonicalEmailResponse.canonicalEmail
-                        if (it.canonicalEmailResponse.canonicalEmail != null) {
-                            // Cache canonical email
-                            cachedCanonicalAddresses[it.email] = it.canonicalEmailResponse.canonicalEmail
-                        }
-                    }
-                }
-                is ApiResponse.Error -> {
-                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.error}")
-                    return null // TODO If one call fails, we return null and consider all as failed ?
-                }
-                is ApiResponse.Exception -> {
-                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.exception.message ?: "(no exception message)"}")
-                    return null // TODO If one call fails, we return null and consider all as failed ?
-                }
-            }
-        }
-
-        return emailPairs
-    }
 }

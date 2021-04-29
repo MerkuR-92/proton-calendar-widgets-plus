@@ -46,7 +46,8 @@ class CalendarViewModel(
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val fetchUserUseCase: FetchUserUseCase,
     private val valueStoreProvider: ValueStoreProvider,
-    private val logger: Logger) : ViewModel() {
+    private val logger: Logger,
+    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : ViewModel() {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -636,7 +637,7 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel getCanonicalEmails")
             return null
         }
-        return usersRepository.getCanonicalAddresses(userId, emails)
+        return getCanonicalEmailsUseCase.invoke(userId, emails)
     }
 
     suspend fun getCalendarDefaultEmail(calendarId: String): String? {

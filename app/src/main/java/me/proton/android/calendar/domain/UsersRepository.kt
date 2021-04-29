@@ -48,6 +48,4 @@ interface UsersRepository {
     fun flowTimeFormat(userId: String): Flow<Int?>
 
     fun flowWeekStart(userId: String): Flow<Int?>
-
-    suspend fun getCanonicalAddresses(userId: UserId, emails: List<String>): Map<String, String?>?
 }
