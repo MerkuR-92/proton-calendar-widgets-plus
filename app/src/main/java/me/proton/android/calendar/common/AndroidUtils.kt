@@ -136,7 +136,7 @@ class AndroidUtils(context: Context) {
             title: String?,
             items: Array<String>,
             selectedIndex: Int,
-            callback: (selectedIndex: Int) -> Unit
+            callback: (selectedIndex: Int, isCancel: Boolean) -> Unit
         ) {
             var selectedItem: Int = 0
             val builder: AlertDialog.Builder = AlertDialog.Builder(context)
@@ -145,10 +145,15 @@ class AndroidUtils(context: Context) {
                 selectedItem = item
             }
             builder.setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
-                callback(selectedItem)
+                callback(selectedItem, false)
                 dialog.dismiss()
             }
-            builder.setNegativeButton(R.string.dialog_button_cancel, null)
+            builder.setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+                callback(selectedIndex, true)
+            }
+            builder.setOnCancelListener { _ ->
+                callback(selectedIndex, true)
+            }
             builder.create().show()
         }
 

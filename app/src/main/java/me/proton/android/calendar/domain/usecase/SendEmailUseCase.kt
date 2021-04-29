@@ -37,7 +37,8 @@ class SendEmailUseCase(
         organizerEmail: String,
         participationStatus: ParticipationStatus,
         subject: String,
-        body: String
+        body: String,
+        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
     ): UseCase.Result {
 
         val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo)
@@ -69,7 +70,7 @@ class SendEmailUseCase(
             )
         )
 
-        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments, emptyMap() /*TODO FIXME*/)) {
+        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments, sendPreferences)) {
             is me.proton.android.calendar.domain.usecase.SendEmailDirect.Result.Success -> return UseCase.Result.Success<Unit>()
             else -> UseCase.Result.Error("SendEmailUseCase executeToOrganizer failed to send email to organizer: $sendEmailResult")
         }

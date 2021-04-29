@@ -16,6 +16,7 @@ import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -36,8 +37,11 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
+import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.util.kotlin.filterNullValues
 import java.time.*
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -55,7 +59,9 @@ class EventViewModel(
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val sendEmailUseCase: SendEmailUseCase,
     private val logger: Logger,
-    private val json: Json
+    private val json: Json,
+    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
+    private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase
 ) : ViewModel() {
 
     sealed class Result {
@@ -479,7 +485,8 @@ class EventViewModel(
         editOption: EventEditDeleteOption? = null,
         occurrenceNumber: Int,
         resources: Resources,
-        timeFormatIs24Hours: Boolean): HandleSaveResult { // create or edit
+        timeFormatIs24Hours: Boolean,
+        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>): HandleSaveResult { // create or edit
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
         logger.d("handleSave with editOption: $editOption")
@@ -1505,9 +1512,6 @@ class EventViewModel(
             }
         } else {
             event.iCalEvent.attendees.remove(attendee)
-            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
-                event.iCalEvent.organizer = null
-            }
         }
         _event.postValue(event)
     }
@@ -1524,7 +1528,8 @@ class EventViewModel(
         participationStatus: ParticipationStatus,
         userAttendee: Attendee,
         userEmails: List<String>,
-        resources: Resources
+        resources: Resources,
+        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
     ) : Boolean {
         val status = participationStatus.toInt()
 
@@ -1552,21 +1557,24 @@ class EventViewModel(
                 null
             }
 
-        val subject = getReplyMailSubject(resources, event.summary)
-        val body = getReplyMailBody(resources, participationStatus, userAttendee.email, event.summary)
-        val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
-            userId,
-            eventCopy.iCalendar,
-            dbEvent?.iCalendar?.timezoneInfo,
-            userAttendee.copy(),
-            event.iCalEvent.organizer.email,
-            participationStatus,
-            subject,
-            body
-        )
-        sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
-        if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
-            return false
+        if (sendPreferences.isNotEmpty()) {
+            val subject = getReplyMailSubject(resources, event.summary)
+            val body = getReplyMailBody(resources, participationStatus, userAttendee.email, event.summary)
+            val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
+                userId,
+                eventCopy.iCalendar,
+                dbEvent?.iCalendar?.timezoneInfo,
+                userAttendee.copy(),
+                event.iCalEvent.organizer.email,
+                participationStatus,
+                subject,
+                body,
+                sendPreferences
+            )
+            sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
+                return false
+            }
         }
 
         val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
@@ -1631,5 +1639,38 @@ class EventViewModel(
 
     suspend fun isStandaloneSingleEdit(): Boolean {
         return calendarsRepository.isStandaloneSingleEdit(userId, event.uid) == true
+    }
+
+    data class SendPreferencesResults(
+        val sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>,
+        val emailErrors: Map<String, ObtainSendPreferencesUseCase.Result.Error>
+    )
+
+    suspend fun getSendPreferences(emails: List<String>): SendPreferencesResults {
+        // get send preferences and check if attendees have disabled email addresses
+        val canonicalEmails = getCanonicalEmailsUseCase.invoke(userId, emails)
+
+        val sendPreferencesResults = obtainSendPreferencesUseCase.execute(userId, canonicalEmails.filterNullValues())
+
+        val emailErrors = hashMapOf<String, ObtainSendPreferencesUseCase.Result.Error>()
+        val sendPreferences = sendPreferencesResults.mapValues {
+            when (val result = it.value) {
+                is ObtainSendPreferencesUseCase.Result.Success -> result.sendPreferences
+                ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.AddressDisabled
+                    null
+                }
+                ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences
+                    null
+                }
+                ObtainSendPreferencesUseCase.Result.Error.NetworkError -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.NetworkError
+                    null
+                }
+            }
+        }.filterNullValues()
+
+        return SendPreferencesResults(sendPreferences, emailErrors)
     }
 }

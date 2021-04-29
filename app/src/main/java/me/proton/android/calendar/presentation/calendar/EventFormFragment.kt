@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.TextUtils
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -42,8 +43,10 @@ import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWE
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.account.AccountViewModel
+import me.proton.core.mailmessage.domain.entity.Email
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -204,48 +207,53 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             if (navigationArguments.eventId.isNullOrEmpty() || eventViewModel.hasEventBeenEdited()) {
 
                 lifecycleScope.launch {
-                    val dbEvent = eventViewModel.dbEvent
-                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
-                            (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
-                            !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
 
-                    val singleEditsInfo = eventViewModel.getSingleEditsInfo()
+                    // TODO Refactor savingEvent loading state
+                    eventViewModel.savingEvent.postValue(true)
 
-                    if (!eventViewModel.eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty()) {
-                        // Show send invitation dialog
-                        if (shouldShowConfirmationPicker && !navigationArguments.eventId.isNullOrEmpty()) {
-                            val message =
-                                if (eventViewModel.hasExDates() || (singleEditsInfo?.hasSingleEdit == true)) {
-                                    R.string.event_add_participants_overwrite_dialog_description
-                                } else {
-                                    R.string.event_add_participants_dialog_description
-                                }
-
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setTitle(R.string.event_add_participants_dialog_title)
-                                .setMessage(message)
-                                .setPositiveButton(R.string.event_add_participants_dialog_confirm) { _, _ ->
-                                    handleSaveWithOption(EventEditDeleteOption.ALL_EVENTS)
-                                }
-                                .setNegativeButton(R.string.event_add_participants_dialog_cancel) { _, _ -> }
-                                .show()
-                        } else {
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setTitle(R.string.event_send_invite_dialog_title)
-                                .setMessage(R.string.event_send_invite_dialog_description)
-                                .setPositiveButton(R.string.event_send_invite_dialog_confirm) { _, _ ->
-                                    lifecycleScope.launch {
-                                        saveEvent(
-                                            shouldShowConfirmationPicker,
-                                            dbEvent,
-                                            singleEditsInfo
+                    val attendeesEmails = eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.mapNotNull { it.extractEmail() }
+                    if (!attendeesEmails.isNullOrEmpty()) {
+                        val sendPreferencesResults = eventViewModel.getSendPreferences(attendeesEmails)
+                        if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+                            if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
+                                this@EventFormFragment.view?.displaySnackBar(getString(R.string.snack_network_error))
+                                eventViewModel.savingEvent.postValue(false)
+                            } else {
+                                MaterialAlertDialogBuilder(requireContext())
+                                    .setTitle(R.string.event_attendees_send_prefs_error_title)
+                                    .setMessage(
+                                        if (sendPreferencesResults.sendPreferences.isEmpty()) getString(R.string.event_attendees_send_prefs_error_none_message)
+                                        else getString(
+                                            R.string.event_attendees_send_prefs_error_some_message,
+                                            TextUtils.join("\n• ", sendPreferencesResults.emailErrors.keys)
                                         )
+                                    )
+                                    .setPositiveButton(R.string.event_attendees_send_prefs_error_confirm) { _, _ ->
+                                        lifecycleScope.launch {
+                                            // Remove attendees whom emails were invalid
+                                            eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.removeIf { attendee ->
+                                                sendPreferencesResults.emailErrors.any {
+                                                    attendee.extractEmail() == it.key
+                                                }
+                                            }
+
+                                            handleSaveAttendeesConfirmationDialog(sendPreferencesResults.sendPreferences)
+                                        }
                                     }
-                                }
-                                .setNegativeButton(R.string.event_send_invite_dialog_cancel) { _, _ -> }
-                                .show()
+                                    .setNegativeButton(R.string.event_attendees_send_prefs_error_cancel) { _, _, ->
+                                        eventViewModel.savingEvent.postValue(false)
+                                    }
+                                    .setOnCancelListener {
+                                        eventViewModel.savingEvent.postValue(false)
+                                    }
+                                    .show()
+                            }
+                        } else {
+                            handleSaveAttendeesConfirmationDialog(sendPreferencesResults.sendPreferences)
                         }
-                    } else saveEvent(shouldShowConfirmationPicker, dbEvent, singleEditsInfo)
+                    } else {
+                        handleSaveAttendeesConfirmationDialog(mapOf())
+                    }
                 }
 
             } else findNavController().navigateUp()
@@ -255,10 +263,64 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    private suspend fun handleSaveAttendeesConfirmationDialog(sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
+        val dbEvent = eventViewModel.dbEvent
+        val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
+                (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
+                !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
+        val singleEditsInfo = eventViewModel.getSingleEditsInfo()
+        if (!eventViewModel.eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty()) {
+            // Show send invitation dialog
+            if (shouldShowConfirmationPicker && !navigationArguments.eventId.isNullOrEmpty()) {
+                val message =
+                    if (eventViewModel.hasExDates() || (singleEditsInfo?.hasSingleEdit == true)) {
+                        R.string.event_add_participants_overwrite_dialog_description
+                    } else {
+                        R.string.event_add_participants_dialog_description
+                    }
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.event_add_participants_dialog_title)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.event_add_participants_dialog_confirm) { _, _ ->
+                        handleSaveWithOption(EventEditDeleteOption.ALL_EVENTS, sendPreferences)
+                    }
+                    .setNegativeButton(R.string.event_add_participants_dialog_cancel) { _, _ ->
+                        eventViewModel.savingEvent.postValue(false)
+                    }
+                    .setOnCancelListener {
+                        eventViewModel.savingEvent.postValue(false)
+                    }
+                    .show()
+            } else {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.event_send_invite_dialog_title)
+                    .setMessage(R.string.event_send_invite_dialog_description)
+                    .setPositiveButton(R.string.event_send_invite_dialog_confirm) { _, _ ->
+                        lifecycleScope.launch {
+                            saveEvent(
+                                shouldShowConfirmationPicker,
+                                dbEvent,
+                                singleEditsInfo,
+                                sendPreferences
+                            )
+                        }
+                    }
+                    .setNegativeButton(R.string.event_send_invite_dialog_cancel) { _, _ ->
+                        eventViewModel.savingEvent.postValue(false)
+                    }
+                    .setOnCancelListener {
+                        eventViewModel.savingEvent.postValue(false)
+                    }
+                    .show()
+            }
+        } else saveEvent(shouldShowConfirmationPicker, dbEvent, singleEditsInfo, sendPreferences)
+    }
+
     private suspend fun saveEvent(
         shouldShowConfirmationPicker: Boolean,
         dbEvent: Event?,
-        singleEditsInfo: EventViewModel.SingleEditsInfo?) {
+        singleEditsInfo: EventViewModel.SingleEditsInfo?,
+        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
 
         if (shouldShowConfirmationPicker) {
             val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
@@ -271,11 +333,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     else null,
                     getString(R.string.event_recurring_edit_all_events)
                 ).toTypedArray(), 0
-            ) {
+            ) { selectedIndex, isCancel ->
+                if (isCancel) {
+                    eventViewModel.savingEvent.postValue(false)
+                    return@displaySingleChoiceConfirmationPicker
+                }
                 val eventEditDeleteOption =
-                    if (it == 0) {
+                    if (selectedIndex == 0) {
                         EventEditDeleteOption.THIS_EVENT
-                    } else if (it == 1) {
+                    } else if (selectedIndex == 1) {
                         if (showThisAndFuture) {
                             EventEditDeleteOption.THIS_EVENT_AND_FUTURE
                         } else {
@@ -288,23 +354,23 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 // Display warning dialog for this event option if recurrence rule has been edited
                 if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && eventViewModel.recurrenceManuallyEdited && eventViewModel.hasRecurrenceRuleBeenEdited()) {
                     displayUpdateRecurringEventDialog(R.string.event_recurring_update_this_description) { _, _ ->
-                        handleSaveWithOption(eventEditDeleteOption)
+                        handleSaveWithOption(eventEditDeleteOption, sendPreferences)
                     }
                 }
                 // Display warning dialog for all events option if has ex dates or single edits
                 else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (eventViewModel.hasExDates() || (singleEditsInfo?.hasSingleEdit == true))) {
                     displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
-                        handleSaveWithOption(eventEditDeleteOption)
+                        handleSaveWithOption(eventEditDeleteOption, sendPreferences)
                     }
                 }
                 // Display warning dialog for all events option if has ex dates or single edits
                 else if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT_AND_FUTURE && (eventViewModel.hasExDates(true) || (singleEditsInfo?.hasFutureSingleEdit == true))) {
                     displayUpdateRecurringEventDialog(R.string.event_recurring_update_all_description) { _, _ ->
-                        handleSaveWithOption(eventEditDeleteOption)
+                        handleSaveWithOption(eventEditDeleteOption, sendPreferences)
                     }
                 }
                 else {
-                    handleSaveWithOption(eventEditDeleteOption)
+                    handleSaveWithOption(eventEditDeleteOption, sendPreferences)
                 }
             }
 
@@ -318,7 +384,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         null,
                     occurrenceNumber = 1,
                     resources,
-                    calendarViewModel.timeFormatIs24Hour(requireContext()))
+                    calendarViewModel.timeFormatIs24Hour(requireContext()),
+                    sendPreferences
+                )
             }
             withContext(Dispatchers.Default) {
                 val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
@@ -373,14 +441,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             .show()
     }
 
-    private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption) {
+    private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption, sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
         lifecycleScope.launch {
             val handleSaveResult = withContext(Dispatchers.IO) {
                 eventViewModel.handleSave(
                     eventEditDeleteOption,
                     navigationArguments.occurrenceNumber,
                     resources,
-                    calendarViewModel.timeFormatIs24Hour(requireContext())
+                    calendarViewModel.timeFormatIs24Hour(requireContext()),
+                    sendPreferences
                 )
             }
             withContext(Dispatchers.Default) {

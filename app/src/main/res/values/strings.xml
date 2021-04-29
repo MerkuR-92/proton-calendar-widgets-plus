@@ -91,6 +91,19 @@
     <string name="event_change_answer_mail_body_declined">%s has declined your invitation to %s</string>
     <string name="event_change_answer_mail_body_tentative">%s has tentatively accepted your invitation to %s</string>
 
+    <string name="event_organizer_send_prefs_error_title">Organizer cannot be notified</string>
+    <string name="event_organizer_send_prefs_message_accepted_title">The organizer cannot be notified that you accepted the invitation</string>
+    <string name="event_organizer_send_prefs_message_declined_title">The organizer cannot be notified that you declined the invitation</string>
+    <string name="event_organizer_send_prefs_message_tentative_title">The organizer cannot be notified that you tentatively accepted the invitation</string>
+    <string name="event_organizer_send_prefs_message_default_title">The organizer cannot be notified that you responded to the invitation</string>
+    <string name="event_organizer_send_prefs_button_title">OK</string>
+
+    <string name="event_attendees_send_prefs_error_title">Participants cannot be notified</string>
+    <string name="event_attendees_send_prefs_error_none_message">None of the participants can be notified about your changes\nWould you like to continue anyway?</string>
+    <string name="event_attendees_send_prefs_error_some_message">The following participants cannot be notified about your changes:\n\n• %s\n\nWould you like to continue anyway?</string>
+    <string name="event_attendees_send_prefs_error_confirm">Continue</string>
+    <string name="event_attendees_send_prefs_error_cancel">Cancel</string>
+
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
@@ -227,6 +240,7 @@
     <string name="snack_add_participant_error">Error while adding the participant</string>
     <string name="snack_add_participant_invalid_email">Invalid email</string>
     <string name="snack_change_attendee_answer_error">Error sending answer, please try again later</string>
+    <string name="snack_network_error">Network error, please try again later</string>
 
     <!-- Dialogs -->
     <string name="error_event_doesnt_exist">Event doesn\'t exist</string>
