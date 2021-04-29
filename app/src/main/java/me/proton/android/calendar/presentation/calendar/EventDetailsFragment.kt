@@ -584,8 +584,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // Update action bar buttons visibility
                 loadingAction.visibleOrGone(savingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented
-                buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.attendees.isNullOrEmpty() && !savingEvent)
-                buttonMenu.visibleOrGone(event.iCalEvent.attendees.isNullOrEmpty() && !savingEvent)
+                buttonEdit.visibleOrGone(event.calendar.isActive && event.iCalEvent.organizer == null && !savingEvent)
+                buttonMenu.visibleOrGone(event.iCalEvent.organizer == null && !savingEvent)
             })
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here

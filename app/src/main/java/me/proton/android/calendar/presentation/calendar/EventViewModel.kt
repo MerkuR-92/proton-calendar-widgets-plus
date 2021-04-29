@@ -338,7 +338,7 @@ class EventViewModel(
                         occurrence.occurrenceNumber > 1 &&
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
-            val hasAttendees = !event.iCalEvent.attendees.isNullOrEmpty()
+            val hasAttendees = event.iCalEvent.organizer != null
 
             // We check for single edits only once and in initialise because it may require API calls
             hasSingleEdit =
@@ -1514,6 +1514,7 @@ class EventViewModel(
         } else {
             event.iCalEvent.attendees.remove(attendee)
             if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
+                // TODO Update this once we allow editing events that have attendees
                 event.iCalEvent.organizer = null
             }
         }

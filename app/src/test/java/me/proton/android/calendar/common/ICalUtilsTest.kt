@@ -6,6 +6,7 @@ import biweekly.ICalVersion
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.util.*
+import biweekly.util.DayOfWeek
 import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtils.clone
@@ -23,10 +24,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.util.*
 
 
@@ -3065,7 +3063,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtils.parseICalString(iCalString)!!
 
-        val ics = getResponseIcs(eventIcal, eventIcal.events.first().attendees.first(), ParticipationStatus.ACCEPTED, null)
+        val ics = getResponseIcs(eventIcal, eventIcal.events.first().attendees.first(), ParticipationStatus.ACCEPTED, null, Date.from(Instant.now()))
 
         val responseICalendar = ICalUtils.parseICalString(ics)!!
 
