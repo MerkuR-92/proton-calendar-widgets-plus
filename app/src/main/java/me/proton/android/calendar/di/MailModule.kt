@@ -4,10 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import me.proton.android.calendar.data.api.EmailMessageRepositoryImpl
+import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.core.contact.data.repository.ContactRepositoryImpl
 import me.proton.core.contact.domain.repository.ContactRepository
-import me.proton.core.mailmessage.data.repository.EmailMessageRepositoryImpl
-import me.proton.core.mailmessage.domain.repository.EmailMessageRepository
 import me.proton.core.network.data.ApiProvider
 import javax.inject.Singleton
 

@@ -6,6 +6,8 @@ import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.api.EmailMessageRepository
+import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.core.accountmanager.domain.AccountManager
@@ -49,6 +51,12 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var cryptoContext: CryptoContext
+
+    @Inject
+    lateinit var generateEmailPackageUseCase: GenerateEmailPackageUseCase
+
+    @Inject
+    lateinit var emailMessageRepository: EmailMessageRepository
 
     @Inject
     lateinit var sendEmailDirect: SendEmailDirect

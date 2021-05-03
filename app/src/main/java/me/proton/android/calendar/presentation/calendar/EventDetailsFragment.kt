@@ -45,6 +45,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -467,7 +468,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         participationStatus: ParticipationStatus,
         currentParticipationStatus: ParticipationStatus,
         userEmails: List<String>,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
+        sendPreferences: Map<Email, SendPreferences>) {
 
         if (event.isPartOfChain()) {
             val isSingleEdit = event.isSingleEdit()
@@ -533,7 +534,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         participationStatus: ParticipationStatus,
         currentParticipationStatus: ParticipationStatus,
         userEmails: List<String>,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>
     ) {
         val calendarId = event.calendar.id
         val eventId = event.id

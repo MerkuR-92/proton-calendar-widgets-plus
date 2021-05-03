@@ -1,30 +1,27 @@
 package me.proton.android.calendar.domain.usecase
 
+import com.github.mangstadt.vinnie.io.FoldedLineWriter
 import com.google.crypto.tink.subtle.Base64
+import com.google.crypto.tink.subtle.Hex
+import com.google.crypto.tink.subtle.Random
+import me.proton.android.calendar.domain.api.EmailMessageRepository
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.pgp.dataPacket
-import me.proton.core.crypto.common.pgp.keyPacket
-import me.proton.core.crypto.common.pgp.split
-import me.proton.core.key.domain.decryptSessionKey
-import me.proton.core.key.domain.encryptAndSignText
-import me.proton.core.key.domain.useKeys
+import me.proton.core.crypto.common.pgp.*
+import me.proton.core.key.domain.*
 import me.proton.core.mailmessage.domain.encryptAndSignAttachmentOrNull
 import me.proton.core.mailmessage.domain.entity.*
-import me.proton.core.mailmessage.domain.repository.EmailMessageRepository
-import me.proton.core.mailmessage.domain.usecase.GenerateEmailPackage
-import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
-import me.proton.core.mailmessage.domain.usecase.invokeOrNull
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.nullIfBlank
-import java.io.InputStream
+import java.io.ByteArrayInputStream
+import java.io.StringWriter
 import javax.inject.Inject
 
 class SendEmailDirect @Inject constructor(
     private val emailMessageRepository: EmailMessageRepository,
-    private val getRecipientPublicAddresses: GetRecipientPublicAddresses,
-    private val generateEmailPackage: GenerateEmailPackage,
+    private val generateEmailPackageUseCase: GenerateEmailPackageUseCase,
     private val cryptoContext: CryptoContext
 ) {
 
@@ -35,22 +32,14 @@ class SendEmailDirect @Inject constructor(
         val toEmailList: List<String>,
         val attachments: List<Attachment>
     ) {
-
-        fun toArguments() = SendEmailDirect.Arguments(
-            this.subject,
-            this.body,
-            this.mimeType,
-            this.toEmailList,
-            this.attachments.map { it.toAttachment() /*TODO remove helper call when we move to core*/ })
-
         data class Attachment(
             val fileName: Filename,
             val fileSize: Int,
             val mimeType: String,
-            val inputStream: InputStream
+            val bytes: ByteArray
         ) {
             fun toAttachment() =
-                SendEmailDirect.Arguments.Attachment(this.fileName, this.fileSize, this.mimeType, this.inputStream)
+                SendEmailDirect.Arguments.Attachment(this.fileName, this.fileSize, this.mimeType, ByteArrayInputStream(this.bytes))
         }
     }
 
@@ -58,7 +47,6 @@ class SendEmailDirect @Inject constructor(
         data class Success(val receipt: EmailReceipt) : Result()
 
         sealed class Error : Result() {
-            data class GettingPublicAddressKeys(val emailAddresses: List<String>) : Error()
             data class GeneratingEmailPackages(val emailAddresses: List<String>) : Error()
             data class EncryptingAttachments(val attachmentFileNames: List<String>) : Error()
         }
@@ -67,23 +55,21 @@ class SendEmailDirect @Inject constructor(
     suspend operator fun invoke(
         sender: UserAddress,
         arguments: Arguments,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>
     ): Result {
-
-        // TODO handle sendPreferences
-        // TODO FIXME remove this step and use sendPreferences for this
-        // Get public address keys for recipients.
-        val publicAddresses = getRecipientPublicAddresses.invoke(sender.userId, arguments.toEmailList)
-        val failedEmails = publicAddresses.filterValues { it == null }.keys
-        if (failedEmails.isNotEmpty())
-            return Result.Error.GettingPublicAddressKeys(failedEmails.toList())
 
         // Encrypt and sign attachments and body, create payload for sender.
         val decryptedAttachmentSessionKeys = mutableListOf<ByteArray>()
         val encodedAttachmentKeyPackets = mutableListOf<String>()
 
-        lateinit var decryptedBodySessionKey: ByteArray
-        lateinit var encryptedBodyDataPacket: ByteArray
+        lateinit var decryptedPlaintextBodySessionKey: ByteArray
+        lateinit var encryptedPlaintextBodyDataPacket: ByteArray
+
+        lateinit var decryptedMimeBodySessionKey: ByteArray
+        lateinit var encryptedMimeBodyDataPacket: ByteArray
+
+        lateinit var signedBodyMime: String
+
         lateinit var encryptedEmail: EncryptedEmail
 
         val attachments = mutableMapOf<Filename, EncryptedAttachment?>()
@@ -107,7 +93,8 @@ class SendEmailDirect @Inject constructor(
                     contents = Base64.encode(it.keyPacket.packet + it.dataPacket.packet + it.signature.packet)
                 )
             }
-            // TODO: sending works with this empty as well
+
+            // sending works with this empty as well
             // encodedAttachmentKeyPackets.add(Base64.encode(encryptedAttachment.keyPacket))
 
             // Decrypt session keys of all attachments for later creation of packages for plaintext recipients.
@@ -129,22 +116,35 @@ class SendEmailDirect @Inject constructor(
             )
 
             // Decrypt body's session key to send it for plaintext recipients.
-            val encryptedBodySplit = encryptedBodyPgpMessage.split(cryptoContext.pgpCrypto)
-            decryptedBodySessionKey = decryptSessionKey(encryptedBodySplit.keyPacket())
-            encryptedBodyDataPacket = encryptedBodySplit.dataPacket()
+            val encryptedPlaintextBodySplit = encryptedBodyPgpMessage.split(cryptoContext.pgpCrypto)
+            decryptedPlaintextBodySessionKey = decryptSessionKey(encryptedPlaintextBodySplit.keyPacket())
+            encryptedPlaintextBodyDataPacket = encryptedPlaintextBodySplit.dataPacket()
+
+            // generate MIME version of the email
+            val plaintextBodyMime = generateMimeBody(arguments.body, arguments.attachments)
+
+            val encryptedMimeBodySplit = encryptAndSignText(plaintextBodyMime).split(cryptoContext.pgpCrypto)
+            decryptedMimeBodySessionKey = decryptSessionKey(encryptedMimeBodySplit.keyPacket())
+            encryptedMimeBodyDataPacket = encryptedMimeBodySplit.dataPacket()
+
+            signedBodyMime = signMimeBody(plaintextBodyMime, signText(plaintextBodyMime))
         }
 
         // Generate package for each recipient.
-        val emailPackages = mutableMapOf<Email, EncryptedPackage?>()
-        publicAddresses.filterNullValues().values.forEach { recipientPublicAddress ->
-            emailPackages[recipientPublicAddress.email] = generateEmailPackage.invokeOrNull(
-                arguments.toArguments(),
-                recipientPublicAddress,
+        val emailPackages = mutableMapOf<Email, me.proton.android.calendar.domain.model.EncryptedPackage?>()
+        sendPreferences.forEach { entry ->
+            emailPackages[entry.key] = generateEmailPackageUseCase.invoke/*OrNull*/(
+                signedBodyMime,
+                entry.key,
+                entry.value,
                 decryptedAttachmentSessionKeys,
-                decryptedBodySessionKey,
-                encryptedBodyDataPacket
+                decryptedPlaintextBodySessionKey,
+                encryptedPlaintextBodyDataPacket,
+                decryptedMimeBodySessionKey,
+                encryptedMimeBodyDataPacket
             )
         }
+
         val failedPackageEmails = emailPackages.filterValues { it == null }.keys
         if (failedPackageEmails.isNotEmpty())
             return Result.Error.GeneratingEmailPackages(failedPackageEmails.toList())
@@ -154,8 +154,84 @@ class SendEmailDirect @Inject constructor(
             userId = sender.userId,
             encryptedEmail = encryptedEmail,
             encryptedPackages = emailPackages.filterNullValues().values.toList(),
-            attachmentKeys = encodedAttachmentKeyPackets
+            attachmentKeys = encodedAttachmentKeyPackets //.ifEmpty { null }
         )
         return Result.Success(receipt)
+    }
+
+    /**
+     * Correctly encode and format plaintext email body
+     */
+    private fun generateMimeBody(body: String, attachments: List<Arguments.Attachment>): String {
+
+        val boundary = "---------------------${Hex.encode(Random.randBytes(16))}"
+
+        val stringWriter = StringWriter()
+        FoldedLineWriter(stringWriter).use {
+            it.write(body, true, Charsets.UTF_8)
+        }
+        val quotedPrintableBody = stringWriter.toString()
+
+        return """
+Content-Type: multipart/mixed; boundary=${boundary.substring(2)}
+
+$boundary
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+
+$quotedPrintableBody
+${attachments.map { "${boundary}\n${generateMimeAttachment(it)}" }.joinToString(separator = "\n")}
+$boundary--
+""".trimIndent()
+
+    }
+
+    /**
+     * Correctly encode and format [Arguments.Attachment]
+     */
+    private fun generateMimeAttachment(attachment: Arguments.Attachment): String {
+
+        val stringWriter = StringWriter()
+        FoldedLineWriter(stringWriter).use {
+            it.write(Base64.encode(attachment.bytes))
+        }
+        val foldedAttachment = stringWriter.toString()
+
+        return """
+Content-Type: ${attachment.mimeType}; filename="${attachment.fileName}"; name="${attachment.fileName}"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="${attachment.fileName}"; name="${attachment.fileName}"
+
+$foldedAttachment
+""".trimIndent()
+
+    }
+
+    /**
+     * Manually wrap MIME body into the signature
+     */
+    private fun signMimeBody(body: String, signature: String): String {
+
+        val boundary = "---------------------${Hex.encode(Random.randBytes(16))}"
+
+        val signatureMime = """
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+$signature
+        """.trimIndent()
+
+        return """
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="${boundary.substring(2)}"; charset=utf-8
+
+$boundary
+$body
+$boundary
+$signatureMime
+
+$boundary--
+        """.trimIndent()
+
     }
 }

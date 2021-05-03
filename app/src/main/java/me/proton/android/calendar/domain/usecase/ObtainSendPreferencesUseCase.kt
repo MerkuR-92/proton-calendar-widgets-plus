@@ -11,7 +11,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.MailSettingsApi
 import me.proton.android.calendar.domain.model.MailSettings
 import me.proton.android.calendar.domain.model.PackageType
-import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase.SendPreferences
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -45,14 +45,6 @@ class ObtainSendPreferencesUseCase(
             object NetworkError : Error()
         }
     }
-
-    data class SendPreferences(
-        val encrypt: Boolean,
-        val sign: Boolean,
-        val pgpScheme: PackageType,
-        val mimeType: String, // 'text/html' | 'text/plain' | 'multipart/mixed'
-        val publicKey: String?
-    )
 
     suspend fun execute(
         userId: UserId,
@@ -111,9 +103,9 @@ class ObtainSendPreferencesUseCase(
 
             val sendPreferences = if (vCardEmail != null && publicAddress != null && vCard != null) {
                 createCustomSendPreferences(vCardEmail, publicAddress, vCard, mailSettings)
-            } else if (publicAddress != null) {
-                createDefaultSendPreferences(publicAddress, mailSettings)
-            } else null
+            } else {
+                createDefaultSendPreferences(mailSettings, publicAddress)
+            }
 
             result[entry.key] = sendPreferences?.let { Result.Success(it) } ?: Result.Error.GettingContactPreferences
 
@@ -169,7 +161,7 @@ class ObtainSendPreferencesUseCase(
                 )
             }
         } else {
-            if (pinnedPublicKey == null) {
+            if (encrypt && pinnedPublicKey == null && publicKey == null) {
                 null
             } else {
                 SendPreferences(
@@ -177,7 +169,7 @@ class ObtainSendPreferencesUseCase(
                     sign = if (encrypt) true else sign,
                     pgpScheme = scheme,
                     mimeType = mime,
-                    publicKey = pinnedPublicKey
+                    publicKey = pinnedPublicKey ?: publicKey
                 )
             }
 
@@ -187,12 +179,12 @@ class ObtainSendPreferencesUseCase(
     // TODO TEST
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun createDefaultSendPreferences(
-        publicAddress: PublicAddress,
-        defaultMailSettings: MailSettings
+        defaultMailSettings: MailSettings,
+        publicAddress: PublicAddress?
     ): SendPreferences? {
 
-        val isInternal = publicAddress.recipient == Recipient.Internal
-        val publicKey = publicAddress.keys.firstOrNull { it.publicKey.isPrimary }?.publicKey?.key
+        val isInternal = publicAddress?.recipient == Recipient.Internal
+        val publicKey = publicAddress?.keys?.firstOrNull { it.publicKey.isPrimary }?.publicKey?.key
 
         return if (isInternal) {
 

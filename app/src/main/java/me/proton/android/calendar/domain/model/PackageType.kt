@@ -6,8 +6,8 @@ enum class PackageType(val type: Int) {
     EncryptedOutside(2),
     Cleartext(4),
     PgpInline(8),
-    PgpMime(16),
-    ClearMime(32);
+    PgpMime(16), // encrypted and signed
+    ClearMime(32); // signed
 
     companion object {
         fun fromScheme(scheme: String, encrypt: Boolean, sign: Boolean): PackageType? =

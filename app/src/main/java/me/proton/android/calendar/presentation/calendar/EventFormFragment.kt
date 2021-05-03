@@ -42,6 +42,7 @@ import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -263,7 +264,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private suspend fun handleSaveAttendeesConfirmationDialog(sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
+    private suspend fun handleSaveAttendeesConfirmationDialog(sendPreferences: Map<Email, SendPreferences>) {
         val dbEvent = eventViewModel.dbEvent
         val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
                 (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
@@ -320,7 +321,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         shouldShowConfirmationPicker: Boolean,
         dbEvent: Event?,
         singleEditsInfo: EventViewModel.SingleEditsInfo?,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
+        sendPreferences: Map<Email, SendPreferences>) {
 
         if (shouldShowConfirmationPicker) {
             val showThisAndFuture = navigationArguments.occurrenceNumber > 1 &&
@@ -441,7 +442,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             .show()
     }
 
-    private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption, sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>) {
+    private fun handleSaveWithOption(eventEditDeleteOption: EventEditDeleteOption, sendPreferences: Map<Email, SendPreferences>) {
         lifecycleScope.launch {
             val handleSaveResult = withContext(Dispatchers.IO) {
                 eventViewModel.handleSave(

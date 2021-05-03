@@ -10,11 +10,11 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
-import java.io.ByteArrayInputStream
 
 class SendEmailUseCase(
     private val logger: Logger,
@@ -38,7 +38,7 @@ class SendEmailUseCase(
         participationStatus: ParticipationStatus,
         subject: String,
         body: String,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>
     ): UseCase.Result {
 
         val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo)
@@ -65,7 +65,7 @@ class SendEmailUseCase(
                     INVITE_ICS_FILE_NAME,
                     attachmentBytes.size,
                     INVITE_ICS_MIME_TYPE,
-                    ByteArrayInputStream(attachmentBytes)
+                    attachmentBytes
                 )
             )
         )
@@ -84,7 +84,7 @@ class SendEmailUseCase(
         body: String,
         isCreate: Boolean,
         editedEvent: Event? = null,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>
     ): UseCase.Result {
         val newEventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to select event entity")
         val sharedEventId = newEventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees sharedEventID was null")
@@ -140,7 +140,7 @@ class SendEmailUseCase(
                     INVITE_ICS_FILE_NAME,
                     attachmentBytes.size,
                     INVITE_ICS_MIME_TYPE,
-                    ByteArrayInputStream(attachmentBytes)
+                    attachmentBytes
                 )
             )
         )

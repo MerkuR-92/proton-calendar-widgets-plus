@@ -38,6 +38,7 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.PackageType
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
@@ -486,7 +487,7 @@ class EventViewModel(
         occurrenceNumber: Int,
         resources: Resources,
         timeFormatIs24Hours: Boolean,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>): HandleSaveResult { // create or edit
+        sendPreferences: Map<Email, SendPreferences>): HandleSaveResult { // create or edit
         // TODO MOVE WHATEVER WE CAN TO WORKER!!!!
 
         logger.d("handleSave with editOption: $editOption")
@@ -897,7 +898,7 @@ class EventViewModel(
 
         // TODO Refactor and move into UseCase
         if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
-            val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, newEvent.id, newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, newEvent, emptyMap() /*TODO FIXME*/)
+            val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, newEvent.id, newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, newEvent, sendPreferences)
             sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
             if (sendEmailResult is UseCase.Result.InvalidParams) {
@@ -930,7 +931,7 @@ class EventViewModel(
             createEventResult.returnValue.tryCast<List<String>> {
                 if (this.isNullOrEmpty()) return@tryCast
 
-                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, null, emptyMap() /*TODO FIXME*/)
+                val sendEmailResult = sendEmailUseCase.executeToAttendees(userId, this.first(), newEvent.iCalEvent.attendees, subject!!, body!!, isCreate, null, sendPreferences)
                 // If send email fails the event without attendees remains in the calendar
                 sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
@@ -1512,6 +1513,9 @@ class EventViewModel(
             }
         } else {
             event.iCalEvent.attendees.remove(attendee)
+            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
+                event.iCalEvent.organizer = null
+            }
         }
         _event.postValue(event)
     }
@@ -1529,7 +1533,7 @@ class EventViewModel(
         userAttendee: Attendee,
         userEmails: List<String>,
         resources: Resources,
-        sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>
     ) : Boolean {
         val status = participationStatus.toInt()
 
@@ -1642,7 +1646,7 @@ class EventViewModel(
     }
 
     data class SendPreferencesResults(
-        val sendPreferences: Map<Email, ObtainSendPreferencesUseCase.SendPreferences>,
+        val sendPreferences: Map<Email, SendPreferences>,
         val emailErrors: Map<String, ObtainSendPreferencesUseCase.Result.Error>
     )
 
