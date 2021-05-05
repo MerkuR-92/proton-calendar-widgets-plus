@@ -7,19 +7,47 @@
     tools:context=".presentation.calendar.MonthFragment"
     android:focusableInTouchMode="false">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/miniCalendarPager"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/miniCalendarPagerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusableInTouchMode="false"
-        android:overScrollMode="never"
+        android:elevation="@dimen/calendar_elevation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/background_norm"
-        android:elevation="@dimen/calendar_elevation"
-        android:paddingBottom="@dimen/calendar_bottom_spacing"
-        />
+        >
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/miniCalendarPager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="false"
+            android:overScrollMode="never"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <LinearLayout
+            android:id="@+id/mini_calendar_slider"
+            android:layout_width="match_parent"
+            android:layout_height="22dp"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@+id/miniCalendarPager"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:background="@drawable/shape_background_square_rounded_dark"
+                android:backgroundTint="@color/interaction_weak"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/agendaPager"
@@ -29,6 +57,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/miniCalendarPager" />
+        app:layout_constraintTop_toBottomOf="@+id/miniCalendarPagerLayout" />
+
+<!--    <androidx.viewpager2.widget.ViewPager2-->
+<!--        android:id="@+id/dayPager"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:overScrollMode="never"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/miniCalendarPagerLayout" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

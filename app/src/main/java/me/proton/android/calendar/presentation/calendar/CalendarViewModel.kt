@@ -86,6 +86,8 @@ class CalendarViewModel(
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
+    var agendaView: MutableLiveData<Boolean> = MutableLiveData(true)
+
     // Those addresses contain canonical email addresses
     var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
 

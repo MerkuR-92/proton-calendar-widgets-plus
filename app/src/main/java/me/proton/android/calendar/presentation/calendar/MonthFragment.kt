@@ -7,23 +7,26 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
+import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
+import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
+import kotlinx.android.synthetic.main.item_mini_calendar_fragment.view.*
 import kotlinx.android.synthetic.main.toolbar_action_primary.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -61,6 +64,7 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
     private lateinit var agendaPagerAdapter: AgendaPagerAdapter
+    private lateinit var dayPagerAdapter: DayPagerAdapter
 
     private val navigationArguments: MonthFragmentArgs by navArgs()
 
@@ -75,6 +79,7 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var buttonCreate: View
     private lateinit var buttonToday: View
+    private lateinit var buttonChangeView: View
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
@@ -85,9 +90,18 @@ class MonthFragment : BaseFragment() {
         with (buttonToday) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
         }
+        buttonChangeView = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
+//        with (buttonChangeView) {
+//            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_agenda))
+//        }
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
+            addView(
+                buttonChangeView, resources.getDimensionPixelSize(
+                    R.dimen.action_clickable_size
+                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
+            )
             addView(
                 buttonToday, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
@@ -128,6 +142,11 @@ class MonthFragment : BaseFragment() {
         buttonToday.setOnSingleClickListener {
             val todayDate = LocalDate.now(timeZoneId)
             calendarViewModel.handleDaySelected(todayDate)
+        }
+
+        buttonChangeView.setOnSingleClickListener {
+            val immutableValue = calendarViewModel.agendaView.value ?: true
+            calendarViewModel.agendaView.postValue(!immutableValue)
         }
     }
 
@@ -180,7 +199,40 @@ class MonthFragment : BaseFragment() {
                     miniCalendarPager.layoutParams = layoutParams
                     miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(this)
                 }
+
+                mini_calendar_slider.setOnSingleClickListener {
+                    if (miniCalendarPager.isVisible) {
+                        collapse(miniCalendarPager)
+                    } else {
+                        expand(miniCalendarPager, height = desiredHeight)
+                    }
+                }
+
+                val gestureDetector = GestureDetector(requireContext(), CalendarGestureListener(miniCalendarPager, desiredHeight))
+                mini_calendar_slider.setOnTouchListener { v, event ->
+                    gestureDetector.onTouchEvent(event)
+                }
             }
+        }
+    }
+
+    class CalendarGestureListener(val view: View, val height: Int): GestureDetector.SimpleOnGestureListener() {
+//        override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+//            if (distanceY > 0) {
+//                collapse(view)
+//            } else if (distanceY < 0) {
+//                expand(view, height = height)
+//            }
+//            return super.onScroll(e1, e2, distanceX, distanceY)
+//        }
+
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+            if (velocityY > 0) {
+                expand(view, height = height)
+            } else if (velocityY < 0) {
+                collapse(view)
+            }
+            return super.onFling(e1, e2, velocityX, velocityY)
         }
     }
 
@@ -252,11 +304,34 @@ class MonthFragment : BaseFragment() {
         }
 
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
-        agendaPager.apply{
-            adapter = agendaPagerAdapter
-            offscreenPageLimit = 1
-            setCurrentItem(agendaPagerAdapter.startingPosition, false)
+        dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
+
+        calendarViewModel.agendaView.observe(viewLifecycleOwner) { agendaView ->
+            if (agendaView) {
+                with (buttonChangeView) {
+                    (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_agenda))
+                }
+                agendaPager.apply {
+                    val currentItem = this.currentItem // Save currently selected item position
+                    adapter = agendaPagerAdapter
+                    setCurrentItem(if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition, false)
+                    offscreenPageLimit = 1
+                }
+            } else {
+                with (buttonChangeView) {
+                    (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_day_view))
+                }
+                agendaPager.apply {
+                    val currentItem = this.currentItem // Save currently selected item position
+                    adapter = dayPagerAdapter
+                    setCurrentItem(if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition, false)
+                    offscreenPageLimit = 1
+                }
+
+//                if (miniCalendarPager.isVisible) mini_calendar_slider.performClick() // Hide the mini calendar when switching to day view
+            }
         }
+
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
 
         // Init view pagers in VM

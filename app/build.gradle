@@ -41,7 +41,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
     ndkVersion "21.3.6528147"
-    
+
     defaultConfig {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
