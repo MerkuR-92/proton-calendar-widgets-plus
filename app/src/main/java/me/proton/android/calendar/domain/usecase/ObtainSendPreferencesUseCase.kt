@@ -114,7 +114,6 @@ class ObtainSendPreferencesUseCase(
         return result
     }
 
-    // TODO TEST
     /**
      * @param vCardEmail it has to be contact email in the vCard, not necessarily canonical version (can be aliased)
      */
@@ -176,7 +175,6 @@ class ObtainSendPreferencesUseCase(
         }
     }
 
-    // TODO TEST
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun createDefaultSendPreferences(
         defaultMailSettings: MailSettings,
