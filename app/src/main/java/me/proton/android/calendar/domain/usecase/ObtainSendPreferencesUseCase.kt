@@ -70,7 +70,7 @@ class ObtainSendPreferencesUseCase(
         // 3. get public addresses for recipients
         val publicAddresses = getRecipientPublicAddresses.invoke(userId, canonicalEmails.keys.toList())
         publicAddresses.forEach {
-            if (it.value == null && !result.containsKey(it.key)) result[it.key] = Result.Error.AddressDisabled
+            if (it.value == null && canonicalEmails.keys.contains(it.key) && !result.containsKey(it.key)) result[it.key] = Result.Error.AddressDisabled
         }
 
         // 4. filter those contacts that have custom Send Preferences

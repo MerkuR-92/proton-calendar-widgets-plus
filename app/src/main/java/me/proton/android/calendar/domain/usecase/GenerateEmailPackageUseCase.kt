@@ -5,11 +5,7 @@ import me.proton.android.calendar.domain.model.EncryptedPackage
 import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.pgp.dataPacket
-import me.proton.core.crypto.common.pgp.keyPacket
-import me.proton.core.crypto.common.pgp.split
 import me.proton.core.key.domain.encryptSessionKey
-import me.proton.core.key.domain.encryptText
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.mailmessage.domain.entity.Email
 import javax.inject.Inject
@@ -18,7 +14,7 @@ class GenerateEmailPackageUseCase @Inject constructor(
     private val cryptoContext: CryptoContext
 ) {
     operator fun invoke(
-        signedBodyMime: String,
+        signedEncryptedBodyMime: Pair<ByteArray, ByteArray>?,
         recipientEmail: Email,
         sendPreferences: SendPreferences,
         decryptedAttachmentSessionKeys: MutableList<ByteArray>,
@@ -26,14 +22,15 @@ class GenerateEmailPackageUseCase @Inject constructor(
         encryptedBodyDataPacket: ByteArray,
         decryptedMimeBodySessionKey: ByteArray,
         encryptedMimeBodyDataPacket: ByteArray
-    ): EncryptedPackage {
+    ): EncryptedPackage? {
 
         return if (sendPreferences.encrypt) {
 
-            val publicKey = PublicKey(sendPreferences.publicKey ?: "", isPrimary = true)
+            if (sendPreferences.pgpScheme == PackageType.ProtonMail) { // Internal Proton
 
-            if (sendPreferences.pgpScheme == PackageType.ProtonMail) {
+                if (sendPreferences.publicKey == null) return null
 
+                val publicKey = PublicKey(sendPreferences.publicKey, isPrimary = true)
                 val recipientBodyKeyPacket = publicKey.encryptSessionKey(cryptoContext, decryptedBodySessionKey)
 
                 val encryptedAttachmentKeyPackets = decryptedAttachmentSessionKeys.map {
@@ -52,20 +49,18 @@ class GenerateEmailPackageUseCase @Inject constructor(
                     type = PackageType.ProtonMail.type
                 )
 
-            } else {
+            } else { // PgpMime
 
-                val recipientEncryptedMultipartBodyCipherText = publicKey
-                    .encryptText(cryptoContext, signedBodyMime)
-                    .split(cryptoContext.pgpCrypto)
+                if (signedEncryptedBodyMime == null) return null
 
                 EncryptedPackage(
                     addresses = mapOf(
                         recipientEmail to EncryptedPackage.Address.ExternalEncrypted(
-                            bodyKeyPacket = Base64.encode(recipientEncryptedMultipartBodyCipherText.keyPacket())
+                            bodyKeyPacket = Base64.encode(signedEncryptedBodyMime.first)
                         )
                     ),
                     mimeType = "multipart/mixed",
-                    body = Base64.encode(recipientEncryptedMultipartBodyCipherText.dataPacket()),
+                    body = Base64.encode(signedEncryptedBodyMime.second),
                     type = PackageType.PgpMime.type
                 )
 

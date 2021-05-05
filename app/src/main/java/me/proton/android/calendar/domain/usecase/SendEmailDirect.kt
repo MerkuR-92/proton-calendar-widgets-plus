@@ -4,10 +4,13 @@ import com.github.mangstadt.vinnie.io.FoldedLineWriter
 import com.google.crypto.tink.subtle.Base64
 import com.google.crypto.tink.subtle.Hex
 import com.google.crypto.tink.subtle.Random
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.EmailMessageRepository
+import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.pgp.*
+import me.proton.core.crypto.common.pgp.exception.CryptoException
 import me.proton.core.key.domain.*
 import me.proton.core.mailmessage.domain.encryptAndSignAttachmentOrNull
 import me.proton.core.mailmessage.domain.entity.*
@@ -22,7 +25,8 @@ import javax.inject.Inject
 class SendEmailDirect @Inject constructor(
     private val emailMessageRepository: EmailMessageRepository,
     private val generateEmailPackageUseCase: GenerateEmailPackageUseCase,
-    private val cryptoContext: CryptoContext
+    private val cryptoContext: CryptoContext,
+    private val logger: Logger
 ) {
 
     data class Arguments(
@@ -68,7 +72,8 @@ class SendEmailDirect @Inject constructor(
         lateinit var decryptedMimeBodySessionKey: ByteArray
         lateinit var encryptedMimeBodyDataPacket: ByteArray
 
-        lateinit var signedBodyMime: String
+        // Map<Email, Pair<KeyPacket, DataPacket>>
+        lateinit var signedAndEncryptedBodyMimeForRecipients: Map<Email, Pair<ByteArray, ByteArray>>
 
         lateinit var encryptedEmail: EncryptedEmail
 
@@ -127,14 +132,27 @@ class SendEmailDirect @Inject constructor(
             decryptedMimeBodySessionKey = decryptSessionKey(encryptedMimeBodySplit.keyPacket())
             encryptedMimeBodyDataPacket = encryptedMimeBodySplit.dataPacket()
 
-            signedBodyMime = signMimeBody(plaintextBodyMime, signText(plaintextBodyMime))
+            val unlockedPrimaryKey = this.privateKeyRing.unlockedPrimaryKey.unlockedKey.value
+            signedAndEncryptedBodyMimeForRecipients = sendPreferences.mapValues { entry ->
+                try {
+                    with (entry.value) {
+                        if (encrypt && pgpScheme != PackageType.ProtonMail && publicKey != null) {
+                            val split = cryptoContext.pgpCrypto.encryptAndSignText(plaintextBodyMime, publicKey, unlockedPrimaryKey).split(cryptoContext.pgpCrypto)
+                            Pair(split.keyPacket(), split.dataPacket())
+                        } else null
+                    }
+                } catch (e: CryptoException) {
+                    logger.e("Exception encrypting and signing Mime body for recipient", e)
+                    null
+                }
+            }.filterNullValues()
         }
 
         // Generate package for each recipient.
         val emailPackages = mutableMapOf<Email, me.proton.android.calendar.domain.model.EncryptedPackage?>()
         sendPreferences.forEach { entry ->
             emailPackages[entry.key] = generateEmailPackageUseCase.invoke/*OrNull*/(
-                signedBodyMime,
+                signedAndEncryptedBodyMimeForRecipients[entry.key],
                 entry.key,
                 entry.value,
                 decryptedAttachmentSessionKeys,
@@ -207,31 +225,4 @@ $foldedAttachment
 
     }
 
-    /**
-     * Manually wrap MIME body into the signature
-     */
-    private fun signMimeBody(body: String, signature: String): String {
-
-        val boundary = "---------------------${Hex.encode(Random.randBytes(16))}"
-
-        val signatureMime = """
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
-$signature
-        """.trimIndent()
-
-        return """
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="${boundary.substring(2)}"; charset=utf-8
-
-$boundary
-$body
-$boundary
-$signatureMime
-
-$boundary--
-        """.trimIndent()
-
-    }
 }

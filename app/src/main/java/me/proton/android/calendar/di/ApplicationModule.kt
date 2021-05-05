@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.Product
 import javax.inject.Singleton
 
@@ -14,5 +16,9 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideProduct(): Product = Product.Calendar
+
+    @Provides
+    @Singleton
+    fun provideLogger(): Logger = TimberLogger
 
 }
