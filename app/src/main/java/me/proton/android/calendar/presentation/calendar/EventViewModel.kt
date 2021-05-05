@@ -338,11 +338,9 @@ class EventViewModel(
                         occurrence.occurrenceNumber > 1 &&
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
-            val hasAttendees = event.iCalEvent.organizer != null
-
             // We check for single edits only once and in initialise because it may require API calls
             hasSingleEdit =
-                if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture && (editMode || !hasAttendees && userEmails != null)) {
+                if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture && (editMode || !event.isAnInvitation && userEmails != null)) {
                     // We don't have option "this and future" when updating first event in chain
                     // TODO Decide behavior if API call was an error and method returns null
                     dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
@@ -351,10 +349,10 @@ class EventViewModel(
                     val singleEdits = calendarsRepository.getSingleEdits(
                         userId,
                         dbEvent.uid,
-                        if (editMode || !hasAttendees && userEmails != null)
+                        if (editMode || !event.isAnInvitation && userEmails != null)
                             occurrenceStart
                         else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
-                        if (editMode || !hasAttendees && userEmails != null)
+                        if (editMode || !event.isAnInvitation && userEmails != null)
                             eventTimeZoneId
                         else null
                     )
@@ -363,7 +361,7 @@ class EventViewModel(
                             hasFutureSingleEdit = true
                         }
                         // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
-                        if (!editMode && hasAttendees && userEmails != null && !singleEdit.isCancelled()) {
+                        if (!editMode && event.isAnInvitation && userEmails != null && !singleEdit.isCancelled()) {
                             // The only values we need are Accepted, Declined and Tentative
                             when (singleEdit.getParticipationStatus(userEmails)) {
                                 ParticipationStatus.ACCEPTED -> hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] = true

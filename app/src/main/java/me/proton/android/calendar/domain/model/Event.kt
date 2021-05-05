@@ -57,6 +57,8 @@ data class Event(
         .atZone(ZoneId.systemDefault())
         .toLocalDate()
 
+    val isAnInvitation: Boolean get() = this.iCalEvent.organizer != null
+
     fun getStart(timeZoneId: String): ZonedDateTime? {
         return iCalEvent.getStart(timeZoneId)
     }

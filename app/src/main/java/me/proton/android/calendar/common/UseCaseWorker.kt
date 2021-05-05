@@ -175,7 +175,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             }
             UseCaseId.UPDATE_PARTICIPATION_STATUS -> {
                 val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase = get()
-                val updateTime = inputData.getInt(INPUT_UPDATE_TIME, 0)
                 updateParticipationStatusUseCase.execute(
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
@@ -183,7 +182,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_ATTENDEE_ID) ?: return Result.failure(),
                     inputData.getInt(INPUT_PARTICIPATION_STATUS, 0),
                     inputData.getString(INPUT_PERSONAL_ICAL_STRING),
-                    if (updateTime == 0) null else updateTime)
+                    if (inputData.hasKeyWithValueOfType<Int>(INPUT_UPDATE_TIME)) inputData.getInt(INPUT_UPDATE_TIME, 0) else null)
             }
             UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT -> {
                 val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase = get()
