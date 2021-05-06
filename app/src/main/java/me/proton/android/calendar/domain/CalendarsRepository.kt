@@ -3,6 +3,8 @@ package me.proton.android.calendar.domain
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
@@ -117,7 +119,7 @@ interface CalendarsRepository {
 
     suspend fun deleteEventsById(ids: List<String>)
 
-    suspend fun getEventsByUid(userId: UserId, eventUid: String): List<EventEntity>?
+    suspend fun getEventsByUid(userId: UserId, eventUid: String): ApiResponse<EventsByUidApiResponse>
 
     // calendar keys
     suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity>

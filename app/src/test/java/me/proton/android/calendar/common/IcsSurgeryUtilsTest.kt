@@ -23,7 +23,12 @@ import me.proton.android.calendar.common.IcsSurgeryUtils.cleanUid
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanXWrTimezone
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -68,53 +73,6 @@ internal class IcsSurgeryUtilsTest {
             assertThat(iCalendar).isNotNull()
         }
     }
-
-//    @Test
-//    fun `ics error folder test`() {
-//        val files = File("./src/test/resources/ics/errors").listFiles()
-//
-//        assertThat(files).isNotNull()
-//
-//        files?.forEach {
-//            val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream("ics/errors/" + it.name)
-//            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-//            val iCalString = bufferedReader.use { it.readText() }
-//
-//            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
-//
-//            print("File tested: ${it.name}\n")
-//            assert(cleanIcsResult is IcsSurgeryUtils.IcsParsingResult.Error)
-//        }
-//    }
-//
-//    @Test
-//    fun `ics valid folder test`() {
-//        val files = File("./src/test/resources/ics/valid").listFiles()
-//
-//        assertThat(files).isNotNull()
-//
-//        files?.forEach {
-//            val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream("ics/valid/" + it.name)
-//            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-//            val iCalString = bufferedReader.use { it.readText() }
-//
-//            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
-//
-//            print("File tested: ${it.name}\n")
-//            assert(cleanIcsResult is IcsSurgeryUtils.IcsParsingResult.ParsingSuccessful)
-//        }
-//    }
-//
-//    @Test
-//    fun `ics error file test`() {
-//        val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream("ics/errors/RecurringRuleInconsistent.ics")
-//        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-//        val iCalString = bufferedReader.use { it.readText() }
-//
-//        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
-//
-//        assert(cleanIcsResult is IcsSurgeryUtils.IcsParsingResult.Error)
-//    }
 
     @Test
     fun `cleanRawIcs all day event with time test`() {
@@ -168,7 +126,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanICalString = iCalString.cleanRawIcs()
 
-        assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateOrDateTimeProperty)
+        assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty)
     }
 
     @Test
@@ -193,7 +151,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanICalString = iCalString.cleanRawIcs()
 
-        assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateOrDateTimeProperty)
+        assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty)
     }
 
     @Test
@@ -368,7 +326,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
 
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion)
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version)
     }
 
     @Test
@@ -394,7 +352,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
 
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion)
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version)
     }
 
     @Test
@@ -1795,24 +1753,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-//    @Test
-//    fun `cleanX fail test`() {
-//
-//        val iCalString = """
-//
-//    """.trimIndent()
-//
-//        val cleanICalString = iCalString.cleanDateOrDateTimeProperties()
-//        assertThat(cleanICalString).isNotNull()
-
-//        val iCalendar = Biweekly.parse(cleanICalString).first()
-//        assertThat(iCalendar).isNotNull()
-//        iCalendar.events.forEach { event ->
-//        assertThat(event.cleanX()).isFalse()
-//        }
-//    }
-
-
     @Test
     fun `test your VALID ics here`() {
 
@@ -1851,5 +1791,55 @@ internal class IcsSurgeryUtilsTest {
 
             assertThat(iCalendar).isNotNull()
         }
+    }
+
+    @Disabled
+    @Test
+    fun `ics error folder test`() {
+        val files = File("./src/test/resources/ics/errors").listFiles()
+
+        assertThat(files).isNotNull()
+
+        files?.forEach {
+            val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream("ics/errors/" + it.name)
+            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+            val iCalString = bufferedReader.use { it.readText() }
+
+            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
+
+            print("File tested: ${it.name}\n")
+            assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error)
+        }
+    }
+
+    @Disabled
+    @Test
+    fun `ics valid folder test`() {
+        val files = File("./src/test/resources/ics/valid").listFiles()
+
+        assertThat(files).isNotNull()
+
+        files?.forEach {
+            val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream("ics/valid/" + it.name)
+            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+            val iCalString = bufferedReader.use { it.readText() }
+
+            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
+
+            print("File tested: ${it.name}\n")
+            assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        }
+    }
+
+    @Disabled
+    @Test
+    fun `ics error file test`() {
+        val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream("ics/errors/RecurringRuleInconsistent.ics")
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+        val iCalString = bufferedReader.use { it.readText() }
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
+
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error)
     }
 }

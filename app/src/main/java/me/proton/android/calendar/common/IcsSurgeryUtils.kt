@@ -7,7 +7,6 @@ import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
-import biweekly.property.Method
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.ICalUtils.clone
@@ -27,8 +26,6 @@ import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
-import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
-import me.proton.android.calendar.common.IcsSurgeryUtils.cleanTimezones
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -63,33 +60,40 @@ object IcsSurgeryUtils {
             object EditCreateEventError: Error()
             object EventDeleted: Error()
             object ParsingFailed: Error()
-            object UnsupportedMethod: Error()
-            object UnsupportedAdd: Error()
-            object UnsupportedRefresh: Error()
-            object UnsupportedCounter: Error()
-            object UnsupportedPublish: Error()
             object PartyCrasher: Error()
-            data class  ReplyPartyCrasher(val eventId: String? = null): Error()
             object MissingUid: Error()
             object NoDefaultCalendarFound: Error()
-            data class DecryptionFailed(val eventId: String? = null, val isRecurring: Boolean? = null): Error()
-            data class DisabledCalendar(val eventId: String? = null): Error()
             object DurationNotSupported: Error()
             object TooManyEvents: Error()
             object NoEvents: Error()
-            object InvalidVersion: Error()
-            object InvalidCalscale: Error()
-            object InvalidDateOrDateTimeProperty: Error()
-            object InvalidDateStart: Error()
-            object InvalidDateEnd: Error()
-            object InvalidDescription: Error()
-            object InvalidLocation: Error()
-            object InvalidSummary: Error()
-            object InvalidRRule: Error()
-            object InvalidRecurrenceId: Error()
-            object InvalidExDate: Error()
-            object InvalidSequence: Error()
-            object InvalidAttendees: Error()
+
+            data class ReplyPartyCrasher(val eventId: String? = null): Error()
+            data class DecryptionFailed(val eventId: String? = null, val isRecurring: Boolean? = null): Error()
+            data class DisabledCalendar(val eventId: String? = null): Error()
+
+            sealed class Unsupported: Error() {
+                object Method: Error()
+                object Add: Error()
+                object Refresh: Error()
+                object Counter: Error()
+                object Publish: Error()
+            }
+
+            sealed class Invalid: Error() {
+                object Version: Error()
+                object CalScale: Error()
+                object DateOrDateTimeProperty: Error()
+                object DateStart: Error()
+                object DateEnd: Error()
+                object Description: Error()
+                object Location: Error()
+                object Summary: Error()
+                object RRule: Error()
+                object RecurrenceId: Error()
+                object ExDate: Error()
+                object Sequence: Error()
+                object Attendees: Error()
+            }
         }
     }
 
@@ -118,36 +122,36 @@ object IcsSurgeryUtils {
 
         /* Calendar properties */
 
-        if (!iCalendar.cleanCalscale()) return HandleIcsResult.Error.InvalidCalscale
+        if (!iCalendar.cleanCalscale()) return HandleIcsResult.Error.Invalid.CalScale
 
         iCalendar.cleanXWrTimezone()
 
-        if (!iCalendar.cleanTimezones()) return HandleIcsResult.Error.InvalidDateOrDateTimeProperty
+        if (!iCalendar.cleanTimezones()) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         /* Event properties */
 
         iCalendar.events.forEach { event ->
             if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
 
-            if (!event.cleanDtStart()) return HandleIcsResult.Error.InvalidDateStart
+            if (!event.cleanDtStart()) return HandleIcsResult.Error.Invalid.DateStart
 
             if (!event.cleanDuration()) return HandleIcsResult.Error.DurationNotSupported
 
-            if (!event.cleanDtEnd()) return HandleIcsResult.Error.InvalidDateEnd
+            if (!event.cleanDtEnd()) return HandleIcsResult.Error.Invalid.DateEnd
 
-            if (!event.cleanDescription()) return HandleIcsResult.Error.InvalidDescription
+            if (!event.cleanDescription()) return HandleIcsResult.Error.Invalid.Description
 
-            if (!event.cleanLocation()) return HandleIcsResult.Error.InvalidLocation
+            if (!event.cleanLocation()) return HandleIcsResult.Error.Invalid.Location
 
-            if (!event.cleanSummary()) return HandleIcsResult.Error.InvalidSummary
+            if (!event.cleanSummary()) return HandleIcsResult.Error.Invalid.Summary
 
-            if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.InvalidRRule
+            if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.Invalid.RRule
 
-            if (!event.cleanExDate()) return HandleIcsResult.Error.InvalidExDate
+            if (!event.cleanExDate()) return HandleIcsResult.Error.Invalid.ExDate
 
-            if (!event.cleanSequence()) return HandleIcsResult.Error.InvalidSequence
+            if (!event.cleanSequence()) return HandleIcsResult.Error.Invalid.Sequence
 
-            if (!event.cleanAttendees()) return HandleIcsResult.Error.InvalidAttendees
+            if (!event.cleanAttendees()) return HandleIcsResult.Error.Invalid.Attendees
 
             if ((iCalendar.method?.isReply == true || iCalendar.method?.isRequest == true || iCalendar.method?.isCancel == true) && !event.alarms.isNullOrEmpty()) {
                 // We drop alarms for invites as those would be the personal alarms of the organizer
@@ -162,7 +166,7 @@ object IcsSurgeryUtils {
         var cleanICalString = this
 
         // VERSION: We don't support iCal versions other than 2.0.
-        if (!cleanICalString.contains(Regex("VERSION:2\\.0\\r?\\n"))) return HandleIcsResult.Error.InvalidVersion
+        if (!cleanICalString.contains(Regex("VERSION:2\\.0\\r?\\n"))) return HandleIcsResult.Error.Invalid.Version
 
         // DATETIME or DATE properties
 
@@ -173,13 +177,13 @@ object IcsSurgeryUtils {
         cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}[Z]?"), "")
 
         // If the type DATE is not specified for an all-day event, we currently reject (as invalid) the event.
-        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\n"))) return HandleIcsResult.Error.InvalidDateOrDateTimeProperty
+        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         // 2) For part day events
 
         // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), reject (as unsupported) the event if there is no X-WR-TIMEZONE.
         if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}T\\d{6}\\n"))
-            && !cleanICalString.contains(Regex("X-WR-TIMEZONE:.+\\n"))) return HandleIcsResult.Error.InvalidDateOrDateTimeProperty
+            && !cleanICalString.contains(Regex("X-WR-TIMEZONE:.+\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         return HandleIcsResult.RawParsingSuccessful(cleanICalString)
     }
@@ -214,26 +218,6 @@ object IcsSurgeryUtils {
             this.setUid(this.uid.value.take(UID_MAX_LENGTH))
         }
         return true
-    }
-
-    fun DateOrDateTimeProperty.localizeDateToTimezone(timezone: String) {
-        // TODO Valid ?
-        if (this.value.rawComponents.toString().contains("Z")) {
-            this.value = ICalDate(
-                Date.from(
-                    ZonedDateTime.ofInstant(this.value.toInstant(), ZoneId.of(timezone)).toInstant()
-                ),
-                true
-            )
-        } else {
-            this.value = ICalDate(
-                Date.from(
-                    this.value.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
-                        .toInstant()
-                ), true
-            )
-        }
-        this.setParameter(TZID, timezone)
     }
 
     fun VEvent.cleanDtStart(): Boolean {
@@ -501,6 +485,26 @@ object IcsSurgeryUtils {
             iCalendar.timezoneInfo.setTimezone(this, TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone))
             this.localizeDateToTimezone(xWrTimezone)
         }
+    }
+
+    private fun DateOrDateTimeProperty.localizeDateToTimezone(timezone: String) {
+        // TODO Valid ?
+        if (this.value.rawComponents.toString().contains("Z")) {
+            this.value = ICalDate(
+                Date.from(
+                    ZonedDateTime.ofInstant(this.value.toInstant(), ZoneId.of(timezone)).toInstant()
+                ),
+                true
+            )
+        } else {
+            this.value = ICalDate(
+                Date.from(
+                    this.value.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
+                        .toInstant()
+                ), true
+            )
+        }
+        this.setParameter(TZID, timezone)
     }
 
     private fun ICalendar.isInvitation(): Boolean {

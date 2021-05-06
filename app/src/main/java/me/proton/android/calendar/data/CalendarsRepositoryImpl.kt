@@ -14,9 +14,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.common.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -883,11 +883,8 @@ class CalendarsRepositoryImpl(
         } else null
     }
 
-    override suspend fun getEventsByUid(userId: UserId, eventUid: String): List<EventEntity>? {
-        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
-        return if (eventsSharingUidResponse is ApiResponse.Success) {
-            eventsSharingUidResponse.data.events
-        } else null
+    override suspend fun getEventsByUid(userId: UserId, eventUid: String): ApiResponse<EventsByUidApiResponse> {
+        return calendarsApi.getEventsByUid(userId, eventUid, 0, 100)
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

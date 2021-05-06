@@ -41,6 +41,7 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.Companion.displayCalendarListMaterialDialog
+import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
@@ -345,7 +346,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             handleOpenIcsIntent(uri)
                         } else navigateTo(Navigation.Deeplink.toMonth())
                     } else {
-                        logger.e("openIcsIntent is null")
                         navigateTo(Navigation.Deeplink.toMonth())
                     }
                 }
@@ -361,14 +361,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
         val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
         lifecycleScope.launch {
-            val userId = accountViewModel.getPrimaryUserId() ?: return@launch // TODO Handle error
             displaySplashScreen(
                 display = true,
                 spinner = true,
                 spinnerText = resources.getString(R.string.splash_init)
             )
 
-            val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader, userId)
+            val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader)
             if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
                 when (handleIcsImportResult.action) {
                     // We use Toast because we do not have the EventDetails view required for SnackBar to be displayed
@@ -377,14 +376,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             .show()
                     IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT -> {
                         when (handleIcsImportResult.newAttendeeStatus?.second) {
-                            ParticipationStatus.ACCEPTED ->
-                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_accepted_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
-                            ParticipationStatus.TENTATIVE ->
-                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_tentative_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
-                            ParticipationStatus.DECLINED ->
-                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_declined_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
-                            else ->
-                                Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
+                            ParticipationStatus.ACCEPTED -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_accepted_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
+                            ParticipationStatus.TENTATIVE -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_tentative_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
+                            ParticipationStatus.DECLINED -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_declined_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
+                            else -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -395,103 +390,28 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             } else {
                 var navigatedToDetails = false
                 when (handleIcsImportResult) {
-                    is IcsSurgeryUtils.HandleIcsResult.Error.DefaultError -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedMethod -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedAdd -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedCounter -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_counter_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedRefresh -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_refresh_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.UnsupportedPublish -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.MissingUid -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.DurationNotSupported -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.TooManyEvents -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.NoEvents -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar -> {
-                        navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_disabled_calendar_error))
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher -> {
-                        navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed -> {
+                    is Error.DefaultError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
+                    is Error.EditCreateEventError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error), Snackbar.LENGTH_LONG)
+                    is Error.ParsingFailed -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error), Snackbar.LENGTH_LONG)
+                    is Error.Unsupported.Method -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error), Snackbar.LENGTH_LONG)
+                    is Error.Unsupported.Add -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error), Snackbar.LENGTH_LONG)
+                    is Error.Unsupported.Counter -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_counter_error), Snackbar.LENGTH_LONG)
+                    is Error.Unsupported.Refresh -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_refresh_error), Snackbar.LENGTH_LONG)
+                    is Error.Unsupported.Publish -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
+                    is Error.PartyCrasher -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error), Snackbar.LENGTH_LONG)
+                    is Error.MissingUid -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error), Snackbar.LENGTH_LONG)
+                    is Error.NoDefaultCalendarFound -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error), Snackbar.LENGTH_LONG)
+                    is Error.DurationNotSupported -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error), Snackbar.LENGTH_LONG)
+                    is Error.TooManyEvents -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error), Snackbar.LENGTH_LONG)
+                    is Error.NoEvents -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
+                    is Error.EventDeleted -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
+                    is Error.Invalid -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error), Snackbar.LENGTH_LONG)
+                    is Error.DisabledCalendar -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_disabled_calendar_error))
+                    is Error.ReplyPartyCrasher -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
+                    is Error.DecryptionFailed -> {
                         if (handleIcsImportResult.eventId != null) {
-                            val confirmationMessage =
-                                if (handleIcsImportResult.isRecurring == true) R.string.event_decryption_error_dialog_confirmation_recurring
-                                else R.string.event_decryption_error_dialog_confirmation
-                            MaterialAlertDialogBuilder(this@MainActivity)
-                                .setTitle(R.string.event_decryption_error_dialog_title)
-                                .setMessage(R.string.event_decryption_error_dialog_message)
-                                .setPositiveButton(confirmationMessage) { _, _ ->
-                                    lifecycleScope.launch { // TODO
-                                        val deleteResult = withContext(Dispatchers.Default) {
-                                            calendarViewModel.handleDeleteEvent(
-                                                handleIcsImportResult.eventId,
-                                                EventEditDeleteOption.ALL_EVENTS
-                                            )
-                                        }
-                                        if (deleteResult is UseCase.Result.Success<*>) {
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
-                                        } else {
-                                            if (deleteResult is UseCase.Result.Error) {
-                                                logger.e("Error deleting event: ${deleteResult.message}")
-                                            } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                                logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                                            }
-                                            this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted_error))
-                                        }
-                                    }
-                                }
-                                .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
-                                .show()
+                            deleteFailedToDecryptEvent(handleIcsImportResult.eventId, handleIcsImportResult.isRecurring)
                         } else this@MainActivity.displaySnackBar(getString(R.string.event_decryption_error_dialog_title), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
-                    }
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidVersion,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidCalscale,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateOrDateTimeProperty,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateStart,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDateEnd,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidDescription,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidLocation,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSummary,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidRRule,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidRecurrenceId,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidExDate,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidSequence,
-                    is IcsSurgeryUtils.HandleIcsResult.Error.InvalidAttendees -> {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error), Snackbar.LENGTH_LONG)
                     }
                     else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
                 }
@@ -499,6 +419,37 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 if (!navigatedToDetails) navigateTo(Navigation.Deeplink.toMonth())
             }
         }
+    }
+
+    private fun deleteFailedToDecryptEvent(eventId: String, isRecurring: Boolean?) {
+        val confirmationMessage =
+            if (isRecurring == true) R.string.event_decryption_error_dialog_confirmation_recurring
+            else R.string.event_decryption_error_dialog_confirmation
+        MaterialAlertDialogBuilder(this@MainActivity)
+            .setTitle(R.string.event_decryption_error_dialog_title)
+            .setMessage(R.string.event_decryption_error_dialog_message)
+            .setPositiveButton(confirmationMessage) { _, _ ->
+                lifecycleScope.launch { // TODO
+                    val deleteResult = withContext(Dispatchers.Default) {
+                        calendarViewModel.handleDeleteEvent(
+                            eventId,
+                            EventEditDeleteOption.ALL_EVENTS
+                        )
+                    }
+                    if (deleteResult is UseCase.Result.Success<*>) {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
+                    } else {
+                        if (deleteResult is UseCase.Result.Error) {
+                            logger.e("Error deleting event: ${deleteResult.message}")
+                        } else if (deleteResult is UseCase.Result.InvalidParams) {
+                            logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                        }
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted_error))
+                    }
+                }
+            }
+            .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
+            .show()
     }
 
     private fun displayErrorAndOpenDetails(eventId: String?, errorMessage: String): Boolean {
