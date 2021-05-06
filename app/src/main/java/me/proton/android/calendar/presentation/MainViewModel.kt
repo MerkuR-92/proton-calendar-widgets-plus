@@ -221,18 +221,6 @@ class MainViewModel(
             defaultCalendar.display == 1
         ), iCalendar)
 
-        newEvent.iCalEvent.attendees?.let {
-            newEvent.iCalEvent.attendees.forEach {
-                if (it.getParameter(CustomICalPropertyParameter.X_PM_TOKEN) == null) {
-                    val canonicalEmail = usersRepository.getCanonicalAddresses(userId,
-                        listOf(it.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError)
-                    )?.get(it.extractEmail()) ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
-                    val token = ICalUtils.generateXPmToken(canonicalEmail, newEvent.uid)
-                    it.addParameter(CustomICalPropertyParameter.X_PM_TOKEN, token)
-                }
-            }
-        }
-
         val eventsSharingUidResponse = calendarsRepository.getEventsByUid(userId, newEvent.uid)
 
         // IMPORTANT: We need parent event to clean recurrence id
