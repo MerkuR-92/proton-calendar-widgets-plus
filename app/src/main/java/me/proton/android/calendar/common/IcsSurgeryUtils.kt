@@ -304,13 +304,13 @@ object IcsSurgeryUtils {
 
         // We reject as invalid RRULEs that:
         val iteratorTimezone = if (dateStart.value.hasTime()) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()
-        val startIterator = recurrenceRule.getDateIterator(dateStart.value, iteratorTimezone)
+        var startIterator = recurrenceRule.getDateIterator(dateStart.value, iteratorTimezone)
 
-        // Do not generate any occurrence.
         if (startIterator.hasNext()) {
             val startIteratorNext = startIterator.next()
             // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
             if (startIteratorNext != dateStart.value) return false
+
         } else return false
 
         // UNTIL: we should use UTC dates if and only if the event is not all-day.
@@ -334,6 +334,18 @@ object IcsSurgeryUtils {
 
         // Special case: YEARLY with BYMONTHDAY but no BYMONTH
         if (recurrenceRule.value.frequency == Frequency.YEARLY && !recurrenceRule.value.byMonthDay.isNullOrEmpty() && recurrenceRule.value.byMonth.isNullOrEmpty()) return false
+
+        // Do not generate any occurrence.
+        startIterator = recurrenceRule.getDateIterator(dateStart.value, iteratorTimezone)
+        var generatesOccurrences = false
+        while (startIterator.hasNext()) {
+            val startIteratorNext = startIterator.next()
+            if (exceptionDates.firstOrNull { exDates -> exDates.values.any { exDateValue -> exDateValue == startIteratorNext } } == null) {
+                generatesOccurrences = true
+                break
+            }
+        }
+        if (!generatesOccurrences) return false
 
         return true
     }

@@ -997,6 +997,39 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `cleanRRule recurring with ex date on only occurrence test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Paris:20210306T160000
+    DTEND;TZID=Europe/Paris:20210306T163000
+    RRULE:FREQ=WEEKLY;UNTIL=20210306T225959Z;BYDAY=SA
+    SEQUENCE:0
+    EXDATE;TZID=Europe/Paris:20210306T160000
+    SUMMARY:Recurring with exdates
+    STATUS:CONFIRMED
+    DTSTAMP:20210311T145808Z
+    UID:35fdx2qMv8RPjvIFecqY1qTMIooJ@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isFalse()
+        }
+    }
+
+    @Test
     fun `cleanRRule DAILY interval over max allowed value test`() {
 
         val iCalString = """
