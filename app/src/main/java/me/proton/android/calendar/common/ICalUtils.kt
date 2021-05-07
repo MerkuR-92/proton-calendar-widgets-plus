@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSIO
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.ICalUtils.clone
 import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRRule
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
@@ -51,7 +52,7 @@ object ICalUtils {
         }
     }
 
-    private fun normaliseICalendar(calendar: ICalendar) {
+    fun normaliseICalendar(calendar: ICalendar) {
 
         // TODO replace this with global validation of all properties from biweekly
         calendar.events?.forEach { vEvent ->
@@ -195,7 +196,7 @@ object ICalUtils {
             val newUntilDate = if (startDate.isAfter(untilDate)) startDate else untilDate
 
             val until : ICalDate = if (iCalEvent.dateStart.value.hasTime()) {
-                ICalDate(Date.from(ZonedDateTime.of(newUntilDate.toLocalDate(), LocalTime.of(23, 59, 59), ZoneId.of(startTimeZone.id)).withZoneSameInstant(ZoneId.of(startTimeZone.id)).toInstant()), true)
+                allDayICalDateToDateTime(newUntilDate, startTimeZone.id)
             } else {
                 ICalDate(newUntilDate.toLocalDate().toDate(ZoneId.systemDefault().id), false)
             }
@@ -205,6 +206,21 @@ object ICalUtils {
             )
         }
 
+    }
+
+    fun allDayICalDateToDateTime(zonedDateTime: ZonedDateTime, timeZoneId: String): ICalDate {
+        return ICalDate(
+            Date.from(
+                ZonedDateTime.of(
+                    zonedDateTime.toLocalDate(),
+                    LocalTime.of(23, 59, 59),
+                    ZoneId.of(timeZoneId)
+                ).withZoneSameInstant(
+                    ZoneId.of(timeZoneId)
+                ).toInstant()
+            ),
+            true
+        )
     }
 
     fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: DayOfWeek) {

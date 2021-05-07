@@ -202,9 +202,7 @@ class EditCreateEventUseCase(
             if (organizerEmail != null) {
                 val canonicalUserEmails = database.addressesDao().select(userId.id).map { canonicalizeProtonEmail(it.email) }
                 val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
-                (canonicalUserEmails.firstOrNull {
-                    canonicalOrganizerEmail == it
-                } != null).toInt()
+                canonicalUserEmails.any { canonicalOrganizerEmail == it }.toInt()
             } else if (newEvent.iCalEvent.attendees.isNullOrEmpty()) 1
             else 0
 

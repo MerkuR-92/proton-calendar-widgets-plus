@@ -340,7 +340,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
-                    if (openIcsIntent != null) {
+                    if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
                         val uri = openIcsIntent.data
                         if (uri != null) {
                             handleOpenIcsIntent(uri)

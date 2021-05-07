@@ -77,11 +77,11 @@ class HandleIcsUseCase(
 
         // Use the default calendar to create the event
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
-            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound // TODO Handle error
+            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         if (defaultCalendar == null || !defaultCalendar.isActive) {
             defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull()
-                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound // TODO Handle error
+                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
         // Create a new event with the clean iCalendar
@@ -211,7 +211,7 @@ class HandleIcsUseCase(
             val updatedAttendee = iCalendar.events.first().attendees.firstOrNull()
             val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
 
-            if (attendee.extractEmail() == updatedAttendeeEmail) {
+            if (attendee.extractEmail().equals(updatedAttendeeEmail, true)) {
                 val attendeeToken = attendee.getParameter(CustomICalPropertyParameter.X_PM_TOKEN)
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
 

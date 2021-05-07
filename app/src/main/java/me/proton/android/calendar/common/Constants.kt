@@ -57,8 +57,9 @@ const val MAX_EMAILS_PER_QUERY: Int = 8
 object FeatureFlag {
     const val NEW_EVENT_DECRYPTION = true
     const val SETTINGS_DRAWER = true
-    const val ADD_ATTENDEES = true
-    const val CHANGE_ANSWER = true
+    const val ADD_ATTENDEES = false
+    const val CHANGE_ANSWER = false
+    const val OPEN_ICS = false
 }
 
 object ApiResponseCode {
