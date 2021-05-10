@@ -3,6 +3,7 @@ package me.proton.android.calendar.common
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.work.*
+import kotlinx.coroutines.CancellationException
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
@@ -41,7 +42,9 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
                 syncServerEventsUseCase.execute(UserId(it.id)).ifSuccessAndLogErrors(logger) {}
             }
         } catch (e: Exception) {
-            logger.e("exception in syncServerEvents()", e)
+            if (e !is CancellationException) {
+                logger.e("exception in syncServerEvents()", e)
+            }
         }
 
     }
