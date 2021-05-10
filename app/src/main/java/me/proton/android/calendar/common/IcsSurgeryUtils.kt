@@ -10,7 +10,9 @@ import biweekly.property.ExceptionDates
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.extractEmail
 import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
+import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
 import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_ATTENDEES

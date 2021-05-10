@@ -9,13 +9,13 @@ import org.koin.test.KoinTest
 internal abstract class BaseTest {
 
     fun eventForICalString(iCalString: String, eventId: String? = null): Event {
-        return Event(eventId ?: "event-id", me.proton.android.calendar.domain.model.Calendar(
+        return Event.from(eventId ?: "event-id", me.proton.android.calendar.domain.model.Calendar(
             "calendar-id",
             "calendar",
             "",
             1,
             true
-        ), ICalUtils.parseICalString(iCalString)!!, null, null)
+        ), ICalUtils.parseICalString(iCalString)!!, null, null)!!
     }
 
 }

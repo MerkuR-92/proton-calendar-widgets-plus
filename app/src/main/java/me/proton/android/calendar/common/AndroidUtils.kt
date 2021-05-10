@@ -48,6 +48,11 @@ import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.DateTimeUtilsImpl.format
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
+import me.proton.android.calendar.common.ICalUtils.toDayOfWeek
+import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.presentation.utils.InputValidationResult
@@ -360,7 +365,7 @@ class AndroidUtils(context: Context) {
                                     R.string.event_recurrence_occurs_on_day_of_week,
                                     repeat,
                                     if (onDaysOfWeek.isNullOrBlank()) {
-                                        (event.iCalEvent.getStart(timeZoneId)!!.dayOfWeek).format()
+                                        (event.getStart(timeZoneId).dayOfWeek).format()
                                     } else onDaysOfWeek
                                 )
                             }
@@ -384,7 +389,7 @@ class AndroidUtils(context: Context) {
                                     context.getString(
                                         R.string.event_recurrence_occurs_on_day_of_month,
                                         repeat,
-                                        event.iCalEvent.getStart(timeZoneId)!!
+                                        event.getStart(timeZoneId)
                                             .toLocalDate().dayOfMonth
                                     )
                                 } else {

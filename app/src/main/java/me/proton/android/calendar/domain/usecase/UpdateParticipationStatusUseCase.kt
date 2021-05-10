@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.toParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository

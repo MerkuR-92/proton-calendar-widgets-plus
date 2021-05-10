@@ -38,8 +38,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
+import me.proton.android.calendar.common.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
+import me.proton.android.calendar.common.ICalUtils.extractEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -423,7 +426,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun setMonthViewSelectedDay() {
-        eventViewModel.eventLiveData.value?.startLocalDate?.let {
+        eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()?.let {
             if (calendarViewModel.selectedDate.value != it) {
                 // Call default method for selection if pagers have been initialised
                 if (calendarViewModel.pagersInitialised) calendarViewModel.handleDaySelected(it)
@@ -926,7 +929,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
-                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), event.iCalEvent.getStart(eventViewModel.displayTimeZoneId)!!, alarm)
+                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), event.getStart(eventViewModel.displayTimeZoneId), alarm)
                 isClickable = false
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {

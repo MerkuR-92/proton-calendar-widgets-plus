@@ -10,6 +10,8 @@ import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.Duration
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.EventUtilsImpl.formatStartForNotification
+import me.proton.android.calendar.common.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
@@ -80,7 +82,7 @@ class ShowNotificationUseCase(
                         if (alarmOccurrence == null) {
                             logger.e("could not generate occurrence for notification of recurring event")
                             null
-                        } else dbEvent.withOccurrence(alarmOccurrence)
+                        } else Event.withOccurrence(dbEvent, alarmOccurrence)
 
                     } else null
 
@@ -168,7 +170,7 @@ class ShowNotificationUseCase(
             logger.v("createAlarmsForNextOccurrence for ${currentEvent.summary}, current occurrence: ${currentOccurrence}")
 
             val nextOccurrenceNumber = currentOccurrence.occurrenceNumber + 1
-            val nextEvent = originalEvent.withOccurrence(nextOccurrenceNumber, zoneId.id)
+            val nextEvent = Event.withOccurrence(originalEvent, nextOccurrenceNumber, zoneId.id)
             logger.v("createAlarmsForNextOccurrence: next event with next occurrence: ${nextEvent}")
 
             if (nextEvent != null) { // maybe [currentOccurrence] was the last valid occurrence of this event

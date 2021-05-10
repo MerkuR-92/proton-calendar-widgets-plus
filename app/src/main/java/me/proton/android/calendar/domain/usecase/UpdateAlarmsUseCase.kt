@@ -2,7 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import android.content.Context
 import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.formatUidForICal
+import me.proton.android.calendar.common.ICalUtils.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId

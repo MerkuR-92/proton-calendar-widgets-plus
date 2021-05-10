@@ -16,10 +16,13 @@ import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
-import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.common.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.EventUtilsImpl.formatFullDayCounter
+import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventAdapter.EventViewHolder.HeaderViewHolder
 import me.proton.core.util.kotlin.nullIfBlank
@@ -66,9 +69,9 @@ class EventAdapter(
                 imageViewIcon.drawable.setTint(Color.parseColor(event.calendar.color))
 
                 textViewHeader.text =
-                    "${(event.getActualStart(
+                    "${(event.getOccurrenceStart(
                         timeZoneId
-                    ))?.formatTime(timeZoneId, is24Hour)} ‐ ${(event.getActualEnd(
+                    ))?.formatTime(timeZoneId, is24Hour)} ‐ ${(event.getOccurrenceEnd(
                         timeZoneId
                     ))?.formatTime(timeZoneId, is24Hour)}" // TODO
 
@@ -144,7 +147,7 @@ class EventAdapter(
                     val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
                     if (fullDayCounter.first == 1) { // this is the first day of an ongoing event
                         textViewHeader.visibleOrGone(true)
-                        textViewHeader.text = "${(event.getActualStart(timeZoneId))?.formatTime(timeZoneId, is24Hour)}" // TODO
+                        textViewHeader.text = "${(event.getOccurrenceStart(timeZoneId))?.formatTime(timeZoneId, is24Hour)}" // TODO
                     } else { // this is second or later day of an ongoing event
                         textViewHeader.visibleOrGone(false)
                     }

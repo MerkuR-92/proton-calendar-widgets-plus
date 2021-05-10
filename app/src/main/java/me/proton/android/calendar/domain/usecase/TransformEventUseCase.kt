@@ -7,6 +7,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.ICalUtils.adjustIncomingAllDayEvent
+import me.proton.android.calendar.common.ICalUtils.printToString
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -144,7 +146,7 @@ class TransformEventUseCase(
         // TODO move sanitising to helper function?
         iCalendar.adjustIncomingAllDayEvent()
 
-        return Event(
+        return Event.from(
             id = eventEntity.id,
             calendar = Calendar(
                 calendarEntity.id,

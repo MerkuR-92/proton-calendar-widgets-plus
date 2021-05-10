@@ -8,90 +8,94 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ICalUtils.printToString
+import me.proton.android.calendar.common.ICalUtils.setStart
+import me.proton.android.calendar.common.ICalUtils.wrapInICalendar
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.sql.Date
+import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 
 internal class EventTest {
 
+
     @Test
     fun `empty event sanity check`() {
         val calendarWithEmptyEvent = VEvent().wrapInICalendar()
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarWithEmptyEvent)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarWithEmptyEvent)
 
-        assertNotNull(event.uid)
-        assertFalse(event.isAllDay())
-        assertFalse(event.spansSingleDay())
+        assertNull(event)
     }
 
     @Test
     fun `is all day event`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDay!!)
-        val eventRecurring = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayRecurring!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDay!!)!!
+        val eventRecurring = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayRecurring!!)!!
         assertTrue(event.isAllDay())
         assertTrue(eventRecurring.isAllDay())
     }
 
     @Test
     fun `is all day event without DTEND`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayWithoutDTEnd!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayWithoutDTEnd!!)!!
         assertTrue(event.isAllDay())
     }
 
     @Test
     fun `is not all day event`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarStartEndTimeDifferentDays!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarStartEndTimeDifferentDays!!)!!
         assertFalse(event.isAllDay())
     }
 
     @Test
     fun `all-day event is on single day`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDay!!)
-        val eventRecurring = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayRecurring!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDay!!)!!
+        val eventRecurring = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayRecurring!!)!!
         assertTrue(event.spansSingleDay())
         assertTrue(eventRecurring.spansSingleDay())
     }
 
     @Test
     fun `all-day event with actual end date is on single day`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayActualEndDate!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayActualEndDate!!)!!
         assertTrue(event.spansSingleDay(actualEndDate = true))
     }
 
     @Test
     fun `all-day event without DTEND is on single day`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayWithoutDTEnd!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDaySingleDayWithoutDTEnd!!)!!
         assertTrue(event.spansSingleDay())
     }
 
     @Test
     fun `all-day event spans many days`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarAllDay3Days!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarAllDay3Days!!)!!
         assertFalse(event.spansSingleDay())
     }
 
     @Test
     fun `event with start-end time spans one day`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendar1HourSingleDay!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendar1HourSingleDay!!)!!
         assertTrue(event.spansSingleDay())
     }
 
     @Test
     fun `event with start-end time spans many days`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarStartEndTimeDifferentDays!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarStartEndTimeDifferentDays!!)!!
         assertFalse(event.spansSingleDay())
     }
 
     @Test
     fun `event with start-end time spans many days in different timezones`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarManyDaysIn2MonthsDifferentEndTimezone!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarManyDaysIn2MonthsDifferentEndTimezone!!)!!
         assertFalse(event.spansSingleDay())
     }
 
     @Test
     fun `event with start-end time spans one day in different timezones`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendar2HoursSingleDayDifferentEndTimezone!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendar2HoursSingleDayDifferentEndTimezone!!)!!
         assertTrue(event.spansSingleDay())
     }
 
@@ -107,10 +111,11 @@ internal class EventTest {
 
         recurrenceRules.forEach {
             val vEvent = VEvent().apply {
+                setStart(LocalDate.now())
                 setRecurrenceRule(it)
             }
             val calendar = vEvent.wrapInICalendar()
-            val event = Event("id", Calendar("id", "name", "color", 1, true), calendar)
+            val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendar)!!
 
             assertThat(event.isCustomRecurring()).isFalse()
         }
@@ -147,10 +152,11 @@ internal class EventTest {
 
         recurrenceRules.forEach {
             val vEvent = VEvent().apply {
+                setStart(LocalDate.now())
                 setRecurrenceRule(it)
             }
             val calendar = vEvent.wrapInICalendar()
-            val event = Event("id", Calendar("id", "name", "color", 1, true), calendar)
+            val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendar)!!
 
             TestsLogger.d(calendar.printToString())
 
@@ -160,7 +166,7 @@ internal class EventTest {
 
     @Test
     fun `calendar with timezone and event displayed in timezone that makes end date at midnight or on next day`() {
-        val event = Event("id", Calendar("id", "name", "color", 1, true), calendarTimezoneUtcEndOfDay!!)
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true), calendarTimezoneUtcEndOfDay!!)!!
 
         // UTC makes event end at 10PM
         var displayTimeZoneId = "UTC"

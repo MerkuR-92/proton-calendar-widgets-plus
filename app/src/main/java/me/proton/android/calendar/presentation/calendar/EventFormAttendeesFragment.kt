@@ -33,8 +33,8 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
+import me.proton.android.calendar.common.ICalUtils.extractEmail
 import me.proton.android.calendar.presentation.BaseDialogFragment
-import me.proton.core.presentation.utils.onTextChange
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 

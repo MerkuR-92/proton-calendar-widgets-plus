@@ -21,15 +21,14 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
-import me.proton.android.calendar.common.ICalUtils.clone
-import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
-import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRRule
+import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
+import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
-import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.data.entity.SkeletonEventEntity
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.security.MessageDigest
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -531,8 +530,8 @@ object ICalUtils {
             event.occurrence = occurrence
             event
         }.filter { // TODO filterFromEnd doesn't work if there are gaps in occurrences caused by single edits
-            val actualStart = it.getActualStart(timeZoneId) ?: return@filter false
-            val actualEnd = it.getActualEnd(timeZoneId) ?: return@filter false
+            val actualStart = it.getOccurrenceStart(timeZoneId) ?: return@filter false
+            val actualEnd = it.getOccurrenceEnd(timeZoneId) ?: return@filter false
             startEndOverlapsWithFullDayRange(actualStart, actualEnd, fromDate, toDate, timeZoneId)
         }
 
@@ -636,7 +635,7 @@ object ICalUtils {
 
                 val eventOccurrence = if (event.isRecurring()) {
                     val occurrence = event.generateFirstRealOccurrenceSince(events, generateOccurrenceSince)
-                    occurrence?.let { event.withOccurrence(it) }
+                    occurrence?.let { Event.withOccurrence(event, it) }
                 } else {
                     event
                 }
@@ -652,6 +651,307 @@ object ICalUtils {
         }.filter { it.occurrence >= now.toEpochSecond() }
     }
 
+    /**
+     * Creates new ICalendar object and sets this VEvent as only event.
+     */
+    fun VEvent.wrapInICalendar(): ICalendar {
+        val calendar = ICalendar()
+        calendar.setProductId(generateProtonProdId())
+        calendar.addEvent(this)
+        return calendar
+    }
+
+    // TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
+    fun ICalendar.printToString() : String {
+        return Biweekly.write(this).go().replace("TZID=/", "TZID=")
+    }
+
+    fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek {
+        return DayOfWeek.of((this.calendarConstant)).minus(1)
+    }
+
+    fun VEvent.setStart(date: LocalDate) {
+        this.setDateStart(date.toDate(), false)
+    }
+
+    fun VEvent.setEnd(date: LocalDate) {
+        this.setDateEnd(date.toDate(), false)
+    }
+
+    fun VEvent.setStart(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateStart(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
+    }
+
+    fun VEvent.setEnd(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateEnd(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
+    }
+
+    fun VEvent.setStart(time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateStart(Date.from(ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
+    }
+
+    fun VEvent.setEnd(time: LocalTime, timeZoneId: String? = "UTC") {
+        this.setDateEnd(Date.from(ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
+    }
+
+    /**
+     * Sets or clears TimeZone for Date Start.
+     */
+    fun ICalendar.setStartTimeZone(timeZoneId: String?) {
+        this.events.first()?.dateStart?.let { this.timezoneInfo.setTimezone(this.events.first().dateStart, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
+    }
+
+    /**
+     * Sets or clears TimeZone for Date End.
+     */
+    fun ICalendar.setEndTimeZone(timeZoneId: String?) {
+        this.events.first()?.dateEnd?.let { this.timezoneInfo.setTimezone(this.events.first().dateEnd, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
+    }
+
+    fun ICalendar.setDefaultTimeZone(timeZoneId: String?) {
+        this.timezoneInfo.defaultTimezone = if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))
+    }
+
+    /**
+     * Sets start and end timezones, preserving the original local datetimes.
+     */
+    fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZoneId: String) {
+
+
+        val event = this.events.first()
+
+        TimberLogger.d("adjusting timezone from ${currentDateTimeTimezoneId} to $timeZoneId")
+//    TimberLogger.d("current start timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
+//    TimberLogger.d("current end timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
+
+        val endTimeZoneId = currentDateTimeTimezoneId//this.timezoneInfo.getTimezone(event.dateEnd)?.timeZone?.id ?: this.timezoneInfo.defaultTimezone?.timeZone?.id ?: "UTC"
+
+        TimberLogger.d("adjusting using timezone $currentDateTimeTimezoneId, $endTimeZoneId")
+
+        event.setStart(event.getStart(currentDateTimeTimezoneId)!!.toLocalDate(), event.getStart(currentDateTimeTimezoneId)!!.toLocalTime(), timeZoneId)
+        event.setEnd(event.getEnd(endTimeZoneId)!!.toLocalDate(), event.getEnd(endTimeZoneId)!!.toLocalTime(), timeZoneId)
+
+        this.setStartTimeZone(timeZoneId)
+        this.setEndTimeZone(timeZoneId)
+
+        this.timezoneInfo.timezones.clear()
+
+    }
+
+    /**
+     * Removes Timezone Assignments and sets correct DTEND according to standard, not GUI form.
+     *
+     * @param timeZoneId needed to correctly interpret Dates if we are about to remove timezone info
+     */
+    fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
+        this.timezoneInfo.timezones.clear()
+        this.events.first().apply {
+            setStart(this.getStart(timeZoneId)!!.toLocalDate())
+            setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
+        }
+    }
+
+    fun ICalendar.adjustIncomingAllDayEvent() {
+        this.events.first().apply {
+
+            if (this.dateStart.value != null && !this.dateStart.value.hasTime()) {
+                if (this.dateStart.value == this.dateEnd.value) {
+                    val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
+                    this.setDateEnd(endLocalDate.toDate(), false)
+                }
+            }
+        }
+    }
+
+
+    fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
+
+        if (this.dateStart?.value == null) return null
+
+        return this.dateStart.value.toZonedDateTime(timeZoneId)
+    }
+
+    fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
+
+        if (this.dateEnd?.value == null) return null
+
+        return this.dateEnd.value.toZonedDateTime(timeZoneId)
+    }
+
+    fun Attendee.extractEmail(): String? {
+        return extractEmail(this.uri, this.email, this.commonName)
+    }
+
+    fun Organizer.extractEmail(): String? {
+        return extractEmail(this.uri, this.email, this.commonName)
+    }
+
+    fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
+        return when {
+            uri?.contains("@") == true -> uri.substringAfter("mailto:")
+            email?.contains("@") == true -> email
+            commonName?.contains("@") == true -> commonName
+            else -> null
+        }
+    }
+
+    /**
+     * Groups all-day and spanning multiple days Events first.
+     */
+    fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event> {
+        val groupedByAllDayEvents = this.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
+        val result = mutableListOf<Event>()
+        result.addAll(
+            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.getOccurrenceStart(timeZoneId) }, { it.summary }))
+                ?: emptyList()
+        )
+        result.addAll(
+            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.getOccurrenceStart(timeZoneId) }, { it.summary }))
+                ?: emptyList()
+        )
+        return result
+    }
+
+    /**
+     * Assumes that elements matching the predicate will be continous in the list,
+     * so it breaks the loop eagerly.
+     */
+    fun <T> List<T>.filterFromTheEnd(predicate: (T) -> Boolean): List<T> {
+
+        val filtered = mutableListOf<T>()
+        var insideWindow = false
+        for (i in (this.size - 1) downTo 0) {
+            if (predicate.invoke(this[i])) {
+                insideWindow = true
+                filtered.add(0, this[i])
+            } else {
+                if (insideWindow) break
+            }
+        }
+
+        return filtered
+    }
+
+    /**
+     * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
+     * that original Event.
+     */
+    fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
+
+        // TODO maybe we should make this use LocalDate so we can use an actual value of the RECURRENCE-ID
+        return this.groupBy({it.uid}).mapValues { events ->
+            events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
+        }.map { it.value }.toList()
+    }
+
+    fun ICalDate.toZonedDateTime(timezone: String): ZonedDateTime {
+        return if (this.hasTime()) {
+            ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
+        } else {
+            this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
+        }
+    }
+
+    fun Date.toZonedDateTime(timezone: String, isAllDay: Boolean): ZonedDateTime {
+        return if (!isAllDay) {
+            ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
+        } else {
+            this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
+        }
+    }
+
+    fun formatUidForICal(eventUid: String): String {
+        // ICal fields maximum length is 75 octets. It separates its values with "\r\n[space]" when needed. In order to fetch
+        //  the UID value from SharedEvents in DB, we need to add the ICal separator to our UID if its length is more than 75
+        return if ((ICAL_UID_PREFIX + eventUid).length > ICAL_LINE_MAXIMUM_LENGTH) {
+            val eventUidValueLines = arrayListOf<String>()
+            val maxLengthWithPrefixIndex = ICAL_LINE_MAXIMUM_LENGTH - ICAL_UID_PREFIX.length
+            eventUidValueLines.add(eventUid.substring(0, maxLengthWithPrefixIndex))
+            var uid = eventUid.substring(maxLengthWithPrefixIndex)
+            // From this point onward we need to count the space separator as part of the string when checking max line length
+            while (uid.length > ICAL_LINE_MAXIMUM_LENGTH - 1) {
+                eventUidValueLines.add(uid.substring(0, ICAL_LINE_MAXIMUM_LENGTH - 1))
+                uid = uid.substring(ICAL_LINE_MAXIMUM_LENGTH - 1)
+            }
+            eventUidValueLines.add(uid)
+            return eventUidValueLines.joinToString(ICAL_LINE_SEPARATOR)
+        } else eventUid
+    }
+
+    fun getResponseIcs(
+        responseICalendar: ICalendar,
+        userAttendee: Attendee,
+        participationStatus: ParticipationStatus,
+        originalTimeZoneInfo: TimezoneInfo?,
+        dtStamp: Date
+    ): String {
+        // Update user PARTSTAT and remove useless X_PM_TOKEN property
+        userAttendee.participationStatus = participationStatus
+        userAttendee.removeParameter(CustomICalPropertyParameter.X_PM_TOKEN)
+        userAttendee.participationLevel = null
+        userAttendee.rsvp = null
+        userAttendee.commonName = userAttendee.extractEmail()
+
+        val iCalendar = ICalendar()
+        iCalendar.setProductId(generateProtonProdId())
+        iCalendar.version = ICalVersion.V2_0
+        iCalendar.setMethod(Method.REPLY)
+        iCalendar.calendarScale = CalendarScale.gregorian()
+        originalTimeZoneInfo?.let { iCalendar.timezoneInfo = originalTimeZoneInfo }
+
+        val event = VEvent()
+        event.addAttendee(userAttendee)
+        responseICalendar.events.first().organizer?.let { event.organizer = it }
+        responseICalendar.events.first().uid?.let { event.uid = it }
+        responseICalendar.events.first().dateStart?.let { event.dateStart = it }
+        responseICalendar.events.first().dateEnd?.let { event.dateEnd = it }
+        responseICalendar.events.first().sequence?.let { event.sequence = it }
+        responseICalendar.events.first().recurrenceId?.let { event.recurrenceId = it }
+        responseICalendar.events.first().recurrenceRule?.let { event.recurrenceRule = it }
+        responseICalendar.events.first().location?.let { if (!it.value.isNullOrEmpty()) event.location = it }
+        responseICalendar.events.first().summary?.let { if (!it.value.isNullOrEmpty()) event.summary = it }
+        event.setDateTimeStamp(dtStamp)
+
+        iCalendar.addEvent(event)
+
+        return iCalendar.printToString()
+    }
+
+    fun getInviteIcs(
+        newEvent: Event,
+        sharedEventId: String,
+        sharedSessionKey: String,
+    ): String {
+
+        val inviteICalendar = newEvent.iCalendar.clone()
+
+        if (inviteICalendar.productId == null) inviteICalendar.setProductId(generateProtonProdId())
+        if (inviteICalendar.version == null) inviteICalendar.version = ICalVersion.V2_0
+
+        // METHOD:REPLY as we answer the REQUEST of the organizer
+        inviteICalendar.setMethod(Method.REQUEST)
+
+        if (inviteICalendar.calendarScale == null) inviteICalendar.calendarScale = CalendarScale.gregorian()
+
+        // Add base64 encoded session key
+        inviteICalendar.setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
+        // Add shared event ID
+        inviteICalendar.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+
+        // Replace common names with emails
+        inviteICalendar.events.first().attendees.forEach {
+            it.commonName = it.extractEmail()
+        }
+
+        // Alarms should be dropped
+        inviteICalendar.events.first().alarms.clear()
+
+        // The EXDATE must be filtered out
+        inviteICalendar.events.first().exceptionDates.clear()
+
+        return inviteICalendar.printToString()
+    }
+
 }
 
 data class CalendarSplit(
@@ -663,359 +963,4 @@ data class CalendarSplit(
     val attendeesPart: ICalendar?
 )
 
-/**
- * Creates new ICalendar object and sets this VEvent as only event.
- */
-fun VEvent.wrapInICalendar(): ICalendar {
-    val calendar = ICalendar()
-    calendar.setProductId(generateProtonProdId())
-    calendar.addEvent(this)
-    return calendar
-}
 
-// TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
-fun ICalendar.printToString() : String {
-    return Biweekly.write(this).go().replace("TZID=/", "TZID=")
-}
-
-/**
- * Calculate ISO week number for given date, taking custom week start into account.
- */
-fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int {
-
-    val firstDayOfTheWeekNumber = this.dayOfWeek.value - startWeekOn.value
-    val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
-
-    var monday: LocalDate = this.minusDays(firstDayOfTheWeekOffset.toLong())
-    while (monday.dayOfWeek != DayOfWeek.MONDAY) {
-        monday = monday.plusDays(1)
-    }
-
-    return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-
-}
-
-fun LocalDate.toDate(timeZoneId: String? = null): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
-
-fun DayOfWeek.format(firstLetter: Boolean = false): String {
-    val formatted = this.getDisplayName(
-        TextStyle.FULL,
-        getLocaleForFormatting()
-    )
-    return if (firstLetter) formatted.firstOrNull()?.toString() ?: "" else formatted
-}
-
-fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
-    return biweekly.util.DayOfWeek.values()[(this.ordinal + 1) % 7]
-}
-
-fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek {
-    return DayOfWeek.of((this.calendarConstant)).minus(1)
-}
-
-fun ZonedDateTime.formatDate(timeZoneId: String): String {
-    return this
-        .withZoneSameInstant(ZoneId.of(timeZoneId))
-        .toLocalDate()
-        .format(
-            DateTimeFormatter
-            .ofLocalizedDate(FormatStyle.FULL)
-            .withLocale(getLocaleForFormatting())
-        )
-}
-
-fun ZonedDateTime.formatTime(timeZoneId: String, is24Hour: Boolean): String = this.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime().format(is24Hour)
-
-/**
- * @param excludeTo will exclude exact toDateTime from rightmost range value
- */
-fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean {
-
-    val thisInstant = this.toInstant()
-    val fromInstant = fromDateTime.toInstant()
-    val toInstant = toDateTime.toInstant()
-
-    return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
-}
-
-fun VEvent.setStart(date: LocalDate) {
-    this.setDateStart(date.toDate(), false)
-}
-
-fun VEvent.setEnd(date: LocalDate) {
-    this.setDateEnd(date.toDate(), false)
-}
-
-fun VEvent.setStart(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
-    this.setDateStart(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
-}
-
-fun VEvent.setEnd(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
-    this.setDateEnd(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
-}
-
-fun VEvent.setStart(time: LocalTime, timeZoneId: String? = "UTC") {
-    this.setDateStart(Date.from(ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
-}
-
-fun VEvent.setEnd(time: LocalTime, timeZoneId: String? = "UTC") {
-    this.setDateEnd(Date.from(ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
-}
-
-/**
- * Sets or clears TimeZone for Date Start.
- */
-fun ICalendar.setStartTimeZone(timeZoneId: String?) {
-    this.events.first()?.dateStart?.let { this.timezoneInfo.setTimezone(this.events.first().dateStart, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
-}
-
-/**
- * Sets or clears TimeZone for Date End.
- */
-fun ICalendar.setEndTimeZone(timeZoneId: String?) {
-    this.events.first()?.dateEnd?.let { this.timezoneInfo.setTimezone(this.events.first().dateEnd, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
-}
-
-fun ICalendar.setDefaultTimeZone(timeZoneId: String?) {
-    this.timezoneInfo.defaultTimezone = if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))
-}
-
-/**
- * Sets start and end timezones, preserving the original local datetimes.
- */
-fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZoneId: String) {
-
-
-    val event = this.events.first()
-
-    TimberLogger.d("adjusting timezone from ${currentDateTimeTimezoneId} to $timeZoneId")
-//    TimberLogger.d("current start timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
-//    TimberLogger.d("current end timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
-
-    val endTimeZoneId = currentDateTimeTimezoneId//this.timezoneInfo.getTimezone(event.dateEnd)?.timeZone?.id ?: this.timezoneInfo.defaultTimezone?.timeZone?.id ?: "UTC"
-
-    TimberLogger.d("adjusting using timezone $currentDateTimeTimezoneId, $endTimeZoneId")
-
-    event.setStart(event.getStart(currentDateTimeTimezoneId)!!.toLocalDate(), event.getStart(currentDateTimeTimezoneId)!!.toLocalTime(), timeZoneId)
-    event.setEnd(event.getEnd(endTimeZoneId)!!.toLocalDate(), event.getEnd(endTimeZoneId)!!.toLocalTime(), timeZoneId)
-
-    this.setStartTimeZone(timeZoneId)
-    this.setEndTimeZone(timeZoneId)
-
-    this.timezoneInfo.timezones.clear()
-
-}
-
-/**
- * Removes Timezone Assignments and sets correct DTEND according to standard, not GUI form.
- *
- * @param timeZoneId needed to correctly interpret Dates if we are about to remove timezone info
- */
-fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
-    this.timezoneInfo.timezones.clear()
-    this.events.first().apply {
-        setStart(this.getStart(timeZoneId)!!.toLocalDate())
-        setEnd(this.getEnd(timeZoneId)!!.toLocalDate().plusDays(1))
-    }
-}
-
-fun ICalendar.adjustIncomingAllDayEvent() {
-    this.events.first().apply {
-
-        if (this.dateStart.value != null && !this.dateStart.value.hasTime()) {
-            if (this.dateStart.value == this.dateEnd.value) {
-                val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
-                this.setDateEnd(endLocalDate.toDate(), false)
-            }
-        }
-    }
-}
-
-
-fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
-
-    if (this.dateStart?.value == null) return null // TODO
-
-    return this.dateStart.value.toZonedDateTime(timeZoneId)
-}
-
-fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
-
-    if (this.dateEnd?.value == null) return null // TODO
-
-    return this.dateEnd.value.toZonedDateTime(timeZoneId)
-}
-
-fun Attendee.extractEmail(): String? {
-    return extractEmail(this.uri, this.email, this.commonName)
-}
-
-fun Organizer.extractEmail(): String? {
-    return extractEmail(this.uri, this.email, this.commonName)
-}
-
-fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
-    return when {
-        uri?.contains("@") == true -> uri.substringAfter("mailto:")
-        email?.contains("@") == true -> email
-        commonName?.contains("@") == true -> commonName
-        else -> null
-    }
-}
-
-/**
- * Groups all-day and spanning multiple days Events first.
- */
-fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event> {
-    val groupedByAllDayEvents = this.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
-    val result = mutableListOf<Event>()
-    result.addAll(
-        groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
-            ?: emptyList()
-    )
-    result.addAll(
-        groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
-            ?: emptyList()
-    )
-    return result
-}
-
-/**
- * Assumes that elements matching the predicate will be continous in the list,
- * so it breaks the loop eagerly.
- */
-fun <T> List<T>.filterFromTheEnd(predicate: (T) -> Boolean): List<T> {
-
-    val filtered = mutableListOf<T>()
-    var insideWindow = false
-    for (i in (this.size - 1) downTo 0) {
-        if (predicate.invoke(this[i])) {
-            insideWindow = true
-            filtered.add(0, this[i])
-        } else {
-            if (insideWindow) break
-        }
-    }
-
-    return filtered
-}
-
-/**
- * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
- * that original Event.
- */
-fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
-
-    // TODO maybe we should make this use LocalDate so we can use an actual value of the RECURRENCE-ID
-    return this.groupBy({it.uid}).mapValues { events ->
-        events.value.find { it.iCalEvent.recurrenceId != null } ?: events.value.first()
-    }.map { it.value }.toList()
-}
-
-fun ICalDate.toZonedDateTime(timezone: String): ZonedDateTime {
-    return if (this.hasTime()) {
-        ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
-    } else {
-        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
-    }
-}
-
-fun Date.toZonedDateTime(timezone: String, isAllDay: Boolean): ZonedDateTime {
-    return if (!isAllDay) {
-        ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
-    } else {
-        this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
-    }
-}
-
-fun formatUidForICal(eventUid: String): String {
-    // ICal fields maximum length is 75 octets. It separates its values with "\r\n[space]" when needed. In order to fetch
-    //  the UID value from SharedEvents in DB, we need to add the ICal separator to our UID if its length is more than 75
-    return if ((ICAL_UID_PREFIX + eventUid).length > ICAL_LINE_MAXIMUM_LENGTH) {
-        val eventUidValueLines = arrayListOf<String>()
-        val maxLengthWithPrefixIndex = ICAL_LINE_MAXIMUM_LENGTH - ICAL_UID_PREFIX.length
-        eventUidValueLines.add(eventUid.substring(0, maxLengthWithPrefixIndex))
-        var uid = eventUid.substring(maxLengthWithPrefixIndex)
-        // From this point onward we need to count the space separator as part of the string when checking max line length
-        while (uid.length > ICAL_LINE_MAXIMUM_LENGTH - 1) {
-            eventUidValueLines.add(uid.substring(0, ICAL_LINE_MAXIMUM_LENGTH - 1))
-            uid = uid.substring(ICAL_LINE_MAXIMUM_LENGTH - 1)
-        }
-        eventUidValueLines.add(uid)
-        return eventUidValueLines.joinToString(ICAL_LINE_SEPARATOR)
-    } else eventUid
-}
-
-fun getResponseIcs(
-    responseICalendar: ICalendar,
-    userAttendee: Attendee,
-    participationStatus: ParticipationStatus,
-    originalTimeZoneInfo: TimezoneInfo?,
-    dtStamp: Date
-): String {
-    // Update user PARTSTAT and remove useless X_PM_TOKEN property
-    userAttendee.participationStatus = participationStatus
-    userAttendee.removeParameter(CustomICalPropertyParameter.X_PM_TOKEN)
-    userAttendee.participationLevel = null
-    userAttendee.rsvp = null
-    userAttendee.commonName = userAttendee.extractEmail()
-
-    val iCalendar = ICalendar()
-    iCalendar.setProductId(generateProtonProdId())
-    iCalendar.version = ICalVersion.V2_0
-    iCalendar.setMethod(Method.REPLY)
-    iCalendar.calendarScale = CalendarScale.gregorian()
-    originalTimeZoneInfo?.let { iCalendar.timezoneInfo = originalTimeZoneInfo }
-
-    val event = VEvent()
-    event.addAttendee(userAttendee)
-    responseICalendar.events.first().organizer?.let { event.organizer = it }
-    responseICalendar.events.first().uid?.let { event.uid = it }
-    responseICalendar.events.first().dateStart?.let { event.dateStart = it }
-    responseICalendar.events.first().dateEnd?.let { event.dateEnd = it }
-    responseICalendar.events.first().sequence?.let { event.sequence = it }
-    responseICalendar.events.first().recurrenceId?.let { event.recurrenceId = it }
-    responseICalendar.events.first().recurrenceRule?.let { event.recurrenceRule = it }
-    responseICalendar.events.first().location?.let { if (!it.value.isNullOrEmpty()) event.location = it }
-    responseICalendar.events.first().summary?.let { if (!it.value.isNullOrEmpty()) event.summary = it }
-    event.setDateTimeStamp(dtStamp)
-
-    iCalendar.addEvent(event)
-
-    return iCalendar.printToString()
-}
-
-fun getInviteIcs(
-    newEvent: Event,
-    sharedEventId: String,
-    sharedSessionKey: String,
-): String {
-
-    val inviteICalendar = newEvent.iCalendar.clone()
-
-    if (inviteICalendar.productId == null) inviteICalendar.setProductId(generateProtonProdId())
-    if (inviteICalendar.version == null) inviteICalendar.version = ICalVersion.V2_0
-
-    // METHOD:REPLY as we answer the REQUEST of the organizer
-    inviteICalendar.setMethod(Method.REQUEST)
-
-    if (inviteICalendar.calendarScale == null) inviteICalendar.calendarScale = CalendarScale.gregorian()
-
-    // Add base64 encoded session key
-    inviteICalendar.setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
-    // Add shared event ID
-    inviteICalendar.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
-
-    // Replace common names with emails
-    inviteICalendar.events.first().attendees.forEach {
-        it.commonName = it.extractEmail()
-    }
-
-    // Alarms should be dropped
-    inviteICalendar.events.first().alarms.clear()
-
-    // The EXDATE must be filtered out
-    inviteICalendar.events.first().exceptionDates.clear()
-
-    return inviteICalendar.printToString()
-}

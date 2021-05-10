@@ -42,11 +42,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.EventUtilsImpl.formatStartEndForActualEndDate
+import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.EventUtilsImpl.isUserInvitedAddressEnabled
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
+import me.proton.android.calendar.common.ICalUtils.extractEmail
+import me.proton.android.calendar.common.ICalUtils.printToString
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
-import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
@@ -89,7 +93,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         //  2. see if handling deeplink straight from notification (not indirectly from MainActivity and navigating manually)
         //  fixes this
         if (findNavController().previousBackStackEntry?.destination?.id != R.id.nav_calendar) {
-            findNavController().navigate(Navigation.Deeplink.toMonth(eventViewModel.eventLiveData.value?.startLocalDate))
+            findNavController().navigate(Navigation.Deeplink.toMonth(eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toLocalDate()))
         } else {
             findNavController().navigateUp()
         }
@@ -673,7 +677,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         resources,
                         event.isAllDay(),
                         calendarViewModel.timeFormatIs24Hour(requireContext()),
-                        event.iCalEvent.getStart(eventViewModel.displayTimeZoneId)!!,
+                        event.getStart(eventViewModel.displayTimeZoneId),
                         alarm
                     )
                 }

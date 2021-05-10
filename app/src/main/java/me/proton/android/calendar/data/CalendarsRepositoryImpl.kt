@@ -11,10 +11,11 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import me.proton.android.calendar.common.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtils
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.formatUidForICal
+import me.proton.android.calendar.common.ICalUtils.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
@@ -536,11 +537,11 @@ class CalendarsRepositoryImpl(
 
             val result = mutableListOf<Event>()
             result.addAll(
-                filtered.get(true)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
+                filtered.get(true)?.sortedWith(compareBy({ it.getOccurrenceStart(timeZoneId) }, { it.summary }))
                     ?: emptyList()
             )
             result.addAll(
-                filtered.get(false)?.sortedWith(compareBy({ it.getActualStart(timeZoneId) }, { it.summary }))
+                filtered.get(false)?.sortedWith(compareBy({ it.getOccurrenceStart(timeZoneId) }, { it.summary }))
                     ?: emptyList()
             )
             result
@@ -602,7 +603,7 @@ class CalendarsRepositoryImpl(
                                     transformedEvent.occurrence = it.occurrence
                                     transformedEvent
                                 } else { // recurring event, apply occurrence
-                                    transformedEvent.withOccurrence(it.occurrence!!)
+                                    Event.withOccurrence(transformedEvent, it.occurrence!!)
                                 }
                             }
                         } else null

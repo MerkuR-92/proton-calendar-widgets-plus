@@ -5,10 +5,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
-import biweekly.Biweekly
-import org.junit.jupiter.api.Disabled
+import me.proton.android.calendar.common.ICalUtils.printToString
 import org.junit.jupiter.api.Test
-import timber.log.Timber
 import java.time.*
 
 internal class ICalTest {

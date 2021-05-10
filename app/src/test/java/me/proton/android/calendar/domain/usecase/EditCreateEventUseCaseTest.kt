@@ -11,6 +11,12 @@ import biweekly.property.*
 import biweekly.util.Duration
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.ICalUtils.printToString
+import me.proton.android.calendar.common.ICalUtils.setEnd
+import me.proton.android.calendar.common.ICalUtils.setEndTimeZone
+import me.proton.android.calendar.common.ICalUtils.setStart
+import me.proton.android.calendar.common.ICalUtils.setStartTimeZone
+import me.proton.android.calendar.common.ICalUtils.wrapInICalendar
 import org.junit.jupiter.api.Test
 import java.time.*
 import java.util.*

@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import me.proton.android.calendar.BaseTest
 import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
 import java.time.*
 
@@ -368,7 +369,7 @@ internal class AlarmsTest : BaseTest() {
         val exDateFiltered = expandedEvents!!.filterOutOccurrencesByExdates(allDay1, timeZoneId)
         val withOccurrences = exDateFiltered.map {
             if (it.occurrence != null) {
-                it.withOccurrence(it.occurrence!!)
+                Event.withOccurrence(it, it.occurrence!!)
             } else it
         }
 

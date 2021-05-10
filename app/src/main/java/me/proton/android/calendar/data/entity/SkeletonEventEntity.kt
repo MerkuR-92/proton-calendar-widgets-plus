@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.ICalUtils.sanitise
 import me.proton.android.calendar.common.ICalUtils.toICalendarFromPlaintextSharedPart
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 
 @Serializable
@@ -26,7 +27,7 @@ data class SkeletonEventEntity(
 fun SkeletonEventEntity.toSkeletonEvent(json: Json, calendarColor: String? = null): SkeletonEvent? =
     toICalendarFromPlaintextSharedPart(json, this.sharedEvents)?.let {
         if (it.events.firstOrNull()?.sanitise() == true) {
-            SkeletonEvent(
+            Event.from(
                 this.id,
                 Calendar(this.calendarId, "", calendarColor ?: "", 0, false),
                 it,

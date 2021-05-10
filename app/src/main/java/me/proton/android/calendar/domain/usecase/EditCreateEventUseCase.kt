@@ -5,6 +5,8 @@ import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.ICalUtils.extractEmail
+import me.proton.android.calendar.common.ICalUtils.printToString
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*

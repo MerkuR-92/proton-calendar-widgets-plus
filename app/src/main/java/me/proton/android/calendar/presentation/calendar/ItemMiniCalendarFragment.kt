@@ -12,17 +12,16 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.visibleOrGone
-import me.proton.android.calendar.common.weekNumber
 import me.proton.android.calendar.domain.Logger
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.*
-import java.time.temporal.IsoFields
 
 
 class ItemMiniCalendarFragment() : Fragment(), KoinComponent {

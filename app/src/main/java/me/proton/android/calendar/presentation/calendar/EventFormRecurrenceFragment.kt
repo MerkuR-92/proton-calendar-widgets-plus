@@ -20,6 +20,11 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.DateTimeUtilsImpl.format
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
+import me.proton.android.calendar.common.ICalUtils.printToString
+import me.proton.android.calendar.common.ICalUtils.toDayOfWeek
+import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.NoLayoutRadioGroup
@@ -212,7 +217,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 custom_recurrence_end_count.clearFocus()
             }
 
-            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
+            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)
                 .toLocalDate()
 
             val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toZonedDateTime(eventViewModel.displayTimeZoneId)

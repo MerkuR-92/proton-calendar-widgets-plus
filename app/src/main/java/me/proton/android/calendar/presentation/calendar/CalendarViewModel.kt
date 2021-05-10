@@ -257,8 +257,8 @@ class CalendarViewModel(
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
-            var start = event.getActualStart(timeZoneId)!!.toLocalDate()
-            val end = event.getActualEnd(timeZoneId)!!.toLocalDate()
+            var start = event.getOccurrenceStart(timeZoneId)!!.toLocalDate()
+            val end = event.getOccurrenceEnd(timeZoneId)!!.toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {

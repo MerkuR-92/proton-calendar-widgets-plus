@@ -19,7 +19,7 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_attendee.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.extractEmail
+import me.proton.android.calendar.common.ICalUtils.extractEmail
 import me.proton.android.calendar.common.getInitials
 import me.proton.android.calendar.common.visibleOrGone
 

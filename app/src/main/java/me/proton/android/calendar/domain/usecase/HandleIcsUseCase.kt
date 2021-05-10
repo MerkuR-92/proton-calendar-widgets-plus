@@ -10,7 +10,9 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.ICalUtils.clone
+import me.proton.android.calendar.common.ICalUtils.extractEmail
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
@@ -85,14 +87,14 @@ class HandleIcsUseCase(
         }
 
         // Create a new event with the clean iCalendar
-        val newEvent = Event(
+        val newEvent = Event.from(
             ICalUtils.generateOfflineEventId(), Calendar(
             defaultCalendar.id,
             defaultCalendar.name,
             defaultCalendar.color,
             defaultCalendar.flags,
             defaultCalendar.display == 1
-        ), iCalendar)
+        ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         // Fetch all events sharing UID from BE
         val eventsSharingUidResponse = (
@@ -259,7 +261,7 @@ class HandleIcsUseCase(
         // Handle party crashers in replies
         val updatedAttendee = iCalendar.events.first().attendees.firstOrNull()
         val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
-        if (existingEvent.iCalEvent.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent?.id)
+        if (existingEvent.iCalEvent.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
 
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
     }
