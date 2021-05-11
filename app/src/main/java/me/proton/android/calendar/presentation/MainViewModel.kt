@@ -1,11 +1,14 @@
 package me.proton.android.calendar.presentation
 
+import android.app.Application
 import android.content.*
 import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.work.*
 import kotlinx.coroutines.Job
+import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -16,10 +19,10 @@ import java.util.concurrent.TimeUnit
 
 
 class MainViewModel(
-    private val context: Context,
+    application: Application,
     private val accountViewModel: AccountViewModel,
     private val handleIcsUseCase: HandleIcsUseCase,
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
 
@@ -32,7 +35,7 @@ class MainViewModel(
             val googleMapsIntent = Intent(Intent.ACTION_VIEW, googleMapsUri)
             googleMapsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             googleMapsIntent.setPackage("com.google.android.apps.maps")
-            context.startActivity(googleMapsIntent)
+            getApplication<Application>().startActivity(googleMapsIntent)
             true
         } catch (e: ActivityNotFoundException) {
             false
@@ -41,7 +44,7 @@ class MainViewModel(
 
     fun handleCopyToClipboard(content: String): Boolean {
         return try {
-            val clipboard: ClipboardManager? = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+            val clipboard: ClipboardManager? = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
             if (clipboard != null) {
                 val clip = ClipData.newPlainText("", content)
                 clipboard.setPrimaryClip(clip)
@@ -56,7 +59,7 @@ class MainViewModel(
     fun syncServerEvents(userId: UserId) : LiveData<Operation.State> {
 
         val workState = kotlin.runCatching {
-            WorkManager.getInstance(context).getWorkInfosForUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS).get(1, TimeUnit.SECONDS)
+            WorkManager.getInstance(getApplication<Application>()).getWorkInfosForUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS).get(1, TimeUnit.SECONDS)
         }.getOrNull()?.firstOrNull()?.state
 
         val existingWorkPolicy = if (workState == WorkInfo.State.RUNNING) {
@@ -78,7 +81,7 @@ class MainViewModel(
             .build()
 
         // TODO work is unique per user-id, make sure different inputdata => different unique work
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS, existingWorkPolicy, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS, existingWorkPolicy, work).state
 
     }
 
@@ -98,7 +101,7 @@ class MainViewModel(
             .build()
 
         // TODO work is unique per user-id, make sure different inputdata => different unique work
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_ALARMS, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_ALARMS, ExistingWorkPolicy.REPLACE, work).state
 
     }
 

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.text.Html
@@ -42,7 +43,7 @@ import java.util.*
 private const val MAX_CALENDAR_INDICATORS = 5
 
 class CalendarViewModel(
-    private val context: Context,
+    application: Application,
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
@@ -50,7 +51,7 @@ class CalendarViewModel(
     private val fetchUserUseCase: FetchUserUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
-    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : ViewModel() {
+    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -390,7 +391,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone: Boolean) : LiveData<Operation.State> {
@@ -409,7 +410,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateDisplayWeekNumber(displayWeekNumber: Boolean) : LiveData<Operation.State> {
@@ -428,7 +429,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateTimeFormat(timeFormat: Int) : LiveData<Operation.State> {
@@ -447,7 +448,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateWeekStart(weekStart: Int) : LiveData<Operation.State> {
@@ -466,7 +467,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_WEEK_START, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_WEEK_START, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateServerCalendarListDisplay() : LiveData<Operation.State> {
@@ -484,7 +485,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_LIST, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_LIST, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateServerCalendar(calendarId: String) : LiveData<Operation.State> {
@@ -503,7 +504,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun sendBugReport(
@@ -538,7 +539,7 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
     }
 
     suspend fun updateInactiveCalendarsPassphrase() {
@@ -668,6 +669,6 @@ class CalendarViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_ADDRESSES, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_ADDRESSES, ExistingWorkPolicy.REPLACE, work).state
     }
 }

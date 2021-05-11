@@ -1,11 +1,9 @@
 package me.proton.android.calendar.presentation.calendar
 
+import android.app.Application
 import android.content.Context
 import android.content.res.Resources
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.work.*
 import biweekly.ICalendar
 import biweekly.component.VAlarm
@@ -70,7 +68,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class EventViewModel(
-    private val context: Context,
+    application: Application,
     private val calendarsRepository: CalendarsRepository,
     private val usersRepository: UsersRepository,
     private val createEventUseCase: EditCreateEventUseCase,
@@ -83,7 +81,7 @@ class EventViewModel(
     private val json: Json,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     sealed class Result {
         object Success : Result()
@@ -1613,7 +1611,7 @@ class EventViewModel(
 
         if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
             // If chain has single edits, update their part stat to NEEDS_ACTION
-            clearSingleEditsParticipationStatus(calendarId, event.uid, userEmails, participationStatus)
+            clearSingleEditsParticipationStatus(calendarId, event.uid, userEmails, participationStatus,)
         }
 
         // Apply alarms modifications
@@ -1655,7 +1653,7 @@ class EventViewModel(
             )
             .build()
 
-        return WorkManager.getInstance(context).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT, ExistingWorkPolicy.REPLACE, work).state
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT, ExistingWorkPolicy.REPLACE, work).state
     }
 
     suspend fun isStandaloneSingleEdit(): Boolean {
