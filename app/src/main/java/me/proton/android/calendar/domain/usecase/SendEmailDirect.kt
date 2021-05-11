@@ -15,6 +15,8 @@ import me.proton.core.key.domain.*
 import me.proton.core.mailmessage.domain.encryptAndSignAttachmentOrNull
 import me.proton.core.mailmessage.domain.entity.*
 import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
+import me.proton.core.network.data.ProtonErrorException
+import me.proton.core.network.domain.ApiException
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.nullIfBlank
@@ -53,6 +55,7 @@ class SendEmailDirect @Inject constructor(
         sealed class Error : Result() {
             data class GeneratingEmailPackages(val emailAddresses: List<String>) : Error()
             data class EncryptingAttachments(val attachmentFileNames: List<String>) : Error()
+            object Api : Error()
         }
     }
 
@@ -168,12 +171,20 @@ class SendEmailDirect @Inject constructor(
             return Result.Error.GeneratingEmailPackages(failedPackageEmails.toList())
 
         // Send Email, Packages and attachmentKeyPackets.
-        val receipt = emailMessageRepository.sendEmailDirect(
-            userId = sender.userId,
-            encryptedEmail = encryptedEmail,
-            encryptedPackages = emailPackages.filterNullValues().values.toList(),
-            attachmentKeys = encodedAttachmentKeyPackets //.ifEmpty { null }
-        )
+        val receipt = try {
+            emailMessageRepository.sendEmailDirect(
+                userId = sender.userId,
+                encryptedEmail = encryptedEmail,
+                encryptedPackages = emailPackages.filterNullValues().values.toList(),
+                attachmentKeys = encodedAttachmentKeyPackets //.ifEmpty { null }
+            )
+        } catch (e: ApiException) {
+            logger.e("api exception sending email direct", e)
+            return Result.Error.Api
+        } catch (e: ProtonErrorException) {
+            logger.e("proton error exception sending email direct", e)
+            return Result.Error.Api
+        }
         return Result.Success(receipt)
     }
 
