@@ -21,28 +21,29 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
-import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
+import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.isLastDayOfWeekInMonth
+import me.proton.android.calendar.common.DateTimeUtilsImpl.startEndOverlapsWithFullDayRange
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.utils.ICalUtils
 import java.security.MessageDigest
 import java.time.*
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
-import java.time.temporal.IsoFields
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-object ICalUtils {
+object ICalUtilsImpl : ICalUtils {
 
-    fun parseICalString(iCalendar: String): ICalendar? {
+    override fun parseICalString(iCalendar: String): ICalendar? {
         return try {
             Biweekly.parse(iCalendar).first().also { normaliseICalendar(it) }
         } catch (e: Exception) {
@@ -51,7 +52,7 @@ object ICalUtils {
         }
     }
 
-    fun normaliseICalendar(calendar: ICalendar) {
+    override fun normaliseICalendar(calendar: ICalendar) {
 
         // TODO replace this with global validation of all properties from biweekly
         calendar.events?.forEach { vEvent ->
@@ -62,45 +63,24 @@ object ICalUtils {
 
     }
 
-    fun formatTimeZoneId(timeZoneId: String, forInstant: Instant, displayId: Boolean = true): String {
-        val rawOffset = TimeZone.getTimeZone(timeZoneId).getOffset(Date.from(forInstant).time).toLong()
-        val offsetLocalTime = LocalTime.MIDNIGHT.plus(if (rawOffset < 0) -rawOffset else rawOffset, ChronoUnit.MILLIS)
-
-        val offset = "${offsetLocalTime.hour}${if (offsetLocalTime.minute > 0) ":${offsetLocalTime.minute}" else ""}"
-
-        return "${if (displayId) "$timeZoneId " else ""}(GMT${if (rawOffset < 0) "-" else "+"}${offset})"
-    }
-
-    fun areTimeZoneOffsetsDifferent(timeZoneIdA: String, timeZoneIdB: String, forInstant: Instant? = null): Boolean? {
-
-        if (!TimeZone.getAvailableIDs().contains(timeZoneIdA) || !TimeZone.getAvailableIDs().contains(timeZoneIdB)) {
-            return null
-        }
-
-        val offsetA = TimeZone.getTimeZone(timeZoneIdA).getOffset(Date.from(forInstant ?: Instant.now()).time).toLong()
-        val offsetB = TimeZone.getTimeZone(timeZoneIdB).getOffset(Date.from(forInstant ?: Instant.now()).time).toLong()
-
-        return offsetA != offsetB
-    }
-
     /**
      * Takes iCalendar parts split according to "the matrix" and returns one iCalendar object.
      */
-    fun mergeCalendarPartsIntoICalendar(calendarStrings: List<String>): ICalendar? {
+    override fun mergeCalendarPartsIntoICalendar(calendarStrings: List<String>): ICalendar? {
         return calendarStrings.mapNotNull { parseICalString(it) }.reduce { sum, element -> mergeICalendars(sum, element) }
     }
 
     /**
      * Clones the ICalendar copying timezones.
      */
-    fun ICalendar.clone(): ICalendar {
+    override fun ICalendar.clone(): ICalendar {
         return parseICalString(this.printToString())!!
     }
 
     /**
      * @return true if Event is valid
      */
-    fun VEvent.sanitise(): Boolean {
+    override fun VEvent.sanitise(): Boolean {
 
         if (this.dateStart == null) return false
 
@@ -122,11 +102,11 @@ object ICalUtils {
     /**
      * This methods clones Recurrence and overwrites only parameters supplied.
      */
-    fun Recurrence.clone(
-        byDay: List<biweekly.util.DayOfWeek>? = null,
-        bySetPos: List<Int>? = null,
-        until: ICalDate? = null,
-        workweekStarts: biweekly.util.DayOfWeek? = null
+    override fun Recurrence.clone(
+        byDay: List<biweekly.util.DayOfWeek>?,
+        bySetPos: List<Int>?,
+        until: ICalDate?,
+        workweekStarts: biweekly.util.DayOfWeek?
     ): Recurrence {
 
         val builder = Recurrence.Builder(this.frequency)
@@ -149,7 +129,7 @@ object ICalUtils {
         return builder.build()
     }
 
-    fun ICalendar.adjustRRuleToStartDate(oldDateTime: ZonedDateTime? = null) {
+    override fun ICalendar.adjustRRuleToStartDate(oldDateTime: ZonedDateTime?) {
 
         val iCalEvent = this.events.first()
 
@@ -207,22 +187,7 @@ object ICalUtils {
 
     }
 
-    fun allDayICalDateToDateTime(zonedDateTime: ZonedDateTime, timeZoneId: String): ICalDate {
-        return ICalDate(
-            Date.from(
-                ZonedDateTime.of(
-                    zonedDateTime.toLocalDate(),
-                    LocalTime.of(23, 59, 59),
-                    ZoneId.of(timeZoneId)
-                ).withZoneSameInstant(
-                    ZoneId.of(timeZoneId)
-                ).toInstant()
-            ),
-            true
-        )
-    }
-
-    fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: DayOfWeek) {
+    override fun RecurrenceRule.adjustToWeekStart(settingsWeekStart: DayOfWeek) {
 
         val addWkst = when (this.value.frequency) {
             Frequency.WEEKLY -> {
@@ -240,14 +205,14 @@ object ICalUtils {
 
     }
 
-    fun VEvent.isDateTimeTheSame(that: VEvent?): Boolean {
+    override fun VEvent.isDateTimeTheSame(that: VEvent?): Boolean {
 
         if (that == null) return false
 
         return (this.dateStart.value.toInstant() == that.dateStart.value.toInstant()) && (this.dateEnd.value.toInstant() == that.dateEnd.value.toInstant())
     }
 
-    fun ICalendar.isDateTimeTheSame(that: ICalendar?): Boolean {
+    override fun ICalendar.isDateTimeTheSame(that: ICalendar?): Boolean {
 
         if (that == null) return false
 
@@ -256,7 +221,7 @@ object ICalUtils {
                 (this.events.first().isDateTimeTheSame(that.events.first()))
     }
 
-    fun ICalendar.iCalTimeZone(property: ICalProperty): TimeZone {
+    override fun ICalendar.iCalTimeZone(property: ICalProperty): TimeZone {
         return if (this.timezoneInfo.isFloating(property)) {
             TimeZone.getDefault()
         } else {
@@ -268,7 +233,7 @@ object ICalUtils {
     /**
      * Takes one iCalendar object and splits it according to "the matrix".
      */
-    fun splitICalendarIntoParts(originalCalendar: ICalendar): CalendarSplit {
+    override fun splitICalendarIntoParts(originalCalendar: ICalendar): CalendarSplit {
 
         // TODO Attendees Part
 
@@ -373,7 +338,7 @@ object ICalUtils {
     /**
      * The token is calculated by doing SHA1(EventUID + canonicalAttendeeAddress)
      */
-    fun generateXPmToken(email: String, uid: String): String {
+    override fun generateXPmToken(email: String, uid: String): String {
         val messageDigest = MessageDigest.getInstance(SHA1)
         messageDigest.update((uid + email).toByteArray())
         val token = messageDigest.digest()
@@ -385,10 +350,7 @@ object ICalUtils {
      *
      * In the future we can extend this to support VTodo and custom components.
      */
-    private fun mergeICalendars(left: ICalendar, right: ICalendar) : ICalendar {
-
-//        TimberLogger.v("merging left: ${left.printToString()}")
-//        TimberLogger.v("merging right: ${right.printToString()}")
+    override fun mergeICalendars(left: ICalendar, right: ICalendar) : ICalendar {
 
         // copy components and properties from the only event there is
         right.events.first().components.forEach { components ->
@@ -420,13 +382,13 @@ object ICalUtils {
         return left
     }
 
-    fun createNewEvent() = VEvent().apply {
+    override fun createNewVEvent() = VEvent().apply {
         setUid(generateProtonUid())
         setStatus(Status(Status.CONFIRMED)) // TODO set this as default if imported event has this field empty
         setSequence(0)
     }
 
-    fun generateEventStartTime(timeZoneId: ZoneId): LocalTime {
+    override fun generateEventStartTime(timeZoneId: ZoneId): LocalTime {
         val time = ZonedDateTime.now(timeZoneId)
         return time.plusMinutes(30L - (time.minute % 30)).toLocalTime()
     }
@@ -434,12 +396,12 @@ object ICalUtils {
     /**
      * Generates Proton UID for new ICalendar components.
      */
-    fun generateProtonUid() = "${com.google.crypto.tink.subtle.Base64.urlSafeEncode(Random.randBytes(21))}@proton.me"
+    override fun generateProtonUid() = "${com.google.crypto.tink.subtle.Base64.urlSafeEncode(Random.randBytes(21))}@proton.me"
 
     /**
      * Generates UID in the form of "original UID prefix + recurrenceId + original UID postfix (after @ symbol)".
      */
-    fun generateProtonUid(originalUid: String, recurrenceId: String): String {
+    override fun generateProtonUid(originalUid: String, recurrenceId: String): String {
         // UID has a maximum length allowed so we need to remove existing date from originalUid
         val dateRegex = Regex("_R\\d{8}T\\d{6}")
         val cleanOriginalUid = originalUid.replace(dateRegex, "")
@@ -450,17 +412,17 @@ object ICalUtils {
     /**
      * Generates Proton Product Identifier.
      */
-    fun generateProtonProdId() = "-//Proton Technologies//${API_APPLICATION_NAME} ${BuildConfig.VERSION_NAME}//EN"
+    override fun generateProtonProdId() = "-//Proton Technologies//${API_APPLICATION_NAME} ${BuildConfig.VERSION_NAME}//EN"
 
     /**
      * Generates offline CalendarID to use before it's successfully sent to server.
      */
-    fun generateOfflineEventId() = "$OFFLINE_EVENT_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
+    override fun generateOfflineEventId() = "$OFFLINE_EVENT_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
 
     /**
      * Generates offline AlarmID for offline alarms calculated locally.
      */
-    fun generateOfflineAlarmId() = "$OFFLINE_ALARM_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
+    override fun generateOfflineAlarmId() = "$OFFLINE_ALARM_ID_PREFIX${UUID.randomUUID()}${UUID.randomUUID()}${UUID.randomUUID()}"
 
     /**
      * Returns iCal Events with Occurrence, but does not overwrite the DTSTART/DTEND. See [withOccurrence]
@@ -468,7 +430,7 @@ object ICalUtils {
      *
      * @param events all single edits selected by UID
      */
-    fun expandOccurrencesWithSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, timeZoneId: String): List<Event>? {
+    override fun expandOccurrencesWithSingleEdits(originalEvent: Event, events: List<Event>, toDate: LocalDate, timeZoneId: String): List<Event>? {
 
         val maxRecurrenceIdEvent = events.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
 
@@ -490,20 +452,10 @@ object ICalUtils {
 
     }
 
-    fun startEndOverlapsWithFullDayRange(startDateTime: ZonedDateTime, endDateTime: ZonedDateTime, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
-
-        val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
-        val toDateTime = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
-
-        return (startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
-                || (endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
-                || ((startDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isBefore(fromDateTime)) && endDateTime.withZoneSameLocal(ZoneId.of(timeZoneId)).isAfter(toDateTime)) // starts before or ends after range, but happens during range
-    }
-
     /**
      * Generated Event objects contain distinct Occurrence properties, but they point to the same ICalendar object!
      */
-    fun expandOccurrencesWithSingleEdits(
+    override fun expandOccurrencesWithSingleEdits(
         originalEvent: Event,
         eventsSharingUid: List<Event>,
         fromDate: LocalDate,
@@ -540,7 +492,7 @@ object ICalUtils {
     /**
      * Creates ICalendar using only plaintext shared event part.
      */
-    fun toICalendarFromPlaintextSharedPart(json: Json, sharedEvents: List<JsonElement>): ICalendar? {
+    override fun toICalendarFromPlaintextSharedPart(json: Json, sharedEvents: List<JsonElement>): ICalendar? {
 
         val sharedPlainTextPart = sharedEvents.asSequence().map { json.decodeFromJsonElement<Event.EventPart.Shared>(it) }.firstOrNull { !it.isEncrypted }
 
@@ -553,7 +505,7 @@ object ICalUtils {
     /**
      * Given original Event, filter out all occurrences that are excluded by EXDATE
      */
-    fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event> {
+    override fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event> {
 
         val exZonedDateTimes =
             originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
@@ -571,7 +523,7 @@ object ICalUtils {
         }
     }
 
-    fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
+    override fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
         return this.distinctBy { "${it.eventId} ${it.occurrence} ${it.trigger} ${it.action}" }
     }
 
@@ -579,13 +531,13 @@ object ICalUtils {
      * Returns event ZonedDateTime on Date format
      * Converts it to default timezone when event is all day
      */
-    fun eventStartZonedDateTimeToDate(startDate: ZonedDateTime, isAllDay: Boolean): Date {
+    override fun eventStartZonedDateTimeToDate(startDate: ZonedDateTime, isAllDay: Boolean): Date {
         // TODO Make utils method to get correct Date.from value
         return if (isAllDay) Date.from(startDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant())
         else Date.from(startDate.toInstant())
     }
 
-    fun calculateAlarmEntity(event: Event, vAlarm: VAlarm, timeZoneId: String, memberId: String): EventAlarmEntity {
+    override fun calculateAlarmEntity(event: Event, vAlarm: VAlarm, timeZoneId: String, memberId: String): EventAlarmEntity {
 
             val occurrence = ZonedDateTime.ofInstant(vAlarm.trigger.duration.add(event.iCalEvent.dateStart.value).toInstant(), ZoneId.systemDefault())
 
@@ -609,7 +561,7 @@ object ICalUtils {
      *
      * ID is generated locally.
      */
-    fun calculateAlarmEntities(event: Event, timeZoneId: String, memberId: String): List<EventAlarmEntity> {
+    override fun calculateAlarmEntities(event: Event, timeZoneId: String, memberId: String): List<EventAlarmEntity> {
         return event.iCalEvent.alarms.map {
             calculateAlarmEntity(event, it, timeZoneId, memberId)
         }
@@ -622,16 +574,14 @@ object ICalUtils {
      * If you need to refresh all alarms for an Event, it's best to supply here all the events in chain
      * (sharing the same UID).
      */
-    fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
+    override fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
     ): List<EventAlarmEntity> {
         return events.flatMap { event ->
             event.iCalEvent.alarms.mapNotNull { vAlarm ->
 
                 val triggerRelativeSeconds = vAlarm.trigger.duration.toMillis() / 1000
-//                TestsLogger.v("trigger $triggerRelativeSeconds (${vAlarm.trigger.duration}) }")
 
                 val generateOccurrenceSince = now.minusSeconds(triggerRelativeSeconds)
-//                TestsLogger.v("generating first occurrence since: ${generateOcurrenceSince} ")
 
                 val eventOccurrence = if (event.isRecurring()) {
                     val occurrence = event.generateFirstRealOccurrenceSince(events, generateOccurrenceSince)
@@ -642,9 +592,6 @@ object ICalUtils {
 
                 eventOccurrence?.let {
                     val alarmEntity = calculateAlarmEntity(it, vAlarm, now.zone.id, memberId)
-                    if (alarmEntity.occurrence >= now.toEpochSecond()) {
-//                        TestsLogger.v("returning alarmEntity (${Instant.ofEpochSecond(alarmEntity.occurrence).atZone(now.zone)}) for ${it.summary} at ${it.getActualStart(now.zone.id)} -> ${alarmEntity}")
-                    }
                     alarmEntity
                 }
             }
@@ -654,7 +601,7 @@ object ICalUtils {
     /**
      * Creates new ICalendar object and sets this VEvent as only event.
      */
-    fun VEvent.wrapInICalendar(): ICalendar {
+    override fun VEvent.wrapInICalendar(): ICalendar {
         val calendar = ICalendar()
         calendar.setProductId(generateProtonProdId())
         calendar.addEvent(this)
@@ -662,67 +609,60 @@ object ICalUtils {
     }
 
     // TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
-    fun ICalendar.printToString() : String {
+    override fun ICalendar.printToString() : String {
         return Biweekly.write(this).go().replace("TZID=/", "TZID=")
     }
 
-    fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek {
-        return DayOfWeek.of((this.calendarConstant)).minus(1)
-    }
-
-    fun VEvent.setStart(date: LocalDate) {
+    override fun VEvent.setStart(date: LocalDate) {
         this.setDateStart(date.toDate(), false)
     }
 
-    fun VEvent.setEnd(date: LocalDate) {
+    override fun VEvent.setEnd(date: LocalDate) {
         this.setDateEnd(date.toDate(), false)
     }
 
-    fun VEvent.setStart(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
+    override fun VEvent.setStart(date: LocalDate, time: LocalTime, timeZoneId: String?) {
         this.setDateStart(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
     }
 
-    fun VEvent.setEnd(date: LocalDate, time: LocalTime, timeZoneId: String? = "UTC") {
+    override fun VEvent.setEnd(date: LocalDate, time: LocalTime, timeZoneId: String?) {
         this.setDateEnd(Date.from(LocalDateTime.of(date, time.truncatedTo(ChronoUnit.MINUTES)).atZone(ZoneId.of(timeZoneId)).toInstant()), true)
     }
 
-    fun VEvent.setStart(time: LocalTime, timeZoneId: String? = "UTC") {
+    override fun VEvent.setStart(time: LocalTime, timeZoneId: String?) {
         this.setDateStart(Date.from(ZonedDateTime.ofInstant(this.dateStart.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
     }
 
-    fun VEvent.setEnd(time: LocalTime, timeZoneId: String? = "UTC") {
+    override fun VEvent.setEnd(time: LocalTime, timeZoneId: String?) {
         this.setDateEnd(Date.from(ZonedDateTime.ofInstant(this.dateEnd.value.toInstant(), ZoneId.of(timeZoneId)).with(time).toInstant()), true)
     }
 
     /**
      * Sets or clears TimeZone for Date Start.
      */
-    fun ICalendar.setStartTimeZone(timeZoneId: String?) {
+    override fun ICalendar.setStartTimeZone(timeZoneId: String?) {
         this.events.first()?.dateStart?.let { this.timezoneInfo.setTimezone(this.events.first().dateStart, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
     }
 
     /**
      * Sets or clears TimeZone for Date End.
      */
-    fun ICalendar.setEndTimeZone(timeZoneId: String?) {
+    override fun ICalendar.setEndTimeZone(timeZoneId: String?) {
         this.events.first()?.dateEnd?.let { this.timezoneInfo.setTimezone(this.events.first().dateEnd, if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))) }
     }
 
-    fun ICalendar.setDefaultTimeZone(timeZoneId: String?) {
+    override fun ICalendar.setDefaultTimeZone(timeZoneId: String?) {
         this.timezoneInfo.defaultTimezone = if (timeZoneId == null) null else TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), VTimezone(timeZoneId))
     }
 
     /**
      * Sets start and end timezones, preserving the original local datetimes.
      */
-    fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZoneId: String) {
-
+    override fun ICalendar.adjustStartEndTimeZones(currentDateTimeTimezoneId: String, timeZoneId: String) {
 
         val event = this.events.first()
 
         TimberLogger.d("adjusting timezone from ${currentDateTimeTimezoneId} to $timeZoneId")
-//    TimberLogger.d("current start timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
-//    TimberLogger.d("current end timezone $${this.timezoneInfo.getTimezone(event.dateStart)?.timeZone?.id}")
 
         val endTimeZoneId = currentDateTimeTimezoneId//this.timezoneInfo.getTimezone(event.dateEnd)?.timeZone?.id ?: this.timezoneInfo.defaultTimezone?.timeZone?.id ?: "UTC"
 
@@ -743,7 +683,7 @@ object ICalUtils {
      *
      * @param timeZoneId needed to correctly interpret Dates if we are about to remove timezone info
      */
-    fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
+    override fun ICalendar.adjustOutgoingAllDayEvent(timeZoneId: String) {
         this.timezoneInfo.timezones.clear()
         this.events.first().apply {
             setStart(this.getStart(timeZoneId)!!.toLocalDate())
@@ -751,7 +691,7 @@ object ICalUtils {
         }
     }
 
-    fun ICalendar.adjustIncomingAllDayEvent() {
+    override fun ICalendar.adjustIncomingAllDayEvent() {
         this.events.first().apply {
 
             if (this.dateStart.value != null && !this.dateStart.value.hasTime()) {
@@ -764,29 +704,29 @@ object ICalUtils {
     }
 
 
-    fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
+    override fun VEvent.getStart(timeZoneId: String): ZonedDateTime? {
 
         if (this.dateStart?.value == null) return null
 
         return this.dateStart.value.toZonedDateTime(timeZoneId)
     }
 
-    fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
+    override fun VEvent.getEnd(timeZoneId: String): ZonedDateTime? {
 
         if (this.dateEnd?.value == null) return null
 
         return this.dateEnd.value.toZonedDateTime(timeZoneId)
     }
 
-    fun Attendee.extractEmail(): String? {
+    override fun Attendee.extractEmail(): String? {
         return extractEmail(this.uri, this.email, this.commonName)
     }
 
-    fun Organizer.extractEmail(): String? {
+    override fun Organizer.extractEmail(): String? {
         return extractEmail(this.uri, this.email, this.commonName)
     }
 
-    fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
+    private fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
         return when {
             uri?.contains("@") == true -> uri.substringAfter("mailto:")
             email?.contains("@") == true -> email
@@ -798,7 +738,7 @@ object ICalUtils {
     /**
      * Groups all-day and spanning multiple days Events first.
      */
-    fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event> {
+    override fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event> {
         val groupedByAllDayEvents = this.groupBy { it.isAllDay() || !it.spansSingleDay(timeZoneId = timeZoneId) }
         val result = mutableListOf<Event>()
         result.addAll(
@@ -813,30 +753,10 @@ object ICalUtils {
     }
 
     /**
-     * Assumes that elements matching the predicate will be continous in the list,
-     * so it breaks the loop eagerly.
-     */
-    fun <T> List<T>.filterFromTheEnd(predicate: (T) -> Boolean): List<T> {
-
-        val filtered = mutableListOf<T>()
-        var insideWindow = false
-        for (i in (this.size - 1) downTo 0) {
-            if (predicate.invoke(this[i])) {
-                insideWindow = true
-                filtered.add(0, this[i])
-            } else {
-                if (insideWindow) break
-            }
-        }
-
-        return filtered
-    }
-
-    /**
      * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
      * that original Event.
      */
-    fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
+    override fun List<Event>.filterOccurencesByRecurrenceId(): List<Event> { // TODO take SEQUENCE into account when filtering
 
         // TODO maybe we should make this use LocalDate so we can use an actual value of the RECURRENCE-ID
         return this.groupBy({it.uid}).mapValues { events ->
@@ -844,23 +764,7 @@ object ICalUtils {
         }.map { it.value }.toList()
     }
 
-    fun ICalDate.toZonedDateTime(timezone: String): ZonedDateTime {
-        return if (this.hasTime()) {
-            ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
-        } else {
-            this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
-        }
-    }
-
-    fun Date.toZonedDateTime(timezone: String, isAllDay: Boolean): ZonedDateTime {
-        return if (!isAllDay) {
-            ZonedDateTime.ofInstant(this.toInstant(), ZoneId.of(timezone))
-        } else {
-            this.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
-        }
-    }
-
-    fun formatUidForICal(eventUid: String): String {
+    override fun formatUidForICal(eventUid: String): String {
         // ICal fields maximum length is 75 octets. It separates its values with "\r\n[space]" when needed. In order to fetch
         //  the UID value from SharedEvents in DB, we need to add the ICal separator to our UID if its length is more than 75
         return if ((ICAL_UID_PREFIX + eventUid).length > ICAL_LINE_MAXIMUM_LENGTH) {
@@ -878,7 +782,7 @@ object ICalUtils {
         } else eventUid
     }
 
-    fun getResponseIcs(
+    override fun getResponseIcs(
         responseICalendar: ICalendar,
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
@@ -917,7 +821,7 @@ object ICalUtils {
         return iCalendar.printToString()
     }
 
-    fun getInviteIcs(
+    override fun getInviteIcs(
         newEvent: Event,
         sharedEventId: String,
         sharedSessionKey: String,

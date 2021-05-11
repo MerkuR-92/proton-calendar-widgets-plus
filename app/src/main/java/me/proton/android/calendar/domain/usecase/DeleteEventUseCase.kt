@@ -4,7 +4,7 @@ import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.handleDeleteThisAndFuture
-import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*

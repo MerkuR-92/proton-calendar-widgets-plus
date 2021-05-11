@@ -20,11 +20,20 @@ import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
+import me.proton.android.calendar.common.AndroidUtils.doAfterFilteredIntValueChanged
+import me.proton.android.calendar.common.AndroidUtils.formatMonthlyDayOfWeek
+import me.proton.android.calendar.common.AndroidUtils.getCheckedRadioButtonIndex
+import me.proton.android.calendar.common.AndroidUtils.setCustomOnCheckedChangeListener
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.showKeyboard
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatWithDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
-import me.proton.android.calendar.common.ICalUtils.printToString
-import me.proton.android.calendar.common.ICalUtils.toDayOfWeek
-import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toDayOfWeek
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.NoLayoutRadioGroup
@@ -239,7 +248,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     eventViewModel.handleRecurrenceUntilDate(newDate)
                     custom_recurrence_end_2.text = getString(
                         R.string.event_recurrence_ends_on_date,
-                        newDate.format()
+                        newDate.formatWithDayOfWeek()
                     )
                 }
             }
@@ -484,7 +493,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             if (it.isCustomRecurring()) {
                 //Set custom edit radio button text
                 event_form_recurrence_custom_edit.visibleOrGone(true)
-                event_form_recurrence_custom_edit.text = AndroidUtils.formatRecurrence(requireContext(), it, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+                event_form_recurrence_custom_edit.text = AndroidUtils.formatRecurrence(requireContext().resources, it, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
                 // handle custom recurrence rule
                 custom_recurrence_occurrence_time_radio_group.check(

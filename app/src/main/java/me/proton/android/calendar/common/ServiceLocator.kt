@@ -30,13 +30,12 @@ import org.koin.dsl.module
 
 val commonModule = module {
     single<Json> { Json { ignoreUnknownKeys = true } }
-    single<ICalUtils> { ICalUtils } // TODO maybe extract interface
+    single<ICalUtilsImpl> { ICalUtilsImpl } // TODO maybe extract interface
     single<Logger> { TimberLogger }
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
     single<ValueStoreProvider> { ValueStoreProviderImpl(get()) }
     single<AppDatabase> { AppDatabase(androidApplication()) }
     single<Crypto> { CryptoImpl(get()) }
-    single<AndroidUtils> { AndroidUtils(get()) }
 
 //    factory { new instance every time }
 //    single(named("special logger")) { TimberLogger } -> single { SpecialRepository(get("special logger")) }

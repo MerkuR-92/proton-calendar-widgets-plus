@@ -9,10 +9,12 @@ import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
-import me.proton.android.calendar.common.ICalUtils.clone
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
-import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_ATTENDEES
@@ -28,10 +30,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
-import me.proton.android.calendar.common.IcsSurgeryUtils.localizeDateToTimezone
-import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -114,7 +113,7 @@ object IcsSurgeryUtils {
 
             if (importedICalendars.isEmpty()) return HandleIcsResult.Error.NoEvents
 
-            (importedICalendars.firstOrNull() ?: return HandleIcsResult.Error.ParsingFailed).also { ICalUtils.normaliseICalendar(it) }
+            (importedICalendars.firstOrNull() ?: return HandleIcsResult.Error.ParsingFailed).also { ICalUtilsImpl.normaliseICalendar(it) }
         } catch (e: Exception) {
             TimberLogger.e("IcsSurgeryUtils: error parsing iCalendar", e)
             return HandleIcsResult.Error.ParsingFailed
@@ -206,7 +205,7 @@ object IcsSurgeryUtils {
         // X-WR-TIMEZONE: This one is not an official iCal property, but if present, we should try to convert it into a supported timezone, and use it to localize some UTC dates in the ICS.
         val xWrTimezone = this.getExperimentalProperty(X_WR_TIMEZONE)
         if (xWrTimezone != null) {
-            val timezoneId = AndroidUtils.fallbackTimeZone(xWrTimezone.value, fallbackToDefault = false)
+            val timezoneId = fallbackTimeZone(xWrTimezone.value, fallbackToDefault = false)
             if (timezoneId != null) {
                 this.setExperimentalProperty(X_WR_TIMEZONE, timezoneId)
             } else {
@@ -330,7 +329,7 @@ object IcsSurgeryUtils {
         // UNTIL: we should transform a DATE into the UTC DATETIME that corresponds to the end of the day in the DTSTART timezone
         if (this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == false) {
             val timezone = iCalendar.timezoneInfo.getTimezone(this.dateStart).timeZone.id
-            val newUntil = ICalUtils.allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
+            val newUntil = allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
             this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
         }
 
@@ -472,7 +471,7 @@ object IcsSurgeryUtils {
     private fun ICalendar.extractTzid(date: DateOrDateTimeProperty?): Boolean {
         // Extract TZID parameter to timezoneInfo if Biweekly didn't process it during parsing
         if (date?.value != null && !date.getParameter(TZID).isNullOrEmpty()) {
-            val supportedTzid = AndroidUtils.fallbackTimeZone(date.getParameter(TZID), fallbackToDefault = false) ?: return false
+            val supportedTzid = fallbackTimeZone(date.getParameter(TZID), fallbackToDefault = false) ?: return false
             this.timezoneInfo.setTimezone(date, TimezoneAssignment(TimeZone.getTimeZone(supportedTzid), supportedTzid))
         }
         return true
@@ -481,7 +480,7 @@ object IcsSurgeryUtils {
     private fun ICalendar.convertToSupportedTimezone(date: DateOrDateTimeProperty?): Boolean {
         // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
         this.timezoneInfo.getTimezone(date)?.let { timezoneAssignment ->
-            val supportedTzid = AndroidUtils.fallbackTimeZone(timezoneAssignment.timeZone.id, fallbackToDefault = false) ?: return false
+            val supportedTzid = fallbackTimeZone(timezoneAssignment.timeZone.id, fallbackToDefault = false) ?: return false
             if (supportedTzid != timezoneAssignment.timeZone.id) this.timezoneInfo.setTimezone(date, TimezoneAssignment(TimeZone.getTimeZone(supportedTzid), supportedTzid))
         }
         return true

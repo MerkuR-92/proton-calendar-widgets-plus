@@ -92,10 +92,5 @@ interface EventUtils {
     // TODO remove nullability from dateTimeStart/End and use function from ICalUtils
     fun Event.overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean
 
-    /**
-     * Checks if Event starting at [startDateTime] and ending at [endDateTime] overlaps with
-     * range [fromDate]-[toDate].
-     */
-    fun Event.startEndOverlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Boolean
     fun Event.overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean
 }

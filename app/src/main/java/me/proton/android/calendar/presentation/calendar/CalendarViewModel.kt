@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
+import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
@@ -577,8 +580,8 @@ class CalendarViewModel(
         updateTimeZoneDialogLastShown = LocalDate.now()
         val timeZoneId = timeZoneId.value
         timeZoneId?.let {
-            val systemTimeZone = AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
-            if (ICalUtils.areTimeZoneOffsetsDifferent(timeZoneId.id, systemTimeZone) == true) {
+            val systemTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
+            if (areTimeZoneOffsetsDifferent(timeZoneId.id, systemTimeZone) == true) {
                 // We add tags to the timezone string argument directly because it is not supported otherwise
                 val dialogMessage: Spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     Html.fromHtml(

@@ -7,9 +7,10 @@ import biweekly.property.Attendee
 import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.ICalUtils.getInviteIcs
-import me.proton.android.calendar.common.ICalUtils.getResponseIcs
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
+import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Event

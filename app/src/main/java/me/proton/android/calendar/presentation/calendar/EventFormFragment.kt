@@ -38,11 +38,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.formattedTimeZoneToId
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.showKeyboard
+import me.proton.android.calendar.common.AndroidUtils.sortFormattedTimeZoneIds
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
-import me.proton.android.calendar.common.ICalUtils.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -646,7 +654,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event_form_end_date.text = formattedEnd.first ?: ""
             event_form_end_time.text = formattedEnd.second ?: ""
 
-            event_form_timezone.text = ICalUtils.formatTimeZoneId(
+            event_form_timezone.text = formatTimeZoneId(
                 event.defaultTimeZone!!,
                 eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!
             ) // TimeZone picked by user is saved in iCalendar's Default Timezone
@@ -658,7 +666,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             )
 
             event_form_recurrence.text =
-                AndroidUtils.formatRecurrence(requireContext(), event, eventViewModel.eventTimeZoneId)
+                AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId)
                     ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
@@ -746,13 +754,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val forInstant = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!
             val formattedTimeZoneIds = allowedTimezoneIds.map {
-                ICalUtils.formatTimeZoneId(it, forInstant)
+                formatTimeZoneId(it, forInstant)
             }.toTypedArray()
             formattedTimeZoneIds.sortFormattedTimeZoneIds()
             val defaultTimeZone = eventViewModel.eventLiveData.value?.defaultTimeZone
             val selectedIndex =
                 if (defaultTimeZone == null) -1
-                else formattedTimeZoneIds.indexOf(ICalUtils.formatTimeZoneId(defaultTimeZone, forInstant))
+                else formattedTimeZoneIds.indexOf(formatTimeZoneId(defaultTimeZone, forInstant))
 
             AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
                 eventViewModel.handleTimeZone(formattedTimeZoneIds[it].formattedTimeZoneToId())

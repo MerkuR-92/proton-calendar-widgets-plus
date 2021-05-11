@@ -49,20 +49,17 @@ import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
-import me.proton.android.calendar.common.ICalUtils.toDayOfWeek
-import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toDayOfWeek
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
-import me.proton.core.presentation.utils.InputValidationResult
 import okhttp3.internal.toHexString
 import java.text.Normalizer
-import java.text.SimpleDateFormat
 import java.time.*
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.time.temporal.ChronoField
 import java.time.temporal.WeekFields
 import java.util.*
 import java.util.Locale.getDefault
@@ -72,9 +69,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.min
 
-class AndroidUtils(context: Context) {
-
-    companion object {
+object AndroidUtils {
 
         fun displayTimePicker(
             context: Context,
@@ -280,30 +275,16 @@ class AndroidUtils(context: Context) {
             materialDialogBuilder.show()
         }
 
-        fun formatRecurrence(context: Context, event: Event, timeZoneId: String): String? {
-
-            // TODO
-            val startWeekOnMonday = true
+        fun formatRecurrence(resources: Resources, event: Event, timeZoneId: String): String? {
 
             val recurrence = event.iCalEvent.recurrenceRule?.value
             if (recurrence != null) {
 
-
-
-
                 val label = listOfNotNull(
                     recurrence.frequency?.let { // non-custom recurrence
 
-// val format = "{0,ordinal}"
-//
-//    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//        android.icu.text.MessageFormat.format(format, this)
-//    } else {
-//        com.ibm.icu.text.MessageFormat.format(format, this)
-//    }
-
                         val onDaysOfWeek = if (recurrence.byDay?.size == 7) {
-                            context.getString(R.string.event_recurrence_weekly_on_all_days)
+                            resources.getString(R.string.event_recurrence_weekly_on_all_days)
                         } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/ })
                             ?.mapIndexedNotNull { index, byDay ->
 
@@ -316,10 +297,10 @@ class AndroidUtils(context: Context) {
                                 val dayOrdinal = if (dayNumber == null) {
                                     null
                                 } else if (dayNumber > 0) {
-                                    context.resources.getStringArray(R.array.ordinals_as_words)
+                                    resources.getStringArray(R.array.ordinals_as_words)
                                         .getOrNull(dayNumber)
                                 } else {
-                                    context.resources.getStringArray(R.array.ordinals_as_words_backwards)
+                                    resources.getStringArray(R.array.ordinals_as_words_backwards)
                                         .getOrNull(dayNumber * -1)
                                 }
 
@@ -332,12 +313,12 @@ class AndroidUtils(context: Context) {
                             Frequency.DAILY -> {
                                 val repeat =
                                     if (recurrence.interval == null || recurrence.interval == 1) {
-                                        context.getString(R.string.event_recurrence_daily)
+                                        resources.getString(R.string.event_recurrence_daily)
                                     } else {
-                                        context.getString(
+                                        resources.getString(
                                             R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            context.resources.getQuantityString(
+                                            resources.getQuantityString(
                                                 R.plurals.plural_day,
                                                 recurrence.interval,
                                                 recurrence.interval
@@ -349,19 +330,19 @@ class AndroidUtils(context: Context) {
                             Frequency.WEEKLY -> {
                                 val repeat =
                                     if (recurrence.interval == null || recurrence.interval == 1) {
-                                        context.getString(R.string.event_recurrence_weekly)
+                                        resources.getString(R.string.event_recurrence_weekly)
                                     } else {
-                                        context.getString(
+                                        resources.getString(
                                             R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            context.resources.getQuantityString(
+                                            resources.getQuantityString(
                                                 R.plurals.plural_week,
                                                 recurrence.interval,
                                                 recurrence.interval
                                             )
                                         )
                                     }
-                                context.getString(
+                                resources.getString(
                                     R.string.event_recurrence_occurs_on_day_of_week,
                                     repeat,
                                     if (onDaysOfWeek.isNullOrBlank()) {
@@ -372,12 +353,12 @@ class AndroidUtils(context: Context) {
                             Frequency.MONTHLY -> {
                                 val repeat =
                                     if (recurrence.interval == null || recurrence.interval == 1) {
-                                        context.getString(R.string.event_recurrence_monthly)
+                                        resources.getString(R.string.event_recurrence_monthly)
                                     } else {
-                                        context.getString(
+                                        resources.getString(
                                             R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            context.resources.getQuantityString(
+                                            resources.getQuantityString(
                                                 R.plurals.plural_month,
                                                 recurrence.interval,
                                                 recurrence.interval
@@ -386,14 +367,14 @@ class AndroidUtils(context: Context) {
                                     }
 
                                 if (onDaysOfWeek.isNullOrBlank()) {
-                                    context.getString(
+                                    resources.getString(
                                         R.string.event_recurrence_occurs_on_day_of_month,
                                         repeat,
                                         event.getStart(timeZoneId)
                                             .toLocalDate().dayOfMonth
                                     )
                                 } else {
-                                    context.getString(
+                                    resources.getString(
                                         R.string.event_recurrence_occurs_on_day_of_week_full_words,
                                         repeat,
                                         onDaysOfWeek
@@ -403,12 +384,12 @@ class AndroidUtils(context: Context) {
                             Frequency.YEARLY -> {
                                 val repeat =
                                     if (recurrence.interval == null || recurrence.interval == 1) {
-                                        context.getString(R.string.event_recurrence_yearly)
+                                        resources.getString(R.string.event_recurrence_yearly)
                                     } else {
-                                        context.getString(
+                                        resources.getString(
                                             R.string.event_recurrence_every_some_period,
                                             recurrence.interval,
-                                            context.resources.getQuantityString(
+                                            resources.getQuantityString(
                                                 R.plurals.plural_year,
                                                 recurrence.interval,
                                                 recurrence.interval
@@ -422,7 +403,7 @@ class AndroidUtils(context: Context) {
                     },
                     recurrence.count?.let {
                         "${if (it > 1) "$it " else ""}${
-                            context.resources.getQuantityString(
+                            resources.getQuantityString(
                                 R.plurals.plural_recurrence_count,
                                 it,
                                 it
@@ -430,7 +411,7 @@ class AndroidUtils(context: Context) {
                         }"
                     },
                     recurrence.until?.let {
-                        context.getString(
+                        resources.getString(
                             R.string.event_recurrence_until,
                             it.toZonedDateTime(timeZoneId).formatDate(timeZoneId)
                         )
@@ -538,7 +519,7 @@ class AndroidUtils(context: Context) {
                     }
                 ).joinToString(separator = ", ")
 
-                val alarmTime = startDate.toLocalTime().format(is24Hour)
+                val alarmTime = startDate.toLocalTime().formatTime(is24Hour)
 
                 if (label.isBlank()) {
                     null
@@ -714,552 +695,454 @@ class AndroidUtils(context: Context) {
             return "#${color.toHexString()}"
         }
 
+
+    fun Activity.clearFocusAndHideKeyboard(view: View?) {
+        val windowToken = view?.rootView?.windowToken
+        val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(windowToken, 0)
+        view?.clearFocus()
+    }
+
+    fun Context.showKeyboard() {
+        (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+            .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+    }
+
+    data class TimePickerData(
         /**
-         * If supplied TimeZone is not supported, fallback retaining UTC offset.
+         * 0-23
          */
-        fun fallbackTimeZone(timeZone: String, fallbackToDefault: Boolean = true): String? {
+        val hour: Int,
+        /**
+         * 0-59
+         */
+        val minute: Int,
+        val is24Hour: Boolean
+    )
 
-            return if (allowedTimezoneIds.contains(timeZone)) {
-                timeZone
-            } else {
+    /**
+     * Month is normalized to be 1-based.
+     */
+    data class DatePickerData(
+        val year: Int,
+        /**
+         * 1-12
+         */
+        val month: Int,
+        val day: Int
+    )
 
-                if (TimeZone.getAvailableIDs().contains(timeZone)) {
+    fun View.visibleOrGone(visible: Boolean) {
+        this.visibility = if (visible) View.VISIBLE else View.GONE
+    }
 
-                    val offset = TimeZone.getTimeZone(timeZone).getOffset(Date.from(Instant.now()).time)
-                    val alternativeTimezones = TimeZone.getAvailableIDs(offset).filter { allowedTimezoneIds.contains(it) }
+    fun View.visibleOrInvisible(visible: Boolean) {
+        this.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    }
 
-                    val alternative = alternativeTimezones.firstOrNull { it.startsWith(timeZone.substringBefore("/")) } ?: alternativeTimezones.firstOrNull()
-
-                    alternative ?: if (fallbackToDefault) TimeZone.getDefault().id else null
-                } else {
-                    if (fallbackToDefault) TimeZone.getDefault().id
-                    else null
+    fun View.animateHeightChange(toHeightPx: Int, onAnimationEnd: () -> Unit) {
+        if (this.measuredHeight != toHeightPx) {
+            val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
+            valueAnimator.duration = 300L
+            valueAnimator.addUpdateListener {
+                val animatedValue = valueAnimator.animatedValue as Int
+                val layoutParams = this.layoutParams.apply {
+                    height = animatedValue
                 }
+                this.layoutParams = layoutParams
+            }
+            valueAnimator.start()
+            valueAnimator.doOnEnd { onAnimationEnd.invoke() }
+        }
+    }
+
+
+    /**
+     * Listens for changes in EditText, only propagates values within range or forces default when
+     * value is non-empty, but incorrect.
+     *
+     * @return TextWatcher so we can disable listening to that EditText
+     */
+    fun EditText.doAfterFilteredIntValueChanged(
+        default: Int,
+        min: Int,
+        max: Int,
+        onValueChanged: (value: Int) -> Unit
+    ): TextWatcher {
+        return this.doAfterTextChanged {
+            if (!it.isNullOrBlank()) {
+                val count = it.toString().toIntOrNull()
+                when {
+                    count == null || it.toString().startsWith("0") -> {
+                        this.setText(default.toString())
+                    }
+                    count < min -> {
+                        this.setText(min.toString())
+                    }
+                    count > max -> {
+                        this.setText(max.toString())
+                    }
+                    else -> {
+                        onValueChanged(count)
+                    }
+                }
+                this.setSelection(this.text.toString().length)
             }
         }
     }
-}
 
-fun Activity.clearFocusAndHideKeyboard(view: View?) {
-    val windowToken = view?.rootView?.windowToken
-    val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-    imm?.hideSoftInputFromWindow(windowToken, 0)
-    view?.clearFocus()
-}
-
-fun Context.showKeyboard() {
-    (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-        .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
-}
-
-data class TimePickerData(
     /**
-     * 0-23
+     *
      */
-    val hour: Int,
+    fun RadioGroup.checkIndex(index: Int) {
+        this.children.filter { it is RadioButton }.elementAtOrNull(index)?.let {
+            this.check(it.id)
+        }
+    }
+
+
+
     /**
-     * 0-59
+     * Returns "first Monday", "second Friday" etc.
+     *
+     * @param reversed when we need reversed ordinals, like "last Friday"
      */
-    val minute: Int,
-    val is24Hour: Boolean
-)
+    fun LocalDate.formatMonthlyDayOfWeek(resources: Resources, backwards: Boolean = false): String {
 
-/**
- * Month is normalized to be 1-based.
- */
-data class DatePickerData(
-    val year: Int,
+        val ordinal = if (backwards) {
+            resources.getStringArray(R.array.ordinals_as_words_backwards)[1] // TODO we support only the last weekdays in month
+        } else {
+            resources.getStringArray(R.array.ordinals_as_words)[this.weekInMonth()]
+        }
+
+        return "$ordinal ${this.dayOfWeek.format()}"
+
+    }
+
     /**
-     * 1-12
+     * @param id string resource formatted with CDATA if support for basic formatting is needed
      */
-    val month: Int,
-    val day: Int
-)
+    fun Context.getText(@StringRes id: Int, vararg args: Any?): CharSequence {
+        val text = String.format(getString(id), *args)
+        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT)
+    }
 
-fun View.visibleOrGone(visible: Boolean) {
-    this.visibility = if (visible) View.VISIBLE else View.GONE
-}
+    fun <T> concatenate(vararg lists: List<T>): List<T> {
+        return listOf(*lists).flatten()
+    }
 
-fun View.visibleOrInvisible(visible: Boolean) {
-    this.visibility = if (visible) View.VISIBLE else View.INVISIBLE
-}
+    fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
+        // Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
+        return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
+    }
 
-fun View.animateHeightChange(toHeightPx: Int, onAnimationEnd: () -> Unit) {
-    if (this.measuredHeight != toHeightPx) {
-        val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
-        valueAnimator.duration = 300L
-        valueAnimator.addUpdateListener {
-            val animatedValue = valueAnimator.animatedValue as Int
-            val layoutParams = this.layoutParams.apply {
-                height = animatedValue
+    class CustomOnCheckedChangeListener(private val onCustomOnCheckedChange: (RadioGroup, Int) -> Unit) : RadioGroup.OnCheckedChangeListener {
+        override fun onCheckedChanged(radioGroup: RadioGroup, checkedId: Int) {
+            radioGroup.children.forEach {
+                if (getCheckedRadioButtonIndex(radioGroup) != radioGroup.indexOfChild(it))
+                    it.jumpDrawablesToCurrentState()
             }
-            this.layoutParams = layoutParams
-        }
-        valueAnimator.start()
-        valueAnimator.doOnEnd { onAnimationEnd.invoke() }
-    }
-}
-
-
-/**
- * Listens for changes in EditText, only propagates values within range or forces default when
- * value is non-empty, but incorrect.
- *
- * @return TextWatcher so we can disable listening to that EditText
- */
-fun EditText.doAfterFilteredIntValueChanged(
-    default: Int,
-    min: Int,
-    max: Int,
-    onValueChanged: (value: Int) -> Unit
-): TextWatcher {
-    return this.doAfterTextChanged {
-        if (!it.isNullOrBlank()) {
-            val count = it.toString().toIntOrNull()
-            when {
-                count == null || it.toString().startsWith("0") -> {
-                    this.setText(default.toString())
-                }
-                count < min -> {
-                    this.setText(min.toString())
-                }
-                count > max -> {
-                    this.setText(max.toString())
-                }
-                else -> {
-                    onValueChanged(count)
-                }
-            }
-            this.setSelection(this.text.toString().length)
+            onCustomOnCheckedChange(radioGroup, checkedId)
         }
     }
-}
 
-/**
- *
- */
-fun RadioGroup.checkIndex(index: Int) {
-    this.children.filter { it is RadioButton }.elementAtOrNull(index)?.let {
-        this.check(it.id)
-    }
-}
-
-fun LocalTime.format(is24Hour: Boolean?): String {
-    return if (is24Hour == true) {
-        this.format(DateTimeFormatter.ofPattern("HH:mm").withLocale(getLocaleForFormatting()))
-    } else if (is24Hour == false) {
-        this.format(DateTimeFormatter.ofPattern("hh:mm a").withLocale(getLocaleForFormatting()))
-    } else {
-        this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocaleForFormatting()))
-    }
-}
-
-// TODO add and change parameters for customisation
-fun LocalDate.format(showDayOfWeek: Boolean = false): String {
-
-    val dateTimeFormatter = if (showDayOfWeek) {
-        DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting())
-    } else {
-        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocaleForFormatting())
-    }
-
-    return this.format(dateTimeFormatter)
-}
-
-fun LocalDate.isLastDayOfWeekInMonth() = this.plusDays(7).monthValue != this.monthValue
-
-// TODO add function for calculating how many days-of-week are there in a given month, we can use it for "backwards" formatting then
-
-fun LocalDate.weekInMonth() = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
-
-/**
- * Returns "January", etc.
- */
-fun LocalDate.formatMonth(capitalize: Boolean = false): String {
-    val dateFormat = SimpleDateFormat("LLLL", getLocaleForFormatting())
-    val formattedMonth = dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-    if (capitalize)
-        return formattedMonth.substring(0, 1).toUpperCase(getDefault()) +
-                formattedMonth.substring(1).toLowerCase(getDefault())
-    return formattedMonth
-}
-
-fun LocalDate.formatDayOfWeek(short: Boolean = false): String {
-    val dateFormat = SimpleDateFormat(if (short) "E" else "EEEE", getLocaleForFormatting())
-    return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-}
-
-/**
- * We only allow Locales used to format date & time that our application is translated to.
- */
-fun getLocaleForFormatting(): Locale {
-    return when (getDefault()) {
-        // add mapping for other supported Locales
-        else -> Locale.US
-    }
-}
-
-/**
- * Returns "first Monday", "second Friday" etc.
- *
- * @param reversed when we need reversed ordinals, like "last Friday"
- */
-fun LocalDate.formatMonthlyDayOfWeek(resources: Resources, backwards: Boolean = false): String {
-
-    val ordinal = if (backwards) {
-        resources.getStringArray(R.array.ordinals_as_words_backwards)[1] // TODO we support only the last weekdays in month
-    } else {
-        resources.getStringArray(R.array.ordinals_as_words)[this.weekInMonth()]
-    }
-
-    return "$ordinal ${this.dayOfWeek.format()}"
-
-}
-
-/**
- * @param id string resource formatted with CDATA if support for basic formatting is needed
- */
-fun Context.getText(@StringRes id: Int, vararg args: Any?): CharSequence {
-    val text = String.format(getString(id), *args)
-    return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_COMPACT)
-}
-
-fun <T> concatenate(vararg lists: List<T>): List<T> {
-    return listOf(*lists).flatten()
-}
-
-fun getCheckedRadioButtonIndex(radioGroup: RadioGroup): Int {
-    // Found a bug where id of radio custom was 10 instead of 5, this makes sure we have the right id
-    return radioGroup.indexOfChild(radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId))
-}
-
-class CustomOnCheckedChangeListener(private val onCustomOnCheckedChange: (RadioGroup, Int) -> Unit) : RadioGroup.OnCheckedChangeListener {
-    override fun onCheckedChanged(radioGroup: RadioGroup, checkedId: Int) {
-        radioGroup.children.forEach {
-            if (getCheckedRadioButtonIndex(radioGroup) != radioGroup.indexOfChild(it))
-                it.jumpDrawablesToCurrentState()
+    fun RadioGroup.setCustomOnCheckedChangeListener(onCustomOnCheckedChange: (RadioGroup, Int) -> Unit) {
+        val customOnCheckedChangeListener = CustomOnCheckedChangeListener { radioGroup, index ->
+            onCustomOnCheckedChange(radioGroup, index)
         }
-        onCustomOnCheckedChange(radioGroup, checkedId)
+        setOnCheckedChangeListener(customOnCheckedChangeListener)
     }
-}
 
-fun RadioGroup.setCustomOnCheckedChangeListener(onCustomOnCheckedChange: (RadioGroup, Int) -> Unit) {
-    val customOnCheckedChangeListener = CustomOnCheckedChangeListener { radioGroup, index ->
-        onCustomOnCheckedChange(radioGroup, index)
+    fun getInitials(name: String): String {
+        if (name.isBlank()) return ""
+        val initials = name.toUpperCase().split(' ')
+            .mapNotNull { it.firstOrNull()?.toString() }
+            .reduce { acc, s -> acc + s }
+        //Keep only the first and last initials
+        return if (initials.length > 2) initials[0].toString() + initials[initials.lastIndex] else initials
     }
-    setOnCheckedChangeListener(customOnCheckedChangeListener)
-}
 
-fun getInitials(name: String): String {
-    if (name.isBlank()) return ""
-    val initials = name.toUpperCase().split(' ')
-        .mapNotNull { it.firstOrNull()?.toString() }
-        .reduce { acc, s -> acc + s }
-    //Keep only the first and last initials
-    return if (initials.length > 2) initials[0].toString() + initials[initials.lastIndex] else initials
-}
+    fun expand(v: View, duration: Long? = null, height: Int? = null) {
+        val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
+        val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
+        val targetHeight = height?: v.measuredHeight
+        if (targetHeight == 0) {
+            TimberLogger.d("animation expand skipped")
+            v.visibility = View.VISIBLE
+            return
+        }
+        TimberLogger.d("animation expand : targetHeight = ${targetHeight}")
 
-fun expand(v: View, duration: Long? = null, height: Int? = null) {
-    val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
-    val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-    v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
-    val targetHeight = height?: v.measuredHeight
-    if (targetHeight == 0) {
-        TimberLogger.d("animation expand skipped")
+        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+        v.layoutParams.height = 1
         v.visibility = View.VISIBLE
-        return
-    }
-    TimberLogger.d("animation expand : targetHeight = ${targetHeight}")
-
-    // Older versions of android (pre API 21) cancel animations for views with a height of 0.
-    v.layoutParams.height = 1
-    v.visibility = View.VISIBLE
-    val animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-            // We make sure height cannot be set to 0 to avoid UI glitch when starting expand animation
-            v.layoutParams.height =
-                if (targetHeight == 0 || interpolatedTime == 0f) 1 else if (interpolatedTime == 1f) targetHeight else (targetHeight * interpolatedTime).toInt()
-            TimberLogger.d("animation expand : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
-            v.requestLayout()
-        }
-
-        override fun willChangeBounds(): Boolean {
-            return true
-        }
-    }
-
-    // Expansion speed of 1dp/ms
-    val animationDuration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
-    animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
-    TimberLogger.d("animation expand : duration = ${animation.duration}")
-    v.startAnimation(animation)
-}
-
-fun collapse(v: View, duration: Long? = null): Int {
-    val initialHeight = v.measuredHeight
-    TimberLogger.d("animation collapse : initialHeight = ${initialHeight}")
-    val animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-            if (interpolatedTime == 1f) {
-                v.visibility = View.GONE
-            } else {
-                v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
+        val animation = object : Animation() {
+            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                // We make sure height cannot be set to 0 to avoid UI glitch when starting expand animation
+                v.layoutParams.height =
+                    if (targetHeight == 0 || interpolatedTime == 0f) 1 else if (interpolatedTime == 1f) targetHeight else (targetHeight * interpolatedTime).toInt()
+                TimberLogger.d("animation expand : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
                 v.requestLayout()
             }
-            TimberLogger.d("animation collapse : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+
+            override fun willChangeBounds(): Boolean {
+                return true
+            }
         }
 
-        override fun willChangeBounds(): Boolean {
-            return true
+        // Expansion speed of 1dp/ms
+        val animationDuration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
+        animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
+        TimberLogger.d("animation expand : duration = ${animation.duration}")
+        v.startAnimation(animation)
+    }
+
+    fun collapse(v: View, duration: Long? = null): Int {
+        val initialHeight = v.measuredHeight
+        TimberLogger.d("animation collapse : initialHeight = ${initialHeight}")
+        val animation = object : Animation() {
+            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                if (interpolatedTime == 1f) {
+                    v.visibility = View.GONE
+                } else {
+                    v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
+                    v.requestLayout()
+                }
+                TimberLogger.d("animation collapse : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+            }
+
+            override fun willChangeBounds(): Boolean {
+                return true
+            }
+        }
+
+        // Collapse speed of 1dp/ms
+        val animationDuration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
+        animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
+        TimberLogger.d("animation collapse : duration = ${animation.duration}")
+        v.startAnimation(animation)
+        return initialHeight
+    }
+
+    fun rotateArrowDownward(v: View, duration: Long = 100) {
+        val rotate =
+            RotateAnimation(
+                180F,
+                0F,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
+        rotate.interpolator = LinearInterpolator()
+        rotate.fillAfter = true
+        rotate.duration = duration
+        v.startAnimation(rotate)
+    }
+
+    fun rotateArrowUpward(v: View, duration: Long = 100) {
+        val rotate =
+            RotateAnimation(
+                0F,
+                180F,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
+        rotate.interpolator = LinearInterpolator()
+        rotate.fillAfter = true
+        rotate.duration = duration
+        v.startAnimation(rotate)
+    }
+
+    fun setStripedBackground(view: View, context: Context, stripeColor: Int) {
+        val colorDrawable = ColorDrawable(ContextCompat.getColor(context, R.color.background_norm)) // bg color3
+        val vDrawable = AppCompatResources.getDrawable(context, R.drawable.vector_stripes) // vector drawable
+        vDrawable?.setTint(stripeColor)
+        vDrawable?.alpha = 51 // decimal value for 20% opacity
+
+        if (vDrawable != null) {
+            val bitmap = Bitmap.createBitmap(
+                vDrawable.intrinsicWidth, vDrawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            vDrawable.setBounds(0, 0, canvas.width, canvas.height)
+            vDrawable.draw(canvas)
+            val bitmapDrawable = BitmapDrawable(context.resources, bitmap)
+            bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT) // set repeat
+            val drawable = LayerDrawable(arrayOf(colorDrawable, bitmapDrawable))
+            view.background = drawable
         }
     }
 
-    // Collapse speed of 1dp/ms
-    val animationDuration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
-    animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
-    TimberLogger.d("animation collapse : duration = ${animation.duration}")
-    v.startAnimation(animation)
-    return initialHeight
-}
-
-fun rotateArrowDownward(v: View, duration: Long = 100) {
-    val rotate =
-        RotateAnimation(
-            180F,
-            0F,
-            Animation.RELATIVE_TO_SELF,
-            0.5f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f
-        )
-    rotate.interpolator = LinearInterpolator()
-    rotate.fillAfter = true
-    rotate.duration = duration
-    v.startAnimation(rotate)
-}
-
-fun rotateArrowUpward(v: View, duration: Long = 100) {
-    val rotate =
-        RotateAnimation(
-            0F,
-            180F,
-            Animation.RELATIVE_TO_SELF,
-            0.5f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f
-        )
-    rotate.interpolator = LinearInterpolator()
-    rotate.fillAfter = true
-    rotate.duration = duration
-    v.startAnimation(rotate)
-}
-
-fun setStripedBackground(view: View, context: Context, stripeColor: Int) {
-    val colorDrawable = ColorDrawable(ContextCompat.getColor(context, R.color.background_norm)) // bg color3
-    val vDrawable = AppCompatResources.getDrawable(context, R.drawable.vector_stripes) // vector drawable
-    vDrawable?.setTint(stripeColor)
-    vDrawable?.alpha = 51 // decimal value for 20% opacity
-
-    if (vDrawable != null) {
-        val bitmap = Bitmap.createBitmap(
-            vDrawable.intrinsicWidth, vDrawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        vDrawable.setBounds(0, 0, canvas.width, canvas.height)
-        vDrawable.draw(canvas)
-        val bitmapDrawable = BitmapDrawable(context.resources, bitmap)
-        bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT) // set repeat
-        val drawable = LayerDrawable(arrayOf(colorDrawable, bitmapDrawable))
-        view.background = drawable
+    fun getParticipationStatusPriorityValue(participationStatus: ParticipationStatus): Int {
+        // Lower value means higher priority in list, sort by ascending order
+        return when(participationStatus) {
+            ParticipationStatus.ACCEPTED -> 0
+            ParticipationStatus.TENTATIVE -> 1
+            ParticipationStatus.DECLINED -> 2
+            ParticipationStatus.NEEDS_ACTION -> 3
+            else -> 4
+        }
     }
-}
 
-fun getParticipationStatusPriorityValue(participationStatus: ParticipationStatus): Int {
-    // Lower value means higher priority in list, sort by ascending order
-    return when(participationStatus) {
-        ParticipationStatus.ACCEPTED -> 0
-        ParticipationStatus.TENTATIVE -> 1
-        ParticipationStatus.DECLINED -> 2
-        ParticipationStatus.NEEDS_ACTION -> 3
-        else -> 4
+    fun Context.showToast(text: String) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
-}
 
-fun Context.showToast(text: String) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-}
+    // Call this method to display SnackBar in a Fragment
+    fun Activity.displaySnackBar(message: String, length: Int? = null) {
+        Snackbar.make(
+            this.findViewById<View>(android.R.id.content),
+            message,
+            length ?: Snackbar.LENGTH_SHORT
+        ).show()
+    }
 
-// Call this method to display SnackBar in a Fragment
-fun Activity.displaySnackBar(message: String, length: Int? = null) {
-    Snackbar.make(
-        this.findViewById<View>(android.R.id.content),
-        message,
-        length ?: Snackbar.LENGTH_SHORT
-    ).show()
-}
+    // Call this method to display SnackBar in a DialogFragment
+    fun View.displaySnackBar(message: String, length: Int? = null) {
+        Snackbar.make(
+            this,
+            message,
+            length ?: Snackbar.LENGTH_SHORT
+        ).show()
+    }
 
-// Call this method to display SnackBar in a DialogFragment
-fun View.displaySnackBar(message: String, length: Int? = null) {
-    Snackbar.make(
-        this,
-        message,
-        length ?: Snackbar.LENGTH_SHORT
-    ).show()
-}
+    @BindingAdapter("onSingleClick")
+    fun View.setOnSingleClickListener(clickListener: View.OnClickListener?) {
+        clickListener?.also {
+            setOnClickListener(OnSingleClickListener(it))
+        } ?: setOnClickListener(null)
+    }
 
-@BindingAdapter("onSingleClick")
-fun View.setOnSingleClickListener(clickListener: View.OnClickListener?) {
-    clickListener?.also {
-        setOnClickListener(OnSingleClickListener(it))
-    } ?: setOnClickListener(null)
-}
+    class OnSingleClickListener(
+        private val clickListener: View.OnClickListener,
+    ) : View.OnClickListener {
+        private var canClick = AtomicBoolean(true)
 
-class OnSingleClickListener(
-    private val clickListener: View.OnClickListener,
-) : View.OnClickListener {
-    private var canClick = AtomicBoolean(true)
-
-    override fun onClick(v: View?) {
-        if (canClick.getAndSet(false)) {
-            v?.run {
-                postDelayed({
-                    canClick.set(true)
-                }, CLICK_INTERVAL_MS)
-                clickListener.onClick(v)
+        override fun onClick(v: View?) {
+            if (canClick.getAndSet(false)) {
+                v?.run {
+                    postDelayed({
+                        canClick.set(true)
+                    }, CLICK_INTERVAL_MS)
+                    clickListener.onClick(v)
+                }
             }
         }
     }
-}
 
-fun Array<String>.sortFormattedTimeZoneIds() {
-    this.sortWith { a, b ->
-        val aFloat = a.formattedTimeZoneToFloat()
-        val bFloat = b.formattedTimeZoneToFloat()
-        when {
-            (aFloat < bFloat) -> 1
-            (aFloat > bFloat) -> -1
-            (a < b) -> -1
-            (a > b) -> 1
+    fun Array<String>.sortFormattedTimeZoneIds() {
+        this.sortWith { a, b ->
+            val aFloat = a.formattedTimeZoneToFloat()
+            val bFloat = b.formattedTimeZoneToFloat()
+            when {
+                (aFloat < bFloat) -> 1
+                (aFloat > bFloat) -> -1
+                (a < b) -> -1
+                (a > b) -> 1
+                else -> 0
+            }
+        }
+    }
+
+    /**
+     * Returns timezone offset as float from formatted timezone with offset
+     */
+    private fun String.formattedTimeZoneToFloat(): Float {
+        val pattern = Pattern.compile("^.*GMT([+-]\\d{1,2}):?(\\d{1,2})?\\).*\$")
+        val matcher = pattern.matcher(this)
+        matcher.find()
+        val hours = matcher.group(1)?.toFloat()
+        val minutes = matcher.group(2)?.toFloat()?.div(100) ?: 0F
+        return (hours ?: 0F) + minutes
+    }
+
+    /**
+     * Returns timezone id from formatted timezone with offset
+     */
+    fun String.formattedTimeZoneToId(): String {
+        return this.replace(
+            Regex(" (\\(GMT[+-]\\d{1,2}:?(\\d{1,2})?\\))"),
+            ""
+        )
+    }
+
+    fun getCurrentLocale(context: Context): Locale? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.resources.configuration.locales[0]
+        } else {
+            context.resources.configuration.locale
+        }
+    }
+
+    fun Context.dpToPixel(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+
+    fun Context.pixelToDp(pixel: Int): Int {
+        return (pixel / resources.displayMetrics.density).toInt()
+    }
+
+    fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {
+        1 -> java.time.DayOfWeek.MONDAY
+        6 -> java.time.DayOfWeek.SATURDAY
+        7 -> java.time.DayOfWeek.SUNDAY
+        else -> WeekFields.of(getDefault()).firstDayOfWeek
+    }
+
+    fun removeAccents(string: CharSequence): String {
+        val regex = "\\p{InCombiningDiacriticalMarks}+".toRegex()
+        val temp = Normalizer.normalize(string, Normalizer.Form.NFD)
+        return regex.replace(temp, "")
+    }
+
+    inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
+        if (this is T) block()
+    }
+
+    fun Int.toParticipationStatus(): ParticipationStatus {
+        return when (this) {
+            1 -> ParticipationStatus.TENTATIVE
+            2 -> ParticipationStatus.DECLINED
+            3 -> ParticipationStatus.ACCEPTED
+            else -> ParticipationStatus.NEEDS_ACTION
+        }
+    }
+
+    fun ParticipationStatus.toInt(): Int {
+        return when (this) {
+            ParticipationStatus.TENTATIVE -> 1
+            ParticipationStatus.DECLINED -> 2
+            ParticipationStatus.ACCEPTED -> 3
             else -> 0
         }
     }
-}
 
-/**
- * Returns timezone offset as float from formatted timezone with offset
- */
-private fun String.formattedTimeZoneToFloat(): Float {
-    val pattern = Pattern.compile("^.*GMT([+-]\\d{1,2}):?(\\d{1,2})?\\).*\$")
-    val matcher = pattern.matcher(this)
-    matcher.find()
-    val hours = matcher.group(1)?.toFloat()
-    val minutes = matcher.group(2)?.toFloat()?.div(100) ?: 0F
-    return (hours ?: 0F) + minutes
-}
-
-/**
- * Returns timezone id from formatted timezone with offset
- */
-fun String.formattedTimeZoneToId(): String {
-    return this.replace(
-        Regex(" (\\(GMT[+-]\\d{1,2}:?(\\d{1,2})?\\))"),
-        ""
-    )
-}
-
-fun getCurrentLocale(context: Context): Locale? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        context.resources.configuration.locales[0]
-    } else {
-        context.resources.configuration.locale
-    }
-}
-
-fun Context.dpToPixel(dp: Int): Int {
-    return (dp * resources.displayMetrics.density).toInt()
-}
-
-fun Context.pixelToDp(pixel: Int): Int {
-    return (pixel / resources.displayMetrics.density).toInt()
-}
-
-fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {
-    1 -> java.time.DayOfWeek.MONDAY
-    6 -> java.time.DayOfWeek.SATURDAY
-    7 -> java.time.DayOfWeek.SUNDAY
-    else -> WeekFields.of(getDefault()).firstDayOfWeek
-}
-
-fun validateEmail(email: CharSequence): Boolean {
-    val regex = InputValidationResult.EMAIL_VALIDATION_PATTERN.toRegex(RegexOption.IGNORE_CASE)
-    return regex.matches(email)
-}
-
-fun removeAccents(string: CharSequence): String {
-    val regex = "\\p{InCombiningDiacriticalMarks}+".toRegex()
-    val temp = Normalizer.normalize(string, Normalizer.Form.NFD)
-    return regex.replace(temp, "")
-}
-
-inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
-    if (this is T) block()
-}
-
-fun canonicalizeProtonEmails(emails: List<String>): Map<String, String> {
-    val canonicalEmails = hashMapOf<String, String>()
-    emails.forEach {
-        val canonicalEmail = canonicalizeProtonEmail(it)
-        canonicalEmails[it] = canonicalEmail
-    }
-    return canonicalEmails
-}
-
-fun canonicalizeProtonEmail(email:String): String {
-    // If user uses a custom domain, we don't apply any canonicalization
-    if (!isProtonDomain(email)) return email
-
-    val regex = Regex("(?:\\.|\\-|\\_|\\+.*)(?=.*@)")
-    return email.replace(regex, "").toLowerCase(getDefault())
-}
-
-fun isProtonDomain(email: String): Boolean {
-    return PROTON_MAIL_DOMAINS.any {
-        email.endsWith("@$it", true)
-    }
-}
-
-fun Int.toParticipationStatus(): ParticipationStatus {
-    return when (this) {
-        1 -> ParticipationStatus.TENTATIVE
-        2 -> ParticipationStatus.DECLINED
-        3 -> ParticipationStatus.ACCEPTED
-        else -> ParticipationStatus.NEEDS_ACTION
-    }
-}
-
-fun ParticipationStatus.toInt(): Int {
-    return when (this) {
-        ParticipationStatus.TENTATIVE -> 1
-        ParticipationStatus.DECLINED -> 2
-        ParticipationStatus.ACCEPTED -> 3
-        else -> 0
-    }
-}
-
-/** Execute the [listener] on [TextWatcher.onTextChanged] */
-inline fun EditText.onTextChange(crossinline listener: (CharSequence) -> Unit): TextWatcher {
-    val watcher = object : TextWatcher {
-        override fun afterTextChanged(editable: Editable) {
-            /* Do nothing */
+    /** Execute the [listener] on [TextWatcher.onTextChanged] */
+    inline fun EditText.onTextChange(crossinline listener: (CharSequence) -> Unit): TextWatcher {
+        val watcher = object : TextWatcher {
+            override fun afterTextChanged(editable: Editable) {
+                /* Do nothing */
+            }
+            override fun beforeTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {
+                /* Do nothing */
+            }
+            override fun onTextChanged(text: CharSequence, start: Int, before: Int, count: Int) {
+                listener(text)
+            }
         }
-        override fun beforeTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {
-            /* Do nothing */
-        }
-        override fun onTextChanged(text: CharSequence, start: Int, before: Int, count: Int) {
-            listener(text)
-        }
+        addTextChangedListener(watcher)
+        return watcher
     }
-    addTextChangedListener(watcher)
-    return watcher
+
+
+
+
+
 }
+
+

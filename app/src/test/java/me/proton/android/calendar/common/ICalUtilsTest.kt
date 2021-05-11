@@ -7,7 +7,9 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
+import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.EventUtilsImpl.formatDateOrDateTimeProperty
@@ -20,34 +22,33 @@ import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.EventUtilsImpl.getExceptionDates
 import me.proton.android.calendar.common.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.EventUtilsImpl.overlapsWithFullDayRange
-import me.proton.android.calendar.common.ICalUtils.adjustOutgoingAllDayEvent
-import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
-import me.proton.android.calendar.common.ICalUtils.adjustStartEndTimeZones
-import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
-import me.proton.android.calendar.common.ICalUtils.clone
-import me.proton.android.calendar.common.ICalUtils.createNewEvent
-import me.proton.android.calendar.common.ICalUtils.eventStartZonedDateTimeToDate
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.ICalUtils.filterFromTheEnd
-import me.proton.android.calendar.common.ICalUtils.filterOccurencesByRecurrenceId
-import me.proton.android.calendar.common.ICalUtils.filterOutDuplicates
-import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.formatUidForICal
-import me.proton.android.calendar.common.ICalUtils.generateProtonProdId
-import me.proton.android.calendar.common.ICalUtils.generateProtonUid
-import me.proton.android.calendar.common.ICalUtils.getEnd
-import me.proton.android.calendar.common.ICalUtils.getInviteIcs
-import me.proton.android.calendar.common.ICalUtils.getResponseIcs
-import me.proton.android.calendar.common.ICalUtils.getStart
-import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
-import me.proton.android.calendar.common.ICalUtils.printToString
-import me.proton.android.calendar.common.ICalUtils.sanitise
-import me.proton.android.calendar.common.ICalUtils.setEnd
-import me.proton.android.calendar.common.ICalUtils.setEndTimeZone
-import me.proton.android.calendar.common.ICalUtils.setStart
-import me.proton.android.calendar.common.ICalUtils.setStartTimeZone
-import me.proton.android.calendar.common.ICalUtils.toDayOfWeek
-import me.proton.android.calendar.common.ICalUtils.wrapInICalendar
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustOutgoingAllDayEvent
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustRRuleToStartDate
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustStartEndTimeZones
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustToWeekStart
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.createNewVEvent
+import me.proton.android.calendar.common.ICalUtilsImpl.eventStartZonedDateTimeToDate
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOccurencesByRecurrenceId
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutDuplicates
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
+import me.proton.android.calendar.common.ICalUtilsImpl.generateProtonProdId
+import me.proton.android.calendar.common.ICalUtilsImpl.generateProtonUid
+import me.proton.android.calendar.common.ICalUtilsImpl.getEnd
+import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
+import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
+import me.proton.android.calendar.common.ICalUtilsImpl.getStart
+import me.proton.android.calendar.common.ICalUtilsImpl.isDateTimeTheSame
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
+import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
+import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
+import me.proton.android.calendar.common.KotlinUtilsImpl.filterFromTheEnd
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -62,35 +63,35 @@ internal class ICalUtilsTest {
     @Test
     fun `is date-time-timezone the same between two ICalendars`() {
 
-        val iCalendar1 = ICalUtils.createNewEvent().apply {
+        val iCalendar1 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
             setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
         }.wrapInICalendar()
         iCalendar1.setStartTimeZone("Europe/Vilnius")
         iCalendar1.setEndTimeZone("Europe/Vilnius")
 
-        val iCalendar2 = ICalUtils.createNewEvent().apply {
+        val iCalendar2 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
             setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
         }.wrapInICalendar()
         iCalendar2.setStartTimeZone("Europe/Vilnius")
         iCalendar2.setEndTimeZone("Europe/Vilnius")
 
-        val iCalendar3 = ICalUtils.createNewEvent().apply {
+        val iCalendar3 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
             setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
         }.wrapInICalendar()
         iCalendar3.setStartTimeZone("Europe/Zurich")
         iCalendar3.setEndTimeZone("Europe/Zurich")
 
-        val iCalendar4 = ICalUtils.createNewEvent().apply {
+        val iCalendar4 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
             setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 14, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant()), true)
         }.wrapInICalendar()
         iCalendar4.setStartTimeZone("Europe/Vilnius")
         iCalendar4.setEndTimeZone("Europe/Vilnius")
 
-        val iCalendar5 = ICalUtils.createNewEvent().apply {
+        val iCalendar5 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(ZonedDateTime.of(2020, 1, 10, 12, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
             setDateEnd(Date.from(ZonedDateTime.of(2020, 1, 10, 13, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant()), true)
         }.wrapInICalendar()
@@ -104,15 +105,15 @@ internal class ICalUtilsTest {
         assertThat(iCalendar5.isDateTimeTheSame(iCalendar5)).isTrue()
         assertThat(iCalendar5.isDateTimeTheSame(null)).isFalse()
 
-        val iCalendar6 = ICalUtils.createNewEvent().apply {
+        val iCalendar6 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(LocalDate.of(2020, 1, 10).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
             setDateEnd(Date.from(LocalDate.of(2020, 1, 11).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
         }.wrapInICalendar()
-        val iCalendar7 = ICalUtils.createNewEvent().apply {
+        val iCalendar7 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(LocalDate.of(2020, 1, 10).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
             setDateEnd(Date.from(LocalDate.of(2020, 1, 11).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
         }.wrapInICalendar()
-        val iCalendar8 = ICalUtils.createNewEvent().apply {
+        val iCalendar8 = ICalUtilsImpl.createNewVEvent().apply {
             setDateStart(Date.from(LocalDate.of(2020, 1, 10).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
             setDateEnd(Date.from(LocalDate.of(2020, 1, 12).atStartOfDay(ZoneId.of("Europe/Vilnius")).toInstant()), false)
         }.wrapInICalendar()
@@ -201,11 +202,11 @@ internal class ICalUtilsTest {
 
         val defaultSystemTimeZone = TimeZone.getDefault().id
 
-        assertThat(AndroidUtils.fallbackTimeZone("Non/Existing_Timezone")).isEqualTo(defaultSystemTimeZone)
+        assertThat(fallbackTimeZone("Non/Existing_Timezone")).isEqualTo(defaultSystemTimeZone)
 
-        assertThat(AndroidUtils.fallbackTimeZone("Europe/Zurich")).isEqualTo("Europe/Zurich")
+        assertThat(fallbackTimeZone("Europe/Zurich")).isEqualTo("Europe/Zurich")
 
-        assertThat(AndroidUtils.fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Athens")
+        assertThat(fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Athens")
 
     }
 
@@ -232,7 +233,7 @@ internal class ICalUtilsTest {
     @Test
     fun `all-day event has no time and no timezone property`() {
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20))
         event.setEnd(LocalDate.of(2020, 1, 22))
 
@@ -250,7 +251,7 @@ internal class ICalUtilsTest {
     @Test
     fun `partial-day event has correct time and timezone property`() {
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Zurich")
         event.setEnd(LocalDate.of(2020, 1, 20), LocalTime.of(11, 0), "Europe/Zurich")
 
@@ -269,7 +270,7 @@ internal class ICalUtilsTest {
     @Test
     fun `multiple edits of datetimes and timezones properly overwrite old values`() {
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Zurich")
         event.setEnd(LocalDate.of(2020, 1, 20), LocalTime.of(11, 0), "Europe/Zurich")
 
@@ -292,7 +293,7 @@ internal class ICalUtilsTest {
     @Test
     fun `set only time of event's start and end`() {
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Vilnius")
         event.setEnd(LocalDate.of(2020, 2, 20), LocalTime.of(11, 0), "Europe/Vilnius")
 
@@ -334,7 +335,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -384,7 +385,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -449,7 +450,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -485,7 +486,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -505,12 +506,12 @@ internal class ICalUtilsTest {
     @Test
     fun `adjust RRULE to WEEK START`() {
 
-        val eventNoAdjustment = createNewEvent()
+        val eventNoAdjustment = createNewVEvent()
         eventNoAdjustment.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.WEEKLY).interval(1).byDay(DayOfWeek.FRIDAY).build())
 
         assertThat(eventNoAdjustment.recurrenceRule.value.workweekStarts).isNull()
 
-        val eventWeekly = createNewEvent()
+        val eventWeekly = createNewVEvent()
         eventWeekly.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.WEEKLY).interval(2).byDay(DayOfWeek.FRIDAY).build())
         eventWeekly.recurrenceRule.adjustToWeekStart(java.time.DayOfWeek.SUNDAY)
 
@@ -518,7 +519,7 @@ internal class ICalUtilsTest {
 
         assertThat(eventWeekly.recurrenceRule.value.workweekStarts).isEqualTo(DayOfWeek.SUNDAY)
 
-        val eventYearly = createNewEvent()
+        val eventYearly = createNewVEvent()
         eventYearly.recurrenceRule = RecurrenceRule(Recurrence.Builder(Frequency.YEARLY).byWeekNo(10).build())
         eventYearly.recurrenceRule.adjustToWeekStart(java.time.DayOfWeek.MONDAY)
 
@@ -537,7 +538,7 @@ internal class ICalUtilsTest {
         val requestedStartHour = 10
         val requestedEndHour = 15
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(requestedStartHour, 0, 10), originalTimeZoneId)
         event.setEnd(LocalDate.of(2020, 1, 20), LocalTime.of(requestedEndHour, 0, 10), originalTimeZoneId)
 
@@ -565,7 +566,7 @@ internal class ICalUtilsTest {
         val timeZoneId = "Europe/Zurich"
 
         // set
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(1, 0), timeZoneId)
         event.setEnd(LocalDate.of(2020, 1, 22), LocalTime.of(2, 0), timeZoneId)
 
@@ -607,7 +608,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -665,7 +666,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -729,7 +730,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -787,7 +788,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -862,7 +863,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -902,7 +903,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Paris"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -948,7 +949,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -991,7 +992,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1038,7 +1039,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1081,7 +1082,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1129,7 +1130,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1147,7 +1148,7 @@ internal class ICalUtilsTest {
         event.addExceptionDate(10)
         event.addExceptionDate(40) // non-existing occurrence
 
-        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
+        val mapped = ICalUtilsImpl.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
         val filteredByExdates = mapped.filterOutOccurrencesByExdates(event, displayTimeZoneId)
 
         assertThat(filteredByExdates.size).isEqualTo(16)
@@ -1178,7 +1179,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1196,7 +1197,7 @@ internal class ICalUtilsTest {
         event.addExceptionDate(10)
         event.addExceptionDate(40) // non-existing occurrence
 
-        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
+        val mapped = ICalUtilsImpl.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
         val filteredByExdates = mapped.filterOutOccurrencesByExdates(event, displayTimeZoneId)
 
         assertThat(filteredByExdates.size).isEqualTo(16)
@@ -1270,7 +1271,7 @@ internal class ICalUtilsTest {
                 "",
                 1,
                 true
-            ), ICalUtils.parseICalString(iCal)!!, null)!!
+            ), ICalUtilsImpl.parseICalString(iCal)!!, null)!!
         }
 
         val filtered = events.filterOccurencesByRecurrenceId()
@@ -1405,7 +1406,7 @@ internal class ICalUtilsTest {
                 "",
                 1,
                 true
-            ), ICalUtils.parseICalString(iCal)!!, null)!!
+            ), ICalUtilsImpl.parseICalString(iCal)!!, null)!!
         }
 
         // 2: 12:00-12:30 [occ 1]
@@ -1418,7 +1419,7 @@ internal class ICalUtilsTest {
         // 9: 12:00-12:30 [occ 7], 13:30-14:00 [occ 6], 18:30-19:00 [occ8]
         // last "ghost occurrence" is on 10th but it was moved to 9th
 
-        val mappedOld = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
+        val mappedOld = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, displayRangeTo, displayTimeZoneId)!!
 
         // there are 7 occurrences until 2020-08-09 and one additional that was moved from 2020-08-10 to 2020-08-09
         assertThat(mappedOld.size).isEqualTo(8)
@@ -1430,20 +1431,20 @@ internal class ICalUtilsTest {
         assertThat(filteredByExdates.find { it.occurrence!!.occurrenceNumber == 5 }).isNull()
 
         // new approach -- all visible in window spanning all events
-        val mappedAll = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 2), displayRangeTo, displayTimeZoneId)!!
+        val mappedAll = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 2), displayRangeTo, displayTimeZoneId)!!
         val filteredByExdatesAll = mappedAll.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
 
         assertThat(filteredByExdatesAll.size).isEqualTo(7)
         assertThat(filteredByExdatesAll.find { it.occurrence!!.occurrenceNumber == 5 }).isNull()
 
         // new approach -- nothing visible in window spanning no events
-        val mappedNone = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 7), LocalDate.of(2020, 8, 8), displayTimeZoneId)!!
+        val mappedNone = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 7), LocalDate.of(2020, 8, 8), displayTimeZoneId)!!
         val filteredByExdatesMappedNone = mappedNone.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
 
         assertThat(filteredByExdatesMappedNone.size).isEqualTo(0)
 
         // new approach -- only events from given window visible
-        val mappedSingleEditBeforeFirstOccurrence = ICalUtils.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 2), LocalDate.of(2020, 8, 2), displayTimeZoneId)!!
+        val mappedSingleEditBeforeFirstOccurrence = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2020, 8, 2), LocalDate.of(2020, 8, 2), displayTimeZoneId)!!
         val filteredByExdatesmappedSingleEditBeforeFirstOccurrence = mappedSingleEditBeforeFirstOccurrence.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
 
         assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence.size).isEqualTo(1)
@@ -1474,7 +1475,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayRangeTo = LocalDate.of(2020, 11, 21)
         val displayTimeZoneId = "UTC"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
@@ -1485,7 +1486,7 @@ internal class ICalUtilsTest {
             true
         ), iCal, null)!!
 
-        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
+        val mapped = ICalUtilsImpl.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
         val filteredByExdates = mapped.filterOutOccurrencesByExdates(event, displayTimeZoneId)
         assertThat(filteredByExdates.size).isEqualTo(6)
         assertThat(filteredByExdates.none { it.occurrence?.occurrenceNumber == 2 }).isTrue()
@@ -1512,7 +1513,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1555,7 +1556,7 @@ internal class ICalUtilsTest {
     @Test
     fun `handle EXDATEs in partial-day event`() {
 
-        val iCalEvent = ICalUtils.createNewEvent()
+        val iCalEvent = ICalUtilsImpl.createNewVEvent()
         iCalEvent.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Vilnius")
         iCalEvent.setEnd(LocalDate.of(2020, 1, 20), LocalTime.of(11, 0), "Europe/Vilnius")
         iCalEvent.setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).interval(1).count(10).build())
@@ -1606,7 +1607,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -1632,7 +1633,7 @@ internal class ICalUtilsTest {
     @Test
     fun `filter out occurrences based on EXDATEs in partial-day event`() {
 
-        val iCalEvent = ICalUtils.createNewEvent()
+        val iCalEvent = ICalUtilsImpl.createNewVEvent()
         iCalEvent.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Vilnius")
         iCalEvent.setEnd(LocalDate.of(2020, 1, 20), LocalTime.of(11, 0), "Europe/Vilnius")
         iCalEvent.setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).interval(1).count(10).build())
@@ -1679,7 +1680,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -1713,7 +1714,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -1751,7 +1752,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -1793,7 +1794,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -1837,7 +1838,7 @@ internal class ICalUtilsTest {
 
         // this should be happening on 1st, 2nd, 3rd and 4th in Zurich timezone
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Zurich"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1872,7 +1873,7 @@ internal class ICalUtilsTest {
 
         // this should be happening on 1st, 2nd and 3rd in Vilnius timezone
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1915,7 +1916,7 @@ internal class ICalUtilsTest {
 
         // this should be happening on 2nd, 3rd and 4th in Pacific/Fiji timezone
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Pacific/Fiji"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1961,7 +1962,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "UTC+12"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -1998,7 +1999,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "UTC+12"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2038,7 +2039,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "UTC+12"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2077,7 +2078,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Budapest"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2117,7 +2118,7 @@ internal class ICalUtilsTest {
 
         // this should be happening on 1st, 2nd, 3rd and 4th in Vilnius timezone
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2154,7 +2155,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2202,7 +2203,7 @@ internal class ICalUtilsTest {
     TRIGGER;RELATED=START:-PT5H
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Paris"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2253,7 +2254,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2302,7 +2303,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val displayTimeZoneId = "Europe/Vilnius"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
@@ -2336,7 +2337,7 @@ internal class ICalUtilsTest {
     @Test
     fun `correctly sanitise partial-day Event without DTEND`() {
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20), LocalTime.of(10, 0), "Europe/Zurich")
 
         assertThat(event.sanitise()).isTrue()
@@ -2352,7 +2353,7 @@ internal class ICalUtilsTest {
     @Test
     fun `correctly sanitise all-day Event without DTEND`() {
 
-        val event = ICalUtils.createNewEvent()
+        val event = ICalUtilsImpl.createNewVEvent()
         event.setStart(LocalDate.of(2020, 1, 20))
 
         assertThat(event.sanitise()).isTrue()
@@ -2396,7 +2397,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val original = ICalUtils.parseICalString(iCalString)!!
+        val original = ICalUtilsImpl.parseICalString(iCalString)!!
         val cloned = original.clone()
 
         original.events.first().summary.value = "edited summary of original event"
@@ -2427,7 +2428,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2459,7 +2460,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2492,7 +2493,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2524,7 +2525,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2556,7 +2557,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2588,7 +2589,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2620,7 +2621,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2653,7 +2654,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2689,7 +2690,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2725,7 +2726,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2780,14 +2781,14 @@ internal class ICalUtilsTest {
                 "",
                 1,
                 true
-            ), ICalUtils.parseICalString(iCal)!!, null)!!
+            ), ICalUtilsImpl.parseICalString(iCal)!!, null)!!
         }
 
         val displayRangeTo = LocalDate.of(2020, 12, 31)
 
         val originalEvent = events.first()!!
         val singleEdit = events[1]
-        val mapped = ICalUtils.expandOccurrencesWithSingleEdits(originalEvent, events, displayRangeTo, displayTimeZoneId)!!
+        val mapped = ICalUtilsImpl.expandOccurrencesWithSingleEdits(originalEvent, events, displayRangeTo, displayTimeZoneId)!!
 
         assertThat(eventStartZonedDateTimeToDate(originalEvent.iCalEvent.getStart(displayTimeZoneId)!!, originalEvent.isAllDay())).isEqualTo(eventStartZonedDateTimeToDate(singleEdit.iCalEvent.getStart(displayTimeZoneId)!!, originalEvent.isAllDay()))
         assertThat(mapped[0].iCalEvent.getStart(displayTimeZoneId)).isEqualTo(singleEdit.iCalEvent.getStart(displayTimeZoneId))
@@ -2812,7 +2813,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2928,7 +2929,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val originalEventICal = ICalUtils.parseICalString(originalEventICalString)!!
+        val originalEventICal = ICalUtilsImpl.parseICalString(originalEventICalString)!!
         val originalEvent = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2937,7 +2938,7 @@ internal class ICalUtilsTest {
             true
         ), originalEventICal, null)!!
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -2992,7 +2993,7 @@ internal class ICalUtilsTest {
 
         val timeZoneId = "Europe/Paris"
 
-        val originalEventICal = ICalUtils.parseICalString(originalEventICalString)!!
+        val originalEventICal = ICalUtilsImpl.parseICalString(originalEventICalString)!!
         val originalEvent = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -3001,7 +3002,7 @@ internal class ICalUtilsTest {
             true
         ), originalEventICal, null)!!
 
-        val iCal = ICalUtils.parseICalString(iCalString)!!
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
@@ -3042,7 +3043,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val eventIcal = ICalUtils.parseICalString(iCalString)!!
+        val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
         val attendees = eventIcal.events.first().attendees
 
         assertThat(attendees.size).isEqualTo(10)
@@ -3090,11 +3091,11 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val eventIcal = ICalUtils.parseICalString(iCalString)!!
+        val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
         val ics = getResponseIcs(eventIcal, eventIcal.events.first().attendees.first(), ParticipationStatus.ACCEPTED, null, Date.from(Instant.now()))
 
-        val responseICalendar = ICalUtils.parseICalString(ics)!!
+        val responseICalendar = ICalUtilsImpl.parseICalString(ics)!!
 
         assertThat(responseICalendar.productId.value).isEqualTo(generateProtonProdId())
         assertThat(responseICalendar.version).isEqualTo(ICalVersion.V2_0)
@@ -3140,7 +3141,7 @@ internal class ICalUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val eventIcal = ICalUtils.parseICalString(iCalString)!!
+        val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
         val ics = getInviteIcs(
             Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true), eventIcal)!!,
@@ -3148,7 +3149,7 @@ internal class ICalUtilsTest {
             "sharedSessionKey"
         )
 
-        val responseICalendar = ICalUtils.parseICalString(ics)!!
+        val responseICalendar = ICalUtilsImpl.parseICalString(ics)!!
 
         assertThat(responseICalendar.productId.value).isEqualTo(generateProtonProdId())
         assertThat(responseICalendar.version).isEqualTo(ICalVersion.V2_0)

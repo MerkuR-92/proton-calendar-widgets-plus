@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_root.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 

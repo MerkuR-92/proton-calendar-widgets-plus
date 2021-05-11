@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_drawer_calendar.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.core.util.kotlin.toInt
 

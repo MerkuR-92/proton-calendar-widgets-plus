@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.ICalUtils.sanitise
-import me.proton.android.calendar.common.ICalUtils.toICalendarFromPlaintextSharedPart
+import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
+import me.proton.android.calendar.common.ICalUtilsImpl.toICalendarFromPlaintextSharedPart
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent

@@ -13,13 +13,16 @@ import biweekly.util.Recurrence
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
+import me.proton.android.calendar.common.DateTimeUtilsImpl.startEndOverlapsWithFullDayRange
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
-import me.proton.android.calendar.common.ICalUtils.clone
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
-import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.AddressStatus
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
@@ -187,7 +190,7 @@ object EventUtilsImpl : EventUtils {
 
             formattedDate = zonedDateTime.toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(getLocaleForFormatting()))
             if (property.value.hasTime()) {
-                formattedTime = zonedDateTime.toLocalTime().format(is24Hour)
+                formattedTime = zonedDateTime.toLocalTime().formatTime(is24Hour)
             }
         }
         return Pair(formattedDate, formattedTime)
@@ -204,7 +207,7 @@ object EventUtilsImpl : EventUtils {
         val occurences = generateOccurrencesUntil(toDate, timeZoneId) ?: emptyList()
 
         return occurences.filter {
-            startEndOverlapsWithFullDayRange(fromDate, toDate, timeZoneId, it.startDateTime, it.endDateTime)
+            startEndOverlapsWithFullDayRange(it.startDateTime, it.endDateTime, fromDate, toDate, timeZoneId)
         }
 
     }
@@ -352,7 +355,7 @@ object EventUtilsImpl : EventUtils {
             val firstEventWithOccurrence = Event.withOccurrence(this, firstOccurrence)
 
             val filteredBySingleEdits = listOf(firstEventWithOccurrence).filter { allEvents.find {
-                it.iCalEvent.recurrenceId?.value == ICalUtils.eventStartZonedDateTimeToDate(
+                it.iCalEvent.recurrenceId?.value == ICalUtilsImpl.eventStartZonedDateTimeToDate(
                     firstOccurrence.startDateTime,
                     originalEvent.isAllDay()
                 )
@@ -427,7 +430,7 @@ object EventUtilsImpl : EventUtils {
     }
 
     override fun Event.setRecurrenceId(recurrenceId: ZonedDateTime, hasTime: Boolean) {
-        iCalEvent.recurrenceId = RecurrenceId(ICalUtils.eventStartZonedDateTimeToDate(recurrenceId, !hasTime), hasTime)
+        iCalEvent.recurrenceId = RecurrenceId(ICalUtilsImpl.eventStartZonedDateTimeToDate(recurrenceId, !hasTime), hasTime)
         if (hasTime) iCalendar.timezoneInfo.setTimezone(iCalEvent.recurrenceId, TimezoneAssignment(TimeZone.getTimeZone(recurrenceId.zone.id), VTimezone(recurrenceId.zone.id)))
     }
 
@@ -513,14 +516,6 @@ object EventUtilsImpl : EventUtils {
         return (dateTimeStart.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
                 || (dateTimeEnd.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range
                 || ((dateTimeStart.isBefore(fromDateTime)) && dateTimeEnd.isAfter(toDateTime)) // starts before or ends after range, but happens during range
-    }
-
-    /**
-     * Checks if Event starting at [startDateTime] and ending at [endDateTime] overlaps with
-     * range [fromDate]-[toDate].
-     */
-    override fun Event.startEndOverlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, startDateTime: ZonedDateTime, endDateTime: ZonedDateTime): Boolean {
-        return ICalUtils.startEndOverlapsWithFullDayRange(startDateTime, endDateTime, fromDate, toDate, timeZoneId)
     }
 
     override fun Event.overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean {

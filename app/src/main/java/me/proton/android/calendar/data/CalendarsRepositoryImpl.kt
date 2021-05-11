@@ -13,9 +13,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.formatUidForICal
+import me.proton.android.calendar.common.ICalUtilsImpl
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
@@ -759,7 +759,7 @@ class CalendarsRepositoryImpl(
      */
     private fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
         return if (event.isRecurring()) {
-            val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(
+            val expandedOccurrences = ICalUtilsImpl.expandOccurrencesWithSingleEdits(
                 event,
                 allEvents.filter { it.uid == event.uid },
                 toDateTime.toLocalDate(),
@@ -786,7 +786,7 @@ class CalendarsRepositoryImpl(
 
         return if (event.isRecurring()) {
             // occurrences are already filtered for time window
-            val expandedOccurrences = ICalUtils.expandOccurrencesWithSingleEdits(
+            val expandedOccurrences = ICalUtilsImpl.expandOccurrencesWithSingleEdits(
                 event,
                 allEvents.filter { it.uid == event.uid },
                 eventsWindow.fromDate,
@@ -878,7 +878,7 @@ class CalendarsRepositoryImpl(
                 val sharedEvents = eventEntity.sharedEvents.map {
                     json.decodeFromJsonElement<Event.EventPart.Shared>(it)
                 }
-                val iCal = ICalUtils.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
+                val iCal = ICalUtilsImpl.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
                 iCal?.events?.first()?.recurrenceId == null
             } == null
         } else null

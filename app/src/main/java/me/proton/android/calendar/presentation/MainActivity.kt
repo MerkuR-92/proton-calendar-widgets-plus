@@ -40,7 +40,12 @@ import kotlinx.coroutines.flow.collect
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.AndroidUtils.Companion.displayCalendarListMaterialDialog
+import me.proton.android.calendar.common.AndroidUtils.displayCalendarListMaterialDialog
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.getInitials
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -581,7 +586,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
                 nav_view_timezone.visibleOrGone(true)
                 nav_view_timezone_login_title.text =
-                    ICalUtils.formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
+                    formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
             }
         }
 

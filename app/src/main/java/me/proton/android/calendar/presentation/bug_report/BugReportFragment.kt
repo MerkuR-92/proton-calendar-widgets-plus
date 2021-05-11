@@ -25,7 +25,10 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.core.util.kotlin.nullIfBlank

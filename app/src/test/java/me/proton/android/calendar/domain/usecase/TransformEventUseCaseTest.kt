@@ -12,7 +12,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.ICalUtils
+import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
@@ -29,7 +29,7 @@ internal class TransformEventUseCaseTest {
     private val json = Json
     private val testsLogger = TestsLogger
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
-    private val iCal = ICalUtils
+    private val iCal = ICalUtilsImpl
     private val crypto: Crypto = mockk()
     private lateinit var database: AppDatabase
 

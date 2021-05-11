@@ -10,10 +10,13 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.toInt
+import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
-import me.proton.android.calendar.common.ICalUtils.clone
-import me.proton.android.calendar.common.ICalUtils.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -88,7 +91,7 @@ class HandleIcsUseCase(
 
         // Create a new event with the clean iCalendar
         val newEvent = Event.from(
-            ICalUtils.generateOfflineEventId(), Calendar(
+            ICalUtilsImpl.generateOfflineEventId(), Calendar(
             defaultCalendar.id,
             defaultCalendar.name,
             defaultCalendar.color,

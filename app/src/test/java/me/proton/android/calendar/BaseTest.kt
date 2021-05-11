@@ -1,10 +1,7 @@
 package me.proton.android.calendar
 
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import org.koin.core.context.startKoin
-import org.koin.test.KoinTest
 
 internal abstract class BaseTest {
 
@@ -15,7 +12,7 @@ internal abstract class BaseTest {
             "",
             1,
             true
-        ), ICalUtils.parseICalString(iCalString)!!, null, null)!!
+        ), ICalUtilsImpl.parseICalString(iCalString)!!, null, null)!!
     }
 
 }

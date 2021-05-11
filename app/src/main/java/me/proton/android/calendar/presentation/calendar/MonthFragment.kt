@@ -3,9 +3,7 @@ package me.proton.android.calendar.presentation.calendar
 import android.app.NotificationManager
 import android.content.Context
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -34,13 +32,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.animateHeightChange
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.getWeekStartDayOfWeek
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatMonth
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.presentation.BaseFragment
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
-import me.proton.core.util.kotlin.toBoolean
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -115,7 +117,7 @@ class MonthFragment : BaseFragment() {
                     .navigate(
                         Navigation.Deeplink.toEventCreate(
                             currentDate,
-                            ICalUtils.generateEventStartTime(timeZoneId)
+                            ICalUtilsImpl.generateEventStartTime(timeZoneId)
                         )
                     )
             } else {

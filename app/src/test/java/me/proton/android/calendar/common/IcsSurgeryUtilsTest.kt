@@ -21,8 +21,6 @@ import me.proton.android.calendar.common.IcsSurgeryUtils.cleanSummary
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanTimezones
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanUid
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanXWrTimezone
-import me.proton.android.calendar.domain.model.Calendar
-import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.BufferedReader
@@ -1439,7 +1437,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val parentICal = ICalUtils.parseICalString(parentICalString)
+        val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
         assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
@@ -1490,7 +1488,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val parentICal = ICalUtils.parseICalString(parentICalString)
+        val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
         assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
@@ -1540,7 +1538,7 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         // TODO
-        val parentICal = ICalUtils.parseICalString(parentICalString)
+        val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
         assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)

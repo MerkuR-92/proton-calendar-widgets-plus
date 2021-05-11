@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
-import me.proton.android.calendar.common.ICalUtils.filterOutDuplicates
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey

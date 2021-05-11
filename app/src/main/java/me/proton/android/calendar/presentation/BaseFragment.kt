@@ -10,7 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_base.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.visibleOrInvisible
+import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 
 abstract class BaseFragment : Fragment() {
 

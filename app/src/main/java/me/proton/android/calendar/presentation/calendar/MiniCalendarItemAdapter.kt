@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.text
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.concatenate
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
 import java.time.*

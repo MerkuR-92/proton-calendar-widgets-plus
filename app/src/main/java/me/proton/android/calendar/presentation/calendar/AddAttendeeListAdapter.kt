@@ -19,7 +19,10 @@ import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.ICalUtils.extractEmail
+import me.proton.android.calendar.common.AndroidUtils.getInitials
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 
 class AddAttendeeListAdapter(
     private val searchList: Boolean = false,

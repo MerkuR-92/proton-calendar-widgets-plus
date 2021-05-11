@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -19,9 +18,9 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_attendee.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.getInitials
-import me.proton.android.calendar.common.visibleOrGone
+import me.proton.android.calendar.common.AndroidUtils.getInitials
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 
 class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
 

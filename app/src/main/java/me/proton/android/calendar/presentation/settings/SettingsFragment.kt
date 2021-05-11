@@ -11,6 +11,11 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.formattedTimeZoneToId
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.sortFormattedTimeZoneIds
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.MainActivity
@@ -67,13 +72,13 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_timezone_press.setOnSingleClickListener {
             val forInstant = Instant.now()
             val formattedTimeZoneIds = allowedTimezoneIds.map {
-                ICalUtils.formatTimeZoneId(it, forInstant)
+                formatTimeZoneId(it, forInstant)
             }.toTypedArray()
             formattedTimeZoneIds.sortFormattedTimeZoneIds()
             val defaultTimeZone = calendarViewModel.timeZoneId.value?.id
             val selectedIndex =
                 if (defaultTimeZone == null) -1
-                else formattedTimeZoneIds.indexOf(ICalUtils.formatTimeZoneId(defaultTimeZone, forInstant))
+                else formattedTimeZoneIds.indexOf(formatTimeZoneId(defaultTimeZone, forInstant))
 
             AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
                 lifecycleScope.launch {

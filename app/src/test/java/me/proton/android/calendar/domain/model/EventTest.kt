@@ -8,15 +8,13 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.ICalUtils.printToString
-import me.proton.android.calendar.common.ICalUtils.setStart
-import me.proton.android.calendar.common.ICalUtils.wrapInICalendar
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.sql.Date
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 
 internal class EventTest {
 
@@ -181,7 +179,7 @@ internal class EventTest {
         assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
     }
 
-    val calendarStartEndTimeDifferentDays = ICalUtils.parseICalString("""
+    val calendarStartEndTimeDifferentDays = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -199,7 +197,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarAllDaySingleDay = ICalUtils.parseICalString("""
+    val calendarAllDaySingleDay = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -217,7 +215,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarAllDaySingleDayActualEndDate = ICalUtils.parseICalString("""
+    val calendarAllDaySingleDayActualEndDate = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -235,7 +233,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarAllDaySingleDayRecurring = ICalUtils.parseICalString("""
+    val calendarAllDaySingleDayRecurring = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     BEGIN:VEVENT
@@ -253,7 +251,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarAllDaySingleDayWithoutDTEnd = ICalUtils.parseICalString("""
+    val calendarAllDaySingleDayWithoutDTEnd = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -270,7 +268,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendar1HourSingleDay = ICalUtils.parseICalString("""
+    val calendar1HourSingleDay = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -288,7 +286,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarAllDay3Days = ICalUtils.parseICalString("""
+    val calendarAllDay3Days = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -306,7 +304,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendar2HoursSingleDayDifferentEndTimezone = ICalUtils.parseICalString("""
+    val calendar2HoursSingleDayDifferentEndTimezone = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -324,7 +322,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarManyDaysIn2MonthsDifferentEndTimezone = ICalUtils.parseICalString("""
+    val calendarManyDaysIn2MonthsDifferentEndTimezone = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
@@ -343,7 +341,7 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
-    val calendarTimezoneUtcEndOfDay = ICalUtils.parseICalString("""
+    val calendarTimezoneUtcEndOfDay = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
     BEGIN:VTIMEZONE

@@ -1,12 +1,13 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.ICalUtils.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -38,7 +39,7 @@ class EditCreateEventUseCase(
         logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
 
         // 1. split original event according to the matrix
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(newEvent.iCalendar)
+        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
 
         //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
@@ -192,7 +193,7 @@ class EditCreateEventUseCase(
         if (attendeesEventContent != null) {
             newEvent.iCalEvent.attendees.forEach {
                 val status = it.participationStatus.toInt()
-                val xpmToken = it.getParameter(X_PM_TOKEN) ?: ICalUtils.generateXPmToken(canonicalizeProtonEmail(it.email), newEvent.uid)
+                val xpmToken = it.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it.email), newEvent.uid)
                 attendees.add(
                     Event.AttendeeStatusEvent(null, xpmToken, status, null)
                 )

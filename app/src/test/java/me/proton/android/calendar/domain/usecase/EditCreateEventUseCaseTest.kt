@@ -11,12 +11,12 @@ import biweekly.property.*
 import biweekly.util.Duration
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.ICalUtils.printToString
-import me.proton.android.calendar.common.ICalUtils.setEnd
-import me.proton.android.calendar.common.ICalUtils.setEndTimeZone
-import me.proton.android.calendar.common.ICalUtils.setStart
-import me.proton.android.calendar.common.ICalUtils.setStartTimeZone
-import me.proton.android.calendar.common.ICalUtils.wrapInICalendar
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
+import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
 import org.junit.jupiter.api.Test
 import java.time.*
 import java.util.*
@@ -27,7 +27,7 @@ internal class EditCreateEventUseCaseTest {
     fun `split iCalendar according to the matrix`() {
 
         val event = VEvent().apply {
-            setUid(ICalUtils.generateProtonUid())
+            setUid(ICalUtilsImpl.generateProtonUid())
             setCreated(Date())
             setLastModified(getCreated().value)
             setDateStart(Date.from(ZonedDateTime.of(LocalDate.of(2020, 4, 2), LocalTime.MIDNIGHT, ZoneId.systemDefault()).toInstant()), false)
@@ -52,7 +52,7 @@ internal class EditCreateEventUseCaseTest {
 
         TestsLogger.d("original event: ${event.wrapInICalendar().printToString()}")
 
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(event.wrapInICalendar())
+        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(event.wrapInICalendar())
 
         TestsLogger.d("raw shared split:\n${Biweekly.write(calendarSplit.sharedPart).go()}")
         TestsLogger.d("raw shared encrypted split:\n${Biweekly.write(calendarSplit.sharedPartToEncrypt).go()}")
@@ -159,7 +159,7 @@ internal class EditCreateEventUseCaseTest {
     fun `VTIMEZONE is empty and date start & end have correct TZID timezones assigned after splitting`() {
 
         val event = VEvent().apply {
-            setUid(ICalUtils.generateProtonUid())
+            setUid(ICalUtilsImpl.generateProtonUid())
             setStart(LocalDate.of(2020, 4, 2), LocalTime.of(15, 5, 20), "Europe/Zurich")
             setEnd(LocalDate.of(2020, 4, 3), LocalTime.of(17, 10, 30), "Europe/Zurich")
         }
@@ -168,7 +168,7 @@ internal class EditCreateEventUseCaseTest {
         calendar.setStartTimeZone("Europe/Zurich")
         calendar.setEndTimeZone("Europe/Zurich")
 
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(calendar)
+        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(calendar)
 
         assertThat(calendarSplit.sharedPart.timezoneInfo.getTimezone(calendarSplit.sharedPart.events.first().dateStart).timeZone.id).isEqualTo("Europe/Zurich")
         assertThat(calendarSplit.sharedPart.timezoneInfo.getTimezone(calendarSplit.sharedPart.events.first().dateEnd).timeZone.id).isEqualTo("Europe/Zurich")
@@ -181,7 +181,7 @@ internal class EditCreateEventUseCaseTest {
     fun `non-required parts are empty after splitting minimal event`() {
 
         val event = VEvent().apply {
-            setUid(ICalUtils.generateProtonUid())
+            setUid(ICalUtilsImpl.generateProtonUid())
             setCreated(Date())
             setLastModified(getCreated().value)
             setDateStart(Date.from(LocalDate.of(2020, 4, 2).atStartOfDay(ZoneId.systemDefault()).toInstant()), false)
@@ -189,7 +189,7 @@ internal class EditCreateEventUseCaseTest {
             setSummary("Test")
         }
 
-        val calendarSplit = ICalUtils.splitICalendarIntoParts(event.wrapInICalendar())
+        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(event.wrapInICalendar())
 
         assertThat(calendarSplit.calendarPart).isNull()
         assertThat(calendarSplit.calendarPartToEncrypt).isNull()

@@ -2,6 +2,7 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmails
 import org.junit.jupiter.api.Test
 
 internal class AndroidUtilsTest {

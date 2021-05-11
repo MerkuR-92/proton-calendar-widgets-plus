@@ -1,8 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.content.Context
-import me.proton.android.calendar.common.ICalUtils
-import me.proton.android.calendar.common.ICalUtils.formatUidForICal
+import me.proton.android.calendar.common.ICalUtilsImpl
+import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
@@ -46,7 +46,7 @@ class UpdateAlarmsUseCase(
 
             val transformedChain = it.second.mapNotNull { transformEventUseCase.execute(it) }
 
-            val upcomingAlarms = ICalUtils.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
+            val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
 
             if (transformedChain.isEmpty()) {
                 logger.e("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")

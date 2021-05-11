@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.AndroidUtils
+import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarFlags
@@ -70,7 +71,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             createDefaultCalendarResult.ifSuccessAndLogErrors(logger) {
                 if (updateCalendarUserPrimaryTimezone) {
                     when (val updateCalendarUserPrimaryTimezoneResponse =
-                        settingsApi.updateCalendarUserPrimaryTimezone(userId, AndroidUtils.fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!)) {
+                        settingsApi.updateCalendarUserPrimaryTimezone(userId, fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!)) {
                         is ApiResponse.Error -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                         is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                     }

@@ -22,32 +22,36 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.toInt
+import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
+import me.proton.android.calendar.common.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.EventUtilsImpl.setRecurrenceId
 import me.proton.android.calendar.common.EventUtilsImpl.updateParticipationStatus
-import me.proton.android.calendar.common.ICalUtils.adjustOutgoingAllDayEvent
-import me.proton.android.calendar.common.ICalUtils.adjustRRuleToStartDate
-import me.proton.android.calendar.common.ICalUtils.adjustStartEndTimeZones
-import me.proton.android.calendar.common.ICalUtils.adjustToWeekStart
-import me.proton.android.calendar.common.ICalUtils.clone
-import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.ICalUtils.formatTimeZoneId
-import me.proton.android.calendar.common.ICalUtils.iCalTimeZone
-import me.proton.android.calendar.common.ICalUtils.isDateTimeTheSame
-import me.proton.android.calendar.common.ICalUtils.printToString
-import me.proton.android.calendar.common.ICalUtils.setDefaultTimeZone
-import me.proton.android.calendar.common.ICalUtils.setEnd
-import me.proton.android.calendar.common.ICalUtils.setEndTimeZone
-import me.proton.android.calendar.common.ICalUtils.setStart
-import me.proton.android.calendar.common.ICalUtils.setStartTimeZone
-import me.proton.android.calendar.common.ICalUtils.toZonedDateTime
-import me.proton.android.calendar.common.ICalUtils.wrapInICalendar
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustOutgoingAllDayEvent
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustRRuleToStartDate
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustStartEndTimeZones
+import me.proton.android.calendar.common.ICalUtilsImpl.adjustToWeekStart
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.isDateTimeTheSame
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
+import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
+import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -196,7 +200,7 @@ class EventViewModel(
 
             eventTimeZoneId = displayTimeZoneId
 
-            val newICalendar = ICalUtils.createNewEvent().wrapInICalendar()
+            val newICalendar = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
             val newVEvent = newICalendar.events.first()
 
             // if there is no requested start date, we take today
@@ -244,7 +248,7 @@ class EventViewModel(
 
             logger.d("INIT: ${newICalendar.printToString()}")
 
-            val newEvent = Event.from(ICalUtils.generateOfflineEventId(), Calendar(
+            val newEvent = Event.from(ICalUtilsImpl.generateOfflineEventId(), Calendar(
                 defaultCalendar.id,
                 defaultCalendar.name,
                 defaultCalendar.color,
@@ -294,7 +298,7 @@ class EventViewModel(
                 if (editMode) {
                     // Setup event time backup values
                     if (this.isAllDay()) {
-                        val startTime = ICalUtils.generateEventStartTime(ZoneId.of(eventTimeZoneId))
+                        val startTime = ICalUtilsImpl.generateEventStartTime(ZoneId.of(eventTimeZoneId))
                         timeStartBackup = startTime
                         timeEndBackup =
                             startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
@@ -553,7 +557,7 @@ class EventViewModel(
                     if (!handleOriginalEventNullSequence(dbEvent)) return HandleSaveResult.ERROR
 
                     val eventToCreate = event.copy( // TODO move to helper method?
-                        id = ICalUtils.generateOfflineEventId(),
+                        id = ICalUtilsImpl.generateOfflineEventId(),
                         iCalendar = event.iCalendar.clone()
                     )
                     // event.uid is still the same
@@ -687,14 +691,14 @@ class EventViewModel(
                 // --------------------------------------
 
                 val eventToCreate = event.copy(
-                    id = ICalUtils.generateOfflineEventId(),
+                    id = ICalUtilsImpl.generateOfflineEventId(),
                     iCalendar = event.iCalendar.clone().apply {
                         this.events.first().apply {
                             setUid(
-                                ICalUtils.generateProtonUid(
+                                ICalUtilsImpl.generateProtonUid(
                                     event.uid,
                                     ICalDateFormat.DATE_TIME_BASIC_WITHOUT_TZ.format(
-                                        ICalUtils.eventStartZonedDateTimeToDate(if (dbEvent.isSingleEdit()) dbEventStartDate!! else dbEventWithOccurrenceStartDate!!, dbEvent.isAllDay())
+                                        ICalUtilsImpl.eventStartZonedDateTimeToDate(if (dbEvent.isSingleEdit()) dbEventStartDate!! else dbEventWithOccurrenceStartDate!!, dbEvent.isAllDay())
                                     )
                                 )
                             )
@@ -1508,7 +1512,7 @@ class EventViewModel(
             attendee.rsvp = true
             attendee.participationLevel = ParticipationLevel.REQUIRED
             attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
-            val token = ICalUtils.generateXPmToken(canonicalEmail, event.uid)
+            val token = ICalUtilsImpl.generateXPmToken(canonicalEmail, event.uid)
             attendee.addParameter(X_PM_TOKEN, token)
             event.iCalEvent.addAttendee(
                 attendee
@@ -1562,7 +1566,7 @@ class EventViewModel(
                 // if changes from NO to YES/MAYBE add default calendar notifications
                 if (loadSettingsForCalendar(calendarId)) {
                     setDefaultAlarms(eventCopy, calendarSettings)
-                    val calendarSplit = ICalUtils.splitICalendarIntoParts(eventCopy.iCalendar)
+                    val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(eventCopy.iCalendar)
                     calendarSplit.personalPart?.printToString()
                 } else null
             } else {

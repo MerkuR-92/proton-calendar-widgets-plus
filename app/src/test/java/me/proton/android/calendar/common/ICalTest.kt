@@ -5,13 +5,13 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
-import me.proton.android.calendar.common.ICalUtils.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import org.junit.jupiter.api.Test
 import java.time.*
 
 internal class ICalTest {
 
-    val iCal = ICalUtils
+    val iCal = ICalUtilsImpl
 
     @Test
     fun `merge calendars for all-day event`() {
@@ -153,7 +153,7 @@ internal class ICalTest {
                 END:VCALENDAR
             """.trimIndent()
 
-        assertThat(ICalUtils.parseICalString(testVCal)).isNotNull()
+        assertThat(ICalUtilsImpl.parseICalString(testVCal)).isNotNull()
 
     }
 

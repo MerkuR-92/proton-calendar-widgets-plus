@@ -42,12 +42,23 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.collapse
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.expand
+import me.proton.android.calendar.common.AndroidUtils.getInitials
+import me.proton.android.calendar.common.AndroidUtils.getParticipationStatusPriorityValue
+import me.proton.android.calendar.common.AndroidUtils.rotateArrowDownward
+import me.proton.android.calendar.common.AndroidUtils.rotateArrowUpward
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.EventUtilsImpl.formatStartEndForActualEndDate
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.EventUtilsImpl.isUserInvitedAddressEnabled
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
-import me.proton.android.calendar.common.ICalUtils.extractEmail
-import me.proton.android.calendar.common.ICalUtils.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -629,7 +640,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 if (event.isRecurring()) {
                     this.text_recurrence.visibleOrGone(true)
                     this.text_recurrence.text = AndroidUtils.formatRecurrence(
-                        requireContext(),
+                        requireContext().resources,
                         event,
                         eventViewModel.eventTimeZoneId
                     )
@@ -661,7 +672,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 text_header.text = if (event.calendar.isActive) {
                     event.calendar.name
                 } else {
-                    requireContext().getText(R.string.event_calendar_disabled, event.calendar.name)
+                    requireContext().resources.getText(R.string.event_calendar_disabled, event.calendar.name)
                 }
                 //Set icon view to Invisible to keep the text view constraints
                 image_icon.visibleOrInvisible(false)

@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import me.proton.android.calendar.BaseTest
-import me.proton.android.calendar.common.ICalUtils.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
 import java.time.*
@@ -49,7 +49,7 @@ internal class AlarmsTest : BaseTest() {
 
         // alarms for part-day event fire at the same point-in-time no matter the timezone
 
-        val alarmsUtc = ICalUtils.calculateAlarmEntities(event, "UTC", "member-id")
+        val alarmsUtc = ICalUtilsImpl.calculateAlarmEntities(event, "UTC", "member-id")
 
         assertThat(alarmsUtc.size).isEqualTo(4)
 
@@ -93,7 +93,7 @@ internal class AlarmsTest : BaseTest() {
         assertThat(alarmsUtc[3].action).isEqualTo(2)
         assertThat(alarmsUtc[3].trigger).isEqualTo("-PT60M")
 
-        val alarmsZurich = ICalUtils.calculateAlarmEntities(event, "Europe/Zurich", "member-id")
+        val alarmsZurich = ICalUtilsImpl.calculateAlarmEntities(event, "Europe/Zurich", "member-id")
 
         assertThat(alarmsZurich.size).isEqualTo(4)
 
@@ -177,7 +177,7 @@ internal class AlarmsTest : BaseTest() {
 
         // in different timezones alarms should fire at the same local time of the same day
 
-        val alarms = ICalUtils.calculateAlarmEntities(event, "UTC", "member-id")
+        val alarms = ICalUtilsImpl.calculateAlarmEntities(event, "UTC", "member-id")
 
         assertThat(alarms.size).isEqualTo(3)
 
@@ -213,7 +213,7 @@ internal class AlarmsTest : BaseTest() {
         assertThat(alarms[2].action).isEqualTo(2)
         assertThat(alarms[2].trigger).isEqualTo("-P2DT16H")
 
-        val alarmsZurich = ICalUtils.calculateAlarmEntities(event, "Europe/Zurich", "member-id")
+        val alarmsZurich = ICalUtilsImpl.calculateAlarmEntities(event, "Europe/Zurich", "member-id")
 
         assertThat(alarms.size).isEqualTo(3)
 
@@ -365,7 +365,7 @@ internal class AlarmsTest : BaseTest() {
         val until = LocalDate.of(2020, 12, 12)
         val timeZoneId = "Pacific/Apia"
         val zoneId = ZoneId.of(timeZoneId)
-        val expandedEvents = ICalUtils.expandOccurrencesWithSingleEdits(allDay1, sameUidEvents, until, timeZoneId)
+        val expandedEvents = ICalUtilsImpl.expandOccurrencesWithSingleEdits(allDay1, sameUidEvents, until, timeZoneId)
         val exDateFiltered = expandedEvents!!.filterOutOccurrencesByExdates(allDay1, timeZoneId)
         val withOccurrences = exDateFiltered.map {
             if (it.occurrence != null) {
@@ -374,7 +374,7 @@ internal class AlarmsTest : BaseTest() {
         }
 
         val alarms = withOccurrences.flatMap {
-            ICalUtils.calculateAlarmEntities(it, timeZoneId, "TODO")
+            ICalUtilsImpl.calculateAlarmEntities(it, timeZoneId, "TODO")
         }
 
         alarms.forEach {
@@ -432,7 +432,7 @@ internal class AlarmsTest : BaseTest() {
         val zoneId = ZoneId.of(timeZoneId)
 
         val now1 = ZonedDateTime.of(2020, 12, 5, 9, 0, 0, 0, zoneId)
-        val alarms = ICalUtils.calculateUpcomingAlarmEntities(sameUidEvents, now1, "TODO")
+        val alarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(sameUidEvents, now1, "TODO")
 
         alarms.forEach {
             TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
@@ -487,7 +487,7 @@ internal class AlarmsTest : BaseTest() {
         val zoneId = ZoneId.of(timeZoneId)
 
         val now2 = ZonedDateTime.of(2020, 12, 8, 12, 0, 0, 0, zoneId)
-        val alarms = ICalUtils.calculateUpcomingAlarmEntities(sameUidEvents, now2, "TODO")
+        val alarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(sameUidEvents, now2, "TODO")
 
         alarms.forEach {
             TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
@@ -526,7 +526,7 @@ internal class AlarmsTest : BaseTest() {
         // no more alarms for event:
 
         val afterAllEvents = ZonedDateTime.of(2020, 12, 12, 12, 0, 0, 0, zoneId)
-        val noMoreAlarms = ICalUtils.calculateUpcomingAlarmEntities(sameUidEvents, afterAllEvents, "TODO")
+        val noMoreAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(sameUidEvents, afterAllEvents, "TODO")
 
         assertThat(noMoreAlarms.isEmpty()).isTrue()
 
@@ -572,7 +572,7 @@ internal class AlarmsTest : BaseTest() {
         val zoneId = ZoneId.of(timeZoneId)
 
         val now = ZonedDateTime.of(2020, 12, 7, 9, 0, 0, 0, zoneId)
-        val alarms = ICalUtils.calculateUpcomingAlarmEntities(events, now, "TODO")
+        val alarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(events, now, "TODO")
 
         alarms.forEach {
             TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")
@@ -590,7 +590,7 @@ internal class AlarmsTest : BaseTest() {
 
         // timestamp after last alarm for occurrence X
         val now2 = ZonedDateTime.of(2020, 12, 14, 15, 55, 0, 0, zoneId)
-        val alarms2 = ICalUtils.calculateUpcomingAlarmEntities(events, now2, "TODO")
+        val alarms2 = ICalUtilsImpl.calculateUpcomingAlarmEntities(events, now2, "TODO")
 
         alarms2.forEach {
             TestsLogger.d("${Instant.ofEpochSecond(it.occurrence).atZone(zoneId)} alarm for ${it.eventId}")

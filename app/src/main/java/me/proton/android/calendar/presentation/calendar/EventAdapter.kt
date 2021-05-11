@@ -19,7 +19,11 @@ import biweekly.parameter.ParticipationStatus
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.setStripedBackground
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatWithDayOfWeek
 import me.proton.android.calendar.common.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
@@ -40,7 +44,7 @@ class EventAdapter(
 
         class HeaderViewHolder(itemView: View) : EventViewHolder(itemView) {
             fun bind(date: LocalDate) {
-                itemView.text_header.text = date.format(showDayOfWeek = true)
+                itemView.text_header.text = date.formatWithDayOfWeek(showDayOfWeek = true)
             }
         }
 

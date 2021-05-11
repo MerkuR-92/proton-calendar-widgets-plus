@@ -3,7 +3,7 @@ package me.proton.android.calendar.presentation
 import android.view.View
 import android.widget.RadioButton
 import androidx.annotation.IdRes
-import me.proton.android.calendar.common.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 
 /**
  * Class mimicking RadioGroup component for checking RadioButtons that are not inside RadioGroup.
