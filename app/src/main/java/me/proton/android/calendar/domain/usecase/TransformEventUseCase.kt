@@ -5,9 +5,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
-import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.ICalUtilsImpl.adjustIncomingAllDayEvent
+import me.proton.android.calendar.common.ICalUtilsImpl.generateXPmToken
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
@@ -132,11 +133,15 @@ class TransformEventUseCase(
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
-                val attendeeToken = attendee.getParameter(X_PM_TOKEN)
+                val attendeeToken = attendee.getParameter(X_PM_TOKEN) ?: generateXPmToken(
+                    canonicalizeProtonEmail(attendee.email),
+                    iCalendar.events.first().uid.value
+                )
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.email) }) currentUserAttendeeId = attendeeStatusEvent.id
+                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.email) }) currentUserAttendeeId =
+                        attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }
             }
