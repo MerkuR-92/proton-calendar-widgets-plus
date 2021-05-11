@@ -59,7 +59,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by inject()
     private val logger: Logger by inject()
     private val eventViewModel: EventViewModel by sharedViewModel() //inject()
-    private lateinit var monthlyRecurrenceOnMap: HashMap<Int, EventViewModel.MonthlyRepatOnOption>
+    private lateinit var monthlyRecurrenceOnMap: HashMap<Int, EventViewModel.MonthlyRepeatOnOption>
 
     // index of the day of the week of Event start, used for forcing weekday picker to have it always picked
     //private val indexOfEventStartDay by lazy { (eventViewModel.eventLiveData.value!!.getStart(eventViewModel.initialTimeZoneId)!!.dayOfWeek.ordinal + if (eventViewModel.startWeekOnMonday) 0 else 1) % 7 }
@@ -416,9 +416,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         // applies only to month
         custom_recurrence_occurrence_time_radio_group.check(
             when (eventViewModel.tempMonthlyRepeatOption) {
-                EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
-                EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
-                EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
+                EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
+                EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
+                EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
             }
         )
 
@@ -426,17 +426,17 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         monthlyRecurrenceOnMap = HashMap()
         optionsRepeatOn.forEach {
             when (it) {
-                EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> {
+                EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> {
                     custom_recurrence_occurrence_time_1.visibleOrGone(true)
                     custom_recurrence_occurrence_time_1.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
                     monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_1] = it
                 }
-                EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> {
+                EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> {
                     custom_recurrence_occurrence_time_2.visibleOrGone(true)
                     custom_recurrence_occurrence_time_2.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
                     monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_2] = it
                 }
-                EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> {
+                EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> {
                     custom_recurrence_occurrence_time_3.visibleOrGone(true)
                     custom_recurrence_occurrence_time_3.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
                     monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_3] = it
@@ -460,17 +460,17 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun mapMonthlyRecurrenceOnToString(eventStartDate: LocalDate, option: EventViewModel.MonthlyRepatOnOption): String {
+    private fun mapMonthlyRecurrenceOnToString(eventStartDate: LocalDate, option: EventViewModel.MonthlyRepeatOnOption): String {
         return when(option) {
-            EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> getString(
+            EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> getString(
                 R.string.event_recurrence_occurs_monthly_on_day,
                 eventStartDate.dayOfMonth
             )
-            EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> getString(
+            EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> getString(
                 R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
                 eventStartDate.formatMonthlyDayOfWeek(resources)
             )
-            EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> getString(
+            EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> getString(
                 R.string.event_recurrence_occurs_on_monthly_on_x_day_of_week,
                 eventStartDate.formatMonthlyDayOfWeek(resources, backwards = true)
             )
@@ -498,9 +498,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 // handle custom recurrence rule
                 custom_recurrence_occurrence_time_radio_group.check(
                     when (eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()]) {
-                        EventViewModel.MonthlyRepatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
-                        EventViewModel.MonthlyRepatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
-                        EventViewModel.MonthlyRepatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
+                        EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
+                        EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
+                        EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
                     }
                 )
 

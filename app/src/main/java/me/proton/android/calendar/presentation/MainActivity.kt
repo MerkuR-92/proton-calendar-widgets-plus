@@ -208,8 +208,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             // Handle Bootstrap errors
             errorReport.observe(this@MainActivity, Observer { errorReport ->
                 errorReport ?: return@Observer
-                val dialogTitle: Int
-                val dialogMessage: Int
+                var dialogTitle: Int? = null
+                var dialogMessage: Int? = null
                 var dialogPositiveButton = R.string.bootstrap_error_default_confirm
                 when (errorReport) {
                     UseCase.Error.NO_CALENDAR -> {
@@ -242,6 +242,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         dialogMessage = R.string.bootstrap_error_update_passphrase_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
+                }
+
+                // This can not happen
+                if (dialogTitle == null || dialogMessage == null) {
+                    clearError()
+                    handleAccountState(this, state.value!!)
+                    return@Observer
                 }
 
                 if (errorReport == UseCase.Error.RESET_NEEDED || errorReport == UseCase.Error.UPDATE_PASSPHRASE) {

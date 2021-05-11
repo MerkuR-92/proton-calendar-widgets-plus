@@ -359,10 +359,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 attachActionHandlers()
             } else {
                 when (viewModeInitStatus) {
-                    EventViewModel.Result.OccurrenceDoesntExist -> {
+                    EventViewModel.Result.OccurrenceDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_doesnt_exist))
                     }
-                    EventViewModel.Result.EventDoesntExist -> {
+                    EventViewModel.Result.EventDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_doesnt_exist))
                     }
                     is EventViewModel.Result.Error -> {
@@ -579,7 +579,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 participationStatus,
                 userAttendee,
                 userEmails,
-                resources,
                 sendPreferences
             )) {
             eventViewModel.handleParticipationStatus(userEmails, participationStatus)

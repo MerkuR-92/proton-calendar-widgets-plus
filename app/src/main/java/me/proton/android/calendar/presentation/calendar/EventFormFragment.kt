@@ -122,13 +122,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             findNavController().navigateUp()
                         } else {
                             when (viewModeInitStatus) {
-                                EventViewModel.Result.OccurrenceDoesntExist -> {
+                                EventViewModel.Result.OccurrenceDoesNotExist -> {
                                     AndroidUtils.displaySimpleOkAlert(
                                         requireContext(),
                                         getString(R.string.error_occurrence_doesnt_exist)
                                     )
                                 }
-                                EventViewModel.Result.EventDoesntExist -> {
+                                EventViewModel.Result.EventDoesNotExist -> {
                                     AndroidUtils.displaySimpleOkAlert(
                                         requireContext(),
                                         getString(R.string.error_event_doesnt_exist)
@@ -395,7 +395,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     else
                         null,
                     occurrenceNumber = 1,
-                    resources,
                     calendarViewModel.timeFormatIs24Hour(requireContext()),
                     sendPreferences
                 )
@@ -459,7 +458,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 eventViewModel.handleSave(
                     eventEditDeleteOption,
                     navigationArguments.occurrenceNumber,
-                    resources,
                     calendarViewModel.timeFormatIs24Hour(requireContext()),
                     sendPreferences
                 )
@@ -543,10 +541,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 attachActionHandlers()
             } else {
                 when (viewModeInitStatus) {
-                    EventViewModel.Result.OccurrenceDoesntExist -> {
+                    EventViewModel.Result.OccurrenceDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_doesnt_exist))
                     }
-                    EventViewModel.Result.EventDoesntExist -> {
+                    EventViewModel.Result.EventDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_doesnt_exist))
                     }
                     is EventViewModel.Result.Error -> {

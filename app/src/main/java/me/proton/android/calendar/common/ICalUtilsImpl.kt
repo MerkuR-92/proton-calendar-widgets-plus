@@ -74,7 +74,8 @@ object ICalUtilsImpl : ICalUtils {
      * Clones the ICalendar copying timezones.
      */
     override fun ICalendar.clone(): ICalendar {
-        return parseICalString(this.printToString())!!
+        val defaultTimezoneId = this.timezoneInfo?.defaultTimezone?.timeZone?.id
+        return parseICalString(this.printToString())!!.apply { setDefaultTimeZone(defaultTimezoneId) }
     }
 
     /**
