@@ -208,6 +208,18 @@ internal class ICalUtilsTest {
 
         assertThat(fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Athens")
 
+        /* Windows Time Zones */
+
+        assertThat(AndroidUtils.fallbackTimeZone("FLE Standard Time")).isEqualTo("Europe/Kiev")
+
+        assertThat(AndroidUtils.fallbackTimeZone("Taipei Standard Time")).isEqualTo("Asia/Taipei")
+
+        assertThat(AndroidUtils.fallbackTimeZone("saskatchewan")).isEqualTo("America/Edmonton")
+
+        assertThat(AndroidUtils.fallbackTimeZone("abu dhabi, muscat")).isEqualTo("Asia/Dubai")
+
+        assertThat(AndroidUtils.fallbackTimeZone("helsinki, kyiv, riga, sofia, tallinn, vilnius")).isEqualTo("Europe/Helsinki")
+
     }
 
     @Test

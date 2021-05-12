@@ -74,27 +74,27 @@ object IcsSurgeryUtils {
             data class DisabledCalendar(val eventId: String? = null): Error()
 
             sealed class Unsupported: Error() {
-                object Method: Error()
-                object Add: Error()
-                object Refresh: Error()
-                object Counter: Error()
-                object Publish: Error()
+                object Method: Unsupported()
+                object Add: Unsupported()
+                object Refresh: Unsupported()
+                object Counter: Unsupported()
+                object Publish: Unsupported()
             }
 
             sealed class Invalid: Error() {
-                object Version: Error()
-                object CalScale: Error()
-                object DateOrDateTimeProperty: Error()
-                object DateStart: Error()
-                object DateEnd: Error()
-                object Description: Error()
-                object Location: Error()
-                object Summary: Error()
-                object RRule: Error()
-                object RecurrenceId: Error()
-                object ExDate: Error()
-                object Sequence: Error()
-                object Attendees: Error()
+                object Version: Invalid()
+                object CalScale: Invalid()
+                object DateOrDateTimeProperty: Invalid()
+                object DateStart: Invalid()
+                object DateEnd: Invalid()
+                object Description: Invalid()
+                object Location: Invalid()
+                object Summary: Invalid()
+                object RRule: Invalid()
+                object RecurrenceId: Invalid()
+                object ExDate: Invalid()
+                object Sequence: Invalid()
+                object Attendees: Invalid()
             }
         }
     }
