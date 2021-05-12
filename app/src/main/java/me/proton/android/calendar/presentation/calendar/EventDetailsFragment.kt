@@ -614,11 +614,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             event.description?.nullIfBlank()?.let {
                 with(section_description) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        text_header.text = Html.fromHtml(event.description, Html.FROM_HTML_MODE_COMPACT)
-                    } else {
-                        text_header.text = Html.fromHtml(event.description)
-                    }
+                    text_header.text = event.description
                     Linkify.addLinks(text_header, Linkify.ALL)
                     image_icon.setImageResource(R.drawable.ic_text_align_left)
                     visibleOrGone(true)
