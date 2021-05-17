@@ -32,6 +32,7 @@ import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.EventUtilsImpl.updateParticipationStatus
 import me.proton.android.calendar.common.ICalUtilsImpl.adjustRRuleToStartDate
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
@@ -119,6 +120,8 @@ class EventViewModel(
     val eventState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
     val eventDialogState: MutableStateFlow<EventDialogState?> = MutableStateFlow(null)
 
+    var currentParticipationStatus: ParticipationStatus? = null
+
     sealed class EventState() {
 
         // TODO
@@ -127,7 +130,7 @@ class EventViewModel(
         sealed class Processing: EventState() {
             object Saving: Processing()
             object Deleting: Processing()
-            object ChangingAnswer: Processing()
+            data class ChangingAnswer(val participationStatus: ParticipationStatus): Processing()
         }
 
     }
@@ -141,9 +144,23 @@ class EventViewModel(
             data class RecurringEvent(val showThisAndFuture: Boolean): Delete()
         }
 
+        sealed class ChangeAnswer: EventDialogState() {
+
+            data class SendPreferences(val participationStatus: ParticipationStatus): ChangeAnswer()
+            data class RecurringEvent(
+                val participationStatus: ParticipationStatus,
+                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
+                val dialogType: ChangeAnswerRecurringDialogType,
+            ): ChangeAnswer()
+        }
+
     }
 
-
+    enum class ChangeAnswerRecurringDialogType {
+        OVERWRITE,
+        SINGLE_EDIT,
+        DEFAULT
+    }
 
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
     //  Check if any case require us to pass through it again or if we keep the init data we had from details
@@ -1004,198 +1021,6 @@ class EventViewModel(
         return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
     }
 
-    suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
-        markEventAsEdited()
-        if (addAttendee) {
-            attendee.rsvp = true
-            attendee.participationLevel = ParticipationLevel.REQUIRED
-            attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
-            val token = ICalUtilsImpl.generateXPmToken(canonicalEmail, event.uid)
-            attendee.addParameter(X_PM_TOKEN, token)
-            event.iCalEvent.addAttendee(
-                attendee
-            )
-            if (event.iCalEvent.organizer == null) {
-                val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
-                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-                }?.email
-                event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
-            }
-        } else {
-            event.iCalEvent.attendees.remove(attendee)
-            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
-                // TODO Update this once we allow editing events that have attendees
-                event.iCalEvent.organizer = null
-            }
-        }
-        _event.postValue(event)
-    }
-
-    fun handleParticipationStatus(userEmails: List<String>, participationStatus: ParticipationStatus) {
-        event.updateParticipationStatus(userEmails, participationStatus)
-        _event.postValue(event)
-    }
-
-    suspend fun updateParticipationStatus(
-        calendarId: String,
-        eventId: String,
-        attendeeId: String,
-        participationStatus: ParticipationStatus,
-        userAttendee: Attendee,
-        userEmails: List<String>,
-        sendPreferences: Map<Email, SendPreferences>
-    ): Boolean {
-        val status = participationStatus.toInt()
-
-        val userParticipationStatus = userAttendee.participationStatus
-
-        val eventCopy = event.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar)
-        val personalPartICalString =
-            if (participationStatus == ParticipationStatus.DECLINED &&
-                event.iCalEvent.alarms != null && event.iCalEvent.alarms.isNotEmpty()
-            ) {
-                // if changes to NO, remove all notifications if there are any
-                eventCopy.iCalEvent.alarms.clear()
-                ""
-            } else if ((userParticipationStatus == ParticipationStatus.DECLINED ||
-                        userParticipationStatus == ParticipationStatus.NEEDS_ACTION) &&
-                (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
-                event.iCalEvent.alarms.isNullOrEmpty()
-            ) {
-                // if changes from NO to YES/MAYBE add default calendar notifications
-                if (loadSettingsForCalendar(calendarId)) {
-                    setDefaultAlarms(eventCopy, calendarSettings)
-                    val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(eventCopy.iCalendar)
-                    calendarSplit.personalPart?.printToString()
-                } else null
-            } else {
-                // else keep notifications as it is
-                null
-            }
-
-        val updateTime = Instant.now()
-
-        if (sendPreferences.isNotEmpty()) {
-            val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
-                userId,
-                eventCopy.iCalendar,
-                dbEvent?.iCalendar?.timezoneInfo,
-                userAttendee.copy(),
-                event.iCalEvent.organizer.email,
-                participationStatus,
-                event.summary,
-                sendPreferences,
-                Date.from(updateTime)
-            )
-            sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
-            if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
-                return false
-            }
-        }
-
-        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
-            userId,
-            calendarId,
-            eventId,
-            attendeeId,
-            status,
-            personalPartICalString,
-            updateTime.epochSecond.toInt()
-        )
-        updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
-        if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
-            return false
-        }
-
-        if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
-            // If chain has single edits, update their part stat to NEEDS_ACTION
-            clearSingleEditsParticipationStatus(calendarId, event.uid, userEmails, participationStatus)
-        }
-
-        // Apply alarms modifications
-        if (personalPartICalString?.isEmpty() == true) {
-            // clear alarms
-            event.iCalEvent.alarms.clear()
-            _event.postValue(event)
-        } else if (personalPartICalString?.isNotEmpty() == true) {
-            // add default alarms
-            setDefaultAlarms(event, calendarSettings)
-            _event.postValue(event)
-        }
-
-        return true
-    }
-
-    private fun clearSingleEditsParticipationStatus(
-        calendarId: String,
-        eventUid: String,
-        userEmails: List<String>,
-        mainChainParticipationStatus: ParticipationStatus
-    ): LiveData<Operation.State> {
-        val status = mainChainParticipationStatus.toInt()
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_EVENT_UID to eventUid,
-                    UseCaseWorker.INPUT_USER_EMAILS to userEmails.toTypedArray(),
-                    UseCaseWorker.INPUT_PARTICIPATION_STATUS to status
-                )
-            )
-            .build()
-
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(
-            UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
-            ExistingWorkPolicy.REPLACE,
-            work
-        ).state
-    }
-
-    suspend fun isStandaloneSingleEdit(): Boolean {
-        return calendarsRepository.isStandaloneSingleEdit(userId, event.uid) == true
-    }
-
-    data class SendPreferencesResults(
-        val sendPreferences: Map<Email, SendPreferences>,
-        val emailErrors: Map<String, ObtainSendPreferencesUseCase.Result.Error>
-    )
-
-    suspend fun getSendPreferences(emails: List<String>): SendPreferencesResults {
-        // get send preferences and check if attendees have disabled email addresses
-        val canonicalEmails = getCanonicalEmailsUseCase.invoke(userId, emails)
-
-        val sendPreferencesResults = obtainSendPreferencesUseCase.execute(userId, canonicalEmails.filterNullValues())
-
-        val emailErrors = hashMapOf<String, ObtainSendPreferencesUseCase.Result.Error>()
-        val sendPreferences = sendPreferencesResults.mapValues {
-            when (val result = it.value) {
-                is ObtainSendPreferencesUseCase.Result.Success -> result.sendPreferences
-                ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> {
-                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.AddressDisabled
-                    null
-                }
-                ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> {
-                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences
-                    null
-                }
-                ObtainSendPreferencesUseCase.Result.Error.NetworkError -> {
-                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.NetworkError
-                    null
-                }
-            }
-        }.filterNullValues()
-
-        return SendPreferencesResults(sendPreferences, emailErrors)
-    }
-
     fun handleDelete(occurrenceNumber: Int) {
         // Post deleting event value to true to display loading state
         eventState.value = EventState.Processing.Deleting
@@ -1210,6 +1035,7 @@ class EventViewModel(
             val showThisAndFuture = occurrenceNumber > 1 &&
                     !event.isEventFirstOccurrence(dbEvent, displayTimeZoneId)
 
+            // Display Confirmation Dialog
             eventDialogState.value = EventDialogState.Delete.RecurringEvent(showThisAndFuture)
 
         } else {
@@ -1218,6 +1044,7 @@ class EventViewModel(
                     event.isPartOfChain() &&
                     dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false
 
+            // Display Confirmation Dialog
             if (disabledCalendarRecurringEvent) eventDialogState.value = EventDialogState.Delete.DisabledCalendarRecurring
             else eventDialogState.value = EventDialogState.Delete.Event
         }
@@ -1269,5 +1096,281 @@ class EventViewModel(
         eventState.value = EventState.Idle
 
         return deleteResult
+    }
+
+    suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
+        markEventAsEdited()
+        if (addAttendee) {
+            attendee.rsvp = true
+            attendee.participationLevel = ParticipationLevel.REQUIRED
+            attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
+            val token = ICalUtilsImpl.generateXPmToken(canonicalEmail, event.uid)
+            attendee.addParameter(X_PM_TOKEN, token)
+            event.iCalEvent.addAttendee(
+                attendee
+            )
+            if (event.iCalEvent.organizer == null) {
+                val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
+                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+                }?.email
+                event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
+            }
+        } else {
+            event.iCalEvent.attendees.remove(attendee)
+            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
+                // TODO Update this once we allow editing events that have attendees
+                event.iCalEvent.organizer = null
+            }
+        }
+        _event.postValue(event)
+    }
+
+    data class SendPreferencesResults(
+        val sendPreferences: Map<Email, SendPreferences>,
+        val emailErrors: Map<String, ObtainSendPreferencesUseCase.Result.Error>
+    )
+
+    suspend fun getSendPreferences(emails: List<String>): SendPreferencesResults {
+        // get send preferences and check if attendees have disabled email addresses
+        val canonicalEmails = getCanonicalEmailsUseCase.invoke(userId, emails)
+
+        val sendPreferencesResults = obtainSendPreferencesUseCase.execute(userId, canonicalEmails.filterNullValues())
+
+        val emailErrors = hashMapOf<String, ObtainSendPreferencesUseCase.Result.Error>()
+        val sendPreferences = sendPreferencesResults.mapValues {
+            when (val result = it.value) {
+                is ObtainSendPreferencesUseCase.Result.Success -> result.sendPreferences
+                ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.AddressDisabled
+                    null
+                }
+                ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences
+                    null
+                }
+                ObtainSendPreferencesUseCase.Result.Error.NetworkError -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.NetworkError
+                    null
+                }
+            }
+        }.filterNullValues()
+
+        return SendPreferencesResults(sendPreferences, emailErrors)
+    }
+
+    suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus): Boolean {
+        if (eventState.value is EventState.Processing) return true
+
+        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+        }
+        if (userEmails == null) {
+            eventState.value = EventState.Idle
+            return false
+        }
+
+        currentParticipationStatus = event.getParticipationStatus(userEmails) ?: ParticipationStatus.NEEDS_ACTION
+        if (currentParticipationStatus != newParticipationStatus) {
+
+            // Display Processing State
+            eventState.value = EventState.Processing.ChangingAnswer(newParticipationStatus)
+
+            val organizerEmail = event.iCalEvent.organizer.extractEmail()
+            if (organizerEmail == null) {
+                eventState.value = EventState.Idle
+                return false
+            }
+
+            val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
+            if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+                // Display Send Preferences Dialog
+                eventDialogState.value = EventDialogState.ChangeAnswer.SendPreferences(newParticipationStatus)
+                return false
+            } else {
+
+                if (event.isPartOfChain()) {
+                    val isSingleEdit = event.isSingleEdit()
+                    val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(userId, event.uid) else false
+
+                    val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
+                    val overwrite =
+                        if (isSingleEdit) false
+                        else hasAnsweredSingleEdit != null &&
+                                ((hasAnsweredSingleEdit[newParticipationStatus] == null && hasAnsweredSingleEdit.isNotEmpty())
+                                        || (hasAnsweredSingleEdit[newParticipationStatus] == true && hasAnsweredSingleEdit.size > 1))
+
+                    return if (isStandaloneSingleEdit == true) {
+                        updateParticipationStatus(
+                            newParticipationStatus,
+                            sendPreferencesResults.sendPreferences
+                        )
+                    } else {
+                        // Display Confirmation Dialog
+                        eventDialogState.value = EventDialogState.ChangeAnswer.RecurringEvent(
+                            newParticipationStatus,
+                            sendPreferencesResults.sendPreferences,
+                            when {
+                                overwrite -> ChangeAnswerRecurringDialogType.OVERWRITE
+                                isSingleEdit -> ChangeAnswerRecurringDialogType.SINGLE_EDIT
+                                else -> ChangeAnswerRecurringDialogType.DEFAULT
+                            }
+                        )
+                        true
+                    }
+                } else {
+                    return updateParticipationStatus(
+                        newParticipationStatus,
+                        sendPreferencesResults.sendPreferences
+                    )
+                }
+            }
+        } else return true
+    }
+
+    suspend fun updateParticipationStatus(
+        participationStatus: ParticipationStatus,
+        sendPreferences: Map<Email, SendPreferences>
+    ): Boolean {
+        val status = participationStatus.toInt()
+
+        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+        }
+        if (userEmails == null) {
+            eventState.value = EventState.Idle
+            return false
+        }
+
+        val userAttendee = event.iCalEvent.attendees.find { attendee ->
+            userEmails.firstOrNull { userEmail ->
+                val attendeeEmail = attendee.extractEmail()
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                    .equals(userEmail, ignoreCase = true)
+            } != null
+        }
+        if (userAttendee == null) {
+            eventState.value = EventState.Idle
+            return false
+        }
+        val userParticipationStatus = userAttendee.participationStatus
+
+        val eventCopy = event.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar)
+        val personalPartICalString =
+            if (participationStatus == ParticipationStatus.DECLINED &&
+                event.iCalEvent.alarms != null && event.iCalEvent.alarms.isNotEmpty()
+            ) {
+                // if changes to NO, remove all notifications if there are any
+                eventCopy.iCalEvent.alarms.clear()
+                ""
+            } else if ((userParticipationStatus == ParticipationStatus.DECLINED ||
+                        userParticipationStatus == ParticipationStatus.NEEDS_ACTION) &&
+                (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
+                event.iCalEvent.alarms.isNullOrEmpty()
+            ) {
+                // if changes from NO to YES/MAYBE add default calendar notifications
+                if (loadSettingsForCalendar(event.calendar.id)) {
+                    setDefaultAlarms(eventCopy, calendarSettings)
+                    val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(eventCopy.iCalendar)
+                    calendarSplit.personalPart?.printToString()
+                } else null
+            } else {
+                // else keep notifications as it is
+                null
+            }
+
+        val updateTime = Instant.now()
+
+        if (sendPreferences.isNotEmpty()) {
+            val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
+                userId,
+                eventCopy.iCalendar,
+                dbEvent?.iCalendar?.timezoneInfo,
+                userAttendee.copy(),
+                event.iCalEvent.organizer.email,
+                participationStatus,
+                event.summary,
+                sendPreferences,
+                Date.from(updateTime)
+            )
+            sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
+                eventState.value = EventState.Idle
+                return false
+            }
+        }
+
+        val attendeeId = event.currentUserAttendeeId
+        if (attendeeId.isNullOrEmpty()) {
+            eventState.value = EventState.Idle
+            return false
+        }
+
+        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
+            userId,
+            event.calendar.id,
+            event.id,
+            attendeeId,
+            status,
+            personalPartICalString,
+            updateTime.epochSecond.toInt()
+        )
+        updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
+        if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
+            eventState.value = EventState.Idle
+            return false
+        }
+
+        if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
+            // If chain has single edits, update their part stat to NEEDS_ACTION
+            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, userEmails, participationStatus)
+        }
+
+        // Apply alarms modifications
+        if (personalPartICalString?.isEmpty() == true) {
+            // clear alarms
+            event.iCalEvent.alarms.clear()
+        } else if (personalPartICalString?.isNotEmpty() == true) {
+            // add default alarms
+            setDefaultAlarms(event, calendarSettings)
+        }
+
+        event.updateParticipationStatus(userEmails, participationStatus)
+        _event.postValue(event)
+
+        eventState.value = EventState.Idle
+        return true
+    }
+
+    private fun clearSingleEditsParticipationStatus(
+        calendarId: String,
+        eventUid: String,
+        userEmails: List<String>,
+        mainChainParticipationStatus: ParticipationStatus
+    ): LiveData<Operation.State> {
+        val status = mainChainParticipationStatus.toInt()
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
+                    UseCaseWorker.INPUT_USER_ID to userId.id,
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
+                    UseCaseWorker.INPUT_EVENT_UID to eventUid,
+                    UseCaseWorker.INPUT_USER_EMAILS to userEmails.toTypedArray(),
+                    UseCaseWorker.INPUT_PARTICIPATION_STATUS to status
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(
+            UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
+            ExistingWorkPolicy.REPLACE,
+            work
+        ).state
     }
 }

@@ -123,7 +123,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override fun onBackPressedCustom() {
 
         val immutableChangeAnswerLoading =
-            eventViewModel.eventState.value == EventViewModel.EventState.Processing.ChangingAnswer
+            eventViewModel.eventState.value is EventViewModel.EventState.Processing.ChangingAnswer
         val immutableDeletingEvent = eventViewModel.eventState.value == EventViewModel.EventState.Processing.Deleting
 
         if (immutableChangeAnswerLoading) {
@@ -373,6 +373,62 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             }
                             .show()
                     }
+                    is EventViewModel.EventDialogState.ChangeAnswer.RecurringEvent -> {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.event_change_answer_recurring_title)
+                            .setMessage(
+                                when(it.dialogType) {
+                                    EventViewModel.ChangeAnswerRecurringDialogType.OVERWRITE -> R.string.event_change_answer_recurring_overwrite_description
+                                    EventViewModel.ChangeAnswerRecurringDialogType.SINGLE_EDIT -> R.string.event_change_answer_recurring_single_edit_description
+                                    else -> R.string.event_change_answer_recurring_description
+                                }
+                            )
+                            .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
+                                lifecycleScope.launch {
+                                    if (!eventViewModel.updateParticipationStatus(it.participationStatus, it.sendPreferences)) {
+                                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                                        view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                                        displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                                    }
+                                }
+                            }
+                            .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                            }
+                            .setOnCancelListener {
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                            }
+                            .setOnDismissListener {
+                                eventViewModel.eventDialogState.value = null
+                            }
+                            .show()
+                    }
+                    is EventViewModel.EventDialogState.ChangeAnswer.SendPreferences -> {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.event_organizer_send_prefs_error_title)
+                            .setMessage(
+                                when (it.participationStatus) {
+                                    ParticipationStatus.ACCEPTED -> R.string.event_organizer_send_prefs_message_accepted_title
+                                    ParticipationStatus.DECLINED -> R.string.event_organizer_send_prefs_message_declined_title
+                                    ParticipationStatus.TENTATIVE -> R.string.event_organizer_send_prefs_message_tentative_title
+                                    else -> R.string.event_organizer_send_prefs_message_default_title
+                                }
+                            )
+                            .setPositiveButton(R.string.event_organizer_send_prefs_button_title) { _, _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                            }
+                            .setOnCancelListener { _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                            }
+                            .setOnDismissListener {
+                                eventViewModel.eventDialogState.value = null
+                            }
+                            .show()
+                    }
                 }
             }
 
@@ -415,201 +471,31 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
-            onChangeAnswerClick(ParticipationStatus.ACCEPTED)
+            lifecycleScope.launch {
+                // Ignore the result if true
+                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.ACCEPTED)) {
+                    view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                    displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                }
+            }
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
-            onChangeAnswerClick(ParticipationStatus.DECLINED)
+            lifecycleScope.launch {
+                // Ignore the result if true
+                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.DECLINED)) {
+                    view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                    displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                }
+            }
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
-            onChangeAnswerClick(ParticipationStatus.TENTATIVE)
-        }
-    }
-
-    private fun onChangeAnswerClick(newParticipationStatus: ParticipationStatus) {
-
-        if (eventViewModel.eventState.value is EventViewModel.EventState.Processing) return
-
-        val userEmails = calendarViewModel.getUserEmails()
-        userEmails?.let {
-            val participationStatus = eventViewModel.eventLiveData.value?.getParticipationStatus(it)
-            if (participationStatus != newParticipationStatus) {
-                handleChangeAnswerSendPreferences(
-                    newParticipationStatus,
-                    participationStatus ?: ParticipationStatus.NEEDS_ACTION,
-                    userEmails
-                )
+            lifecycleScope.launch {
+                // Ignore the result if true
+                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.TENTATIVE)) {
+                    view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
+                    displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+                }
             }
-        }
-    }
-
-    private fun handleChangeAnswerSendPreferences(
-        participationStatus: ParticipationStatus,
-        currentParticipationStatus: ParticipationStatus,
-        userEmails: List<String>
-    ) {
-        lifecycleScope.launch {
-            val event = eventViewModel.eventLiveData.value
-            if (event == null) {
-                view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                return@launch
-            }
-
-            // Display loading state for new value
-            displayAttendeeAnswerState(participationStatus, true)
-
-            val organizerEmail = event.iCalEvent.organizer.extractEmail()
-            if (organizerEmail == null) {
-                view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                return@launch
-            }
-
-            val sendPreferencesResults = eventViewModel.getSendPreferences(listOf(organizerEmail))
-            if (sendPreferencesResults.emailErrors.isNotEmpty()) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.event_organizer_send_prefs_error_title)
-                    .setMessage(
-                        when (participationStatus) {
-                            ParticipationStatus.ACCEPTED -> R.string.event_organizer_send_prefs_message_accepted_title
-                            ParticipationStatus.DECLINED -> R.string.event_organizer_send_prefs_message_declined_title
-                            ParticipationStatus.TENTATIVE -> R.string.event_organizer_send_prefs_message_tentative_title
-                            else -> R.string.event_organizer_send_prefs_message_default_title
-                        }
-                    )
-                    .setPositiveButton(R.string.event_organizer_send_prefs_button_title) { _, _ ->
-                        lifecycleScope.launch {
-                            handleChangeAnswerConfirmationDialog(
-                                event,
-                                participationStatus,
-                                currentParticipationStatus,
-                                userEmails,
-                                sendPreferencesResults.sendPreferences
-                            )
-                        }
-                    }
-                    .setOnCancelListener {
-                        displayAttendeeAnswerState(currentParticipationStatus, false)
-                    }
-                    .show()
-            } else handleChangeAnswerConfirmationDialog(
-                event,
-                participationStatus,
-                currentParticipationStatus,
-                userEmails,
-                sendPreferencesResults.sendPreferences
-            )
-        }
-    }
-
-    private suspend fun handleChangeAnswerConfirmationDialog(
-        event: Event,
-        participationStatus: ParticipationStatus,
-        currentParticipationStatus: ParticipationStatus,
-        userEmails: List<String>,
-        sendPreferences: Map<Email, SendPreferences>
-    ) {
-
-        if (event.isPartOfChain()) {
-            val isSingleEdit = event.isSingleEdit()
-            val isStandaloneSingleEdit = if (isSingleEdit) eventViewModel.isStandaloneSingleEdit() else false
-
-            val hasAnsweredSingleEdit = eventViewModel.getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
-            val overwrite =
-                if (isSingleEdit) false
-                else hasAnsweredSingleEdit != null &&
-                        ((hasAnsweredSingleEdit[participationStatus] == null && hasAnsweredSingleEdit.isNotEmpty())
-                                || (hasAnsweredSingleEdit[participationStatus] == true && hasAnsweredSingleEdit.size > 1))
-
-            if (isStandaloneSingleEdit) {
-                updateAttendeeParticipationStatus(
-                    event,
-                    participationStatus,
-                    currentParticipationStatus,
-                    userEmails,
-                    sendPreferences
-                )
-            } else {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.event_change_answer_recurring_title)
-                    .setMessage(
-                        when {
-                            overwrite -> R.string.event_change_answer_recurring_overwrite_description
-                            isSingleEdit -> R.string.event_change_answer_recurring_single_edit_description
-                            else -> R.string.event_change_answer_recurring_description
-                        }
-                    )
-                    .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
-                        lifecycleScope.launch {
-                            updateAttendeeParticipationStatus(
-                                event,
-                                participationStatus,
-                                currentParticipationStatus,
-                                userEmails,
-                                sendPreferences
-                            )
-                        }
-                    }
-                    .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ ->
-                        displayAttendeeAnswerState(currentParticipationStatus, false)
-                    }
-                    .setOnCancelListener {
-                        displayAttendeeAnswerState(currentParticipationStatus, false)
-                    }
-                    .show()
-            }
-        } else {
-            updateAttendeeParticipationStatus(
-                event,
-                participationStatus,
-                currentParticipationStatus,
-                userEmails,
-                sendPreferences
-            )
-        }
-    }
-
-    private suspend fun updateAttendeeParticipationStatus(
-        event: Event,
-        participationStatus: ParticipationStatus,
-        currentParticipationStatus: ParticipationStatus,
-        userEmails: List<String>,
-        sendPreferences: Map<Email, SendPreferences>
-    ) {
-        val calendarId = event.calendar.id
-        val eventId = event.id
-        val attendeeId = event.currentUserAttendeeId
-        if (attendeeId.isNullOrEmpty()) {
-            displayAttendeeAnswerState(currentParticipationStatus, false)
-            view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-            return
-        }
-
-        val userAttendee = event.iCalEvent.attendees.find { attendee ->
-            userEmails.firstOrNull { userEmail ->
-                val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
-            } != null
-        }
-        if (userAttendee == null) {
-            displayAttendeeAnswerState(currentParticipationStatus, false)
-            view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-            return
-        }
-
-        if (eventViewModel.updateParticipationStatus(
-                calendarId,
-                eventId,
-                attendeeId,
-                participationStatus,
-                userAttendee,
-                userEmails,
-                sendPreferences
-            )
-        ) {
-            eventViewModel.handleParticipationStatus(userEmails, participationStatus)
-        } else {
-            // TODO Use custom error messages depending on error ("Cannot send to organizer: ${sendPreferenceErrorMessage}")
-            view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-            displayAttendeeAnswerState(currentParticipationStatus, false)
         }
     }
 
@@ -625,6 +511,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // TODO Remove attendees condition once edit attendees is implemented
                 buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent)
                 buttonMenu.visibleOrGone(!event.isAnInvitation && !deletingEvent)
+
+                if (eventState is EventViewModel.EventState.Processing.ChangingAnswer) displayAttendeeAnswerState(eventState.participationStatus)
             }
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
@@ -920,10 +808,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean = false) {
+    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?) {
 
-        eventViewModel.eventState.value =
-            if (loading) EventViewModel.EventState.Processing.ChangingAnswer else EventViewModel.EventState.Idle
+        val loading = eventViewModel.eventState.value is EventViewModel.EventState.Processing.ChangingAnswer
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))

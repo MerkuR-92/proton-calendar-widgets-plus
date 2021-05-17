@@ -14,7 +14,7 @@ abstract class AddressesDao : BaseDao<AddressEntity> {
     @Query("SELECT * FROM addresses WHERE fkUserId = :userId")
     abstract fun selectFlow(userId: String): Flow<List<AddressEntity>> // TODO unify Flow<List> and List<>
 
-    @Query("SELECT * FROM addresses WHERE fkUserId = :userId AND email = :email")
+    @Query("SELECT * FROM addresses WHERE fkUserId = :userId AND email = :email COLLATE NOCASE")
     abstract suspend fun select(userId: String, email: String): List<AddressEntity>
 
     @Query("SELECT * FROM addresses WHERE fkUserId = :userId")

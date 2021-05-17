@@ -59,13 +59,14 @@ class SendEmailUseCase(
 
         val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp)
 
-        val senderAddressesId = database.addressesDao().select(userId.id, canonicalizeProtonEmail(userAttendee.email)).map {
-            it.toAddress(json)
-        }.firstOrNull()?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
+        val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendee.email)
+        val senderAddressId = database.addressesDao().select(userId.id).find {
+            canonicalizeProtonEmail(it.email) == userAttendeeCanonicalEmail
+        }?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
 
         // TODO Check with core if refresh true can be removed
         val senderAddress = userManager.getAddresses(userId, refresh = true).find {
-            it.addressId.id == senderAddressesId
+            it.addressId.id == senderAddressId
         } ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
 
         val attachmentBytes = ics.toByteArray()
@@ -146,13 +147,14 @@ class SendEmailUseCase(
         )
 
         val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees: there is no valid first Member when creating Event")
-        val senderAddressesId = database.addressesDao().select(userId.id, canonicalizeProtonEmail(member.email)).map {
-            it.toAddress(json)
-        }.firstOrNull()?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address ID for sender") // TODO better error
+        val senderCanonicalEmail = canonicalizeProtonEmail(member.email)
+        val senderAddressId = database.addressesDao().select(userId.id).find {
+            canonicalizeProtonEmail(it.email) == senderCanonicalEmail
+        }?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address ID for sender") // TODO better error
 
         // TODO Check with core if refresh true can be removed
         val senderAddress = userManager.getAddresses(userId, refresh = true).find {
-            it.addressId.id == senderAddressesId
+            it.addressId.id == senderAddressId
         } ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address for sender") // TODO better error
 
         val attachmentBytes = ics.toByteArray()

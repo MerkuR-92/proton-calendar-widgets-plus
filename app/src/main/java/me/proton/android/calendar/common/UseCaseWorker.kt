@@ -34,7 +34,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_DISPLAY_WEEK_NUMBER = UpdateCalendarUserSettingsUseCase.WORKER_ID_WEEK_NUMBER
             const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
-            const val UPDATE_PARTICIPATION_STATUS = UpdateParticipationStatusUseCase.WORKER_ID
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
             const val FETCH_ADDRESSES = FetchUserUseCase.WORKER_ID
         }
@@ -86,7 +85,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_DISPLAY_WEEK_NUMBER = "UPDATE_DISPLAY_WEEK_NUMBER"
             const val UPDATE_TIME_FORMAT = "UPDATE_TIME_FORMAT"
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
-            const val UPDATE_PARTICIPATION_STATUS = "UPDATE_PARTICIPATION_STATUS"
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
             const val FETCH_ADDRESSES = "FETCH_ADDRESSES"
         }
@@ -172,17 +170,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                         inputData.getInt(INPUT_WEEK_START, 0)
                     else return Result.failure()
                 )
-            }
-            UseCaseId.UPDATE_PARTICIPATION_STATUS -> {
-                val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase = get()
-                updateParticipationStatusUseCase.execute(
-                    userId,
-                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
-                    inputData.getString(INPUT_EVENT_ID) ?: return Result.failure(),
-                    inputData.getString(INPUT_ATTENDEE_ID) ?: return Result.failure(),
-                    inputData.getInt(INPUT_PARTICIPATION_STATUS, 0),
-                    inputData.getString(INPUT_PERSONAL_ICAL_STRING),
-                    if (inputData.hasKeyWithValueOfType<Int>(INPUT_UPDATE_TIME)) inputData.getInt(INPUT_UPDATE_TIME, 0) else null)
             }
             UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT -> {
                 val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase = get()
