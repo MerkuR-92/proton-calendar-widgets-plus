@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -95,8 +96,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
     override fun onBackPressedCustom() {
-        val immutableSavingEvent = eventViewModel.savingEvent.value
-        if (immutableSavingEvent != null && immutableSavingEvent) {
+        val processingEvent = eventViewModel.eventState.value is EventViewModel.EventState.Processing
+        if (processingEvent) {
             view?.displaySnackBar(getString(R.string.snack_event_saving))
             return
         }
@@ -148,8 +149,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onNavigationIconClicked(): Boolean {
-        val immutableSavingEvent = eventViewModel.savingEvent.value
-        if (immutableSavingEvent != null && immutableSavingEvent) {
+        val processingEvent = eventViewModel.eventState.value is EventViewModel.EventState.Processing
+        if (processingEvent) {
             view?.displaySnackBar(getString(R.string.snack_event_saving))
             return true
         }
@@ -220,16 +221,22 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                 lifecycleScope.launch {
 
-                    // TODO Refactor savingEvent loading state
-                    eventViewModel.savingEvent.postValue(true)
+                    eventViewModel.eventState.value = EventViewModel.EventState.Processing.Saving
 
+                    // TODO try to move the logic to VM
                     val attendeesEmails = eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.mapNotNull { it.extractEmail() }
                     if (!attendeesEmails.isNullOrEmpty()) {
+
                         val sendPreferencesResults = eventViewModel.getSendPreferences(attendeesEmails)
+
                         if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+
+
+
+
                             if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
                                 this@EventFormFragment.view?.displaySnackBar(getString(R.string.snack_network_error))
-                                eventViewModel.savingEvent.postValue(false)
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
                             } else {
                                 MaterialAlertDialogBuilder(requireContext())
                                     .setTitle(R.string.event_attendees_send_prefs_error_title)
@@ -253,13 +260,19 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                         }
                                     }
                                     .setNegativeButton(R.string.event_attendees_send_prefs_error_cancel) { _, _, ->
-                                        eventViewModel.savingEvent.postValue(false)
+                                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
                                     }
                                     .setOnCancelListener {
-                                        eventViewModel.savingEvent.postValue(false)
+                                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
                                     }
                                     .show()
                             }
+
+
+
+
+
+
                         } else {
                             handleSaveAttendeesConfirmationDialog(sendPreferencesResults.sendPreferences)
                         }
@@ -297,10 +310,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         handleSaveWithOption(EventEditDeleteOption.ALL_EVENTS, sendPreferences)
                     }
                     .setNegativeButton(R.string.event_add_participants_dialog_cancel) { _, _ ->
-                        eventViewModel.savingEvent.postValue(false)
+                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
                     }
                     .setOnCancelListener {
-                        eventViewModel.savingEvent.postValue(false)
+                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
                     }
                     .show()
             } else {
@@ -318,10 +331,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         }
                     }
                     .setNegativeButton(R.string.event_send_invite_dialog_cancel) { _, _ ->
-                        eventViewModel.savingEvent.postValue(false)
+                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
                     }
                     .setOnCancelListener {
-                        eventViewModel.savingEvent.postValue(false)
+                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
                     }
                     .show()
             }
@@ -347,7 +360,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 ).toTypedArray(), 0
             ) { selectedIndex, isCancel ->
                 if (isCancel) {
-                    eventViewModel.savingEvent.postValue(false)
+                    eventViewModel.eventState.value = EventViewModel.EventState.Idle
                     return@displaySingleChoiceConfirmationPicker
                 }
                 val eventEditDeleteOption =
@@ -403,8 +416,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
                 handleAlarmsUseCase.execute(userId)
             }
-            // Post saving event value to false to stop loading state
-            eventViewModel.savingEvent.postValue(false)
+            // stop loading state
+            eventViewModel.eventState.value = EventViewModel.EventState.Idle
 
             if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                 if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) {
@@ -466,8 +479,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 val userId = accountViewModel.getPrimaryUserId() ?: return@withContext logger.e("Error user id was null in EventFormFragment onSaveClick")
                 handleAlarmsUseCase.execute(userId)
             }
-            // Post saving event value to false to stop loading state
-            eventViewModel.savingEvent.postValue(false)
+            // stop loading state
+            eventViewModel.eventState.value = EventViewModel.EventState.Idle
 
             if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) { // TODO remove duplicated code here and below
                 onSuccessEventUpdateCalendarDisplay()
@@ -558,36 +571,41 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 findNavController().navigateUp()
             }
 
-            eventViewModel.savingEvent.observe(viewLifecycleOwner, Observer { savingEvent: Boolean ->
+            eventViewModel.eventState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
+                val processingEvent = eventState is EventViewModel.EventState.Processing
+
                 // Update action bar buttons visibility
-                loadingAction.visibleOrGone(savingEvent)
-                buttonSave.visibleOrGone(!savingEvent)
+                loadingAction.visibleOrGone(processingEvent)
+                buttonSave.visibleOrGone(!processingEvent)
 
                 // Disable/Enable all items linked to actions from our view
-                event_form_title.isEnabled = !savingEvent
-                event_form_location.isEnabled = !savingEvent
-                event_form_description.isEnabled = !savingEvent
-                event_form_all_day_press.isEnabled = !savingEvent
-                event_form_all_day_switch.isClickable = !savingEvent
-                event_form_all_day_switch.isFocusable = !savingEvent
-                event_form_timezone_press.isEnabled = !savingEvent
-                event_form_start_date_press.isEnabled = !savingEvent
-                event_form_end_date_press.isEnabled = !savingEvent
-                event_form_start_time_press.isEnabled = !savingEvent
-                event_form_end_time_press.isEnabled = !savingEvent
-                event_form_calendar_press.isEnabled = !savingEvent
-                event_form_recurrence_press.isEnabled = !savingEvent
-                event_form_alarm_press.isEnabled = !savingEvent
+                event_form_title.isEnabled = !processingEvent
+                event_form_location.isEnabled = !processingEvent
+                event_form_description.isEnabled = !processingEvent
+                event_form_all_day_press.isEnabled = !processingEvent
+                event_form_all_day_switch.isClickable = !processingEvent
+                event_form_all_day_switch.isFocusable = !processingEvent
+                event_form_timezone_press.isEnabled = !processingEvent
+                event_form_start_date_press.isEnabled = !processingEvent
+                event_form_end_date_press.isEnabled = !processingEvent
+                event_form_start_time_press.isEnabled = !processingEvent
+                event_form_end_time_press.isEnabled = !processingEvent
+                event_form_calendar_press.isEnabled = !processingEvent
+                event_form_recurrence_press.isEnabled = !processingEvent
+                event_form_alarm_press.isEnabled = !processingEvent
+
                 for (i in 0 until event_form_alarm_list.childCount) {
                     // Disable the delete buttons from inside alarm items views
-                    event_form_alarm_list.getChildAt(i).findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !savingEvent
+                    event_form_alarm_list.getChildAt(i)
+                        .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
                 }
-                event_form_participant_press.isEnabled = !savingEvent
+
+                event_form_participant_press.isEnabled = !processingEvent
                 for (i in 0 until event_form_participant_chip_group.childCount) {
                     // Disable the chips from inside attendees items views
-                    event_form_participant_chip_group.getChildAt(i).isEnabled = !savingEvent
+                    event_form_participant_chip_group.getChildAt(i).isEnabled = !processingEvent
                 }
-            })
+            }
         }
     }
 
@@ -602,16 +620,24 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event.location?.let { event_form_location.setText(it) }
             event.description?.let { event_form_description.setText(it) }
 
-            if (event_form_location.text.isEmpty())
-                ImageViewCompat.setImageTintList(
-                    event_form_location_icon,
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint))
+            ImageViewCompat.setImageTintList(
+                event_form_location_icon,
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (event_form_location.text.isEmpty()) R.color.icon_hint else R.color.icon_norm
+                    )
                 )
-            if (event_form_description.text.isEmpty())
-                ImageViewCompat.setImageTintList(
-                    event_form_description_icon,
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint))
+            )
+            ImageViewCompat.setImageTintList(
+                event_form_description_icon,
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        if (event_form_description.text.isEmpty()) R.color.icon_hint else R.color.icon_norm
+                    )
                 )
+            )
 
             event_form_all_day_switch.isChecked = event.isAllDay()
             event_form_all_day_switch.jumpDrawablesToCurrentState()

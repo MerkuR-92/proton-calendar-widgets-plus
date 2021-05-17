@@ -12,11 +12,15 @@ import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.isLastDayOfWeekInMonth
@@ -63,7 +67,8 @@ class EventViewModel(
     private val json: Json,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase,
-    private val handleSaveUseCase: HandleSaveUseCase
+    private val handleSaveUseCase: HandleSaveUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase
 ) : AndroidViewModel(application) {
 
     sealed class Result {
@@ -72,6 +77,8 @@ class EventViewModel(
         object EventDoesNotExist : Result()
         class Error(val message: String) : Result()
     }
+
+    private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private lateinit var userId: UserId
 
@@ -109,9 +116,34 @@ class EventViewModel(
     var recurrenceManuallyEdited: Boolean = false
     private var singleEditsInfo: SingleEditsInfo? = null
 
-    var savingEvent = MutableLiveData(false)
-    var deletingEvent = MutableLiveData(false)
-    var changeAnswerLoading = MutableLiveData(false)
+    val eventState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
+    val eventDialogState: MutableStateFlow<EventDialogState?> = MutableStateFlow(null)
+
+    sealed class EventState() {
+
+        // TODO
+        object Idle: EventState()
+
+        sealed class Processing: EventState() {
+            object Saving: Processing()
+            object Deleting: Processing()
+            object ChangingAnswer: Processing()
+        }
+
+    }
+
+    sealed class EventDialogState {
+
+        sealed class Delete: EventDialogState() {
+
+            object Event: Delete()
+            object DisabledCalendarRecurring: Delete()
+            data class RecurringEvent(val showThisAndFuture: Boolean): Delete()
+        }
+
+    }
+
+
 
     // TODO: Initialise is called a second time for same eventId if we open event form from event details
     //  Check if any case require us to pass through it again or if we keep the init data we had from details
@@ -124,6 +156,8 @@ class EventViewModel(
         initStartTime: String? /*TODO in the future also endDate for multi-day events*/
     ): Result {
 
+        eventState.value = EventState.Idle
+
         // reset backup values
         timeStartBackup = null
         timeEndBackup = null
@@ -131,9 +165,6 @@ class EventViewModel(
         eventEdited = false
         eventCustomPartialDayAlarmsSave = null
         eventCustomAllDayAlarmsSave = null
-        savingEvent.postValue(false)
-        deletingEvent.postValue(false)
-        changeAnswerLoading.postValue(false)
         dbEvent = null
         originalDbEvent = null
         recurrenceManuallyEdited = false
@@ -505,7 +536,7 @@ class EventViewModel(
     ): HandleSaveResult {
 
         // Post saving event value to true to trigger loading state
-        savingEvent.postValue(true)
+        eventState.value = EventState.Processing.Saving
 
         val eventCopy = event.copy(iCalendar = event.iCalendar.clone())
         val handleSaveResult = handleSaveUseCase.handleSave(
@@ -525,7 +556,7 @@ class EventViewModel(
         handleSaveResult.ifSuccessAndLogErrors(logger) {}
 
         // Post saving event value to false to hide loading state
-        savingEvent.postValue(false)
+        eventState.value = EventState.Idle
 
         if (handleSaveResult is UseCase.Result.Error) {
             return when (handleSaveResult.error) {
@@ -789,7 +820,7 @@ class EventViewModel(
 
             if (this.frequency != Frequency.MONTHLY) return 0
 
-            val eventStartDate = event.getStart(eventTimeZoneId)!!.toLocalDate()
+            val eventStartDate = event.getStart(eventTimeZoneId).toLocalDate()
 
             val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
             val weekInMonth = eventStartDate.weekInMonth()
@@ -1163,5 +1194,80 @@ class EventViewModel(
         }.filterNullValues()
 
         return SendPreferencesResults(sendPreferences, emailErrors)
+    }
+
+    fun handleDelete(occurrenceNumber: Int) {
+        // Post deleting event value to true to display loading state
+        eventState.value = EventState.Processing.Deleting
+
+        val event = eventLiveData.value!!
+        val dbEvent = this.dbEvent
+
+        if (event.isPartOfChain() &&
+            dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false &&
+            event.calendar.isActive) {
+
+            val showThisAndFuture = occurrenceNumber > 1 &&
+                    !event.isEventFirstOccurrence(dbEvent, displayTimeZoneId)
+
+            eventDialogState.value = EventDialogState.Delete.RecurringEvent(showThisAndFuture)
+
+        } else {
+            // TODO Check if we need to handle inactive calendars the same way
+            val disabledCalendarRecurringEvent = event.calendar.isDisabled &&
+                    event.isPartOfChain() &&
+                    dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false
+
+            if (disabledCalendarRecurringEvent) eventDialogState.value = EventDialogState.Delete.DisabledCalendarRecurring
+            else eventDialogState.value = EventDialogState.Delete.Event
+        }
+    }
+
+    suspend fun handleDeleteEvent(occurrenceNumber: Int): UseCase.Result {
+        val deleteResult =
+            if (dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == true) {
+                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+            } else {
+                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
+            }
+
+        // Post deleting event value to false to stop loading state
+        eventState.value = EventState.Idle
+
+        return deleteResult
+    }
+
+    suspend fun handleDeleteDisabledCalendarRecurring(): UseCase.Result {
+        val deleteResult = deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+
+        // Post deleting event value to false to stop loading state
+        eventState.value = EventState.Idle
+
+        return deleteResult
+    }
+
+    suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean): UseCase.Result {
+        val deleteResult =
+            if (selectedIndex == 0) {
+                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
+            } else if (selectedIndex == 1) {
+                if (showThisAndFuture) {
+                    deleteEventUseCase.execute(
+                        userId,
+                        event.id,
+                        EventEditDeleteOption.THIS_EVENT_AND_FUTURE,
+                        occurrenceNumber
+                    )
+                } else {
+                    deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+                }
+            } else { // it == 2
+                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+            }
+
+        // Post deleting event value to false to stop loading state
+        eventState.value = EventState.Idle
+
+        return deleteResult
     }
 }
