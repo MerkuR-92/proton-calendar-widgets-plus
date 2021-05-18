@@ -97,6 +97,7 @@ object IcsSurgeryUtils {
                 object Sequence: Invalid()
                 object Attendees: Invalid()
                 object MissingDateTimeStamp: Invalid()
+                object Method: Invalid()
             }
         }
     }

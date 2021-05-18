@@ -50,16 +50,6 @@ class HandleIcsUseCase(
 
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
-        // METHOD: We support REQUEST, CANCEL, REPLY.
-        if (iCalendar.method.isAdd) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Add // TODO Remove once ADD is handled
-        if (iCalendar.method.isCounter) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Counter // TODO Remove once COUNTER is handled
-        if (iCalendar.method.isRefresh) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Refresh // TODO Remove once REFRESH is handled
-        if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
-        if (!iCalendar.method.isRequest &&
-            !iCalendar.method.isCancel &&
-            !iCalendar.method.isReply) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Method // TODO Remove once other methods are handled
-
-
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
             canonicalizeProtonEmail(address.email)
         }
@@ -71,6 +61,30 @@ class HandleIcsUseCase(
                 val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
                 userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
             } else false
+
+        // METHOD: We support REQUEST, CANCEL, REPLY.
+        if (iCalendar.method.isAdd) {
+            // TODO Remove once ADD is handled
+            return if (isOrganizerMode) IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
+            else IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Add
+        }
+        if (iCalendar.method.isCounter) {
+            // TODO Remove once COUNTER is handled
+            return if (isOrganizerMode) IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Counter
+            else IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
+        }
+        if (iCalendar.method.isRefresh) {
+            // TODO Remove once REFRESH is handled
+            return if (isOrganizerMode) IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Refresh
+            else IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
+        }
+        if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
+        
+        if (!iCalendar.method.isRequest &&
+            !iCalendar.method.isCancel &&
+            !iCalendar.method.isReply) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method // TODO Remove once other methods are handled
+
+        if (iCalendar.method.isCancel && isOrganizerMode) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
 
         if (isOrganizerMode && iCalendar.method.isReply && iCalendar.events.first().recurrenceId?.value != null)
             return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.SingleEditReply
