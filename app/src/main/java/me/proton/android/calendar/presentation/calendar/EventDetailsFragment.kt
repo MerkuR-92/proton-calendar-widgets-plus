@@ -335,15 +335,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .show()
                     }
                     is EventViewModel.EventDialogState.Delete.RecurringEvent -> {
-                        val showThisAndFuture = it.showThisAndFuture
-
                         var selectedItem = 0
                         val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
                         builder.setTitle(getString(R.string.dialog_title_delete_recurring_event))
                             .setSingleChoiceItems(
                                 listOfNotNull(
                                     getString(R.string.event_recurring_edit_this),
-                                    if (showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
+                                    if (it.showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
                                     else null,
                                     getString(R.string.event_recurring_edit_all_events)
                                 ).toTypedArray(),
@@ -356,7 +354,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                     val deleteResult = eventViewModel.handleDeleteRecurring(
                                         navigationArguments.occurrenceNumber,
                                         selectedItem,
-                                        showThisAndFuture
+                                        it.showThisAndFuture
                                     )
                                     handleDeleteResult(deleteResult)
                                 }

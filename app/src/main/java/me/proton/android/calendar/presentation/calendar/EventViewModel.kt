@@ -137,16 +137,40 @@ class EventViewModel(
 
     sealed class EventDialogState {
 
+        sealed class Save: EventDialogState() {
+
+            data class SendPreferences(
+                val sendPreferencesResults: SendPreferencesResults
+            ): Save()
+            data class AddParticipants(
+                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
+                val hasExDates: Boolean,
+                val hasSingleEdit: Boolean): Save()
+            data class SendInvitation(
+                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>
+            ): Save()
+            data class RecurringEvent(
+                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
+                val showThisAndFuture: Boolean,
+                val hasSingleEdit: Boolean,
+                val hasFutureSingleEdit: Boolean
+            ): Save()
+        }
+
         sealed class Delete: EventDialogState() {
 
             object Event: Delete()
             object DisabledCalendarRecurring: Delete()
-            data class RecurringEvent(val showThisAndFuture: Boolean): Delete()
+            data class RecurringEvent(
+                val showThisAndFuture: Boolean
+                ): Delete()
         }
 
         sealed class ChangeAnswer: EventDialogState() {
 
-            data class SendPreferences(val participationStatus: ParticipationStatus): ChangeAnswer()
+            data class SendPreferences(
+                val participationStatus: ParticipationStatus
+                ): ChangeAnswer()
             data class RecurringEvent(
                 val participationStatus: ParticipationStatus,
                 val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
@@ -555,13 +579,13 @@ class EventViewModel(
         // Post saving event value to true to trigger loading state
         eventState.value = EventState.Processing.Saving
 
-        val eventCopy = event.copy(iCalendar = event.iCalendar.clone())
+        // TODO Use a copy of event in order to avoid making changes to it when processing handleSave
         val handleSaveResult = handleSaveUseCase.handleSave(
             editOption,
             occurrenceNumber,
             timeFormatIs24Hours,
             sendPreferences,
-            eventCopy,
+            event,
             originalDbEvent,
             userSettings,
             eventTimeZoneId,
