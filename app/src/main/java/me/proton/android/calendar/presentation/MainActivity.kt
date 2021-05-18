@@ -410,6 +410,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     is Error.Unsupported.Counter -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_counter_error), Snackbar.LENGTH_LONG)
                     is Error.Unsupported.Refresh -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_refresh_error), Snackbar.LENGTH_LONG)
                     is Error.Unsupported.Publish -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
+                    is Error.Unsupported.SingleEditReply -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_single_edit_reply_error), Snackbar.LENGTH_LONG)
                     is Error.PartyCrasher -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error), Snackbar.LENGTH_LONG)
                     is Error.MissingUid -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error), Snackbar.LENGTH_LONG)
                     is Error.NoDefaultCalendarFound -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error), Snackbar.LENGTH_LONG)

@@ -370,7 +370,11 @@ object ICalUtilsImpl : ICalUtils {
                 // We use setProperty to avoid having duplicates, but we need to use addProperty for Attendees
                 // to properly add multiple ones
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
-                else left.events.first().setProperty(iCalProperty)
+                if (iCalProperty::class == DateTimeStamp::class) {
+                    // Take latest DateTimeStamp
+                    if ((iCalProperty as DateTimeStamp).value.after(left.events.first().getProperty(DateTimeStamp::class.java).value))
+                        left.events.first().setProperty(iCalProperty)
+                } else left.events.first().setProperty(iCalProperty)
                 left.timezoneInfo.setTimezone(iCalProperty, right.timezoneInfo.getTimezone(iCalProperty))
             }
         }
@@ -540,21 +544,21 @@ object ICalUtilsImpl : ICalUtils {
 
     override fun calculateAlarmEntity(event: Event, vAlarm: VAlarm, timeZoneId: String, memberId: String): EventAlarmEntity {
 
-            val occurrence = ZonedDateTime.ofInstant(vAlarm.trigger.duration.add(event.iCalEvent.dateStart.value).toInstant(), ZoneId.systemDefault())
+        val occurrence = ZonedDateTime.ofInstant(vAlarm.trigger.duration.add(event.iCalEvent.dateStart.value).toInstant(), ZoneId.systemDefault())
 
-            val occurrenceInTimeZone = if (event.isAllDay()) {
-                occurrence.withZoneSameLocal(ZoneId.of(timeZoneId))
-            } else occurrence
+        val occurrenceInTimeZone = if (event.isAllDay()) {
+            occurrence.withZoneSameLocal(ZoneId.of(timeZoneId))
+        } else occurrence
 
-            return EventAlarmEntity(
-                generateOfflineAlarmId(),
-                occurrenceInTimeZone.toEpochSecond(),
-                vAlarm.trigger.duration.toString(),
-                if (vAlarm.action.isDisplay) 2 else 1,
-                event.id,
-                memberId,
-                event.calendar.id
-            )
+        return EventAlarmEntity(
+            generateOfflineAlarmId(),
+            occurrenceInTimeZone.toEpochSecond(),
+            vAlarm.trigger.duration.toString(),
+            if (vAlarm.action.isDisplay) 2 else 1,
+            event.id,
+            memberId,
+            event.calendar.id
+        )
     }
 
     /**

@@ -251,6 +251,7 @@
     <string name="snack_ics_unsupported_counter_error">Event rescheduling is not supported for the moment</string>
     <string name="snack_ics_unsupported_refresh_error">Event refreshing is not supported for the moment</string>
     <string name="snack_ics_unsupported_publish_error">Event import is not supported for the moment</string>
+    <string name="snack_ics_unsupported_single_edit_reply_error">We only support answers to all events of a series for the moment</string>
     <string name="snack_ics_party_crasher_error">Your email is not on the participant list</string>
     <string name="snack_ics_reply_party_crasher_error">Participants who were not invited by the organizer cannot be added</string>
     <string name="snack_ics_missing_uid_error">The event is missing UID</string>

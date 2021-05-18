@@ -79,6 +79,7 @@ object IcsSurgeryUtils {
                 object Refresh: Unsupported()
                 object Counter: Unsupported()
                 object Publish: Unsupported()
+                object SingleEditReply: Unsupported()
             }
 
             sealed class Invalid: Error() {

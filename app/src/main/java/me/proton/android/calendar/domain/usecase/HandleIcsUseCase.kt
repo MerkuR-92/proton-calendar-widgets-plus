@@ -12,6 +12,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
@@ -69,6 +72,9 @@ class HandleIcsUseCase(
                 userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
             } else false
 
+        if (isOrganizerMode && iCalendar.method.isReply && iCalendar.events.first().recurrenceId?.value != null)
+            return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.SingleEditReply
+
         // Try to extract the current user from the attendee list if it exists
         val userAttendee = iCalendar.events.first().attendees.find { attendee ->
             userEmails?.firstOrNull { userEmail ->
@@ -92,12 +98,12 @@ class HandleIcsUseCase(
         // Create a new event with the clean iCalendar
         val newEvent = Event.from(
             ICalUtilsImpl.generateOfflineEventId(), Calendar(
-            defaultCalendar.id,
-            defaultCalendar.name,
-            defaultCalendar.color,
-            defaultCalendar.flags,
-            defaultCalendar.display == 1
-        ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
+                defaultCalendar.id,
+                defaultCalendar.name,
+                defaultCalendar.color,
+                defaultCalendar.flags,
+                defaultCalendar.display == 1
+            ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         // Fetch all events sharing UID from BE
         val eventsSharingUidResponse = (
@@ -151,7 +157,13 @@ class HandleIcsUseCase(
             // Event already exists, check if we need to update it using the ics content
             val immutableExistingEvent = existingEvent
             val immutableExistingEventEntity = existingEventEntity
+
             if (!isOrganizerMode && immutableExistingEvent != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
+                if (newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
+                    newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SESSION_KEY) != null) {
+                    // Event is a proton to proton invite
+                    return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+                }
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
                 return updateEventAsAnOrganizer(immutableExistingEvent, immutableExistingEventEntity, iCalendar, userId)
