@@ -53,7 +53,7 @@ class HandleIcsUseCase(
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
             canonicalizeProtonEmail(address.email)
         }
-        val organizerEmail = iCalendar.events.first().organizer.extractEmail()
+        val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
 
         // Find out if we are in organizer mode or attendee mode
         val isOrganizerMode =
@@ -79,7 +79,7 @@ class HandleIcsUseCase(
             else IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
         }
         if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
-        
+
         if (!iCalendar.method.isRequest &&
             !iCalendar.method.isCancel &&
             !iCalendar.method.isReply) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method // TODO Remove once other methods are handled

@@ -98,6 +98,7 @@ object IcsSurgeryUtils {
                 object Attendees: Invalid()
                 object MissingDateTimeStamp: Invalid()
                 object Method: Invalid()
+                object MissingOrganizer: Invalid()
             }
         }
     }
