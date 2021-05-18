@@ -96,6 +96,7 @@ object IcsSurgeryUtils {
                 object ExDate: Invalid()
                 object Sequence: Invalid()
                 object Attendees: Invalid()
+                object MissingDateTimeStamp: Invalid()
             }
         }
     }
@@ -140,6 +141,8 @@ object IcsSurgeryUtils {
 
         // TODO Once we handle multiple events, allow them to fail separately
         iCalendar.events.forEach { event ->
+            if (event.dateTimeStamp?.value == null) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
+
             if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
 
             if (!event.cleanDtStart()) return HandleIcsResult.Error.Invalid.DateStart
