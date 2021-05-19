@@ -226,27 +226,20 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                     eventViewModel.eventState.value = EventViewModel.EventState.Processing.Saving
 
-                    // TODO try to move the logic to VM
-                    val attendeesEmails = eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.mapNotNull { it.extractEmail() }
-                    if (!attendeesEmails.isNullOrEmpty()) {
-
-                        val sendPreferencesResults = eventViewModel.getSendPreferences(attendeesEmails)
-
-                        if (sendPreferencesResults.emailErrors.isNotEmpty()) {
-
-                            if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
-                                this@EventFormFragment.view?.displaySnackBar(getString(R.string.snack_network_error))
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            } else {
-                                // Display Send Preferences Dialog
-                                eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Save.SendPreferences(sendPreferencesResults)
-                            }
+                    val dbEvent = eventViewModel.dbEvent
+                    val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
+                            (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
+                            !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
+                    if (!eventViewModel.eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty()) {
+                        if (shouldShowConfirmationPicker && !navigationArguments.eventId.isNullOrEmpty()) {
+                            val singleEditsInfo = eventViewModel.getSingleEditsInfo()
+                            // Display Add Participants Dialog
+                            eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Save.AddParticipants(eventViewModel.hasExDates(), singleEditsInfo?.hasSingleEdit == true)
                         } else {
-                            handleSaveAttendeesConfirmationDialog(sendPreferencesResults.sendPreferences)
+                            // Display Send Invitation Dialog
+                            eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Save.SendInvitation
                         }
-                    } else {
-                        handleSaveAttendeesConfirmationDialog(mapOf())
-                    }
+                    } else saveEvent(mapOf())
                 }
 
             } else findNavController().navigateUp()
@@ -256,21 +249,29 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private suspend fun handleSaveAttendeesConfirmationDialog(sendPreferences: Map<Email, SendPreferences>) {
-        val dbEvent = eventViewModel.dbEvent
-        val shouldShowConfirmationPicker = !eventViewModel.isEventNew() &&
-                (dbEvent?.isRecurring() == true || dbEvent?.isPartOfChain() == true) &&
-                !dbEvent.isSingleOccurrenceRecurring(eventViewModel.displayTimeZoneId)
-        if (!eventViewModel.eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty()) {
-            if (shouldShowConfirmationPicker && !navigationArguments.eventId.isNullOrEmpty()) {
-                val singleEditsInfo = eventViewModel.getSingleEditsInfo()
-                // Display Add Participants Dialog
-                eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Save.AddParticipants(sendPreferences, eventViewModel.hasExDates(), singleEditsInfo?.hasSingleEdit == true)
+    private suspend fun handleSaveAttendeesSendPreferences(isAddParticipants: Boolean) {
+        // TODO try to move the logic to VM
+        val attendeesEmails = eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.mapNotNull { it.extractEmail() }
+        if (!attendeesEmails.isNullOrEmpty()) {
+
+            val sendPreferencesResults = eventViewModel.getSendPreferences(attendeesEmails)
+
+            if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+
+                if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
+                    this@EventFormFragment.view?.displaySnackBar(getString(R.string.snack_network_error))
+                    eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                } else {
+                    // Display Send Preferences Dialog
+                    eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Save.SendPreferences(sendPreferencesResults, isAddParticipants)
+                }
             } else {
-                // Display Send Invitation Dialog
-                eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Save.SendInvitation(sendPreferences)
+                if (isAddParticipants) handleSaveWithOption(EventEditDeleteOption.ALL_EVENTS, sendPreferencesResults.sendPreferences)
+                else saveEvent(sendPreferencesResults.sendPreferences)
             }
-        } else saveEvent(sendPreferences)
+        } else {
+            saveEvent(mapOf())
+        }
     }
 
     private suspend fun saveEvent(sendPreferences: Map<Email, SendPreferences>) {
@@ -533,7 +534,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                         }
                                     }
 
-                                    handleSaveAttendeesConfirmationDialog(it.sendPreferencesResults.sendPreferences)
+                                    if (it.isAddParticipants) handleSaveWithOption(EventEditDeleteOption.ALL_EVENTS, it.sendPreferencesResults.sendPreferences)
+                                    else saveEvent(it.sendPreferencesResults.sendPreferences)
                                 }
                             }
                             .setNegativeButton(R.string.event_attendees_send_prefs_error_cancel) { _, _, ->
@@ -558,7 +560,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             .setTitle(R.string.event_add_participants_dialog_title)
                             .setMessage(message)
                             .setPositiveButton(R.string.event_add_participants_dialog_confirm) { _, _ ->
-                                handleSaveWithOption(EventEditDeleteOption.ALL_EVENTS, it.sendPreferences)
+                                lifecycleScope.launch {
+                                    handleSaveAttendeesSendPreferences(true)
+                                }
                             }
                             .setNegativeButton(R.string.event_add_participants_dialog_cancel) { _, _ ->
                                 eventViewModel.eventState.value = EventViewModel.EventState.Idle
@@ -577,7 +581,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             .setMessage(R.string.event_send_invite_dialog_description)
                             .setPositiveButton(R.string.event_send_invite_dialog_confirm) { _, _ ->
                                 lifecycleScope.launch {
-                                    saveEvent(it.sendPreferences)
+                                    handleSaveAttendeesSendPreferences(false)
                                 }
                             }
                             .setNegativeButton(R.string.event_send_invite_dialog_cancel) { _, _ ->

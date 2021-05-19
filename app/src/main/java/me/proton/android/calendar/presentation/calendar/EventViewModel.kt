@@ -140,15 +140,13 @@ class EventViewModel(
         sealed class Save: EventDialogState() {
 
             data class SendPreferences(
-                val sendPreferencesResults: SendPreferencesResults
+                val sendPreferencesResults: SendPreferencesResults,
+                val isAddParticipants: Boolean
             ): Save()
             data class AddParticipants(
-                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
                 val hasExDates: Boolean,
                 val hasSingleEdit: Boolean): Save()
-            data class SendInvitation(
-                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>
-            ): Save()
+            object SendInvitation: Save()
             data class RecurringEvent(
                 val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
                 val showThisAndFuture: Boolean,
