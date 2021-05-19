@@ -383,7 +383,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             )
                             .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
                                 lifecycleScope.launch {
-                                    if (!eventViewModel.updateParticipationStatus(it.participationStatus, it.sendPreferences)) {
+                                    if (!eventViewModel.handleChangeAnswerSendPreferences(it.participationStatus)) {
                                         eventViewModel.eventState.value = EventViewModel.EventState.Idle
                                         view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                                         displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
@@ -404,6 +404,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .show()
                     }
                     is EventViewModel.EventDialogState.ChangeAnswer.SendPreferences -> {
+                        // Reset change answer buttons to previous state
+                        displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
+
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(R.string.event_organizer_send_prefs_error_title)
                             .setMessage(
@@ -415,8 +418,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 }
                             )
                             .setPositiveButton(R.string.event_organizer_send_prefs_button_title) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
                             }
                             .setOnCancelListener { _ ->
                                 eventViewModel.eventState.value = EventViewModel.EventState.Idle

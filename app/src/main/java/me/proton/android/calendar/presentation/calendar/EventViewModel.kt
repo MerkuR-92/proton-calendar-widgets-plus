@@ -161,17 +161,16 @@ class EventViewModel(
             object DisabledCalendarRecurring: Delete()
             data class RecurringEvent(
                 val showThisAndFuture: Boolean
-                ): Delete()
+            ): Delete()
         }
 
         sealed class ChangeAnswer: EventDialogState() {
 
             data class SendPreferences(
                 val participationStatus: ParticipationStatus
-                ): ChangeAnswer()
+            ): ChangeAnswer()
             data class RecurringEvent(
                 val participationStatus: ParticipationStatus,
-                val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
                 val dialogType: ChangeAnswerRecurringDialogType,
             ): ChangeAnswer()
         }
@@ -1198,59 +1197,63 @@ class EventViewModel(
             // Display Processing State
             eventState.value = EventState.Processing.ChangingAnswer(newParticipationStatus)
 
-            val organizerEmail = event.iCalEvent.organizer.extractEmail()
-            if (organizerEmail == null) {
-                eventState.value = EventState.Idle
-                return false
-            }
+            if (event.isPartOfChain()) {
+                val isSingleEdit = event.isSingleEdit()
+                val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(userId, event.uid) else false
 
-            val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
-            if (sendPreferencesResults.emailErrors.isNotEmpty()) {
-                // Display Send Preferences Dialog
-                eventDialogState.value = EventDialogState.ChangeAnswer.SendPreferences(newParticipationStatus)
-                return false
-            } else {
+                val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
+                val overwrite =
+                    if (isSingleEdit) false
+                    else hasAnsweredSingleEdit != null &&
+                            ((hasAnsweredSingleEdit[newParticipationStatus] == null && hasAnsweredSingleEdit.isNotEmpty())
+                                    || (hasAnsweredSingleEdit[newParticipationStatus] == true && hasAnsweredSingleEdit.size > 1))
 
-                if (event.isPartOfChain()) {
-                    val isSingleEdit = event.isSingleEdit()
-                    val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(userId, event.uid) else false
-
-                    val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
-                    val overwrite =
-                        if (isSingleEdit) false
-                        else hasAnsweredSingleEdit != null &&
-                                ((hasAnsweredSingleEdit[newParticipationStatus] == null && hasAnsweredSingleEdit.isNotEmpty())
-                                        || (hasAnsweredSingleEdit[newParticipationStatus] == true && hasAnsweredSingleEdit.size > 1))
-
-                    return if (isStandaloneSingleEdit == true) {
-                        updateParticipationStatus(
-                            newParticipationStatus,
-                            sendPreferencesResults.sendPreferences
-                        )
-                    } else {
-                        // Display Confirmation Dialog
-                        eventDialogState.value = EventDialogState.ChangeAnswer.RecurringEvent(
-                            newParticipationStatus,
-                            sendPreferencesResults.sendPreferences,
-                            when {
-                                overwrite -> ChangeAnswerRecurringDialogType.OVERWRITE
-                                isSingleEdit -> ChangeAnswerRecurringDialogType.SINGLE_EDIT
-                                else -> ChangeAnswerRecurringDialogType.DEFAULT
-                            }
-                        )
-                        true
-                    }
-                } else {
-                    return updateParticipationStatus(
-                        newParticipationStatus,
-                        sendPreferencesResults.sendPreferences
+                return if (isStandaloneSingleEdit == true) {
+                    handleChangeAnswerSendPreferences(
+                        newParticipationStatus
                     )
+                } else {
+                    // Display Confirmation Dialog
+                    eventDialogState.value = EventDialogState.ChangeAnswer.RecurringEvent(
+                        newParticipationStatus,
+                        when {
+                            overwrite -> ChangeAnswerRecurringDialogType.OVERWRITE
+                            isSingleEdit -> ChangeAnswerRecurringDialogType.SINGLE_EDIT
+                            else -> ChangeAnswerRecurringDialogType.DEFAULT
+                        }
+                    )
+                    true
                 }
+            } else {
+                return handleChangeAnswerSendPreferences(
+                    newParticipationStatus
+                )
             }
         } else return true
     }
 
-    suspend fun updateParticipationStatus(
+    suspend fun handleChangeAnswerSendPreferences(newParticipationStatus: ParticipationStatus): Boolean {
+        val organizerEmail = event.iCalEvent.organizer.extractEmail()
+        if (organizerEmail == null) {
+            eventState.value = EventState.Idle
+            return false
+        }
+
+        val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
+        if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+            // Display Send Preferences Dialog
+            eventState.value = EventState.Idle
+            eventDialogState.value = EventDialogState.ChangeAnswer.SendPreferences(newParticipationStatus)
+            return false
+        } else {
+            return updateParticipationStatus(
+                newParticipationStatus,
+                sendPreferencesResults.sendPreferences
+            )
+        }
+    }
+
+    private suspend fun updateParticipationStatus(
         participationStatus: ParticipationStatus,
         sendPreferences: Map<Email, SendPreferences>
     ): Boolean {
