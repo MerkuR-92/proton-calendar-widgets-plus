@@ -370,7 +370,7 @@ object ICalUtilsImpl : ICalUtils {
                 // We use setProperty to avoid having duplicates, but we need to use addProperty for Attendees
                 // to properly add multiple ones
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
-                if (iCalProperty::class == DateTimeStamp::class) {
+                else if (iCalProperty::class == DateTimeStamp::class) {
                     // Take latest DateTimeStamp
                     if ((iCalProperty as DateTimeStamp).value.after(left.events.first().getProperty(DateTimeStamp::class.java).value))
                         left.events.first().setProperty(iCalProperty)

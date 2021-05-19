@@ -160,7 +160,7 @@ class HandleIcsUseCase(
 
         if (isNew && !isOrganizerMode && !iCalendar.method.isCancel) {
             // Create brand new event
-            newEvent.iCalendar.setAttendeesXPmToken(userId)
+            if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
             return editCreateEventFromIcs(
                 IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
                 userId,
@@ -177,7 +177,7 @@ class HandleIcsUseCase(
                     // Event is a proton to proton invite
                     return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
                 }
-                newEvent.iCalendar.setAttendeesXPmToken(userId)
+                if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
                 return updateEventAsAnOrganizer(immutableExistingEvent, immutableExistingEventEntity, iCalendar, userId)
@@ -190,13 +190,14 @@ class HandleIcsUseCase(
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
     }
 
-    private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId) {
+    private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId): Boolean {
         val missingToken = this.events.first().attendees.firstOrNull { attendee ->
             attendee.getParameter(X_PM_TOKEN) == null
         } != null
         val eventUid = this.events.first().uid?.value
         if (missingToken && eventUid != null) {
             val canonicalEmails = canonicalEmailsUseCase.invoke(userId, this.events.first().attendees.mapNotNull { it.extractEmail() })
+            if (canonicalEmails.values.any { it.isNullOrEmpty() }) return false
             this.events.first().attendees.forEach { attendee ->
                 val attendeeCanonicalEmail = canonicalEmails[attendee.extractEmail()]
                 if (attendee.getParameter(X_PM_TOKEN) == null && attendeeCanonicalEmail != null) {
@@ -205,6 +206,7 @@ class HandleIcsUseCase(
                 }
             }
         }
+        return true
     }
 
     private suspend fun updateEventAsAnAttendee(newEvent: Event, existingEvent: Event, userEmails: List<String>?, userAttendee: Attendee?, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
