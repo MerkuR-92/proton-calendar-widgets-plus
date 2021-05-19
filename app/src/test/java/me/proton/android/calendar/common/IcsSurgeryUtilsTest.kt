@@ -757,7 +757,7 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanDtEnd()).isFalse()
+            assertThat(event.cleanDtEnd()).isTrue()
         }
     }
 
