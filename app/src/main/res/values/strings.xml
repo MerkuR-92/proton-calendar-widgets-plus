@@ -99,7 +99,7 @@
     <string name="event_organizer_send_prefs_button_title">OK</string>
 
     <string name="event_attendees_send_prefs_error_title">Participants cannot be notified</string>
-    <string name="event_attendees_send_prefs_error_none_message">None of the participants can be notified about your changes\nWould you like to continue anyway?</string>
+    <string name="event_attendees_send_prefs_error_none_message">None of the participants can be notified about your changes:\n\n• %s\n\nWould you like to continue anyway?</string>
     <string name="event_attendees_send_prefs_error_some_message">The following participants cannot be notified about your changes:\n\n• %s\n\nWould you like to continue anyway?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continue</string>
     <string name="event_attendees_send_prefs_error_cancel">Cancel</string>

@@ -519,7 +519,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(R.string.event_attendees_send_prefs_error_title)
                             .setMessage(
-                                if (it.sendPreferencesResults.sendPreferences.isEmpty()) getString(R.string.event_attendees_send_prefs_error_none_message)
+                                if (it.sendPreferencesResults.sendPreferences.isEmpty()) getString(
+                                    R.string.event_attendees_send_prefs_error_none_message,
+                                    TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.keys)
+                                )
                                 else getString(
                                     R.string.event_attendees_send_prefs_error_some_message,
                                     TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.keys)
