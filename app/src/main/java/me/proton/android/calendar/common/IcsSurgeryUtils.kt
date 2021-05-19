@@ -7,6 +7,7 @@ import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
+import biweekly.property.ICalProperty
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
@@ -443,12 +444,15 @@ object IcsSurgeryUtils {
 
     fun ICalendar.cleanTimezones(): Boolean {
 
-        // If EXDATE has a timezone different from the DTSTART, re-localize in the DTSTART timezone.
         this.events.forEach {
             it.exceptionDates.forEach { exDate ->
+                // If EXDATE has a timezone different from the DTSTART, re-localize in the DTSTART timezone.
                 if (this.timezoneInfo.getTimezone(exDate) != this.timezoneInfo.getTimezone(this.events.first().dateStart)) {
                     this.timezoneInfo.setTimezone(exDate, this.timezoneInfo.getTimezone(this.events.first().dateStart))
                 }
+
+                // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
+                if (!this.convertToSupportedTimezone(exDate)) return false
             }
 
             // DATESTART, DATEEND, RECURRENCE-ID:
@@ -486,7 +490,7 @@ object IcsSurgeryUtils {
         return true
     }
 
-    private fun ICalendar.convertToSupportedTimezone(date: DateOrDateTimeProperty?): Boolean {
+    private fun ICalendar.convertToSupportedTimezone(date: ICalProperty?): Boolean {
         // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
         this.timezoneInfo.getTimezone(date)?.let { timezoneAssignment ->
             val supportedTzid = fallbackTimeZone(timezoneAssignment.timeZone.id, fallbackToDefault = false) ?: return false
