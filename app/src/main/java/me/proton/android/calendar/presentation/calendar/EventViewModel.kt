@@ -579,13 +579,14 @@ class EventViewModel(
         // Post saving event value to true to trigger loading state
         eventState.value = EventState.Processing.Saving
 
-        // TODO Use a copy of event in order to avoid making changes to it when processing handleSave
+        val eventCopy = Event.from(event)
+
         val handleSaveResult = handleSaveUseCase.handleSave(
             editOption,
             occurrenceNumber,
             timeFormatIs24Hours,
             sendPreferences,
-            event,
+            eventCopy,
             originalDbEvent,
             userSettings,
             eventTimeZoneId,

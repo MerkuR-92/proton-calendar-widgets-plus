@@ -3,6 +3,7 @@ package me.proton.android.calendar.common
 import assertk.assertThat
 import assertk.assertions.*
 import biweekly.ICalVersion
+import biweekly.ICalendar
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.util.*
@@ -43,6 +44,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.ICalUtilsImpl.isDateTimeTheSame
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
+import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.setStart
@@ -2378,7 +2380,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `clone iCalendar`() {
+    fun `clone iCalendar created from ical string`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -2417,7 +2419,36 @@ internal class ICalUtilsTest {
         assertThat(cloned.events.first().summary.value).isEqualTo("monthly on last Tuesday")
         assertThat(cloned.events.first().alarms.size).isEqualTo(3)
         assertThat(cloned.timezoneInfo.getTimezone(cloned.events.first().dateStart).globalId).isEqualTo("Europe/Zurich")
+        assertThat(cloned.events.first().dateStart.value.toInstant()).isEqualTo(ZonedDateTime.of(2020, 7, 28, 13, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant())
 
+    }
+
+    @Test
+    fun `clone Event`() {
+
+        val eventTimeZoneId = "Europe/Zurich"
+
+        val newICalendar = createNewVEvent().wrapInICalendar()
+        val newVEvent = newICalendar.events.first()
+
+        newVEvent.setStart(LocalDate.of(2021, 5, 18), LocalTime.of(18, 0), eventTimeZoneId)
+        newICalendar.setStartTimeZone(eventTimeZoneId)
+        newVEvent.setEnd(LocalDate.of(2021, 5, 18), LocalTime.of(19, 0), eventTimeZoneId)
+        newICalendar.setEndTimeZone(eventTimeZoneId)
+        newICalendar.setDefaultTimeZone(eventTimeZoneId)
+
+        val event = Event.from("id", Calendar("", "", "", 1, true), newICalendar)!!
+        val eventCopy = Event.from(event)
+
+        event.iCalEvent.setStart(LocalDate.of(2021, 1, 1), LocalTime.of(18, 0), "Europe/Vilnius")
+        event.iCalEvent.setEnd(LocalDate.of(2021, 1, 1), LocalTime.of(19, 0), "Europe/Vilnius")
+
+        assertThat(event.getStart("Europe/Zurich").toInstant()).isEqualTo(ZonedDateTime.of(2021, 1, 1, 18, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant())
+        assertThat(event.getEnd("Europe/Zurich").toInstant()).isEqualTo(ZonedDateTime.of(2021, 1, 1, 19, 0, 0, 0, ZoneId.of("Europe/Vilnius")).toInstant())
+
+        assertThat(eventCopy.getStart("Europe/Zurich").toInstant()).isEqualTo(ZonedDateTime.of(2021, 5, 18, 18, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant())
+        assertThat(eventCopy.getEnd("Europe/Zurich").toInstant()).isEqualTo(ZonedDateTime.of(2021, 5, 18, 19, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant())
+        assertThat(eventCopy.defaultTimeZone).isEqualTo("Europe/Zurich")
     }
 
     @Test

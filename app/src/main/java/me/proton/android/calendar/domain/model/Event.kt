@@ -13,8 +13,10 @@ import java.time.temporal.ChronoUnit
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.getStart
+import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.setStart
@@ -57,6 +59,14 @@ data class Event private constructor(
                 )
             } else null
 
+        }
+
+        /**
+         * Makes sure we have deep copy of [ICalendar] object inside [Event].
+         */
+        fun from(event: Event): Event {
+            val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
+            return event.copy(iCalendar = ICalendar(event.iCalendar).apply { setDefaultTimeZone(defaultTimezoneId) })
         }
 
         /**
