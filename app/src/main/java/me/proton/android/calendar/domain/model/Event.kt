@@ -115,7 +115,8 @@ data class Event private constructor(
 
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
 
-    val isAnInvitation: Boolean get() = this.iCalEvent.organizer != null
+    // TODO Change this once we allow editing event with attendees
+    val isAnInvitation: Boolean get() = !this.iCalEvent.attendees.isNullOrEmpty()
 
     fun getStart(timeZoneId: String): ZonedDateTime {
         return iCalEvent.getStart(timeZoneId)!!
