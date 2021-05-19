@@ -210,15 +210,15 @@ internal class ICalUtilsTest {
 
         /* Windows Time Zones */
 
-        assertThat(AndroidUtils.fallbackTimeZone("FLE Standard Time")).isEqualTo("Europe/Kiev")
+        assertThat(fallbackTimeZone("FLE Standard Time")).isEqualTo("Europe/Kiev")
 
-        assertThat(AndroidUtils.fallbackTimeZone("Taipei Standard Time")).isEqualTo("Asia/Taipei")
+        assertThat(fallbackTimeZone("Taipei Standard Time")).isEqualTo("Asia/Taipei")
 
-        assertThat(AndroidUtils.fallbackTimeZone("saskatchewan")).isEqualTo("America/Edmonton")
+        assertThat(fallbackTimeZone("saskatchewan")).isEqualTo("America/Edmonton")
 
-        assertThat(AndroidUtils.fallbackTimeZone("abu dhabi, muscat")).isEqualTo("Asia/Dubai")
+        assertThat(fallbackTimeZone("abu dhabi, muscat")).isEqualTo("Asia/Dubai")
 
-        assertThat(AndroidUtils.fallbackTimeZone("helsinki, kyiv, riga, sofia, tallinn, vilnius")).isEqualTo("Europe/Helsinki")
+        assertThat(fallbackTimeZone("helsinki, kyiv, riga, sofia, tallinn, vilnius")).isEqualTo("Europe/Helsinki")
 
     }
 

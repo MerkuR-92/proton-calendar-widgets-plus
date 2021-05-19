@@ -38,7 +38,8 @@ class HandleIcsUseCase(
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
-    private val updateCalendarUseCase: UpdateCalendarUseCase
+    private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase
 ) {
 
     suspend fun execute(iCalString: String, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
@@ -56,11 +57,8 @@ class HandleIcsUseCase(
         val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
 
         // Find out if we are in organizer mode or attendee mode
-        val isOrganizerMode =
-            if (organizerEmail != null) {
-                val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
-                userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
-            } else false
+        val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
+        val isOrganizerMode = userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
 
         // METHOD: We support REQUEST, CANCEL, REPLY.
         if (iCalendar.method.isAdd) {
@@ -162,6 +160,7 @@ class HandleIcsUseCase(
 
         if (isNew && !isOrganizerMode && !iCalendar.method.isCancel) {
             // Create brand new event
+            newEvent.iCalendar.setAttendeesXPmToken(userId)
             return editCreateEventFromIcs(
                 IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
                 userId,
@@ -178,6 +177,7 @@ class HandleIcsUseCase(
                     // Event is a proton to proton invite
                     return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
                 }
+                newEvent.iCalendar.setAttendeesXPmToken(userId)
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
                 return updateEventAsAnOrganizer(immutableExistingEvent, immutableExistingEventEntity, iCalendar, userId)
@@ -188,6 +188,23 @@ class HandleIcsUseCase(
 
         // If no update is needed, return the existing event id
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+    }
+
+    private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId) {
+        val missingToken = this.events.first().attendees.firstOrNull { attendee ->
+            attendee.getParameter(X_PM_TOKEN) == null
+        } != null
+        val eventUid = this.events.first().uid?.value
+        if (missingToken && eventUid != null) {
+            val canonicalEmails = canonicalEmailsUseCase.invoke(userId, this.events.first().attendees.mapNotNull { it.extractEmail() })
+            this.events.first().attendees.forEach { attendee ->
+                val attendeeCanonicalEmail = canonicalEmails[attendee.extractEmail()]
+                if (attendee.getParameter(X_PM_TOKEN) == null && attendeeCanonicalEmail != null) {
+                    val token = ICalUtilsImpl.generateXPmToken(attendeeCanonicalEmail, eventUid)
+                    attendee.addParameter(X_PM_TOKEN, token)
+                }
+            }
+        }
     }
 
     private suspend fun updateEventAsAnAttendee(newEvent: Event, existingEvent: Event, userEmails: List<String>?, userAttendee: Attendee?, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
@@ -243,7 +260,7 @@ class HandleIcsUseCase(
             val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
 
             if (attendee.extractEmail().equals(updatedAttendeeEmail, true)) {
-                val attendeeToken = attendee.getParameter(CustomICalPropertyParameter.X_PM_TOKEN)
+                val attendeeToken = attendee.getParameter(X_PM_TOKEN)
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
 
                 // Find the current update time value for this attendee from the event entity attendees part
