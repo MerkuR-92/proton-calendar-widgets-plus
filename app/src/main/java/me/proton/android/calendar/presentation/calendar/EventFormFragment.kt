@@ -791,7 +791,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 
             // TODO Replace this with !event.isAnInvitation once we check if event is an invite by checking organizer field
-            event_form_calendar_press.visibleOrGone(event.iCalEvent.organizer == null)
+            event_form_calendar_press.visibleOrGone(event.iCalEvent.organizer == null || navigationArguments.eventId.isNullOrEmpty())
         })
     }
 
