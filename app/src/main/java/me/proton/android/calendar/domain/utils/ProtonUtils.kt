@@ -5,4 +5,5 @@ interface ProtonUtils {
     fun canonicalizeProtonEmails(emails: List<String>): Map<String, String>
     fun canonicalizeProtonEmail(email: String): String
     fun isProtonDomain(email: String): Boolean
+    fun isShortDomainAddress(email: String): Boolean
 }

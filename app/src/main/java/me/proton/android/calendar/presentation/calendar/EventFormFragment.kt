@@ -28,7 +28,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -784,8 +783,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 )
             )
 
+            lifecycleScope.launch {
+                event_form_participant_layout.visibleOrGone(ADD_ATTENDEES && eventViewModel.allowSendForCalendarAddress() && event.hasProtonUid) // TODO Remove feature flag
+            }
+
             event_form_participant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
-            event_form_participant_layout.visibleOrGone(ADD_ATTENDEES && event.hasProtonUid) // TODO Remove feature flag
             event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 
             // TODO Replace this with !event.isAnInvitation once we check if event is an invite by checking organizer field

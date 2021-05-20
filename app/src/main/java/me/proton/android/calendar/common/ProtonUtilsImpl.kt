@@ -34,5 +34,9 @@ object ProtonUtilsImpl : ProtonUtils {
         }
     }
 
+    override fun isShortDomainAddress(email: String): Boolean {
+        return email.endsWith(PROTON_MAIL_SHORT_DOMAIN)
+    }
+
 }
 

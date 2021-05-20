@@ -2,9 +2,7 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.text.format.DateFormat
 import android.text.util.Linkify
 import android.util.TypedValue
@@ -57,20 +55,18 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.EventUtilsImpl.formatStartEndForActualEndDate
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
-import me.proton.android.calendar.common.EventUtilsImpl.isUserInvitedAddressEnabled
+import me.proton.android.calendar.common.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
-import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -647,21 +643,22 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             section_answer.visibleOrGone(false)
             return
         }
-        val event = eventViewModel.eventLiveData.value
-        val userEmails = calendarViewModel.getUserEmails()
-        val userAddresses = calendarViewModel.userAddresses.value
-        if (event != null && userAddresses != null && userEmails != null) {
-            lifecycleScope.launch {
+        lifecycleScope.launch {
+            val isFreeUser = eventViewModel.user.isFree
+            val event = eventViewModel.eventLiveData.value
+            val userEmails = calendarViewModel.getUserEmails()
+            val userAddresses = calendarViewModel.userAddresses.value
+            if (event != null && userAddresses != null && userEmails != null) {
                 val isActive = event.calendar.isActive
-                val isAddressActive = event.isUserInvitedAddressEnabled(userAddresses)
+                val isAddressActive = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
 
                 if (participationStatus != null && isActive && isAddressActive && !event.isCancelled()) {
                     section_answer.visibleOrGone(true)
                     displayAttendeeAnswerState(participationStatus)
                 } else section_answer.visibleOrGone(false)
-            }
-        } else section_answer.visibleOrGone(false)
+            } else section_answer.visibleOrGone(false)
+        }
     }
 
     private fun initParticipantsItem(attendeeList: List<Attendee>) {

@@ -41,6 +41,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
+import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -48,6 +49,7 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
+import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
@@ -113,6 +115,7 @@ class EventViewModel(
 
     lateinit var calendarUserSettings: CalendarUserSettingsEntity
     lateinit var userSettings: UserSettingsEntity
+    lateinit var user: User
 
     var recurrenceManuallyEdited: Boolean = false
     private var singleEditsInfo: SingleEditsInfo? = null
@@ -233,6 +236,8 @@ class EventViewModel(
             ?: return Result.Error("EventViewModel: could not get Calendar User Settings")
         userSettings = usersRepository.selectUserSettings(userId.id)
             ?: return Result.Error("EventViewModel: could not get User Settings")
+        user = usersRepository.selectUserById(userId.id)
+            ?: return Result.Error("EventViewModel: could not get User")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
@@ -1398,5 +1403,22 @@ class EventViewModel(
             ExistingWorkPolicy.REPLACE,
             work
         ).state
+    }
+
+    suspend fun allowSendForCalendarAddress(): Boolean {
+        val user =
+            if (this::user.isInitialized) user
+            else {
+                logger.i("EventViewModel: User was null in allowSend")
+                return false
+            }
+        val email = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
+            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+        }?.email
+        if (email == null) {
+            logger.i("EventViewModel: Email from selectMembers was null in allowSend")
+            return false
+        }
+        return !user.isFree || !(user.isFree && isShortDomainAddress(email))
     }
 }

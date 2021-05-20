@@ -48,6 +48,7 @@ const val MAX_ANIM_DURATION = 500L
 const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
+val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
 val PROTON_UID = "@proton.me"
 val PROTON_OLD_UID = "proton-calendar"

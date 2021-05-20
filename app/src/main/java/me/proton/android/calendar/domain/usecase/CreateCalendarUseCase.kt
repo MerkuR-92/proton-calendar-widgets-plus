@@ -9,6 +9,8 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
+import me.proton.android.calendar.data.entity.AddressStatus
 
 class CreateCalendarUseCase(
     private val logger: Logger,
@@ -23,7 +25,14 @@ class CreateCalendarUseCase(
 
         val user = usersRepository.selectUserById(userId.id)
         val email = user?.email ?: return UseCase.Result.Error("CreateCalendarUseCase: Email for user was null")
-        val address = database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json) ?: return UseCase.Result.Error("CreateCalendarUseCase: No address id found")
+        val address = if (user.isFree && isShortDomainAddress(email)) {
+            database.addressesDao().select(userId.id).firstOrNull {
+                it.status == AddressStatus.ENABLED.value && !isShortDomainAddress(it.email)
+            }?.toAddress(json) ?: return UseCase.Result.Error("CreateCalendarUseCase: No address id found")
+        } else {
+            database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json)
+                ?: return UseCase.Result.Error("CreateCalendarUseCase: No address id found")
+        }
 
         val createCalendarApiRequest =
             CreateCalendarApiRequest(

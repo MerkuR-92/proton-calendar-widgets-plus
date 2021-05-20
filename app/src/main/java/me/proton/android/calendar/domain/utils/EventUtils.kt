@@ -12,7 +12,7 @@ interface EventUtils {
 
     // TODO: Once we have proper user management, check if we could get participation status for current user on event init
     fun Event.getParticipationStatus(userEmails: List<String>): ParticipationStatus?
-    fun Event.isUserInvitedAddressEnabled(userAddresses: List<Address>): Boolean
+    fun Event.isUserAddressAllowedSend(userAddresses: List<Address>, isFreeUser: Boolean): Boolean
     fun Event.updateParticipationStatus(userEmails: List<String>, status: ParticipationStatus)
 
     /**

@@ -23,9 +23,11 @@ import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.data.entity.AddressStatus
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.utils.EventUtils
 import java.time.LocalDate
 import java.time.LocalTime
@@ -50,14 +52,14 @@ object EventUtilsImpl : EventUtils {
         }?.participationStatus
     }
 
-    override fun Event.isUserInvitedAddressEnabled(userAddresses: List<Address>): Boolean {
+    override fun Event.isUserAddressAllowedSend(userAddresses: List<Address>, isFreeUser: Boolean): Boolean {
         iCalEvent.attendees.forEach { attendee ->
             val userAddress = userAddresses.firstOrNull { userAddress ->
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userAddress.email, ignoreCase = true)
             }
             userAddress?.let {
-                return it.status == AddressStatus.ENABLED.value
+                return it.status == AddressStatus.ENABLED.value && (!isFreeUser || !(isFreeUser && isShortDomainAddress(it.email)))
             }
         }
         return false
