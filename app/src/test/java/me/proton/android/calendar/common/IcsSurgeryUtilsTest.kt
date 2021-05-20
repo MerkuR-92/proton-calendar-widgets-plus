@@ -1758,6 +1758,58 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `cleanAttendees ATTENDEE with Apple garbage`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Proton Technologies//ProtonCalendar 4.1.8//EN
+    VERSION:2.0
+    METHOD:REQUEST
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    SEQUENCE:1
+    STATUS:CONFIRMED
+    SUMMARY:Test
+    UID:FKQKTlAcHr6irit-E7iuR3elGxFf@proton.me
+    DTSTART;TZID=Europe/Paris:20210326T130000
+    DTEND;TZID=Europe/Paris:20210326T140000
+    ORGANIZER;CN=test@protonmail.com:mailto:test@proton
+     mail.com
+    ATTENDEE;CN=test1@pm.me;CUTYPE=INDIVIDUAL;EMAIL=test1@pm.me;RSVP=TRUE;PARTST
+     AT=NEEDS-ACTION:/1234567zMDQ4Mjk2MDIzMIZjbeHD-pCEmJU6loV23jx6n2nXhXA9yXmtoE
+     412345/principal/
+    ATTENDEE;CN=test2@protonmail.com;CUTYPE=INDIVIDUAL;EMAIL=test2@protonmail.co
+     m;RSVP=TRUE;PARTSTAT=NEEDS-ACTION:/1234567zMDQ4Mjk2MDIzMIZjbeHD-pCEmJU6loV2
+     3jx6n2nXhXA9yXmtoE412345/principal/
+    ATTENDEE;CN=test31@example.com;EMAIL=test32@example.com;PARTSTAT=NEEDS
+     -ACTION;ROLE=REQ-PARTICIPANT:test33
+    ATTENDEE;CN=test41;EMAIL=test42@example.com;PARTSTAT=NEEDS-ACTION;ROLE
+     =REQ-PARTICIPANT:test43
+    ATTENDEE;CN=test51;EMAIL=test52@example.com;PARTSTAT=NEEDS-ACTION;ROLE
+     =REQ-PARTICIPANT:test53
+    ATTENDEE;CN=test61@example.com;EMAIL=test62;PARTSTAT=NEEDS-ACTION;ROLE
+     =REQ-PARTICIPANT:test63
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanAttendees()).isTrue()
+            event.attendees.forEach {
+                assertThat(it.uri?.contains("/principal/") == true).isFalse()
+                assertThat(it.uri?.contains("test") == true).isFalse()
+            }
+        }
+    }
+
+    @Test
     fun `cleanSequence SEQUENCE negative value test`() {
 
         val iCalString = """
