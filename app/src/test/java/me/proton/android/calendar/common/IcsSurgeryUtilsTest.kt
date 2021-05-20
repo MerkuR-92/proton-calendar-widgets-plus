@@ -4,6 +4,9 @@ import assertk.assertThat
 import assertk.assertions.*
 import biweekly.Biweekly
 import biweekly.util.ICalDate
+import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
+import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGTH
+import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanAttendees
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanCalscale
@@ -856,7 +859,8 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanDescription()).isFalse()
+            assertThat(event.cleanDescription()).isTrue()
+            assertThat(event.description.value.length).isEqualTo(DESCRIPTION_MAX_LENGTH)
         }
     }
 
@@ -889,7 +893,8 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanLocation()).isFalse()
+            assertThat(event.cleanLocation()).isTrue()
+            assertThat(event.location.value.length).isEqualTo(LOCATION_MAX_LENGTH)
         }
     }
 
@@ -922,7 +927,8 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanSummary()).isFalse()
+            assertThat(event.cleanSummary()).isTrue()
+            assertThat(event.summary.value.length).isEqualTo(SUMMARY_MAX_LENGTH)
         }
     }
 

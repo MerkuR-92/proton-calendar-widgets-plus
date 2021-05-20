@@ -277,18 +277,31 @@ object IcsSurgeryUtils {
         return true
     }
 
+    private fun String.ellipsizeField(maxLength: Int): String {
+        return this.substring(0, maxLength - 3).plus("...")
+    }
+
     fun VEvent.cleanDescription(): Boolean {
         // DESCRIPTION: This field is limited to 3k characters.
+        if (this.description?.value != null && this.description.value.length > DESCRIPTION_MAX_LENGTH) {
+            this.description.value = this.description.value.ellipsizeField(DESCRIPTION_MAX_LENGTH)
+        }
         return this.description?.value == null || this.description.value.length <= DESCRIPTION_MAX_LENGTH
     }
 
     fun VEvent.cleanLocation(): Boolean {
         // LOCATION: This field is limited to 255 characters.
+        if (this.location?.value != null && this.location.value.length > LOCATION_MAX_LENGTH) {
+            this.location.value = this.location.value.ellipsizeField(LOCATION_MAX_LENGTH)
+        }
         return this.location?.value == null || this.location.value.length <= LOCATION_MAX_LENGTH
     }
 
     fun VEvent.cleanSummary(): Boolean {
         // SUMMARY: This field is limited to 255 characters.
+        if (this.summary?.value != null && this.summary.value.length > SUMMARY_MAX_LENGTH) {
+            this.summary.value = this.summary.value.ellipsizeField(SUMMARY_MAX_LENGTH)
+        }
         return this.summary?.value == null || this.summary.value.length <= SUMMARY_MAX_LENGTH
     }
 
