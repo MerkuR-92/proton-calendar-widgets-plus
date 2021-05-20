@@ -42,6 +42,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.formatSendPreferencesError
 import me.proton.android.calendar.common.AndroidUtils.formattedTimeZoneToId
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.showKeyboard
@@ -515,16 +516,21 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             eventDialogState?.let {
                 when (it) {
                     is EventViewModel.EventDialogState.Save.SendPreferences -> {
+
+                        val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
+                            resources.getString(R.string.event_attendees_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
+                        })
+
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(R.string.event_attendees_send_prefs_error_title)
                             .setMessage(
                                 if (it.sendPreferencesResults.sendPreferences.isEmpty()) getString(
                                     R.string.event_attendees_send_prefs_error_none_message,
-                                    TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.keys)
+                                    emailsWithErrors
                                 )
                                 else getString(
                                     R.string.event_attendees_send_prefs_error_some_message,
-                                    TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.keys)
+                                    emailsWithErrors
                                 )
                             )
                             .setPositiveButton(R.string.event_attendees_send_prefs_error_confirm) { _, _ ->

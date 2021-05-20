@@ -57,6 +57,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import okhttp3.internal.toHexString
 import java.text.Normalizer
 import java.time.*
@@ -448,6 +449,12 @@ object AndroidUtils {
             }
         }
 
+        fun ObtainSendPreferencesUseCase.Result.Error.formatSendPreferencesError(resources: Resources): String =
+            when (this) {
+                ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> resources.getString(R.string.event_attendees_send_prefs_error_address_disabled)
+                ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> resources.getString(R.string.event_attendees_send_prefs_error_getting_contact)
+                ObtainSendPreferencesUseCase.Result.Error.NetworkError -> resources.getString(R.string.event_attendees_send_prefs_error_network)
+            }
 
         fun formatAlarm(
             resources: Resources,

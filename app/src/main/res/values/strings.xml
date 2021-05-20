@@ -103,6 +103,10 @@
     <string name="event_attendees_send_prefs_error_some_message">The following participants cannot be notified about your changes:\n\n• %s\n\nWould you like to continue anyway?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continue</string>
     <string name="event_attendees_send_prefs_error_cancel">Cancel</string>
+    <string name="event_attendees_send_prefs_error_address_disabled">this address does not exist</string>
+    <string name="event_attendees_send_prefs_error_getting_contact">could not get contact data</string>
+    <string name="event_attendees_send_prefs_error_network">network error</string>
+    <string name="event_attendees_send_prefs_error_template">%s (%s)</string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
