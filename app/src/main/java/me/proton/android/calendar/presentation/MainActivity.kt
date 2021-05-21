@@ -394,10 +394,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             else -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
                         }
                     }
+                    //IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT -> TODO()
                 }
 
                 val eventId = handleIcsImportResult.eventId
-                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
+                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else null)
                 navigateTo(eventDetailsDeepLink)
             } else {
                 var navigatedToDetails = false

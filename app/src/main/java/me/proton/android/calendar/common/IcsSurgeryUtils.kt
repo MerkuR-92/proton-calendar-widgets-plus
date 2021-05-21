@@ -49,7 +49,8 @@ object IcsSurgeryUtils {
         data class Success(
             val eventId: String,
             val action: HandleIcsAction,
-            val newAttendeeStatus: Pair<String, ParticipationStatus>? = null
+            val newAttendeeStatus: Pair<String, ParticipationStatus>? = null,
+            val isRecurring: Boolean? = false
         ): HandleIcsResult()
 
         data class ParsingSuccessful(

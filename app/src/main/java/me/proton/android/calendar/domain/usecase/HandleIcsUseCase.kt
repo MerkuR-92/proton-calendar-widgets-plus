@@ -176,7 +176,7 @@ class HandleIcsUseCase(
                     newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SESSION_KEY) != null) {
                     // Event is a proton to proton invite
                     existingEvent?.let { displayCalendar(it, userId) }
-                    return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+                    return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = newEvent.isRecurring())
                 }
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
@@ -189,7 +189,7 @@ class HandleIcsUseCase(
 
         // If no update is needed, return the existing event id
         existingEvent?.let { displayCalendar(it, userId) }
-        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
     }
 
     private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId): Boolean {
@@ -302,7 +302,8 @@ class HandleIcsUseCase(
                     return IcsSurgeryUtils.HandleIcsResult.Success(
                         eventId = existingEvent.id,
                         IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT,
-                        Pair(updatedAttendeeEmail, updatedAttendee.participationStatus)
+                        Pair(updatedAttendeeEmail, updatedAttendee.participationStatus),
+                        isRecurring = existingEvent.isRecurring()
                     )
                 }
             }
@@ -314,7 +315,7 @@ class HandleIcsUseCase(
         if (existingEvent.iCalEvent.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
 
         displayCalendar(existingEvent, userId)
-        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent.isRecurring())
     }
 
     private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
@@ -327,7 +328,7 @@ class HandleIcsUseCase(
 
                 displayCalendar(newEvent, userId)
 
-                return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action)
+                return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action, isRecurring = newEvent.isRecurring())
             }
             is UseCase.Result.InvalidParams -> {
                 logger.e("MainViewModel: invalid params in create event: ${editCreateEventResult.message}")
