@@ -71,7 +71,8 @@ class EventViewModel(
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase,
     private val handleSaveUseCase: HandleSaveUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val updateCalendarUseCase: UpdateCalendarUseCase
 ) : AndroidViewModel(application) {
 
     sealed class Result {
@@ -1366,6 +1367,14 @@ class EventViewModel(
         }
 
         event.updateParticipationStatus(userEmails, participationStatus)
+
+        if (!event.calendar.display) {
+            // 1. Update in DB
+            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
+            // 2. Update on Server
+            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
+        }
+
         _event.postValue(event)
 
         eventState.value = EventState.Idle

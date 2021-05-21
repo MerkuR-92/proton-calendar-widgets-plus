@@ -175,6 +175,7 @@ class HandleIcsUseCase(
                 if (newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
                     newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SESSION_KEY) != null) {
                     // Event is a proton to proton invite
+                    existingEvent?.let { displayCalendar(it, userId) }
                     return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
                 }
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
@@ -187,6 +188,7 @@ class HandleIcsUseCase(
         }
 
         // If no update is needed, return the existing event id
+        existingEvent?.let { displayCalendar(it, userId) }
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
     }
 
@@ -311,6 +313,7 @@ class HandleIcsUseCase(
         val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
         if (existingEvent.iCalEvent.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
 
+        displayCalendar(existingEvent, userId)
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
     }
 
@@ -322,12 +325,7 @@ class HandleIcsUseCase(
                     eventId = this.firstOrNull()
                 }
 
-                if (!newEvent.calendar.display) {
-                    // 1. Update in DB
-                    calendarsRepository.updateCalendarDisplay(newEvent.calendar.id, 1)
-                    // 2. Update on Server
-                    updateCalendarUseCase.executeUpdate(userId, newEvent.calendar.id)
-                }
+                displayCalendar(newEvent, userId)
 
                 return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action)
             }
@@ -339,6 +337,15 @@ class HandleIcsUseCase(
                 logger.e("MainViewModel: error in create event: ${editCreateEventResult.message}")
                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }
+        }
+    }
+
+    private suspend fun displayCalendar(event: Event, userId: UserId) {
+        if (!event.calendar.display) {
+            // 1. Update in DB
+            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
+            // 2. Update on Server
+            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
         }
     }
 }
