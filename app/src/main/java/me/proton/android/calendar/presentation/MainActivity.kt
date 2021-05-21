@@ -403,6 +403,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 var navigatedToDetails = false
                 when (handleIcsImportResult) {
                     is Error.DefaultError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
+                    is Error.EventNotFound -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_not_found_error), Snackbar.LENGTH_LONG)
                     is Error.NetworkError -> this@MainActivity.displaySnackBar(getString(R.string.snack_network_error), Snackbar.LENGTH_LONG)
                     is Error.EditCreateEventError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error), Snackbar.LENGTH_LONG)
                     is Error.ParsingFailed -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error), Snackbar.LENGTH_LONG)

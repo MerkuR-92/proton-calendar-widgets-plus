@@ -62,6 +62,7 @@ object IcsSurgeryUtils {
 
         sealed class Error: HandleIcsResult() {
             object DefaultError: Error()
+            object EventNotFound: Error()
             object NetworkError: Error()
             object EditCreateEventError: Error()
             object EventDeleted: Error()

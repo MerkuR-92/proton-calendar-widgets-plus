@@ -189,7 +189,7 @@ class HandleIcsUseCase(
 
         // If no update is needed, return the existing event id
         existingEvent?.let { displayCalendar(it, userId) }
-        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
+        return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT)
     }
 
     private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId): Boolean {

@@ -248,6 +248,7 @@
     <string name="snack_import_event_signed_out">You need to sign in to import events</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
+    <string name="snack_ics_event_not_found_error">Event not found</string>
     <string name="snack_ics_create_error">Error creating event</string>
     <string name="snack_ics_parsing_error">Error reading calendar</string>
     <string name="snack_ics_unsupported_method_error">This event type is not supported yet</string>
