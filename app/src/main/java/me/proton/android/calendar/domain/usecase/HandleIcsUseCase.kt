@@ -120,7 +120,7 @@ class HandleIcsUseCase(
         // Fetch all events sharing UID from BE
         val eventsSharingUidResponse = (
                 calendarsRepository.getEventsByUid(userId, newEvent.uid).valueOrNullAndLogErrors(logger)
-                    ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
+                    ?: return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
                 ).events
 
         // IMPORTANT: We need parent event to clean recurrence id
