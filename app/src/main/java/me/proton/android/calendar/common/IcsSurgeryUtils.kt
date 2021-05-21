@@ -12,6 +12,7 @@ import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.partDayICalDateToDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
@@ -31,6 +32,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
+import me.proton.android.calendar.common.IcsSurgeryUtils.localizeFloatingDate
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -192,13 +194,7 @@ object IcsSurgeryUtils {
         cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}[Z]?"), "")
 
         // If the type DATE is not specified for an all-day event, we currently reject (as invalid) the event.
-        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
-
-        // 2) For part day events
-
-        // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), reject (as unsupported) the event if there is no X-WR-TIMEZONE.
-        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}T\\d{6}\\n"))
-            && !cleanICalString.contains(Regex("X-WR-TIMEZONE:.+\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
+        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\r?\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         return HandleIcsResult.RawParsingSuccessful(cleanICalString)
     }
@@ -222,7 +218,7 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun ICalendar.getXWrTimezone(): String? {
+    private fun ICalendar.getXWrTimezone(): String? {
         return this.getExperimentalProperty(X_WR_TIMEZONE)?.value
     }
 
@@ -346,7 +342,10 @@ object IcsSurgeryUtils {
 
         // UNTIL: we should use UTC dates if and only if the event is not all-day.
         if (!this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == true) {
-            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = ICalDate(this.recurrenceRule.value.until, false))
+            val timeZone = iCalendar.timezoneInfo.timezones.map { it.timeZone }.firstOrNull()
+            val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: "UTC" else "UTC"
+            val untilDate = this.recurrenceRule.value.until
+            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = partDayICalDateToDate(untilDate, supportedTimeZone))
         }
 
         // UNTIL: we should transform a DATE into the UTC DATETIME that corresponds to the end of the day in the DTSTART timezone
@@ -488,9 +487,9 @@ object IcsSurgeryUtils {
             if (!this.convertToSupportedTimezone(it.recurrenceId)) return false
 
             // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), localize it to the x-wr-timezone if supported.
-            it.dateStart?.localizeFloatingDate(this)
-            it.dateEnd?.localizeFloatingDate(this)
-            it.recurrenceId?.localizeFloatingDate(this)
+            if (it.dateStart?.localizeFloatingDate(this) == false) return false
+            if (it.dateEnd?.localizeFloatingDate(this) == false) return false
+            if (it.recurrenceId?.localizeFloatingDate(this) == false) return false
 
             // If it's a Zulu time, the event is non-recurring and x-wr-timezone is present and supported, localize the date-time to the supported timezone.
             it.dateStart?.localizeZuluTimeDate(this, it)
@@ -519,13 +518,20 @@ object IcsSurgeryUtils {
         return true
     }
 
-    private fun DateOrDateTimeProperty.localizeFloatingDate(iCalendar: ICalendar) {
+    private fun DateOrDateTimeProperty.localizeFloatingDate(iCalendar: ICalendar): Boolean {
         // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), localize it to the x-wr-timezone if supported.
         val xWrTimezone = iCalendar.getXWrTimezone()
-        if (this.value.hasTime() && iCalendar.timezoneInfo.getTimezone(this) == null && !this.value.rawComponents.toString().contains("Z") && xWrTimezone != null) {
-            iCalendar.timezoneInfo.setTimezone(this, TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone))
-            this.localizeDateToTimezone(xWrTimezone)
+        if (this.value.hasTime() && iCalendar.timezoneInfo.getTimezone(this) == null && !this.value.rawComponents.toString().contains("Z")) {
+            if (xWrTimezone == null) return false
+            else {
+                iCalendar.timezoneInfo.setTimezone(
+                    this,
+                    TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone)
+                )
+                this.localizeDateToTimezone(xWrTimezone)
+            }
         }
+        return true
     }
 
     private fun DateOrDateTimeProperty.localizeZuluTimeDate(iCalendar: ICalendar, event: VEvent) {

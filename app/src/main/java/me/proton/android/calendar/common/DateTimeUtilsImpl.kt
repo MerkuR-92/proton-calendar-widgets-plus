@@ -128,6 +128,18 @@ object DateTimeUtilsImpl : DateTimeUtils {
         )
     }
 
+    override fun partDayICalDateToDate(iCalDate: ICalDate, timeZoneId: String): ICalDate {
+        return ICalDate(
+            Date.from(
+                ZonedDateTime.of(
+                    iCalDate.toInstant().atZone(ZoneId.of(timeZoneId)).toLocalDate(),
+                    LocalTime.MIDNIGHT,
+                    ZoneId.systemDefault()
+                ).toInstant()
+            ), false
+        )
+    }
+
     override fun startEndOverlapsWithFullDayRange(startDateTime: ZonedDateTime, endDateTime: ZonedDateTime, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
 
         val fromDateTime = fromDate.atStartOfDay(ZoneId.of(timeZoneId))

@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtEnd
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtStart
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDuration
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanExDate
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanLocation
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRRule
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
@@ -30,6 +31,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -150,7 +153,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanICalString = iCalString.cleanRawIcs()
+        val cleanICalString = cleanIcs(iCalString)
 
         assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty)
     }
@@ -1372,6 +1375,63 @@ internal class IcsSurgeryUtilsTest {
         iCalendar.events.forEach { event ->
             assertThat(event.cleanRRule(iCalendar)).isTrue()
             assertThat(event.recurrenceRule).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanRRule all day event with DATETIME UNTIL in RRULE test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    METHOD:REQUEST
+    PRODID:Microsoft Exchange Server 2010
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Taipei Standard Time
+    BEGIN:STANDARD
+    DTSTART:16010101T000000
+    TZOFFSETFROM:+0800
+    TZOFFSETTO:+0800
+    END:STANDARD
+    BEGIN:DAYLIGHT
+    DTSTART:16010101T000000
+    TZOFFSETFROM:+0800
+    TZOFFSETTO:+0800
+    END:DAYLIGHT
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    ORGANIZER;CN=test:mailto:test@protonmail.com
+    ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=breakingcalendar@pm.me:mailto:breakingcalendar@pm.me
+    DESCRIPTION;LANGUAGE=en-US:\n
+    RRULE:FREQ=DAILY;UNTIL=20210522T160000Z;INTERVAL=1
+    UID:android_until_outlook
+    SUMMARY;LANGUAGE=en-US:android, until
+    DTSTART;VALUE=DATE:20210519
+    DTEND;VALUE=DATE:20210519
+    CLASS:PUBLIC
+    PRIORITY:5
+    DTSTAMP:20201112T025741Z
+    TRANSP:TRANSPARENT
+    STATUS:CONFIRMED
+    SEQUENCE:0
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar!!.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
+            val newUntilDate = ZonedDateTime.of(
+                LocalDate.of(2021, 5, 23),
+                LocalTime.MIDNIGHT,
+                ZoneId.systemDefault()
+            ).toInstant()
+            assertThat(event.recurrenceRule.value.until).isEqualTo(ICalDate(Date.from(newUntilDate), false))
         }
     }
 
