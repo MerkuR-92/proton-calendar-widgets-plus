@@ -8,6 +8,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.ICalUtilsImpl.adjustIncomingAllDayEvent
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.generateXPmToken
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
@@ -134,13 +135,13 @@ class TransformEventUseCase(
             }
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter(X_PM_TOKEN) ?: generateXPmToken(
-                    canonicalizeProtonEmail(attendee.email),
+                    canonicalizeProtonEmail(attendee.extractEmail() ?: ""),
                     iCalendar.events.first().uid.value
                 )
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.email) }) currentUserAttendeeId =
+                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.extractEmail() ?: "") }) currentUserAttendeeId =
                         attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }

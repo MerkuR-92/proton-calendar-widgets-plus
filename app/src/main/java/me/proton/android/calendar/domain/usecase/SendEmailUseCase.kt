@@ -54,12 +54,13 @@ class SendEmailUseCase(
         dtStamp: Date
     ): UseCase.Result {
 
+        val userAttendeeEmail = userAttendee.extractEmail() ?: return UseCase.Result.InvalidParams("SendEmailUseCase userAttendee has empty email")
         val subject = getReplyMailSubject(summary)
-        val body = getReplyMailBody(participationStatus, userAttendee.email, summary)
+        val body = getReplyMailBody(participationStatus, userAttendeeEmail, summary)
 
         val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp)
 
-        val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendee.email)
+        val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
         val senderAddressId = database.addressesDao().select(userId.id).find {
             canonicalizeProtonEmail(it.email) == userAttendeeCanonicalEmail
         }?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
