@@ -71,6 +71,131 @@
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/nav_view_switcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/nav_view_switcher_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nav_view_switcher"
+                    style="@style/Text.Caption.Weak.Dark"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <View
+                    android:id="@+id/nav_view_switcher_separator"
+                    style="@style/Separator.Dark"
+                    android:layout_marginTop="7dp"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_title"
+                    app:layout_constraintStart_toStartOf="@+id/nav_view_switcher_title"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_switcher_day_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_separator">
+
+                    <include
+                        android:id="@+id/nav_view_switcher_day_press"
+                        layout="@layout/view_press_overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_switcher_day_separator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/nav_view_switcher_day_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_day"
+                        style="@style/AppImageViewIcon.Dark"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_switcher_day_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_switcher_day_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_switcher_day_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_view_switcher_day"
+                        style="@style/Text.DefaultSmall.Dark"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_switcher_day_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_switcher_day_separator"
+                        style="@style/Separator.Dark"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_day_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_switcher_day_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_switcher_agenda_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_day_layout">
+
+                    <include
+                        android:id="@+id/nav_view_switcher_agenda_press"
+                        layout="@layout/view_press_overlay"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_switcher_agenda_separator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/nav_view_switcher_agenda_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_agenda"
+                        style="@style/AppImageViewIcon.Dark"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_switcher_agenda_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_switcher_agenda_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_switcher_agenda_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_view_switcher_agenda"
+                        style="@style/Text.DefaultSmall.Dark"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_switcher_agenda_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_switcher_agenda_separator"
+                        style="@style/Separator.Dark"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_agenda_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_switcher_agenda_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/nav_view_calendars"
                 android:visibility="gone"
                 android:layout_width="match_parent"

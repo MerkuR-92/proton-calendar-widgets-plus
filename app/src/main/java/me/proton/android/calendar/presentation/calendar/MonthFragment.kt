@@ -79,7 +79,6 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var buttonCreate: View
     private lateinit var buttonToday: View
-    private lateinit var buttonChangeView: View
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
@@ -88,20 +87,11 @@ class MonthFragment : BaseFragment() {
         }
         buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
         with (buttonToday) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_today))
         }
-        buttonChangeView = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
-//        with (buttonChangeView) {
-//            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_agenda))
-//        }
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
-            addView(
-                buttonChangeView, resources.getDimensionPixelSize(
-                    R.dimen.action_clickable_size
-                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size)
-            )
             addView(
                 buttonToday, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
@@ -142,11 +132,6 @@ class MonthFragment : BaseFragment() {
         buttonToday.setOnSingleClickListener {
             val todayDate = LocalDate.now(timeZoneId)
             calendarViewModel.handleDaySelected(todayDate)
-        }
-
-        buttonChangeView.setOnSingleClickListener {
-            val immutableValue = calendarViewModel.agendaView.value ?: true
-            calendarViewModel.agendaView.postValue(!immutableValue)
         }
     }
 
@@ -308,9 +293,6 @@ class MonthFragment : BaseFragment() {
 
         calendarViewModel.agendaView.observe(viewLifecycleOwner) { agendaView ->
             if (agendaView) {
-                with (buttonChangeView) {
-                    (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_agenda))
-                }
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = agendaPagerAdapter
@@ -318,9 +300,6 @@ class MonthFragment : BaseFragment() {
                     offscreenPageLimit = 1
                 }
             } else {
-                with (buttonChangeView) {
-                    (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_day_view))
-                }
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = dayPagerAdapter
@@ -355,6 +334,11 @@ class MonthFragment : BaseFragment() {
 
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
             setToolbarMonthYearTitle(it)
+            with (buttonToday) {
+                val textField = (findViewById<TextView>(R.id.toolbarActionSecondaryText))
+                textField.text = it.dayOfMonth.toString()
+                textField.visibility = View.VISIBLE
+            }
         }
 
         lifecycleScope.launch {

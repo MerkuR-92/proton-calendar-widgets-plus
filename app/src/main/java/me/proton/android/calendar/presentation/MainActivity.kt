@@ -642,6 +642,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             accountViewModel.addAccount()
             drawer_layout.close()
         }
+
+        nav_view_switcher_day_press.setOnSingleClickListener {
+            calendarViewModel.agendaView.postValue(false)
+        }
+
+        nav_view_switcher_agenda_press.setOnSingleClickListener {
+            calendarViewModel.agendaView.postValue(true)
+        }
     }
 
     private fun initDrawerHeader() {
