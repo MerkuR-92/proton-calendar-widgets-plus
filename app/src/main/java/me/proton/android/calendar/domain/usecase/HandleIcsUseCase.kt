@@ -159,7 +159,7 @@ class HandleIcsUseCase(
             if (existingCalendarEntity?.isActive == false) {
                 // If calendar is disabled, display error message and try to open event details
                 return if (existingEvent != null) IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
-                else IcsSurgeryUtils.HandleIcsResult.Error.UpdateInDisabledCalendar
+                else IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(null)
             }
 
             existingCalendarEntity
