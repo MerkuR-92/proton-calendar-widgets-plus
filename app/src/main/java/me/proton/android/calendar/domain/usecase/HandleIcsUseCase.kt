@@ -107,19 +107,9 @@ class HandleIcsUseCase(
                 ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
-        // Create a new event with the clean iCalendar
-        val newEvent = Event.from(
-            ICalUtilsImpl.generateOfflineEventId(), Calendar(
-                defaultCalendar.id,
-                defaultCalendar.name,
-                defaultCalendar.color,
-                defaultCalendar.flags,
-                defaultCalendar.display == 1
-            ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
-
         // Fetch all events sharing UID from BE
         val eventsSharingUidResponse = (
-                calendarsRepository.getEventsByUid(userId, newEvent.uid).valueOrNullAndLogErrors(logger)
+                calendarsRepository.getEventsByUid(userId, iCalendar.events.first().uid.value).valueOrNullAndLogErrors(logger)
                     ?: return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
                 ).events
 
@@ -145,7 +135,7 @@ class HandleIcsUseCase(
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
                 val event = transformEventUseCase.execute(eventEntity)
-                if (event?.iCalEvent?.recurrenceId == newEvent.iCalEvent.recurrenceId) {
+                if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
                     existingEventEntity = eventEntity
                     break
@@ -157,6 +147,30 @@ class HandleIcsUseCase(
         if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
 
         val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
+
+        // If a series already exist, use the same calendar, else use the default one
+        val existingCalendar = if (!eventsSharingUidResponse.isNullOrEmpty()) {
+            val existingCalendarId = eventsSharingUidResponse.first().calendarId
+            val existingCalendarEntity = calendarsRepository.selectCalendar(existingCalendarId)
+
+            if (existingCalendarEntity?.isActive == false) {
+                // If calendar is disabled, display error message and try to open event details
+                return if (existingEvent != null) IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
+                else IcsSurgeryUtils.HandleIcsResult.Error.UpdateInDisabledCalendar
+            }
+
+            existingCalendarEntity
+        } else null
+
+        // Create a new event with the clean iCalendar
+        val newEvent = Event.from(
+            ICalUtilsImpl.generateOfflineEventId(), Calendar(
+                existingCalendar?.id ?: defaultCalendar.id,
+                existingCalendar?.name ?: defaultCalendar.name,
+                existingCalendar?.color ?: defaultCalendar.color,
+                existingCalendar?.flags ?: defaultCalendar.flags,
+                if (existingCalendar != null) existingCalendar.display == 1 else defaultCalendar.display == 1
+            ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         if (isNew && !isOrganizerMode && !iCalendar.method.isCancel) {
             // Create brand new event
@@ -172,8 +186,8 @@ class HandleIcsUseCase(
             val immutableExistingEventEntity = existingEventEntity
 
             if (!isOrganizerMode && immutableExistingEvent != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
-                if (newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
-                    newEvent.iCalendar.events.first().getExperimentalProperty(X_PM_SESSION_KEY) != null) {
+                if (newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
+                    newEvent.iCalEvent.getExperimentalProperty(X_PM_SESSION_KEY) != null) {
                     // Event is a proton to proton invite
                     existingEvent?.let { displayCalendar(it, userId) }
                     return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = newEvent.isRecurring())

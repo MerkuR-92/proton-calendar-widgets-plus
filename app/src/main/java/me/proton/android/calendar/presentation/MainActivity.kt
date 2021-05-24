@@ -398,7 +398,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
 
                 val eventId = handleIcsImportResult.eventId
-                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else null)
+                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else 0)
                 navigateTo(eventDetailsDeepLink)
             } else {
                 var navigatedToDetails = false
@@ -422,6 +422,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     is Error.NoEvents -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
                     is Error.EventDeleted -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
                     is Error.Invalid -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error), Snackbar.LENGTH_LONG)
+                    is Error.UpdateInDisabledCalendar -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_update_disabled_calendar_error), Snackbar.LENGTH_LONG)
                     is Error.DisabledCalendar -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_disabled_calendar_error))
                     is Error.ReplyPartyCrasher -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
                     is Error.DecryptionFailed -> {
