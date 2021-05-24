@@ -305,7 +305,7 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         assertThat(iCalendar.cleanTimezones()).isTrue()
-        assertThat(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().dateStart).timeZone.id).isEqualTo("Europe/Athens")
+        assertThat(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().dateStart).timeZone.id).isEqualTo("Europe/Prague")
     }
 
     @Test
@@ -450,7 +450,7 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         assertThat(iCalendar.cleanXWrTimezone()).isTrue()
-        assertThat(iCalendar.getExperimentalProperty("X-WR-TIMEZONE").value).isEqualTo("Europe/Athens")
+        assertThat(iCalendar.getExperimentalProperty("X-WR-TIMEZONE").value).isEqualTo("Europe/Prague")
     }
 
     @Test

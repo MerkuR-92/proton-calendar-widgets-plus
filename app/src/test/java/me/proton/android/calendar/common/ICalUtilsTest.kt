@@ -208,8 +208,6 @@ internal class ICalUtilsTest {
 
         assertThat(fallbackTimeZone("Europe/Zurich")).isEqualTo("Europe/Zurich")
 
-        assertThat(fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Athens")
-
         /* Windows Time Zones */
 
         assertThat(fallbackTimeZone("FLE Standard Time")).isEqualTo("Europe/Kiev")
@@ -221,6 +219,14 @@ internal class ICalUtilsTest {
         assertThat(fallbackTimeZone("abu dhabi, muscat")).isEqualTo("Asia/Dubai")
 
         assertThat(fallbackTimeZone("helsinki, kyiv, riga, sofia, tallinn, vilnius")).isEqualTo("Europe/Helsinki")
+
+        assertThat(fallbackTimeZone("W Europe Standard Time")).isEqualTo("Europe/Berlin")
+
+        /* Aliases Time Zones */
+
+        assertThat(fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Prague")
+
+        assertThat(fallbackTimeZone("Atlantic/St_Helena")).isEqualTo("Africa/Abidjan")
 
     }
 

@@ -159,7 +159,10 @@ object DateTimeUtilsImpl : DateTimeUtils {
             timeZone
         } else {
 
-            if (TimeZone.getAvailableIDs().contains(timeZone)) {
+            val aliasTimezone = aliasesTimezonesMap[timeZone]
+            if (aliasTimezone != null) {
+                fallbackTimeZone(aliasTimezone, fallbackToDefault)
+            } else if (TimeZone.getAvailableIDs().contains(timeZone)) {
 
                 val offset = TimeZone.getTimeZone(timeZone).getOffset(Date.from(Instant.now()).time)
                 val alternativeTimezones = TimeZone.getAvailableIDs(offset).filter { allowedTimezoneIds.contains(it) }
