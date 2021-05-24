@@ -143,6 +143,9 @@ class HandleIcsUseCase(
             }
         }
 
+        if (iCalendar.method.isReply && !isOrganizerMode) {
+            return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
+        }
         if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.isRecurring())
         if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
 
