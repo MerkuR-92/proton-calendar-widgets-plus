@@ -252,6 +252,10 @@ class HandleIcsUseCase(
                     // Sequence did not change, keep current participation status
                     newICalendar.events.first().attendees.firstOrNull { it == userAttendee }?.participationStatus =
                         currentParticipationStatus
+
+                    // Copy existing alarms
+                    newICalendar.events.first().alarms.clear()
+                    newICalendar.events.first().alarms.addAll(existingEvent.iCalEvent.alarms)
                 }
             }
 
