@@ -55,11 +55,22 @@
         android:layout_marginStart="7dp"
         android:layout_marginEnd="7dp"
         android:ellipsize="end"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/text_title_side"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Klosterstraße 44, 10179 Berlin, Germany"
         />
+
+    <TextView
+        android:id="@+id/text_title_side"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_on_calendar_color"
+        style="@style/Text.Caption.Strong"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="7dp"
+        tools:text="(1/2)" />
 
     <ImageView
         android:id="@+id/decryption_error_icon"
@@ -85,7 +96,7 @@
         android:background="@drawable/shape_background_decryption_error"
         android:backgroundTint="@color/text_norm"
         android:alpha="0.1"
-        app:layout_constraintEnd_toStartOf="@+id/text_subheader_side"
+        app:layout_constraintEnd_toStartOf="@+id/text_title_side"
         app:layout_constraintStart_toEndOf="@+id/decryption_error_icon"
         app:layout_constraintTop_toTopOf="@+id/decryption_error_icon"
         app:layout_constraintBottom_toBottomOf="@+id/decryption_error_icon"
