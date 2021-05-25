@@ -192,8 +192,8 @@ class HandleIcsUseCase(
                 if (newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
                     newEvent.iCalEvent.getExperimentalProperty(X_PM_SESSION_KEY) != null) {
                     // Event is a proton to proton invite
-                    existingEvent?.let { displayCalendar(it, userId) }
-                    return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = newEvent.isRecurring())
+                    displayCalendar(immutableExistingEvent, userId)
+                    return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
