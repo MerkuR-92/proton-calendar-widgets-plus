@@ -299,6 +299,7 @@ class MonthFragment : BaseFragment() {
                     setCurrentItem(if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition, false)
                     offscreenPageLimit = 1
                 }
+                calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             } else {
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
@@ -306,6 +307,7 @@ class MonthFragment : BaseFragment() {
                     setCurrentItem(if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition, false)
                     offscreenPageLimit = 1
                 }
+                calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
 
 //                if (miniCalendarPager.isVisible) mini_calendar_slider.performClick() // Hide the mini calendar when switching to day view
             }

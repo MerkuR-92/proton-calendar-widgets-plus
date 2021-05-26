@@ -253,10 +253,17 @@ class CalendarViewModel(
         }
 
         // adjust Agenda
-        val agendaAdapter = (agendaPager.adapter as? AgendaPagerAdapter)
+        val agendaAdapter = if (agendaView.value == true) agendaPager.adapter as? AgendaPagerAdapter else agendaPager.adapter as? DayPagerAdapter
         if (agendaAdapter != null) {
-            val selectedDayOffset = ChronoUnit.DAYS.between(agendaAdapter.startingDate, date).toInt()
-            val agendaIndex = agendaAdapter.startingPosition + selectedDayOffset
+            val startingDate =
+                if (agendaView.value == true) (agendaAdapter as AgendaPagerAdapter).startingDate
+                else (agendaPager.adapter as DayPagerAdapter).startingDate
+            val startingPosition =
+                if (agendaView.value == true) (agendaPager.adapter as AgendaPagerAdapter).startingPosition
+                else (agendaPager.adapter as DayPagerAdapter).startingPosition
+
+            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, date).toInt()
+            val agendaIndex = startingPosition + selectedDayOffset
 
             if (agendaPager.currentItem != agendaIndex) {
                 agendaPager.post {

@@ -6,14 +6,104 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/all_day_layout"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@color/background_norm"
+        android:elevation="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/all_day_header"
+            style="@style/Text.Caption.Weak"
+            android:layout_width="71dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/event_all_day"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/all_day_items_cropped_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/all_day_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="4dp"
+            tools:listitem="@layout/item_day_view_event_all_day"
+            tools:itemCount="2" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/all_day_items_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@+id/all_day_items_cropped_list"
+            app:layout_constraintStart_toEndOf="@+id/all_day_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_day_view_event_all_day"
+            tools:itemCount="2" />
+
+        <LinearLayout
+            android:id="@+id/all_day_more_items_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@+id/all_day_header"
+            app:layout_constraintTop_toBottomOf="@+id/all_day_items_cropped_list"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageView
+            android:id="@+id/all_day_more_collapse_button"
+            style="@style/Icon.Small"
+            app:tint="@color/icon_weak"
+            android:layout_width="0dp"
+            android:rotation="180"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintStart_toStartOf="@+id/all_day_header"
+            app:layout_constraintEnd_toEndOf="@+id/all_day_header"
+            app:layout_constraintBottom_toTopOf="@+id/all_day_view_separator"
+            android:layout_marginBottom="6dp"
+            app:srcCompat="@drawable/ic_chevron_down" />
+
+        <View
+            android:id="@+id/all_day_view_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/lines_norm"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <View
+            android:id="@+id/all_day_view_vertical_separator"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/lines_norm"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/all_day_view_separator"
+            app:layout_constraintEnd_toStartOf="@+id/all_day_items_cropped_list"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <ScrollView
-        android:id="@+id/sample_scroll"
+        android:id="@+id/day_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
         <me.proton.android.calendar.common.DayView
-            android:id="@+id/sample_day"
+            android:id="@+id/day_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/large_padding"
@@ -26,6 +116,7 @@
             app:hourLabelMarginEnd="4dp"
             app:hourLabelWidth="@dimen/hour_label_width"
             app:startHour="@integer/start_hour" />
+
     </ScrollView>
 
 </LinearLayout>

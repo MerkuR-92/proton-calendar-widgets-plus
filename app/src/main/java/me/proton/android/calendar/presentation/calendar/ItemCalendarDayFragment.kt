@@ -3,13 +3,14 @@ package me.proton.android.calendar.presentation.calendar
 import android.graphics.Color
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ScrollView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.ColorRes
 import androidx.collection.LongSparseArray
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -17,6 +18,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_agenda_event_all_day.view.*
@@ -39,7 +41,6 @@ import java.text.DateFormat
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
@@ -65,6 +66,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private var allEvents: LongSparseArray<List<Event>>? = null
     private var dateFormat: DateFormat? = null
+
+    private lateinit var allDayEventCroppedListAdapter: DayViewAllDayEventAdapter
+    private lateinit var allDayEventListAdapter: DayViewAllDayEventAdapter
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarDayFragment{
@@ -105,7 +109,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
         timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault())
 
-        dayView = rootView.findViewById(R.id.sample_day)
+        dayView = rootView.findViewById(R.id.day_view)
 
         // Inflate a label view for each hour the day view will display
         val hour: java.util.Calendar = day.clone() as java.util.Calendar
@@ -309,8 +313,78 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             day.timeInMillis,
                             it.events
                         )
-
                         onEventsChange(timeZoneId)
+
+                        val allDayEvents = it.events.filter { event -> !event.spansSingleDay(true, timeZoneId) }
+                        val croppedList = allDayEvents.take(
+                            if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) DAY_VIEW_ALL_DAY_MAX - 1
+                            else DAY_VIEW_ALL_DAY_MAX
+                        )
+                        val moreEvents =
+                            if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) allDayEvents.takeLast(allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
+                            else listOf()
+
+                        all_day_layout.visibleOrGone(!allDayEvents.isNullOrEmpty())
+                        all_day_more_items_layout.removeAllViews()
+
+                        val userEmails = calendarViewModel.getUserEmails()
+
+                        /* Cropped list */
+                        val allDayEventsCroppedListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                        all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
+                        allDayEventCroppedListAdapter = DayViewAllDayEventAdapter(userEmails ?: listOf()) { event ->
+                            onEventClick(event)
+                        }
+                        all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
+                        allDayEventCroppedListAdapter.submitList(croppedList)
+
+                        /* Rest of the list */
+                        val allDayEventsMoreListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                        all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
+                        allDayEventListAdapter = DayViewAllDayEventAdapter(userEmails ?: listOf()) { event ->
+                            onEventClick(event)
+                        }
+                        all_day_items_list.adapter = allDayEventListAdapter
+                        allDayEventListAdapter.submitList(moreEvents)
+
+                        all_day_more_collapse_button.setOnSingleClickListener {
+                            collapse(all_day_items_list)
+                            all_day_more_collapse_button.visibleOrGone(false)
+                            all_day_more_items_layout.visibleOrInvisible(true)
+                        }
+
+                        if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) {
+                            val eventView = layoutInflater.inflate(R.layout.item_day_view_event_partial, dayView, false)
+
+                            val title = (eventView.findViewById<View>(R.id.text_title) as TextView)
+                            val titleParams = title.layoutParams
+                            titleParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                            title.layoutParams = titleParams
+                            title.gravity = Gravity.CENTER_VERTICAL
+                            title.text = getString(R.string.day_view_all_day_more, allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
+                            title.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+
+                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(R.id.main_surface).setTint(
+                                ContextCompat.getColor(requireContext(), R.color.interaction_weak)
+                            )
+                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(R.id.side_strip).setTint(
+                                ContextCompat.getColor(requireContext(), R.color.interaction_weak)
+                            )
+
+                            // When an event is clicked, start a new draft event and show the edit event dialog
+                            eventView.setOnClickListener {
+                                expand(all_day_items_list)
+                                all_day_more_collapse_button.visibleOrGone(true)
+                                all_day_more_items_layout.visibleOrInvisible(false)
+                            }
+
+                            val layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                resources.getDimensionPixelSize(R.dimen.all_day_item_height))
+                            layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_end)
+                            layoutParams.bottomMargin = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
+                            all_day_more_items_layout.addView(eventView, layoutParams)
+                        }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         // TODO

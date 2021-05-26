@@ -117,6 +117,11 @@
         <item name="android:layout_marginStart">@dimen/default_inner_padding_start</item>
     </style>
 
+    <style name="Icon.Small">
+        <item name="android:layout_width">@dimen/small_icon_size</item>
+        <item name="android:layout_height">@dimen/small_icon_size</item>
+    </style>
+
     <style name="InputText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/brand_norm</item>
         <item name="boxStrokeWidth">0dp</item>

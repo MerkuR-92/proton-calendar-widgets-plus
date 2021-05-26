@@ -34,7 +34,8 @@
     <dimen name="default_margin_text_end">64dp</dimen>
 
     <dimen name="default_icon_size">24dp</dimen>
-    <dimen name="small_icon_size">20dp</dimen>
+    <dimen name="small_icon_size">16dp</dimen>
+    <dimen name="badge_icon_size">20dp</dimen>
 
     <dimen name="default_separator_margin_top">20dp</dimen>
 
@@ -66,4 +67,9 @@
     <dimen name="add_event_button_foreground_size">52dp</dimen>
     <dimen name="add_event_button_background_size">85dp</dimen>
     <dimen name="add_event_button_background_bottom_margin">4dp</dimen>
+
+    <dimen name="all_day_item_height">28dp</dimen>
+    <dimen name="all_day_item_margin_bottom">2dp</dimen>
+    <dimen name="all_day_item_margin_end">11dp</dimen>
+
 </resources>
