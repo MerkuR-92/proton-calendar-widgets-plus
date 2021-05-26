@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.*
@@ -192,7 +193,7 @@ class EditCreateEventUseCase(
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
         if (attendeesEventContent != null) {
             newEvent.iCalEvent.attendees.forEach {
-                val status = it.participationStatus?.toInt() ?: 0
+                val status = it.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
                 val xpmToken = it.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it.email), newEvent.uid) // TODO Maybe use API route ?
                 attendees.add(
                     Event.AttendeeStatusEvent(null, xpmToken, status, null)

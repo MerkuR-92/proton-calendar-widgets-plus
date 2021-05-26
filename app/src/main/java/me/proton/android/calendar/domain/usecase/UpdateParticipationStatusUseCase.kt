@@ -1,5 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.parameter.ParticipationStatus
+import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.toParticipationStatus
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
@@ -74,7 +76,7 @@ class UpdateParticipationStatusUseCase(
             val mainChanParticipationStatus = mainChainStatus.toParticipationStatus()
             if (event.currentUserAttendeeId == null || event.getParticipationStatus(userEmails) == mainChanParticipationStatus) return@forEach
             when (val updateParticipationStatusResponse =
-                calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, 0) // 0 == NEEDS_ACTION
+                calendarsApi.updateParticipationStatus(userId, calendarId, event.id, event.currentUserAttendeeId, ParticipationStatus.NEEDS_ACTION.toInt()) // 0 == NEEDS_ACTION
             ) {
                 is ApiResponse.Success -> {
                     // Clear alarms

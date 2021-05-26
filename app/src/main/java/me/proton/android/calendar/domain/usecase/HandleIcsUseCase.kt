@@ -192,7 +192,7 @@ class HandleIcsUseCase(
                 if (newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
                     newEvent.iCalEvent.getExperimentalProperty(X_PM_SESSION_KEY) != null) {
                     // Event is a proton to proton invite
-                    displayCalendar(immutableExistingEvent, userId)
+                    makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
@@ -205,7 +205,7 @@ class HandleIcsUseCase(
         }
 
         // If no update is needed, return the existing event id
-        existingEvent?.let { displayCalendar(it, userId) }
+        existingEvent?.let { makeCalendarVisible(it, userId) }
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
     }
 
@@ -335,7 +335,7 @@ class HandleIcsUseCase(
         val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
         if (existingEvent.iCalEvent.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
 
-        displayCalendar(existingEvent, userId)
+        makeCalendarVisible(existingEvent, userId)
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent.isRecurring())
     }
 
@@ -347,7 +347,7 @@ class HandleIcsUseCase(
                     eventId = this.firstOrNull()
                 }
 
-                displayCalendar(newEvent, userId)
+                makeCalendarVisible(newEvent, userId)
 
                 return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action, isRecurring = newEvent.isRecurring())
             }
@@ -362,7 +362,7 @@ class HandleIcsUseCase(
         }
     }
 
-    private suspend fun displayCalendar(event: Event, userId: UserId) {
+    private suspend fun makeCalendarVisible(event: Event, userId: UserId) {
         if (!event.calendar.display) {
             // 1. Update in DB
             calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
