@@ -132,7 +132,7 @@ class ObtainSendPreferencesUseCase(
 
         val vCardEncrypt = vCard.getProperty(propertyGroup, "x-pm-encrypt")
         val vCardSign = vCard.getProperty(propertyGroup, "x-pm-sign")
-        val vCardMime = vCard.getProperty(propertyGroup, "x-pm-mime")
+        val vCardMime = vCard.getProperty(propertyGroup, "x-pm-mimetype")
         val vCardScheme = vCard.getProperty(propertyGroup, "x-pm-scheme")
         val vCardPublicKeys = vCard.getKeysForGroup(propertyGroup)
 
