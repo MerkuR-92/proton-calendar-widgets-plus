@@ -45,6 +45,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.collapse
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
+import me.proton.android.calendar.common.AndroidUtils.formatSendPreferencesError
 import me.proton.android.calendar.common.AndroidUtils.getInitials
 import me.proton.android.calendar.common.AndroidUtils.getParticipationStatusPriorityValue
 import me.proton.android.calendar.common.AndroidUtils.getText
@@ -403,16 +404,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         // Reset change answer buttons to previous state
                         displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
 
+                        val errorMessage = getString(when (it.participationStatus) {
+                            ParticipationStatus.ACCEPTED -> R.string.event_organizer_send_prefs_message_accepted_title
+                            ParticipationStatus.DECLINED -> R.string.event_organizer_send_prefs_message_declined_title
+                            ParticipationStatus.TENTATIVE -> R.string.event_organizer_send_prefs_message_tentative_title
+                            else -> R.string.event_organizer_send_prefs_message_default_title
+                        })
+
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(R.string.event_organizer_send_prefs_error_title)
-                            .setMessage(
-                                when (it.participationStatus) {
-                                    ParticipationStatus.ACCEPTED -> R.string.event_organizer_send_prefs_message_accepted_title
-                                    ParticipationStatus.DECLINED -> R.string.event_organizer_send_prefs_message_declined_title
-                                    ParticipationStatus.TENTATIVE -> R.string.event_organizer_send_prefs_message_tentative_title
-                                    else -> R.string.event_organizer_send_prefs_message_default_title
-                                }
-                            )
+                            .setMessage(resources.getString(R.string.event_send_prefs_error_template, errorMessage, it.obtainError.formatSendPreferencesError(resources)))
                             .setPositiveButton(R.string.event_organizer_send_prefs_button_title) { _, _ ->
                             }
                             .setOnCancelListener { _ ->

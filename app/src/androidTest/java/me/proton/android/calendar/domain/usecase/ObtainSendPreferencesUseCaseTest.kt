@@ -3,7 +3,10 @@ package me.proton.android.calendar.domain.usecase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import ezvcard.Ezvcard
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.ApiResponse
@@ -14,6 +17,7 @@ import me.proton.core.contact.domain.entity.ContactCard
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.crypto.common.pgp.PGPCrypto
 import me.proton.core.key.domain.entity.key.PublicAddress
 import me.proton.core.key.domain.entity.key.PublicAddressKey
 import me.proton.core.key.domain.entity.key.PublicKey
@@ -21,6 +25,7 @@ import me.proton.core.key.domain.entity.key.Recipient
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.user.domain.UserManager
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -33,6 +38,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     private val userManagerMock: UserManager = mockk()
     private val mailSettingsApiMock: MailSettingsApi = mockk()
     private val cryptoContextMock: CryptoContext = mockk()
+    private val pgpCryptoMock: PGPCrypto = mockk()
     private val getRecipientPublicAddressesMock: GetRecipientPublicAddresses = mockk()
 
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -46,13 +52,22 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         getRecipientPublicAddressesMock
     )
 
+    @Before
+    fun beforeEach() {
+        clearAllMocks()
+
+        coEvery { cryptoContextMock.pgpCrypto } returns pgpCryptoMock
+    }
+
     @Test
     fun handle_createCustomSendPreferences_for_contact_with_pinned_key() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
         val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptTrue.cards.first {it.type == 2}.data).first()!!
 
-        val result = sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyPublicAddress, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!)!!
+        coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
+
+        val result = (sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyPublicAddress, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!) as ObtainSendPreferencesUseCase.SendPreferencesOrError.Success).sendPreferences
 
         with (result) {
             assertTrue(encrypt)
@@ -71,12 +86,56 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
         val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
 
-        val result = sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyPublicAddress, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!)!!
+        coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
+
+        val result = (sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyPublicAddress, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!) as ObtainSendPreferencesUseCase.SendPreferencesOrError.Success).sendPreferences
 
         with (result) {
             assertFalse(encrypt)
             assertTrue(sign)
         }
+
+    }
+
+    @Test
+    fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_key_deleted_in_public_repo() {
+
+        val vCardEmail = "contact_external_pinned_key+alias@email.com"
+        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+
+        coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
+
+        val result = sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyEmptyPublicAddress, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!)
+
+        assertTrue(result is ObtainSendPreferencesUseCase.SendPreferencesOrError.Error.TrustedKeysInvalid)
+
+    }
+
+    @Test
+    fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_key_is_obsolete() {
+
+        val vCardEmail = "contact_external_pinned_key+alias@email.com"
+        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+
+        coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
+
+        val result = sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyPublicAddressObsolete, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!)
+
+        assertTrue(result is ObtainSendPreferencesUseCase.SendPreferencesOrError.Error.TrustedKeysInvalid)
+
+    }
+
+    @Test
+    fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_key_is_compromised() {
+
+        val vCardEmail = "contact_external_pinned_key+alias@email.com"
+        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+
+        coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
+
+        val result = sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyPublicAddressCompromised, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!)
+
+        assertTrue(result is ObtainSendPreferencesUseCase.SendPreferencesOrError.Error.TrustedKeysInvalid)
 
     }
 
@@ -98,12 +157,37 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
             """.trimIndent()
     ))
 
+    private val contactExternalPinnedKeyEmptyPublicAddress = PublicAddress(
+        "contact_external_pinned_key@pm.me",
+        recipientType = Recipient.External.value,
+        "text/html",
+        emptyList()
+    )
+
     private val contactExternalPinnedKeyPublicAddress = PublicAddress(
         "contact_external_pinned_key@pm.me",
         recipientType = Recipient.External.value,
         "text/html",
         listOf(
+            PublicAddressKey("contact_external_pinned_key@pm.me", 3, PublicKey("armored key from public repository", isPrimary = true)),
+        )
+    )
+
+    private val contactExternalPinnedKeyPublicAddressCompromised = PublicAddress(
+        "contact_external_pinned_key@pm.me",
+        recipientType = Recipient.External.value,
+        "text/html",
+        listOf(
             PublicAddressKey("contact_external_pinned_key@pm.me", 0, PublicKey("armored key from public repository", isPrimary = true)),
+        )
+    )
+
+    private val contactExternalPinnedKeyPublicAddressObsolete = PublicAddress(
+        "contact_external_pinned_key@pm.me",
+        recipientType = Recipient.External.value,
+        "text/html",
+        listOf(
+            PublicAddressKey("contact_external_pinned_key@pm.me", 1, PublicKey("armored key from public repository", isPrimary = true)),
         )
     )
 

@@ -79,7 +79,6 @@ object IcsSurgeryUtils {
             data class DecryptionFailed(val eventId: String? = null, val isRecurring: Boolean? = null): Error()
             data class DisabledCalendar(val eventId: String? = null): Error()
             data class Method(val eventId: String? = null): Error()
-            object UpdateInDisabledCalendar: Error()
 
             sealed class Unsupported: Error() {
                 object Method: Unsupported()

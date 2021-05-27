@@ -518,7 +518,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventDialogState.Save.SendPreferences -> {
 
                         val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
-                            resources.getString(R.string.event_attendees_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
+                            resources.getString(R.string.event_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
                         })
 
                         MaterialAlertDialogBuilder(requireContext())

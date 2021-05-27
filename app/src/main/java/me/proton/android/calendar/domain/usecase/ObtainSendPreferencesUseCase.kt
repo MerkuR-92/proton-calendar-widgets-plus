@@ -14,8 +14,10 @@ import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.crypto.common.pgp.getFingerprintOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.entity.key.PublicAddress
+import me.proton.core.key.domain.entity.key.PublicAddressKey
 import me.proton.core.key.domain.entity.key.Recipient
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
@@ -42,6 +44,9 @@ class ObtainSendPreferencesUseCase(
         sealed class Error : Result() {
             object AddressDisabled : Error()
             object GettingContactPreferences : Error()
+            object TrustedKeysInvalid : Error()
+            object NoCorrectlySignedTrustedKeys : Error()
+            object PublicKeysInvalid : Error()
             object NetworkError : Error()
         }
     }
@@ -90,7 +95,9 @@ class ObtainSendPreferencesUseCase(
         // 6. obtain VCards for those contacts
         val user = userManager.getUser(userId)
         val validVCards = fullContactsWithCustomPreferences.filterNullValues().mapValues { entry ->
-            entry.value.extractSignedVCard(user, cryptoContext, logger)
+            entry.value.extractSignedVCard(user, cryptoContext, logger).also {
+                if (it == null) result[entry.key] = Result.Error.NoCorrectlySignedTrustedKeys
+            }
         }
 
         // 7. parse VCards to get custom Contact preferences
@@ -101,17 +108,31 @@ class ObtainSendPreferencesUseCase(
             val vCard = validVCards[entry.key]
             val vCardEmail = contactEmailsWithCustomPreferences[entry.key]?.email
 
-            val sendPreferences = if (vCardEmail != null && publicAddress != null && vCard != null) {
+            val sendPreferencesOrError = if (vCardEmail != null && publicAddress != null && vCard != null) {
                 createCustomSendPreferences(vCardEmail, publicAddress, vCard, mailSettings)
             } else {
                 createDefaultSendPreferences(mailSettings, publicAddress)
             }
 
-            result[entry.key] = sendPreferences?.let { Result.Success(it) } ?: Result.Error.GettingContactPreferences
-
+            result[entry.key] = when (sendPreferencesOrError) {
+                is SendPreferencesOrError.Success -> Result.Success(sendPreferencesOrError.sendPreferences)
+                SendPreferencesOrError.Error.TrustedKeysInvalid -> Result.Error.TrustedKeysInvalid
+                else -> Result.Error.GettingContactPreferences
+            }
         }
 
         return result
+    }
+
+    sealed class SendPreferencesOrError {
+        data class Success(val sendPreferences: SendPreferences): SendPreferencesOrError()
+
+        sealed class Error: SendPreferencesOrError() {
+            object NoKeysAvailable: Error()
+            object NoEmailInVCard: Error()
+            object TrustedKeysInvalid: Error()
+            object PublicKeysInvalid: Error()
+        }
     }
 
     /**
@@ -123,12 +144,12 @@ class ObtainSendPreferencesUseCase(
         publicAddress: PublicAddress,
         vCard: VCard,
         defaultMailSettings: MailSettings
-    ): SendPreferences? {
+    ): SendPreferencesOrError {
 
         val isInternal = publicAddress.recipient == Recipient.Internal
-        val publicKey = publicAddress.keys.firstOrNull { it.publicKey.isPrimary }?.publicKey?.key
+        val publicAddressKey = publicAddress.keys.firstOrNull { it.publicKey.isPrimary }
 
-        val propertyGroup = vCard.getGroupForEmail(vCardEmail) ?: return null
+        val propertyGroup = vCard.getGroupForEmail(vCardEmail) ?: return SendPreferencesOrError.Error.NoEmailInVCard
 
         val vCardEncrypt = vCard.getProperty(propertyGroup, "x-pm-encrypt")
         val vCardSign = vCard.getProperty(propertyGroup, "x-pm-sign")
@@ -145,30 +166,53 @@ class ObtainSendPreferencesUseCase(
         val mime = if (vCardMime?.value != null) vCardMime.value else defaultMailSettings.draftMimeType
 
         // we have to encrypt but there's no valid pinned public key
-        if (encrypt && pinnedPublicKey == null) return null
+        if (encrypt && pinnedPublicKey == null) return SendPreferencesOrError.Error.NoKeysAvailable
+
+        if (pinnedPublicKey != null) {
+            val pinnedKeyFingerprint = cryptoContext.pgpCrypto.getFingerprintOrNull(pinnedPublicKey) ?: return SendPreferencesOrError.Error.TrustedKeysInvalid
+            val matchingPublicAddressKey = publicAddress.keys.find { cryptoContext.pgpCrypto.getFingerprintOrNull(it.publicKey.key) == pinnedKeyFingerprint }
+
+            // pinned key is not in the public key repository
+            if (matchingPublicAddressKey == null) return SendPreferencesOrError.Error.TrustedKeysInvalid
+
+            // pinned key is compromised
+            if (matchingPublicAddressKey.isCompromised()) return SendPreferencesOrError.Error.TrustedKeysInvalid
+
+            // pinned key is obsolete
+            if (matchingPublicAddressKey.isObsolete()) return SendPreferencesOrError.Error.TrustedKeysInvalid
+        }
+
+        if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return SendPreferencesOrError.Error.PublicKeysInvalid
 
         return if (isInternal) {
-            if (pinnedPublicKey == null && publicKey == null) {
-                null
+
+            if (pinnedPublicKey == null && publicAddressKey == null) {
+                SendPreferencesOrError.Error.NoKeysAvailable
             } else {
-                SendPreferences(
-                    encrypt = true,
-                    sign = true,
-                    pgpScheme = PackageType.ProtonMail,
-                    mimeType = mime,
-                    publicKey = pinnedPublicKey ?: publicKey
+                SendPreferencesOrError.Success(
+                    SendPreferences(
+                        encrypt = true,
+                        sign = true,
+                        pgpScheme = PackageType.ProtonMail,
+                        mimeType = mime,
+                        publicKey = pinnedPublicKey ?: publicAddressKey?.publicKey?.key
+                    )
                 )
             }
+
         } else {
-            if (encrypt && pinnedPublicKey == null && publicKey == null) {
-                null
+
+            if (encrypt && pinnedPublicKey == null && publicAddressKey == null) {
+                SendPreferencesOrError.Error.NoKeysAvailable
             } else {
-                SendPreferences(
-                    encrypt = encrypt,
-                    sign = if (encrypt) true else sign,
-                    pgpScheme = scheme,
-                    mimeType = mime,
-                    publicKey = pinnedPublicKey ?: publicKey
+                SendPreferencesOrError.Success(
+                    SendPreferences(
+                        encrypt = encrypt,
+                        sign = if (encrypt) true else sign,
+                        pgpScheme = scheme,
+                        mimeType = mime,
+                        publicKey = pinnedPublicKey ?: publicAddressKey?.publicKey?.key
+                    )
                 )
             }
 
@@ -179,23 +223,28 @@ class ObtainSendPreferencesUseCase(
     fun createDefaultSendPreferences(
         defaultMailSettings: MailSettings,
         publicAddress: PublicAddress?
-    ): SendPreferences? {
+    ): SendPreferencesOrError {
 
         val isInternal = publicAddress?.recipient == Recipient.Internal
-        val publicKey = publicAddress?.keys?.firstOrNull { it.publicKey.isPrimary }?.publicKey?.key
+        val publicAddressKey = publicAddress?.keys?.firstOrNull { it.publicKey.isPrimary }
 
         return if (isInternal) {
 
-            if (publicKey != null) {
-                SendPreferences(
-                    encrypt = true,
-                    sign = true,
-                    pgpScheme = PackageType.ProtonMail,
-                    mimeType = defaultMailSettings.draftMimeType,
-                    publicKey = publicKey
+            if (publicAddressKey != null) {
+
+                if (publicAddressKey.isObsolete() || publicAddressKey.isCompromised()) return SendPreferencesOrError.Error.PublicKeysInvalid
+
+                SendPreferencesOrError.Success(
+                    SendPreferences(
+                        encrypt = true,
+                        sign = true,
+                        pgpScheme = PackageType.ProtonMail,
+                        mimeType = defaultMailSettings.draftMimeType,
+                        publicKey = publicAddressKey.publicKey.key
+                    )
                 )
             } else {
-                null // can't encrypt without Public Key
+                SendPreferencesOrError.Error.NoKeysAvailable
             }
 
         } else {
@@ -206,26 +255,43 @@ class ObtainSendPreferencesUseCase(
             val defaultMimeType =
                 if (defaultPgpScheme == PackageType.PgpMime) "multipart/mixed" else "text/plain"
 
-            if (publicKey != null) {
-                SendPreferences(
-                    encrypt = true,
-                    sign = true,
-                    pgpScheme = defaultPgpScheme,
-                    mimeType = defaultMimeType,
-                    publicKey = publicKey
+            if (publicAddressKey != null) {
+
+                if (publicAddressKey.isObsolete() || publicAddressKey.isCompromised()) return SendPreferencesOrError.Error.PublicKeysInvalid
+
+                SendPreferencesOrError.Success(
+                    SendPreferences(
+                        encrypt = true,
+                        sign = true,
+                        pgpScheme = defaultPgpScheme,
+                        mimeType = defaultMimeType,
+                        publicKey = publicAddressKey.publicKey.key
+                    )
                 )
             } else {
-                SendPreferences(
-                    encrypt = false,
-                    sign = defaultMailSettings.sign,
-                    pgpScheme = defaultPgpScheme,
-                    mimeType = defaultMimeType,
-                    publicKey = null
+                SendPreferencesOrError.Success(
+                    SendPreferences(
+                        encrypt = false,
+                        sign = defaultMailSettings.sign,
+                        pgpScheme = defaultPgpScheme,
+                        mimeType = defaultMimeType,
+                        publicKey = null
+                    )
                 )
             }
 
         }
 
     }
+
+    /**
+     * If true, do not use the key for encrypting, nor for signature verification.
+     */
+    private fun PublicAddressKey.isCompromised() = !(this.flags and 1 == 1)
+
+    /**
+     * If true, do not use the key to encrypt new messages, but can verify signatures.
+     */
+    private fun PublicAddressKey.isObsolete() = !(this.flags and 2 == 2)
 
 }

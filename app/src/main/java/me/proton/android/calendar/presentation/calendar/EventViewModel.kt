@@ -149,7 +149,8 @@ class EventViewModel(
             ): Save()
             data class AddParticipants(
                 val hasExDates: Boolean,
-                val hasSingleEdit: Boolean): Save()
+                val hasSingleEdit: Boolean
+            ): Save()
             object SendInvitation: Save()
             data class RecurringEvent(
                 val sendPreferences: Map<Email, me.proton.android.calendar.domain.model.SendPreferences>,
@@ -171,7 +172,8 @@ class EventViewModel(
         sealed class ChangeAnswer: EventDialogState() {
 
             data class SendPreferences(
-                val participationStatus: ParticipationStatus
+                val participationStatus: ParticipationStatus,
+                val obtainError: ObtainSendPreferencesUseCase.Result.Error
             ): ChangeAnswer()
             data class RecurringEvent(
                 val participationStatus: ParticipationStatus,
@@ -1180,12 +1182,27 @@ class EventViewModel(
                     emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.NetworkError
                     null
                 }
+                ObtainSendPreferencesUseCase.Result.Error.TrustedKeysInvalid -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.TrustedKeysInvalid
+                    null
+                }
+                ObtainSendPreferencesUseCase.Result.Error.PublicKeysInvalid -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.PublicKeysInvalid
+                    null
+                }
+                ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys -> {
+                    emailErrors[it.key] = ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys
+                    null
+                }
             }
         }.filterNullValues()
 
         return SendPreferencesResults(sendPreferences, emailErrors)
     }
 
+    /**
+     * @return show snackbar with generic error
+     */
     suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus): Boolean {
         if (eventState.value is EventState.Processing) return true
 
@@ -1205,7 +1222,10 @@ class EventViewModel(
 
             if (event.isPartOfChain()) {
                 val isSingleEdit = event.isSingleEdit()
-                val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(userId, event.uid) else false
+                val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(
+                    userId,
+                    event.uid
+                ) else false
 
                 val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
                 val overwrite =
@@ -1247,10 +1267,14 @@ class EventViewModel(
 
         val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
         if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+
+            val emailError = sendPreferencesResults.emailErrors.values.first()
+
             // Display Send Preferences Dialog
             eventState.value = EventState.Idle
-            eventDialogState.value = EventDialogState.ChangeAnswer.SendPreferences(newParticipationStatus)
-            return false
+            eventDialogState.value = EventDialogState.ChangeAnswer.SendPreferences(newParticipationStatus, emailError)
+
+            return emailError !is ObtainSendPreferencesUseCase.Result.Error.NetworkError
         } else {
             return updateParticipationStatus(
                 newParticipationStatus,
