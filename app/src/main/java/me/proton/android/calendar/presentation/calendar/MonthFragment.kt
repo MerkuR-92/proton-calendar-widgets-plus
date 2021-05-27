@@ -129,6 +129,11 @@ class MonthFragment : BaseFragment() {
             }
         }
 
+        with (buttonToday) {
+            val textField = (findViewById<TextView>(R.id.toolbarActionSecondaryText))
+            textField.text = LocalDate.now(timeZoneId).dayOfMonth.toString()
+            textField.visibility = View.VISIBLE
+        }
         buttonToday.setOnSingleClickListener {
             val todayDate = LocalDate.now(timeZoneId)
             calendarViewModel.handleDaySelected(todayDate)
@@ -212,9 +217,9 @@ class MonthFragment : BaseFragment() {
 //        }
 
         override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-            if (velocityY > 0) {
+            if (velocityY > 0 && !view.isVisible) {
                 expand(view, height = height)
-            } else if (velocityY < 0) {
+            } else if (velocityY < 0 && view.isVisible) {
                 collapse(view)
             }
             return super.onFling(e1, e2, velocityX, velocityY)
@@ -336,11 +341,6 @@ class MonthFragment : BaseFragment() {
 
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
             setToolbarMonthYearTitle(it)
-            with (buttonToday) {
-                val textField = (findViewById<TextView>(R.id.toolbarActionSecondaryText))
-                textField.text = it.dayOfMonth.toString()
-                textField.visibility = View.VISIBLE
-            }
         }
 
         lifecycleScope.launch {

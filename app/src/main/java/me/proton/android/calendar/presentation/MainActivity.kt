@@ -645,10 +645,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.agendaView.postValue(false)
+            drawerLayout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.agendaView.postValue(true)
+            drawerLayout.close()
         }
     }
 

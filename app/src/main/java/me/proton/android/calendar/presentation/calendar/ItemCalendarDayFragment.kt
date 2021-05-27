@@ -3,11 +3,9 @@ package me.proton.android.calendar.presentation.calendar
 import android.graphics.Color
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
@@ -96,6 +94,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     ): View? {
         val rootView =  inflater.inflate(R.layout.item_calendar_day_fragment, container, false)
 
+        val dayLayout: LinearLayout = rootView.findViewById(R.id.day_layout)
+        dayLayout.layoutTransition.setAnimateParentHierarchy(false)
+
         // Create a new calendar object set to the start of today
         day = java.util.Calendar.getInstance()
         day.set(java.util.Calendar.HOUR_OF_DAY, 0)
@@ -111,6 +112,15 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         dayView = rootView.findViewById(R.id.day_view)
 
+        val scrollView: ScrollView = rootView.findViewById(R.id.day_scroll_view)
+        rootView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                scrollView.viewTreeObserver.removeOnPreDrawListener(this)
+                scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+                return false
+            }
+        })
+
         // Inflate a label view for each hour the day view will display
         val hour: java.util.Calendar = day.clone() as java.util.Calendar
         val hourLabelViews: MutableList<View> = java.util.ArrayList()
@@ -122,7 +132,19 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
         dayView.setHourLabelViews(hourLabelViews)
 
+        scrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            calendarViewModel.dayViewScrollYPosition.value = scrollY
+            if (oldScrollY - scrollY < 0) {
+                // TODO Hide mini calendar
+            }
+        }
+
         return rootView
+    }
+
+    override fun onResume() {
+        super.onResume()
+        day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
     }
 
     private fun onEventsChange(timeZoneId: String) {
@@ -250,6 +272,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
         agendaMediator.observe(viewLifecycleOwner) {
             it?.let { setupItemMiniCalendarContent(it.first, it.second, it.third) }
+        }
+
+        calendarViewModel.dayViewScrollYPosition.observe(viewLifecycleOwner) {
+            if (!this.isResumed) day_scroll_view.scrollY = it
         }
     }
 

@@ -65,6 +65,8 @@ class CalendarViewModel(
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
 
+    var dayViewScrollYPosition: MutableLiveData<Int> = MutableLiveData(0)
+
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
