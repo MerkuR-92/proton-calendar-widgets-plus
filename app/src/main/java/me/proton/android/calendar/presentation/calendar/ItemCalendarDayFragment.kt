@@ -26,6 +26,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.collapse
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.AndroidUtils.expand
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Address
@@ -47,8 +53,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private var position: Int? = null
     private var date: LocalDate? = null
-
-    private val fakeHeaderEvent = Event("", Calendar("", "", "", 1, true), ICalendar())
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null

@@ -15,6 +15,7 @@ import biweekly.parameter.ParticipationStatus
 import kotlinx.android.synthetic.main.item_day_view_event_all_day.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
+import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.model.Event
 
 class DayViewAllDayEventAdapter(
