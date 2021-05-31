@@ -627,7 +627,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 // Check if organizer is also an attendee to display its status
                 val organizerAttendee =
-                    attendeeList.find { it.email.equals(event.iCalEvent.organizer.extractEmail(), ignoreCase = true) }
+                    attendeeList.find { it.extractEmail().equals(event.iCalEvent.organizer.extractEmail(), ignoreCase = true) }
                 val organizer = event.iCalEvent.organizer
                 if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
 

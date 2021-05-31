@@ -192,13 +192,15 @@ class EditCreateEventUseCase(
 
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
         if (attendeesEventContent != null) {
-            newEvent.iCalEvent.attendees.forEach {
-                if (it.participationStatus == null) it.participationStatus = ParticipationStatus.NEEDS_ACTION
-                val status = it.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
-                val xpmToken = it.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it.email), newEvent.uid) // TODO Maybe use API route ?
-                attendees.add(
-                    Event.AttendeeStatusEvent(null, xpmToken, status, null)
-                )
+            newEvent.iCalEvent.attendees.forEach { attendee ->
+                if (attendee.participationStatus == null) attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
+                val status = attendee.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
+                attendee.extractEmail()?.let {
+                    val xpmToken = attendee.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it), newEvent.uid) // TODO Maybe use API route ?
+                    attendees.add(
+                        Event.AttendeeStatusEvent(null, xpmToken, status, null)
+                    )
+                }
             }
         }
 
