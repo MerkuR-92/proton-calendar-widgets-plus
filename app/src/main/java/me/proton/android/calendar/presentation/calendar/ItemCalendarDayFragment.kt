@@ -384,7 +384,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         }
 
                         if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) {
-                            val eventView = layoutInflater.inflate(R.layout.item_day_view_event_partial, dayView, false)
+                            val eventView = layoutInflater.inflate(R.layout.item_day_view_event_all_day, dayView, false)
 
                             val title = (eventView.findViewById<View>(R.id.text_title) as TextView)
                             val titleParams = title.layoutParams

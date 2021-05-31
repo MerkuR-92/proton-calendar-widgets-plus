@@ -62,7 +62,7 @@
     <dimen name="medium_padding">5dp</dimen>
     <dimen name="large_padding">10dp</dimen>
     <dimen name="divider_height">1dp</dimen>
-    <dimen name="half_hour_height">45dp</dimen>
+    <dimen name="half_hour_height">30dp</dimen>
     <dimen name="hour_label_width">56dp</dimen>
     <dimen name="add_event_button_foreground_size">52dp</dimen>
     <dimen name="add_event_button_background_size">85dp</dimen>
