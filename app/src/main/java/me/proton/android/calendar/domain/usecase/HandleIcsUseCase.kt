@@ -95,6 +95,11 @@ class HandleIcsUseCase(
             } != null
         }
 
+        // Make sure all attendees have a part stat (default is NEEDS-ACTION)
+        iCalendar.events.first().attendees.forEach {
+            if (it.participationStatus == null) it.participationStatus = ParticipationStatus.NEEDS_ACTION
+        }
+
         // If current user is not in the attendee list and is not the organizer then it is a party crasher
         if (!isOrganizerMode && userAttendee == null) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
