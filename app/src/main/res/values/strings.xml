@@ -340,26 +340,6 @@
     <string name="bootstrap_error_update_passphrase_message">You have reactivated your keys and events linked to the following calendars can now be decrypted.</string>
     <string name="bootstrap_error_continue_button">Continue</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-
-    <string name="menu_login">LOGIN</string>
-    <string name="menu_settings">Settings TODO</string>
-    <string name="menu_contacts">Contacts TODO</string>
-    <string name="menu_feedback">Feedback TODO</string>
-
-    <string name="home_second">Home Second</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-    <string name="hello_home_second">Hello HomeSecondFragment. Arg: %1$s</string>
-    <string name="hello_gallery_second">Hello GallerySecondFragment. Arg: %1$s</string>
-    <string name="hello_slideshow_second">Hello SlideshowSecondFragment. Arg: %1$s</string>
-    <string name="delete">Delete</string>
-
     <string name="splash_after_login_init">Preparing calendars</string>
     <string name="splash_init">Decrypting events</string>
     <string name="default_calendar_name">My calendar</string>
