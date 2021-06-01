@@ -373,7 +373,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         /* Cropped list */
                         val allDayEventsCroppedListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                         all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
-                        allDayEventCroppedListAdapter = DayViewAllDayEventAdapter(userEmails ?: listOf()) { event ->
+                        allDayEventCroppedListAdapter = DayViewAllDayEventAdapter(userEmails ?: listOf(), timeZoneId, immutableDate) { event ->
                             onEventClick(event)
                         }
                         all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
@@ -382,7 +382,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         /* Rest of the list */
                         val allDayEventsMoreListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                         all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
-                        allDayEventListAdapter = DayViewAllDayEventAdapter(userEmails ?: listOf()) { event ->
+                        allDayEventListAdapter = DayViewAllDayEventAdapter(userEmails ?: listOf(), timeZoneId, immutableDate) { event ->
                             onEventClick(event)
                         }
                         all_day_items_list.adapter = allDayEventListAdapter

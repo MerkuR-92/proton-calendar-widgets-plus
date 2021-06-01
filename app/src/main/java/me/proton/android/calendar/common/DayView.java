@@ -92,6 +92,7 @@ public class DayView extends ViewGroup {
     private final int usableHalfHourHeight;
     private final int hourLabelWidth;
     private final int hourLabelMarginEnd;
+    private final int hourLabelDividerOverflow;
     private final int eventMargin;
 
     private boolean isRtl;
@@ -168,6 +169,7 @@ public class DayView extends ViewGroup {
 
         hourLabelWidth = array.getDimensionPixelSize(R.styleable.DayView_hourLabelWidth, 0);
         hourLabelMarginEnd = array.getDimensionPixelSize(R.styleable.DayView_hourLabelMarginEnd, 0);
+        hourLabelDividerOverflow = array.getDimensionPixelSize(R.styleable.DayView_hourLabelDividerOverflow, 0);
         eventMargin = array.getDimensionPixelSize(R.styleable.DayView_eventMargin, 0);
         array.recycle();
     }
@@ -355,7 +357,7 @@ public class DayView extends ViewGroup {
 
         // Draw the hour and half-hour divider lines directly onto the canvas
         for (DirectionalRect rect : hourDividerRects) {
-            canvas.drawRect(rect.getLeft(),
+            canvas.drawRect(rect.getLeft() - hourLabelDividerOverflow,
                     rect.getTop(),
                     rect.getRight(),
                     rect.getBottom(),
@@ -369,6 +371,13 @@ public class DayView extends ViewGroup {
                     rect.getBottom(),
                     halfHourDividerPaint);
         }
+
+        // Draw vertical divider between hour labels and grid
+        canvas.drawRect(hourDividerRects.get(0).getLeft() - eventMargin,
+                0,
+                hourDividerRects.get(0).getLeft() - eventMargin + dividerHeight,
+                getHeight(),
+                hourDividerPaint);
     }
 
     @Override

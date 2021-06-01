@@ -85,7 +85,7 @@
         android:background="@drawable/shape_background_decryption_error"
         android:backgroundTint="@color/text_norm"
         android:alpha="0.1"
-        app:layout_constraintEnd_toStartOf="@+id/text_title_side"
+        app:layout_constraintEnd_toEndOf="@+id/text_title"
         app:layout_constraintStart_toEndOf="@+id/decryption_error_icon"
         app:layout_constraintTop_toTopOf="@+id/decryption_error_icon"
         app:layout_constraintBottom_toBottomOf="@+id/decryption_error_icon"
