@@ -447,17 +447,19 @@ object IcsSurgeryUtils {
         // If there are more than 100 attendees, reject invitation as unsupported.
         if (this.attendees != null && this.attendees.size > MAX_ATTENDEES) return false
 
-        // Remove URI parameter if it's clearly not an email
+        val attendeesEmail = mutableListOf<String>()
         this.attendees?.forEach { attendee ->
+            val email = attendee.extractEmail() ?: return false
+
+            // Remove URI parameter if it's clearly not an email
             if (attendee.uri?.contains("@") == false) {
                 attendee.uri = null
             }
-        }
 
-        // In case some attendee emails are repeated, we reject (as unsupported) the invite
-        val attendeesEmail = mutableListOf<String>()
-        this.attendees?.forEach {
-            val email = it.extractEmail() ?: return false
+            // Overwrite email field with extracted email value
+            attendee.email = email
+
+            // In case some attendee emails are repeated, we reject (as unsupported) the invite
             if (attendeesEmail.contains(email)) return false
             attendeesEmail.add(email)
         }

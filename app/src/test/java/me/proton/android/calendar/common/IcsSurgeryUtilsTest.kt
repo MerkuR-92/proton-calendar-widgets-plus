@@ -1866,6 +1866,13 @@ internal class IcsSurgeryUtilsTest {
                 assertThat(it.uri?.contains("/principal/") == true).isFalse()
                 assertThat(it.uri?.contains("test") == true).isFalse()
             }
+
+            assertThat(event.attendees[0].email).isEqualTo("test1@pm.me")
+            assertThat(event.attendees[1].email).isEqualTo("test2@protonmail.com")
+            assertThat(event.attendees[2].email).isEqualTo("test32@example.com")
+            assertThat(event.attendees[3].email).isEqualTo("test42@example.com")
+            assertThat(event.attendees[4].email).isEqualTo("test52@example.com")
+            assertThat(event.attendees[5].email).isEqualTo("test61@example.com")
         }
     }
 
