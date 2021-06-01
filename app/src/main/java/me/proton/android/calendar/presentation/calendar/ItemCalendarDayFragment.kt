@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_agenda_event_all_day.view.*
 import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
@@ -35,7 +34,6 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Address
-import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -179,7 +177,20 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                     if (remaining > 0) recycled[--remaining] else layoutInflater.inflate(R.layout.item_day_view_event_partial, dayView, false)
 
                 val summary = event.summary
-                (eventView.findViewById<View>(R.id.text_title) as TextView).text = if (summary.isNullOrEmpty()) getString(R.string.default_event_summary) else summary
+                val titleTextView = (eventView.findViewById<View>(R.id.text_title) as TextView)
+                titleTextView.viewTreeObserver.addOnDrawListener {
+                    // Check if last line of text view is cut off
+                    val lastVisibleLineNumber: Int = titleTextView.layout.getLineForVertical(titleTextView.height + titleTextView.scrollY)
+                    if (titleTextView.height < titleTextView.layout.getLineBottom(lastVisibleLineNumber)) {
+                        // If line is cut off, set max line property
+                        val lineHeight = titleTextView.paint.fontMetrics.bottom - titleTextView.paint.fontMetrics.top
+                        val maxLines = titleTextView.height / lineHeight
+                        titleTextView.maxLines = maxLines.toInt()
+                        titleTextView.gravity = Gravity.CENTER_VERTICAL
+                        titleTextView.ellipsize
+                    }
+                }
+                titleTextView.text = if (summary.isNullOrEmpty()) getString(R.string.default_event_summary) else summary
                 (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(R.id.main_surface).setTint(Color.parseColor(event.calendar.color))
                 (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(R.id.side_strip).setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
 
