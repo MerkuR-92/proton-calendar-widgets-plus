@@ -810,7 +810,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         event_attendees_press.setOnClickListener {
             if (event_attendee_list.isVisible) {
                 // Save expanded view height only once
-                val height = collapse(event_attendee_list)
+                val height = collapse(event_attendee_list).first
                 if (attendeesListHeight == null) attendeesListHeight = height
                 rotateArrowDownward(event_attendees_button)
             } else {

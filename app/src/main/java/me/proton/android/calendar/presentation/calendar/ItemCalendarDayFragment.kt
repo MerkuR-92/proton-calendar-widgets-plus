@@ -502,10 +502,16 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_items_list.adapter = allDayEventListAdapter
                         allDayEventListAdapter.submitList(moreEvents)
 
-                        all_day_more_collapse_button.setOnSingleClickListener {
-                            collapse(all_day_items_list)
-                            all_day_more_collapse_button.visibleOrGone(false)
-                            all_day_more_items_layout.visibleOrGone(true)
+                        all_day_more_collapse_button.setOnSingleClickListener { view ->
+                            val duration = collapse(all_day_items_list).second
+                            view?.run {
+                                postDelayed({
+                                    all_day_more_items_layout.visibleOrGone(true)
+                                }, duration / 2)
+                                postDelayed({
+                                    all_day_more_collapse_button.visibleOrGone(false)
+                                }, duration)
+                            }
                         }
 
                         if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) {
@@ -527,10 +533,16 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             )
 
                             // When an event is clicked, start a new draft event and show the edit event dialog
-                            eventView.setOnClickListener {
-                                expand(all_day_items_list)
-                                all_day_more_collapse_button.visibleOrGone(true)
-                                all_day_more_items_layout.visibleOrGone(false)
+                            eventView.setOnClickListener { view ->
+                                val duration = expand(all_day_items_list).second
+                                view?.run {
+                                    postDelayed({
+                                        all_day_more_items_layout.visibleOrGone(false)
+                                    }, duration / 2)
+                                    postDelayed({
+                                        all_day_more_collapse_button.visibleOrGone(true)
+                                    }, duration)
+                                }
                             }
 
                             val layoutParams = LinearLayout.LayoutParams(

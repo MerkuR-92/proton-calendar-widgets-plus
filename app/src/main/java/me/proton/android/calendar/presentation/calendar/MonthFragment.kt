@@ -182,7 +182,7 @@ class MonthFragment : BaseFragment() {
                     startWeekOn
                 )
 
-                if (miniCalendarPager.height != desiredHeight) {
+                if (miniCalendarPager.height != desiredHeight && miniCalendarPager.isVisible) {
                     miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
                     val layoutParams = miniCalendarPager.layoutParams.apply {

@@ -873,7 +873,7 @@ object AndroidUtils {
         return if (initials.length > 2) initials[0].toString() + initials[initials.lastIndex] else initials
     }
 
-    fun expand(v: View, duration: Long? = null, height: Int? = null) {
+    fun expand(v: View, duration: Long? = null, height: Int? = null): Pair<Int, Long> {
         val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
         val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
@@ -881,7 +881,7 @@ object AndroidUtils {
         if (targetHeight == 0) {
             TimberLogger.d("animation expand skipped")
             v.visibility = View.VISIBLE
-            return
+            return Pair(0, 0)
         }
         TimberLogger.d("animation expand : targetHeight = ${targetHeight}")
 
@@ -907,9 +907,10 @@ object AndroidUtils {
         animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
         TimberLogger.d("animation expand : duration = ${animation.duration}")
         v.startAnimation(animation)
+        return Pair(targetHeight, animation.duration)
     }
 
-    fun collapse(v: View, duration: Long? = null): Int {
+    fun collapse(v: View, duration: Long? = null): Pair<Int, Long> {
         val initialHeight = v.measuredHeight
         TimberLogger.d("animation collapse : initialHeight = ${initialHeight}")
         val animation = object : Animation() {
@@ -933,7 +934,7 @@ object AndroidUtils {
         animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
         TimberLogger.d("animation collapse : duration = ${animation.duration}")
         v.startAnimation(animation)
-        return initialHeight
+        return Pair(initialHeight, animation.duration)
     }
 
     fun rotateArrowDownward(v: View, duration: Long = 100) {
