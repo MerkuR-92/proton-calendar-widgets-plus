@@ -9,7 +9,7 @@
         android:id="@+id/view_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/shape_item_all_day_event_background"
+        android:background="@drawable/shape_item_day_view_part_day_event_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

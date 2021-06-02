@@ -98,8 +98,8 @@ class DayViewAllDayEventAdapter(
             viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
 
             if (event.isInThePast(timeZoneId)) {
-                eventItemTitle.setTextAppearance(R.style.Text_Caption_Weak)
-                eventItemTitleSide.setTextAppearance(R.style.Text_Caption_Weak)
+                eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
+                eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
 
                 if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
@@ -117,10 +117,9 @@ class DayViewAllDayEventAdapter(
                     decryptionErrorView.alpha = 0.1f
                 }
             } else {
-                eventItemTitle.setTextAppearance(R.style.Text_Caption_Strong)
-                eventItemTitleSide.setTextAppearance(R.style.Text_Caption_Strong)
-
                 if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                    eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                    eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                 } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))

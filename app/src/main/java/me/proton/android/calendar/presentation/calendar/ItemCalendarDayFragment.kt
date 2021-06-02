@@ -237,6 +237,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         val viewBackground: LayerDrawable = eventView.findViewById<View>(R.id.view_background).background as LayerDrawable
         val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
+        val viewBorder: Drawable = viewBackground.findDrawableByLayerId(R.id.border)
         val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
 
         val viewBackgroundStripedLayout: CardView = eventView.findViewById(R.id.view_background_striped_layout)
@@ -276,13 +277,15 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
 
         if (event.isInThePast(timeZoneId)) {
-            eventItemTitle.setTextAppearance(R.style.Text_Caption_Weak)
+            eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
             ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
 
             if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
             } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
                 AndroidUtils.setStripedBackground(
                     viewBackgroundStriped,
                     requireContext(),
@@ -290,17 +293,19 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 ) // striped background with 20% opacity for unanswered all day events
             } else {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_secondary))
+                viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.background_secondary))
                 decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_norm))
                 decryptionErrorView.alpha = 0.1f
             }
         } else {
-            eventItemTitle.setTextAppearance(R.style.Text_Caption_Strong)
-
             if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
-                viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
-            } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
-                viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
+            } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
                 AndroidUtils.setStripedBackground(
                     viewBackgroundStriped,
                     requireContext(),
@@ -308,6 +313,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 ) // striped background with 20% opacity for unanswered all day events
             } else {
                 viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                viewBorder.setTint(Color.parseColor(event.calendar.color))
                 eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color))
                 ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color)))
                 decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color))
