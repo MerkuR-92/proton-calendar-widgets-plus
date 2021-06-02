@@ -505,7 +505,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_more_collapse_button.setOnSingleClickListener {
                             collapse(all_day_items_list)
                             all_day_more_collapse_button.visibleOrGone(false)
-                            all_day_more_items_layout.visibleOrInvisible(true)
+                            all_day_more_items_layout.visibleOrGone(true)
                         }
 
                         if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) {
@@ -530,7 +530,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             eventView.setOnClickListener {
                                 expand(all_day_items_list)
                                 all_day_more_collapse_button.visibleOrGone(true)
-                                all_day_more_items_layout.visibleOrInvisible(false)
+                                all_day_more_items_layout.visibleOrGone(false)
                             }
 
                             val layoutParams = LinearLayout.LayoutParams(

@@ -28,41 +28,50 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="10dp"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/all_day_items_cropped_list"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:overScrollMode="never"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/all_day_header"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="4dp"
-            tools:listitem="@layout/item_day_view_event_all_day"
-            tools:itemCount="2" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/all_day_items_list"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:overScrollMode="never"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/all_day_items_cropped_list"
-            app:layout_constraintStart_toEndOf="@+id/all_day_header"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:listitem="@layout/item_day_view_event_all_day"
-            tools:itemCount="2" />
-
-        <LinearLayout
-            android:id="@+id/all_day_more_items_layout"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@+id/all_day_header"
-            app:layout_constraintTop_toBottomOf="@+id/all_day_items_cropped_list"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/all_day_items_cropped_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    android:layout_marginTop="4dp"
+                    tools:listitem="@layout/item_day_view_event_all_day"
+                    tools:itemCount="2" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/all_day_items_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:listitem="@layout/item_day_view_event_all_day"
+                    tools:itemCount="2" />
+
+                <LinearLayout
+                    android:id="@+id/all_day_more_items_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
 
         <ImageView
             android:id="@+id/all_day_more_collapse_button"
