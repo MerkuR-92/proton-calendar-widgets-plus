@@ -1,13 +1,19 @@
 package me.proton.android.calendar.presentation.calendar
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -15,10 +21,14 @@ import biweekly.parameter.ParticipationStatus
 import kotlinx.android.synthetic.main.item_day_view_event_all_day.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.common.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.util.kotlin.nullIfBlank
 import java.time.LocalDate
 
 class DayViewAllDayEventAdapter(
@@ -56,13 +66,17 @@ class DayViewAllDayEventAdapter(
         private val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
         private val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
 
+        private val viewBackgroundStripedLayout: CardView = itemView.findViewById(R.id.view_background_striped_layout)
+        private val viewBackgroundStriped: View = itemView.findViewById(R.id.view_background_striped)
+
+        private val decryptionErrorIcon: ImageView = itemView.findViewById(R.id.decryption_error_icon)
+        private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
+
         fun bind(event : Event, position : Int) {
 
-            this.view.setOnClickListener {
-                clickListener(event)
-            }
-
-            initEventStatus(event.getParticipationStatus(userEmails), view.context)
+            // TODO Extract this logic to avoid duplication with EventAdapter (All day) and ItemCalendarDayFragment's event boxes
+            val participationStatus = event.getParticipationStatus(userEmails)
+            viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
             eventItemTitle.text = if (event.summary.isNullOrEmpty()) view.context.getString(R.string.default_event_summary) else event.summary
             if (event.spansSingleDay(timeZoneId = timeZoneId)) {
@@ -71,8 +85,69 @@ class DayViewAllDayEventAdapter(
                 eventItemTitleSide.visibleOrGone(true)
                 eventItemTitleSide.text = event.formatFullDayCounter(date, timeZoneId)
             }
-            viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+
+            if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
+                decryptionErrorIcon.visibleOrGone(true)
+                decryptionErrorView.visibleOrGone(true)
+                eventItemTitle.visibleOrGone(false)
+            } else {
+                decryptionErrorIcon.visibleOrGone(false)
+                decryptionErrorView.visibleOrGone(false)
+            }
+
             viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
+
+            if (event.isInThePast(timeZoneId)) {
+                eventItemTitle.setTextAppearance(R.style.Text_Caption_Weak)
+                eventItemTitleSide.setTextAppearance(R.style.Text_Caption_Weak)
+                ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
+
+                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                    AndroidUtils.setStripedBackground(
+                        viewBackgroundStriped,
+                        itemView.context,
+                        ContextCompat.getColor(itemView.context, R.color.shade_60)
+                    ) // striped background with 20% opacity for unanswered all day events
+                } else {
+                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_secondary))
+                    decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                    decryptionErrorView.alpha = 0.1f
+                }
+            } else {
+                eventItemTitle.setTextAppearance(R.style.Text_Caption_Strong)
+                eventItemTitleSide.setTextAppearance(R.style.Text_Caption_Strong)
+
+                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                    viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                    eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                    eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                    AndroidUtils.setStripedBackground(
+                        viewBackgroundStriped,
+                        itemView.context,
+                        Color.parseColor(event.calendar.color)
+                    ) // striped background with 20% opacity for unanswered all day events
+                } else {
+                    viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                    eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                    eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color)))
+                    decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                    decryptionErrorView.alpha = 0.2f
+                }
+            }
+
+            if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                eventItemTitle.paintFlags = eventItemTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                eventItemTitle.paintFlags = eventItemTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
+
+            itemView.setOnSingleClickListener { clickListener(event) }
         }
     }
 }
