@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.time.LocalDate
 
-class AgendaPagerAdapter(activity: FragmentActivity, private val calendarViewModel: CalendarViewModel, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
+class AgendaPagerAdapter(activity: FragmentActivity, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
 

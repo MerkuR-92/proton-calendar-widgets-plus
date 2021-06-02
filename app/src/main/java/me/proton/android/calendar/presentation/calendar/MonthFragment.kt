@@ -295,8 +295,10 @@ class MonthFragment : BaseFragment() {
             setCurrentItem(miniCalendarPagerAdapter.startingPosition, false)
         }
 
-        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
-        dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel, calendarViewModel.initialToday)
+        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday)
+        dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday) {
+            if (miniCalendarPager.isVisible) collapse(miniCalendarPager)
+        }
 
         calendarViewModel.agendaView.observe(viewLifecycleOwner) { agendaView ->
             if (agendaView) {

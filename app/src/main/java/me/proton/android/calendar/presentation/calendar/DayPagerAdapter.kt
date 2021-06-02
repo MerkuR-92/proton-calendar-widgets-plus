@@ -3,9 +3,14 @@ package me.proton.android.calendar.presentation.calendar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import me.proton.android.calendar.domain.model.Event
 import java.time.LocalDate
 
-class DayPagerAdapter(activity: FragmentActivity, private val calendarViewModel: CalendarViewModel, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
+class DayPagerAdapter(
+    activity: FragmentActivity,
+    val startingDate: LocalDate,
+    private val hideMiniCalendarListener: () -> Unit
+) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
 
@@ -14,9 +19,11 @@ class DayPagerAdapter(activity: FragmentActivity, private val calendarViewModel:
     }
 
     override fun createFragment(position: Int): Fragment {
-        return ItemCalendarDayFragment.newInstance(
+        val fragment = ItemCalendarDayFragment.newInstance(
             position,
             startingDate.plusDays((position - startingPosition).toLong())
         )
+        fragment.setHideMiniCalendarListener(hideMiniCalendarListener)
+        return fragment
     }
 }

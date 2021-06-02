@@ -38,6 +38,7 @@ import me.proton.android.calendar.common.AndroidUtils.expand
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -48,8 +49,12 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.*
 
 class ItemCalendarDayFragment() : Fragment(), KoinComponent {
@@ -69,14 +74,15 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private var selectedDate: LocalDate? = null
 
     private lateinit var day: Calendar
-    private lateinit var timeFormat: DateFormat
     private lateinit var dayView: DayView
 
     private var allEvents: LongSparseArray<List<Event>>? = null
-    private var dateFormat: DateFormat? = null
 
     private lateinit var allDayEventCroppedListAdapter: DayViewAllDayEventAdapter
     private lateinit var allDayEventListAdapter: DayViewAllDayEventAdapter
+
+    private lateinit var hideMiniCalendarListener: () -> Unit
+    private var canHideMiniCalendar = true
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarDayFragment{
@@ -87,6 +93,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 }
             }
         }
+    }
+
+    fun setHideMiniCalendarListener(hideMiniCalendarListener: () -> Unit) {
+        this.hideMiniCalendarListener = hideMiniCalendarListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,8 +127,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // Populate today's entry in the map with a list of example events
         allEvents = LongSparseArray<List<Event>>()
 
-        dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-        timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault())
 
         dayView = rootView.findViewById(R.id.day_view)
 
@@ -131,21 +139,36 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             }
         })
 
-        // Inflate a label view for each hour the day view will display
-        val hour: Calendar = day.clone() as Calendar
-        val hourLabelViews: MutableList<View> = ArrayList()
-        for (i in dayView.startHour..dayView.endHour) {
-            hour[Calendar.HOUR_OF_DAY] = i
-            val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
-            hourLabelView.text = timeFormat.format(hour.time)
-            hourLabelViews.add(hourLabelView)
+        calendarViewModel.timeFormat.observe(viewLifecycleOwner) {
+            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
+            // Inflate a label view for each hour the day view will display
+            val hour: Calendar = day.clone() as Calendar
+            val hourLabelViews: MutableList<View> = ArrayList()
+            for (i in dayView.startHour..dayView.endHour) {
+                hour[Calendar.HOUR_OF_DAY] = i
+                val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
+                hourLabelView.text =
+                    if (timeFormatIs24Hour) {
+                        SimpleDateFormat("HH:mm", DateTimeUtilsImpl.getLocaleForFormatting()).format(hour.time)
+                    } else {
+                        SimpleDateFormat("h a", DateTimeUtilsImpl.getLocaleForFormatting()).format(hour.time)
+                    }
+                hourLabelViews.add(hourLabelView)
+            }
+            dayView.setHourLabelViews(hourLabelViews)
         }
-        dayView.setHourLabelViews(hourLabelViews)
 
-        scrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        scrollView.setOnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
             if (this.isResumed) calendarViewModel.dayViewScrollYPosition.value = scrollY
-            if (oldScrollY - scrollY < 0) {
-                // TODO Hide mini calendar
+            if (oldScrollY - scrollY < 0 && oldScrollY > 0) {
+                v?.run {
+                    if (!canHideMiniCalendar) return@setOnScrollChangeListener
+                    canHideMiniCalendar = false
+                    postDelayed({
+                        canHideMiniCalendar = true
+                    }, CLICK_INTERVAL_MS)
+                    if (this@ItemCalendarDayFragment::hideMiniCalendarListener.isInitialized) hideMiniCalendarListener.invoke()
+                }
             }
         }
 
