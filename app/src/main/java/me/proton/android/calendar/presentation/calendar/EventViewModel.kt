@@ -542,16 +542,9 @@ class EventViewModel(
     }
 
     /**
-     * Checks if start date/time is before end date/time
+     * Checks if end date/time is not before start date/time
      */
-    fun validateDateTime(): Boolean {
-        // TODO this works only as long as we have the same timezone for start and end
-        return if (event.isAllDay()) {
-            !(event.getStart(eventTimeZoneId).isAfter(event.getEnd(eventTimeZoneId)))
-        } else {
-            event.getStart(eventTimeZoneId).isBefore(event.getEnd(eventTimeZoneId))
-        }
-    }
+    fun validateDateTime(): Boolean = !(event.getEnd(eventTimeZoneId).isBefore(event.getStart(eventTimeZoneId)))
 
     // alarm temp values
     var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
