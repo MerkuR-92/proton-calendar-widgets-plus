@@ -17,7 +17,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import kotlinx.android.synthetic.main.event_attendees_view.*
@@ -40,8 +39,12 @@ import me.proton.android.calendar.common.AndroidUtils.collapse
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
 import me.proton.android.calendar.common.AndroidUtils.getWeekStartDayOfWeek
+import me.proton.android.calendar.common.AndroidUtils.rotateArrowDownward
+import me.proton.android.calendar.common.AndroidUtils.rotateArrowUpward
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatMonth
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
@@ -56,6 +59,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.temporal.WeekFields
 import java.util.*
 
 class MonthFragment : BaseFragment() {
@@ -81,6 +85,8 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var buttonCreate: View
     private lateinit var buttonToday: View
+
+    private var fromPosition: Int = 0
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
@@ -149,10 +155,24 @@ class MonthFragment : BaseFragment() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
-                calendarViewModel.handleDaySelected(firstDayOfMonth, fromMonthPagerCallback = true)
+                val firstDay = if (calendarViewModel.monthView.value == true) {
+                    miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
+                } else {
+                    val firstDayOfTheWeekNumber = miniCalendarPagerAdapter.firstDayOfMonth.dayOfWeek.value - startWeekOn.value
+                    val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
 
-                setToolbarMonthYearTitle(firstDayOfMonth)
+                    val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
+                    val dayOfTheWeek =
+                        if (fromPosition - position <= 0) 1
+                        else 7
+                    val firstDayOfTheWeek = miniCalendarPagerAdapter.firstDayOfMonth.with(temporalField, dayOfTheWeek.toLong())
+                    firstDayOfTheWeek.plusWeeks((position - miniCalendarPagerAdapter.startingPosition).toLong())
+                }
+                fromPosition = position
+
+                calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
+
+                setToolbarMonthYearTitle(firstDay)
 
                 adjustMiniCalendarView(position, startWeekOn)
             }
@@ -168,6 +188,7 @@ class MonthFragment : BaseFragment() {
      */
     private lateinit var miniCalendarPagerLayoutListener: ViewTreeObserver.OnGlobalLayoutListener
 
+    private var initialHeightAdjusted = false
     private fun setMiniCalendarPagerLayoutListener(startWeekOn: DayOfWeek) {
         miniCalendarPagerLayoutListener = object: ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -175,57 +196,76 @@ class MonthFragment : BaseFragment() {
                 // TODO Null check here because this listener is triggered once even after view has been destroyed
                 if (miniCalendarPager == null) return
 
-                val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((miniCalendarPager.currentItem - miniCalendarPagerAdapter.startingPosition).toLong())
-                val desiredHeight = MiniCalendarItemAdapter.calculateAdapterHeight(
-                    requireContext(),
-                    firstDayOfMonth,
-                    startWeekOn
-                )
-
-                if (miniCalendarPager.height != desiredHeight && miniCalendarPager.isVisible) {
-                    miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(this)
-
-                    val layoutParams = miniCalendarPager.layoutParams.apply {
-                        height = desiredHeight
-                    }
-                    miniCalendarPager.layoutParams = layoutParams
-                    miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(this)
+                if (!initialHeightAdjusted) {
+                    initialHeightAdjusted = true
+                    if (calendarViewModel.monthView.value == false) mini_calendar_chevron.rotation = 180f
+                    updateMiniCalendarHeight(this, startWeekOn, true, false)
                 }
 
-                mini_calendar_slider.setOnSingleClickListener {
-                    if (miniCalendarPager.isVisible) {
-                        collapse(miniCalendarPager)
+                fragment_toolbar_title_layout.setOnSingleClickListener {
+                    if (calendarViewModel.monthView.value == false) {
+                        calendarViewModel.monthView.value = true
+                        rotateArrowDownward(mini_calendar_chevron)
+                        updateMiniCalendarHeight(this, startWeekOn, true, true)
                     } else {
-                        expand(miniCalendarPager, height = desiredHeight)
+                        calendarViewModel.monthView.value = false
+                        rotateArrowUpward(mini_calendar_chevron)
+                        updateMiniCalendarHeight(this, startWeekOn, false, true)
                     }
-                }
-
-                val gestureDetector = GestureDetector(requireContext(), CalendarGestureListener(miniCalendarPager, desiredHeight))
-                mini_calendar_slider.setOnTouchListener { v, event ->
-                    gestureDetector.onTouchEvent(event)
                 }
             }
         }
     }
 
-    class CalendarGestureListener(val view: View, val height: Int): GestureDetector.SimpleOnGestureListener() {
-//        override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-//            if (distanceY > 0) {
-//                collapse(view)
-//            } else if (distanceY < 0) {
-//                expand(view, height = height)
-//            }
-//            return super.onScroll(e1, e2, distanceX, distanceY)
-//        }
+    private fun updateMiniCalendarHeight(miniCalendarPagerLayoutListener: ViewTreeObserver.OnGlobalLayoutListener, startWeekOn: DayOfWeek, isMonthView: Boolean, animateChange: Boolean) {
 
-        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-            if (velocityY > 0 && !view.isVisible) {
-                expand(view, height = height)
-            } else if (velocityY < 0 && view.isVisible) {
-                collapse(view)
-            }
-            return super.onFling(e1, e2, velocityX, velocityY)
+
+        // Fill the list first and then animate
+//        if (!isWeekView) miniCalendarPagerAdapter.listenerMap[firstDayOfMonth]?.onExpand()
+//        if (isWeekView) miniCalendarPagerAdapter.listenerMap[firstDayOfMonth]?.onCollapse()
+
+        if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.unregisterOnPageChangeCallback(miniCalendarPageChangeCallback)
+        if (isMonthView) {
+            val position = miniCalendarPagerAdapter.startingPosition +
+                    (calendarViewModel.selectedDate.value!!.monthValue - miniCalendarPagerAdapter.firstDayOfMonth.monthValue)
+            fromPosition = position
+            miniCalendarPager.setCurrentItem(position, false)
+        } else {
+            val position = miniCalendarPagerAdapter.startingPosition +
+                    (calendarViewModel.selectedDate.value!!.weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.weekNumber(startWeekOn))
+            fromPosition = position
+            miniCalendarPager.setCurrentItem(position, false)
         }
+        if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
+
+        val firstDayOfMonth = calendarViewModel.selectedDate.value!!.withDayOfMonth(1)
+        val desiredHeight = MiniCalendarItemAdapter.calculateAdapterHeight(
+            requireContext(),
+            firstDayOfMonth,
+            startWeekOn,
+            isMonthView
+        )
+
+        if (miniCalendarPager.height != desiredHeight && miniCalendarPager.isVisible) {
+            miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+
+            if (animateChange) {
+                miniCalendarPager.animateHeightChange(desiredHeight) {
+                    miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+                }
+            } else {
+                val layoutParams = miniCalendarPager.layoutParams.apply {
+                    height = desiredHeight
+                }
+                miniCalendarPager.layoutParams = layoutParams
+                miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
+            }
+        }
+    }
+
+    interface OnFlingMiniCalendarListener {
+        fun expandOnFling()
+        fun collapseOnFling()
     }
 
     private val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -268,13 +308,13 @@ class MonthFragment : BaseFragment() {
         //  smaller items, like months with fewer week lines. That's why we need to resize it every time we
         //  display a month
         val firstDayOfMonth = miniCalendarPagerAdapter.firstDayOfMonth.plusMonths((position - miniCalendarPagerAdapter.startingPosition).toLong())
-        miniCalendarPager.animateHeightChange(
-            MiniCalendarItemAdapter.calculateAdapterHeight(
-                requireContext(),
-                firstDayOfMonth,
-                startWeekOn,
-            )
-        ) {
+        val desiredHeight = MiniCalendarItemAdapter.calculateAdapterHeight(
+            requireContext(),
+            firstDayOfMonth,
+            startWeekOn,
+            calendarViewModel.monthView.value ?: true
+        )
+        miniCalendarPager.animateHeightChange(desiredHeight) {
             if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
         }
     }
@@ -288,16 +328,50 @@ class MonthFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1))
+        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1), object: OnFlingMiniCalendarListener {
+            override fun expandOnFling() {
+                val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
+                if (calendarViewModel.monthView.value == false) {
+                    calendarViewModel.monthView.value = true
+                    rotateArrowDownward(mini_calendar_chevron)
+                    updateMiniCalendarHeight(this@MonthFragment.miniCalendarPagerLayoutListener, startWeekOn, true, true)
+                }
+            }
+
+            override fun collapseOnFling() {
+                val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
+                if (calendarViewModel.monthView.value == true) {
+                    calendarViewModel.monthView.value = false
+                    rotateArrowUpward(mini_calendar_chevron)
+                    updateMiniCalendarHeight(this@MonthFragment.miniCalendarPagerLayoutListener, startWeekOn, false, true)
+                }
+            }
+
+        })
+
+        fromPosition = miniCalendarPagerAdapter.startingPosition
+
         miniCalendarPager.apply{
             adapter = miniCalendarPagerAdapter
             offscreenPageLimit = 1
             setCurrentItem(miniCalendarPagerAdapter.startingPosition, false)
         }
 
-        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday)
+        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday) {
+            if (calendarViewModel.monthView.value == true) {
+                calendarViewModel.monthView.value = false
+                val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return@AgendaPagerAdapter)
+                rotateArrowUpward(mini_calendar_chevron)
+                updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
+            }
+        }
         dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday) {
-            if (miniCalendarPager.isVisible) collapse(miniCalendarPager)
+            if (calendarViewModel.monthView.value == true) {
+                calendarViewModel.monthView.value = false
+                val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return@DayPagerAdapter)
+                rotateArrowUpward(mini_calendar_chevron)
+                updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
+            }
         }
 
         calendarViewModel.agendaView.observe(viewLifecycleOwner) { agendaView ->
@@ -431,5 +505,6 @@ class MonthFragment : BaseFragment() {
         year.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.text_hint)), 0, year.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         toolbarTitle.text = "$month "
         toolbarTitle.append(year)
+        mini_calendar_chevron.visibleOrGone(true)
     }
 }

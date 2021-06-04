@@ -29,24 +29,6 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <LinearLayout
-            android:id="@+id/mini_calendar_slider"
-            android:layout_width="match_parent"
-            android:layout_height="22dp"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@+id/miniCalendarPager"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <View
-                android:layout_width="40dp"
-                android:layout_height="4dp"
-                android:background="@drawable/shape_background_square_rounded_dark"
-                android:backgroundTint="@color/interaction_weak"
-                android:layout_gravity="center"/>
-
-        </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.viewpager2.widget.ViewPager2

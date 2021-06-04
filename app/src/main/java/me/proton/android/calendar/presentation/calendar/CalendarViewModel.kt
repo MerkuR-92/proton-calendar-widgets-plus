@@ -23,6 +23,8 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
@@ -89,6 +91,7 @@ class CalendarViewModel(
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
     var agendaView: MutableLiveData<Boolean> = MutableLiveData(true)
+    var monthView: MutableLiveData<Boolean> = MutableLiveData(true)
 
     // Those addresses contain canonical email addresses
     var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
@@ -234,19 +237,31 @@ class CalendarViewModel(
     }
 
     fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
-
         // prevent mini-calendar scroll from overriding selected date
         _selectedDate.value?.let {
-            if (fromMonthPagerCallback && it.month == date.month && it.year == date.year) {
+            if (fromMonthPagerCallback && monthView.value == true && it.month == date.month && it.year == date.year) {
                 return
+            }
+            weekStart.value?.let { weekStart ->
+                val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart)
+                if (fromMonthPagerCallback && monthView.value == false && it.weekNumber(startWeekOn) == date.weekNumber(startWeekOn) && it.year == date.year) {
+                    // TODO is this early return logic really needed for week view here ?
+                    return
+                }
             }
         }
 
         _selectedDate.postValue(date)
 
         // adjust Mini Calendar
-        val monthsOffset = ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
-        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + monthsOffset
+        val offset =
+            if (monthView.value == true) {
+                ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
+            } else {
+                val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart.value!!)
+                date.weekNumber(startWeekOn) - initialToday.withDayOfMonth(1).weekNumber(startWeekOn)
+            }
+        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + offset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
             miniCalendarPager.post {

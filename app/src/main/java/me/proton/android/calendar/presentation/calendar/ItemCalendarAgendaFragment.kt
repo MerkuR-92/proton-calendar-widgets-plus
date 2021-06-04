@@ -11,6 +11,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
@@ -54,6 +55,9 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
 
+    private lateinit var hideMiniCalendarListener: () -> Unit
+    private var canHideMiniCalendar = true
+
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment{
             return ItemCalendarAgendaFragment().apply {
@@ -63,6 +67,10 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                 }
             }
         }
+    }
+
+    fun setHideMiniCalendarListener(hideMiniCalendarListener: () -> Unit) {
+        this.hideMiniCalendarListener = hideMiniCalendarListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,6 +165,23 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             }
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
+
+        rv_agenda.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy > 0) {
+                    recyclerView.run {
+                        if (!canHideMiniCalendar) return
+                        canHideMiniCalendar = false
+                        postDelayed({
+                            canHideMiniCalendar = true
+                        }, CLICK_INTERVAL_MS)
+                        if (this@ItemCalendarAgendaFragment::hideMiniCalendarListener.isInitialized) hideMiniCalendarListener.invoke()
+                    }
+                }
+            }
+        })
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
 

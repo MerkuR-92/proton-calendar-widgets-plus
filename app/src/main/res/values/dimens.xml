@@ -14,6 +14,7 @@
 
     <dimen name="calendar_bottom_spacing">4dp</dimen>
     <dimen name="calendar_elevation">4dp</dimen>
+    <dimen name="calendar_item_day_vertical_spacing">6dp</dimen>
     <dimen name="calendar_item_day_spacing">1dp</dimen>
     <dimen name="calendar_item_header_height">24dp</dimen>
     <dimen name="calendar_item_height">38dp</dimen>

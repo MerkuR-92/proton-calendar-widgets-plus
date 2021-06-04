@@ -5,7 +5,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.time.LocalDate
 
-class AgendaPagerAdapter(activity: FragmentActivity, val startingDate: LocalDate) : FragmentStateAdapter(activity) {
+class AgendaPagerAdapter(
+    activity: FragmentActivity,
+    val startingDate: LocalDate,
+    private val hideMiniCalendarListener: () -> Unit
+) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
 
@@ -14,9 +18,11 @@ class AgendaPagerAdapter(activity: FragmentActivity, val startingDate: LocalDate
     }
 
     override fun createFragment(position: Int): Fragment {
-        return ItemCalendarAgendaFragment.newInstance(
+        val fragment = ItemCalendarAgendaFragment.newInstance(
             position,
             startingDate.plusDays((position - startingPosition).toLong())
         )
+        fragment.setHideMiniCalendarListener(hideMiniCalendarListener)
+        return fragment
     }
 }

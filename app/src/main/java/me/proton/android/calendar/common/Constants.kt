@@ -181,6 +181,7 @@ object FormValidation {
 
 object FragmentArguments {
     const val POSITION_ARG = "POSITION_ARG"
+    const val STARTING_POSITION_ARG = "STARTING_POSITION_ARG"
     const val DATE_ARG = "DATE_ARG"
 }
 
