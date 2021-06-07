@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
 
-    <string name="default_event_summary">(no title)</string>
+    <string name="default_event_summary" comment="Event has no title">(no title)</string>
     <string name="default_user_email">(no email address)</string>
     <string name="default_user_display_name">(no name)</string>
 
@@ -34,37 +34,37 @@
 
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">All Day</string>
-    <string name="event_time_period_spanning_single_day">%s \u2013 %s</string>
-    <string name="event_time_period_spanning_many_days">%s \u2013\n%s</string>
+    <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
+    <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
     <string name="event_alarm_label_at_event_time">At time of event</string>
     <string name="event_alarm_label_on_the_same_day">On the same day</string>
-    <string name="event_alarm_label_before">%s before</string>
-    <string name="event_alarm_label">%s</string>
-    <string name="event_alarm_label_before_by_email">%s before by email</string>
-    <string name="event_alarm_label_not_before_with_time">%s at %s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email">%s at %s by email</string> <!--"1 day before at 9:00 by email"-->
-    <string name="event_alarm_label_before_with_time">%s before at %s</string>
-    <string name="event_alarm_label_before_with_time_by_email">%s before at %s by email</string> <!--"1 day before at 9:00 by email"-->
-    <string name="event_recurrence_every_some_period">Every %d %s</string>
-    <string name="event_recurrence_occurs_on_day_of_week">%s on %s</string><!--"weekly on Friday"-->
-    <string name="event_recurrence_occurs_on_day_of_month">%s on day %d</string><!--"monthly on day 15"-->
-    <string name="event_recurrence_occurs_on_day_of_week_full_words">%s on %s</string><!--"monthly on first Friday"-->
+    <string name="event_alarm_label_before">%1$s before</string>
+    <string name="event_alarm_label">%1$s</string>
+    <string name="event_alarm_label_before_by_email">%1$s before by email</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s at %2$s</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s at %2$s by email</string>
+    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s before at %2$s</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s before at %2$s by email</string>
+    <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">Every %1$d %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s on %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s on day %2$d</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s on %2$s</string>
     <string name="event_recurrence_none">Does not repeat</string>
     <string name="event_recurrence_daily">Daily</string>
     <string name="event_recurrence_weekly">Weekly</string>
     <string name="event_recurrence_monthly">Monthly</string>
     <string name="event_recurrence_yearly">Yearly</string>
     <string name="event_recurrence_weekly_on_all_days">all days</string>
-    <string name="event_recurrence_until">until %s</string>
-    <string name="event_recurrence_until_with_timezone">until %s (%s)</string>
-    <string name="event_attendee_count">%d %s</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">until %1$s</string>
+    <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">until %1$s (%2$s)</string>
+    <string name="event_attendee_count" comment="(note the capitalised word) Example: 5 Participants">%1$d %2$s</string>
     <string name="event_status_cancelled">Cancelled</string>
-    <string name="event_calendar_disabled"><![CDATA[%s <i>(Disabled)</i>]]></string>
-    <string name="event_attendee_status_separator">%s, %s</string>
-    <string name="event_attendee_yes">%d yes</string>
-    <string name="event_attendee_maybe">%d maybe</string>
-    <string name="event_attendee_no">%d no</string>
-    <string name="event_attendee_unanswered">%d unanswered</string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Disabled)</i>]]></string>
+    <string name="event_attendee_status_separator">%1$s, %2$s</string>
+    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d yes</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d maybe</string>
+    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d unanswered</string>
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
@@ -86,10 +86,10 @@
     <string name="event_change_answer_recurring_single_edit_description">This event has been updated by the organizer. Would you like to change your answer only for this occurrence in this series?</string>
     <string name="event_change_answer_recurring_cancel">Cancel</string>
     <string name="event_change_answer_recurring_confirm">Update</string>
-    <string name="event_change_answer_mail_subject_accepted">Re: Invitation: %s</string>
-    <string name="event_change_answer_mail_body_accepted">%s has accepted your invitation to %s</string>
-    <string name="event_change_answer_mail_body_declined">%s has declined your invitation to %s</string>
-    <string name="event_change_answer_mail_body_tentative">%s has tentatively accepted your invitation to %s</string>
+    <string name="event_change_answer_mail_subject_accepted" comment="Subject of an email when sending response to invitation">Re: Invitation: %1$s</string>
+    <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s has accepted your invitation to %2$s</string>
+    <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s has declined your invitation to %2$s</string>
+    <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s has tentatively accepted your invitation to %2$s</string>
 
     <string name="event_organizer_send_prefs_error_title">Organizer cannot be notified</string>
     <string name="event_organizer_send_prefs_message_accepted_title">The organizer cannot be notified that you accepted the invitation</string>
@@ -99,8 +99,8 @@
     <string name="event_organizer_send_prefs_button_title">OK</string>
 
     <string name="event_attendees_send_prefs_error_title">Participants cannot be notified</string>
-    <string name="event_attendees_send_prefs_error_none_message">None of the participants can be notified about your changes:\n\n• %s\n\nWould you like to continue anyway?</string>
-    <string name="event_attendees_send_prefs_error_some_message">The following participants cannot be notified about your changes:\n\n• %s\n\nWould you like to continue anyway?</string>
+    <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">None of the participants can be notified about your changes:\n\n• %1$s\n\nWould you like to continue anyway?</string>
+    <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">The following participants cannot be notified about your changes:\n\n• %1$s\n\nWould you like to continue anyway?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continue</string>
     <string name="event_attendees_send_prefs_error_cancel">Cancel</string>
 
@@ -110,7 +110,7 @@
     <string name="event_send_prefs_trusted_keys_invalid">trusted keys are invalid</string>
     <string name="event_send_prefs_public_keys_invalid">public keys are invalid</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">contact signature invalid</string>
-    <string name="event_send_prefs_error_template">%s (%s)</string>
+    <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
 
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
@@ -118,9 +118,9 @@
     <string name="event_hint_title">Add Title</string>
     <string name="event_hint_location">Add location</string>
     <string name="event_text_add_participants">Add participants</string>
-    <string name="event_text_participants">Participants (%d/%d)</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">You</string>
-    <string name="event_max_attendee_chip">+ %d more</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d more</string>
     <string name="event_text_switch_all_day">All day</string>
     <string name="event_text_date_start">Start</string>
     <string name="event_text_date_end">End</string>
@@ -143,11 +143,11 @@
     <string name="event_alarm_partial_day_3">30 minutes</string>
     <string name="event_alarm_partial_day_4">1 hour</string>
     <string name="event_alarm_partial_day_5">1 week</string>
-    <string name="event_alarm_all_day_1">on the same day at %s</string>
-    <string name="event_alarm_all_day_2">1 day before at %s</string>
-    <string name="event_alarm_all_day_3">1 week before at %s</string>
-    <string name="event_alarm_all_day_4">3 weeks before at %s</string>
-    <string name="event_alarm_at_time">at %s</string>
+    <string name="event_alarm_all_day_1">on the same day at %1$s</string>
+    <string name="event_alarm_all_day_2">1 day before at %1$s</string>
+    <string name="event_alarm_all_day_3">1 week before at %1$s</string>
+    <string name="event_alarm_all_day_4">3 weeks before at %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">at %1$s</string>
     <string name="event_alarm_action">Send by</string>
     <string name="event_alarm_action_notification">notification</string>
     <string name="event_alarm_action_email">email</string>
@@ -162,12 +162,12 @@
 
     <string name="event_recurrence_occurs_every">Repeats every</string>
     <string name="event_recurrence_occurs_on">Repeats on</string>
-    <string name="event_recurrence_occurs_monthly_on_day">on day %d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week">on the %s</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">on day %1$d</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">on the %1$s</string>
     <string name="event_recurrence_ends_on">Ends</string>
     <string name="event_recurrence_ends_never">never</string>
     <string name="event_recurrence_ends_on_date_empty">on day</string>
-    <string name="event_recurrence_ends_on_date">on %s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">on %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">after</string>
 
     <string name="event_recurring_edit_this">This event</string>
@@ -190,15 +190,15 @@
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
 
-    <string name="event_send_invite_mail_subject_all_day">Invitation for an event on %s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">Invitation for an event starting on %s</string>
-    <string name="event_send_invite_mail_subject_part_day">Invitation for an event starting on %s at %s %s</string>
-    <string name="event_send_invite_mail_body">You are invited to %s\nWhen: %s</string>
-    <string name="event_send_invite_mail_body_all_day_single">%s (all day)</string>
-    <string name="event_send_invite_mail_body_all_day_multiple">%s - %s</string>
-    <string name="event_send_invite_mail_body_part_day">%s at %s %s - %s at %s %s</string>
-    <string name="event_send_invite_mail_body_where">\nWhere: %s</string>
-    <string name="event_send_invite_mail_body_description">\nDescription: %s</string>
+    <string name="event_send_invite_mail_subject_all_day">Invitation for an event on %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day_multiple">Invitation for an event starting on %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation for an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_invite_mail_body">You are invited to %1$s\nWhen: %2$s</string>
+    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (all day)</string>
+    <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
+    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s at %2$s %3$s - %4$s at %5$s %6$s</string>
+    <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nWhere: %1$s</string>
+    <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nDescription: %1$s</string>
 
     <string name="event_send_invite_dialog_title">Send invitation</string>
     <string name="event_send_invite_dialog_description">An invitation will be sent to added participants.</string>
@@ -220,7 +220,7 @@
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
-    <string name="nav_view_version_name">Proton Calendar %s</string>
+    <string name="nav_view_version_name">Proton Calendar %1$s</string>
 
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
@@ -272,16 +272,16 @@
     <string name="snack_ics_disabled_calendar_error">Re-enable the address linked to this calendar to update this event</string>
     <string name="snack_ics_event_deleted_error">The event does not exist in your calendar anymore</string>
 
-    <string name="snack_event_attendee_accepted_answer">%s accepted your invitation</string>
-    <string name="snack_event_attendee_tentative_answer">%s tentatively accepted your invitation</string>
-    <string name="snack_event_attendee_declined_answer">%s declined your invitation</string>
+    <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s accepted your invitation</string>
+    <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s tentatively accepted your invitation</string>
+    <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s declined your invitation</string>
 
     <!-- Dialogs -->
     <string name="error_event_doesnt_exist">Event doesn\'t exist</string>
     <string name="error_occurrence_doesnt_exist">Occurrence doesn\'t exist</string>
 
     <string name="update_timezone_dialog_title">Time zone changed</string>
-    <string name="update_timezone_dialog_message">Your system time zone seems to have changed to %s. Do you want to update your time zone preference?</string>
+    <string name="update_timezone_dialog_message">Your system time zone seems to have changed to %1$s. Do you want to update your time zone preference?</string>
     <string name="update_timezone_dialog_confirmation">Update</string>
     <string name="update_timezone_dialog_cancel">Cancel</string>
 
@@ -296,10 +296,10 @@
     <string name="notification_channel_sync">Calendar Synchronisation</string>
     <string name="notification_sync">Synchronising Calendars…</string>
     <string name="notification_text_today">Today</string>
-    <string name="notification_text_today_part_time">Today at %s</string>
+    <string name="notification_text_today_part_time">Today at %1$s</string>
     <string name="notification_text_tomorrow">Tomorrow</string>
-    <string name="notification_text_tomorrow_part_time">Tomorrow at %s</string>
-    <string name="notification_text_part_time">%s at %s</string>
+    <string name="notification_text_tomorrow_part_time">Tomorrow at %1$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s at %2$s</string>
 
     <!-- Bug report -->
     <string name="bug_report_hint_title">Subject</string>
