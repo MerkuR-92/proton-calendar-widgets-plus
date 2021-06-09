@@ -18,6 +18,12 @@ import java.time.ZonedDateTime
 // TODO move to separate package?
 interface CalendarsRepository {
 
+    data class EventsWindow(
+        val fromDate: LocalDate,
+        val toDate: LocalDate,
+        val timeZoneId: String
+    )
+
     suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<InitingState>
 
     suspend fun shutdown()

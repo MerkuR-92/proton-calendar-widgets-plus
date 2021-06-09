@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import me.proton.android.calendar.common.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtilsImpl
@@ -78,11 +79,11 @@ class CalendarsRepositoryImpl(
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
 
     // caches already calculated Events for EventsWindow to quickly show them when resubscribing to flow
-    private val eventsCache = mutableMapOf<EventsWindow, List<Event>>()
+    private val eventsCache = mutableMapOf<CalendarsRepository.EventsWindow, List<Event>>()
     private val eventsCacheMutex = Mutex()
 
     // cache for SkeletonEvents
-    private val skeletonEventsCache = mutableMapOf<EventsWindow, List<SkeletonEvent>>()
+    private val skeletonEventsCache = mutableMapOf<CalendarsRepository.EventsWindow, List<SkeletonEvent>>()
     private val skeletonEventsCacheMutex = Mutex()
 
     private val visibleCalendarEntitiesFlow =
@@ -591,7 +592,7 @@ class CalendarsRepositoryImpl(
 
     }
 
-    private fun createEventsFlow(eventsWindow: EventsWindow): Flow<CalendarsRepository.GetEventsResult<Event>> {
+    private fun createEventsFlow(eventsWindow: CalendarsRepository.EventsWindow): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->
 
@@ -637,10 +638,18 @@ class CalendarsRepositoryImpl(
         }.onStart {
             
             eventsCacheMutex.withLock {
-                val cachedEvents = eventsCache[eventsWindow]
 
-                if (cachedEvents != null) {
-                    emit(CalendarsRepository.GetEventsResult.Success(cachedEvents))
+                val overlappingWindow = eventsCache.keys.getFullyOverlappingWindow(eventsWindow)
+
+                if (overlappingWindow != null) {
+                    val overlappingEvents = eventsCache[overlappingWindow]?.filter { it.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId) }
+                    if (overlappingEvents == null) {
+                        logger.e("events not found in cache")
+                        emit(CalendarsRepository.GetEventsResult.InProgress)
+                    } else {
+                        logger.v("returning skeleton events from cache ($eventsWindow): ${overlappingEvents.size} in total")
+                        emit(CalendarsRepository.GetEventsResult.Success(overlappingEvents))
+                    }
                 } else {
                     emit(CalendarsRepository.GetEventsResult.InProgress)
                 }
@@ -661,19 +670,13 @@ class CalendarsRepositoryImpl(
         timeZoneId: String
     ): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
-        val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
         return createEventsFlow(eventsWindow)
     }
 
-    private data class EventsWindow(
-        val fromDate: LocalDate,
-        val toDate: LocalDate,
-        val timeZoneId: String
-    )
-
     private fun createSkeletonsFlow(
-        eventsWindow: EventsWindow
+        eventsWindow: CalendarsRepository.EventsWindow
     ): Flow<List<SkeletonEvent>> {
 
         return visibleSkeletonEventsFlow.map { visibleSkeletonEvents ->
@@ -693,7 +696,7 @@ class CalendarsRepositoryImpl(
     }
 
     private fun getSkeletonEvents(
-        eventsWindow: EventsWindow
+        eventsWindow: CalendarsRepository.EventsWindow
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventSkeletons ->
@@ -709,10 +712,18 @@ class CalendarsRepositoryImpl(
         }.onStart {
 
             skeletonEventsCacheMutex.withLock {
-                val cachedSkeletonEvents = skeletonEventsCache[eventsWindow]
 
-                if (cachedSkeletonEvents != null) {
-                    emit(CalendarsRepository.GetEventsResult.Success(cachedSkeletonEvents))
+                val overlappingWindow = skeletonEventsCache.keys.getFullyOverlappingWindow(eventsWindow)
+
+                if (overlappingWindow != null) {
+                    val overlappingEvents = skeletonEventsCache[overlappingWindow]?.filter { it.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId) }
+                    if (overlappingEvents == null) {
+                        logger.e("skeletonEvents not found in cache")
+                        emit(CalendarsRepository.GetEventsResult.InProgress)
+                    } else {
+                        logger.v("returning skeleton events from cache ($eventsWindow): ${overlappingEvents.size} in total")
+                        emit(CalendarsRepository.GetEventsResult.Success(overlappingEvents))
+                    }
                 } else {
                     emit(CalendarsRepository.GetEventsResult.InProgress)
                 }
@@ -738,7 +749,7 @@ class CalendarsRepositoryImpl(
 
         logger.v("calling getSkeletonEventsForIndicators $fromDate - $toDate")
 
-        val eventsWindow = EventsWindow(fromDate, toDate, timeZoneId)
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
         return getSkeletonEvents(eventsWindow)
     }
@@ -797,7 +808,7 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    private fun expandSkeletonEventsAndFilterInWindow(event: Event, allEvents: List<Event>, eventsWindow: EventsWindow): List<Event> {
+    private fun expandSkeletonEventsAndFilterInWindow(event: Event, allEvents: List<Event>, eventsWindow: CalendarsRepository.EventsWindow): List<Event> {
 
         return if (event.isRecurring()) {
             // occurrences are already filtered for time window

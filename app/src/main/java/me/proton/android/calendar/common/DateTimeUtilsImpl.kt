@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common
 
 import biweekly.util.ICalDate
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.text.SimpleDateFormat
@@ -39,6 +40,14 @@ object DateTimeUtilsImpl : DateTimeUtils {
         val toInstant = toDateTime.toInstant()
 
         return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
+    }
+
+    override fun LocalDate.isBetween(fromDate: LocalDate, toDate: LocalDate): Boolean {
+        val thisLocalDate = this.atTime(LocalTime.MIDNIGHT).atZone(ZoneOffset.UTC)
+        val fromZonedDateTime = fromDate.atTime(LocalTime.MIDNIGHT).atZone(ZoneOffset.UTC)
+        val toZonedDateTime = toDate.atTime(LocalTime.MAX).atZone(ZoneOffset.UTC)
+
+        return thisLocalDate.isBetween(fromZonedDateTime, toZonedDateTime, false, false)
     }
 
     /**
@@ -234,6 +243,12 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return when (Locale.getDefault()) {
             // add mapping for other supported Locales
             else -> Locale.US
+        }
+    }
+
+    override fun Collection<CalendarsRepository.EventsWindow>.getFullyOverlappingWindow(eventsWindow: CalendarsRepository.EventsWindow): CalendarsRepository.EventsWindow? {
+        return this.find {
+            eventsWindow.fromDate.isBetween(it.fromDate, it.toDate) && eventsWindow.toDate.isBetween(it.fromDate, it.toDate)
         }
     }
 

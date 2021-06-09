@@ -1,8 +1,10 @@
 package me.proton.android.calendar.domain.utils
 
+import androidx.annotation.VisibleForTesting
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.allowedTimezoneIds
+import me.proton.android.calendar.domain.CalendarsRepository
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -21,6 +23,8 @@ interface DateTimeUtils {
      * @param excludeTo will exclude exact toDateTime from rightmost range value
      */
     fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean
+
+    fun LocalDate.isBetween(fromDate: LocalDate, toDate: LocalDate): Boolean
 
     /**
      * Calculate ISO week number for given date, taking custom week start into account.
@@ -79,4 +83,10 @@ interface DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     fun getLocaleForFormatting(): Locale
+
+    /**
+     * Gets [EventsWindow] from the collection if argument fully overlaps with it.
+     */
+    fun Collection<CalendarsRepository.EventsWindow>.getFullyOverlappingWindow(eventsWindow: CalendarsRepository.EventsWindow): CalendarsRepository.EventsWindow?
+
 }
