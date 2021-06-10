@@ -13,12 +13,15 @@ import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.text
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.concatenate
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
@@ -26,6 +29,7 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.TimberLogger
+import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
 import java.time.*
@@ -63,6 +67,9 @@ class MiniCalendarItemAdapter(
             val lastDayOfMonthWeekValue = DayOfWeek.of(lastDayOfTheMonth.dayOfWeek.value).value
             val lastDayOfMonthOffset = 7 - (startWeekOn.value + lastDayOfMonthWeekValue - 1)
 
+            val fromDate = firstDayOfTheMonth.minusDays(firstDayOfTheWeekOffset.toLong())
+            val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()).plusDays(lastDayOfMonthOffset.toLong())
+
             val headerItems = (0 until WEEKDAYS_TO_SHOW).map {
                 MiniCalendarItem(firstDayOfTheMonth.plusDays(-firstDayOfTheWeekOffset + it.toLong()), false,false, emptyList())
             }
@@ -87,8 +94,11 @@ class MiniCalendarItemAdapter(
             this.submitList(skeletonList)
 
             // subscribe for calendar indicators and selected date
-
-            indicatorsMediator.addSource(calendarViewModel.calendarIndicators(firstDayOfTheMonth.minusDays(firstDayOfTheWeekOffset.toLong() + 1), firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()).plusDays(lastDayOfMonthOffset.toLong()), timeZoneId)) {
+            indicatorsMediator.addSource(calendarViewModel.calendarIndicators(
+                fromDate,
+                toDate,
+                timeZoneId
+            )) {
                 indicators = it
 
                 if (indicators != null && selectedDate != null) {
@@ -123,7 +133,6 @@ class MiniCalendarItemAdapter(
             this.submitList(skeletonList)
 
             // subscribe for calendar indicators and selected date
-
             indicatorsMediator.addSource(calendarViewModel.calendarIndicators(firstDay, firstDay.plusDays(6), timeZoneId)) {
                 indicators = it
 
@@ -144,8 +153,9 @@ class MiniCalendarItemAdapter(
         indicatorsMediator.observe(lifecycleOwner) {
             submitList(it)
         }
-
     }
+
+
 
     private fun applyIndicatorsAndSelectedDate(indicators: Map<LocalDate, List<String>>, selectedDate: LocalDate, skeletonList: List<MiniCalendarItem?>): List<MiniCalendarItem> {
 
@@ -154,11 +164,6 @@ class MiniCalendarItemAdapter(
             if (tmpList.size != skeletonList.size) skeletonList.toMutableList()
             else tmpList
         } else {
-//            val tmpList = currentList.toMutableList()
-//            tmpList.removeIf {
-//                it == null || (it.isDay && (it.date.isBefore(selectedDate.minusDays(3)) || it.date.isAfter(selectedDate.plusDays(3))))
-//            }
-//            tmpList
             skeletonList.toMutableList()
         }
 
@@ -200,10 +205,7 @@ class MiniCalendarItemAdapter(
             private val timeZoneId: String,
             private val forDate: LocalDate,
             private val startWeekOn: DayOfWeek,
-            private val isMonthView: Boolean,
-            private val selectedDate: LocalDate?,
-            private val calendarViewModel: CalendarViewModel,
-            private val lifecycleOwner: LifecycleOwner
+            private val isMonthView: Boolean
         ) : MiniCalendarViewHolder(
             itemView
         ) {
@@ -222,20 +224,24 @@ class MiniCalendarItemAdapter(
                             itemView.context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
                         else 0
 
-                    val firstDayOfTheWeekNumber = forDate.dayOfWeek.value - startWeekOn.value
-                    val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
-
-                    val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
-                    val firstDay = forDate.with(temporalField, 1)
-                    val lastDay = forDate.with(temporalField, 7)
-                    val twoMonthsMode = firstDay.month != lastDay.month
-
-                    setItemStyle(item, twoMonthsMode, selectedDate)
-
-                    // Only observe for weeks that need a change of style depending on selected date
-                    if (twoMonthsMode) {
-                        calendarViewModel.selectedDate.observe(lifecycleOwner) { selectedDate ->
-                            setItemStyle(item, twoMonthsMode, selectedDate)
+                    when {
+                        item.isSelected -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
+                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                        }
+                        item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                            itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
+                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                        }
+                        isMonthView && item.date.month != forDate.month -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Weak)
+                            itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
+                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                        }
+                        else -> {
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
                         }
                     }
 
@@ -258,29 +264,6 @@ class MiniCalendarItemAdapter(
 
                     if (item != null) {
                         clickListener?.invoke(item.date)
-                    }
-                }
-            }
-
-            private fun setItemStyle(item: MiniCalendarItem, twoMonthsMode: Boolean, selectedDate: LocalDate?) {
-                when {
-                    item.isSelected -> {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
-                        itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
-                    }
-                    item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                        itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
-                        itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
-                    }
-                    twoMonthsMode && item.date.month != (selectedDate ?: forDate).month -> {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Weak)
-                        itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
-                        itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
-                    }
-                    else -> {
-                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                        itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
                     }
                 }
             }
@@ -322,10 +305,7 @@ class MiniCalendarItemAdapter(
                 timeZoneId,
                 forDate,
                 startWeekOn,
-                isMonthView,
-                selectedDate,
-                calendarViewModel,
-                lifecycleOwner
+                isMonthView
             )
         }
     }

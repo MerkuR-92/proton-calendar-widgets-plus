@@ -251,7 +251,7 @@ class CalendarViewModel(
             }
         }
 
-        _selectedDate.postValue(date)
+        _selectedDate.value = date
 
         // adjust Mini Calendar
         val offset =
@@ -296,8 +296,8 @@ class CalendarViewModel(
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
-            var start = event.getOccurrenceStart(timeZoneId)!!.toLocalDate()
-            val end = event.getOccurrenceEnd(timeZoneId)!!.toLocalDate()
+            var start = event.getOccurrenceStart(timeZoneId).toLocalDate()
+            val end = event.getOccurrenceEnd(timeZoneId).toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {

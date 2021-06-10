@@ -10,6 +10,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
@@ -140,31 +141,41 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
         logger.d("mini calendar onViewCreated: $firstDay")
 
-        rv_mini_calendar.apply {
-            layoutManager = GridLayoutManager(
-                this@ItemMiniCalendarFragment.context,
-                MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW /*TODO*/
-            )
-            adapter = MiniCalendarItemAdapter(
-                timeZoneId,
-                firstDay,
-                startWeekOn,
-                monthView,
-                calendarViewModel,
-                viewLifecycleOwner
-            ) {
-                calendarViewModel.handleDaySelected(it)
+        calendarViewModel.lifeCycleScope.launch {
+            if (monthView && calendarViewModel.selectedDate.value?.month != firstDay.month) {
+                delay(300)
             }
 
-            if (this@ItemMiniCalendarFragment::onFlingMiniCalendarListener.isInitialized) {
-                val miniCalendarGestureDetector =
-                    GestureDetector(requireContext(), MiniCalendarGestureListener(this, onFlingMiniCalendarListener))
-                setOnTouchListener { v, event ->
-                    miniCalendarGestureDetector.onTouchEvent(event)
+            // Check if view still exists after delay
+            if (rv_mini_calendar == null) return@launch
+
+            rv_mini_calendar.apply {
+                layoutManager = GridLayoutManager(
+                    this@ItemMiniCalendarFragment.context,
+                    MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW /*TODO*/
+                )
+
+                adapter = MiniCalendarItemAdapter(
+                    timeZoneId,
+                    firstDay,
+                    startWeekOn,
+                    monthView,
+                    calendarViewModel,
+                    viewLifecycleOwner
+                ) {
+                    calendarViewModel.handleDaySelected(it)
                 }
-            }
 
-            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise(timeZoneId)
+                if (this@ItemMiniCalendarFragment::onFlingMiniCalendarListener.isInitialized) {
+                    val miniCalendarGestureDetector =
+                        GestureDetector(requireContext(), MiniCalendarGestureListener(this, onFlingMiniCalendarListener))
+                    setOnTouchListener { v, event ->
+                        miniCalendarGestureDetector.onTouchEvent(event)
+                    }
+                }
+
+                (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise(timeZoneId)
+            }
         }
 
         // setup week numbers
