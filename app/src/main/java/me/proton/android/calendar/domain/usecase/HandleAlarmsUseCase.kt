@@ -13,6 +13,7 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
 import java.time.ZoneId
+import kotlin.math.roundToInt
 
 class HandleAlarmsUseCase(
     private val logger: Logger,
@@ -50,15 +51,18 @@ class HandleAlarmsUseCase(
             val lastHandledTimestamp = valueStoreProvider.provideValueStore(userId.id).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP) ?: nowInstant.epochSecond
 
             // if no alarms were ever shown, this will return empty result
-            val alarmsToDisplayNow = database.eventAlarmsDao().select(lastHandledTimestamp + 1, nowInstant.epochSecond)
+            val alarmsToDisplayNow = database.eventAlarmsDao().select(lastHandledTimestamp + 1, nowInstant.epochSecond).filterOutDuplicates()
 
             // TODO get most X recent alarms so we don't bombard user with obsolete alarms if they haven't used the app for a while
 
             logger.v("missed alarms to display at ${nowInstant}: ${alarmsToDisplayNow}")
-            showNotificationUseCase.execute(alarmsToDisplayNow.filterOutDuplicates(), userId.id)
+            showNotificationUseCase.execute(alarmsToDisplayNow, userId.id)
 
             val maxAlarmOccurrenceSeconds = alarmsToDisplayNow.maxByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
             valueStoreProvider.provideValueStore(userId.id).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)
+
+            val minAlarmOccurrenceSeconds = alarmsToDisplayNow.minByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
+            logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${((nowInstant.epochSecond - minAlarmOccurrenceSeconds) / 60.0).roundToInt()} minutes")
 
             maxAlarmOccurrenceSeconds
 

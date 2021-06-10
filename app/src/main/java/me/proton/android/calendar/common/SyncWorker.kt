@@ -7,6 +7,7 @@ import kotlinx.coroutines.CancellationException
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
@@ -23,8 +24,9 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
     private val database: AppDatabase by inject()
 
     private val syncServerEventsUseCase: SyncServerEventsUseCase by inject()
+    private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
 
-    val notificationBuilder = NotificationCompat.Builder(appContext, ShowNotificationUseCase.CHANNEL_ID_SYNC_SERVICE)
+    private val notificationBuilder = NotificationCompat.Builder(appContext, ShowNotificationUseCase.CHANNEL_ID_SYNC_SERVICE)
 
     override suspend fun doWork(): Result {
 
@@ -32,7 +34,23 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
 
         syncServerEvents()
 
+        forceShowLateAlarms()
+
         return Result.success()
+    }
+
+    private suspend fun forceShowLateAlarms() {
+
+        try {
+            database.usersDao().select().forEach {
+                handleAlarmsUseCase.execute(UserId(it.id))
+            }
+        } catch (e: Exception) {
+            if (e !is CancellationException) {
+                logger.e("exception in forceShowLateAlarms()", e)
+            }
+        }
+
     }
 
     private suspend fun syncServerEvents() {
