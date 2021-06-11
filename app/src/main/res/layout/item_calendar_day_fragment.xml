@@ -126,7 +126,7 @@
             android:padding="@dimen/large_padding"
             app:dividerHeight="@dimen/small_padding"
             app:endHour="@integer/end_hour"
-            app:eventMargin="@dimen/small_padding"
+            app:eventMargin="0dp"
             app:halfHourDividerColor="@color/background_norm"
             app:halfHourHeight="@dimen/half_hour_height"
             app:hourDividerColor="@color/lines_norm"

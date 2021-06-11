@@ -73,4 +73,6 @@
     <dimen name="all_day_item_margin_bottom">2dp</dimen>
     <dimen name="all_day_item_margin_end">11dp</dimen>
 
+    <dimen name="current_time_indicator_dot_size">7dp</dimen>
+
 </resources>

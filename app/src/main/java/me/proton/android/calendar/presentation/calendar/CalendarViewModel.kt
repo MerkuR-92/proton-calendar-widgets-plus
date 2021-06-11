@@ -92,6 +92,7 @@ class CalendarViewModel(
 
     var agendaView: MutableLiveData<Boolean> = MutableLiveData(true)
     var monthView: MutableLiveData<Boolean> = MutableLiveData(true)
+    var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
 
     // Those addresses contain canonical email addresses
     var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values

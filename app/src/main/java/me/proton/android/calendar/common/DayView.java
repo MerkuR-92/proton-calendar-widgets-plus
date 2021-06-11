@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.view.ViewCompat;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,6 +100,9 @@ public class DayView extends ViewGroup {
     private int parentWidth;
     private float minuteHeight;
 
+    private View currentTimeView;
+    private int currentTimeDotSize;
+
     public DayView(@NonNull Context context) {
         this(context, null);
     }
@@ -172,6 +176,39 @@ public class DayView extends ViewGroup {
         hourLabelDividerOverflow = array.getDimensionPixelSize(R.styleable.DayView_hourLabelDividerOverflow, 0);
         eventMargin = array.getDimensionPixelSize(R.styleable.DayView_eventMargin, 0);
         array.recycle();
+    }
+
+    /**
+     * @param currentTimeView the view to show as current time indicator
+     */
+    public void setCurrentTimeView(Context context, View currentTimeView) {
+        removeView(this.currentTimeView);
+        addView(currentTimeView);
+        this.currentTimeView = currentTimeView;
+        currentTimeDotSize = context.getResources().getDimensionPixelSize(R.dimen.current_time_indicator_dot_size);
+    }
+
+    /**
+     * Updates the y position of the current time indicator with current LocalTime.now() value
+     */
+    public void updateCurrentTimeView() {
+        if (currentTimeView == null) return;
+        currentTimeView.measure(MeasureSpec.makeMeasureSpec(parentWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(currentTimeDotSize, MeasureSpec.EXACTLY));
+        LocalTime currentTime = LocalTime.now();
+        int top = getHourTop(currentTime.getHour());
+        int bottom = getHourBottom(currentTime.getHour());
+        int y = top + (bottom - top) * currentTime.getMinute() / 60;
+        currentTimeView.layout(currentTimeView.getLeft(), y,  currentTimeView.getRight(), y + currentTimeDotSize);
+        currentTimeView.bringToFront();
+    }
+
+    public void removeCurrentTimeView() {
+        removeView(this.currentTimeView);
+    }
+
+    public Boolean hasCurrentTimeIndicator() {
+        return currentTimeView != null;
     }
 
     /**
@@ -429,7 +466,19 @@ public class DayView extends ViewGroup {
         measureHourLabels();
         measureEvents();
 
+        // Only measure the current time indicator the first time
+        if (currentTimeView != null && currentTimeView.getWidth() == 0) {
+            currentTimeView.measure(MeasureSpec.makeMeasureSpec(parentWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(currentTimeDotSize, MeasureSpec.EXACTLY));
+            LocalTime currentTime = LocalTime.now();
+            int top = getHourTop(currentTime.getHour());
+            int bottom = getHourBottom(currentTime.getHour());
+            int y = top + (bottom - top) * currentTime.getMinute() / 60;
+            currentTimeView.layout(dividerStart - eventMargin - (currentTimeDotSize / 2), y, parentWidth, y + currentTimeDotSize);
+        }
+
         setMeasuredDimension(widthMeasureSpec, measuredHeight);
+        if (currentTimeView != null) currentTimeView.bringToFront();
     }
 
     protected void measureExactly(@NonNull View view, @NonNull DirectionalRect rect) {

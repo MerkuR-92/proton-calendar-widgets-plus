@@ -145,6 +145,7 @@ class MonthFragment : BaseFragment() {
         buttonToday.setOnSingleClickListener {
             val todayDate = LocalDate.now(timeZoneId)
             calendarViewModel.handleDaySelected(todayDate)
+            calendarViewModel.jumpToCurrentTime.value = true
         }
     }
 
@@ -384,6 +385,7 @@ class MonthFragment : BaseFragment() {
                 }
                 calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             } else {
+                calendarViewModel.jumpToCurrentTime.value = true
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = dayPagerAdapter
