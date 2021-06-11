@@ -5,34 +5,33 @@ import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.AddressStatus
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
-import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
-import me.proton.android.calendar.data.entity.AddressStatus
+import me.proton.core.user.domain.UserManager
 
 class CreateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
     private val json: Json,
-    private val usersRepository: UsersRepository,
-    private val keySetupUseCase: KeySetupUseCase
+    private val keySetupUseCase: KeySetupUseCase,
+    private val userManager: UserManager
 ): UseCase {
 
     suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1) : UseCase.Result {
 
-        val user = usersRepository.selectUserById(userId.id)
-        val email = user?.email ?: return UseCase.Result.Error("CreateCalendarUseCase: Email for user was null")
-        val address = if (user.isFree && isShortDomainAddress(email)) {
-            database.addressesDao().select(userId.id).firstOrNull {
-                it.status == AddressStatus.ENABLED.value && !isShortDomainAddress(it.email)
-            }?.toAddress(json) ?: return UseCase.Result.Error("CreateCalendarUseCase: No address id found")
-        } else {
-            database.addressesDao().select(userId.id, email).firstOrNull()?.toAddress(json)
-                ?: return UseCase.Result.Error("CreateCalendarUseCase: No address id found")
-        }
+        // TODO when we upgrade to core, obtain Primary Key to pass it to KeySetupUseCase and stop using our
+        //  Address model, Primary Key is the one with flags = 3 but there is no getter for it yet
+
+        val validAddressId = userManager.getAddresses(userId, refresh = true).firstOrNull {
+            it.canSend && it.canReceive
+        }?.addressId ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid address ID found")
+
+        val address = database.addressesDao().select(userId.id).find {
+            it.status == AddressStatus.ENABLED.value && it.id == validAddressId.id
+        }?.toAddress(json) ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid address found")
 
         val createCalendarApiRequest =
             CreateCalendarApiRequest(
