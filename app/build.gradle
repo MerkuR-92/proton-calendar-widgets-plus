@@ -146,7 +146,7 @@ dependencies {
     kapt "com.squareup.inject:assisted-inject-processor-dagger2:${rootProject.ext.version.assisted_inject}"
 
     // Hilt AndroidX (JetPack Integration).
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:${rootProject.ext.version.hilt_androidx}"
+//    implementation "androidx.hilt:hilt-lifecycle-viewmodel:${rootProject.ext.version.hilt_androidx}"
     implementation "androidx.hilt:hilt-work:${rootProject.ext.version.hilt_androidx}"
     kapt "androidx.hilt:hilt-compiler:${rootProject.ext.version.hilt_androidx}"
 
@@ -212,6 +212,8 @@ dependencies {
 
     // Shared preferences
     implementation 'androidx.preference:preference-ktx:1.1.1'
+
+    implementation "net.gotev:cookie-store:${rootProject.ext.version.cookie_store}"
 
     detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
     detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'

@@ -13,15 +13,17 @@ import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.API_BASE_URL
 import me.proton.android.calendar.common.CoreLogger
 import me.proton.android.calendar.data.api.CalendarApiClient
-import me.proton.core.network.data.ApiProvider
-import me.proton.core.network.data.di.ApiFactory
-import me.proton.core.network.data.di.NetworkManager
-import me.proton.core.network.data.di.NetworkPrefs
+import me.proton.core.network.data.*
+import me.proton.core.network.data.client.ClientIdProviderImpl
 import me.proton.core.network.domain.ApiClient
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.network.domain.NetworkPrefs
+import me.proton.core.network.domain.client.ClientIdProvider
+import me.proton.core.network.domain.humanverification.HumanVerificationListener
+import me.proton.core.network.domain.humanverification.HumanVerificationProvider
 import me.proton.core.network.domain.session.SessionListener
 import me.proton.core.network.domain.session.SessionProvider
+import me.proton.core.util.kotlin.Logger
 import javax.inject.Singleton
 
 @Module
@@ -42,18 +44,42 @@ object NetworkModule {
     @Singleton
     fun provideApiFactory(
         apiClient: ApiClient,
+        clientIdProvider: ClientIdProvider,
         networkManager: NetworkManager,
         networkPrefs: NetworkPrefs,
+        protonCookieStore: ProtonCookieStore,
         sessionProvider: SessionProvider,
-        sessionListener: SessionListener
-    ): ApiFactory = ApiFactory(
-        API_BASE_URL, apiClient, CoreLogger, networkManager, networkPrefs, sessionProvider, sessionListener,
-        cookieStore = null, CoroutineScope(Job() + Dispatchers.Default)
+        sessionListener: SessionListener,
+        humanVerificationProvider: HumanVerificationProvider,
+        humanVerificationListener: HumanVerificationListener
+    ): ApiManagerFactory = ApiManagerFactory(
+        API_BASE_URL,
+        apiClient,
+        clientIdProvider,
+        CoreLogger,
+        networkManager,
+        networkPrefs,
+        sessionProvider,
+        sessionListener,
+        humanVerificationProvider,
+        humanVerificationListener,
+        protonCookieStore,
+        CoroutineScope(Job() + Dispatchers.Default)
     )
 
     @Provides
     @Singleton
-    fun provideApiProvider(apiFactory: ApiFactory, sessionProvider: SessionProvider): ApiProvider =
+    fun provideClientIdProvider(protonCookieStore: ProtonCookieStore): ClientIdProvider =
+        ClientIdProviderImpl(API_BASE_URL, protonCookieStore)
+
+    @Provides
+    @Singleton
+    fun provideProtonCookieStore(@ApplicationContext context: Context): ProtonCookieStore =
+        ProtonCookieStore(context)
+
+    @Provides
+    @Singleton
+    fun provideApiProvider(apiFactory: ApiManagerFactory, sessionProvider: SessionProvider): ApiProvider =
         ApiProvider(apiFactory, sessionProvider)
 }
 

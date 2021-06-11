@@ -31,7 +31,8 @@ class GenerateEmailPackageUseCase @Inject constructor(
 
                 if (sendPreferences.publicKey == null) return null
 
-                val publicKey = PublicKey(sendPreferences.publicKey, isPrimary = true)
+                // TODO create a factory for PublicKey?
+                val publicKey = PublicKey(sendPreferences.publicKey, true, true, true, true)
                 val recipientBodyKeyPacket = publicKey.encryptSessionKey(cryptoContext, decryptedBodySessionKey)
 
                 val encryptedAttachmentKeyPackets = decryptedAttachmentSessionKeys.map {

@@ -304,8 +304,8 @@ internal class ObtainSendPreferencesUseCaseTest {
         recipientType = Recipient.External.value,
         "text/html",
         listOf(
-            PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = false)),
-            PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = true))
+            PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = false, true, true, true)),
+            PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = true, true, true, true))
         )
     )
 
@@ -321,8 +321,8 @@ internal class ObtainSendPreferencesUseCaseTest {
         recipientType = Recipient.Internal.value,
         "text/html",
         listOf(
-            PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = false)),
-            PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = true))
+            PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = false, true, true, true)),
+            PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = true, true, true, true))
         )
     )
 
@@ -341,7 +341,8 @@ internal class ObtainSendPreferencesUseCaseTest {
             PublicAddressKey(
                 "contact_external_pinned_key@pm.me", 3, PublicKey(
                     "armored key from public repository",
-                    isPrimary = true
+                    isPrimary = true,
+                    true, true, true
                 )
             ),
         )

@@ -134,12 +134,11 @@ class AccountViewModel(
             // Close app if Login screen has been closed.
             onLoginResult { result -> if (result == null) finishAppIfNoAccount(context) }
             // General state handling.
-            accountManager.observe(context.lifecycleScope)
+            accountManager.observe(context.lifecycle)
                 .onAccountReady { checkAccount(it) }
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
                 .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }
-                .onSessionHumanVerificationNeeded { startHumanVerificationWorkflow(it) }
                 .onAccountTwoPassModeFailed { removeUser(it.userId) }
                 .onAccountCreateAddressFailed { removeUser(it.userId) }
                 .onAccountDisabled { removeUser(it.userId) }

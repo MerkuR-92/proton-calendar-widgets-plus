@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.Logger
+import me.proton.core.account.domain.entity.AccountType
 import me.proton.core.domain.entity.Product
 import javax.inject.Singleton
 
@@ -16,6 +17,11 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideProduct(): Product = Product.Calendar
+
+    @Provides
+    @Singleton
+    fun provideRequiredAccountType(): AccountType =
+        AccountType.Internal
 
     @Provides
     @Singleton
