@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,24 +36,17 @@ import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.user.domain.entity.UserAddress
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import java.time.*
 import java.util.*
 
 class ItemCalendarDayFragment() : Fragment(), KoinComponent {
@@ -65,8 +59,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
-    private var userAddresses: List<Address>? = null
-    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<Address>>>()
+    private var userAddresses: List<UserAddress>? = null
+    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -183,6 +177,29 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         scrollView.setOnScrollChangeListener(onScrollChangeListener)
 
+        dayView.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP && dayView.areCoordinatesWithinEventGrid(event.x.toInt(), event.y.toInt())) {
+                val startTime = dayView.getTimeForYCoordinate(event.y.toInt())
+                calendarViewModel.lifeCycleScope.launch {
+                    val calendarSettings = calendarViewModel.getDefaultCalendarSettings()
+                    val immutableDate = date
+                    if (calendarSettings == null || immutableDate == null) {
+                        return@launch
+                    }
+                    val truncatedStartTime = LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
+                    requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                        .navigate(
+                            Navigation.Deeplink.toEventCreate(
+                                immutableDate,
+                                truncatedStartTime
+                            )
+                        )
+                }
+                v.performClick()
+            }
+            true
+        }
+
         return rootView
     }
 
@@ -234,7 +251,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
     }
 
-    private fun onEventsChange(timeZoneId: String, userAddresses: List<Address>) {
+    private fun onEventsChange(timeZoneId: String, userAddresses: List<UserAddress>) {
         val userEmails = userAddresses.map { userAddress -> userAddress.email }
         // The day view needs a list of event views and a corresponding list of event time ranges
         var eventViews: MutableList<View?>? = null
@@ -444,11 +461,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         agendaMediator.addSource(calendarViewModel.userAddresses) { value ->
             userAddresses = value
 
-            if (userAddresses?.firstOrNull { it.displayName == null } != null) {
-                // Refresh Addresses for user to fetch displayName values
-                calendarViewModel.refreshAddressesFromServer()
-            }
-
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
@@ -483,7 +495,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         updateCurrentTimeIndicatorDelayed()
     }
 
-    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<Address>) {
+    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
         val immutableDate = date ?: return
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
@@ -525,7 +537,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
     }
 
-    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, userAddresses: List<Address>) {
+    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, userAddresses: List<UserAddress>) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove already existing observer for $immutableDate")
             eventsLiveData.removeObservers(viewLifecycleOwner)

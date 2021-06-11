@@ -103,6 +103,8 @@ public class DayView extends ViewGroup {
     private View currentTimeView;
     private int currentTimeDotSize;
 
+    private int eventGridStart;
+
     public DayView(@NonNull Context context) {
         this(context, null);
     }
@@ -176,6 +178,22 @@ public class DayView extends ViewGroup {
         hourLabelDividerOverflow = array.getDimensionPixelSize(R.styleable.DayView_hourLabelDividerOverflow, 0);
         eventMargin = array.getDimensionPixelSize(R.styleable.DayView_eventMargin, 0);
         array.recycle();
+    }
+
+    /**
+     * Verify that the following coordinates fit within the 24h event grid
+     */
+    public Boolean areCoordinatesWithinEventGrid(int x, int y) {
+        return x > eventGridStart && y > getHourTop(0) && y < getHourTop(24);
+    }
+
+    /**
+     * Get the LocalTime corresponding to the y coordinate
+     */
+    public LocalTime getTimeForYCoordinate(int y) {
+        float totalMinutes = (float) (y - getHourTop(0)) / getMinuteHeight();
+        int minutes = Math.round(totalMinutes / 60 % 1 * 60);
+        return LocalTime.of((int) totalMinutes / 60, minutes == 60 ? 59 : minutes);
     }
 
     /**
@@ -456,6 +474,7 @@ public class DayView extends ViewGroup {
         // Calculate the horizontal positions of the dividers
         int dividerStart = hourLabelEnd + hourLabelMarginEnd;
         int dividerEnd = getMeasuredWidth() - (isRtl ? getPaddingLeft() : getPaddingRight());
+        eventGridStart = dividerStart - eventMargin;
 
         // Set the rects for hour labels, dividers, and events
         setHourLabelRects(hourLabelStart, hourLabelEnd, firstDividerTop);
@@ -474,7 +493,7 @@ public class DayView extends ViewGroup {
             int top = getHourTop(currentTime.getHour());
             int bottom = getHourBottom(currentTime.getHour());
             int y = top + (bottom - top) * currentTime.getMinute() / 60;
-            currentTimeView.layout(dividerStart - eventMargin - (currentTimeDotSize / 2), y, parentWidth, y + currentTimeDotSize);
+            currentTimeView.layout(eventGridStart - (currentTimeDotSize / 2), y, parentWidth, y + currentTimeDotSize);
         }
 
         setMeasuredDimension(widthMeasureSpec, measuredHeight);
@@ -738,5 +757,10 @@ public class DayView extends ViewGroup {
 
             return true;
         }
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

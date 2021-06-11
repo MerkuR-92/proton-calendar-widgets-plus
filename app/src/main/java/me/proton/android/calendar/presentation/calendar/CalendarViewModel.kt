@@ -28,6 +28,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -688,5 +689,19 @@ class CalendarViewModel(
 
     fun getUserEmails(): List<String>? {
         return userAddresses.value?.map { it.email }
+    }
+
+    suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+        if (defaultCalendarId == null) {
+            logger.e("defaultCalendarId was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        return calendarsRepository.selectCalendarSettings(defaultCalendarId)
     }
 }
