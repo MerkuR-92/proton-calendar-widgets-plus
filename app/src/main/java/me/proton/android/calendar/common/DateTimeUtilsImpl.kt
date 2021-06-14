@@ -232,7 +232,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
     }
 
     override fun LocalDate.formatDayOfWeek(short: Boolean): String {
-        val dateFormat = SimpleDateFormat(if (short) "E" else "EEEE", getLocaleForFormatting())
+        val dateFormat = SimpleDateFormat(if (short) "EEEEE" else "EEEE", getLocaleForFormatting())
         return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
     }
 

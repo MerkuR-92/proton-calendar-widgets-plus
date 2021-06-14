@@ -22,6 +22,7 @@
 
     <dimen name="nav_view_user_margin_top">48dp</dimen>
     <dimen name="nav_view_user_initials_box_size">28dp</dimen>
+    <dimen name="nav_view_view_selected_check_size">20dp</dimen>
 
     <dimen name="default_inner_padding_start">16dp</dimen>
     <dimen name="default_inner_padding_end">12dp</dimen>

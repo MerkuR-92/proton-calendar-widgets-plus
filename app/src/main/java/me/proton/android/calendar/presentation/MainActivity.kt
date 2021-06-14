@@ -652,6 +652,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.agendaView.postValue(true)
             drawerLayout.close()
         }
+
+        calendarViewModel.agendaView.observe(this@MainActivity) { agendaView ->
+            nav_view_main_content.nav_view_switcher_day_selected_check.visibleOrGone(!agendaView)
+            nav_view_main_content.nav_view_switcher_agenda_selected_check.visibleOrGone(agendaView)
+        }
     }
 
     private fun initDrawerHeader() {
