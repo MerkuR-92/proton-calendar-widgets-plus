@@ -12,6 +12,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
@@ -28,6 +29,7 @@ import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
+import me.proton.core.util.kotlin.toBoolean
 import java.util.concurrent.TimeUnit
 
 class HandleIcsUseCase(
@@ -192,10 +194,8 @@ class HandleIcsUseCase(
             // Event already exists, check if we need to update it using the ics content
             val immutableExistingEvent = existingEvent
             val immutableExistingEventEntity = existingEventEntity
-
-            if (!isOrganizerMode && immutableExistingEvent != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
-                if (newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID) != null &&
-                    newEvent.iCalEvent.getExperimentalProperty(X_PM_SESSION_KEY) != null) {
+            if (!isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
+                if (immutableExistingEventEntity.isProtonProtonInvite?.toBoolean() == true || immutableExistingEvent.sharedEventId == newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID).value) {
                     // Event is a proton to proton invite
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
@@ -203,6 +203,12 @@ class HandleIcsUseCase(
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
+                if (newEvent.hasProtonProtonProperties ||
+                    newEvent.iCalEvent.getExperimentalProperty(X_PM_PROTON_REPLY)?.value == "1") {
+                    // Attendee added the event as a Proton to Proton invite
+                    makeCalendarVisible(immutableExistingEvent, userId)
+                    return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
+                }
                 return updateEventAsAnOrganizer(immutableExistingEvent, immutableExistingEventEntity, iCalendar, userId)
             } else if (isOrganizerMode && existingEvent == null) {
                 return IcsSurgeryUtils.HandleIcsResult.Error.EventDeleted
@@ -348,7 +354,9 @@ class HandleIcsUseCase(
     }
 
     private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
-        when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)) {
+        val createLinkedEventAsAttendee =
+            action == IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT && newEvent.hasProtonProtonProperties
+        when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent, createLinkedEventAsAttendee)) {
             is UseCase.Result.Success<*> -> {
                 var eventId: String? = null
                 editCreateEventResult.returnValue.tryCast<List<String>> {

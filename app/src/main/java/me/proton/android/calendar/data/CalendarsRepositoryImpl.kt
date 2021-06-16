@@ -17,6 +17,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
@@ -886,6 +887,10 @@ class CalendarsRepositoryImpl(
 
     override suspend fun getEventsByUid(userId: UserId, eventUid: String): ApiResponse<EventsByUidApiResponse> {
         return calendarsApi.getEventsByUid(userId, eventUid, 0, 100)
+    }
+
+    override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
+        return calendarsApi.getEvent(userId, calendarId, eventId)
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {

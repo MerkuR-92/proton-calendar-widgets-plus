@@ -16,7 +16,7 @@ import me.proton.android.calendar.data.entity.*
 
 @Database(
     entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
-    version = 26,
+    version = 27,
     exportSchema = true
 )
 @TypeConverters(DatabaseTypeConverters::class)
@@ -70,7 +70,8 @@ abstract class AppDatabase : RoomDatabase() {
                 .fallbackToDestructiveMigration()
                 .addMigrations(
                     MIGRATION_24_25,
-                    MIGRATION_25_26
+                    MIGRATION_25_26,
+                    MIGRATION_26_27
                 ).build()
     }
 }
@@ -96,6 +97,13 @@ val MIGRATION_25_26 = object : Migration(25, 26) {
     override fun migrate(database: SupportSQLiteDatabase) {
 
         database.execSQL("ALTER TABLE $TABLE_EVENTS ADD COLUMN sharedEventId TEXT")
+    }
+}
+
+val MIGRATION_26_27 = object : Migration(26, 27) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+
+        database.execSQL("ALTER TABLE $TABLE_EVENTS ADD COLUMN isProtonProtonInvite INTEGER")
     }
 }
 

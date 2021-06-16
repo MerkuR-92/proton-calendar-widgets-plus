@@ -19,6 +19,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
@@ -792,7 +793,10 @@ object ICalUtilsImpl : ICalUtils {
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
         originalTimeZoneInfo: TimezoneInfo?,
-        dtStamp: Date
+        dtStamp: Date,
+        isProtonProtonInvite: Boolean,
+        sharedEventId: String?,
+        sharedSessionKey: String?
     ): String {
         // Update user PARTSTAT and remove useless X_PM_TOKEN property
         userAttendee.participationStatus = participationStatus
@@ -821,6 +825,15 @@ object ICalUtilsImpl : ICalUtils {
         responseICalendar.events.first().summary?.let { if (!it.value.isNullOrEmpty()) event.summary = it }
         event.setDateTimeStamp(dtStamp)
 
+        if (isProtonProtonInvite && sharedEventId != null && sharedSessionKey != null) {
+            // Add base64 encoded session key
+            event.setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
+            // Add shared event ID
+            event.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+            // Add X-PM-PROTON-REPLY and set it to true
+            event.setExperimentalProperty(X_PM_PROTON_REPLY, "1")
+        }
+
         iCalendar.addEvent(event)
 
         return iCalendar.printToString()
@@ -829,7 +842,7 @@ object ICalUtilsImpl : ICalUtils {
     override fun getInviteIcs(
         newEvent: Event,
         sharedEventId: String,
-        sharedSessionKey: String,
+        sharedSessionKey: String
     ): String {
 
         val inviteICalendar = newEvent.iCalendar.clone()

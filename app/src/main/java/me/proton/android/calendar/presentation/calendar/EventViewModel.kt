@@ -22,6 +22,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.toInt
+import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
@@ -42,6 +43,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -54,6 +56,7 @@ import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.util.kotlin.filterNullValues
+import me.proton.core.util.kotlin.toBoolean
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -1327,6 +1330,54 @@ class EventViewModel(
                 null
             }
 
+        val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
+            (calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger))?.event
+        } else null
+
+        val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
+
+        if (isProtonProtonInvite == true) {
+            if (!changeAnswerProtonProton(sendPreferences, eventCopy, eventEntity, userAttendee, participationStatus, status, personalPartICalString)) return false
+        } else {
+            if (!changeAnswer(sendPreferences, eventCopy, userAttendee, participationStatus, status, personalPartICalString)) return false
+        }
+
+        if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
+            // If chain has single edits, update their part stat to NEEDS_ACTION
+            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, userEmails, participationStatus)
+        }
+
+        // Apply alarms modifications
+        if (personalPartICalString?.isEmpty() == true) {
+            // clear alarms
+            event.iCalEvent.alarms.clear()
+        } else if (personalPartICalString?.isNotEmpty() == true) {
+            // add default alarms
+            setDefaultAlarms(event, calendarSettings)
+        }
+
+        event.updateParticipationStatus(userEmails, participationStatus)
+
+        if (!event.calendar.display) {
+            // 1. Update in DB
+            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
+            // 2. Update on Server
+            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
+        }
+
+        _event.postValue(event)
+
+        eventState.value = EventState.Idle
+        return true
+    }
+
+    private suspend fun changeAnswer(
+        sendPreferences: Map<Email, SendPreferences>,
+        eventCopy: Event,
+        userAttendee: Attendee,
+        participationStatus: ParticipationStatus,
+        status: Int,
+        personalPartICalString: String?): Boolean {
         val updateTime = Instant.now()
 
         if (sendPreferences.isNotEmpty()) {
@@ -1339,7 +1390,9 @@ class EventViewModel(
                 participationStatus,
                 event.summary,
                 sendPreferences,
-                Date.from(updateTime)
+                Date.from(updateTime),
+                null,
+                false
             )
             sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
             if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
@@ -1369,32 +1422,65 @@ class EventViewModel(
             return false
         }
 
-        if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
-            // If chain has single edits, update their part stat to NEEDS_ACTION
-            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, userEmails, participationStatus)
+        return true
+    }
+
+    private suspend fun changeAnswerProtonProton(
+        sendPreferences: Map<Email, SendPreferences>,
+        eventCopy: Event,
+        eventEntity: EventEntity?,
+        userAttendee: Attendee,
+        participationStatus: ParticipationStatus,
+        status: Int,
+        personalPartICalString: String?): Boolean {
+        if (eventEntity == null) {
+            eventState.value = EventState.Idle
+            return false
         }
 
-        // Apply alarms modifications
-        if (personalPartICalString?.isEmpty() == true) {
-            // clear alarms
-            event.iCalEvent.alarms.clear()
-        } else if (personalPartICalString?.isNotEmpty() == true) {
-            // add default alarms
-            setDefaultAlarms(event, calendarSettings)
+        val updateTime = Instant.now()
+
+        val attendeeId = event.currentUserAttendeeId
+        if (attendeeId.isNullOrEmpty()) {
+            eventState.value = EventState.Idle
+            return false
         }
 
-        event.updateParticipationStatus(userEmails, participationStatus)
-
-        if (!event.calendar.display) {
-            // 1. Update in DB
-            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
-            // 2. Update on Server
-            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
+        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
+            userId,
+            event.calendar.id,
+            event.id,
+            attendeeId,
+            status,
+            personalPartICalString,
+            updateTime.epochSecond.toInt()
+        )
+        updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
+        if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
+            eventState.value = EventState.Idle
+            return false
         }
 
-        _event.postValue(event)
+        if (sendPreferences.isNotEmpty()) {
+            updateParticipationStatusUseCaseResult.returnValue.tryCast<Int> {
+                val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
+                    userId,
+                    eventCopy.iCalendar,
+                    dbEvent?.iCalendar?.timezoneInfo,
+                    userAttendee.copy(),
+                    event.iCalEvent.organizer.email,
+                    participationStatus,
+                    event.summary,
+                    sendPreferences,
+                    Date.from(Instant.ofEpochSecond(this.toLong())), // Use ModifyTime returned by Update part stat BE call
+                    eventEntity,
+                    true
+                )
+                sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+                // Sending the email is optional for proton to proton so we don't care if it failed
+            }
+        }
 
-        eventState.value = EventState.Idle
         return true
     }
 

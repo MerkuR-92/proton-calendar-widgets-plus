@@ -50,5 +50,7 @@ data class EventEntity(
     @SerialName("AttendeesEvents")
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
-    val attendees: List<JsonElement>
+    val attendees: List<JsonElement>,
+    @SerialName("IsProtonProtonInvite")
+    val isProtonProtonInvite: Int? // 1 if is proton to proton invite
 )

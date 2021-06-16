@@ -47,6 +47,8 @@ const val MAX_ANIM_DURATION = 500L
 
 const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
+const val SESSION_KEY_ALGO = "aes256"
+
 val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
 val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
@@ -160,6 +162,8 @@ object CustomICalPropertyParameter {
     const val X_PM_TOKEN = "X-PM-TOKEN"
     const val X_PM_SESSION_KEY = "X-PM-SESSION-KEY"
     const val X_PM_SHARED_EVENT_ID = "X-PM-SHARED-EVENT-ID"
+    const val X_PM_PROTON_REPLY = "X-PM-PROTON-REPLY"
+
 }
 
 object MessageDigestHashType {

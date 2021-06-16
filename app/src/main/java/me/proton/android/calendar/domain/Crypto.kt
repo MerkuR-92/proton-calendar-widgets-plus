@@ -59,6 +59,11 @@ interface Crypto {
     fun encryptTextWithSessionKey(plainText: String, publicKeys: List<String>): Pair<String, List<String?>>
 
     /**
+     * Encrypts session key with the given public key and returns Base64 encoded key packet
+     */
+    fun getKeyPacket(sessionKey: SessionKey, publicKey: String): String?
+
+    /**
      * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket.
      */
     fun encryptSignText(plaintext: String, armoredPublicKey: String, privateKey: String, passphrase: ByteArray): String?

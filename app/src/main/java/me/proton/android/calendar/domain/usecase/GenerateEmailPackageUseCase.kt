@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import com.google.crypto.tink.subtle.Base64
+import me.proton.android.calendar.common.SESSION_KEY_ALGO
 import me.proton.android.calendar.domain.model.EncryptedPackage
 import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -75,13 +76,13 @@ class GenerateEmailPackageUseCase @Inject constructor(
                     mimeType = "multipart/mixed",
                     body = Base64.encode(encryptedMimeBodyDataPacket),
                     type = PackageType.ClearMime.type,
-                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedMimeBodySessionKey), "aes256")
+                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedMimeBodySessionKey), SESSION_KEY_ALGO)
                 )
 
             } else { // Cleartext
 
                 val packageAttachmentKeys = decryptedAttachmentSessionKeys.map {
-                    EncryptedPackage.Key(Base64.encode(it), "aes256")
+                    EncryptedPackage.Key(Base64.encode(it), SESSION_KEY_ALGO)
                 }
 
                 EncryptedPackage(
@@ -90,7 +91,7 @@ class GenerateEmailPackageUseCase @Inject constructor(
                     body = Base64.encode(encryptedBodyDataPacket),
                     type = PackageType.Cleartext.type,
                     attachmentKeys = packageAttachmentKeys,
-                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedBodySessionKey), "aes256")
+                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedBodySessionKey), SESSION_KEY_ALGO)
                 )
 
             }

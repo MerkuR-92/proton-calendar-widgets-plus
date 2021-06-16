@@ -19,6 +19,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -51,14 +52,29 @@ class SendEmailUseCase(
         participationStatus: ParticipationStatus,
         summary: String?,
         sendPreferences: Map<Email, SendPreferences>,
-        dtStamp: Date
+        dtStamp: Date,
+        eventEntity: EventEntity?,
+        isProtonProtonInvite: Boolean
     ): UseCase.Result {
 
         val userAttendeeEmail = userAttendee.extractEmail() ?: return UseCase.Result.InvalidParams("SendEmailUseCase userAttendee has empty email")
         val subject = getReplyMailSubject(summary)
         val body = getReplyMailBody(participationStatus, userAttendeeEmail, summary)
 
-        val ics = getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp)
+        val ics = if (isProtonProtonInvite && eventEntity != null) {
+            val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer sharedEventID was null")
+            val calendarId = eventEntity.calendarId
+
+            val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer: there are no active keys for calendar")
+            val calendarPassphraseList = database.passphrasesDao().select(calendarId)
+            if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer: there are no passphrase for calendar")
+            val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
+            val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer: there is no valid cached Calendar Passphrase")
+
+            val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
+
+            getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite, sharedEventId, sharedSessionKey)
+        } else getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
         val senderAddressId = database.addressesDao().select(userId.id).find {

@@ -393,7 +393,7 @@ data class SyncEventDeleteContainer(
 @Serializable
 data class SyncEvent(
     @SerialName("Permissions")
-    val permissions: Int,
+    val permissions: Int? = null,
     @SerialName("IsOrganizer")
     val isOrganizer: Int, // Default value is 1
     @SerialName("CalendarKeyPacket")
@@ -403,13 +403,17 @@ data class SyncEvent(
     @SerialName("SharedKeyPacket")
     val sharedKeyPacket: String? = null,
     @SerialName("SharedEventContent")
-    val sharedEventContent: List<Event.EventPart.Shared>,
+    val sharedEventContent: List<Event.EventPart.Shared>? = null,
     @SerialName("PersonalEventContent")
     val personalEventContent: Event.EventPart.Personal? = null,
     @SerialName("AttendeesEventContent")
     val attendeesEventContent: List<Event.EventPart.Attendee>? = null,
     @SerialName("Attendees")
-    val attendees: List<Event.AttendeeStatusEvent>? = null
+    val attendees: List<Event.AttendeeStatusEvent>? = null,
+    @SerialName("SharedEventID")
+    val sharedEventId: String? = null,
+    @SerialName("UID")
+    val uid: String? = null
 )
 
 @Serializable
@@ -498,20 +502,16 @@ data class ReenableKeyApiRequest(
 
 @Serializable
 data class AttendeeApiResponse(
-    @SerialName("Attendee")
-    val attendee: AttendeeStatusApiResponse
+    @SerialName("Event")
+    val event: AttendeeStatusApiResponse
 )
 
 @Serializable
 data class AttendeeStatusApiResponse(
     @SerialName("ID")
     val id: String,
-    @SerialName("Token")
-    val token: String,
-    @SerialName("Status")
-    val status: Int, // 0: Unanswered, 1: Maybe, 2: No, 3: Yes
-    @SerialName("UpdateTime")
-    val updateTime: Int? = null
+    @SerialName("ModifyTime")
+    val modifyTime: Int
 )
 
 @Serializable

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import android.util.Base64
 import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
@@ -13,10 +14,12 @@ import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
+import org.koin.ext.getScopeId
 
 class EditCreateEventUseCase(
     private val logger: Logger,
@@ -31,7 +34,7 @@ class EditCreateEventUseCase(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, calendarId: String, newEvent: Event) : UseCase.Result {
+    suspend fun execute(userId: UserId, calendarId: String, newEvent: Event, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
 
         // TODO figure out member-id, it's hardcoded below
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
@@ -75,13 +78,6 @@ class EditCreateEventUseCase(
             }
         }
 
-        logger.d("old event entity: $oldEventEntity")
-        logger.d("shared key packet raw: ${oldEventEntity?.sharedKeyPacket}")
-        logger.d("calendar key packet raw: ${oldEventEntity?.calendarKeyPacket}")
-
-        logger.d("shared key packet decrypted algo: ${oldSharedSessionKey?.algo}")
-        logger.d("calendar key packet decrypted algo: ${oldCalendarSessionKey?.algo}")
-
         // 5. sign and encrypt Shared Parts
         val sharedPartICalString = calendarSplit.sharedPart.printToString()
 
@@ -89,14 +85,24 @@ class EditCreateEventUseCase(
 
         val sharedPartToEncryptICalString = calendarSplit.sharedPartToEncrypt.printToString()
 
-        val encryptedSharedPartCiphertext = if (oldSharedSessionKey != null) {
-            val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, oldSharedSessionKey)
-            Ciphertext.from(null, encryptedSharedPart!!)
-        } else {
-            val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, crypto.getArmoredPublicKey(calendarPrimaryPrivateKey)
-                ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
-            Ciphertext.from(encryptedSharedPart!!)
-        }
+        val encryptedSharedPartCiphertext =
+            if (createLinkedEventAsAttendee) {
+                val sharedSessionKeyProperty = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY).value ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, shared session key was null")
+                val sharedSessionKey = SessionKey(Base64.decode(sharedSessionKeyProperty, Base64.DEFAULT), SESSION_KEY_ALGO)
+                // TODO migrate to PublicKey.encryptSessionKey(cryptoContext, sessionKeyBytes)
+                val sharedKeyPacket = crypto.getKeyPacket(
+                    sharedSessionKey,
+                    crypto.getArmoredPublicKey(calendarPrimaryPrivateKey) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, calendar public key was null")
+                )
+                Ciphertext.from(sharedKeyPacket, "")
+            } else if (oldSharedSessionKey != null) {
+                val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, oldSharedSessionKey)
+                Ciphertext.from(null, encryptedSharedPart!!)
+            } else {
+                val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, crypto.getArmoredPublicKey(calendarPrimaryPrivateKey)
+                    ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
+                Ciphertext.from(encryptedSharedPart!!)
+            }
         val signatureOfEncryptedSharedPart = crypto.signTextDetached(sharedPartToEncryptICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
 
         // 6. sign and encrypt Calendar Parts (optional)
@@ -124,7 +130,8 @@ class EditCreateEventUseCase(
         val attendeesPartICalString = calendarSplit.attendeesPart?.printToString()
 
         val attendeesEventContent =
-            if (attendeesPartICalString != null) {
+            if (createLinkedEventAsAttendee) null // We don't send the attendeesEventContent part when creating a linked event as an attendee
+            else if (attendeesPartICalString != null) {
                 val encryptedAttendeesPartCiphertext = if (oldSharedSessionKey != null) {
                     val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, oldSharedSessionKey)
                     Ciphertext.from(null, encryptedAttendeesPart!!)
@@ -146,20 +153,24 @@ class EditCreateEventUseCase(
             } else null
 
         // 9. assemble API request, depending on action we're taking
-        val sharedEventContent = listOf(
-            Event.EventPart.Shared(
-                2,
-                sharedPartICalString,
-                signatureOfSharedPart!!, // TODO
-                "" // on server, "author" will be extracted from MemberID and this value ignored
-            ),
-            Event.EventPart.Shared(
-                3,
-                encryptedSharedPartCiphertext.encodedDataPacket,
-                signatureOfEncryptedSharedPart!!, // TODO
-                "" // on server, "author" will be extracted from MemberID and this value ignored
-            )
-        )
+        val sharedEventContent =
+            if (createLinkedEventAsAttendee) null
+            else {
+                listOf(
+                    Event.EventPart.Shared(
+                        2,
+                        sharedPartICalString,
+                        signatureOfSharedPart!!, // TODO
+                        "" // on server, "author" will be extracted from MemberID and this value ignored
+                    ),
+                    Event.EventPart.Shared(
+                        3,
+                        encryptedSharedPartCiphertext.encodedDataPacket,
+                        signatureOfEncryptedSharedPart!!, // TODO
+                        "" // on server, "author" will be extracted from MemberID and this value ignored
+                    )
+                )
+            }
 
         val calendarEventContent = listOfNotNull(
             if (calendarPartICalString != null && signatureOfCalendarPart != null) {
@@ -192,7 +203,22 @@ class EditCreateEventUseCase(
 
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
         if (attendeesEventContent != null) {
-            newEvent.iCalEvent.attendees.forEach { attendee ->
+            val newEventAttendees =
+                if (createLinkedEventAsAttendee) {
+                    // The array must only contain one Attendee (the user itself) with his own token and answered participation status
+                    val userEmails = userAddresses.map { address ->
+                        canonicalizeProtonEmail(address.email)
+                    }
+                    val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
+                        userEmails.firstOrNull { userEmail ->
+                            val attendeeEmail = attendee.extractEmail()
+                            attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                        } != null
+                    } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from newEvent")
+                    listOf(userAttendee)
+                } else newEvent.iCalEvent.attendees
+
+            newEventAttendees.forEach { attendee ->
                 if (attendee.participationStatus == null) attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
                 val status = attendee.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
                 attendee.extractEmail()?.let {
@@ -238,28 +264,48 @@ class EditCreateEventUseCase(
             )
 
         } else { // CREATE
-            SyncEventsUpdateApiRequest(
-                memberId = member.id,
-                events = listOf(
-                    SyncEventCreateContainer(
-                        event = SyncEvent(
-                            permissions = 1,
-                            isOrganizer = isOrganizer,
-                            sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
-                            sharedEventContent = sharedEventContent,
-                            calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
-                            calendarEventContent = calendarEventContent,
-                            personalEventContent = personalEventContent,
-                            attendeesEventContent =
-                            if (newEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
-                            else null, // We first create without attendees
-                            attendees =
-                            if (newEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
-                            else null // We first create without attendees
+            if (createLinkedEventAsAttendee) {
+                // This is a proton to proton invite
+                val sharedEventId = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID).value
+                SyncEventsUpdateApiRequest(
+                    memberId = member.id,
+                    events = listOf(
+                        SyncEventCreateContainer(
+                            event = SyncEvent(
+                                isOrganizer = isOrganizer,
+                                sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
+                                personalEventContent = personalEventContent,
+                                attendees = attendees,
+                                sharedEventId = sharedEventId,
+                                uid = newEvent.uid
+                            )
                         )
                     )
                 )
-            )
+            } else {
+                SyncEventsUpdateApiRequest(
+                    memberId = member.id,
+                    events = listOf(
+                        SyncEventCreateContainer(
+                            event = SyncEvent(
+                                permissions = 1,
+                                isOrganizer = isOrganizer,
+                                sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
+                                sharedEventContent = sharedEventContent,
+                                calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
+                                calendarEventContent = calendarEventContent,
+                                personalEventContent = personalEventContent,
+                                attendeesEventContent =
+                                if (newEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
+                                else null, // We first create without attendees
+                                attendees =
+                                if (newEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
+                                else null // We first create without attendees
+                            )
+                        )
+                    )
+                )
+            }
         }
 
         return when (val syncResponse = calendarsApi.syncEvents(userId, calendarId, syncRequestBody)) {

@@ -121,13 +121,13 @@ class CryptoImpl(private val logger: Logger) : Crypto {
         return Pair(Base64.encode(dataPacket), keyPackets)
     }
 
-    private fun getKeyPacket(sessionKey: SessionKey, publicKey: String): String? {
+    override fun getKeyPacket(sessionKey: SessionKey, publicKey: String): String? {
         return try {
             val keyRing = newKeyRing(newKeyFromArmored(publicKey))
             val keyPacket = keyRing.encryptSessionKey(sessionKey)
             Base64.encode(keyPacket)
         } catch (e: java.lang.Exception) {
-            logger.i("encryptTextWithSessionKey failed", e)
+            logger.i("getKeyPacket failed", e)
             null
         }
     }

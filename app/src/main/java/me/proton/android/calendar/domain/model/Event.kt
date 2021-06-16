@@ -30,7 +30,8 @@ data class Event private constructor(
     val verificationStatus: SignatureVerification? = null,
     val decryptionStatus: DecryptionStatus? = null,
     val currentUserAttendeeId: String? = null,
-    val sharedEventId: String? = null
+    val sharedEventId: String? = null,
+    val isProtonProtonInvite: Boolean? = null
 ) : BaseModel() {
 
     companion object {
@@ -42,7 +43,8 @@ data class Event private constructor(
             verificationStatus: SignatureVerification? = null,
             decryptionStatus: DecryptionStatus? = null,
             currentUserAttendeeId: String? = null,
-            sharedEventId: String? = null
+            sharedEventId: String? = null,
+            isProtonProtonInvite: Boolean? = null
         ): Event? {
 
             val vEvent = iCalendar.events.firstOrNull()
@@ -55,7 +57,8 @@ data class Event private constructor(
                     verificationStatus,
                     decryptionStatus,
                     currentUserAttendeeId,
-                    sharedEventId
+                    sharedEventId,
+                    isProtonProtonInvite
                 )
             } else null
 
@@ -117,6 +120,10 @@ data class Event private constructor(
 
     // TODO Change this once we allow editing event with attendees
     val isAnInvitation: Boolean get() = !this.iCalEvent.attendees.isNullOrEmpty()
+
+    val hasProtonProtonProperties: Boolean get() =
+        iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value?.isNotBlank() == true &&
+                iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY)?.value?.isNotBlank() == true
 
     fun getStart(timeZoneId: String): ZonedDateTime {
         return iCalEvent.getStart(timeZoneId)!!

@@ -18,6 +18,7 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.util.kotlin.toBoolean
 
 
 class TransformEventUseCase(
@@ -185,7 +186,8 @@ class TransformEventUseCase(
                 else -> null
             },
             currentUserAttendeeId = currentUserAttendeeId,
-            sharedEventId = eventEntity.sharedEventId
+            sharedEventId = eventEntity.sharedEventId,
+            isProtonProtonInvite = eventEntity.isProtonProtonInvite?.toBoolean()
         )
 
     }

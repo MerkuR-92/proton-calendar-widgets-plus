@@ -214,7 +214,10 @@ interface ICalUtils {
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
         originalTimeZoneInfo: TimezoneInfo?,
-        dtStamp: Date
+        dtStamp: Date,
+        isProtonProtonInvite: Boolean,
+        sharedEventId: String? = null,
+        sharedSessionKey: String? = null
     ): String
 
     fun getInviteIcs(
