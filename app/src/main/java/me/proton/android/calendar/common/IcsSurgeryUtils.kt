@@ -32,7 +32,6 @@ import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
-import me.proton.android.calendar.common.IcsSurgeryUtils.localizeFloatingDate
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -386,21 +385,23 @@ object IcsSurgeryUtils {
         if (!isReply && event.recurrenceId?.value != null && event.recurrenceRule?.value != null) return false
 
         // Allow standalone single edits
-        val parentEvents = parentCalendar?.events?.firstOrNull() ?: return true
+        val parentEvent = parentCalendar?.events?.firstOrNull() ?: return true
 
         // If RECURRENCE-ID is of type DATE-TIME for a parent all-day event, convert to type DATE by keeping just the date part.
-        if (event.recurrenceId.value.hasTime() && parentEvents.dateStart?.value?.hasTime() == false) {
+        if (event.recurrenceId.value.hasTime() && parentEvent.dateStart?.value?.hasTime() == false) {
             event.recurrenceId.value = ICalDate(event.recurrenceId.value, false)
         }
 
         // If RECURRENCE-ID is of type DATE for a parent part-day event then we cannot recover and reject (as invalid).
-        if (!event.recurrenceId.value.hasTime() && parentEvents.dateStart?.value?.hasTime() == true) {
+        if (!event.recurrenceId.value.hasTime() && parentEvent.dateStart?.value?.hasTime() == true) {
             return false
         }
 
         // If RECURRENCE-ID has a timezone different from the parent DTSTART one, re-localize in the parent DTSTART timezone.
-        if (event.recurrenceId.value != null && this.timezoneInfo.getTimezone(event.recurrenceId) != parentCalendar.timezoneInfo?.getTimezone(parentEvents.dateStart)) {
-            this.timezoneInfo.setTimezone(event.recurrenceId, parentCalendar.timezoneInfo?.getTimezone(parentEvents.dateStart))
+        val eventRecurrenceIdTimezone = this.timezoneInfo.getTimezone(event.recurrenceId).timeZone.id
+        val parentRecurrenceIdTimezone = parentCalendar.timezoneInfo?.getTimezone(parentEvent.dateStart)?.timeZone?.id
+        if (event.recurrenceId.value != null && eventRecurrenceIdTimezone != parentRecurrenceIdTimezone) {
+            this.timezoneInfo.setTimezone(event.recurrenceId, parentCalendar.timezoneInfo?.getTimezone(parentEvent.dateStart))
         }
 
         return true

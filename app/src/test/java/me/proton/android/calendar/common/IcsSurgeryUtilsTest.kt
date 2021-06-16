@@ -1618,6 +1618,106 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `cleanRecurrenceId RECURRENCE-ID timezone (with TZ definition) same as the parent DTSTART test`() {
+
+        val parentICalString = """
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTAMP:20210601T134616Z
+DTSTART;TZID=Africa/El_Aaiun:20210601T100000
+DTEND;TZID=Africa/El_Aaiun:20210601T103000
+RRULE:FREQ=WEEKLY;UNTIL=20210901T225959Z;BYDAY=FR,SA,TH,TU,WE
+ORGANIZER;CN=iamblueuser@gmail.com:mailto:iamblueuser@gmail.com
+SEQUENCE:0
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descripti
+ on.\n\nView your event at https://calendar.google.com/calendar/event?actio
+ n=VIEW&eid=MHFndW1sbmFraGg3dTliYmZkcDNvbjk5b2YgY2FsZW5kYXJhdXRvbWF0aW9uOTk
+ 5QHByb3Rvbm1haWwuY29t&tok=MjEjaWFtYmx1ZXVzZXJAZ21haWwuY29tMDRjOWNmNTJhNzQ1
+ YTAyYTJiODM4NTE4NzljNTU2YjY5OTM4YThjNw&ctz=Europe%2FVilnius&hl=en_GB&es=1.
+ \n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~::~:~::-
+SUMMARY:Timezone +1
+UID:0qgumlnakhh7u9bbfdp3on99ofadam@google.com
+ATTENDEE;X-PM-TOKEN=bd25aa978853c40eec974a60a8b1911a1c0ec567;RSVP=TRUE;ROLE
+ =REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=adamtst@protonmail.com:mailto:adamt
+ st@protonmail.com
+ATTENDEE;X-PM-TOKEN=cb098dff9886f4688bb50b9138d796357144dfa2;RSVP=TRUE;ROLE
+ =REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=iamblueuser@gmail.com:mailto:iamblue
+ user@gmail.com
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+    """.trimIndent()
+
+        val iCalString = """
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Africa/El_Aaiun
+X-LIC-LOCATION:Africa/El_Aaiun
+BEGIN:STANDARD
+TZOFFSETFROM:+0000
+TZOFFSETTO:+0000
+TZNAME:+00
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20210729
+DTEND;VALUE=DATE:20210730
+DTSTAMP:20210601T135021Z
+ORGANIZER;CN=iamblueuser@gmail.com:mailto:iamblueuser@gmail.com
+UID:0qgumlnakhh7u9bbfdp3on99ofadam2@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=iamblueuser@gmail.com;X-NUM-GUESTS=0:mailto:iamblueuser@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=adamtst@protonmail.com;X-NUM-GUESTS=0:mailto:adamtst
+ @protonmail.com
+X-MICROSOFT-CDO-OWNERAPPTID:-462541747
+RECURRENCE-ID;TZID=Africa/El_Aaiun:20210729T100000
+CREATED:20210601T134615Z
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descriptio
+ n.\n\nView your event at https://calendar.google.com/calendar/event?action=
+ VIEW&eid=MHFndW1sbmFraGg3dTliYmZkcDNvbjk5b2ZfMjAyMTA3MjlUMDkwMDAwWiBjYWxlbm
+ RhcmF1dG9tYXRpb245OTlAcHJvdG9ubWFpbC5jb20&tok=MjEjaWFtYmx1ZXVzZXJAZ21haWwuY
+ 29tOGQwZTZjNTc5ZWY1NDgyN2UzODc0ZDU5ZjQ3NmRiMTA5YzFhOTdkOQ&ctz=Europe%2FViln
+ ius&hl=en_GB&es=0.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20210601T135020Z
+LOCATION:
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Timezone To full day
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+    """.trimIndent()
+
+        val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar!!
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar.cleanRecurrenceId(true, parentICal)).isTrue()
+            assertThat(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().recurrenceId).timeZone.id).isEqualTo("Africa/El_Aaiun")
+        }
+    }
+
+    @Test
     fun `cleanExDate EXDATE is of type DATE-TIME for an all-day event test`() {
 
         val iCalString = """
