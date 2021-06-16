@@ -18,7 +18,7 @@ class GetCanonicalEmailsUseCase(
      * Returns Map of <Email String, canonical version of Email String> getting rid of address aliases,
      * different capitalisations, etc. according to server rules.
      *
-     * @return Email mapped to null if it canonicalization failed, or no Email in the map in case of other error
+     * @return Email mapped to null if its canonicalization failed, or no Email in the map in case of other error
      */
     suspend operator fun invoke(userId: UserId, emails: List<String>): Map<String, String?> {
 

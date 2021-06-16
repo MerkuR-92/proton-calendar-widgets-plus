@@ -335,10 +335,16 @@ class HandleIcsUseCase(
             }
         }
 
+        // TODO should we move it before the loop above and fail faster?
         // Handle party crashers in replies
         val updatedAttendee = iCalendar.events.first().attendees.firstOrNull()
         val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
-        if (existingEvent.iCalEvent.attendees?.firstOrNull { updatedAttendeeEmail == it.extractEmail() } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
+        val canonicalAttendeeEmail = canonicalEmailsUseCase.invoke(userId, listOf(updatedAttendeeEmail))[updatedAttendeeEmail] ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+        val existingEventCanonicalAttendeeEmails = canonicalEmailsUseCase.invoke(userId, existingEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() })
+
+        if (existingEvent.iCalEvent.attendees?.none {
+            canonicalAttendeeEmail == existingEventCanonicalAttendeeEmails[it.extractEmail()]
+        } == true) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
 
         makeCalendarVisible(existingEvent, userId)
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent.isRecurring())
