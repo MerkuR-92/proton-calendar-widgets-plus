@@ -181,24 +181,37 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         // setup week numbers
         view?.findViewById<LinearLayout>(R.id.ll_weekdays)?.run {
             this.removeAllViews()
-            val fullWeeksInMonth = MiniCalendarItemAdapter.calculateFullWeeksInMonth(immutableDate, startWeekOn)
+            val fullWeeksInMonth = MiniCalendarItemAdapter.calculateFullWeeksInMonth(firstDay, startWeekOn)
             for (i in 0 until fullWeeksInMonth) {
                 val weekdayView = LayoutInflater.from(this.context).inflate(
                     R.layout.item_mini_calendar_weekday,
                     this,
                     false
                 )
-                (weekdayView as TextView).text = "${immutableDate.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
+                (weekdayView as TextView).text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
                 addView(weekdayView)
             }
         }
 
         calendarViewModel.lifeCycleScope.launch {
 
-            val fromDate = immutableDate.withDayOfMonth(1)
-            val toDate = immutableDate.withDayOfMonth(immutableDate.lengthOfMonth())
+            if (monthView) {
+                val firstDayOfTheMonth = firstDay.withDayOfMonth(1)
+                val firstDayOfTheWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
+                val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+                val lastDayOfTheMonth = firstDay.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
+                val lastDayOfMonthWeekValue = DayOfWeek.of(lastDayOfTheMonth.dayOfWeek.value).value
+                val lastDayOfMonthOffset = 7 - (startWeekOn.value + lastDayOfMonthWeekValue - 1)
 
-            calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId)
+                val fromDate = firstDayOfTheMonth.minusDays(firstDayOfTheWeekOffset.toLong())
+                val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()).plusDays(lastDayOfMonthOffset.toLong())
+
+                calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId)
+            } else {
+                val toDate = firstDay.plusDays(6)
+
+                calendarViewModel.fetchEvents(firstDay, toDate, timeZoneId)
+            }
         }
     }
 }

@@ -6,30 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.distinctUntilChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.text
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.concatenate
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
-import me.proton.android.calendar.common.TimberLogger
-import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
 import java.time.*
@@ -338,17 +330,20 @@ class MiniCalendarItemAdapter(
          * No need to measure the adapter view, we can calculate the height because item dimensions
          * are constant.
          */
-        fun calculateAdapterHeight(context: Context, firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek, isMonthView: Boolean): Int {
+        fun calculateAdapterHeight(
+            context: Context,
+            firstDayOfMonth: LocalDate,
+            startWeekOn: DayOfWeek,
+            isMonthView: Boolean
+        ): Int {
             val fullWeeksInMonth = if (isMonthView) calculateFullWeeksInMonth(firstDayOfMonth, startWeekOn) else 1
 
-            val newHeight = context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
+            return context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
                     fullWeeksInMonth * context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) +
                     (if (fullWeeksInMonth == 1) context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing) * 2
                     else (fullWeeksInMonth - 1) * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)) +
                     fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing) +
                     context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing)
-
-            return newHeight
         }
 
         fun calculateFullWeeksInMonth(firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {
