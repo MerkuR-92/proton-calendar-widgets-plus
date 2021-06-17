@@ -1877,7 +1877,7 @@ END:VCALENDAR
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanAttendees()).isFalse()
+            assertThat(event.cleanAttendees(iCalendar.method)).isFalse()
         }
     }
 
@@ -1913,7 +1913,7 @@ END:VCALENDAR
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanAttendees()).isFalse()
+            assertThat(event.cleanAttendees(iCalendar.method)).isFalse()
         }
     }
 
@@ -1961,7 +1961,7 @@ END:VCALENDAR
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanAttendees()).isTrue()
+            assertThat(event.cleanAttendees(iCalendar.method)).isTrue()
             event.attendees.forEach {
                 assertThat(it.uri?.contains("/principal/") == true).isFalse()
                 assertThat(it.uri?.contains("test") == true).isFalse()
@@ -1973,6 +1973,45 @@ END:VCALENDAR
             assertThat(event.attendees[3].email).isEqualTo("test42@example.com")
             assertThat(event.attendees[4].email).isEqualTo("test52@example.com")
             assertThat(event.attendees[5].email).isEqualTo("test61@example.com")
+        }
+    }
+
+    @Test
+    fun `cleanAttendees REPLY with multiple ATTENDEE`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Proton Technologies//ProtonMail 4.1.48//EN
+    VERSION:2.0
+    METHOD:REPLY
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    UID:gq5SSswmHEVRZsuySZFNjg6_V6QW@proton.me
+    DTSTART;TZID=Europe/Paris:20210614T160000
+    DTEND;TZID=Europe/Paris:20210614T163000
+    SEQUENCE:0
+    ORGANIZER;CN=breakingcalendar@protonmail.com:mailto:breakingcalendar@proton
+     mail.com
+    SUMMARY:Create Proton to proton 1
+    X-PM-SHARED-EVENT-ID:NdGVn4ks6nlYxlieUeuah9J-Oeuw5-V8qHCZcPR6QHvyM6LzRfVZe7
+     twRYW7Dk3_q__om5Rm9RHJOEL7XKIKSObOXZXJHS_0aEki2-C-d18=
+    X-PM-SESSION-KEY:ZkVFqPfOknRQWnLsKN/unJAbRyitjYncBDdy0g/A2Ww=
+    DTSTAMP:20210614T134325Z
+    ATTENDEE;PARTSTAT=ACCEPTED:mailto:benjaminlovestesting@pm.me
+    ATTENDEE;PARTSTAT=DECLINED:mailto:adamtst@pm.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanAttendees(iCalendar.method)).isFalse()
         }
     }
 

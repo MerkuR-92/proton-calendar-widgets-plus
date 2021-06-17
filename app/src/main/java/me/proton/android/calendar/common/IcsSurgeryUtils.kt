@@ -9,6 +9,7 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.ICalProperty
+import biweekly.property.Method
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
@@ -175,7 +176,7 @@ object IcsSurgeryUtils {
 
             if (!event.cleanSequence()) return HandleIcsResult.Error.Invalid.Sequence
 
-            if (!event.cleanAttendees()) return HandleIcsResult.Error.Invalid.Attendees
+            if (!event.cleanAttendees(iCalendar.method)) return HandleIcsResult.Error.Invalid.Attendees
 
             if ((iCalendar.method?.isReply == true || iCalendar.method?.isRequest == true || iCalendar.method?.isCancel == true) && !event.alarms.isNullOrEmpty()) {
                 // We drop alarms for invites as those would be the personal alarms of the organizer
@@ -448,9 +449,12 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun VEvent.cleanAttendees(): Boolean {
+    fun VEvent.cleanAttendees(method: Method): Boolean {
         // If there are more than 100 attendees, reject invitation as unsupported.
         if (this.attendees != null && this.attendees.size > MAX_ATTENDEES) return false
+
+        // REPLY ics should only contain one attendee
+        if (method.isReply && this.attendees.size > 1) return false
 
         val attendeesEmail = mutableListOf<String>()
         this.attendees?.forEach { attendee ->
