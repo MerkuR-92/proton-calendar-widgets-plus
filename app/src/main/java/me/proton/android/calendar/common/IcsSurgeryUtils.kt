@@ -4,12 +4,14 @@ import biweekly.Biweekly
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.io.TimezoneAssignment
+import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.ICalProperty
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.partDayICalDateToDate
@@ -17,6 +19,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.IcsParsingValidation.CONTACT_NAME_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_ATTENDEES
@@ -31,6 +34,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.MIN_DATE
 import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
+import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import java.time.ZoneId
 import java.util.*
@@ -277,7 +281,7 @@ object IcsSurgeryUtils {
     }
 
     private fun String.ellipsizeField(maxLength: Int): String {
-        return this.substring(0, maxLength - 3).plus("...")
+        return this.substring(0, maxLength - 1).plus("…")
     }
 
     fun VEvent.cleanDescription(): Boolean {
@@ -459,6 +463,36 @@ object IcsSurgeryUtils {
 
             // Overwrite email field with extracted email value
             attendee.email = email
+
+            // CN: This field is limited to 190 characters, which is the limit we impose on contact names.
+            if (attendee.commonName?.isNotBlank() == true && attendee.commonName.length > CONTACT_NAME_MAX_LENGTH) {
+                attendee.commonName = attendee.commonName.ellipsizeField(CONTACT_NAME_MAX_LENGTH)
+            }
+
+            // ROLE: We only admit OPTIONAL or REQUIRED as values. If the value is any other, ignore the parameter.
+            if (attendee.participationLevel != ParticipationLevel.OPTIONAL && attendee.participationLevel != ParticipationLevel.REQUIRED) {
+                attendee.participationLevel = null
+            }
+
+            // RSVP: We only admit TRUE as value. Ignore other values.
+            if (attendee.rsvp != true) {
+                attendee.rsvp = null
+            }
+
+            // PARTSTAT: We only admit NEEDS_ACTION, ACCEPTED, DECLINED, TENTATIVE or DELEGATED as values, if different fall back to NEEDS-ACTION
+            if (attendee.participationStatus != ParticipationStatus.NEEDS_ACTION &&
+                attendee.participationStatus != ParticipationStatus.ACCEPTED &&
+                attendee.participationStatus != ParticipationStatus.DECLINED &&
+                attendee.participationStatus != ParticipationStatus.TENTATIVE &&
+                attendee.participationStatus != ParticipationStatus.DELEGATED) {
+                attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
+            }
+
+            if (attendee.getParameter(X_PM_TOKEN) != null) {
+                val token = attendee.getParameter(X_PM_TOKEN)
+                // X-PM-TOKEN: Make a quick check that it's a valid Proton token (check length plus proton.me domain). If invalid, reject the event as invalid.
+                if (token.length != X_PM_TOKEN_LENGTH) return false
+            }
 
             // In case some attendee emails are repeated, we reject (as unsupported) the invite
             if (attendeesEmail.contains(email)) return false

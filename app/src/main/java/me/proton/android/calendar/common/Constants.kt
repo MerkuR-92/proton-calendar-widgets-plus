@@ -80,9 +80,12 @@ enum class AppTheme(val value: Int) {
 
 object IcsParsingValidation {
     const val UID_MAX_LENGTH = 191
+    const val CONTACT_NAME_MAX_LENGTH = 190
     const val SUMMARY_MAX_LENGTH = 255
     const val LOCATION_MAX_LENGTH = 255
     const val DESCRIPTION_MAX_LENGTH = 3000
+
+    const val X_PM_TOKEN_LENGTH = 40
 
     const val MAX_COUNT = 49
     const val MAX_COUNT_INVITATION = 499
