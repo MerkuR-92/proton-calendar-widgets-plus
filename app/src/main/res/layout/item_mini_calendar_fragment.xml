@@ -4,26 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingStart="9dp"
     tools:context=".presentation.calendar.MonthFragment">
 
     <LinearLayout
         android:id="@+id/ll_weekdays"
-        android:layout_width="@dimen/calendar_week_number_width"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="@dimen/calendar_week_number_spacing_start"
         android:paddingTop="@dimen/calendar_item_header_height"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_mini_calendar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:scrollbars="none"
+        android:layout_marginStart="@dimen/calendar_week_number_spacing_start"
         android:layout_marginTop="8dp"
-        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ll_weekdays"

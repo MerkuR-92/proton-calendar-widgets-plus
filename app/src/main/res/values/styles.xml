@@ -101,6 +101,19 @@
         <item name="android:textColor">@color/text_weak</item>
     </style>
 
+    <style name="Text.Overline">
+        <item name="android:textSize">10sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/text_weak</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+    </style>
+
+    <style name="Text.Overline.Strong">
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
     <style name="Separator">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">1dp</item>

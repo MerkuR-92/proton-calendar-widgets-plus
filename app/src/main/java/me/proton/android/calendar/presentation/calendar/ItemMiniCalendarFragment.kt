@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_month.*
+import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -185,7 +188,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                     this,
                     false
                 )
-                (weekdayView as TextView).text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
+                val textView = weekdayView as TextView
+                textView.text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
                 addView(weekdayView)
             }
         }
