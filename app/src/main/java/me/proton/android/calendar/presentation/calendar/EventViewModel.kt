@@ -12,15 +12,12 @@ import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
@@ -129,7 +126,7 @@ class EventViewModel(
 
     var currentParticipationStatus: ParticipationStatus? = null
 
-    sealed class EventState() {
+    sealed class EventState {
 
         // TODO
         object Idle: EventState()
@@ -414,8 +411,7 @@ class EventViewModel(
             val event = _event.value ?: return null
             val dbEvent = dbEvent ?: return null
 
-            var hasSingleEdit: Boolean = false
-            var hasFutureSingleEdit: Boolean = false
+            var hasFutureSingleEdit = false
             val hasAnsweredSingleEdit = hashMapOf<ParticipationStatus, Boolean>()
 
             val occurrenceStart = event.getOccurrenceStart(eventTimeZoneId)
@@ -426,7 +422,7 @@ class EventViewModel(
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
             // We check for single edits only once and in initialise because it may require API calls
-            hasSingleEdit =
+            val hasSingleEdit =
                 if (occurrence?.occurrenceNumber == 1 &&
                     !allowShowThisAndFuture && (editMode ||
                             !event.isAnInvitation && userEmails != null)) {
@@ -550,7 +546,7 @@ class EventViewModel(
     fun validateDateTime(): Boolean = !(event.getEnd(eventTimeZoneId).isBefore(event.getStart(eventTimeZoneId)))
 
     // alarm temp values
-    var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
+    private var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
     var tempAlarmTime: LocalTime = LocalTime.of(9, 0)
 
     fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
@@ -866,7 +862,6 @@ class EventViewModel(
             val eventStartDate = event.getStart(eventTimeZoneId).toLocalDate()
 
             val iCalDayOfWeek = eventStartDate.dayOfWeek.toBiweeklyDayOfWeek()
-            val weekInMonth = eventStartDate.weekInMonth()
 
             val eventDaySetPos = this.bySetPos.getOrNull(this.byDay.indexOfFirst { it.day == iCalDayOfWeek })
 
@@ -1197,7 +1192,7 @@ class EventViewModel(
     }
 
     /**
-     * @return show snackbar with generic error
+     * @return show snack with generic error
      */
     suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus): Boolean {
         if (eventState.value is EventState.Processing) return true
@@ -1262,7 +1257,7 @@ class EventViewModel(
         }
 
         val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
-        if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+        return if (sendPreferencesResults.emailErrors.isNotEmpty()) {
 
             val emailError = sendPreferencesResults.emailErrors.values.first()
 
@@ -1270,9 +1265,9 @@ class EventViewModel(
             eventState.value = EventState.Idle
             eventDialogState.value = EventDialogState.ChangeAnswer.SendPreferences(newParticipationStatus, emailError)
 
-            return emailError !is ObtainSendPreferencesUseCase.Result.Error.NetworkError
+            emailError !is ObtainSendPreferencesUseCase.Result.Error.NetworkError
         } else {
-            return updateParticipationStatus(
+            updateParticipationStatus(
                 newParticipationStatus,
                 sendPreferencesResults.sendPreferences
             )
@@ -1331,7 +1326,7 @@ class EventViewModel(
             }
 
         val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
-            (calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger))?.event
+            (calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger) ?: return false).event
         } else null
 
         val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()

@@ -856,9 +856,9 @@ object ICalUtilsImpl : ICalUtils {
         if (inviteICalendar.calendarScale == null) inviteICalendar.calendarScale = CalendarScale.gregorian()
 
         // Add base64 encoded session key
-        inviteICalendar.setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
+        inviteICalendar.events.first().setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
         // Add shared event ID
-        inviteICalendar.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+        inviteICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
 
         // Replace common names with emails
         inviteICalendar.events.first().attendees.forEach {
