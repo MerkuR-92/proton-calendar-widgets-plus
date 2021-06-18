@@ -85,7 +85,17 @@
             android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name="me.proton.core.auth.presentation.ui.AddAccountActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ProtonTheme.Calendar.AddAccount"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name="me.proton.core.auth.presentation.ui.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ProtonTheme"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="me.proton.core.auth.presentation.ui.signup.SignupActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
@@ -104,6 +114,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

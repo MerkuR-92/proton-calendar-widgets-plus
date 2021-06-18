@@ -4,12 +4,10 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 
 const val API_VERSION_CALENDAR = "v1"
-//const val API_BASE_URL = "https://protonmail.blue/api/"
-const val API_BASE_URL = "https://api.protonmail.ch/"
-const val CAPTCHA_BASE_URL = "protonmail.ch"
+const val API_HOST = "api.protonmail.ch"
+const val BASE_URL = "https://$API_HOST/"
 const val API_APPLICATION_NAME = "AndroidCalendar"
 
 const val USER_AGENT_NAME = "ProtonCalendar"

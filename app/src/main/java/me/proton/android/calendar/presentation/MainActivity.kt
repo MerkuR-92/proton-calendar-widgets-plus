@@ -14,9 +14,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -38,6 +37,8 @@ import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -215,11 +216,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         with(accountViewModel) {
             init(this@MainActivity)
 
-            state.distinctUntilChanged().observe(this@MainActivity, Observer { state ->
+            // Close app if AddAccount screen has been closed.
+            onAddAccountClosed { finish() }
+
+            state.onEach { state ->
                 if (errorReport.value == null) {
                     handleAccountState(this, state)
                 }
-            })
+            }.launchIn(lifecycleScope)
 
             // Handle Bootstrap errors
             errorReport.observe(this@MainActivity, Observer { errorReport ->
@@ -347,7 +351,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
                 }
                 findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
-                accountViewModel.startLoginWorkflow()
+                accountViewModel.addAccount()
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
             AccountViewModel.State.Ready -> {
@@ -397,7 +401,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     } else navigateTo(Navigation.Deeplink.toMonth())
                 }
             }
-            AccountViewModel.State.LoginInProgress,
             AccountViewModel.State.Processing -> {
                 displaySplashScreen(
                     display = true,
@@ -650,7 +653,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawerLayout.close()
         }
         nav_view_main_content.nav_view_more_login_press.setOnSingleClickListener {
-            accountViewModel.startLoginWorkflow()
+            accountViewModel.addAccount()
             drawerLayout.close()
         }
     }

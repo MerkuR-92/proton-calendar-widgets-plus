@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.proton.android.calendar.common.CAPTCHA_BASE_URL
+import me.proton.android.calendar.common.API_HOST
 import me.proton.core.accountmanager.data.db.AccountManagerDatabase
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.humanverification.data.HumanVerificationListenerImpl
@@ -17,7 +17,7 @@ import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.domain.HumanVerificationWorkflowHandler
 import me.proton.core.humanverification.domain.repository.HumanVerificationRepository
 import me.proton.core.humanverification.domain.repository.UserVerificationRepository
-import me.proton.core.humanverification.presentation.CaptchaBaseUrl
+import me.proton.core.humanverification.presentation.CaptchaApiHost
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.domain.client.ClientIdProvider
@@ -30,8 +30,8 @@ import javax.inject.Singleton
 object HumanVerificationModule {
 
     @Provides
-    @CaptchaBaseUrl
-    fun provideCaptchaBaseUrl(): String = CAPTCHA_BASE_URL
+    @CaptchaApiHost
+    fun provideCaptchaApiHost(): String = API_HOST
 
     @Provides
     fun provideHumanVerificationOrchestrator(): HumanVerificationOrchestrator =
