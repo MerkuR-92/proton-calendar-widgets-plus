@@ -211,7 +211,8 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList(),
                     emptyList(),
                     emptyList(),
-                    emptyList()))
+                    emptyList(),
+                    null))
             )
 
             coEvery { calendarsApiMock.getEvent(userId, calendarId, "KEZDgiuT4MIsCMCH9aPPXJ9NpDNnKRr3-fY1dh8shzeAri-GLWVjb0sexZAc6hpRJUDTV2ljNfapsxEy-47WBQ==") } returns ApiResponse.Success(
@@ -228,7 +229,8 @@ internal class SyncServerEventsUseCaseTest {
                     emptyList(),
                     emptyList(),
                     emptyList(),
-                    emptyList()))
+                    emptyList(),
+                    null))
             )
 
             val handleEventsMetadataUseCase = HandleEventsMetadataUseCase(

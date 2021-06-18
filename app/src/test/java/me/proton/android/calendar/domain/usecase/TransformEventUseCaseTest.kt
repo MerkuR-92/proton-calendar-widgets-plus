@@ -63,7 +63,8 @@ internal class TransformEventUseCaseTest {
                 getMockedNonEncryptedCalendarEvents(),
                 getMockedPersonalEvents(),
                 getMockedNonEncryptedAttendeesEvents(),
-                getMockedAttendees()
+                getMockedAttendees(),
+                null
             )
 
             // calendarEntity
