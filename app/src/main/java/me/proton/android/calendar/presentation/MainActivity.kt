@@ -164,6 +164,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         handleAppTheme()
     }
 
+    fun changeViewMode(viewMode: ViewMode) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val editor = sharedPreferences.edit()
+        editor.putInt(SharedPreferencesKeys.VIEW_MODE, viewMode.value)
+        editor.apply()
+    }
+
+    fun getLastViewMode(): ViewMode {
+        // By default we display the agenda view
+        return ViewMode.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.AGENDA.value)]
+    }
+
     private fun handleAppTheme() {
         when (getAppTheme()) {
             AppTheme.LIGHT -> {
@@ -310,6 +323,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             })
         }
+        calendarViewModel.viewMode.value = getLastViewMode()
 
         nav_view_main_content.nav_view_version.text = getString(
             R.string.nav_view_version_name,
@@ -644,18 +658,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_switcher_day_press.setOnSingleClickListener {
-            calendarViewModel.agendaView.postValue(false)
+            calendarViewModel.viewMode.postValue(ViewMode.DAY)
+            changeViewMode(ViewMode.DAY)
             drawerLayout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
-            calendarViewModel.agendaView.postValue(true)
+            calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
+            changeViewMode(ViewMode.AGENDA)
             drawerLayout.close()
         }
 
-        calendarViewModel.agendaView.observe(this@MainActivity) { agendaView ->
-            nav_view_main_content.nav_view_switcher_day_selected_check.visibleOrGone(!agendaView)
-            nav_view_main_content.nav_view_switcher_agenda_selected_check.visibleOrGone(agendaView)
+        calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->
+            nav_view_main_content.nav_view_switcher_day_selected_check.visibleOrGone(viewMode == ViewMode.DAY)
+            nav_view_main_content.nav_view_switcher_agenda_selected_check.visibleOrGone(viewMode == ViewMode.AGENDA)
         }
     }
 

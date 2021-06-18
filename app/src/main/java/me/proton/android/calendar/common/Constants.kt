@@ -82,6 +82,7 @@ object ApiResponseCode {
 
 object SharedPreferencesKeys {
     const val THEME = "theme"
+    const val VIEW_MODE = "view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
 }
@@ -95,6 +96,11 @@ enum class AppTheme(val value: Int) {
 enum class AlarmAction(val value: Int) {
     EMAIL(1),
     DISPLAY(2)
+}
+
+enum class ViewMode(val value: Int) {
+    AGENDA(0),
+    DAY(1)
 }
 
 object IcsParsingValidation {

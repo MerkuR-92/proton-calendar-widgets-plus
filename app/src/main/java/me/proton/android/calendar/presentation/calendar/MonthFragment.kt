@@ -375,8 +375,8 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        calendarViewModel.agendaView.observe(viewLifecycleOwner) { agendaView ->
-            if (agendaView) {
+        calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
+            if (viewMode == ViewMode.AGENDA) {
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = agendaPagerAdapter
@@ -393,8 +393,6 @@ class MonthFragment : BaseFragment() {
                     offscreenPageLimit = 1
                 }
                 calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
-
-//                if (miniCalendarPager.isVisible) mini_calendar_slider.performClick() // Hide the mini calendar when switching to day view
             }
         }
 

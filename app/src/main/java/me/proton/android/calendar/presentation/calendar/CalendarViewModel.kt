@@ -91,7 +91,7 @@ class CalendarViewModel(
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
-    var agendaView: MutableLiveData<Boolean> = MutableLiveData(true)
+    var viewMode: MutableLiveData<ViewMode> = MutableLiveData(ViewMode.AGENDA)
     var monthView: MutableLiveData<Boolean> = MutableLiveData(true)
     var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -272,13 +272,13 @@ class CalendarViewModel(
         }
 
         // adjust Agenda
-        val agendaAdapter = if (agendaView.value == true) agendaPager.adapter as? AgendaPagerAdapter else agendaPager.adapter as? DayPagerAdapter
+        val agendaAdapter = if (viewMode.value == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter else agendaPager.adapter as? DayPagerAdapter
         if (agendaAdapter != null) {
             val startingDate =
-                if (agendaView.value == true) (agendaAdapter as AgendaPagerAdapter).startingDate
+                if (viewMode.value == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
                 else (agendaPager.adapter as DayPagerAdapter).startingDate
             val startingPosition =
-                if (agendaView.value == true) (agendaPager.adapter as AgendaPagerAdapter).startingPosition
+                if (viewMode.value == ViewMode.AGENDA) (agendaPager.adapter as AgendaPagerAdapter).startingPosition
                 else (agendaPager.adapter as DayPagerAdapter).startingPosition
 
             val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, date).toInt()
