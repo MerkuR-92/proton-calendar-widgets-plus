@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.AndroidUtils.concatenate
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
@@ -112,7 +113,7 @@ class MiniCalendarItemAdapter(
             val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
             val firstDay = forDate.with(temporalField, 1)
             val headerItems = (0 until WEEKDAYS_TO_SHOW).map {
-                MiniCalendarItem(firstDayOfTheMonth.plusDays(-firstDayOfTheWeekOffset + it.toLong()), false,false, emptyList())
+                MiniCalendarItem(firstDay.plusDays(it.toLong()), false,false, emptyList())
             }
 
             val dayItems = (0 until 7).map {
@@ -184,11 +185,24 @@ class MiniCalendarItemAdapter(
 
     sealed class MiniCalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        class HeaderViewHolder(itemView: View, private val timeZoneId: String) : MiniCalendarViewHolder(itemView) {
+        class HeaderViewHolder(
+            itemView: View,
+            private val timeZoneId: String,
+            private val startWeekOn: DayOfWeek,
+            private val isMonthView: Boolean
+        ) : MiniCalendarViewHolder(itemView) {
             fun bind(date: LocalDate) {
                 itemView.text.text = date.formatDayOfWeek(short = true)
-                if (date == LocalDate.now(ZoneId.of(timeZoneId))) itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
-                else itemView.text.setTextAppearance(itemView.context, R.style.Text_Caption_Weak)
+                if (((isMonthView && date.month == LocalDate.now(ZoneId.of(timeZoneId)).month) ||
+                    (!isMonthView && date.weekNumber(startWeekOn) == LocalDate.now(ZoneId.of(timeZoneId)).weekNumber(startWeekOn))) &&
+                    date.dayOfWeek == LocalDate.now(ZoneId.of(timeZoneId)).dayOfWeek) {
+                    itemView.text.setTextAppearance(itemView.context, R.style.Text_Caption_Strong)
+                    itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
+                }
+                else {
+                    itemView.text.setTextAppearance(itemView.context, R.style.Text_Caption_Strong)
+                    itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
+                }
             }
         }
 
@@ -224,16 +238,16 @@ class MiniCalendarItemAdapter(
                         item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
                             itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
                             itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
-                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                            itemView.selected_background.setBackgroundResource(0)
                         }
                         isMonthView && item.date.month != forDate.month -> {
-                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Weak)
+                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
                             itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
-                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                            itemView.selected_background.setBackgroundResource(0)
                         }
                         else -> {
                             itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day)
+                            itemView.selected_background.setBackgroundResource(0)
                         }
                     }
 
@@ -285,7 +299,9 @@ class MiniCalendarItemAdapter(
                     parent,
                     false
                 ),
-                timeZoneId
+                timeZoneId,
+                startWeekOn,
+                isMonthView
             )
         } else {
             MiniCalendarViewHolder.DayViewHolder(

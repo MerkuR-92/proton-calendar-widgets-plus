@@ -32,7 +32,7 @@
                 android:indeterminateTint="@color/brand_norm"
                 android:indeterminateTintMode="src_in"
                 android:layout_gravity="bottom"
-                android:layout_marginBottom="-4dp"/>
+                android:layout_marginBottom="-8dp"/>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/fragment_toolbar"
@@ -84,7 +84,7 @@
                             android:id="@+id/mini_calendar_chevron"
                             style="@style/Icon.Small"
                             android:layout_marginStart="6dp"
-                            android:src="@drawable/ic_chevron_up"
+                            android:src="@drawable/ic_chevron_small_down"
                             app:tint="@color/text_norm"
                             android:background="@null"
                             android:visibility="gone"

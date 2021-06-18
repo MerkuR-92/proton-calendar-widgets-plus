@@ -199,7 +199,7 @@ class MonthFragment : BaseFragment() {
 
                 if (!initialHeightAdjusted) {
                     initialHeightAdjusted = true
-                    if (calendarViewModel.monthView.value == false) mini_calendar_chevron.rotation = 180f
+                    if (calendarViewModel.monthView.value == true) mini_calendar_chevron.rotation = 180f
                     updateMiniCalendarHeight(this, startWeekOn, true, false)
                 }
 
@@ -504,9 +504,7 @@ class MonthFragment : BaseFragment() {
     private fun setToolbarMonthYearTitle(localDate: LocalDate) {
         val month = SpannableString(localDate.formatMonth(true))
         val year = SpannableString(localDate.year.toString())
-        year.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.text_hint)), 0, year.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        toolbarTitle.text = "$month "
-        toolbarTitle.append(year)
+        toolbarTitle.text = "$month $year"
         mini_calendar_chevron.visibleOrGone(true)
     }
 }
