@@ -32,13 +32,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-<!--            TODO uncomment when we enable ics-open-->
 <!--            <intent-filter>-->
 <!--                <action android:name="android.intent.action.VIEW" />-->
 <!--                <category android:name="android.intent.category.DEFAULT" />-->
 <!--                <category android:name="android.intent.category.BROWSABLE" />-->
 <!--                <data android:scheme="content" android:host="*" android:mimeType="text/calendar" />-->
 <!--            </intent-filter>-->
+            <intent-filter>
+                <action android:name="me.proton.android.calendar.intent.action.CTA_OPEN_ICS" />
+                <data android:scheme="content" android:host="*" android:mimeType="text/calendar" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
             <nav-graph android:value="@navigation/graph_main" />
         </activity>
         <receiver
