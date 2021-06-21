@@ -225,8 +225,10 @@ class MiniCalendarItemAdapter(
                 } else {
 
                     val itemLayoutParams: GridLayoutManager.LayoutParams = (itemView.item_mini_calendar_layout).layoutParams as GridLayoutManager.LayoutParams
+                    val itemDateWeekNumber = item.date.weekNumber(startWeekOn)
+                    val forDateWeekNumber = forDate.weekNumber(startWeekOn)
                     itemLayoutParams.topMargin =
-                        if (isMonthView && item.date.isAfter(forDate) && (item.date.weekNumber(startWeekOn) - forDate.weekNumber(startWeekOn) > 0 || item.date.month != forDate.month))
+                        if (isMonthView && item.date.isAfter(forDate) && (itemDateWeekNumber - forDateWeekNumber != 0 || item.date.month != forDate.month))
                             itemView.context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
                         else 0
 
