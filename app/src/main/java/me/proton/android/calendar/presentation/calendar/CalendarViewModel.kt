@@ -44,6 +44,7 @@ import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.time.temporal.WeekFields
 import java.util.*
 
 private const val MAX_CALENDAR_INDICATORS = 5
@@ -261,7 +262,18 @@ class CalendarViewModel(
                 ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
             } else {
                 val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart.value!!)
-                date.weekNumber(startWeekOn) - initialToday.withDayOfMonth(1).weekNumber(startWeekOn)
+                val firstDayOfTheWeekNumber = date.dayOfWeek.value - startWeekOn.value
+                val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+
+                val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
+                val firstDayOfTheWeek = date.with(temporalField, 1)
+                if (firstDayOfTheWeek.year < initialToday.year) {
+                    date.weekNumber(startWeekOn) - (firstDayOfTheWeek.withDayOfYear(firstDayOfTheWeek.lengthOfYear()).weekNumber(startWeekOn) + initialToday.withDayOfMonth(1).weekNumber(startWeekOn))
+                } else if (firstDayOfTheWeek.year > initialToday.year) {
+                    date.weekNumber(startWeekOn) + (initialToday.withDayOfYear(firstDayOfTheWeek.lengthOfYear()).weekNumber(startWeekOn) - initialToday.withDayOfMonth(1).weekNumber(startWeekOn))
+                } else {
+                    date.weekNumber(startWeekOn) - initialToday.withDayOfMonth(1).weekNumber(startWeekOn)
+                }
             }
         val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + offset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {

@@ -129,21 +129,21 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         val firstDay =
             if (monthView) {
                 immutableDate.plusMonths((immutablePosition - immutableStartingPosition).toLong())
-            }
-            else {
+            } else {
                 val firstDayOfTheWeekNumber = immutableDate.dayOfWeek.value - startWeekOn.value
                 val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
 
                 val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
                 val firstDayOfTheWeek = immutableDate.with(temporalField, 1)
-                firstDayOfTheWeek.plusWeeks((immutablePosition - immutableStartingPosition).toLong())
+                val offset = immutablePosition - immutableStartingPosition
+                firstDayOfTheWeek.plusWeeks(offset.toLong())
             }
 
         logger.d("mini calendar onViewCreated: $firstDay")
 
         calendarViewModel.lifeCycleScope.launch {
             if (monthView && calendarViewModel.selectedDate.value?.month != firstDay.month) {
-                delay(300)
+                delay(300) // TODO Still needed ?
             }
 
             // Check if view still exists after delay

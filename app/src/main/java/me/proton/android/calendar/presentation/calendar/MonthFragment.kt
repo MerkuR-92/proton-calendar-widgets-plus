@@ -56,6 +56,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -220,20 +221,33 @@ class MonthFragment : BaseFragment() {
 
     private fun updateMiniCalendarHeight(miniCalendarPagerLayoutListener: ViewTreeObserver.OnGlobalLayoutListener, startWeekOn: DayOfWeek, isMonthView: Boolean, animateChange: Boolean) {
 
-
-        // Fill the list first and then animate
-//        if (!isWeekView) miniCalendarPagerAdapter.listenerMap[firstDayOfMonth]?.onExpand()
-//        if (isWeekView) miniCalendarPagerAdapter.listenerMap[firstDayOfMonth]?.onCollapse()
-
         if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.unregisterOnPageChangeCallback(miniCalendarPageChangeCallback)
         if (isMonthView) {
-            val position = miniCalendarPagerAdapter.startingPosition +
-                    (calendarViewModel.selectedDate.value!!.monthValue - miniCalendarPagerAdapter.firstDayOfMonth.monthValue)
+            val selectedDate = calendarViewModel.selectedDate.value ?: return
+            val position =
+                if (selectedDate.year != miniCalendarPagerAdapter.firstDayOfMonth.year) {
+                    miniCalendarPagerAdapter.startingPosition + Period.between(miniCalendarPagerAdapter.firstDayOfMonth, selectedDate).months
+                } else {
+                    miniCalendarPagerAdapter.startingPosition +
+                            (calendarViewModel.selectedDate.value!!.monthValue - miniCalendarPagerAdapter.firstDayOfMonth.monthValue)
+                }
             fromPosition = position
             miniCalendarPager.setCurrentItem(position, false)
         } else {
-            val position = miniCalendarPagerAdapter.startingPosition +
-                    (calendarViewModel.selectedDate.value!!.weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.weekNumber(startWeekOn))
+            val selectedDate = calendarViewModel.selectedDate.value ?: return
+            val firstDayOfTheWeekNumber = selectedDate.dayOfWeek.value - startWeekOn.value
+            val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+
+            val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
+            val firstDayOfTheWeek = selectedDate.with(temporalField, 1)
+            val position =
+                if (firstDayOfTheWeek.year < miniCalendarPagerAdapter.firstDayOfMonth.year) {
+                    miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) - (firstDayOfTheWeek.withDayOfYear(firstDayOfTheWeek.lengthOfYear()).weekNumber(startWeekOn) + miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn)))
+                } else if (firstDayOfTheWeek.year > miniCalendarPagerAdapter.firstDayOfMonth.year) {
+                    miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) + (miniCalendarPagerAdapter.firstDayOfMonth.withDayOfYear(firstDayOfTheWeek.lengthOfYear()).weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn)))
+                } else {
+                    miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn))
+                }
             fromPosition = position
             miniCalendarPager.setCurrentItem(position, false)
         }
