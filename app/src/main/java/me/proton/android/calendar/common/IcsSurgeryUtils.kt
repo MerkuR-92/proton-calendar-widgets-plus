@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.partDayICalDateToDate
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
@@ -339,12 +340,23 @@ object IcsSurgeryUtils {
 
         // We reject as invalid RRULEs that:
         val iteratorTimezone = if (dateStart.value.hasTime()) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()
-        var startIterator = recurrenceRule.getDateIterator(dateStart.value, iteratorTimezone)
+        var specialCase = false
+        val startICalDate = if (!recurrenceRule.value.bySetPos.isNullOrEmpty() || dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear != dateStart.value.toZonedDateTime(iteratorTimezone.id).toLocalDate().dayOfYear) {
+            specialCase = true
+            ICalDate(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
+        } else dateStart.value
+        var startIterator = recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
 
         if (startIterator.hasNext()) {
-            val startIteratorNext = startIterator.next()
             // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
-            if (startIteratorNext != dateStart.value) return false
+            if (specialCase) {
+                // Special case is for events that have date iterator skip the first occurrence (either by having bysetpos, or by having a display tz that makes it jump to the next day)
+                val nextDate = startIterator.next().toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id, true).withHour(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).hour).withMinute(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).minute)
+                if (nextDate.toInstant() != dateStart.value.toInstant()) return false
+            } else {
+                val nextDate = startIterator.next()
+                if (nextDate != dateStart.value) return false
+            }
 
         } else return false
 

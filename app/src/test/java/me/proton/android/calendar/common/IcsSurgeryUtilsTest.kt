@@ -10,7 +10,6 @@ import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanAttendees
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanCalscale
-import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRawIcs
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDescription
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtEnd
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtStart
@@ -19,6 +18,7 @@ import me.proton.android.calendar.common.IcsSurgeryUtils.cleanExDate
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanIcs
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanLocation
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRRule
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRawIcs
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanSequence
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanSummary
@@ -1432,6 +1432,58 @@ internal class IcsSurgeryUtilsTest {
                 ZoneId.systemDefault()
             ).toInstant()
             assertThat(event.recurrenceRule.value.until).isEqualTo(ICalDate(Date.from(newUntilDate), false))
+        }
+    }
+
+    @Test
+    fun `cleanRRule part day event with tz that make occurrences happen on the next day test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//ProtonCalendar 4.1.19-prod.1//EN
+    METHOD:REQUEST
+    CALSCALE:GREGORIAN
+    BEGIN:VTIMEZONE
+    TZID:Pacific/Niue
+    LAST-MODIFIED:20210410T122212Z
+    X-LIC-LOCATION:Pacific/Niue
+    BEGIN:STANDARD
+    TZNAME:-11
+    TZOFFSETFROM:-1100
+    TZOFFSETTO:-1100
+    DTSTART:19700101T000000
+    END:STANDARD
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    SUMMARY:Different timezone
+    STATUS:CONFIRMED
+    RRULE:FREQ=MONTHLY;BYDAY=TU;BYSETPOS=4
+    DTSTART;TZID=Pacific/Niue:20210622T110000
+    DTEND;TZID=Pacific/Niue:20210622T113000
+    ATTENDEE;X-PM-TOKEN=fd5a754f0f3f9b89f44f251bc39d4342901a2b29;RSVP=TRUE;ROLE
+    =REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=breakingcalendar@protonmail.com:
+    mailto:breakingcalendar@protonmail.com
+    UID:aRpVeZ2WB-NBHPO_LLykafrJIYKr@proton.me
+    ORGANIZER;CN=benjaminlovesdebugging@pm.me:mailto:benjaminlovesdebugging@pm.
+    me
+    SEQUENCE:0
+    DTSTAMP:20210622T125255Z
+    X-PM-SHARED-EVENT-ID:s6zweKVpKPlwW3e_59EIPL-zOBgPl3cGdP1VRTEGzB6Nyx2I21hcnA
+    nuQ97-9pMdmUGc7qgcvjQexclIZMpBgXKkL9e7xyS1zWtg_a_RbW8=
+    X-PM-SESSION-KEY:e6Rybl4XlTgNlG4vyI8FggwIwMogBbafdoMcf150IdM=
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar!!.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
         }
     }
 

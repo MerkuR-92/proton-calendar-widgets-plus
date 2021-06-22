@@ -27,7 +27,6 @@ import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.data.entity.AddressStatus
 import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.utils.EventUtils
 import java.time.LocalDate
 import java.time.LocalTime
@@ -246,13 +245,17 @@ object EventUtilsImpl : EventUtils {
         //  we generate occurrences ignoring time of day & timezone and set it later manually,
         //   this will most likely only work for FREQUENCY at least DAILY
 
-        val hasTime = !isAllDay() && iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty()
+        val hasTime = !isAllDay() && iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty() && iCalEvent.recurrenceRule.value.byDay.isNullOrEmpty()
 
         val startZonedDateTime = iCalEvent.dateStart.value.toZonedDateTime(timeZoneId)
         val startZonedDateTimeAllDayNormalised = ZonedDateTime.of(startZonedDateTime.toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
 
-        val startICalDate = ICalDate(iCalEvent.dateStart.value, hasTime)
         val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(iCalEvent.dateStart) else TimeZone.getDefault()
+        var specialCase = false // Special case is for events that have date iterator skip the first occurrence (either by having bysetpos, or by having a display tz that makes it jump to the next day)
+        val startICalDate = if (!isAllDay() && (!iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty() || iCalEvent.dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).toLocalDate().dayOfYear)) {
+            specialCase = true
+            ICalDate(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
+        } else ICalDate(iCalEvent.dateStart.value, hasTime)
 
         val recurrenceRule = if (this.isAllDay() && this.iCalEvent.recurrenceRule?.value?.until != null) {
             RecurrenceRule(this.iCalEvent.recurrenceRule.value.clone(until = ICalDate(this.iCalEvent.recurrenceRule.value.until, true)))
@@ -275,7 +278,9 @@ object EventUtilsImpl : EventUtils {
 
             val startIteratorNext = startIterator.next()
             val occurrenceStart =
-                if (!hasTime && !isAllDay()) {
+                if (specialCase) {
+                    ZonedDateTime.ofInstant(startIteratorNext.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id, true).withHour(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).hour).withMinute(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).minute).toInstant(), ZoneId.of(timeZoneId))
+                } else if (!hasTime && !isAllDay()) {
                     // Handle BySetPos edge case
                     startIteratorNext.toZonedDateTime(timeZoneId, !isAllDay()).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
                 } else {
