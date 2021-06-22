@@ -46,6 +46,7 @@ import me.proton.android.calendar.common.AndroidUtils.getInitials
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
+import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -355,7 +356,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
                         val uri = openIcsIntent.data
                         if (uri != null) {
-                            handleOpenIcsIntent(uri)
+                            val senderEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_SENDER_EMAIL)
+                            val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)?.removePrefix(INVITE_PROTON_EXTRA_RECIPIENT_PREFIX)
+                            handleOpenIcsIntent(uri, senderEmail, recipientEmail)
                         } else navigateTo(Navigation.Deeplink.toMonth())
                     } else {
                         navigateTo(Navigation.Deeplink.toMonth())
@@ -369,7 +372,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private fun handleOpenIcsIntent(uri: Uri) {
+    private fun handleOpenIcsIntent(uri: Uri, senderEmail: String?, recipientEmail: String?) {
+
+        if (!OPEN_ICS_FILES) {
+            if (senderEmail == null || recipientEmail == null) {
+                this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
+                navigateTo(Navigation.Deeplink.toMonth())
+                return
+            }
+        }
+
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
         val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
         lifecycleScope.launch {
@@ -379,7 +391,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 spinnerText = resources.getString(R.string.splash_init)
             )
 
-            val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader)
+            val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader, senderEmail, recipientEmail)
             if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
                 when (handleIcsImportResult.action) {
                     // We use Toast because we do not have the EventDetails view required for SnackBar to be displayed

@@ -42,6 +42,7 @@ const val INVITE_EMAIL_MIME_TYPE = "text/plain"
 const val INVITE_PROTON_INTENT_ACTION = "me.proton.android.calendar.intent.action.CTA_OPEN_ICS"
 const val INVITE_PROTON_EXTRA_SENDER_EMAIL = "me.proton.android.calendar.intent.extra.ICS_SENDER_EMAIL"
 const val INVITE_PROTON_EXTRA_RECIPIENT_EMAIL = "me.proton.android.calendar.intent.extra.ICS_RECIPIENT_EMAIL"
+const val INVITE_PROTON_EXTRA_RECIPIENT_PREFIX = ": "
 
 const val ICAL_LINE_MAXIMUM_LENGTH = 75
 const val ICAL_LINE_SEPARATOR = "\\r\\n "
@@ -67,6 +68,7 @@ object FeatureFlag {
     const val ADD_ATTENDEES = false
     const val CHANGE_ANSWER = false
     const val OPEN_ICS = false
+    const val OPEN_ICS_FILES = false
 }
 
 object ApiResponseCode {

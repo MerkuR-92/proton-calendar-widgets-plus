@@ -17,6 +17,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSIO
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanRecurrenceId
@@ -44,7 +45,8 @@ class HandleIcsUseCase(
     private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase
 ) {
 
-    suspend fun execute(iCalString: String, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
+    suspend fun execute(iCalString: String, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
+
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
 
         if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
@@ -61,6 +63,23 @@ class HandleIcsUseCase(
         // Find out if we are in organizer mode or attendee mode
         val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
         val isOrganizerMode = userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
+
+        var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
+        if (!OPEN_ICS_FILES || (senderEmail != null && recipientEmail != null)) {
+            val canonicalExtrasEmails = canonicalEmailsUseCase.invoke(userId, listOf(senderEmail!!, recipientEmail!!))
+            val canonicalSenderEmail = canonicalExtrasEmails[senderEmail]
+            val canonicalRecipientEmail = canonicalExtrasEmails[recipientEmail]
+
+            isCurrentUserSender = userEmails?.contains(canonicalSenderEmail) == true
+            val isCurrentUserRecipient = userEmails?.contains(canonicalRecipientEmail) == true
+
+            if (!isCurrentUserSender && !isCurrentUserRecipient) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+
+            val canonicalAttendeeEmails = canonicalEmailsUseCase.invoke(
+                userId,
+                iCalendar.events.first().attendees.mapNotNull { it.extractEmail() })
+            if (isOrganizerMode && isCurrentUserRecipient && !canonicalAttendeeEmails.contains(canonicalSenderEmail)) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+        }
 
         // METHOD: We support REQUEST, CANCEL, REPLY.
         if (iCalendar.method.isAdd) {
@@ -155,6 +174,12 @@ class HandleIcsUseCase(
         }
         if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.isRecurring())
         if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
+
+        if (isCurrentUserSender && existingEvent != null) {
+            // We are opening an invite sent by the current user, no changes are needed, open event details
+            existingEvent?.let { makeCalendarVisible(it, userId) }
+            return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
+        }
 
         val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
 

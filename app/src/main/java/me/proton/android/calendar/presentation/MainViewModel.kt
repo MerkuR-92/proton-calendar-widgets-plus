@@ -142,9 +142,9 @@ class MainViewModel(
         }
     }
 
-    suspend fun handleIcsFile(bufferedReader: BufferedReader): IcsSurgeryUtils.HandleIcsResult {
+    suspend fun handleIcsFile(bufferedReader: BufferedReader, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
         val userId = accountViewModel.getPrimaryUserId() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
         val iCalString = bufferedReader.use { it.readText() }
-        return handleIcsUseCase.execute(iCalString, userId)
+        return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
     }
 }
