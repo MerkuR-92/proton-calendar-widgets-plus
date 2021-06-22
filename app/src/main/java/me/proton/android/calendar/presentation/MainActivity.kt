@@ -179,7 +179,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
-        if (!isTaskRoot && intent.action != INVITE_PROTON_INTENT_ACTION && intent.type != INVITE_ICS_MIME_TYPE) {
+        if (!isTaskRoot && intent.action != INVITE_PROTON_INTENT_ACTION && intent.action != Intent.ACTION_VIEW && intent.type != INVITE_ICS_MIME_TYPE) {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
             //  at the top of the stack (ie: the last state of this task)
@@ -322,7 +322,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
         when (state) {
             AccountViewModel.State.LoginNeeded -> {
-                val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
+                var openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
+                if (openIcsIntent == null) {
+                    openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                }
                 if (openIcsIntent != null) {
                     Toast.makeText(this, getString(R.string.snack_import_event_signed_out), Toast.LENGTH_LONG).show()
                 }
@@ -352,12 +355,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
 
                 } else {
-                    val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
+                    var openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
+                    if (openIcsIntent == null && OPEN_ICS_FILES) {
+                        openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                    }
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
                         val uri = openIcsIntent.data
                         if (uri != null) {
                             val senderEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_SENDER_EMAIL)
-                            val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)?.removePrefix(INVITE_PROTON_EXTRA_RECIPIENT_PREFIX)
+                            val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)
                             handleOpenIcsIntent(uri, senderEmail, recipientEmail)
                         } else navigateTo(Navigation.Deeplink.toMonth())
                     } else {
