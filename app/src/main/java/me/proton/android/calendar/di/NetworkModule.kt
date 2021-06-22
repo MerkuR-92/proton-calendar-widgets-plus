@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.API_BASE_URL
 import me.proton.android.calendar.common.CoreLogger
 import me.proton.android.calendar.data.api.CalendarApiClient
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.network.data.*
 import me.proton.core.network.data.client.ClientIdProviderImpl
 import me.proton.core.network.domain.ApiClient
@@ -21,9 +22,9 @@ import me.proton.core.network.domain.NetworkPrefs
 import me.proton.core.network.domain.client.ClientIdProvider
 import me.proton.core.network.domain.humanverification.HumanVerificationListener
 import me.proton.core.network.domain.humanverification.HumanVerificationProvider
+import me.proton.core.network.domain.server.ServerTimeListener
 import me.proton.core.network.domain.session.SessionListener
 import me.proton.core.network.domain.session.SessionProvider
-import me.proton.core.util.kotlin.Logger
 import javax.inject.Singleton
 
 @Module
@@ -45,6 +46,7 @@ object NetworkModule {
     fun provideApiFactory(
         apiClient: ApiClient,
         clientIdProvider: ClientIdProvider,
+        serverTimeListener: ServerTimeListener,
         networkManager: NetworkManager,
         networkPrefs: NetworkPrefs,
         protonCookieStore: ProtonCookieStore,
@@ -56,6 +58,7 @@ object NetworkModule {
         API_BASE_URL,
         apiClient,
         clientIdProvider,
+        serverTimeListener,
         CoreLogger,
         networkManager,
         networkPrefs,
@@ -81,6 +84,16 @@ object NetworkModule {
     @Singleton
     fun provideApiProvider(apiFactory: ApiManagerFactory, sessionProvider: SessionProvider): ApiProvider =
         ApiProvider(apiFactory, sessionProvider)
+
+    @Provides
+    @Singleton
+    fun provideServerTimeListener(
+        context: CryptoContext
+    ) = object : ServerTimeListener {
+        override fun onServerTimeUpdated(epochSeconds: Long) {
+            context.pgpCrypto.updateTime(epochSeconds)
+        }
+    }
 }
 
 @Module
