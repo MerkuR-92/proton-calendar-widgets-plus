@@ -42,23 +42,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     private var monthView: Boolean? = null
     private val miniCalendarMediator = MediatorLiveData<Triple<String, DayOfWeek, Boolean>>()
 
-    private lateinit var onFlingMiniCalendarListener: MonthFragment.OnFlingMiniCalendarListener
-
-    class MiniCalendarGestureListener(val view: View, private val onFlingMiniCalendarListener: MonthFragment.OnFlingMiniCalendarListener): GestureDetector.SimpleOnGestureListener() {
-        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-            if (velocityY > 0) {
-                onFlingMiniCalendarListener.expandOnFling()
-            } else if (velocityY < 0) {
-                onFlingMiniCalendarListener.collapseOnFling()
-            }
-            return super.onFling(e1, e2, velocityX, velocityY)
-        }
-    }
-
-    fun setOnFlingMiniCalendarListener(onFlingMiniCalendarListener: MonthFragment.OnFlingMiniCalendarListener) {
-        this.onFlingMiniCalendarListener = onFlingMiniCalendarListener
-    }
-
     companion object {
         fun newInstance(position: Int, startingPosition: Int, date: LocalDate) : ItemMiniCalendarFragment{
             return ItemMiniCalendarFragment().apply {
@@ -164,14 +147,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                     viewLifecycleOwner
                 ) {
                     calendarViewModel.handleDaySelected(it)
-                }
-
-                if (this@ItemMiniCalendarFragment::onFlingMiniCalendarListener.isInitialized) {
-                    val miniCalendarGestureDetector =
-                        GestureDetector(requireContext(), MiniCalendarGestureListener(this, onFlingMiniCalendarListener))
-                    setOnTouchListener { v, event ->
-                        miniCalendarGestureDetector.onTouchEvent(event)
-                    }
                 }
 
                 (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise(timeZoneId)

@@ -343,26 +343,7 @@ class MonthFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1), object: OnFlingMiniCalendarListener {
-            override fun expandOnFling() {
-                val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
-                if (calendarViewModel.monthView.value == false) {
-                    calendarViewModel.monthView.value = true
-                    rotateArrowDownward(mini_calendar_chevron)
-                    updateMiniCalendarHeight(this@MonthFragment.miniCalendarPagerLayoutListener, startWeekOn, true, true)
-                }
-            }
-
-            override fun collapseOnFling() {
-                val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
-                if (calendarViewModel.monthView.value == true) {
-                    calendarViewModel.monthView.value = false
-                    rotateArrowUpward(mini_calendar_chevron)
-                    updateMiniCalendarHeight(this@MonthFragment.miniCalendarPagerLayoutListener, startWeekOn, false, true)
-                }
-            }
-
-        })
+        miniCalendarPagerAdapter = MiniCalendarPagerAdapter(requireActivity(), calendarViewModel.initialToday.withDayOfMonth(1))
 
         fromPosition = miniCalendarPagerAdapter.startingPosition
 
