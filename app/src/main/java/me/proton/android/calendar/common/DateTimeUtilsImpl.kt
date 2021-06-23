@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common
 
 import biweekly.util.ICalDate
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
@@ -14,6 +15,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.IsoFields
 import java.util.*
 import java.util.Locale.getDefault
+import kotlin.math.abs
 
 object DateTimeUtilsImpl : DateTimeUtils {
 
@@ -65,6 +67,48 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
         return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 
+    }
+
+    /**
+     * Calculate week number difference between two dates
+     */
+    override fun calculateWeekNumberBetween(start: LocalDate, end: LocalDate, startWeekOn: DayOfWeek): Int {
+        var startWeekNumber = start.weekNumber(startWeekOn)
+        var endWeekNumber = end.weekNumber(startWeekOn)
+
+        val yearDifference = abs(start.year - end.year)
+        if (yearDifference == 0) return endWeekNumber - startWeekNumber
+
+        // Handle case where first day of year's week number is previous year's last week number
+        if (start.monthValue == 1 && startWeekNumber > 5) startWeekNumber = 0
+        if (end.monthValue == 1 && endWeekNumber > 5) endWeekNumber = 0
+
+        var tmpStart = start
+        var weeksToAdd = 0
+        for (i in 1 until yearDifference) {
+            tmpStart =
+                if (start.year < end.year) tmpStart.plusYears(i.toLong())
+                else tmpStart.minusYears(i.toLong())
+            weeksToAdd += calculateWeekNumberInYear(tmpStart, startWeekOn)
+        }
+
+        if (tmpStart.year + 1 == end.year) {
+            // End is after start
+            weeksToAdd += endWeekNumber + (calculateWeekNumberInYear(start, startWeekOn) - startWeekNumber)
+        } else if (tmpStart.year - 1 == end.year) {
+            // End is before start
+            tmpStart = tmpStart.minusYears(1)
+            weeksToAdd += (calculateWeekNumberInYear(tmpStart, startWeekOn) - endWeekNumber) + startWeekNumber
+            weeksToAdd *= -1 // Turn negative
+        }
+
+        return weeksToAdd
+    }
+
+    override fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int {
+        val lastDayWeekNumber = date.withDayOfYear(date.lengthOfYear()).weekNumber(startWeekOn)
+        return if (lastDayWeekNumber == 1) date.withDayOfYear(date.lengthOfYear() - 7).weekNumber(startWeekOn)
+        else lastDayWeekNumber
     }
 
     override fun LocalDate.toDate(timeZoneId: String?): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())

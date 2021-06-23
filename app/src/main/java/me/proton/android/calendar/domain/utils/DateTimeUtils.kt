@@ -30,6 +30,8 @@ interface DateTimeUtils {
      * Calculate ISO week number for given date, taking custom week start into account.
      */
     fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int
+    fun calculateWeekNumberBetween(start: LocalDate, end: LocalDate, startWeekOn: DayOfWeek): Int
+    fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int
     fun LocalDate.toDate(timeZoneId: String? = null): Date
     fun DayOfWeek.format(firstLetter: Boolean = false): String
     fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek

@@ -1,11 +1,14 @@
 package me.proton.android.calendar.common
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import me.proton.android.calendar.common.DateTimeUtilsImpl.calculateWeekNumberBetween
 import me.proton.android.calendar.common.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.domain.CalendarsRepository
 import org.junit.jupiter.api.Test
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 internal class DateTimeUtilsTest {
@@ -40,6 +43,42 @@ internal class DateTimeUtilsTest {
         assertThat(eventsWindows.getFullyOverlappingWindow(windowOverlappingEnd)).isNull()
         assertThat(eventsWindows.getFullyOverlappingWindow(windowAfter)).isNull()
 
+    }
+
+    @Test
+    fun `Calculate weeks between dates`() {
+        assertThat(calculateWeekNumberBetween(
+            LocalDate.of(2021, 6, 1),
+            LocalDate.of(2021, 7, 15),
+            DayOfWeek.MONDAY))
+            .isEqualTo(6)
+        assertThat(calculateWeekNumberBetween(
+            LocalDate.of(2021, 6, 1),
+            LocalDate.of(2021, 4, 20),
+            DayOfWeek.MONDAY))
+            .isEqualTo(-6)
+        assertThat(calculateWeekNumberBetween(
+            LocalDate.of(2021, 6, 1),
+            LocalDate.of(2023, 4, 6),
+            DayOfWeek.MONDAY))
+            .isEqualTo(96)
+        // End date's week number is previous year's last week number
+        assertThat(calculateWeekNumberBetween(
+            LocalDate.of(2021, 6, 1),
+            LocalDate.of(2023, 1, 1),
+            DayOfWeek.MONDAY))
+            .isEqualTo(82)
+        // Start date's week number is previous year's last week number
+        assertThat(calculateWeekNumberBetween(
+            LocalDate.of(2023, 1, 1),
+            LocalDate.of(2021, 6, 1),
+            DayOfWeek.MONDAY))
+            .isEqualTo(-82)
+        assertThat(calculateWeekNumberBetween(
+            LocalDate.of(2021, 6, 1),
+            LocalDate.of(2019, 9, 18),
+            DayOfWeek.MONDAY))
+            .isEqualTo(-89)
     }
 
 }
