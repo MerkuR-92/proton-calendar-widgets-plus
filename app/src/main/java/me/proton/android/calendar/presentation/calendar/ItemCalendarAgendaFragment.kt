@@ -16,6 +16,7 @@ import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -114,12 +115,22 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             }
         }
         agendaMediator.observe(viewLifecycleOwner) {
-            it?.let { setupItemMiniCalendarContent(it.first, it.second, it.third) }
+            it?.let {
+
+                lifecycleScope.launch {
+                    if (calendarViewModel.selectedDate.value != date) {
+                        delay(300) // TODO Still needed ?
+                    }
+                    setupItemMiniCalendarContent(it.first, it.second, it.third)
+                }
+            }
         }
     }
 
     private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
         val immutableDate = date ?: return
+
+        if (rv_agenda == null) return
 
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)

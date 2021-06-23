@@ -71,6 +71,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         return inflater.inflate(R.layout.item_mini_calendar_fragment, container, false)
     }
 
+    private var currentMonthView: Boolean? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -124,33 +125,36 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
         logger.d("mini calendar onViewCreated: $firstDay")
 
+        rv_mini_calendar.apply {
+            layoutManager = GridLayoutManager(
+                this@ItemMiniCalendarFragment.context,
+                MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW /*TODO*/
+            )
+
+            adapter = MiniCalendarItemAdapter(
+                timeZoneId,
+                firstDay,
+                startWeekOn,
+                monthView,
+                calendarViewModel,
+                viewLifecycleOwner
+            ) {
+                calendarViewModel.handleDaySelected(it)
+            }
+        }
+
         calendarViewModel.lifeCycleScope.launch {
-            if (monthView && calendarViewModel.selectedDate.value?.month != firstDay.month) {
-                delay(300) // TODO Still needed ?
+            if (currentMonthView == false && monthView && calendarViewModel.selectedDate.value?.month != firstDay.month) {
+                delay(300) // TODO This messes up the side swipe a bit if we swipe multiple months fast
             }
 
             // Check if view still exists after delay
             if (rv_mini_calendar == null) return@launch
 
-            rv_mini_calendar.apply {
-                layoutManager = GridLayoutManager(
-                    this@ItemMiniCalendarFragment.context,
-                    MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW /*TODO*/
-                )
+            val delay = currentMonthView == null && monthView && calendarViewModel.selectedDate.value?.month != firstDay.month
 
-                adapter = MiniCalendarItemAdapter(
-                    timeZoneId,
-                    firstDay,
-                    startWeekOn,
-                    monthView,
-                    calendarViewModel,
-                    viewLifecycleOwner
-                ) {
-                    calendarViewModel.handleDaySelected(it)
-                }
-
-                (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise(timeZoneId)
-            }
+            currentMonthView = monthView
+            (rv_mini_calendar.adapter as MiniCalendarItemAdapter).initialise(timeZoneId, delay)
         }
 
         // setup week numbers

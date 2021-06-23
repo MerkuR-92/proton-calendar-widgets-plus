@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.text
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.concatenate
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
@@ -49,7 +51,7 @@ class MiniCalendarItemAdapter(
     private var indicators: Map<LocalDate, List<String>>? = null
     private var indicatorsMediator = MediatorLiveData<List<MiniCalendarItem>>()
 
-    fun initialise(timeZoneId: String) {
+    fun initialise(timeZoneId: String, delay: Boolean) {
         indicatorsMediator = MediatorLiveData<List<MiniCalendarItem>>()
 
         if (isMonthView) {
@@ -86,23 +88,27 @@ class MiniCalendarItemAdapter(
             val skeletonList = concatenate(headerItems, previousMonthDayItems, dayItems, upcomingMonthDayItems)
             this.submitList(skeletonList)
 
-            // subscribe for calendar indicators and selected date
-            indicatorsMediator.addSource(calendarViewModel.calendarIndicators(
-                fromDate,
-                toDate,
-                timeZoneId
-            )) {
-                indicators = it
+            calendarViewModel.lifeCycleScope.launch {
+                if (delay) delay(300) // TODO Still needed ?
 
-                if (indicators != null && selectedDate != null) {
-                    indicatorsMediator.value = applyIndicatorsAndSelectedDate(indicators!!, selectedDate!!, skeletonList)
+                // subscribe for calendar indicators and selected date
+                indicatorsMediator.addSource(calendarViewModel.calendarIndicators(
+                    fromDate,
+                    toDate,
+                    timeZoneId
+                )) {
+                    indicators = it
+
+                    if (indicators != null && selectedDate != null) {
+                        indicatorsMediator.value = applyIndicatorsAndSelectedDate(indicators!!, selectedDate!!, skeletonList)
+                    }
                 }
-            }
-            indicatorsMediator.addSource(calendarViewModel.selectedDate) {
-                selectedDate = it
+                indicatorsMediator.addSource(calendarViewModel.selectedDate) {
+                    selectedDate = it
 
-                if (indicators != null && selectedDate != null) {
-                    indicatorsMediator.value = applyIndicatorsAndSelectedDate(indicators!!, selectedDate!!, skeletonList)
+                    if (indicators != null && selectedDate != null) {
+                        indicatorsMediator.value = applyIndicatorsAndSelectedDate(indicators!!, selectedDate!!, skeletonList)
+                    }
                 }
             }
         } else {
@@ -194,7 +200,7 @@ class MiniCalendarItemAdapter(
             fun bind(date: LocalDate) {
                 itemView.text.text = date.formatDayOfWeek(short = true)
                 if (((isMonthView && date.month == LocalDate.now(ZoneId.of(timeZoneId)).month) ||
-                    (!isMonthView && date.weekNumber(startWeekOn) == LocalDate.now(ZoneId.of(timeZoneId)).weekNumber(startWeekOn))) &&
+                            (!isMonthView && date.weekNumber(startWeekOn) == LocalDate.now(ZoneId.of(timeZoneId)).weekNumber(startWeekOn))) &&
                     date.dayOfWeek == LocalDate.now(ZoneId.of(timeZoneId)).dayOfWeek) {
                     itemView.text.setTextAppearance(itemView.context, R.style.Text_Caption_Strong)
                     itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))

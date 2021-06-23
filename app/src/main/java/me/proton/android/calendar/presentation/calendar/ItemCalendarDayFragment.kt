@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_agenda_event_all_day.view.*
+import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.*
 import me.proton.android.calendar.R
@@ -466,7 +467,14 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             }
         }
         agendaMediator.observe(viewLifecycleOwner) {
-            it?.let { setupItemMiniCalendarContent(it.first, it.second, it.third) }
+            it?.let {
+                lifecycleScope.launch {
+                    if (calendarViewModel.selectedDate.value != date) {
+                        delay(300) // TODO Still needed ?
+                    }
+                    setupItemMiniCalendarContent(it.first, it.second, it.third)
+                }
+            }
         }
 
         calendarViewModel.dayViewScrollYPosition.observe(viewLifecycleOwner) {
@@ -497,6 +505,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
         val immutableDate = date ?: return
+
+        if (day_view == null) return
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
 

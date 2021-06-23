@@ -17,6 +17,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import kotlinx.android.synthetic.main.event_attendees_view.*
@@ -244,7 +245,8 @@ class MonthFragment : BaseFragment() {
                 if (firstDayOfTheWeek.year < miniCalendarPagerAdapter.firstDayOfMonth.year) {
                     miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) - (firstDayOfTheWeek.withDayOfYear(firstDayOfTheWeek.lengthOfYear()).weekNumber(startWeekOn) + miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn)))
                 } else if (firstDayOfTheWeek.year > miniCalendarPagerAdapter.firstDayOfMonth.year) {
-                    miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) + (miniCalendarPagerAdapter.firstDayOfMonth.withDayOfYear(firstDayOfTheWeek.lengthOfYear()).weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn)))
+                    val firstDayOfTheWeekYearLength = firstDayOfTheWeek.lengthOfYear()
+                    miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) + (miniCalendarPagerAdapter.firstDayOfMonth.withDayOfYear(if (firstDayOfTheWeekYearLength > 365) firstDayOfTheWeekYearLength - 1 else firstDayOfTheWeekYearLength).weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn)))
                 } else {
                     miniCalendarPagerAdapter.startingPosition + (selectedDate.weekNumber(startWeekOn) - miniCalendarPagerAdapter.firstDayOfMonth.withDayOfMonth(1).weekNumber(startWeekOn))
                 }
@@ -389,6 +391,8 @@ class MonthFragment : BaseFragment() {
                 }
                 calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             }
+            (agendaPager.getChildAt(0) as RecyclerView).layoutManager?.isItemPrefetchEnabled = false
+            (agendaPager.getChildAt(0) as RecyclerView).setItemViewCacheSize(0)
         }
 
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
