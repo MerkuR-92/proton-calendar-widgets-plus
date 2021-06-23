@@ -173,13 +173,13 @@ class ObtainSendPreferencesUseCase(
             val matchingPublicAddressKey = publicAddress.keys.find { cryptoContext.pgpCrypto.getFingerprintOrNull(it.publicKey.key) == pinnedKeyFingerprint }
 
             // pinned key is not in the public key repository
-            if (matchingPublicAddressKey == null) return SendPreferencesOrError.Error.TrustedKeysInvalid
+            if (isInternal && matchingPublicAddressKey == null) return SendPreferencesOrError.Error.TrustedKeysInvalid
 
             // pinned key is compromised
-            if (matchingPublicAddressKey.isCompromised()) return SendPreferencesOrError.Error.TrustedKeysInvalid
+            if (matchingPublicAddressKey?.isCompromised() == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
 
             // pinned key is obsolete
-            if (matchingPublicAddressKey.isObsolete()) return SendPreferencesOrError.Error.TrustedKeysInvalid
+            if (matchingPublicAddressKey?.isObsolete() == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
         }
 
         if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return SendPreferencesOrError.Error.PublicKeysInvalid
