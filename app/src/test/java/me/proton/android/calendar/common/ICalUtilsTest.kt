@@ -2300,6 +2300,52 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate n-th occurrence of partial-day recurring event, display in a timezone that make it happen the previous day`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//ProtonCalendar 4.1.19-prod.1//EN
+    METHOD:REQUEST
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    SUMMARY:Different timezone
+    STATUS:CONFIRMED
+    RRULE:FREQ=MONTHLY;BYDAY=TU;BYSETPOS=4
+    DTSTART;TZID=Asia/Anadyr:20210622T050000
+    DTEND;TZID=Asia/Anadyr:20210622T053000
+    UID:aRpVeZ2WB-NBHPO_LLykafrJIYKr@proton.me
+    SEQUENCE:0
+    DTSTAMP:20210622T125255Z
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Paris"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true
+        ), iCal, null)!!
+
+        val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
+        val occurrence2 = event.generateOccurrence(2, displayTimeZoneId)
+
+        assertThat(occurrence1).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2021, 6, 21, 19, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2021, 6, 21, 19, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrence2).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2021, 7, 26, 19, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2021, 7, 26, 19, 30, 0, 0, ZoneId.of(displayTimeZoneId)),
+            2))
+    }
+
+    @Test
     fun `generate n-th occurrence of partial-day multi-day event with BYDAY, display in different timezone`() {
 
         val iCalString = """

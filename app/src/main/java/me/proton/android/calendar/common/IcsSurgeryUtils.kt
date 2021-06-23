@@ -339,9 +339,13 @@ object IcsSurgeryUtils {
         if (recurrenceRule.value.until != null && recurrenceRule.value.until.toInstant().isAfter(MAX_DATE.toInstant())) return false
 
         // We reject as invalid RRULEs that:
-        val iteratorTimezone = if (dateStart.value.hasTime()) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()
+        val hasTime = dateStart.value.hasTime() && recurrenceRule.value.bySetPos.isNullOrEmpty() && recurrenceRule.value.byDay.isNullOrEmpty()
+        val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()
+
+        // Special case is for events that have date iterator skip the first occurrence
+        //  (either by having bysetpos, or by having a display tz that makes it jump to the next / previous day)
         var specialCase = false
-        val startICalDate = if (!recurrenceRule.value.bySetPos.isNullOrEmpty() || dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear != dateStart.value.toZonedDateTime(iteratorTimezone.id).toLocalDate().dayOfYear) {
+        val startICalDate = if (!recurrenceRule.value.bySetPos.isNullOrEmpty() || dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > dateStart.value.toZonedDateTime(iteratorTimezone.id).toLocalDate().dayOfYear) {
             specialCase = true
             ICalDate(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
         } else dateStart.value
@@ -350,7 +354,6 @@ object IcsSurgeryUtils {
         if (startIterator.hasNext()) {
             // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
             if (specialCase) {
-                // Special case is for events that have date iterator skip the first occurrence (either by having bysetpos, or by having a display tz that makes it jump to the next day)
                 val nextDate = startIterator.next().toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id, true).withHour(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).hour).withMinute(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).minute)
                 if (nextDate.toInstant() != dateStart.value.toInstant()) return false
             } else {

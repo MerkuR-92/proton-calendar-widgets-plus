@@ -251,7 +251,10 @@ object EventUtilsImpl : EventUtils {
         val startZonedDateTimeAllDayNormalised = ZonedDateTime.of(startZonedDateTime.toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
 
         val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(iCalEvent.dateStart) else TimeZone.getDefault()
-        var specialCase = false // Special case is for events that have date iterator skip the first occurrence (either by having bysetpos, or by having a display tz that makes it jump to the next day)
+
+        // Special case is for events that have date iterator skip the first occurrence
+        //  (either by having bysetpos, or by having a display tz that makes it jump to the next / previous day)
+        var specialCase = false
         val startICalDate = if (!isAllDay() && (!iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty() || iCalEvent.dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).toLocalDate().dayOfYear)) {
             specialCase = true
             ICalDate(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)

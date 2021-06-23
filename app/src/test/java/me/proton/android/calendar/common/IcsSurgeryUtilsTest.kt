@@ -1488,6 +1488,44 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `cleanRRule part day event with tz that make occurrences happen on the previous day test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//ProtonCalendar 4.1.19-prod.1//EN
+    METHOD:REQUEST
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    SUMMARY:Different timezone
+    STATUS:CONFIRMED
+    RRULE:FREQ=MONTHLY;BYDAY=TU;BYSETPOS=4
+    DTSTART;TZID=Asia/Anadyr:20210622T050000
+    DTEND;TZID=Asia/Anadyr:20210622T053000
+    ATTENDEE;X-PM-TOKEN=fd5a754f0f3f9b89f44f251bc39d4342901a2b29;RSVP=TRUE;ROLE
+    =REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=breakingcalendar@protonmail.com:
+    mailto:breakingcalendar@protonmail.com
+    UID:aRpVeZ2WB-NBHPO_LLykafrJIYKr@proton.me
+    ORGANIZER;CN=benjaminlovesdebugging@pm.me:mailto:benjaminlovesdebugging@pm.
+    me
+    SEQUENCE:0
+    DTSTAMP:20210622T125255Z
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar!!.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
+        }
+    }
+
+    @Test
     fun `cleanRecurrenceId RECURRENCE-ID with RRULE test`() {
 
         val iCalString = """
