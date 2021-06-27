@@ -56,8 +56,8 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
 
-    private lateinit var hideMiniCalendarListener: () -> Unit
-    private var canHideMiniCalendar = true
+    private lateinit var calendarOnScrollListener: MonthFragment.CalendarOnScrollListener
+    private var canTriggerCalendarOnScrollListener = true
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment{
@@ -70,8 +70,8 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         }
     }
 
-    fun setHideMiniCalendarListener(hideMiniCalendarListener: () -> Unit) {
-        this.hideMiniCalendarListener = hideMiniCalendarListener
+    fun setCalendarOnScrollListener(calendarOnScrollListener: MonthFragment.CalendarOnScrollListener) {
+        this.calendarOnScrollListener = calendarOnScrollListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -181,16 +181,19 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (dy > 0) {
-                    recyclerView.run {
-                        if (!canHideMiniCalendar) return
-                        canHideMiniCalendar = false
-                        postDelayed({
-                            canHideMiniCalendar = true
-                        }, CLICK_INTERVAL_MS)
-                        if (this@ItemCalendarAgendaFragment::hideMiniCalendarListener.isInitialized) hideMiniCalendarListener.invoke()
-                    }
-                }
+                logger.e("Test test dx $dx dy $dy")
+//                if (dy > 0) {
+//                    recyclerView.run {
+//                        if (!canTriggerCalendarOnScrollListener) return
+//                        canTriggerCalendarOnScrollListener = false
+//                        postDelayed({
+//                            canTriggerCalendarOnScrollListener = true
+//                        }, ON_SCROLL_TRIGGER_INTERVAL)
+//                        if (this@ItemCalendarAgendaFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScroll(dy)
+//                    }
+//                }
+                if (!this@ItemCalendarAgendaFragment.isResumed) return
+                if (this@ItemCalendarAgendaFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScroll(dy)
             }
         })
 

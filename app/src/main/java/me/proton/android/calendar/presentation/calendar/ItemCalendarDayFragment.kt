@@ -74,8 +74,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private lateinit var allDayEventCroppedListAdapter: DayViewAllDayEventAdapter
     private lateinit var allDayEventListAdapter: DayViewAllDayEventAdapter
 
-    private lateinit var hideMiniCalendarListener: () -> Unit
-    private var canHideMiniCalendar = true
+    private lateinit var calendarOnScrollListener: MonthFragment.CalendarOnScrollListener
+    private var canTriggerCalendarOnScrollListener = true
     private var preDrawDone = false
 
     private var onScrollChangeListener: View.OnScrollChangeListener? = null
@@ -91,8 +91,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
     }
 
-    fun setHideMiniCalendarListener(hideMiniCalendarListener: () -> Unit) {
-        this.hideMiniCalendarListener = hideMiniCalendarListener
+    fun setCalendarOnScrollListener(calendarOnScrollListener: MonthFragment.CalendarOnScrollListener) {
+        this.calendarOnScrollListener = calendarOnScrollListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,16 +140,18 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         onScrollChangeListener = View.OnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
             if (this.isResumed) calendarViewModel.dayViewScrollYPosition.value = scrollY
-            if (oldScrollY - scrollY < 0 && oldScrollY > 0) {
-                v?.run {
-                    if (!canHideMiniCalendar) return@OnScrollChangeListener
-                    canHideMiniCalendar = false
-                    postDelayed({
-                        canHideMiniCalendar = true
-                    }, CLICK_INTERVAL_MS)
-                    if (this@ItemCalendarDayFragment::hideMiniCalendarListener.isInitialized) hideMiniCalendarListener.invoke()
-                }
-            }
+//            if (oldScrollY - scrollY < 0 && oldScrollY > 0) {
+//                v?.run {
+//                    if (!canTriggerCalendarOnScrollListener) return@OnScrollChangeListener
+//                    canTriggerCalendarOnScrollListener = false
+//                    postDelayed({
+//                        canTriggerCalendarOnScrollListener = true
+//                    }, ON_SCROLL_TRIGGER_INTERVAL)
+//                    if (this@ItemCalendarDayFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScrollChange(scrollY, oldScrollY)
+//                }
+//            }
+            if (!this.isResumed) return@OnScrollChangeListener
+            if (this@ItemCalendarDayFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScrollChange(scrollY, oldScrollY)
         }
 
         val scrollView: ScrollView = rootView.findViewById(R.id.day_scroll_view)

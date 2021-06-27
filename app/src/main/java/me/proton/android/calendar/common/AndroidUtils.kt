@@ -30,6 +30,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckedTextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Guideline
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -767,6 +769,28 @@ object AndroidUtils {
         }
     }
 
+    fun Guideline.animateHeightChange(toHeightPx: Int, maxHeight: Int, onAnimationEnd: () -> Unit) {
+        val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
+        if (layoutParams.guideBegin != toHeightPx) {
+            val duration = if (toHeightPx > layoutParams.guideBegin) {
+                val percentLeft = ((toHeightPx - layoutParams.guideBegin) * 100) / toHeightPx
+                (percentLeft * 300) / 100
+            } else {
+                val percentLeft = 100 - (((maxHeight - layoutParams.guideBegin) * 100) / maxHeight)
+                (percentLeft * 300) / 100
+            }
+
+            val valueAnimator = ValueAnimator.ofInt(layoutParams.guideBegin, toHeightPx)
+            valueAnimator.duration = duration.toLong()
+            valueAnimator.addUpdateListener {
+                val animatedValue = valueAnimator.animatedValue as Int
+                layoutParams.guideBegin = animatedValue
+                this.layoutParams = layoutParams
+            }
+            valueAnimator.start()
+            valueAnimator.doOnEnd { onAnimationEnd.invoke() }
+        }
+    }
 
     /**
      * Listens for changes in EditText, only propagates values within range or forces default when

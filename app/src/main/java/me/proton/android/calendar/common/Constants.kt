@@ -19,6 +19,7 @@ const val OFFLINE_ALARM_ID_PREFIX = "Proton-Android-App-Offline-Alarm-ID:"
 const val ATTENDEE_AUTO_EXPAND_LIMIT = 5
 
 const val CLICK_INTERVAL_MS: Long = 500L
+const val ON_SCROLL_TRIGGER_INTERVAL: Long = 50L
 
 const val WORKER_MAX_RETRY_COUNT = 5
 

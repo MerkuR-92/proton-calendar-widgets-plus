@@ -9,7 +9,7 @@ import java.time.LocalDate
 class DayPagerAdapter(
     activity: FragmentActivity,
     val startingDate: LocalDate,
-    private val hideMiniCalendarListener: () -> Unit
+    private val calendarOnScrollListener: MonthFragment.CalendarOnScrollListener
 ) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
@@ -23,7 +23,7 @@ class DayPagerAdapter(
             position,
             startingDate.plusDays((position - startingPosition).toLong())
         )
-        fragment.setHideMiniCalendarListener(hideMiniCalendarListener)
+        fragment.setCalendarOnScrollListener(calendarOnScrollListener)
         return fragment
     }
 }

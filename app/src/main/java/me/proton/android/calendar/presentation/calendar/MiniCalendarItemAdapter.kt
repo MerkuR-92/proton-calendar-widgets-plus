@@ -367,7 +367,8 @@ class MiniCalendarItemAdapter(
                     (if (fullWeeksInMonth == 1) context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing) * 2
                     else (fullWeeksInMonth - 1) * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)) +
                     fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing) +
-                    context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing)
+                    context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing) +
+                    context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
         }
 
         fun calculateFullWeeksInMonth(firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {
