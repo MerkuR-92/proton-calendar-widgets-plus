@@ -6,6 +6,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import me.proton.android.calendar.common.DateTimeUtilsImpl.calculateWeekNumberBetween
 import me.proton.android.calendar.common.DateTimeUtilsImpl.getFullyOverlappingWindow
+import me.proton.android.calendar.common.DateTimeUtilsImpl.getLastWeekOfMonthOffset
 import me.proton.android.calendar.domain.CalendarsRepository
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
@@ -81,4 +82,32 @@ internal class DateTimeUtilsTest {
             .isEqualTo(-89)
     }
 
+    @Test
+    fun `Calculate last week of the month offset`() {
+        assertThat(getLastWeekOfMonthOffset(
+            DayOfWeek.MONDAY,
+            LocalDate.of(2021, 6, 30)
+        )).isEqualTo(4)
+        assertThat(getLastWeekOfMonthOffset(
+            DayOfWeek.SATURDAY,
+            LocalDate.of(2021, 6, 30)
+        )).isEqualTo(2)
+        assertThat(getLastWeekOfMonthOffset(
+            DayOfWeek.SUNDAY,
+            LocalDate.of(2021, 6, 30)
+        )).isEqualTo(3)
+
+        assertThat(getLastWeekOfMonthOffset(
+            DayOfWeek.SUNDAY,
+            LocalDate.of(2021, 7, 31)
+        )).isEqualTo(0)
+        assertThat(getLastWeekOfMonthOffset(
+            DayOfWeek.SATURDAY,
+            LocalDate.of(2021, 7, 31)
+        )).isEqualTo(6)
+        assertThat(getLastWeekOfMonthOffset(
+            DayOfWeek.MONDAY,
+            LocalDate.of(2021, 7, 31)
+        )).isEqualTo(1)
+    }
 }

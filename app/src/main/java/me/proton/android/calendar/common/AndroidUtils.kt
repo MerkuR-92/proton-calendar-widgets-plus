@@ -769,16 +769,18 @@ object AndroidUtils {
         }
     }
 
-    fun Guideline.animateHeightChange(toHeightPx: Int, maxHeight: Int, onAnimationEnd: () -> Unit) {
+    fun Guideline.animateHeightChange(toHeightPx: Int, maxHeight: Int? = null, onAnimationEnd: () -> Unit) {
         val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
         if (layoutParams.guideBegin != toHeightPx) {
-            val duration = if (toHeightPx > layoutParams.guideBegin) {
-                val percentLeft = ((toHeightPx - layoutParams.guideBegin) * 100) / toHeightPx
-                (percentLeft * 300) / 100
-            } else {
-                val percentLeft = 100 - (((maxHeight - layoutParams.guideBegin) * 100) / maxHeight)
-                (percentLeft * 300) / 100
-            }
+            val duration =
+                if (maxHeight == null) 300
+                else if (toHeightPx > layoutParams.guideBegin) {
+                    val percentLeft = ((toHeightPx - layoutParams.guideBegin) * 100) / toHeightPx
+                    (percentLeft * 300) / 100
+                } else {
+                    val percentLeft = 100 - (((maxHeight - layoutParams.guideBegin) * 100) / maxHeight)
+                    (percentLeft * 300) / 100
+                }
 
             val valueAnimator = ValueAnimator.ofInt(layoutParams.guideBegin, toHeightPx)
             valueAnimator.duration = duration.toLong()

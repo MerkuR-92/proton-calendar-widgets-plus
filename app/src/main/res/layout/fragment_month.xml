@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<me.proton.android.calendar.presentation.calendar.InterceptTouchConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragmentMonthLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.calendar.MonthFragment"
-    android:focusableInTouchMode="false">
+    tools:context=".presentation.calendar.MonthFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/viewPagerTopGuideline"
@@ -28,17 +27,32 @@
         android:background="@color/background_norm"
         >
 
+        <LinearLayout
+            android:id="@+id/miniCalendarDaysHeaderLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="7"
+            android:background="@color/background_norm"
+            android:layout_marginStart="@dimen/mini_calendar_margin"
+            android:layout_marginEnd="@dimen/mini_calendar_margin"
+            android:layout_marginTop="@dimen/calendar_item_day_vertical_spacing"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/miniCalendarPager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:focusableInTouchMode="false"
             android:overScrollMode="never"
+            android:layout_marginTop="@dimen/calendar_item_day_vertical_spacing"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/mini_calendar_slider"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/miniCalendarDaysHeaderLayout"
+            app:layout_constraintBottom_toTopOf="@+id/viewPagerSliderGuideline" />
 
 <!--        <androidx.viewpager2.widget.ViewPager2-->
 <!--            android:id="@+id/miniCalendarPager"-->
@@ -51,11 +65,20 @@
 <!--            app:layout_constraintBottom_toTopOf="@+id/mini_calendar_slider"-->
 <!--            />-->
 
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/viewPagerSliderGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="268dp" />
+
         <LinearLayout
             android:id="@+id/mini_calendar_slider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/calendar_slider_height"
             android:gravity="center"
+            android:background="@color/background_norm"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -81,4 +104,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewPagerTopGuideline" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<!--    <LinearLayout-->
+<!--        android:id="@+id/agendaPagerOverview"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:clickable="true"-->
+<!--        android:focusable="true"-->
+<!--        android:orientation="vertical"-->
+<!--        android:background="@color/pomegranate"-->
+<!--        android:visibility="gone"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/viewPagerTopGuideline"/>-->
+
+</me.proton.android.calendar.presentation.calendar.InterceptTouchConstraintLayout>

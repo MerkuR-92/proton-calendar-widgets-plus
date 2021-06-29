@@ -70,6 +70,8 @@ interface DateTimeUtils {
 
     fun LocalDate.isLastDayOfWeekInMonth(): Boolean
 
+    fun getLastWeekOfMonthOffset(startWeekOn: DayOfWeek, lastDayOfMonth: LocalDate): Int
+
 // TODO add function for calculating how many days-of-week are there in a given month, we can use it for "backwards" formatting then
 
     fun LocalDate.weekInMonth(): Int

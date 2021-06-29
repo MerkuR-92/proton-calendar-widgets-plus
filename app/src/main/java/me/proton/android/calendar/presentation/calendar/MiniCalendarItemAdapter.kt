@@ -22,11 +22,9 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.concatenate
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
-import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
+import me.proton.android.calendar.common.DateTimeUtilsImpl.getLastWeekOfMonthOffset
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK
-import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter.CalendarSettings.WEEKDAYS_TO_SHOW
 import java.time.*
 import java.time.temporal.WeekFields
 import kotlin.math.ceil
@@ -39,7 +37,7 @@ class MiniCalendarItemAdapter(
     private val calendarViewModel: CalendarViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val clickListener: ((LocalDate) -> Unit)?
-) : ListAdapter<MiniCalendarItem, MiniCalendarItemAdapter.MiniCalendarViewHolder>(DiffCallback()) {
+) : ListAdapter<MiniCalendarItem, MiniCalendarItemAdapter.DayViewHolder>(DiffCallback()) {
 
     object CalendarSettings {
         const val DAYS_IN_A_WEEK = 7 // always 7
@@ -51,6 +49,8 @@ class MiniCalendarItemAdapter(
     private var indicators: Map<LocalDate, List<String>>? = null
     private var indicatorsMediator = MediatorLiveData<List<MiniCalendarItem>>()
 
+    var selectedIndex = 0
+
     fun initialise(timeZoneId: String, delay: Boolean) {
         indicatorsMediator = MediatorLiveData<List<MiniCalendarItem>>()
 
@@ -59,15 +59,10 @@ class MiniCalendarItemAdapter(
             val firstDayOfTheWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
             val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
             val lastDayOfTheMonth = forDate.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
-            val lastDayOfMonthWeekValue = DayOfWeek.of(lastDayOfTheMonth.dayOfWeek.value).value
-            val lastDayOfMonthOffset = 7 - (startWeekOn.value + lastDayOfMonthWeekValue - 1)
+            val lastDayOfMonthOffset = getLastWeekOfMonthOffset(startWeekOn, lastDayOfTheMonth)
 
             val fromDate = firstDayOfTheMonth.minusDays(firstDayOfTheWeekOffset.toLong())
             val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth()).plusDays(lastDayOfMonthOffset.toLong())
-
-            val headerItems = (0 until WEEKDAYS_TO_SHOW).map {
-                MiniCalendarItem(firstDayOfTheMonth.plusDays(-firstDayOfTheWeekOffset + it.toLong()), false,false, emptyList())
-            }
 
             val previousMonthDayItems = (0 until firstDayOfTheWeekOffset).map {
                 val date = firstDayOfTheMonth.minusDays(it.toLong() + 1)
@@ -85,7 +80,7 @@ class MiniCalendarItemAdapter(
             }
 
             // submit month skeleton with only days and weekday names
-            val skeletonList = concatenate(headerItems, previousMonthDayItems, dayItems, upcomingMonthDayItems)
+            val skeletonList = concatenate(previousMonthDayItems, dayItems, upcomingMonthDayItems)
             this.submitList(skeletonList)
 
             calendarViewModel.lifeCycleScope.launch {
@@ -118,9 +113,6 @@ class MiniCalendarItemAdapter(
 
             val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
             val firstDay = forDate.with(temporalField, 1)
-            val headerItems = (0 until WEEKDAYS_TO_SHOW).map {
-                MiniCalendarItem(firstDay.plusDays(it.toLong()), false,false, emptyList())
-            }
 
             val dayItems = (0 until 7).map {
                 val date = firstDay.plusDays(it.toLong())
@@ -128,7 +120,7 @@ class MiniCalendarItemAdapter(
             }
 
             // submit month skeleton with only days and weekday names
-            val skeletonList = concatenate(headerItems, dayItems)
+            val skeletonList = concatenate(dayItems)
             this.submitList(skeletonList)
 
             // subscribe for calendar indicators and selected date
@@ -175,11 +167,12 @@ class MiniCalendarItemAdapter(
         val indexToSelect = mutableList.indexOfLast { it?.date == selectedDate }
         if (indexToSelect != -1) {
             mutableList[indexToSelect] = mutableList[indexToSelect].copy(isSelected = true)
+            selectedIndex = indexToSelect
         }
 
         // update calendar indicators
         mutableList.forEachIndexed { index, miniCalendarItem ->
-            if (index >= WEEKDAYS_TO_SHOW && miniCalendarItem != null) {
+            if (miniCalendarItem != null) {
                 val colors = indicators.getOrDefault(miniCalendarItem.date, emptyList())
 
                 mutableList[index] = miniCalendarItem.copy(indicatorColors = colors)
@@ -189,152 +182,27 @@ class MiniCalendarItemAdapter(
         return mutableList
     }
 
-    sealed class MiniCalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        class HeaderViewHolder(
-            itemView: View,
-            private val timeZoneId: String,
-            private val startWeekOn: DayOfWeek,
-            private val isMonthView: Boolean
-        ) : MiniCalendarViewHolder(itemView) {
-            fun bind(date: LocalDate) {
-                itemView.text.text = date.formatDayOfWeek(short = true)
-                if (((isMonthView && date.month == LocalDate.now(ZoneId.of(timeZoneId)).month) ||
-                            (!isMonthView && date.weekNumber(startWeekOn) == LocalDate.now(ZoneId.of(timeZoneId)).weekNumber(startWeekOn))) &&
-                    date.dayOfWeek == LocalDate.now(ZoneId.of(timeZoneId)).dayOfWeek) {
-                    itemView.text.setTextAppearance(itemView.context, R.style.Text_Caption_Strong)
-                    itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
-                }
-                else {
-                    itemView.text.setTextAppearance(itemView.context, R.style.Text_Caption_Strong)
-                    itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
-                }
-            }
-        }
-
-        class DayViewHolder(
-            itemView: View,
-            private val timeZoneId: String,
-            private val forDate: LocalDate,
-            private val startWeekOn: DayOfWeek,
-            private val isMonthView: Boolean
-        ) : MiniCalendarViewHolder(
-            itemView
-        ) {
-
-            fun bind(item: MiniCalendarItem?, clickListener: ((LocalDate) -> Unit)?) {
-
-                if (item == null) {
-                    itemView.text.text = ""
-                    itemView.ll_calendar_dots.visibleOrInvisible(false)
-                    itemView.setBackgroundResource(0)
-                } else {
-
-                    val itemLayoutParams: GridLayoutManager.LayoutParams = (itemView.item_mini_calendar_layout).layoutParams as GridLayoutManager.LayoutParams
-                    val itemDateWeekNumber = item.date.weekNumber(startWeekOn)
-                    val forDateWeekNumber = forDate.weekNumber(startWeekOn)
-                    itemLayoutParams.topMargin =
-                        if (isMonthView && item.date.isAfter(forDate) && (itemDateWeekNumber - forDateWeekNumber != 0 || item.date.month != forDate.month))
-                            itemView.context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
-                        else 0
-
-                    when {
-                        item.isSelected -> {
-                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
-                            itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
-                        }
-                        item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
-                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                            itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
-                            itemView.selected_background.setBackgroundResource(0)
-                        }
-                        isMonthView && item.date.month != forDate.month -> {
-                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                            itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
-                            itemView.selected_background.setBackgroundResource(0)
-                        }
-                        else -> {
-                            itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
-                            itemView.selected_background.setBackgroundResource(0)
-                        }
-                    }
-
-                    itemView.text.text = "${item.date.dayOfMonth}"
-
-                    itemView.ll_calendar_dots.visibleOrInvisible(true)
-                    itemView.ll_calendar_dots.apply {
-                        children.forEachIndexed { index, view ->
-                            if (item.indicatorColors.size - 1 >= index) {
-                                (view as ImageView).drawable.setTint(Color.parseColor(item.indicatorColors[index]))
-                                view.visibleOrGone(true)
-                            } else {
-                                view.visibleOrGone(false)
-                            }
-                        }
-                    }
-                }
-
-                itemView.setOnClickListener {
-
-                    if (item != null) {
-                        clickListener?.invoke(item.date)
-                    }
-                }
-            }
-        }
-
-    }
-
-    private val ITEM_TYPE_HEADER = 0
-    private val ITEM_TYPE_DAY = 1
-
-    override fun getItemViewType(position: Int): Int {
-        return if (position < CalendarSettings.WEEKDAYS_TO_SHOW) {
-            ITEM_TYPE_HEADER
-        } else {
-            ITEM_TYPE_DAY
-        }
-    }
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int /*later when we have more view types*/
-    ): MiniCalendarViewHolder {
-        return if (viewType == ITEM_TYPE_HEADER) {
-            MiniCalendarViewHolder.HeaderViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_mini_calendar_header,
-                    parent,
-                    false
-                ),
-                timeZoneId,
-                startWeekOn,
-                isMonthView
-            )
-        } else {
-            MiniCalendarViewHolder.DayViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_mini_calendar,
-                    parent,
-                    false
-                ),
-                timeZoneId,
-                forDate,
-                startWeekOn,
-                isMonthView
-            )
-        }
+    ): DayViewHolder {
+        return DayViewHolder(
+            LayoutInflater.from(parent.context).inflate(
+                R.layout.item_mini_calendar,
+                parent,
+                false
+            ),
+            timeZoneId,
+            forDate,
+            startWeekOn,
+            isMonthView
+        )
     }
 
-    override fun onBindViewHolder(holder: MiniCalendarViewHolder, position: Int) {
-
-        when (holder) {
-            is MiniCalendarViewHolder.HeaderViewHolder -> holder.bind(getItem(position).date)
-            is MiniCalendarViewHolder.DayViewHolder -> holder.bind(getItem(position)) {
-                clickListener?.invoke(it)
-            }
+    override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
+        holder.bind(getItem(position)) {
+            clickListener?.invoke(it)
         }
-
     }
 
     private class DiffCallback : DiffUtil.ItemCallback<MiniCalendarItem>() {
@@ -345,6 +213,75 @@ class MiniCalendarItemAdapter(
         override fun areContentsTheSame(oldItem: MiniCalendarItem, newItem: MiniCalendarItem): Boolean {
             return oldItem.isSelected == newItem.isSelected && oldItem.indicatorColors.size == newItem.indicatorColors.size
                     && oldItem.indicatorColors.containsAll(newItem.indicatorColors)
+        }
+    }
+
+    class DayViewHolder(
+        itemView: View,
+        private val timeZoneId: String,
+        private val forDate: LocalDate,
+        private val startWeekOn: DayOfWeek,
+        private val isMonthView: Boolean
+    ) : RecyclerView.ViewHolder(itemView) {
+
+        fun bind(item: MiniCalendarItem?, clickListener: ((LocalDate) -> Unit)?) {
+
+            if (item == null) {
+                itemView.text.text = ""
+                itemView.ll_calendar_dots.visibleOrInvisible(false)
+                itemView.setBackgroundResource(0)
+            } else {
+
+                val itemLayoutParams: GridLayoutManager.LayoutParams = (itemView.item_mini_calendar_layout).layoutParams as GridLayoutManager.LayoutParams
+                val itemDateWeekNumber = item.date.weekNumber(startWeekOn)
+                val forDateWeekNumber = forDate.weekNumber(startWeekOn)
+                itemLayoutParams.topMargin =
+                    if (isMonthView && item.date.isAfter(forDate) && (itemDateWeekNumber - forDateWeekNumber != 0 || item.date.month != forDate.month))
+                        itemView.context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
+                    else 0
+
+                when {
+                    item.isSelected -> {
+                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong_Inverted)
+                        itemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    }
+                    item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
+                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                        itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
+                        itemView.selected_background.setBackgroundResource(0)
+                    }
+                    isMonthView && item.date.month != forDate.month -> {
+                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                        itemView.text.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_hint))
+                        itemView.selected_background.setBackgroundResource(0)
+                    }
+                    else -> {
+                        itemView.text.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Strong)
+                        itemView.selected_background.setBackgroundResource(0)
+                    }
+                }
+
+                itemView.text.text = "${item.date.dayOfMonth}"
+
+                itemView.ll_calendar_dots.visibleOrInvisible(true)
+                itemView.ll_calendar_dots.apply {
+                    children.forEachIndexed { index, view ->
+                        if (item.indicatorColors.size - 1 >= index) {
+                            (view as ImageView).drawable.setTint(Color.parseColor(item.indicatorColors[index]))
+                            view.visibleOrGone(true)
+                        } else {
+                            view.visibleOrGone(false)
+                        }
+                    }
+                }
+            }
+
+            itemView.setOnClickListener {
+
+                if (item != null) {
+                    clickListener?.invoke(item.date)
+                }
+            }
         }
     }
 
@@ -365,10 +302,11 @@ class MiniCalendarItemAdapter(
             return context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
                     fullWeeksInMonth * context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) +
                     (if (fullWeeksInMonth == 1) context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing) * 2
-                    else (fullWeeksInMonth - 1) * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)) +
+                    else (fullWeeksInMonth) * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)) +
                     fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing) +
                     context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing) +
                     context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
+
         }
 
         fun calculateFullWeeksInMonth(firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {

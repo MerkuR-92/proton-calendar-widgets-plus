@@ -4,6 +4,7 @@ import biweekly.util.ICalDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
+import me.proton.android.calendar.presentation.calendar.MiniCalendarItem
 import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.text.SimpleDateFormat
 import java.time.*
@@ -258,6 +259,17 @@ object DateTimeUtilsImpl : DateTimeUtils {
     }
 
     override fun LocalDate.isLastDayOfWeekInMonth() = this.plusDays(7).monthValue != this.monthValue
+
+    override fun getLastWeekOfMonthOffset(startWeekOn: DayOfWeek, lastDayOfMonth: LocalDate): Int {
+        val weekEnd = startWeekOn.plus(6)
+        var offset = 0
+        (0 until 7).forEach {
+            if (lastDayOfMonth.plusDays(it.toLong()).dayOfWeek == weekEnd) return offset
+            offset++
+        }
+
+        return offset
+    }
 
 // TODO add function for calculating how many days-of-week are there in a given month, we can use it for "backwards" formatting then
 
