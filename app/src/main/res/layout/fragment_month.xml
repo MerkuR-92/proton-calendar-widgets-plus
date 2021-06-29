@@ -35,6 +35,8 @@
             android:gravity="center"
             android:weightSum="7"
             android:background="@color/background_norm"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_marginStart="@dimen/mini_calendar_margin"
             android:layout_marginEnd="@dimen/mini_calendar_margin"
             android:layout_marginTop="@dimen/calendar_item_day_vertical_spacing"

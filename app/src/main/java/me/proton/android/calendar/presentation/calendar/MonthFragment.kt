@@ -6,7 +6,6 @@ import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.SpannableString
-import android.util.AttributeSet
 import android.view.*
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -66,6 +65,7 @@ import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.*
+import kotlin.math.sqrt
 
 class MonthFragment : BaseFragment() {
 
@@ -381,12 +381,14 @@ class MonthFragment : BaseFragment() {
         fun fullyCollapse(animationEndListener: (() -> Unit))
     }
 
-    class MonthLayoutTouchListener(
+    class MonthLayoutGestureListener(
+        private val context: Context,
+        private val calendarViewModel: CalendarViewModel,
         private val startWeekOn: DayOfWeek,
-        private val monthView: Boolean,
         private val viewPagerTopGuideline: View,
         private val miniCalendarPager: ViewPager2,
         private val miniCalendarPagerAdapter: MiniCalendarPagerAdapter,
+        private val agendaPager: ViewPager2,
         private val currentPosDesiredWeekHeight: Int,
         private val currentPosDesiredMonthHeight: Int,
         private val monthLayoutOnFinishMoveListener: MonthLayoutOnFinishMoveListener
@@ -397,11 +399,36 @@ class MonthFragment : BaseFragment() {
         private var scrollUp: Boolean = false
         private var scrollDown: Boolean = false
 
+        private val MAX_CLICK_DURATION = 1000L
+        private val MAX_CLICK_DISTANCE = 15
+
+        private var pressStartTime: Long = 0
+        private var pressedX = 0f
+        private var pressedY = 0f
+        private var stayedWithinClickDistance = false
+
+
+        private fun distance(x1: Float, y1: Float, x2: Float, y2: Float): Float {
+            val dx = x1 - x2
+            val dy = y1 - y2
+            val distanceInPx = sqrt((dx * dx + dy * dy).toDouble()).toFloat()
+            return pxToDp(distanceInPx)
+        }
+
+        private fun pxToDp(px: Float): Float {
+            return px / context.resources.displayMetrics.density
+        }
+
         override fun onTouch(v: View?, event: MotionEvent): Boolean {
             TimberLogger.e("Test test onTouch $event")
 
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> {
+
+                    if (stayedWithinClickDistance && distance(pressedX, pressedY, event.x, event.y) > MAX_CLICK_DISTANCE) {
+                        stayedWithinClickDistance = false
+                    }
+
                     val scrollY = event.y
                     if (oldScrollY != null && scrollY < oldScrollY!!) {
                         scrollUp = true
@@ -423,8 +450,6 @@ class MonthFragment : BaseFragment() {
                             if (viewPagerGuidelineLayoutParams.guideBegin < currentPosDesiredWeekHeight) viewPagerGuidelineLayoutParams.guideBegin = currentPosDesiredWeekHeight
                             viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
 
-                        } else if (monthView) {
-//                            TimberLogger.e("Test test fully collapse")
                         }
                     } else if (oldScrollY != null && scrollY > oldScrollY!!) {
                         scrollUp = false
@@ -446,8 +471,6 @@ class MonthFragment : BaseFragment() {
                             if (viewPagerGuidelineLayoutParams.guideBegin > currentPosDesiredMonthHeight) viewPagerGuidelineLayoutParams.guideBegin = currentPosDesiredMonthHeight
                             viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
 
-                        } else if (!monthView) {
-//                            TimberLogger.e("Test test fully expand")
                         }
                     }
                     oldScrollY = scrollY
@@ -457,12 +480,33 @@ class MonthFragment : BaseFragment() {
                     scrollUp = false
                     scrollDown = false
                     actionDownY = event.y
+
+                    pressStartTime = System.currentTimeMillis()
+                    pressedX = event.x
+                    pressedY = event.y
+                    stayedWithinClickDistance = true
+
                     TimberLogger.e("Test test ACTION_DOWN $actionDownY")
                     return true
                 }
                 MotionEvent.ACTION_UP -> {
                     actionUpY = event.y
                     oldScrollY = null
+
+
+                    val pressDuration = System.currentTimeMillis() - pressStartTime
+                    val delegateArea = Rect()
+                    agendaPager.getHitRect(delegateArea)
+                    val isWithinPager = delegateArea.contains(pressedX.toInt(), pressedY.toInt())
+                    TimberLogger.e("Test test check click event isWithinPager $isWithinPager pressDuration $pressDuration stayedWithinClickDistance $stayedWithinClickDistance monthView ${calendarViewModel.monthView.value}")
+                    if (isWithinPager && pressDuration < MAX_CLICK_DURATION && stayedWithinClickDistance && calendarViewModel.monthView.value == true) {
+                        // Click event has occurred
+                        TimberLogger.e("Test test click event fully collapse")
+                        monthLayoutOnFinishMoveListener.fullyCollapse { }
+                        miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
+                        return true
+                    }
+
                     val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
                     val distanceWithWeekTop = layoutParams.guideBegin - currentPosDesiredWeekHeight
                     val distanceWithMonthBottom = currentPosDesiredMonthHeight - layoutParams.guideBegin
@@ -714,12 +758,14 @@ class MonthFragment : BaseFragment() {
                 startWeekOn,
                 false
             )
-            val onTouchListener = MonthLayoutTouchListener(
+            val onTouchListener = MonthLayoutGestureListener(
+                requireContext(),
+                calendarViewModel,
                 startWeekOn,
-                calendarViewModel.monthView.value!!,
                 viewPagerTopGuideline,
                 miniCalendarPager,
                 miniCalendarPagerAdapter,
+                agendaPager,
                 currentPosDesiredWeekHeight,
                 currentPosDesiredMonthHeight,
                 object : MonthLayoutOnFinishMoveListener {
@@ -755,6 +801,7 @@ class MonthFragment : BaseFragment() {
             )
 
             fragmentMonthLayout.setOnTouchListener(onTouchListener)
+            fragmentMonthLayout.agendaPager = agendaPager
 
             miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
             miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
