@@ -420,7 +420,7 @@ class MonthFragment : BaseFragment() {
         }
 
         override fun onTouch(v: View?, event: MotionEvent): Boolean {
-            TimberLogger.e("Test test onTouch $event")
+//            TimberLogger.e("Test test onTouch $event")
 
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> {
@@ -774,6 +774,7 @@ class MonthFragment : BaseFragment() {
                             calendarViewModel.monthView.value = true
                             rotateArrowDownward(mini_calendar_chevron)
                             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
+                            timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
                             viewPagerTopGuideline.animateHeightChange(currentPosDesiredMonthHeight, currentPosDesiredMonthHeight) {
                                 miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
@@ -788,6 +789,7 @@ class MonthFragment : BaseFragment() {
                             calendarViewModel.monthView.value = false
                             rotateArrowUpward(mini_calendar_chevron)
                             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
+                            timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
                             viewPagerTopGuideline.animateHeightChange(currentPosDesiredWeekHeight, currentPosDesiredMonthHeight) {
                                 miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)

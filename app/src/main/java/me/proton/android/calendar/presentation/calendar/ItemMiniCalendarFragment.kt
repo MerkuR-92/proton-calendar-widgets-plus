@@ -98,13 +98,20 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 val headerItemBottom = requireContext().resources.getDimensionPixelSize(R.dimen.calendar_item_header_height)
                 val miniCalendarCurrentTop = (rv_mini_calendar.top * -1) + headerItemBottom
                 if (selectedItemView.top != 0 && selectedItemViewTop > miniCalendarCurrentTop) {
-                    logger.e("Test test drags selectedItemViewTop $selectedItemViewTop headerItemBottom $headerItemBottom miniCalendarCurrentTop $miniCalendarCurrentTop")
-                    logger.e("Test test drags sliderTop $sliderTop selectedItemViewTop $selectedItemViewTop  selectedWeekTop $selectedWeekTop selectedWeekBottom $selectedWeekBottom rv_mini_calendar.top ${rv_mini_calendar.top} rv_mini_calendar.height ${rv_mini_calendar.height} rv_mini_calendar.y ${rv_mini_calendar.y} rv_mini_calendar.bottom ${rv_mini_calendar.bottom}")
+//                    logger.e("Test test drags selectedItemViewTop $selectedItemViewTop miniCalendarCurrentTop $miniCalendarCurrentTop result ${miniCalendarCurrentTop - scrollValue.toInt()}")
+//                    logger.e("Test test drags selectedItemViewTop $selectedItemViewTop headerItemBottom $headerItemBottom miniCalendarCurrentTop $miniCalendarCurrentTop")
+//                    logger.e("Test test drags sliderTop $sliderTop selectedItemViewTop $selectedItemViewTop  selectedWeekTop $selectedWeekTop selectedWeekBottom $selectedWeekBottom rv_mini_calendar.top ${rv_mini_calendar.top} rv_mini_calendar.height ${rv_mini_calendar.height} rv_mini_calendar.y ${rv_mini_calendar.y} rv_mini_calendar.bottom ${rv_mini_calendar.bottom}")
                     rv_mini_calendar.top -= scrollValue.toInt()
                     ll_weeknumbers.top -= scrollValue.toInt()
+                    if (selectedItemViewTop < (rv_mini_calendar.top * -1) + headerItemBottom) {
+                        rv_mini_calendar.top = (selectedItemViewTop * -1) + requireContext().resources.getDimensionPixelSize(R.dimen.calendar_item_header_height)
+                        ll_weeknumbers.top = (selectedItemViewTop * -1) + requireContext().resources.getDimensionPixelSize(R.dimen.calendar_item_header_height)
+                    }
                 } else {
-                    logger.e("Test test hides selectedItemViewTop $selectedItemViewTop headerItemBottom $headerItemBottom miniCalendarCurrentTop $miniCalendarCurrentTop")
-                    logger.e("Test test hides sliderTop $sliderTop selectedItemViewTop $selectedItemViewTop  selectedWeekTop $selectedWeekTop selectedWeekBottom $selectedWeekBottom rv_mini_calendar.top ${rv_mini_calendar.top} rv_mini_calendar.height ${rv_mini_calendar.height} rv_mini_calendar.y ${rv_mini_calendar.y} rv_mini_calendar.bottom ${rv_mini_calendar.bottom}")
+//                    logger.e("Test test hides selectedItemViewTop $selectedItemViewTop miniCalendarCurrentTop $miniCalendarCurrentTop result ${miniCalendarCurrentTop - scrollValue.toInt()}")
+//                    logger.e("Test test hides selectedItemViewTop $selectedItemViewTop headerItemBottom $headerItemBottom miniCalendarCurrentTop $miniCalendarCurrentTop")
+//                    logger.e("Test test hides sliderTop $sliderTop selectedItemViewTop $selectedItemViewTop  selectedWeekTop $selectedWeekTop selectedWeekBottom $selectedWeekBottom rv_mini_calendar.top ${rv_mini_calendar.top} rv_mini_calendar.height ${rv_mini_calendar.height} rv_mini_calendar.y ${rv_mini_calendar.y} rv_mini_calendar.bottom ${rv_mini_calendar.bottom}")
+//                    logger.e("Test test new top value ${(selectedItemViewTop * -1) + requireContext().resources.getDimensionPixelSize(R.dimen.calendar_item_header_height)}")
                     rv_mini_calendar.top = (selectedItemViewTop * -1) + requireContext().resources.getDimensionPixelSize(R.dimen.calendar_item_header_height)
                     ll_weeknumbers.top = (selectedItemViewTop * -1) + requireContext().resources.getDimensionPixelSize(R.dimen.calendar_item_header_height)
                 }
@@ -118,8 +125,12 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 if (initialMiniCalendarLayoutParams == null) initialMiniCalendarLayoutParams = rv_mini_calendar.layoutParams as ConstraintLayout.LayoutParams
                 if (initialWeekNumbersLayoutParams == null) initialWeekNumbersLayoutParams = ll_weeknumbers.layoutParams as ConstraintLayout.LayoutParams
 
-                rv_mini_calendar.top += scrollValue.toInt()
-                ll_weeknumbers.top += scrollValue.toInt()
+                if (rv_mini_calendar.top < 0) {
+                    if (rv_mini_calendar.top + scrollValue.toInt() > 0) rv_mini_calendar.top = 0
+                    else rv_mini_calendar.top += scrollValue.toInt()
+                    if (ll_weeknumbers.top + scrollValue.toInt() > 0) ll_weeknumbers.top = 0
+                    else ll_weeknumbers.top += scrollValue.toInt()
+                }
                 return rv_mini_calendar.top
             }
 
