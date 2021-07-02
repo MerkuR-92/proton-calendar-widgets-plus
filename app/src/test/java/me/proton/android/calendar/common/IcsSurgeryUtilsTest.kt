@@ -1557,7 +1557,7 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
-    fun `cleanRecurrenceId datetime type RECURRENCE-ID for all day event test`() {
+    fun `cleanRecurrenceId datetime type RECURRENCE-ID for all day event with TZID test`() {
 
         val parentICalString = """
     BEGIN:VCALENDAR
@@ -1591,6 +1591,94 @@ internal class IcsSurgeryUtilsTest {
     UID:lOIY56JOStapy1PUGuN4WiN67oBQ@proton.me
     END:VEVENT
     END:VCALENDAR
+    """.trimIndent()
+
+        val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        assertThat(iCalendar.cleanRecurrenceId(iCalendar.method?.isReply == true, parentICal)).isTrue()
+        assertThat(iCalendar.events.first().recurrenceId.value.hasTime()).isFalse()
+    }
+
+    @Test
+    fun `cleanRecurrenceId datetime type RECURRENCE-ID for all day event without TZID test`() {
+
+        val parentICalString = """
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20210704
+DTEND;VALUE=DATE:20210705
+RRULE:FREQ=DAILY;COUNT=7
+DTSTAMP:20210628T135523Z
+ORGANIZER;CN=calendarregression@gmail.com:mailto:calendarregression@gmail.c
+ om
+UID:5ju5dd05gteb97ei0iaknapt03@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=calendaruser@pm.me;X-NUM-GUESTS=0:mailto:calendaruser@pm.me
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=calendarregression@gmail.com;X-NUM-GUESTS=0:mailto:calendarregression@g
+ mail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=adamtst@protonmail.com;X-NUM-GUESTS=0:mailto:adamtst@protonmail.com
+X-MICROSOFT-CDO-OWNERAPPTID:-272203753
+CREATED:20210628T135522Z
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nDo not edit this section of the description.\n\nV
+ iew your event at https://calendar.google.com/calendar/event?action=VIEW&ei
+ d=NWp1NWRkMDVndGViOTdlaTBpYWtuYXB0MDMgY2FsZW5kYXJ1c2VyQHBtLm1l&tok=MjgjY2Fs
+ ZW5kYXJyZWdyZXNzaW9uQGdtYWlsLmNvbTMxNzgwYmUyNmUyODYwZDJkM2RkY2IyNjI2MDQ4YzV
+ kNmVhYzkxY2I&ctz=Europe%2FVilnius&hl=en_GB&es=1.\n-::~:~::~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20210628T135523Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:SeriesFull
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
+    """.trimIndent()
+
+        val iCalString = """
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:CANCEL
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20210705
+DTEND;VALUE=DATE:20210706
+DTSTAMP:20210628T135535Z
+ORGANIZER;CN=calendarregression@gmail.com:mailto:calendarregression@gmail.c
+ om
+UID:5ju5dd05gteb97ei0iaknapt03@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=calend
+ arregression@gmail.com;X-NUM-GUESTS=0:mailto:calendarregression@gmail.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN=ca
+ lendaruser@pm.me;X-NUM-GUESTS=0:mailto:calendaruser@pm.me
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=adamtst@protonmail.com;X-NUM-GUESTS=0:mailto:adamtst@protonmail.com
+RECURRENCE-ID;VALUE=DATE:20210705
+CREATED:20210628T135522Z
+DESCRIPTION:
+LAST-MODIFIED:20210628T135535Z
+LOCATION:
+SEQUENCE:1
+STATUS:CANCELLED
+SUMMARY:SeriesFull
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
     """.trimIndent()
 
         val parentICal = ICalUtilsImpl.parseICalString(parentICalString)

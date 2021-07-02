@@ -417,11 +417,13 @@ object IcsSurgeryUtils {
             return false
         }
 
-        // If RECURRENCE-ID has a timezone different from the parent DTSTART one, re-localize in the parent DTSTART timezone.
-        val eventRecurrenceIdTimezone = this.timezoneInfo.getTimezone(event.recurrenceId).timeZone.id
-        val parentRecurrenceIdTimezone = parentCalendar.timezoneInfo?.getTimezone(parentEvent.dateStart)?.timeZone?.id
-        if (event.recurrenceId.value != null && eventRecurrenceIdTimezone != parentRecurrenceIdTimezone) {
-            this.timezoneInfo.setTimezone(event.recurrenceId, parentCalendar.timezoneInfo?.getTimezone(parentEvent.dateStart))
+        if (event.recurrenceId.value.hasTime()) {
+            // If RECURRENCE-ID has a timezone different from the parent DTSTART one, re-localize in the parent DTSTART timezone.
+            val eventRecurrenceIdTimezone = this.timezoneInfo.getTimezone(event.recurrenceId).timeZone.id
+            val parentRecurrenceIdTimezone = parentCalendar.timezoneInfo?.getTimezone(parentEvent.dateStart)?.timeZone?.id
+            if (event.recurrenceId.value != null && eventRecurrenceIdTimezone != parentRecurrenceIdTimezone) {
+                this.timezoneInfo.setTimezone(event.recurrenceId, parentCalendar.timezoneInfo?.getTimezone(parentEvent.dateStart))
+            }
         }
 
         return true

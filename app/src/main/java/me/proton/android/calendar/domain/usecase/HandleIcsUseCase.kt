@@ -207,7 +207,10 @@ class HandleIcsUseCase(
                 if (existingCalendar != null) existingCalendar.display == 1 else defaultCalendar.display == 1
             ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
-        if (isNew && !isOrganizerMode && !iCalendar.method.isCancel) {
+        val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel
+        val isNewSingleEditCancelled = isNew && existingEvent == null && iCalendar.method.isCancel
+
+        if (isNewNonCancelled || isNewSingleEditCancelled) {
             // Create brand new event
             if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
             return editCreateEventFromIcs(
