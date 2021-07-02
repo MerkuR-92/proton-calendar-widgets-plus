@@ -1512,6 +1512,12 @@ class EventViewModel(
         ).state
     }
 
+    // TODO remove once we support editing with attendees
+    suspend fun isApiEventAnInvitation(): Boolean? {
+        val eventEntity = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event ?: return null
+        return eventEntity.attendees.isNotEmpty()
+    }
+
     suspend fun allowSendForCalendarAddress(): Boolean {
         val user =
             if (this::user.isInitialized) user
