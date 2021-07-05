@@ -62,7 +62,9 @@ class HandleAlarmsUseCase(
             valueStoreProvider.provideValueStore(userId.id).putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)
 
             val minAlarmOccurrenceSeconds = alarmsToDisplayNow.minByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
-            logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${((nowInstant.epochSecond - minAlarmOccurrenceSeconds) / 60.0).roundToInt()} minutes")
+            if (alarmsToDisplayNow.isNotEmpty()) {
+                logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${((nowInstant.epochSecond - minAlarmOccurrenceSeconds) / 60.0).roundToInt()} minutes")
+            }
 
             maxAlarmOccurrenceSeconds
 
