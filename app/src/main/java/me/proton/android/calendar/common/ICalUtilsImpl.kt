@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common
 
 import biweekly.Biweekly
+import biweekly.ICalDataType
 import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.component.VAlarm
@@ -831,7 +832,7 @@ object ICalUtilsImpl : ICalUtils {
             // Add shared event ID
             event.setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
             // Add X-PM-PROTON-REPLY and set it to true
-            event.setExperimentalProperty(X_PM_PROTON_REPLY, "1")
+            event.setExperimentalProperty(X_PM_PROTON_REPLY, ICalDataType.BOOLEAN, "TRUE")
         }
 
         iCalendar.addEvent(event)

@@ -125,6 +125,8 @@ data class Event private constructor(
         iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value?.isNotBlank() == true &&
                 iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY)?.value?.isNotBlank() == true
 
+    val isProtonProtonReply = iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_PROTON_REPLY)?.value == "TRUE"
+
     fun getStart(timeZoneId: String): ZonedDateTime {
         return iCalEvent.getStart(timeZoneId)!!
     }

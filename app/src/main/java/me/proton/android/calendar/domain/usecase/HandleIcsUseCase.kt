@@ -12,8 +12,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
-import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
-import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
@@ -231,8 +229,7 @@ class HandleIcsUseCase(
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
-                if (newEvent.hasProtonProtonProperties ||
-                    newEvent.iCalEvent.getExperimentalProperty(X_PM_PROTON_REPLY)?.value == "1") {
+                if (newEvent.hasProtonProtonProperties || newEvent.isProtonProtonReply) {
                     // Attendee added the event as a Proton to Proton invite
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())

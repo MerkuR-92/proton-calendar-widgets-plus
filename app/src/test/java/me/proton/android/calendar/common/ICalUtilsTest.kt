@@ -2,6 +2,7 @@ package me.proton.android.calendar.common
 
 import assertk.assertThat
 import assertk.assertions.*
+import biweekly.ICalDataType
 import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.parameter.ParticipationStatus
@@ -3301,7 +3302,7 @@ internal class ICalUtilsTest {
         assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
         assertThat(responseICalendar.events.first().getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value?.equals("sharedEventId"))
         assertThat(responseICalendar.events.first().getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY)?.value?.equals("sharedSessionKey"))
-        assertThat(responseICalendar.events.first().getExperimentalProperty(CustomICalPropertyParameter.X_PM_PROTON_REPLY)?.value?.equals("1"))
+        assertThat(responseICalendar.events.first().getExperimentalProperty(CustomICalPropertyParameter.X_PM_PROTON_REPLY)?.value?.equals("TRUE"))
     }
 
     @Test
