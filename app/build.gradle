@@ -234,4 +234,6 @@ dependencies {
 
     testImplementation "org.koin:koin-test:${rootProject.ext.version.koin}"
 
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+
 }
