@@ -507,8 +507,8 @@ class HandleSaveUseCase(
 
                 // For single edit we need to calculate span to add days to original event date end
                 val eventSpan = ChronoUnit.DAYS.between(
-                    newEvent.getStart(event.defaultTimeZone!!),
-                    newEvent.getEnd(event.defaultTimeZone!!)
+                    newEvent.getStart(event.defaultTimeZone!!).toLocalDate(),
+                    newEvent.getEnd(event.defaultTimeZone!!).toLocalDate()
                 )
                 if (event.isAllDay()) {
                     // We use original event LocalDate
@@ -553,8 +553,8 @@ class HandleSaveUseCase(
                 }
 
                 val eventSpan = ChronoUnit.DAYS.between(
-                    event.getStart(event.defaultTimeZone!!),
-                    event.getEnd(event.defaultTimeZone!!)
+                    event.getStart(event.defaultTimeZone!!).toLocalDate(),
+                    event.getEnd(event.defaultTimeZone!!).toLocalDate()
                 )
                 if (event.isAllDay()) {
                     HandleSaveOptionResult.Success(event.also {
