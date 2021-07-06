@@ -345,7 +345,7 @@ object IcsSurgeryUtils {
         // Special case is for events that have date iterator skip the first occurrence
         //  (either by having bysetpos, or by having a display tz that makes it jump to the next / previous day)
         var specialCase = false
-        val startICalDate = if (!recurrenceRule.value.bySetPos.isNullOrEmpty() || dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > dateStart.value.toZonedDateTime(iteratorTimezone.id).toLocalDate().dayOfYear) {
+        val startICalDate = if (dateStart.value.hasTime() && (!recurrenceRule.value.bySetPos.isNullOrEmpty() || dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > dateStart.value.toZonedDateTime(iteratorTimezone.id).toLocalDate().dayOfYear)) {
             specialCase = true
             ICalDate(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
         } else dateStart.value
