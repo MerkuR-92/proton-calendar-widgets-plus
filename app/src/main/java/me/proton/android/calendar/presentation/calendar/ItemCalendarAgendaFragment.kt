@@ -181,7 +181,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                logger.e("Test test dx $dx dy $dy")
 //                if (dy > 0) {
 //                    recyclerView.run {
 //                        if (!canTriggerCalendarOnScrollListener) return

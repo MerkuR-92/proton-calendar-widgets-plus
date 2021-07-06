@@ -70,6 +70,8 @@ class CalendarViewModel(
     val userId: LiveData<UserId> = _userId
 
     var dayViewScrollYPosition: MutableLiveData<Int> = MutableLiveData(0)
+    var weekViewStartingPositionAndDate: MutableLiveData<Pair<Int, LocalDate>?> = MutableLiveData(null)
+    var monthViewStartingPositionAndDate: MutableLiveData<Pair<Int, LocalDate>?> = MutableLiveData(null)
 
     override fun onCleared() {
         super.onCleared()
@@ -257,18 +259,23 @@ class CalendarViewModel(
         _selectedDate.value = date
 
         // adjust Mini Calendar
-        val offset =
+        val miniCalendarIndex =
             if (monthView.value == true) {
-                ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
+                val monthStartingDate = monthViewStartingPositionAndDate.value?.second ?: initialToday.withDayOfMonth(1)
+                val offset = ChronoUnit.MONTHS.between(monthStartingDate, date.withDayOfMonth(1)).toInt()
+                val monthStartingPosition = monthViewStartingPositionAndDate.value?.first ?: (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
+                monthStartingPosition + offset
             } else {
                 val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart.value!!)
-                DateTimeUtilsImpl.calculateWeekNumberBetween(initialToday.withDayOfMonth(1), date, startWeekOn)
+                val weekStartingDate = weekViewStartingPositionAndDate.value?.second ?: initialToday.withDayOfMonth(1)
+                val offset = DateTimeUtilsImpl.calculateWeekNumberBetween(weekStartingDate, date, startWeekOn)
+                val weekStartingPosition = weekViewStartingPositionAndDate.value?.first ?: (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
+                weekStartingPosition + offset
             }
-        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + offset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
             miniCalendarPager.post {
-                miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
+                miniCalendarPager.setCurrentItem(miniCalendarIndex, monthView.value == true && Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
             }
         }
 

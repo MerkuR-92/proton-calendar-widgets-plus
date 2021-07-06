@@ -56,6 +56,8 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 const val SESSION_KEY_ALGO = "aes256"
 
+const val DAYS_IN_A_WEEK = 7 // always 7
+
 val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
 val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
