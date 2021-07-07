@@ -1,15 +1,12 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
-import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.domain.entity.UserId
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -56,25 +53,17 @@ class BootstrapCalendarsUseCase( // TODO TEST
 
         if (calendarsResponse.data.calendars.isNullOrEmpty()) {
 
-            // Only update user primary timezone if user has no calendar settings yet
-            var updateCalendarUserPrimaryTimezone = false
-            when (val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId)) {
-                is ApiResponse.Error -> {
-                    updateCalendarUserPrimaryTimezone = calendarUserSettingsResponse.httpCode == 404
-                    if (calendarUserSettingsResponse.httpCode != 404) logger.e("api error getting calendar user settings: $calendarUserSettingsResponse")
-                }
-                is ApiResponse.Exception -> logger.e("api error getting calendar user settings: $calendarUserSettingsResponse")
-            }
-
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
             createDefaultCalendarResult.ifSuccessAndLogErrors(logger) {
-                if (updateCalendarUserPrimaryTimezone) {
-                    when (val updateCalendarUserPrimaryTimezoneResponse =
-                        settingsApi.updateCalendarUserPrimaryTimezone(userId, fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!)) {
-                        is ApiResponse.Error -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                        is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                    }
+                // Only update user primary timezone if we just created the first calendar
+                when (val updateCalendarUserPrimaryTimezoneResponse =
+                    settingsApi.updateCalendarUserPrimaryTimezone(
+                        userId,
+                        fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
+                    )) {
+                    is ApiResponse.Error -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
+                    is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                 }
             }
 
