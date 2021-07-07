@@ -275,7 +275,7 @@ class CalendarViewModel(
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
             miniCalendarPager.post {
-                miniCalendarPager.setCurrentItem(miniCalendarIndex, monthView.value == true && Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
+                miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
             }
         }
 

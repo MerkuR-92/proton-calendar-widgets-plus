@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.fragment_base.*
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.item_form_section.view.*
+import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.*
@@ -191,7 +192,8 @@ class MonthFragment : BaseFragment() {
 
                 calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
 
-                setToolbarMonthYearTitle(firstDay)
+
+                setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
 
                 adjustMiniCalendarView(position, startWeekOn)
 
@@ -699,7 +701,7 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.handleInitialDaySelection(navigationDate ?: calendarViewModel.initialToday)
 
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) {
-            setToolbarMonthYearTitle(it)
+            setToolbarMonthYearTitle(it, miniCalendarPager.currentItem)
         }
 
         lifecycleScope.launch {
@@ -867,6 +869,9 @@ class MonthFragment : BaseFragment() {
             val firstDayOfTheWeek = selectedDate.with(temporalField, 1)
             if (monthView == false) calendarViewModel.weekViewStartingPositionAndDate.value = Pair(miniCalendarPager.currentItem, firstDayOfTheWeek)
             else calendarViewModel.monthViewStartingPositionAndDate.value = Pair(miniCalendarPager.currentItem, selectedDate.withDayOfMonth(1))
+
+            // TODO Delete this
+            setToolbarMonthYearTitle(selectedDate, miniCalendarPager.currentItem)
         }
 
         calendarViewModel.activeCalendars.observe(viewLifecycleOwner) { activeCalendars ->
@@ -938,10 +943,12 @@ class MonthFragment : BaseFragment() {
         headerLayout.addView(weekDayHeaderView)
     }
 
-    private fun setToolbarMonthYearTitle(localDate: LocalDate) {
+    // TODO Delete position parameter
+    private fun setToolbarMonthYearTitle(localDate: LocalDate, position: Int) {
         val month = SpannableString(localDate.formatMonth(true))
         val year = SpannableString(localDate.year.toString())
-        toolbarTitle.text = "$month $year"
+        // TODO Delete position
+        toolbarTitle.text = "$month $year ${position.toString().takeLast(3)}"
         mini_calendar_chevron.visibleOrGone(true)
     }
 }
