@@ -12,7 +12,6 @@ import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.pgp.*
 import me.proton.core.crypto.common.pgp.exception.CryptoException
 import me.proton.core.key.domain.*
-import me.proton.core.mailmessage.domain.encryptAndSignAttachmentOrNull
 import me.proton.core.mailmessage.domain.entity.*
 import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
 import me.proton.core.network.data.ProtonErrorException
@@ -83,8 +82,19 @@ class SendEmailDirect @Inject constructor(
         val attachments = mutableMapOf<Filename, EncryptedAttachment?>()
         sender.useKeys(cryptoContext) {
             arguments.attachments.forEach { attachment ->
-                attachments[attachment.fileName] =
-                    encryptAndSignAttachmentOrNull(attachment.toAttachment() /*TODO remove helper call when we move to core*/)
+
+                // TODO use KeyHolderContext.encryptAndSignAttachment when it's fixed in core
+                val encryptedData = encryptData(attachment.bytes).split(cryptoContext.pgpCrypto)
+                val signedData = signData(attachment.bytes)
+
+                attachments[attachment.fileName] = EncryptedAttachment(
+                    fileName = attachment.fileName,
+                    mimeType = attachment.mimeType,
+                    fileSize = attachment.fileSize,
+                    signature = EncryptedPacket(getUnarmored(signedData), PacketType.Signature),
+                    keyPacket = EncryptedPacket(encryptedData.keyPacket(), PacketType.Key),
+                    dataPacket = EncryptedPacket(encryptedData.dataPacket(), PacketType.Data)
+                )
             }
         }
         val failedAttachmentFilenames = attachments.filterValues { it == null }.keys
