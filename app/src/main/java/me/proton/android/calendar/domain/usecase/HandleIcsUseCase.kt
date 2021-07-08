@@ -76,7 +76,7 @@ class HandleIcsUseCase(
             val canonicalAttendeeEmails = canonicalEmailsUseCase.invoke(
                 userId,
                 iCalendar.events.first().attendees.mapNotNull { it.extractEmail() })
-            if (isOrganizerMode && isCurrentUserRecipient && !canonicalAttendeeEmails.contains(canonicalSenderEmail)) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+            if (isOrganizerMode && isCurrentUserRecipient && !canonicalAttendeeEmails.values.contains(canonicalSenderEmail)) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
         }
 
         // METHOD: We support REQUEST, CANCEL, REPLY.
