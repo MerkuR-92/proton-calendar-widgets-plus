@@ -349,19 +349,41 @@ object IcsSurgeryUtils {
             specialCase = true
             ICalDate(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
         } else dateStart.value
-        var startIterator = recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
+        val startIterator = recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
 
-        if (startIterator.hasNext()) {
-            // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
+        var checkDtStart = true
+        var generatesOccurrences = false
+        // Do not generate any occurrence.
+        if (!startIterator.hasNext()) return false
+        while (startIterator.hasNext()) {
             if (specialCase) {
                 val nextDate = startIterator.next().toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id, true).withHour(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).hour).withMinute(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).minute)
-                if (nextDate.toInstant() != dateStart.value.toInstant()) return false
+
+                // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
+                if (checkDtStart && nextDate.toInstant() != dateStart.value.toInstant()) return false
+                checkDtStart = false
+
+                // Do not generate any occurrence.
+                if (exceptionDates.firstOrNull { exDates -> exDates.values.any { exDateValue -> exDateValue == ICalDate.from(nextDate.toInstant()) } } == null) {
+                    generatesOccurrences = true
+                    break
+                }
             } else {
                 val nextDate = startIterator.next()
-                if (nextDate != dateStart.value) return false
-            }
 
-        } else return false
+                // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
+                if (checkDtStart && nextDate != dateStart.value) return false
+                checkDtStart = false
+
+                // Do not generate any occurrence.
+                if (exceptionDates.firstOrNull { exDates -> exDates.values.any { exDateValue -> exDateValue == nextDate } } == null) {
+                    generatesOccurrences = true
+                    break
+                }
+            }
+        }
+
+        if (!generatesOccurrences) return false
 
         // UNTIL: we should use UTC dates if and only if the event is not all-day.
         if (!this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == true) {
@@ -380,18 +402,6 @@ object IcsSurgeryUtils {
 
         // Special case: YEARLY with BYMONTHDAY but no BYMONTH
         if (recurrenceRule.value.frequency == Frequency.YEARLY && !recurrenceRule.value.byMonthDay.isNullOrEmpty() && recurrenceRule.value.byMonth.isNullOrEmpty()) return false
-
-        // Do not generate any occurrence.
-        startIterator = recurrenceRule.getDateIterator(dateStart.value, iteratorTimezone)
-        var generatesOccurrences = false
-        while (startIterator.hasNext()) {
-            val startIteratorNext = startIterator.next()
-            if (exceptionDates.firstOrNull { exDates -> exDates.values.any { exDateValue -> exDateValue == startIteratorNext } } == null) {
-                generatesOccurrences = true
-                break
-            }
-        }
-        if (!generatesOccurrences) return false
 
         return true
     }

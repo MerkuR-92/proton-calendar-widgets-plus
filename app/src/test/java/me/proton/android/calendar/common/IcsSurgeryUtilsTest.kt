@@ -1526,6 +1526,39 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `cleanRRule part day monthly event with bysetpos and same month until value`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.19.6//EN
+    METHOD:REQUEST
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    DTSTAMP:20210708T191427Z
+    DTSTART;TZID=Europe/Vilnius:20210708T223000
+    DTEND;TZID=Europe/Vilnius:20210708T230000
+    RRULE:FREQ=MONTHLY;UNTIL=20210731T205959Z;BYDAY=TH;BYSETPOS=2
+    SEQUENCE:0
+    SUMMARY:Custom monthly until same month
+    STATUS:CONFIRMED
+    UID:tPk35J26Cn-Hz6mL937t41_QtDE2@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar!!.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
+        }
+    }
+
+    @Test
     fun `cleanRecurrenceId RECURRENCE-ID with RRULE test`() {
 
         val iCalString = """
