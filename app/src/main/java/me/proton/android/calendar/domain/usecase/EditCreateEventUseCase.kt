@@ -87,7 +87,7 @@ class EditCreateEventUseCase(
 
         val encryptedSharedPartCiphertext =
             if (createLinkedEventAsAttendee) {
-                val sharedSessionKeyProperty = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY).value ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, shared session key was null")
+                val sharedSessionKeyProperty = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY)?.value ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, shared session key was null")
                 val sharedSessionKey = SessionKey(Base64.decode(sharedSessionKeyProperty, Base64.DEFAULT), SESSION_KEY_ALGO)
                 // TODO migrate to PublicKey.encryptSessionKey(cryptoContext, sessionKeyBytes)
                 val sharedKeyPacket = crypto.getKeyPacket(
@@ -266,7 +266,7 @@ class EditCreateEventUseCase(
         } else { // CREATE
             if (createLinkedEventAsAttendee) {
                 // This is a proton to proton invite
-                val sharedEventId = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID).value
+                val sharedEventId = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value
                 SyncEventsUpdateApiRequest(
                     memberId = member.id,
                     events = listOf(

@@ -221,7 +221,7 @@ class HandleIcsUseCase(
             val immutableExistingEvent = existingEvent
             val immutableExistingEventEntity = existingEventEntity
             if (!isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
-                if (immutableExistingEventEntity.isProtonProtonInvite?.toBoolean() == true || immutableExistingEvent.sharedEventId == newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID).value) {
+                if (immutableExistingEventEntity.isProtonProtonInvite?.toBoolean() == true || immutableExistingEvent.sharedEventId == newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID)?.value) {
                     // Event is a proton to proton invite
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())

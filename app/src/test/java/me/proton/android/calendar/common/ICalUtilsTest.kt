@@ -3357,8 +3357,8 @@ internal class ICalUtilsTest {
         assertThat(responseICalendar.events.first().attendees.first().email).isEqualTo("james@example.com")
         assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
         assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
-        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY").value).isEqualTo("sharedSessionKey")
-        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID").value).isEqualTo("sharedEventId")
+        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY")?.value).isEqualTo("sharedSessionKey")
+        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID")?.value).isEqualTo("sharedEventId")
     }
 
     @Test
