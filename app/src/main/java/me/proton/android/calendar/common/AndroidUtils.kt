@@ -72,638 +72,639 @@ import kotlin.math.min
 
 object AndroidUtils {
 
-        fun displayTimePicker(
-            context: Context,
-            initialTime: LocalTime?,
-            is24Hour: Boolean,
-            callback: (result: LocalTime) -> Unit
-        ) {
-            val immutableInitialTime = initialTime?: LocalTime.now()
-            val timePickerDialog = TimePickerDialog(context, 0,
-                { view, hourOfDay, minute ->
-                    callback(LocalTime.of(hourOfDay, minute))
-                },
-                immutableInitialTime.hour,
-                immutableInitialTime.minute,
-                is24Hour)
-            timePickerDialog.show()
+    fun displayTimePicker(
+        context: Context,
+        initialTime: LocalTime?,
+        is24Hour: Boolean,
+        callback: (result: LocalTime) -> Unit
+    ) {
+        val immutableInitialTime = initialTime?: LocalTime.now()
+        val timePickerDialog = TimePickerDialog(context, 0,
+            { view, hourOfDay, minute ->
+                callback(LocalTime.of(hourOfDay, minute))
+            },
+            immutableInitialTime.hour,
+            immutableInitialTime.minute,
+            is24Hour)
+        timePickerDialog.show()
+    }
+
+    fun displayDatePicker(
+        context: Context,
+        firstDayOfWeek: java.time.DayOfWeek,
+        initialDate: LocalDate?,
+        minDate: LocalDate? = null,
+        maxDate: LocalDate? = null,
+        callback: (result: LocalDate) -> Unit
+    ) {
+        val immutableInitialDate = initialDate?: LocalDate.now()
+        val datePickerDialog = DatePickerDialog(context, 0,
+            { view, year, month, dayOfMonth ->
+                callback(LocalDate.of(year, month + 1, dayOfMonth))
+            },
+            immutableInitialDate.year,
+            immutableInitialDate.monthValue - 1,
+            immutableInitialDate.dayOfMonth)
+        minDate?.let {
+            datePickerDialog.datePicker.minDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         }
-
-        fun displayDatePicker(
-            context: Context,
-            firstDayOfWeek: java.time.DayOfWeek,
-            initialDate: LocalDate?,
-            minDate: LocalDate? = null,
-            maxDate: LocalDate? = null,
-            callback: (result: LocalDate) -> Unit
-        ) {
-            val immutableInitialDate = initialDate?: LocalDate.now()
-            val datePickerDialog = DatePickerDialog(context, 0,
-                { view, year, month, dayOfMonth ->
-                    callback(LocalDate.of(year, month + 1, dayOfMonth))
-                },
-                immutableInitialDate.year,
-                immutableInitialDate.monthValue - 1,
-                immutableInitialDate.dayOfMonth)
-            minDate?.let {
-                datePickerDialog.datePicker.minDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            }
-            maxDate?.let {
-                datePickerDialog.datePicker.maxDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            }
-            datePickerDialog.datePicker.firstDayOfWeek = firstDayOfWeek.toBiweeklyDayOfWeek().calendarConstant
-            datePickerDialog.show()
+        maxDate?.let {
+            datePickerDialog.datePicker.maxDate = it.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         }
+        datePickerDialog.datePicker.firstDayOfWeek = firstDayOfWeek.toBiweeklyDayOfWeek().calendarConstant
+        datePickerDialog.show()
+    }
 
-        fun displaySingleChoicePicker(
-            context: Context,
-            title: String?,
-            items: Array<String>,
-            selectedIndex: Int,
-            callback: (selectedIndex: Int) -> Unit
-        ) {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            title?.apply { builder.setTitle(this) }
-            builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
-                callback(item)
-                dialog.dismiss()
-            }
-            builder.setNegativeButton(R.string.dialog_button_cancel, null)
-            builder.create().show()
+    fun displaySingleChoicePicker(
+        context: Context,
+        title: String?,
+        items: Array<String>,
+        selectedIndex: Int,
+        callback: (selectedIndex: Int) -> Unit
+    ) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        title?.apply { builder.setTitle(this) }
+        builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
+            callback(item)
+            dialog.dismiss()
         }
+        builder.setNegativeButton(R.string.dialog_button_cancel, null)
+        builder.create().show()
+    }
 
-        fun displaySingleChoiceConfirmationPicker(
-            context: Context,
-            title: String?,
-            items: Array<String>,
-            selectedIndex: Int,
-            callback: (selectedIndex: Int, isCancel: Boolean) -> Unit
-        ) {
-            var selectedItem: Int = 0
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            title?.apply { builder.setTitle(this) }
-            builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
-                selectedItem = item
-            }
-            builder.setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
-                callback(selectedItem, false)
-                dialog.dismiss()
-            }
-            builder.setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
-                callback(selectedIndex, true)
-            }
-            builder.setOnCancelListener { _ ->
-                callback(selectedIndex, true)
-            }
-            builder.create().show()
+    fun displaySingleChoiceConfirmationPicker(
+        context: Context,
+        title: String?,
+        items: Array<String>,
+        selectedIndex: Int,
+        callback: (selectedIndex: Int, isCancel: Boolean) -> Unit
+    ) {
+        var selectedItem: Int = 0
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        title?.apply { builder.setTitle(this) }
+        builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
+            selectedItem = item
         }
-
-        fun displaySimpleOkAlert(
-            context: Context,
-            message: String,
-            title: String? = null
-        ) {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            title?.apply { builder.setTitle(this) }
-            builder.setMessage(message)
-            builder.setPositiveButton(R.string.dialog_button_ok, null)
-            builder.create().show()
+        builder.setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
+            callback(selectedItem, false)
+            dialog.dismiss()
         }
+        builder.setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+            callback(selectedIndex, true)
+        }
+        builder.setOnCancelListener { _ ->
+            callback(selectedIndex, true)
+        }
+        builder.create().show()
+    }
 
-        fun displayCalendarPicker(
-            context: Context,
-            title: String?,
-            items: Array<CalendarEntity>,
-            initiallySelectedIndex: Int,
-            callback: (selectedIndex: Int) -> Unit
-        ) {
+    fun displaySimpleOkAlert(
+        context: Context,
+        message: String,
+        title: String? = null
+    ) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        title?.apply { builder.setTitle(this) }
+        builder.setMessage(message)
+        builder.setPositiveButton(R.string.dialog_button_ok, null)
+        builder.create().show()
+    }
 
-            val adapter = object : ArrayAdapter<String>(context, R.layout.item_calendar_picker) {
+    fun displayCalendarPicker(
+        context: Context,
+        title: String?,
+        items: Array<CalendarEntity>,
+        initiallySelectedIndex: Int,
+        callback: (selectedIndex: Int) -> Unit
+    ) {
 
-                lateinit var dialog: DialogInterface
-                var selectedIndex = initiallySelectedIndex
+        val adapter = object : ArrayAdapter<String>(context, R.layout.item_calendar_picker) {
 
-                override fun getCount(): Int = items.size
+            lateinit var dialog: DialogInterface
+            var selectedIndex = initiallySelectedIndex
 
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    var view = convertView
-                    if (view == null) {
-                        view = LayoutInflater.from(context)
-                            .inflate(R.layout.item_calendar_picker, parent, false)
-                    }
+            override fun getCount(): Int = items.size
 
-                    view!!.findViewById<AppCompatCheckedTextView>(R.id.ctv_calendar_name).apply {
-                        text = items[position].name
-                        tag = position
-                        isChecked = position == selectedIndex
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                var view = convertView
+                if (view == null) {
+                    view = LayoutInflater.from(context)
+                        .inflate(R.layout.item_calendar_picker, parent, false)
+                }
+
+                view!!.findViewById<AppCompatCheckedTextView>(R.id.ctv_calendar_name).apply {
+                    text = items[position].name
+                    tag = position
+                    isChecked = position == selectedIndex
 //                        compoundDrawablesRelative?.first().setTint(Color.parseColor(items[position].color))
-                        setOnSingleClickListener() {
-                            selectedIndex = it.tag as Int
-                            notifyDataSetChanged()
-                            callback(selectedIndex)
-                            dialog.dismiss()
-                        }
+                    setOnSingleClickListener() {
+                        selectedIndex = it.tag as Int
+                        notifyDataSetChanged()
+                        callback(selectedIndex)
+                        dialog.dismiss()
                     }
-
-                    view.findViewById<ImageView>(R.id.iv_calendar_circle).drawable.setTint(
-                        Color.parseColor(
-                            items[position].color
-                        )
-                    )
-
-                    return view
                 }
 
+                view.findViewById<ImageView>(R.id.iv_calendar_circle).drawable.setTint(
+                    Color.parseColor(
+                        items[position].color
+                    )
+                )
+
+                return view
             }
 
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            title?.apply { builder.setTitle(this) }
-            builder.setAdapter(adapter, null)
-            builder.setNegativeButton(R.string.dialog_button_cancel, null)
-            val dialog = builder.create()
-            adapter.dialog = dialog
-            dialog.show()
         }
 
-        fun Context.displayCalendarListMaterialDialog(
-            title: Int,
-            message: Int,
-            cancellable: Boolean,
-            items: List<CalendarEntity>,
-            callback: DialogInterface.OnClickListener
-        ) {
-            val materialDialogBuilder = MaterialAlertDialogBuilder(this)
-                .setTitle(title)
-                .setCancelable(cancellable)
-                .setPositiveButton(R.string.bootstrap_error_continue_button, callback)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        title?.apply { builder.setTitle(this) }
+        builder.setAdapter(adapter, null)
+        builder.setNegativeButton(R.string.dialog_button_cancel, null)
+        val dialog = builder.create()
+        adapter.dialog = dialog
+        dialog.show()
+    }
 
-            val adapter = object : ArrayAdapter<CalendarEntity>(this, R.layout.item_calendar_dialog, items) {
+    fun Context.displayCalendarListMaterialDialog(
+        title: Int,
+        message: Int,
+        cancellable: Boolean,
+        items: List<CalendarEntity>,
+        callback: DialogInterface.OnClickListener
+    ) {
+        val materialDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setCancelable(cancellable)
+            .setPositiveButton(R.string.bootstrap_error_continue_button, callback)
 
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                    var view = convertView
-                    if (view == null) {
-                        view = LayoutInflater.from(context)
-                            .inflate(R.layout.item_calendar_dialog, parent, false)
-                    }
+        val adapter = object : ArrayAdapter<CalendarEntity>(this, R.layout.item_calendar_dialog, items) {
 
-                    view!!.findViewById<TextView>(R.id.item_calendar_dialog_title).apply {
-                        text = getItem(position)?.name
-                        tag = position
-                    }
-
-                    view.findViewById<ImageView>(R.id.item_calendar_dialog_icon).drawable.setTint(
-                        Color.parseColor(
-                            getItem(position)?.color
-                        )
-                    )
-
-                    view.isClickable = false
-
-                    return view
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                var view = convertView
+                if (view == null) {
+                    view = LayoutInflater.from(context)
+                        .inflate(R.layout.item_calendar_dialog, parent, false)
                 }
 
+                view!!.findViewById<TextView>(R.id.item_calendar_dialog_title).apply {
+                    text = getItem(position)?.name
+                    tag = position
+                }
+
+                view.findViewById<ImageView>(R.id.item_calendar_dialog_icon).drawable.setTint(
+                    Color.parseColor(
+                        getItem(position)?.color
+                    )
+                )
+
+                view.isClickable = false
+
+                return view
             }
 
-            val view = LayoutInflater.from(this)
-                .inflate(R.layout.dialog_calendar_list, null, false)
-
-            view.dialog_calendar_list_header.text = getString(message)
-
-            view.dialog_calendar_list_recycler_view.adapter = adapter
-            view.dialog_calendar_list_recycler_view.divider = null
-
-            materialDialogBuilder.setView(view)
-            materialDialogBuilder.show()
         }
 
-        fun formatRecurrence(resources: Resources, event: Event, timeZoneId: String): String? {
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.dialog_calendar_list, null, false)
 
-            val recurrence = event.iCalEvent.recurrenceRule?.value
-            if (recurrence != null) {
+        view.dialog_calendar_list_header.text = getString(message)
 
-                val label = listOfNotNull(
-                    recurrence.frequency?.let { // non-custom recurrence
+        view.dialog_calendar_list_recycler_view.adapter = adapter
+        view.dialog_calendar_list_recycler_view.divider = null
 
-                        val onDaysOfWeek = if (recurrence.byDay?.size == 7) {
-                            resources.getString(R.string.event_recurrence_weekly_on_all_days)
-                        } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/ })
-                            ?.mapIndexedNotNull { index, byDay ->
+        materialDialogBuilder.setView(view)
+        materialDialogBuilder.show()
+    }
 
-                                val dayOfWeekAsWord = byDay.day.toDayOfWeek().format()
+    fun formatRecurrence(resources: Resources, event: Event, timeZoneId: String): String? {
 
-                                val dayNumber: Int? = if (recurrence.bySetPos.isNotEmpty()) {
-                                    recurrence.bySetPos[index]
-                                } else byDay.num
+        val recurrence = event.iCalEvent.recurrenceRule?.value
+        if (recurrence != null) {
 
-                                val dayOrdinal = if (dayNumber == null) {
-                                    null
-                                } else if (dayNumber > 0) {
-                                    resources.getStringArray(R.array.ordinals_as_words)
-                                        .getOrNull(dayNumber)
+            val label = listOfNotNull(
+                recurrence.frequency?.let { // non-custom recurrence
+
+                    val onDaysOfWeek = if (recurrence.byDay?.size == 7) {
+                        resources.getString(R.string.event_recurrence_weekly_on_all_days)
+                    } else recurrence.byDay?.sortedBy({ if (it.day == DayOfWeek.SUNDAY) 7 else it.day.ordinal /*TODO take start day of week into account*/ })
+                        ?.mapIndexedNotNull { index, byDay ->
+
+                            val dayOfWeekAsWord = byDay.day.toDayOfWeek().format()
+
+                            val dayNumber: Int? = if (recurrence.bySetPos.isNotEmpty()) {
+                                recurrence.bySetPos[index]
+                            } else byDay.num
+
+                            val dayOrdinal = if (dayNumber == null) {
+                                null
+                            } else if (dayNumber > 0) {
+                                resources.getStringArray(R.array.ordinals_as_words)
+                                    .getOrNull(dayNumber)
+                            } else {
+                                resources.getStringArray(R.array.ordinals_as_words_backwards)
+                                    .getOrNull(dayNumber * -1)
+                            }
+
+                            "${if (dayOrdinal != null) "$dayOrdinal " else ""}$dayOfWeekAsWord"
+
+                        }?.joinToString(separator = ", ")
+                    // TODO handle .byMonthDay, .byYearDay when needed
+
+                    when (it) {
+                        Frequency.DAILY -> {
+                            val repeat =
+                                if (recurrence.interval == null || recurrence.interval == 1) {
+                                    resources.getString(R.string.event_recurrence_daily)
                                 } else {
-                                    resources.getStringArray(R.array.ordinals_as_words_backwards)
-                                        .getOrNull(dayNumber * -1)
+                                    resources.getString(
+                                        R.string.event_recurrence_every_some_period,
+                                        recurrence.interval,
+                                        resources.getQuantityString(
+                                            R.plurals.plural_day,
+                                            recurrence.interval,
+                                            recurrence.interval
+                                        ) /*TODO remove double quantity param, it's not needed anymore because we're not formatting plural string*/
+                                    )
+                                }
+                            repeat
+                        }
+                        Frequency.WEEKLY -> {
+                            val repeat =
+                                if (recurrence.interval == null || recurrence.interval == 1) {
+                                    resources.getString(R.string.event_recurrence_weekly)
+                                } else {
+                                    resources.getString(
+                                        R.string.event_recurrence_every_some_period,
+                                        recurrence.interval,
+                                        resources.getQuantityString(
+                                            R.plurals.plural_week,
+                                            recurrence.interval,
+                                            recurrence.interval
+                                        )
+                                    )
+                                }
+                            resources.getString(
+                                R.string.event_recurrence_occurs_on_day_of_week,
+                                repeat,
+                                if (onDaysOfWeek.isNullOrBlank()) {
+                                    (event.getStart(timeZoneId).dayOfWeek).format()
+                                } else onDaysOfWeek
+                            )
+                        }
+                        Frequency.MONTHLY -> {
+                            val repeat =
+                                if (recurrence.interval == null || recurrence.interval == 1) {
+                                    resources.getString(R.string.event_recurrence_monthly)
+                                } else {
+                                    resources.getString(
+                                        R.string.event_recurrence_every_some_period,
+                                        recurrence.interval,
+                                        resources.getQuantityString(
+                                            R.plurals.plural_month,
+                                            recurrence.interval,
+                                            recurrence.interval
+                                        )
+                                    )
                                 }
 
-                                "${if (dayOrdinal != null) "$dayOrdinal " else ""}$dayOfWeekAsWord"
-
-                            }?.joinToString(separator = ", ")
-                        // TODO handle .byMonthDay, .byYearDay when needed
-
-                        when (it) {
-                            Frequency.DAILY -> {
-                                val repeat =
-                                    if (recurrence.interval == null || recurrence.interval == 1) {
-                                        resources.getString(R.string.event_recurrence_daily)
-                                    } else {
-                                        resources.getString(
-                                            R.string.event_recurrence_every_some_period,
-                                            recurrence.interval,
-                                            resources.getQuantityString(
-                                                R.plurals.plural_day,
-                                                recurrence.interval,
-                                                recurrence.interval
-                                            ) /*TODO remove double quantity param, it's not needed anymore because we're not formatting plural string*/
-                                        )
-                                    }
-                                repeat
-                            }
-                            Frequency.WEEKLY -> {
-                                val repeat =
-                                    if (recurrence.interval == null || recurrence.interval == 1) {
-                                        resources.getString(R.string.event_recurrence_weekly)
-                                    } else {
-                                        resources.getString(
-                                            R.string.event_recurrence_every_some_period,
-                                            recurrence.interval,
-                                            resources.getQuantityString(
-                                                R.plurals.plural_week,
-                                                recurrence.interval,
-                                                recurrence.interval
-                                            )
-                                        )
-                                    }
+                            if (onDaysOfWeek.isNullOrBlank()) {
                                 resources.getString(
-                                    R.string.event_recurrence_occurs_on_day_of_week,
+                                    R.string.event_recurrence_occurs_on_day_of_month,
                                     repeat,
-                                    if (onDaysOfWeek.isNullOrBlank()) {
-                                        (event.getStart(timeZoneId).dayOfWeek).format()
-                                    } else onDaysOfWeek
+                                    event.getStart(timeZoneId)
+                                        .toLocalDate().dayOfMonth
+                                )
+                            } else {
+                                resources.getString(
+                                    R.string.event_recurrence_occurs_on_day_of_week_full_words,
+                                    repeat,
+                                    onDaysOfWeek
                                 )
                             }
-                            Frequency.MONTHLY -> {
-                                val repeat =
-                                    if (recurrence.interval == null || recurrence.interval == 1) {
-                                        resources.getString(R.string.event_recurrence_monthly)
-                                    } else {
-                                        resources.getString(
-                                            R.string.event_recurrence_every_some_period,
-                                            recurrence.interval,
-                                            resources.getQuantityString(
-                                                R.plurals.plural_month,
-                                                recurrence.interval,
-                                                recurrence.interval
-                                            )
-                                        )
-                                    }
-
-                                if (onDaysOfWeek.isNullOrBlank()) {
-                                    resources.getString(
-                                        R.string.event_recurrence_occurs_on_day_of_month,
-                                        repeat,
-                                        event.getStart(timeZoneId)
-                                            .toLocalDate().dayOfMonth
-                                    )
+                        }
+                        Frequency.YEARLY -> {
+                            val repeat =
+                                if (recurrence.interval == null || recurrence.interval == 1) {
+                                    resources.getString(R.string.event_recurrence_yearly)
                                 } else {
                                     resources.getString(
-                                        R.string.event_recurrence_occurs_on_day_of_week_full_words,
-                                        repeat,
-                                        onDaysOfWeek
+                                        R.string.event_recurrence_every_some_period,
+                                        recurrence.interval,
+                                        resources.getQuantityString(
+                                            R.plurals.plural_year,
+                                            recurrence.interval,
+                                            recurrence.interval
+                                        )
                                     )
                                 }
-                            }
-                            Frequency.YEARLY -> {
-                                val repeat =
-                                    if (recurrence.interval == null || recurrence.interval == 1) {
-                                        resources.getString(R.string.event_recurrence_yearly)
-                                    } else {
-                                        resources.getString(
-                                            R.string.event_recurrence_every_some_period,
-                                            recurrence.interval,
-                                            resources.getQuantityString(
-                                                R.plurals.plural_year,
-                                                recurrence.interval,
-                                                recurrence.interval
-                                            )
-                                        )
-                                    }
-                                repeat
-                            }
-                            else -> null
+                            repeat
                         }
-                    },
-                    recurrence.count?.let {
-                        "${if (it > 1) "$it " else ""}${
-                            resources.getQuantityString(
-                                R.plurals.plural_recurrence_count,
-                                it,
-                                it
-                            )
-                        }"
-                    },
-                    recurrence.until?.let {
-                        resources.getString(
-                            R.string.event_recurrence_until,
-                            it.toZonedDateTime(timeZoneId).formatDate(timeZoneId)
+                        else -> null
+                    }
+                },
+                recurrence.count?.let {
+                    "${if (it > 1) "$it " else ""}${
+                        resources.getQuantityString(
+                            R.plurals.plural_recurrence_count,
+                            it,
+                            it
                         )
-                    },
-                ).joinToString(separator = ", ")
-
-                val startTimeZone = event.iCalendar.timezoneInfo?.getTimezone(event.iCalendar.events.first().dateStart)?.timeZone
-                val formatTimeZone = TimeZone.getTimeZone(timeZoneId)
-
-                TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
-
-                if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.id != startTimeZone.id) {
-                    return "${label} (${formatTimeZone.id})"
-                } else {
-                    return label
-                }
-
-            }
-
-            return null
-        }
-
-        private fun shouldShowRecurrenceTimeZone(recurrence: Recurrence): Boolean {
-            return when (recurrence.frequency) {
-                Frequency.DAILY -> {
-                    recurrence.until != null
-                }
-                Frequency.WEEKLY -> true
-                Frequency.MONTHLY -> true
-                Frequency.YEARLY -> {
-                    recurrence.until != null
-                }
-                else -> false
-            }
-        }
-
-        fun ObtainSendPreferencesUseCase.Result.Error.formatSendPreferencesError(resources: Resources): String =
-            when (this) {
-                ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> resources.getString(R.string.event_send_prefs_error_address_disabled)
-                ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> resources.getString(R.string.event_send_prefs_error_getting_contact)
-                ObtainSendPreferencesUseCase.Result.Error.NetworkError -> resources.getString(R.string.event_send_prefs_error_network)
-                ObtainSendPreferencesUseCase.Result.Error.TrustedKeysInvalid -> resources.getString(R.string.event_send_prefs_trusted_keys_invalid)
-                ObtainSendPreferencesUseCase.Result.Error.PublicKeysInvalid -> resources.getString(R.string.event_send_prefs_public_keys_invalid)
-                ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys -> resources.getString(R.string.event_send_prefs_trusted_keys_signature_invalid)
-            }
-
-        fun formatAlarm(
-            resources: Resources,
-            isAllDay: Boolean,
-            is24Hour: Boolean,
-            startZonedDateTime: ZonedDateTime,
-            alarm: VAlarm
-        ): String? {
-
-            val trigger = alarm.trigger.duration
-            return if (isAllDay) { // example: "1 day before at 9:00"
-
-                val startDate = if (trigger.isPrior) {
-                    startZonedDateTime
-                        .minus(Period.ofWeeks(trigger.weeks ?: 0))
-                        .minus(Period.ofDays(trigger.days ?: 0))
-                        .minus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
-                        .minus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
-                } else {
-                    startZonedDateTime
-                        .plus(Period.ofWeeks(trigger.weeks ?: 0))
-                        .plus(Period.ofDays(trigger.days ?: 0))
-                        .plus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
-                        .plus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
-                }
-
-                TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
-
-                val onTheSameDay = !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
-
-                // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
-                var daysFormatted: Int? = if (trigger.days != null) { // add 1 day if time of day exists and is different than midnight
-                    trigger.days + (if ((trigger.hours != null && trigger.hours.toInt() != 0) || (trigger.minutes != null && trigger.minutes?.toInt() != 0)) 1 else 0)
-                } else {
-                    if (trigger.hours != null || trigger.minutes != null) {
-                        1
-                    } else null
-                }
-
-                if (onTheSameDay) daysFormatted = null
-
-                var weeksFormatted = trigger.weeks?.toInt()
-                if (daysFormatted == 7) {
-                    weeksFormatted = (weeksFormatted ?: 0) + 1
-                    daysFormatted = null
-                }
-
-                val label = listOfNotNull(
-                    if (onTheSameDay) {
-                        resources.getString(R.string.event_alarm_label_on_the_same_day)
-                    } else null,
-                    weeksFormatted?.let {
-                        "${it} ${
-                            resources.getQuantityString(
-                                R.plurals.plural_week,
-                                it,
-                                it
-                            )
-                        }"
-                    },
-                    daysFormatted?.let {
-                        "${it} ${
-                            resources.getQuantityString(
-                                R.plurals.plural_day,
-                                it,
-                                it
-                            )
-                        }"
-                    }
-                ).joinToString(separator = ", ")
-
-                val alarmTime = startDate.toLocalTime().formatTime(is24Hour)
-
-                if (label.isBlank()) {
-                    null
-                } else if (alarm.action?.isEmail == true) {
+                    }"
+                },
+                recurrence.until?.let {
                     resources.getString(
-                        if (onTheSameDay) R.string.event_alarm_label_not_before_with_time_by_email else R.string.event_alarm_label_before_with_time_by_email,
-                        label,
-                        alarmTime
+                        R.string.event_recurrence_until,
+                        it.toZonedDateTime(timeZoneId).formatDate(timeZoneId)
                     )
-                } else if (alarm.action?.isDisplay == true) {
-                    resources.getString(
-                        if (onTheSameDay) R.string.event_alarm_label_not_before_with_time else R.string.event_alarm_label_before_with_time,
-                        label,
-                        alarmTime
-                    )
-                } else {
-                    null
-                }
+                },
+            ).joinToString(separator = ", ")
 
-            } else { // example: "15 minutes before"
+            val startTimeZone = event.iCalendar.timezoneInfo?.getTimezone(event.iCalendar.events.first().dateStart)?.timeZone
+            val formatTimeZone = TimeZone.getTimeZone(timeZoneId)
 
-                // Proton support only 1 component for partial-day alarms
+            TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
 
-                val label = listOfNotNull(
-                    trigger.weeks?.let {
-                        "$it ${
-                            resources.getQuantityString(
-                                R.plurals.plural_week,
-                                it,
-                                it
-                            )
-                        }"
-                    },
-                    trigger.days?.let {
-                        "$it ${
-                            resources.getQuantityString(
-                                R.plurals.plural_day,
-                                it,
-                                it
-                            )
-                        }"
-                    },
-                    trigger.hours?.let {
-                        "$it ${
-                            resources.getQuantityString(
-                                R.plurals.plural_hour,
-                                it,
-                                it
-                            )
-                        }"
-                    },
-                    trigger.minutes?.let {
-                        "$it ${
-                            resources.getQuantityString(
-                                R.plurals.plural_minute,
-                                it,
-                                it
-                            )
-                        }"
-                    }
-                ).joinToString(separator = ", ")
-
-                if (label.isBlank()) {
-                    if (!trigger.isPrior && (trigger.seconds != null && trigger.seconds == 0)) {
-                        resources.getString(R.string.event_alarm_label_at_event_time)
-                    } else {
-                        null
-                    }
-                } else if (alarm.action?.isEmail == true) {
-                    resources.getString(R.string.event_alarm_label_before_by_email, label)
-                } else if (alarm.action?.isDisplay == true) {
-                    resources.getString(R.string.event_alarm_label_before, label)
-                } else {
-                    null
-                }
+            if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.id != startTimeZone.id) {
+                return "${label} (${formatTimeZone.id})"
+            } else {
+                return label
             }
 
         }
 
-        /**
-         * @param labels Pair<String Resource ID, Color Resource ID>
-         * @param icons Pair<Drawable Resource ID, Color Resource ID>
-         */
-        fun displayPopupMenu(
-            view: View,
-            labels: List<Pair<Int, Int?>>,
-            icons: List<Pair<Int?, Int?>>,
-            onItemClicked: (position: Int) -> Unit
-        ) {
+        return null
+    }
 
-            // TODO we need custom adapter to apply custom colors to icon and text, this is workaround for now
+    private fun shouldShowRecurrenceTimeZone(recurrence: Recurrence): Boolean {
+        return when (recurrence.frequency) {
+            Frequency.DAILY -> {
+                recurrence.until != null
+            }
+            Frequency.WEEKLY -> true
+            Frequency.MONTHLY -> true
+            Frequency.YEARLY -> {
+                recurrence.until != null
+            }
+            else -> false
+        }
+    }
 
-            val data = ArrayList<HashMap<String, Any>>()
-            data.add(
-                hashMapOf(
-                    "text" to view.resources.getText(R.string.action_delete),
-                    "icon" to R.drawable.ic_trash
+    fun ObtainSendPreferencesUseCase.Result.Error.formatSendPreferencesError(resources: Resources): String =
+        when (this) {
+            ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> resources.getString(R.string.event_send_prefs_error_address_disabled)
+            ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> resources.getString(R.string.event_send_prefs_error_getting_contact)
+            ObtainSendPreferencesUseCase.Result.Error.NetworkError -> resources.getString(R.string.event_send_prefs_error_network)
+            ObtainSendPreferencesUseCase.Result.Error.TrustedKeysInvalid -> resources.getString(R.string.event_send_prefs_trusted_keys_invalid)
+            ObtainSendPreferencesUseCase.Result.Error.PublicKeysInvalid -> resources.getString(R.string.event_send_prefs_public_keys_invalid)
+            ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys -> resources.getString(R.string.event_send_prefs_trusted_keys_signature_invalid)
+        }
+
+    fun formatAlarm(
+        resources: Resources,
+        isAllDay: Boolean,
+        is24Hour: Boolean,
+        startZonedDateTime: ZonedDateTime,
+        alarm: VAlarm
+    ): String? {
+
+        val trigger = alarm.trigger.duration
+        return if (isAllDay) { // example: "1 day before at 9:00"
+
+            val startDate = if (trigger.isPrior) {
+                startZonedDateTime
+                    .minus(Period.ofWeeks(trigger.weeks ?: 0))
+                    .minus(Period.ofDays(trigger.days ?: 0))
+                    .minus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
+                    .minus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
+            } else {
+                startZonedDateTime
+                    .plus(Period.ofWeeks(trigger.weeks ?: 0))
+                    .plus(Period.ofDays(trigger.days ?: 0))
+                    .plus(Duration.ofHours(trigger.hours?.toLong() ?: 0L))
+                    .plus(Duration.ofMinutes(trigger.minutes?.toLong() ?: 0L))
+            }
+
+            TimberLogger.d("trigger weeks: ${trigger.weeks}, days: ${trigger.days}")
+
+            val onTheSameDay = !trigger.isPrior // technically this means "not before" but we don't support "after" alarms
+
+            // magic number 1 is needed for days, because 5 hours before midnight will actually be "1 day before" in "human speak"
+            var daysFormatted: Int? = if (trigger.days != null) { // add 1 day if time of day exists and is different than midnight
+                trigger.days + (if ((trigger.hours != null && trigger.hours.toInt() != 0) || (trigger.minutes != null && trigger.minutes?.toInt() != 0)) 1 else 0)
+            } else {
+                if (trigger.hours != null || trigger.minutes != null) {
+                    1
+                } else null
+            }
+
+            if (onTheSameDay) daysFormatted = null
+
+            var weeksFormatted = trigger.weeks?.toInt()
+            if (daysFormatted == 7) {
+                weeksFormatted = (weeksFormatted ?: 0) + 1
+                daysFormatted = null
+            }
+
+            val label = listOfNotNull(
+                if (onTheSameDay) {
+                    resources.getString(R.string.event_alarm_label_on_the_same_day)
+                } else null,
+                weeksFormatted?.let {
+                    "${it} ${
+                        resources.getQuantityString(
+                            R.plurals.plural_week,
+                            it,
+                            it
+                        )
+                    }"
+                },
+                daysFormatted?.let {
+                    "${it} ${
+                        resources.getQuantityString(
+                            R.plurals.plural_day,
+                            it,
+                            it
+                        )
+                    }"
+                }
+            ).joinToString(separator = ", ")
+
+            val alarmTime = startDate.toLocalTime().formatTime(is24Hour)
+
+            if (label.isBlank()) {
+                null
+            } else if (alarm.action?.isEmail == true) {
+                resources.getString(
+                    if (onTheSameDay) R.string.event_alarm_label_not_before_with_time_by_email else R.string.event_alarm_label_before_with_time_by_email,
+                    label,
+                    alarmTime
                 )
+            } else if (alarm.action?.isDisplay == true) {
+                resources.getString(
+                    if (onTheSameDay) R.string.event_alarm_label_not_before_with_time else R.string.event_alarm_label_before_with_time,
+                    label,
+                    alarmTime
+                )
+            } else {
+                null
+            }
+
+        } else { // example: "15 minutes before"
+
+            // Proton support only 1 component for partial-day alarms
+
+            val label = listOfNotNull(
+                trigger.weeks?.let {
+                    "$it ${
+                        resources.getQuantityString(
+                            R.plurals.plural_week,
+                            it,
+                            it
+                        )
+                    }"
+                },
+                trigger.days?.let {
+                    "$it ${
+                        resources.getQuantityString(
+                            R.plurals.plural_day,
+                            it,
+                            it
+                        )
+                    }"
+                },
+                trigger.hours?.let {
+                    "$it ${
+                        resources.getQuantityString(
+                            R.plurals.plural_hour,
+                            it,
+                            it
+                        )
+                    }"
+                },
+                trigger.minutes?.let {
+                    "$it ${
+                        resources.getQuantityString(
+                            R.plurals.plural_minute,
+                            it,
+                            it
+                        )
+                    }"
+                }
+            ).joinToString(separator = ", ")
+
+            if (label.isBlank()) {
+                if (!trigger.isPrior && (trigger.seconds != null && trigger.seconds == 0)) {
+                    if (alarm.action?.isEmail == true) resources.getString(R.string.event_alarm_label_at_event_time_by_email)
+                    else resources.getString(R.string.event_alarm_label_at_event_time)
+                } else {
+                    null
+                }
+            } else if (alarm.action?.isEmail == true) {
+                resources.getString(R.string.event_alarm_label_before_by_email, label)
+            } else if (alarm.action?.isDisplay == true) {
+                resources.getString(R.string.event_alarm_label_before, label)
+            } else {
+                null
+            }
+        }
+
+    }
+
+    /**
+     * @param labels Pair<String Resource ID, Color Resource ID>
+     * @param icons Pair<Drawable Resource ID, Color Resource ID>
+     */
+    fun displayPopupMenu(
+        view: View,
+        labels: List<Pair<Int, Int?>>,
+        icons: List<Pair<Int?, Int?>>,
+        onItemClicked: (position: Int) -> Unit
+    ) {
+
+        // TODO we need custom adapter to apply custom colors to icon and text, this is workaround for now
+
+        val data = ArrayList<HashMap<String, Any>>()
+        data.add(
+            hashMapOf(
+                "text" to view.resources.getText(R.string.action_delete),
+                "icon" to R.drawable.ic_trash
             )
+        )
 
-            val popupWindow = ListPopupWindow(view.context)
+        val popupWindow = ListPopupWindow(view.context)
 
-            val adapter: SimpleAdapter = object: SimpleAdapter(
-                view.context,
-                data,
-                R.layout.item_popup_error, // TODO
-                arrayOf("text", "icon"),
-                intArrayOf(R.id.tv_text, R.id.iv_icon)
-            ) {
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                    return super.getView(position, convertView, parent).apply {
-                        press_popup.setOnSingleClickListener {
-                            onItemClicked(position)
-                            popupWindow.dismiss()
-                        }
+        val adapter: SimpleAdapter = object: SimpleAdapter(
+            view.context,
+            data,
+            R.layout.item_popup_error, // TODO
+            arrayOf("text", "icon"),
+            intArrayOf(R.id.tv_text, R.id.iv_icon)
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                return super.getView(position, convertView, parent).apply {
+                    press_popup.setOnSingleClickListener {
+                        onItemClicked(position)
+                        popupWindow.dismiss()
                     }
                 }
             }
+        }
 
-            with(popupWindow) {
-                isModal = true
-                anchorView = view
-                verticalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
-                horizontalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
-                width = measureContentWidth(view.context, adapter)
-                height = ListPopupWindow.WRAP_CONTENT
-                setAdapter(adapter)
-                show()
+        with(popupWindow) {
+            isModal = true
+            anchorView = view
+            verticalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
+            horizontalOffset = view.resources.getDimensionPixelSize(R.dimen.spacing_element_small)
+            width = measureContentWidth(view.context, adapter)
+            height = ListPopupWindow.WRAP_CONTENT
+            setAdapter(adapter)
+            show()
+        }
+
+    }
+
+    // https://stackoverflow.com/questions/14200724/listpopupwindow-not-obeying-wrap-content-width-spec/26814964#26814964
+    private fun measureContentWidth(context: Context, listAdapter: ListAdapter): Int {
+        var mMeasureParent: ViewGroup? = null
+        var maxWidth = 0
+        var itemView: View? = null
+        var itemType = 0
+        val widthMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
+            0,
+            View.MeasureSpec.UNSPECIFIED
+        )
+        val heightMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
+            0,
+            View.MeasureSpec.UNSPECIFIED
+        )
+        val count = listAdapter.count
+        for (i in 0 until count) {
+            val positionType = listAdapter.getItemViewType(i)
+            if (positionType != itemType) {
+                itemType = positionType
+                itemView = null
             }
-
-        }
-
-        // https://stackoverflow.com/questions/14200724/listpopupwindow-not-obeying-wrap-content-width-spec/26814964#26814964
-        private fun measureContentWidth(context: Context, listAdapter: ListAdapter): Int {
-            var mMeasureParent: ViewGroup? = null
-            var maxWidth = 0
-            var itemView: View? = null
-            var itemType = 0
-            val widthMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
-                0,
-                View.MeasureSpec.UNSPECIFIED
-            )
-            val heightMeasureSpec: Int = View.MeasureSpec.makeMeasureSpec(
-                0,
-                View.MeasureSpec.UNSPECIFIED
-            )
-            val count = listAdapter.count
-            for (i in 0 until count) {
-                val positionType = listAdapter.getItemViewType(i)
-                if (positionType != itemType) {
-                    itemType = positionType
-                    itemView = null
-                }
-                if (mMeasureParent == null) {
-                    mMeasureParent = FrameLayout(context)
-                }
-                itemView = listAdapter.getView(i, itemView, mMeasureParent)
-                itemView.measure(widthMeasureSpec, heightMeasureSpec)
-                val itemWidth = itemView.measuredWidth
-                if (itemWidth > maxWidth) {
-                    maxWidth = itemWidth
-                }
+            if (mMeasureParent == null) {
+                mMeasureParent = FrameLayout(context)
             }
-            return maxWidth
+            itemView = listAdapter.getView(i, itemView, mMeasureParent)
+            itemView.measure(widthMeasureSpec, heightMeasureSpec)
+            val itemWidth = itemView.measuredWidth
+            if (itemWidth > maxWidth) {
+                maxWidth = itemWidth
+            }
         }
+        return maxWidth
+    }
 
-        fun darkenCalendarColor(colorString: String): String {
-            val outHSL = FloatArray(3)
-            ColorUtils.colorToHSL(Integer.valueOf(colorString.substringAfter("#"), 16), outHSL)
+    fun darkenCalendarColor(colorString: String): String {
+        val outHSL = FloatArray(3)
+        ColorUtils.colorToHSL(Integer.valueOf(colorString.substringAfter("#"), 16), outHSL)
 
-            // magic number, reducing lightness by 12
-            val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] - 0.12f, 1.0f))))
-            return "#${color.toHexString()}"
-        }
+        // magic number, reducing lightness by 12
+        val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] - 0.12f, 1.0f))))
+        return "#${color.toHexString()}"
+    }
 
 
     fun Activity.clearFocusAndHideKeyboard(view: View?) {

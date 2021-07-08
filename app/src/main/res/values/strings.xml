@@ -37,6 +37,7 @@
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
     <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
     <string name="event_alarm_label_at_event_time">At time of event</string>
+    <string name="event_alarm_label_at_event_time_by_email">At time of event by email</string>
     <string name="event_alarm_label_on_the_same_day">On the same day</string>
     <string name="event_alarm_label_before">%1$s before</string>
     <string name="event_alarm_label">%1$s</string>
@@ -240,6 +241,7 @@
     <string name="snack_event_edit_with_attendees_error">Editing events with attendees is not supported yet</string>
     <string name="snack_event_init_error">Error initialising new event</string>
     <string name="snack_event_calendar_error">Error switching calendar</string>
+    <string name="snack_event_add_alarm_error">The maximum number of notifications has been reached</string>
     <string name="snack_send_bug_report_success">Report sent, thank you for your feedback</string>
     <string name="snack_send_bug_report_error">Error sending report, please try again later</string>
     <string name="snack_send_bug_report_description_empty">Please provide a description of your report</string>

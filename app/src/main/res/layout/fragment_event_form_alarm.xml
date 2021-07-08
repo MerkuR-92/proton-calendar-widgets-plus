@@ -83,57 +83,61 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="event_form_alarm_custom_layout,event_form_alarm_radio_group" />
 
-    <!-- TODO Display alarm sends by items once implemented-->
-    <View
-        android:visibility="gone"
-        android:id="@+id/event_form_alarm_action_separator"
-        style="@style/Separator"
-        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_barrier"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- TODO Display alarm sends by items once implemented-->
-    <TextView
-        android:visibility="gone"
-        android:id="@+id/event_form_alarm_action"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/event_form_alarm_send_by_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Text.DefaultSmall.Weak"
-        android:text="@string/event_alarm_action"
-        android:layout_marginStart="@dimen/spacing_page"
-        android:layout_marginEnd="@dimen/spacing_page"
-        android:layout_marginTop="@dimen/spacing_large"
-        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_separator"
+        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_barrier"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- TODO Display alarm sends by items once implemented-->
-    <RadioGroup
-        android:visibility="gone"
-        android:id="@+id/event_form_alarm_action_radio_group"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_element_small"
-        android:paddingStart="@dimen/radio_group_inner_padding"
-        android:paddingEnd="@dimen/radio_group_inner_padding"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action">
+        <View
+            android:id="@+id/event_form_alarm_action_separator"
+            style="@style/Separator"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <RadioButton
-            android:id="@+id/event_form_alarm_action_notification"
-            style="@style/Text.Default.RadioButton"
+        <TextView
+            android:id="@+id/event_form_alarm_action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/event_alarm_action_notification" />
+            style="@style/Text.DefaultSmall.Weak"
+            android:text="@string/event_alarm_action"
+            android:layout_marginStart="@dimen/spacing_page"
+            android:layout_marginEnd="@dimen/spacing_page"
+            android:layout_marginTop="@dimen/spacing_large"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action_separator"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <RadioButton
-            android:id="@+id/event_form_alarm_action_email"
-            style="@style/Text.Default.RadioButton"
-            android:layout_width="match_parent"
+        <RadioGroup
+            android:id="@+id/event_form_alarm_action_radio_group"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/event_alarm_action_email" />
+            android:layout_marginTop="@dimen/spacing_element_small"
+            android:paddingStart="@dimen/radio_group_inner_padding"
+            android:paddingEnd="@dimen/radio_group_inner_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_alarm_action">
 
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/event_form_alarm_action_notification"
+                style="@style/Text.Default.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_alarm_action_notification" />
+
+            <RadioButton
+                android:id="@+id/event_form_alarm_action_email"
+                style="@style/Text.Default.RadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_alarm_action_email" />
+
+        </RadioGroup>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

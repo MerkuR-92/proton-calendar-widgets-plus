@@ -127,6 +127,9 @@ class EventViewModel(
 
     var currentParticipationStatus: ParticipationStatus? = null
 
+    // TODO Remove once we allow creating events with email notifications
+    var hasEmailNotifications: Boolean = false
+
     sealed class EventState {
 
         // TODO
@@ -215,6 +218,7 @@ class EventViewModel(
         recurrenceManuallyEdited = false
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
+        hasEmailNotifications = false
 
         this.editMode = editMode
 
@@ -394,6 +398,8 @@ class EventViewModel(
             } else return Result.Error("EventViewModel: could not generate event with occurrence in EventViewModel")
         }
 
+        hasEmailNotifications = event.hasEmailNotifications
+
         _event.postValue(event)
 
         return Result.Success
@@ -506,7 +512,7 @@ class EventViewModel(
         event.iCalEvent.alarms.clear()
         getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
             // TODO Remove alarm type check once other types are handled
-            if (it.action == Action.display()) event.iCalEvent.addAlarm(it)
+            if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) event.iCalEvent.addAlarm(it)
         }
     }
 
@@ -898,8 +904,8 @@ class EventViewModel(
         this.tempAlarmTime = time
     }
 
-    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null) {
-        markEventAsEdited()
+    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null): Boolean {
+        if (isAlarmLimitReached()) return false
         val duration = if (event.isAllDay()) {
             when (alarmTypeOption) {
                 0 -> Duration.builder().prior(false).hours(9).build() // on the day at 9:00
@@ -988,6 +994,7 @@ class EventViewModel(
         }
 
         duration?.apply {
+            markEventAsEdited()
 
             val alarm = when (tempAlarmSendByOption) {
                 SendByOption.NOTIFICATION -> VAlarm.display(Trigger(duration, Related.START), null)
@@ -998,6 +1005,8 @@ class EventViewModel(
             saveUserEditedAlarms()
             _event.postValue(event)
         }
+
+        return true
     }
 
     fun handleAlarmDelete(index: Int) {

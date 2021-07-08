@@ -127,6 +127,8 @@ data class Event private constructor(
 
     val isProtonProtonReply = iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_PROTON_REPLY)?.value == "TRUE"
 
+    val hasEmailNotifications: Boolean get() = this.iCalEvent.alarms.firstOrNull { it.action == Action.email() } != null
+
     fun getStart(timeZoneId: String): ZonedDateTime {
         return iCalEvent.getStart(timeZoneId)!!
     }

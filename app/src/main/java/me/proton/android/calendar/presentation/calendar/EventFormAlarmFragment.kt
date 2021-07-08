@@ -11,18 +11,21 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
+import biweekly.property.Action
 import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.doAfterFilteredIntValueChanged
 import me.proton.android.calendar.common.AndroidUtils.getCheckedRadioButtonIndex
 import me.proton.android.calendar.common.AndroidUtils.setCustomOnCheckedChangeListener
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -88,12 +91,13 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
         val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group)
         // countTypeOption with value at 4 is used for "on the day" option
-        eventViewModel.handleAlarm(alarmTypeOption,
+        if (!eventViewModel.handleAlarm(alarmTypeOption,
             count = custom_alarm_field.text.toString().toIntOrNull() ?:
             if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
             else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
-            countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption)
-        findNavController().navigateUp()
+            countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption)) {
+            this.view?.displaySnackBar(requireContext().getString(R.string.snack_event_add_alarm_error))
+        } else findNavController().navigateUp()
 
         // TODO
         // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
@@ -143,6 +147,8 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         toolbarTitle = toolbar.findViewById(R.id.dialog_toolbar_title)
         toolbarTitle.text = getString(R.string.event_alarms_title)
         toolbar.setNavigationIcon(R.drawable.ic_close)
+
+        event_form_alarm_send_by_layout.visibleOrGone(eventViewModel.hasEmailNotifications || ADD_EMAIL_NOTIFICATIONS)
 
         event_form_alarm_5.visibleOrGone(!isAllDay)
         resetAlarmText(-1)
