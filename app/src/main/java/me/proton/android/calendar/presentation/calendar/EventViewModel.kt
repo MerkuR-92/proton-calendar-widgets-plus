@@ -1468,7 +1468,7 @@ class EventViewModel(
                     participationStatus,
                     event.summary,
                     sendPreferences,
-                    Date.from(Instant.ofEpochSecond(this.toLong())), // Use ModifyTime returned by Update part stat BE call
+                    Date.from(updateTime), // Use same updateTime as for Update part stat BE call
                     eventEntity,
                     true
                 )
