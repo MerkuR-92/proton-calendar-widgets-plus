@@ -105,8 +105,8 @@ val useCaseModule = module {
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
     factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get()) }
     factory<SendEmailUseCase> { SendEmailUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get(), get(), get()) }
     factory<HandleIcsUseCase> { HandleIcsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get(), get()) }
     factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get(), get()) }
 }
 
