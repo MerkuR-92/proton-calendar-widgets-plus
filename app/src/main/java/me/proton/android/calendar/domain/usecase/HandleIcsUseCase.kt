@@ -211,7 +211,10 @@ class HandleIcsUseCase(
         if (isNewNonCancelled || isNewSingleEditCancelled) {
             // Create brand new event
             if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
-            if (isNewSingleEditCancelled) newEvent.iCalendar.method = Method.request()
+            if (isNewSingleEditCancelled) {
+                newEvent.iCalendar.method = Method.request()
+                newEvent.iCalEvent.status = Status.cancelled() // In case of un-invite, the status needs to be set to cancelled
+            }
             return editCreateEventFromIcs(
                 IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT,
                 userId,
