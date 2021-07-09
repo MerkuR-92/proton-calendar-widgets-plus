@@ -176,7 +176,8 @@ class CalendarsRepositoryImpl(
         // TODO make sure we also migrate the calendar fetching for new event decryption
         coroutineScope.launch {
             fetchEventsChannel.consumeEach {
-            logger.v("consuming: $it")
+                logger.e("Test test fetchEventsChannel consuming $it")
+                logger.v("consuming: $it")
                 fetchEventsInWindow(it)
             }
         }
@@ -280,7 +281,10 @@ class CalendarsRepositoryImpl(
         }
 
         coroutineScope.launch {
-            fetchEventsChannel.consumeEach { fetchEventsInWindow(it) }
+            fetchEventsChannel.consumeEach {
+                logger.e("Test test fetchEventsChannel consuming $it")
+                fetchEventsInWindow(it)
+            }
         }
 
         return flow
@@ -289,6 +293,7 @@ class CalendarsRepositoryImpl(
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
 
         if (!fetchedWindows.contains(fetchWindow)) {
+            logger.e("Test test fetchEventsInWindow fromDate ${fetchWindow.fromDate} toDate ${fetchWindow.toDate}")
             logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
@@ -318,6 +323,7 @@ class CalendarsRepositoryImpl(
             fetchingState.value = CalendarsRepository.FetchingState.Finished
 
         } else {
+            logger.e("Test test fetchEventsInWindow no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
             logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
         }
 

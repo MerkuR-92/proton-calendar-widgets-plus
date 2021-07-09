@@ -304,6 +304,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         // Skip init for current item if monthView changes
         if (!forceRefresh && this.isResumed && gl_mini_calendar.childCount > 0 && currentMonthView != null && currentMonthView != monthView) {
             currentMonthView = monthView
+            logger.e("Test test skip init for current item if monthView changes")
             return
         }
 
@@ -344,18 +345,17 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         logger.e("Test test mini calendar setupItemMiniCalendarContent: firstDay $firstDay firstDayMonthView $firstDayMonthView firstDayWeekView $firstDayWeekView")
 
         calendarViewModel.lifeCycleScope.launch {
-            if (currentMonthView == false && monthView && calendarViewModel.selectedDate.value?.month != firstDay.month) {
+            if (!this@ItemMiniCalendarFragment.isResumed) {
+                logger.e("Test test delay in setupItemMiniCalendarContent")
                 delay(300) // TODO This messes up the side swipe a bit if we swipe multiple months fast
             }
 
             // Check if view still exists after delay
             if (gl_mini_calendar == null) return@launch
 
-            val delay = currentMonthView == null && monthView && calendarViewModel.selectedDate.value?.month != firstDay.month
-
             currentMonthView = monthView
 
-            initialiseMiniCalendarContent(firstDay, firstDayWeekView, startWeekOn, timeZoneId, monthView, delay, forceRefresh)
+            initialiseMiniCalendarContent(if (forceRefresh) firstDayMonthView else firstDay, firstDayWeekView, startWeekOn, timeZoneId, monthView, forceRefresh)
         }
 
         calendarViewModel.lifeCycleScope.launch {
@@ -381,7 +381,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         }
     }
 
-    private fun initialiseMiniCalendarContent(forDate: LocalDate, firstDayWeekView: LocalDate, startWeekOn: DayOfWeek, timeZoneId: String, monthView: Boolean, delay: Boolean, forceRefresh: Boolean) {
+    private fun initialiseMiniCalendarContent(forDate: LocalDate, firstDayWeekView: LocalDate, startWeekOn: DayOfWeek, timeZoneId: String, monthView: Boolean, forceRefresh: Boolean) {
         val firstDayOfTheMonth = forDate.withDayOfMonth(1)
         val firstDayOfTheWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
         val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
@@ -437,14 +437,14 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         }
 
         calendarViewModel.lifeCycleScope.launch {
-            if (delay) delay(300) // TODO Still needed ?
-
             logger.e("Test test calendarIndicators fromDate $fromDate toDate $toDate")
+            val calendarIndicatorsTimer = System.currentTimeMillis()
             calendarViewModel.calendarIndicators(
                 fromDate,
                 toDate,
                 timeZoneId
             ).observe(viewLifecycleOwner) { indicators ->
+                logger.e("Test test lags calendarIndicators ${System.currentTimeMillis() - calendarIndicatorsTimer}")
                 this@ItemMiniCalendarFragment.indicators = indicators
                 applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
                 applyMiniCalendarWeekIndicators(indicators, currentWeekFirstDay ?: firstDayWeekView)
@@ -488,6 +488,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
     private fun setMiniCalendarSkeletonList(skeletonList: List<MiniCalendarItem>, forDate: LocalDate, firstDay: LocalDate, firstMiniCalendarDay: LocalDate, firstDayWeekView: LocalDate, startWeekOn: DayOfWeek, monthView: Boolean) {
 
+        logger.e("Test test setMiniCalendarSkeletonList position $position forDate $forDate monthView $monthView isResumed ${this@ItemMiniCalendarFragment.isResumed}")
         view?.findViewById<GridLayout>(R.id.gl_mini_calendar)?.run {
             this.removeAllViews()
             selectedMiniCalendarItem = -1
@@ -537,6 +538,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     }
 
     private fun ViewGroup.addMiniCalendarItemView(skeletonList: List<MiniCalendarItem>, forDate: LocalDate, monthView: Boolean) {
+        logger.e("Test test addMiniCalendarItemView position $position forDate $forDate monthView $monthView isResumed ${this@ItemMiniCalendarFragment.isResumed}")
+        val addMiniCalendarItemViewTimer = System.currentTimeMillis()
         skeletonList.forEach { item ->
             val miniCalendarItemView = LayoutInflater.from(this.context).inflate(
                 R.layout.item_mini_calendar,
@@ -571,6 +574,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                     miniCalendarItemView.selected_background.setBackgroundResource(0)
                 }
             }
+            logger.e("Test test styling position $position item.date ${item.date} forDate $forDate")
 
             miniCalendarItemView.itemMiniCalendarText.text = "${item.date.dayOfMonth}"
 
@@ -592,9 +596,11 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
             this.addView(miniCalendarItemView)
         }
+        logger.e("Test test lags addMiniCalendarItemView ${System.currentTimeMillis() - addMiniCalendarItemViewTimer}")
     }
 
     private fun applyMiniCalendarIndicators(indicators: Map<LocalDate, List<String>>, firstMiniCalendarDay: LocalDate) {
+        val applyMiniCalendarIndicatorsTimer = System.currentTimeMillis()
         indicators.forEach { (date, indicatorColors) ->
             val miniCalendarIndex = ChronoUnit.DAYS.between(firstMiniCalendarDay, date).toInt()
             val itemView = gl_mini_calendar.getChildAt(miniCalendarIndex)
@@ -612,9 +618,11 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 }
             }
         }
+        logger.e("Test test lags applyMiniCalendarIndicators ${System.currentTimeMillis() - applyMiniCalendarIndicatorsTimer}")
     }
 
     private fun applyMiniCalendarWeekIndicators(indicators: Map<LocalDate, List<String>>, firstDayWeekView: LocalDate) {
+        val applyMiniCalendarWeekIndicatorsTimer = System.currentTimeMillis()
         indicators.forEach { (date, indicatorColors) ->
             val miniCalendarWeekIndex = ChronoUnit.DAYS.between(firstDayWeekView, date).toInt()
             val weekItemView = ll_mini_calendar_week.getChildAt(miniCalendarWeekIndex)
@@ -632,6 +640,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 }
             }
         }
+        logger.e("Test test lags applyMiniCalendarWeekIndicators ${System.currentTimeMillis() - applyMiniCalendarWeekIndicatorsTimer}")
     }
 
     private fun applySelectedDate(selectedDate: LocalDate, firstMiniCalendarDay: LocalDate, firstDayWeekView: LocalDate) {
@@ -650,6 +659,13 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                             R.style.Text_DefaultSmall_Strong
                         )
                         miniCalendarItemView.itemMiniCalendarText.setTextColor(ContextCompat.getColor(miniCalendarItemView.context, R.color.brand_norm))
+                        miniCalendarItemView.selected_background.setBackgroundResource(0)
+                    } else if (selectedDate.month != firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()).month) {
+                        miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
+                            miniCalendarItemView.context,
+                            R.style.Text_DefaultSmall_Strong
+                        )
+                        miniCalendarItemView.itemMiniCalendarText.setTextColor(ContextCompat.getColor(miniCalendarItemView.context, R.color.text_hint))
                         miniCalendarItemView.selected_background.setBackgroundResource(0)
                     } else {
                         miniCalendarItemView.itemMiniCalendarText.setTextAppearance(

@@ -113,6 +113,9 @@ class CalendarViewModel(
     var showAutoDetectPrimaryTimezone = true
     var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
 
+    var currentPosDesiredMonthHeight = 0
+    var currentPosDesiredWeekHeight = 0
+
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
         if (userId == null) {
