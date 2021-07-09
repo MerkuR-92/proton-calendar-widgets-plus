@@ -92,8 +92,8 @@ val useCaseModule = module {
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get()) }
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
     factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get()) }
-    factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get(), get(), get()) }
-    factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get()) }
+    factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get()) }
     factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get()) }
