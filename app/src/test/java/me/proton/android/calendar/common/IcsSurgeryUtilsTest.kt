@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import biweekly.Biweekly
 import biweekly.util.ICalDate
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
@@ -1958,7 +1959,7 @@ END:VCALENDAR
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanExDate()).isTrue()
+            assertThat(event.cleanExDate(iCalendar)).isTrue()
             assertThat(event.exceptionDates.first().values.first().hasTime()).isFalse()
             assertThat(event.exceptionDates.first().values.first()).isEqualTo(
                 ICalDate(
@@ -2011,7 +2012,7 @@ END:VCALENDAR
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanExDate()).isFalse()
+            assertThat(event.cleanExDate(iCalendar)).isFalse()
         }
     }
 
@@ -2049,7 +2050,46 @@ END:VCALENDAR
         assertThat(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().exceptionDates[1])).isEqualTo(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().dateStart))
         assertThat(iCalendar.events.first().exceptionDates[0].values.first()).isEqualTo(iCalendar.events.first().dateStart.value)
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanExDate()).isTrue()
+            assertThat(event.cleanExDate(iCalendar)).isTrue()
+        }
+    }
+
+    @Test
+    fun `cleanExDate EXDATE has multiple values that needs to be split test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Paris:20210306T160000
+    DTEND;TZID=Europe/Paris:20210306T163000
+    RRULE:FREQ=WEEKLY;UNTIL=20210327T225959Z;BYDAY=SA
+    SEQUENCE:0
+    EXDATE;TZID=Europe/Vilnius:20210306T170000,20210313T170000,20210320T170000
+    EXDATE;TZID=Europe/Vilnius:20210327T170000
+    SUMMARY:Recurring with exdates
+    STATUS:CONFIRMED
+    DTSTAMP:20210311T145808Z
+    UID:35fdx2qMv8RPjvIFecqY1qTMIooJ@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        assertThat(iCalendar.cleanTimezones()).isTrue()
+        assertThat(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().exceptionDates[0])).isEqualTo(iCalendar.timezoneInfo.getTimezone(iCalendar.events.first().dateStart))
+        assertThat(iCalendar.events.first().exceptionDates[0].values.first()).isEqualTo(iCalendar.events.first().dateStart.value)
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanExDate(iCalendar)).isTrue()
+            assertThat(event.exceptionDates.size).isEqualTo(4)
+            assertThat(iCalendar.timezoneInfo.getTimezone(event.exceptionDates[0]).globalId).isEqualTo("Europe/Paris")
         }
     }
 

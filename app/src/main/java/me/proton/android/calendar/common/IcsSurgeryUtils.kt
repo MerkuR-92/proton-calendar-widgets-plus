@@ -38,6 +38,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
+import me.proton.android.calendar.common.IcsSurgeryUtils.localizeZuluTimeDate
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -173,7 +174,7 @@ object IcsSurgeryUtils {
 
             if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.Invalid.RRule
 
-            if (!event.cleanExDate()) return HandleIcsResult.Error.Invalid.ExDate
+            if (!event.cleanExDate(iCalendar)) return HandleIcsResult.Error.Invalid.ExDate
 
             if (!event.cleanSequence()) return HandleIcsResult.Error.Invalid.Sequence
 
@@ -439,7 +440,7 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun VEvent.cleanExDate(): Boolean {
+    fun VEvent.cleanExDate(iCalendar: ICalendar): Boolean {
         // EXDATE: If the event contains an EXDATE, but not an RRULE, reject (as invalid).
         if (!this.exceptionDates.isNullOrEmpty() && this.recurrenceRule?.value == null) return false
 
@@ -466,6 +467,25 @@ object IcsSurgeryUtils {
                 }
             }
         }
+
+        // We only allow one EXDATE value per row
+        val exceptionDatesSplit = arrayListOf<ExceptionDates>()
+        this.exceptionDates.forEach {
+            if (it.values.size > 1) {
+                val exceptionDateParametersCopy = it.parameters
+                it.values.forEach { iCalDate ->
+                    val timeZone = iCalendar.timezoneInfo.getTimezone(it)
+                    val exceptionDate = ExceptionDates()
+                    exceptionDate.parameters = exceptionDateParametersCopy
+                    exceptionDate.values.add(iCalDate)
+                    exceptionDatesSplit.add(exceptionDate)
+                    iCalendar.timezoneInfo.setTimezone(exceptionDate, timeZone)
+                }
+                iCalendar.timezoneInfo.setTimezone(it, null)
+            } else exceptionDatesSplit.add(it)
+        }
+        this.exceptionDates.removeAll(this.exceptionDates)
+        this.exceptionDates.addAll(exceptionDatesSplit)
 
         return true
     }
