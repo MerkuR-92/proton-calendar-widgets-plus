@@ -170,8 +170,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
                 val alternative = alternativeTimezones.firstOrNull { it.startsWith(timeZone.substringBefore("/")) } ?: alternativeTimezones.firstOrNull()
 
                 alternative ?: if (fallbackToDefault) TimeZone.getDefault().id else null
-            } else if (!windowsTimeZoneMap[timeZone.toLowerCase(getDefault())].isNullOrEmpty()) {
-                val windowsIdReplacement = windowsTimeZoneMap[timeZone.toLowerCase(getDefault())]
+            } else if (!windowsTimeZoneMap[timeZone.toLowerCase(getDefault()).replace(".", "")].isNullOrEmpty()) {
+                val windowsIdReplacement = windowsTimeZoneMap[timeZone.toLowerCase(getDefault()).replace(".", "")]
                     ?: return if (fallbackToDefault) TimeZone.getDefault().id
                     else null
                 fallbackTimeZone(windowsIdReplacement, fallbackToDefault)
