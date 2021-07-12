@@ -20,6 +20,7 @@ import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.domain.entity.Product
 import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
+import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
@@ -84,7 +85,7 @@ val useCaseModule = module {
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
-    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get()) }
@@ -122,7 +123,8 @@ fun coreModule(
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
     contactEmailsRepository: ContactRepository,
     cryptoContext: CryptoContext,
-    sendEmailDirect: SendEmailDirect
+    sendEmailDirect: SendEmailDirect,
+    publicAddressRepository: PublicAddressRepository
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -138,4 +140,5 @@ fun coreModule(
     single<CryptoContext> { cryptoContext }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), contactEmailsRepository, get(), get(), get(), getRecipientPublicAddresses) }
     factory<SendEmailDirect> { sendEmailDirect /*SendEmailDirect(get(), get(), get(), get())*/ }
+    single<PublicAddressRepository> { publicAddressRepository }
 }

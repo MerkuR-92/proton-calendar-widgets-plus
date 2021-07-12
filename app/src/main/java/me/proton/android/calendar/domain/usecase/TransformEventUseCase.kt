@@ -17,6 +17,10 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.repository.PublicAddressRepository
+import me.proton.core.key.domain.verifyText
 import me.proton.core.util.kotlin.toBoolean
 
 
@@ -26,7 +30,9 @@ class TransformEventUseCase(
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
-    private val iCal: ICalUtilsImpl
+    private val iCal: ICalUtilsImpl,
+    private val publicAddressRepository: PublicAddressRepository,
+    private val cryptoContext: CryptoContext
 ) : UseCase { // TODO ADD TEST
 
     suspend fun execute(eventEntity: EventEntity) : Event? {
@@ -64,7 +70,8 @@ class TransformEventUseCase(
                         eventEntity.sharedKeyPacket,
                         calendarPrivateKeys,
                         keyPassphrase,
-                        sharedEvent
+                        sharedEvent,
+                        UserId(userId)
                     )
                 }
             }
@@ -78,7 +85,8 @@ class TransformEventUseCase(
                         eventEntity.calendarKeyPacket,
                         calendarPrivateKeys,
                         keyPassphrase,
-                        calendarEvent
+                        calendarEvent,
+                        UserId(userId)
                     )
                 }
             }
@@ -92,7 +100,8 @@ class TransformEventUseCase(
                         null, // personal parts are only signed
                         calendarPrivateKeys,
                         keyPassphrase,
-                        personalEvent
+                        personalEvent,
+                        UserId(userId)
                     )
                 }
             }
@@ -106,7 +115,8 @@ class TransformEventUseCase(
                         eventEntity.sharedKeyPacket,
                         calendarPrivateKeys,
                         keyPassphrase,
-                        attendeeEvent
+                        attendeeEvent,
+                        UserId(userId)
                     )
                 }
             }
@@ -202,7 +212,8 @@ class TransformEventUseCase(
     private suspend fun getPlainText(keyPacket: String?,
                                      privateKeys: List<String>,
                                      keyPassphrase: String,
-                                     eventPart: Event.EventPart
+                                     eventPart: Event.EventPart,
+                                     userId: UserId
     ): ProcessResult {
 
         // decrypt if necessary
@@ -224,14 +235,16 @@ class TransformEventUseCase(
 
                 if (eventPart.signature != null) {
 
-                    // TODO introduce verification keys cache
-                    val verificationKeys = database.publicKeysDao().select(eventPart.author).map { it.publicKey }
-                    if (verificationKeys.isEmpty()) {
+                    val publicAddressKeys = kotlin.runCatching { publicAddressRepository.getPublicAddress(userId, eventPart.author, refresh = false).keys }.getOrNull()
+
+                    if (publicAddressKeys == null || publicAddressKeys.isEmpty()) {
                         signatureVerification = Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                     } else {
 
-                        val signatureOk = eventPart.signature?.let {
-                            crypto.verifyTextDetached(plainText, it, verificationKeys)
+                        val signatureOk = eventPart.signature?.let { signature ->
+                            publicAddressKeys.any {
+                                it.publicKey.verifyText(cryptoContext, plainText, signature)
+                            }
                         } ?: false
 
                         if (signatureOk) {
