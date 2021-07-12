@@ -101,7 +101,7 @@ val useCaseModule = module {
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<GetCanonicalEmailsUseCase> { GetCanonicalEmailsUseCase(get(), get()) }
     factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
-    factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
     factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get()) }

@@ -5,26 +5,28 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ReenableKeyApiRequest
 import me.proton.android.calendar.data.api.ReenableKeyApiResponse
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.crypto.common.pgp.EncryptedMessage
+import me.proton.core.crypto.common.pgp.decryptAndVerifyTextOrNull
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.decryptText
+import me.proton.core.key.domain.decryptTextOrNull
+import me.proton.core.key.domain.useKeys
+import me.proton.core.key.domain.verifyText
+import me.proton.core.user.domain.UserManager
+import me.proton.core.util.kotlin.equalsNoCase
 
 class ReactivateCalendarKeyUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
-    private val crypto: Crypto,
-    private val valueStoreProvider: ValueStoreProvider,
     private val json: Json,
-    private val database: AppDatabase
+    private val userManager: UserManager,
+    private val cryptoContext: CryptoContext
 ): UseCase {
 
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
-        val valueStore = valueStoreProvider.provideValueStore(userId.id)
-        val userPassphrase = valueStore.getString(ValueKey.USER_PASSPHRASE)
-        if (userPassphrase == null) {
-            return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error empty user passphrase")
-        }
 
         // Get all keys
         val keysResponse = calendarsApi.getKeys(userId, calendarId)
@@ -63,78 +65,51 @@ class ReactivateCalendarKeyUseCase(
                         memberPassphrase.memberId == member.id
                     } ?: return@members
 
-                    // Load all AddressKeys of address linked to member
-                    val address =
-                        database.addressesDao().select(userId.id, member.email).firstOrNull()?.toAddress(json)
-                            ?: return@members
+                    // Load Address linked to member
+                    val memberAddress = userManager.getAddresses(userId, refresh = true).find {
+                        it.email.equalsNoCase(member.email)
+                    } ?: return@members
 
-                    // Try to decrypt passphrase, if fail continue for each
-                    address.keys.forEach addressKeys@{ addressKey ->
-
-                        val decryptedPassphrase = crypto.decryptText(
-                            memberPassphrase.passphrase,
-                            addressKey.privateKey,
-                            userPassphrase.toByteArray()
-                        ) ?: return@addressKeys
-
-                        if (!crypto.verifyTextDetached(
-                                decryptedPassphrase,
-                                memberPassphrase.signature,
-                                listOf(crypto.getArmoredPublicKey(addressKey.publicKey) ?: "")
-                            )
-                        ) return@addressKeys
-
-                        // Decrypt Calendar key
-                        val decryptedCalendarKey = newKeyFromArmored(calendarKey.privateKey).unlock(decryptedPassphrase.toByteArray()) ?: return@addressKeys
-
-                        // Get primary passphrase
-                        val primaryPassphrase = passphrasesResponse.data.passphrases.firstOrNull {
-                            it.flags == 1
-                        }?.toPassphrase(json) ?: return@addressKeys
-
-                        // Get member primary passphrase
-                        val memberPrimaryPassphrase = primaryPassphrase.memberPassphrases.firstOrNull {
-                            it.memberId == member.id
-                        } ?: return@addressKeys
-
-                        // Get all private keys for address
-                        val privateAddressKeys = address.keys.map {
-                            it.privateKey
+                    // Try to decrypt passphrase
+                    val decryptedPassphrase = memberAddress.useKeys(cryptoContext) {
+                        decryptTextOrNull(memberPassphrase.passphrase)?.let {
+                            if (verifyText(it, memberPassphrase.signature)) it else null
                         }
+                    } ?: return@members
 
-                        // Get all public keys for address
-                        val publicAddressKeys = address.keys.map {
-                            it.publicKey
+                    // Decrypt Calendar key
+                    val decryptedCalendarKey = newKeyFromArmored(calendarKey.privateKey).unlock(decryptedPassphrase.toByteArray()) ?: return@members
+
+                    // Get primary passphrase
+                    val primaryPassphrase = passphrasesResponse.data.passphrases.firstOrNull {
+                        it.flags == 1
+                    }?.toPassphrase(json) ?: return@members
+
+                    // Get member primary passphrase
+                    val memberPrimaryPassphrase = primaryPassphrase.memberPassphrases.firstOrNull {
+                        it.memberId == member.id
+                    } ?: return@members
+
+                    // Decrypt member primary passphrase
+                    val decryptedMemberPrimaryPassphrase = memberAddress.useKeys(cryptoContext) {
+                        decryptTextOrNull(memberPrimaryPassphrase.passphrase)?.let {
+                            if (verifyText(it, memberPrimaryPassphrase.signature)) it else null
                         }
+                    } ?: return@members
 
-                        // Decrypt member primary passphrase
-                        val decryptedMemberPrimaryPassphrase = crypto.decryptText(
-                            memberPrimaryPassphrase.passphrase,
-                            privateAddressKeys,
-                            userPassphrase.toByteArray()
-                        ) ?: return@addressKeys
+                    // Encrypt Calendar key using primary passphrase
+                    val newlyEncryptedCalendarKey = decryptedCalendarKey.lock(decryptedMemberPrimaryPassphrase.toByteArray()) ?: return@members
 
-                        if (!crypto.verifyTextDetached(
-                                decryptedMemberPrimaryPassphrase,
-                                memberPrimaryPassphrase.signature,
-                                publicAddressKeys
-                            )
-                        ) return@addressKeys
+                    // Post newly encrypted Calendar key
+                    reenableKeyResponses.add(calendarsApi.reenableKey(
+                        userId,
+                        calendarId,
+                        calendarKey.id,
+                        ReenableKeyApiRequest(newlyEncryptedCalendarKey.armor())
+                    ))
 
-                        // Encrypt Calendar key using primary passphrase
-                        val newlyEncryptedCalendarKey = decryptedCalendarKey.lock(decryptedMemberPrimaryPassphrase.toByteArray()) ?: return@addressKeys
-
-                        // Post newly encrypted Calendar key
-                        reenableKeyResponses.add(calendarsApi.reenableKey(
-                            userId,
-                            calendarId,
-                            calendarKey.id,
-                            ReenableKeyApiRequest(newlyEncryptedCalendarKey.armor())
-                        ))
-
-                        // Break calendar member for each
-                        return@keys
-                    }
+                    // Break calendar member for each
+                    return@keys
                 }
             }
         }
