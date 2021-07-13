@@ -64,12 +64,7 @@ class AccountViewModel(
             val valueStore = valueStoreProvider.provideValueStore(account.userId.id)
             val eventId = checkNotNull(account.details.session?.initialEventId)
 
-            val user = userManager.getUser(account.userId, refresh = true)
-            val passphrase = user.keys.primary()?.privateKey?.passphrase
-            val decryptedPassphrase = checkNotNull(passphrase).decryptWith(keyStoreCrypto)
-
             valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
-            valueStore.putString(ValueKey.USER_PASSPHRASE, String(decryptedPassphrase.array))
 
             setupUser(account.userId)
         }.onFailure {

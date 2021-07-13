@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStore
 import me.proton.android.calendar.domain.ValueStoreProvider
 
@@ -57,12 +58,18 @@ class ValueStoreProviderImpl(private val sharedPreferencesProvider: SharedPrefer
 
         @Synchronized
         override fun clearAll() = sharedPreferences.edit().clear().apply()
+
+        @Synchronized
+        override fun removeKey(key: String) = sharedPreferences.edit().remove(key).apply()
     }
 
     @Synchronized
     override fun provideValueStore(userId: String): ValueStore {
         return valueStores.getOrPut(userId) {
-            ValueStoreImpl(sharedPreferencesProvider.provideSharedPreferencesFor(userId))
+            ValueStoreImpl(sharedPreferencesProvider.provideSharedPreferencesFor(userId)).also {
+                // TODO remove User Passphrase that used to be saved in the prefs
+                it.removeKey(ValueKey.USER_PASSPHRASE)
+            }
         }
     }
 
