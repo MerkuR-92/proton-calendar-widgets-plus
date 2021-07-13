@@ -39,7 +39,7 @@ val commonModule = module {
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
     single<ValueStoreProvider> { ValueStoreProviderImpl(get()) }
     single<ResourceProvider> { ResourceProviderImpl(androidApplication().resources) }
-    single<AppDatabase> { AppDatabase(androidApplication()) }
+    single<AppDatabase> { AppDatabase.buildDatabase(androidApplication()) }
     single<Crypto> { CryptoImpl(get()) }
 
 //    factory { new instance every time }
