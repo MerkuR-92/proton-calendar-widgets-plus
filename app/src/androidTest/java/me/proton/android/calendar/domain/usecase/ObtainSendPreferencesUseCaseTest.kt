@@ -98,7 +98,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     }
 
     @Test
-    fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_key_deleted_in_public_repo() {
+    fun handle_createCustomSendPreferences_for_contact_with_pinned_key_and_no_key_in_public_repo() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
         val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
@@ -107,7 +107,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
 
         val result = sut.createCustomSendPreferences(vCardEmail, contactExternalPinnedKeyEmptyPublicAddress, vCard, mailSettingsSignFalse.data.mailSettings.toMailSettings()!!)
 
-        assertTrue(result is ObtainSendPreferencesUseCase.SendPreferencesOrError.Error.TrustedKeysInvalid)
+        assertTrue(result is ObtainSendPreferencesUseCase.SendPreferencesOrError.Success)
 
     }
 
