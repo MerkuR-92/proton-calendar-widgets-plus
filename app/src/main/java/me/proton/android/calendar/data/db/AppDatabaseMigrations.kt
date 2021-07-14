@@ -20,6 +20,7 @@ package me.proton.android.calendar.data.db
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import me.proton.core.data.room.db.extension.dropTable
 
 object AppDatabaseMigrations {
 
@@ -61,6 +62,16 @@ object AppDatabaseMigrations {
 
             database.execSQL("CREATE TABLE ${AppDatabase.TABLE_CALENDAR_SUBSCRIPTIONS} (calendarId TEXT NOT NULL PRIMARY KEY, createTime INTEGER NOT NULL, lastUpdateTime INTEGER NOT NULL, status INTEGER NOT NULL, url TEXT NOT NULL, FOREIGN KEY (calendarId) REFERENCES calendars (id) ON DELETE CASCADE ON UPDATE NO ACTION)")
             database.execSQL("CREATE INDEX index_calendar_subscriptions_calendarId ON ${AppDatabase.TABLE_CALENDAR_SUBSCRIPTIONS} (calendarId)")
+        }
+    }
+
+    /**
+     * Drop old Users/Addresses Calendar Tables.
+     */
+    val MIGRATION_29_30 = object : Migration(29, 30) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.dropTable(AppDatabase.TABLE_USERS)
+            database.dropTable(AppDatabase.TABLE_ADDRESSES)
         }
     }
 }
