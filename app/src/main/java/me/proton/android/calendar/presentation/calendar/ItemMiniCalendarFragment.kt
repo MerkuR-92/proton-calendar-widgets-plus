@@ -26,6 +26,7 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.DateTimeUtilsImpl
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
+import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.FragmentArguments.STARTING_POSITION_ARG
@@ -51,6 +52,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     private var weekStart: DayOfWeek? = null
     private var monthView: Boolean? = null
     private val miniCalendarMediator = MediatorLiveData<Triple<String, DayOfWeek, Boolean>>()
+    private val miniCalendarNoWeekModeMediator = MediatorLiveData<Pair<String, DayOfWeek>>()
     private var fullWeeksInMonth = 0
 
     private var selectedMiniCalendarItem = -1
@@ -87,6 +89,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             startWeekOn: DayOfWeek,
             isMonthView: Boolean
         ): Int {
+            if (!WEEK_COMPONENT && !isMonthView) return context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
+
             val fullWeeksInMonth = if (isMonthView) calculateFullWeeksInMonth(firstDayOfMonth, startWeekOn) else 1
 
             return context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height) +
@@ -239,8 +243,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 initialWeekNumbersLayoutParams?.let { ll_weeknumbers.layoutParams = it }
 
                 gl_mini_calendar.visibleOrInvisible(monthView == true)
-                ll_mini_calendar_week.visibleOrInvisible(monthView == false)
-                ll_weeknumber_weekview.visibleOrInvisible(monthView == false && calendarViewModel.displayWeekNumber.value == true)
+                ll_mini_calendar_week.visibleOrInvisible(WEEK_COMPONENT && monthView == false)
+                ll_weeknumber_weekview.visibleOrInvisible(WEEK_COMPONENT && monthView == false && calendarViewModel.displayWeekNumber.value == true)
             }
 
             override fun doesViewExist(): Boolean {
@@ -269,37 +273,64 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        miniCalendarMediator.addSource(calendarViewModel.timeZoneId) { value ->
-            timeZoneId = value?.id
+        if (!WEEK_COMPONENT) {
+            monthView = true
+            ll_mini_calendar_week.visibleOrGone(false)
+            ll_weeknumber_weekview.visibleOrGone(false)
 
-            if (timeZoneId != null && weekStart != null && monthView != null) {
-                miniCalendarMediator.value = Triple(timeZoneId!!, weekStart!!, monthView!!)
+            miniCalendarNoWeekModeMediator.addSource(calendarViewModel.timeZoneId) { value ->
+                timeZoneId = value?.id
+
+                if (timeZoneId != null && weekStart != null) {
+                    miniCalendarNoWeekModeMediator.value = Pair(timeZoneId!!, weekStart!!)
+                }
             }
-        }
-        miniCalendarMediator.addSource(calendarViewModel.weekStart) { value ->
-            weekStart = value?.let { getWeekStartDayOfWeek(it) }
+            miniCalendarNoWeekModeMediator.addSource(calendarViewModel.weekStart) { value ->
+                weekStart = value?.let { getWeekStartDayOfWeek(it) }
 
-            if (timeZoneId != null && weekStart != null && monthView != null) {
-                miniCalendarMediator.value = Triple(timeZoneId!!, weekStart!!, monthView!!)
+                if (timeZoneId != null && weekStart != null) {
+                    miniCalendarNoWeekModeMediator.value = Pair(timeZoneId!!, weekStart!!)
+                }
             }
-        }
-        miniCalendarMediator.addSource(calendarViewModel.monthView) { value ->
-            monthView = value
 
-            if (timeZoneId != null && weekStart != null && monthView != null) {
-                miniCalendarMediator.value = Triple(timeZoneId!!, weekStart!!, monthView!!)
+            miniCalendarNoWeekModeMediator.observe(viewLifecycleOwner) {
+                it?.let {
+                    setupItemMiniCalendarContent(it.first, it.second, true)
+                }
             }
-        }
+        } else {
+            miniCalendarMediator.addSource(calendarViewModel.timeZoneId) { value ->
+                timeZoneId = value?.id
 
-        miniCalendarMediator.observe(viewLifecycleOwner) {
-            it?.let {
-                setupItemMiniCalendarContent(it.first, it.second, it.third)
+                if (timeZoneId != null && weekStart != null && monthView != null) {
+                    miniCalendarMediator.value = Triple(timeZoneId!!, weekStart!!, monthView!!)
+                }
+            }
+            miniCalendarMediator.addSource(calendarViewModel.weekStart) { value ->
+                weekStart = value?.let { getWeekStartDayOfWeek(it) }
+
+                if (timeZoneId != null && weekStart != null && monthView != null) {
+                    miniCalendarMediator.value = Triple(timeZoneId!!, weekStart!!, monthView!!)
+                }
+            }
+            miniCalendarMediator.addSource(calendarViewModel.monthView) { value ->
+                monthView = value
+
+                if (timeZoneId != null && weekStart != null && monthView != null) {
+                    miniCalendarMediator.value = Triple(timeZoneId!!, weekStart!!, monthView!!)
+                }
+            }
+
+            miniCalendarMediator.observe(viewLifecycleOwner) {
+                it?.let {
+                    setupItemMiniCalendarContent(it.first, it.second, it.third)
+                }
             }
         }
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
             view.findViewById<LinearLayout>(R.id.ll_weeknumbers).visibleOrGone(displayWeekNumber)
-            view.findViewById<LinearLayout>(R.id.ll_weeknumber_weekview).visibleOrGone(displayWeekNumber)
+            view.findViewById<LinearLayout>(R.id.ll_weeknumber_weekview).visibleOrGone(WEEK_COMPONENT && displayWeekNumber)
         }
     }
 
@@ -436,8 +467,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             )
 
             gl_mini_calendar.visibleOrInvisible(monthView)
-            ll_mini_calendar_week.visibleOrInvisible(!monthView)
-            ll_weeknumber_weekview.visibleOrInvisible(!monthView && calendarViewModel.displayWeekNumber.value == true)
+            ll_mini_calendar_week.visibleOrInvisible(WEEK_COMPONENT && !monthView)
+            ll_weeknumber_weekview.visibleOrInvisible(WEEK_COMPONENT && !monthView && calendarViewModel.displayWeekNumber.value == true)
         }
 
         calendarViewModel.lifeCycleScope.launch {
@@ -475,7 +506,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
                 val currentSelectedDate = if (currentWeekFirstDay == firstDayOfTheWeek) firstDayOfTheWeek.plusDays(selectedMiniCalendarWeekItem.toLong()) else null
 
-                if (selectedDate.weekNumber(immutableWeekStart) != currentWeekFirstDay?.weekNumber(immutableWeekStart)) {
+                if (WEEK_COMPONENT &&selectedDate.weekNumber(immutableWeekStart) != currentWeekFirstDay?.weekNumber(immutableWeekStart)) {
                     logger.e("Test test handleSelectedDate selectedDate $selectedDate currentWeekFirstDay $currentWeekFirstDay firstDayOfTheWeek $firstDayOfTheWeek position $position")
 
                     currentWeekFirstDay = firstDayOfTheWeek
@@ -491,7 +522,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 } else {
                     logger.e("Test test handleSelectedDate selectedDate $selectedDate currentSelectedDate $currentSelectedDate position $position monthView $monthView firstDayOfTheWeek $firstDayOfTheWeek firstMiniCalendarDay $firstMiniCalendarDay firstDayOfTheMonth $firstDayOfTheMonth")
                     applySelectedDate(selectedDate, firstMiniCalendarDay, firstDayOfTheWeek, firstDayOfTheMonth)
-                    if (selectedDate.month != currentSelectedDate?.month && this@ItemMiniCalendarFragment.isResumed && !(this@ItemMiniCalendarFragment.monthView ?: monthView)) {
+                    if (WEEK_COMPONENT && selectedDate.month != currentSelectedDate?.month && this@ItemMiniCalendarFragment.isResumed && !(this@ItemMiniCalendarFragment.monthView ?: monthView)) {
                         val immutablePosition = position ?: return@observe
                         calendarViewModel.monthViewStartingPositionAndDate.value = Pair(immutablePosition, selectedDate.withDayOfMonth(1))
                         logger.e("Test test handleSelectedDate setupItemMiniCalendarContent position $position selectedDate $selectedDate currentSelectedDate $currentSelectedDate monthViewStartingPositionAndDate ${calendarViewModel.monthViewStartingPositionAndDate.value}")
@@ -525,6 +556,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     }
 
     private fun setMiniCalendarWeekSkeletonList(skeletonList: List<MiniCalendarItem>, firstMiniCalendarDay: LocalDate, firstDayWeekView: LocalDate, firstDayOfTheMonth: LocalDate, startWeekOn: DayOfWeek, monthView: Boolean) {
+        if (!WEEK_COMPONENT) return
         if (currentMiniCalendarWeekList == skeletonList) return
         currentMiniCalendarWeekList = skeletonList
         view?.findViewById<LinearLayout>(R.id.ll_mini_calendar_week)?.run {
@@ -641,6 +673,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     }
 
     private fun applyMiniCalendarWeekIndicators(indicators: Map<LocalDate, List<String>>, firstDayWeekView: LocalDate) {
+        if (!WEEK_COMPONENT) return
         val applyMiniCalendarWeekIndicatorsTimer = System.currentTimeMillis()
         indicators.forEach { (date, indicatorColors) ->
             val miniCalendarWeekIndex = ChronoUnit.DAYS.between(firstDayWeekView, date).toInt()
@@ -713,7 +746,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         }
 
         val newSelectedMiniCalendarWeekItem = ChronoUnit.DAYS.between(firstDayWeekView, selectedDate).toInt()
-        if (selectedMiniCalendarWeekItem != newSelectedMiniCalendarWeekItem) {
+        if (WEEK_COMPONENT && selectedMiniCalendarWeekItem != newSelectedMiniCalendarWeekItem) {
             logger.e("Test test previous selectedMiniCalendarWeekItem $selectedMiniCalendarWeekItem")
             if (selectedMiniCalendarWeekItem != -1) {
                 val miniCalendarWeekItemView = ll_mini_calendar_week.getChildAt(selectedMiniCalendarWeekItem)

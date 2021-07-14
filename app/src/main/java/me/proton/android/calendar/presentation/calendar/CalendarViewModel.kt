@@ -25,6 +25,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.areTimeZoneOffsetsDif
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
+import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
@@ -247,7 +248,7 @@ class CalendarViewModel(
     fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
         // prevent mini-calendar scroll from overriding selected date
         _selectedDate.value?.let {
-            if (fromMonthPagerCallback && monthView.value == true && it.month == date.month && it.year == date.year) {
+            if (fromMonthPagerCallback && (!WEEK_COMPONENT || monthView.value == true) && it.month == date.month && it.year == date.year) {
                 return
             }
             weekStart.value?.let { weekStart ->
@@ -259,11 +260,12 @@ class CalendarViewModel(
             }
         }
 
+        logger.e("Test test handleSelectedDate postValue date $date")
         _selectedDate.value = date
 
         // adjust Mini Calendar
         val miniCalendarIndex =
-            if (monthView.value == true) {
+            if (monthView.value == true || !WEEK_COMPONENT) {
                 val monthStartingDate = monthViewStartingPositionAndDate.value?.second ?: initialToday.withDayOfMonth(1)
                 val offset = ChronoUnit.MONTHS.between(monthStartingDate, date.withDayOfMonth(1)).toInt()
                 val monthStartingPosition = monthViewStartingPositionAndDate.value?.first ?: (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition

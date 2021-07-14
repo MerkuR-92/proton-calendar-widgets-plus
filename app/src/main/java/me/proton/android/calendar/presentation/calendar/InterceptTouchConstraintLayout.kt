@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 import me.proton.android.calendar.common.TimberLogger
 import java.util.*
 
@@ -17,6 +18,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
 
     var allowScrolling: Boolean = false
     var agendaPager: View? = null
+    var sliderView: View? = null
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         /*
@@ -27,14 +29,25 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
         return when (ev.actionMasked) {
             // Always handle the case of the touch gesture being complete.
             MotionEvent.ACTION_DOWN -> {
-                TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN")
-                if (allowScrolling) {
+                TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN allowScrolling $allowScrolling")
+                if (allowScrolling && WEEK_COMPONENT) {
                     false
                 } else {
-                    val delegateArea = Rect()
-                    agendaPager?.getHitRect(delegateArea)
-                    TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
-                    delegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                    if (!WEEK_COMPONENT) {
+                        val delegateArea = Rect()
+                        agendaPager?.getHitRect(delegateArea)
+                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
+
+                        val sliderDelegateArea = Rect()
+                        sliderView?.getHitRect(sliderDelegateArea)
+                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN sliderDelegateArea $sliderDelegateArea")
+                        (!allowScrolling && delegateArea.contains(ev.x.toInt(), ev.y.toInt())) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                    } else {
+                        val delegateArea = Rect()
+                        agendaPager?.getHitRect(delegateArea)
+                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
+                        delegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                    }
                 }
             }
             MotionEvent.ACTION_UP -> {
@@ -42,14 +55,25 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
                 false // Do not intercept touch event, let the child handle it
             }
             MotionEvent.ACTION_MOVE -> {
-                TimberLogger.e("Test test onInterceptTouchEvent ACTION_MOVE")
-                if (allowScrolling) {
+                TimberLogger.e("Test test onInterceptTouchEvent ACTION_MOVE allowScrolling $allowScrolling")
+                if (allowScrolling && WEEK_COMPONENT) {
                     false
                 } else {
-                    val delegateArea = Rect()
-                    agendaPager?.getHitRect(delegateArea)
-                    TimberLogger.e("Test test onInterceptTouchEvent ACTION_MOVE delegateArea $delegateArea")
-                    delegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                    if (!WEEK_COMPONENT) {
+                        val delegateArea = Rect()
+                        agendaPager?.getHitRect(delegateArea)
+                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
+
+                        val sliderDelegateArea = Rect()
+                        sliderView?.getHitRect(sliderDelegateArea)
+                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN sliderDelegateArea $sliderDelegateArea")
+                        (!allowScrolling && delegateArea.contains(ev.x.toInt(), ev.y.toInt())) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                    } else {
+                        val delegateArea = Rect()
+                        agendaPager?.getHitRect(delegateArea)
+                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
+                        delegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                    }
                 }
             }
             else -> {
