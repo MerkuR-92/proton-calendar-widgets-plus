@@ -394,6 +394,7 @@ class MonthFragment : BaseFragment() {
     interface MonthLayoutOnFinishMoveListener {
         fun fullyExpand(animationEndListener: (() -> Unit))
         fun fullyCollapse(animationEndListener: (() -> Unit))
+        fun simulateExpand(animationEndListener: (() -> Unit))
         fun simulateCollapse(animationEndListener: (() -> Unit))
     }
 
@@ -406,6 +407,7 @@ class MonthFragment : BaseFragment() {
         private val miniCalendarPager: ViewPager2,
         private val miniCalendarPagerAdapter: MiniCalendarPagerAdapter,
         private val agendaPager: ViewPager2,
+        private val sliderView: View,
         private val monthLayoutOnFinishMoveListener: MonthLayoutOnFinishMoveListener
     ): View.OnTouchListener {
         private var oldScrollY: Float? = null
@@ -415,6 +417,8 @@ class MonthFragment : BaseFragment() {
         private var scrollDown: Boolean = false
 
         private val MAX_CLICK_DURATION = 1000L
+        private val MAX_FLICK_DURATION = 100L
+        private val MIN_FLICK_DISTANCE = 50
         private val MAX_CLICK_DISTANCE = 15
 
         private var pressStartTime: Long = 0
@@ -515,12 +519,22 @@ class MonthFragment : BaseFragment() {
                     val pressDuration = System.currentTimeMillis() - pressStartTime
                     val delegateArea = Rect()
                     agendaPager.getHitRect(delegateArea)
+                    val sliderDelegateArea = Rect()
+                    sliderView.getHitRect(sliderDelegateArea)
                     val isWithinPager = delegateArea.contains(pressedX.toInt(), pressedY.toInt())
+                    val isWithinSlider = sliderDelegateArea.contains(pressedX.toInt(), pressedY.toInt())
                     TimberLogger.e("Test test check click event isWithinPager $isWithinPager pressDuration $pressDuration stayedWithinClickDistance $stayedWithinClickDistance monthView ${calendarViewModel.monthView.value}")
+                    TimberLogger.e("Test test check flick event isWithin ${(isWithinPager || isWithinSlider)} pressDuration $pressDuration distance ${distance(pressedX, pressedY, event.x, event.y)} monthView ${calendarViewModel.monthView.value}")
                     if (isWithinPager && pressDuration < MAX_CLICK_DURATION && stayedWithinClickDistance && calendarViewModel.monthView.value == true) {
                         // Click event has occurred
                         TimberLogger.e("Test test click event fully collapse")
                         monthLayoutOnFinishMoveListener.simulateCollapse { }
+                        return true
+                    } else if (pressDuration < MAX_FLICK_DURATION && distance(pressedX, pressedY, event.x, event.y) > MIN_FLICK_DISTANCE) {
+                        // Flick event has occurred
+                        TimberLogger.e("Test test flick event fully collapse")
+                        if (calendarViewModel.monthView.value == true) monthLayoutOnFinishMoveListener.simulateCollapse { }
+                        else monthLayoutOnFinishMoveListener.simulateExpand { }
                         return true
                     }
 
@@ -795,6 +809,7 @@ class MonthFragment : BaseFragment() {
                 miniCalendarPager,
                 miniCalendarPagerAdapter,
                 agendaPager,
+                mini_calendar_slider,
                 object : MonthLayoutOnFinishMoveListener {
                     override fun fullyExpand(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == false) {
@@ -828,6 +843,10 @@ class MonthFragment : BaseFragment() {
 
                     override fun simulateCollapse(animationEndListener: () -> Unit) {
                         simulateCollapseWithScroll(startWeekOn)
+                    }
+
+                    override fun simulateExpand(animationEndListener: () -> Unit) {
+                        simulateExpandWithScroll(startWeekOn)
                     }
 
                 }
