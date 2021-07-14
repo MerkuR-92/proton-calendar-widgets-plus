@@ -223,17 +223,7 @@ class MonthFragment : BaseFragment() {
 
                 if (!initialHeightAdjusted) {
                     initialHeightAdjusted = true
-                    if (calendarViewModel.monthView.value == true) mini_calendar_chevron.rotation = 180f
                     updateMiniCalendarHeight(this, startWeekOn, true, false)
-                }
-
-                fragment_toolbar_title_layout.setOnSingleClickListener {
-                    TimberLogger.e("Test test fragment_toolbar_title_layout setOnSingleClickListener ${calendarViewModel.monthView.value}")
-                    if (calendarViewModel.monthView.value == false) {
-                        simulateExpandWithScroll(startWeekOn)
-                    } else {
-                        simulateCollapseWithScroll(startWeekOn)
-                    }
                 }
             }
         }
@@ -787,6 +777,14 @@ class MonthFragment : BaseFragment() {
             setMiniCalendarPagerLayoutListener(startWeekOn)
             setMiniCalendarPageChangeCallback(startWeekOn)
 
+            fragment_toolbar_title_layout.setOnSingleClickListener {
+                if (calendarViewModel.monthView.value == false) {
+                    simulateExpandWithScroll(startWeekOn)
+                } else {
+                    simulateCollapseWithScroll(startWeekOn)
+                }
+            }
+
             val firstDayOfMonth = calendarViewModel.selectedDate.value!!.withDayOfMonth(1)
             calendarViewModel.currentPosDesiredMonthHeight = calculateAdapterHeight(
                 requireContext(),
@@ -814,7 +812,6 @@ class MonthFragment : BaseFragment() {
                     override fun fullyExpand(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == false) {
                             calendarViewModel.monthView.value = true
-                            rotateArrowDownward(mini_calendar_chevron)
                             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
                             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
@@ -829,7 +826,6 @@ class MonthFragment : BaseFragment() {
                     override fun fullyCollapse(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == true) {
                             calendarViewModel.monthView.value = false
-                            rotateArrowUpward(mini_calendar_chevron)
                             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
                             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
@@ -974,7 +970,6 @@ class MonthFragment : BaseFragment() {
         val month = SpannableString(localDate.formatMonth(true))
         val year = SpannableString(localDate.year.toString())
         toolbarTitle.text = "$month $year"
-        mini_calendar_chevron.visibleOrGone(true)
     }
 
     private fun simulateExpandWithScroll(startWeekOn: DayOfWeek) {
@@ -1008,7 +1003,6 @@ class MonthFragment : BaseFragment() {
                 delay(200L / (desiredHeight / 10))
             }
             calendarViewModel.monthView.value = true
-            rotateArrowDownward(mini_calendar_chevron)
             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
             miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
@@ -1038,7 +1032,6 @@ class MonthFragment : BaseFragment() {
             }
             TimberLogger.e("Test test simulate collapse done ${(viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams).guideBegin}")
             calendarViewModel.monthView.value = false
-            rotateArrowUpward(mini_calendar_chevron)
             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
             miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)

@@ -123,7 +123,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     fun getMiniCalendarPositionListener(): MiniCalendarPositionListener {
         return object: MiniCalendarPositionListener {
             override fun scrollUp(scrollValue: Float, sliderTop: Int): Int? {
-                if (gl_mini_calendar == null) return null
+                if (gl_mini_calendar == null || !WEEK_COMPONENT) return null
                 if (initialMiniCalendarLayoutParams == null) initialMiniCalendarLayoutParams = gl_mini_calendar.layoutParams as ConstraintLayout.LayoutParams
                 if (initialWeekNumbersLayoutParams == null) initialWeekNumbersLayoutParams = ll_weeknumbers.layoutParams as ConstraintLayout.LayoutParams
 
@@ -175,7 +175,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             }
 
             override fun scrollDown(scrollValue: Float, sliderTop: Int): Int? {
-                if (gl_mini_calendar == null) return null
+                if (gl_mini_calendar == null || !WEEK_COMPONENT) return null
                 if (initialMiniCalendarLayoutParams == null) initialMiniCalendarLayoutParams = gl_mini_calendar.layoutParams as ConstraintLayout.LayoutParams
                 if (initialWeekNumbersLayoutParams == null) initialWeekNumbersLayoutParams = ll_weeknumbers.layoutParams as ConstraintLayout.LayoutParams
 
