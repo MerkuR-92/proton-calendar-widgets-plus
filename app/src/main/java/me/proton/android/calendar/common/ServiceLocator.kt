@@ -2,7 +2,7 @@ package me.proton.android.calendar.common
 
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
-import me.proton.android.calendar.data.UsersRepositoryImpl
+import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -24,6 +24,8 @@ import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.repository.UserAddressRepository
+import me.proton.core.user.domain.repository.UserRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -48,7 +50,6 @@ val commonModule = module {
 
 val networkModule = module {
     single<CalendarsApi> { CalendarsApiImpl(get()) }
-    single<UsersApi> { UsersApiImpl(get()) }
     single<KeysApi> { KeysApiImpl(get()) }
     single<AddressesApi> { AddressesApiImpl(get()) }
     single<AuthenticationApi> { AuthenticationApiImpl(get()) }
@@ -60,7 +61,7 @@ val networkModule = module {
 
 val repositoryModule = module {
     single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get(), get()) }
-    single<UsersRepository> { UsersRepositoryImpl(get(), get(), get(), get()) }
+    single<UserSettingsRepository> { UserSettingsRepositoryImpl(get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
 }
@@ -74,20 +75,20 @@ val viewModelModule = module {
             get()
         )
     }
-    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
-    factory<FetchUserUseCase> { FetchUserUseCase(get(), get(), get(), get()) }
+    factory<FetchUserUseCase> { FetchUserUseCase(get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
-    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<DeleteEventUseCase> { DeleteEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get()) }
@@ -119,6 +120,8 @@ fun coreModule(
     humanVerificationManager: HumanVerificationManager,
     humanVerificationOrchestrator: HumanVerificationOrchestrator,
     userManager: UserManager,
+    userRepository: UserRepository,
+    userAddressRepository: UserAddressRepository,
     keyStoreCrypto: KeyStoreCrypto,
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
     contactEmailsRepository: ContactRepository,
@@ -136,6 +139,8 @@ fun coreModule(
     single<HumanVerificationManager> { humanVerificationManager }
     factory<HumanVerificationOrchestrator> { humanVerificationOrchestrator }
     single<UserManager> { userManager }
+    single<UserRepository> { userRepository }
+    single<UserAddressRepository> { userAddressRepository }
     single<KeyStoreCrypto> { keyStoreCrypto }
     single<CryptoContext> { cryptoContext }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), contactEmailsRepository, get(), get(), get(), getRecipientPublicAddresses) }

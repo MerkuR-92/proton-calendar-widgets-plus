@@ -4,14 +4,16 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.work.*
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.SyncServerEventsUseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
-import me.proton.core.domain.entity.UserId
+import me.proton.core.account.domain.entity.AccountState
+import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.accountmanager.domain.getAccounts
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.temporal.ChronoUnit
@@ -21,7 +23,7 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
     KoinComponent {
 
     private val logger: Logger by inject()
-    private val database: AppDatabase by inject()
+    private val accountManager: AccountManager by inject()
 
     private val syncServerEventsUseCase: SyncServerEventsUseCase by inject()
     private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
@@ -42,8 +44,8 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
     private suspend fun forceShowLateAlarms() {
 
         try {
-            database.usersDao().select().forEach {
-                handleAlarmsUseCase.execute(UserId(it.id))
+            accountManager.getAccounts(AccountState.Ready).first().forEach {
+                handleAlarmsUseCase.execute(it.userId)
             }
         } catch (e: Exception) {
             if (e !is CancellationException) {
@@ -56,8 +58,8 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
     private suspend fun syncServerEvents() {
 
         try {
-            database.usersDao().select().forEach {
-                syncServerEventsUseCase.execute(UserId(it.id)).ifSuccessAndLogErrors(logger) {}
+            accountManager.getAccounts(AccountState.Ready).first().forEach {
+                syncServerEventsUseCase.execute(it.userId).ifSuccessAndLogErrors(logger) {}
             }
         } catch (e: Exception) {
             if (e !is CancellationException) {

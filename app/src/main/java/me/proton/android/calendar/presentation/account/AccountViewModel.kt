@@ -14,14 +14,12 @@ import me.proton.core.accountmanager.presentation.*
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.onAddAccountResult
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
-import me.proton.core.crypto.common.keystore.decryptWith
 import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
 import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
-import me.proton.core.key.domain.extension.primary
 import me.proton.core.user.domain.UserManager
 
 class AccountViewModel(
@@ -33,7 +31,7 @@ class AccountViewModel(
     private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
-    private val usersRepository: UsersRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val keyStoreCrypto: KeyStoreCrypto,
@@ -55,7 +53,7 @@ class AccountViewModel(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    private suspend fun Account.isBootstrapped() = usersRepository.selectUserSettings(userId.id) != null
+    private suspend fun Account.isBootstrapped() = userSettingsRepository.selectUserSettings(userId.id) != null
 
     private suspend fun checkAccount(account: Account) {
         runCatching {
@@ -112,7 +110,6 @@ class AccountViewModel(
         // Workers could observe getAccount(userId), and cancel if state == Removed ?
         // How to reproduce: 1) Login. 2) During loading/syncing, logout.
         calendarsRepository.shutdown()
-        usersRepository.deleteUserById(userId.id)
     }
 
     // TODO: Merge State & Error in the same StateFlow.

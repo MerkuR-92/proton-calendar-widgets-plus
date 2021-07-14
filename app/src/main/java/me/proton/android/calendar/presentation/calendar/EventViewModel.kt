@@ -45,14 +45,16 @@ import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
-import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.User
+import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
 import java.time.*
@@ -62,8 +64,9 @@ import kotlin.collections.ArrayList
 
 class EventViewModel(
     application: Application,
+    private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,
-    private val usersRepository: UsersRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val transformEventUseCase: TransformEventUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val sendEmailUseCase: SendEmailUseCase,
@@ -243,10 +246,12 @@ class EventViewModel(
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
             ?: return Result.Error("EventViewModel: could not get Calendar User Settings")
-        userSettings = usersRepository.selectUserSettings(userId.id)
+        userSettings = userSettingsRepository.selectUserSettings(userId.id)
             ?: return Result.Error("EventViewModel: could not get User Settings")
-        user = usersRepository.selectUserById(userId.id)
-            ?: return Result.Error("EventViewModel: could not get User")
+
+        runCatching {
+            user = userManager.getUser(userId)
+        }.getOrElse { return Result.Error("EventViewModel: could not get User") }
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
@@ -1212,12 +1217,8 @@ class EventViewModel(
     suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus): Boolean {
         if (eventState.value is EventState.Processing) return true
 
-        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
+        val userEmails = userManager.getAddresses(userId).map { address ->
             ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
-        }
-        if (userEmails == null) {
-            eventState.value = EventState.Idle
-            return false
         }
 
         currentParticipationStatus = event.getParticipationStatus(userEmails) ?: ParticipationStatus.NEEDS_ACTION
@@ -1295,12 +1296,8 @@ class EventViewModel(
     ): Boolean {
         val status = participationStatus.toInt()
 
-        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
+        val userEmails = userManager.getAddresses(userId).map { address ->
             ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
-        }
-        if (userEmails == null) {
-            eventState.value = EventState.Idle
-            return false
         }
 
         val userAttendee = event.iCalEvent.attendees.find { attendee ->
@@ -1560,7 +1557,7 @@ class EventViewModel(
             logger.i("EventViewModel: Email from selectMembers was null in allowSend")
             return false
         }
-        return !user.isFree || !(user.isFree && isShortDomainAddress(email))
+        return user.hasSubscription() || !isShortDomainAddress(email)
     }
 
     sealed class EventLinkResult {

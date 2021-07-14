@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -31,7 +32,9 @@ import me.proton.core.mailsettings.data.entity.MailSettingsEntity
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserConverters
 import me.proton.core.user.data.db.UserDatabase
+import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.data.entity.AddressKeyEntity
+import me.proton.core.user.data.entity.UserEntity
 import me.proton.core.user.data.entity.UserKeyEntity
 
 @Database(
@@ -41,9 +44,9 @@ import me.proton.core.user.data.entity.UserKeyEntity
         AccountMetadataEntity::class,
         SessionEntity::class,
         SessionDetailsEntity::class,
-        me.proton.core.user.data.entity.UserEntity::class,
+        UserEntity::class,
         UserKeyEntity::class,
-        me.proton.core.user.data.entity.AddressEntity::class,
+        AddressEntity::class,
         AddressKeyEntity::class,
         KeySaltEntity::class,
         PublicAddressEntity::class,
@@ -53,8 +56,6 @@ import me.proton.core.user.data.entity.UserKeyEntity
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
-        UserEntity::class,
-        AddressEntity::class,
         CalendarSettingsEntity::class,
         CalendarUserSettingsEntity::class,
         CalendarKeyEntity::class,
@@ -90,8 +91,6 @@ abstract class AppDatabase :
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
-    abstract fun usersDao(): UsersDao
-    abstract fun addressesDao(): AddressesDao
     abstract fun calendarSettingsDao(): CalendarSettingsDao
     abstract fun calendarSubscriptionDao(): CalendarSubscriptionDao
     abstract fun calendarUserSettingsDao(): CalendarUserSettingsDao
@@ -121,17 +120,13 @@ abstract class AppDatabase :
         const val name = "proton.calendar.db"
         const val version = 29
 
-        val migrations = listOf(
-            AppDatabaseMigrations.MIGRATION_24_25,
-            AppDatabaseMigrations.MIGRATION_25_26,
-            AppDatabaseMigrations.MIGRATION_26_27,
-            AppDatabaseMigrations.MIGRATION_27_28,
-            AppDatabaseMigrations.MIGRATION_28_29,
+        val migrations = listOf<Migration>(
         )
 
         fun buildDatabase(context: Context): AppDatabase =
             databaseBuilder<AppDatabase>(context, name)
                 .apply { migrations.forEach { addMigrations(it) } }
+                .fallbackToDestructiveMigrationFrom(28)
                 .build()
     }
 }

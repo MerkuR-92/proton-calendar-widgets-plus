@@ -9,12 +9,13 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.core.user.data.entity.UserEntity
 
 @Entity(
     tableName = AppDatabase.TABLE_CALENDARS,
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
-        parentColumns = ["id"],
+        parentColumns = ["userId"],
         childColumns = ["fkUserId"],
         onDelete = CASCADE
     )],

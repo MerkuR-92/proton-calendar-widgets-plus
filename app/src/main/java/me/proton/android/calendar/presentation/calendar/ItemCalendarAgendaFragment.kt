@@ -26,10 +26,10 @@ import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.user.domain.entity.UserAddress
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -48,8 +48,8 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
-    private var userAddresses: List<Address>? = null
-    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<Address>>>()
+    private var userAddresses: List<UserAddress>? = null
+    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -115,7 +115,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         }
     }
 
-    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<Address>) {
+    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
         val immutableDate = date ?: return
 
         rv_agenda.apply {

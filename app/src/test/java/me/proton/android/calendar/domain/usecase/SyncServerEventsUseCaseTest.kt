@@ -1,8 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.util.Log
-import assertk.assertThat
-import assertk.assertions.isEqualTo
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.ServerEventsApi
@@ -18,6 +16,8 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.repository.UserAddressRepository
+import me.proton.core.user.domain.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -28,7 +28,9 @@ internal class SyncServerEventsUseCaseTest {
 
     private val serverEventsApiMock: ServerEventsApi = mockk()
     private val calendarsRepositoryMock: CalendarsRepository = mockk()
-    private val usersRepositoryMock: UsersRepository = mockk()
+    private val userRepositoryMock: UserRepository = mockk()
+    private val userAddressRepositoryMock: UserAddressRepository = mockk()
+    private val userSettingsRepositoryMock: UserSettingsRepository = mockk()
     private val valueStoreMock: ValueStore = mockk()
     private lateinit var appDatabaseMock: AppDatabase
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
@@ -66,12 +68,13 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { calendarsRepositoryMock.hasEvent(any(), any()) } returns true
         coEvery { calendarsRepositoryMock.refreshCalendarsFlagsForAddress(any(), any(), any()) } just Runs
         coEvery { calendarsRepositoryMock.refreshCalendars(any()) } returns true
-        coEvery { usersRepositoryMock.hasReactivatedAddressKeys(any()) } returns true
-        coEvery { usersRepositoryMock.persistAddress(userId.id, any()) } just Runs
-        coEvery { usersRepositoryMock.persistUser(any()) } just Runs
-        coEvery { usersRepositoryMock.updateUser(any()) } just Runs
-        coEvery { usersRepositoryMock.persistUserSettings(any(), any()) } just Runs
-        coEvery { usersRepositoryMock.updateAddress(any(), any()) } just Runs
+        coEvery { userRepositoryMock.addUser(any()) } just Runs
+        coEvery { userRepositoryMock.updateUser(any()) } just Runs
+        coEvery { userAddressRepositoryMock.addAddresses(any()) } just Runs
+        coEvery { userAddressRepositoryMock.updateAddresses(any()) } just Runs
+        coEvery { userAddressRepositoryMock.deleteAddresses(any()) } just Runs
+        coEvery { userSettingsRepositoryMock.hasReactivatedAddressKeys(any()) } returns true
+        coEvery { userSettingsRepositoryMock.persistUserSettings(any(), any()) } just Runs
         coEvery { calendarsRepositoryMock.persistEventAlarm(any()) } just Runs
         coEvery { calendarsRepositoryMock.deleteEventAlarmById(any()) } just Runs
         coEvery { calendarsRepositoryMock.persistCalendarKey(any()) } just Runs
@@ -125,7 +128,23 @@ internal class SyncServerEventsUseCaseTest {
                 json.decodeFromString<ServerCoreEventsApiResponse>(File("src/test/resources/get_server_core_events_2.json").readText()).toServerEventsApiResponse()
             )
 
-            val handleServerEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCaseMock, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, bootstrapCalendarsUseCaseMock, calendarsApiMock, valueStoreProviderMock, serverEventsApiMock)
+            val handleServerEventsUseCase = HandleServerEventsUseCase(
+                testsLogger,
+                userRepositoryMock,
+                userAddressRepositoryMock,
+                calendarsRepositoryMock,
+                userSettingsRepositoryMock,
+                cacheCalendarPassphraseUseCaseMock,
+                handleAlarmsUseCaseMock,
+                updateAlarmsUseCaseMock,
+                handleEventsMetadataUseCaseMock,
+                calendarUserSettingsChangedUseCaseMock,
+                keySetupUseCaseMock,
+                bootstrapCalendarsUseCaseMock,
+                calendarsApiMock,
+                valueStoreProviderMock,
+                serverEventsApiMock
+            )
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,
@@ -149,13 +168,13 @@ internal class SyncServerEventsUseCaseTest {
                 calendarsRepositoryMock.updateCalendar(userId.id, any())
             }
             coVerify(exactly = 1) {
-                usersRepositoryMock.updateAddress(userId.id, any())
+                userAddressRepositoryMock.updateAddresses(any())
             }
             coVerify(exactly = 1) {
-                usersRepositoryMock.persistUserSettings(userId.id, any())
+                userSettingsRepositoryMock.persistUserSettings(userId.id, any())
             }
             coVerify(exactly = 1) {
-                usersRepositoryMock.updateUser(any())
+                userRepositoryMock.updateUser(any())
             }
             coVerify(exactly = 1) {
                 calendarUserSettingsChangedUseCaseMock.execute(userId.id, any())
@@ -241,7 +260,23 @@ internal class SyncServerEventsUseCaseTest {
                 fetchPublicKeysUseCaseMock
             )
 
-            val handleServerEventsUseCase = HandleServerEventsUseCase(testsLogger, calendarsRepositoryMock, usersRepositoryMock, cacheCalendarPassphraseUseCaseMock, handleAlarmsUseCaseMock, updateAlarmsUseCaseMock, handleEventsMetadataUseCase, calendarUserSettingsChangedUseCaseMock, keySetupUseCaseMock, bootstrapCalendarsUseCaseMock, calendarsApiMock, valueStoreProviderMock, serverEventsApiMock)
+            val handleServerEventsUseCase = HandleServerEventsUseCase(
+                testsLogger,
+                userRepositoryMock,
+                userAddressRepositoryMock,
+                calendarsRepositoryMock,
+                userSettingsRepositoryMock,
+                cacheCalendarPassphraseUseCaseMock,
+                handleAlarmsUseCaseMock,
+                updateAlarmsUseCaseMock,
+                handleEventsMetadataUseCase,
+                calendarUserSettingsChangedUseCaseMock,
+                keySetupUseCaseMock,
+                bootstrapCalendarsUseCaseMock,
+                calendarsApiMock,
+                valueStoreProviderMock,
+                serverEventsApiMock
+            )
 
             val useCase = SyncServerEventsUseCase(
                 testsLogger,

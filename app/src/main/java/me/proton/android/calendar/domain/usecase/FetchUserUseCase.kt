@@ -1,59 +1,51 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
-import me.proton.android.calendar.domain.api.AddressesApi
-import me.proton.android.calendar.domain.api.UsersApi
-import me.proton.android.calendar.domain.model.Delinquent
-import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.extension.primary
+import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.Delinquent
 
 class FetchUserUseCase(
-    private val usersApi: UsersApi,
-    private val addressesApi: AddressesApi,
-    private val usersRepository: UsersRepository,
-    private val logger: Logger
+    private val userManager: UserManager
 ) : UseCase {
 
     companion object {
         const val WORKER_ID = "FETCH_ADDRESSES"
     }
 
-    // Fetch user and addresses
+    // TODO: Extends DefaultUserCheck and add user.usedSpace >= user.maxSpace.
     suspend fun executeFetchUserAndAddresses(userId: UserId): UseCase.Result {
-        val userResponse = usersApi.getUser(userId)
-        if (userResponse is ApiResponse.Success) {
-            usersRepository.persistUser(userResponse.data.user)
-        } else {
-            return UseCase.Result.Error("FetchUserUseCase: user request failed: $userResponse")
-        }
-
-        val user = userResponse.data.user.toUser()
+        val user = userManager.getUser(userId)
 
         // Limit users
         // User's payment failed or expired
-        if (user.delinquent >= Delinquent.UNPAID_DELINQUENT) return UseCase.Result.Error("FetchUserUseCase: user is delinquent", UseCase.Error.DELINQUENT_USER)
+        when (user.delinquent) {
+            Delinquent.InvoiceDelinquent,
+            Delinquent.InvoiceMailDisabled -> return UseCase.Result.Error(
+                "FetchUserUseCase: user is delinquent",
+                UseCase.Error.DELINQUENT_USER
+            )
+            else -> Unit
+        }
         // User reached storage quota: creation of event is disabled
-        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error("FetchUserUseCase: user reached storage quota", UseCase.Error.STORAGE_QUOTA_REACHED)
+        if (user.usedSpace >= user.maxSpace) return UseCase.Result.Error(
+            "FetchUserUseCase: user reached storage quota",
+            UseCase.Error.STORAGE_QUOTA_REACHED
+        )
 
-        user.primaryKey ?: return UseCase.Result.Error("FetchUserUseCase: user has no primary key")
+        user.keys.primary() ?: return UseCase.Result.Error("FetchUserUseCase: user has no primary key")
 
-        return executeGetAddresses(userId)
+        return UseCase.Result.Success<Unit>()
     }
 
     // Fetch addresses
+    // TODO: Only rely on Events Loop.
     suspend fun executeGetAddresses(userId: UserId): UseCase.Result {
-        val addressesResponse = addressesApi.getAddresses(userId)
-        if (addressesResponse is ApiResponse.Success) {
-            addressesResponse.data.addresses.forEach {
-                usersRepository.persistAddress(userId.id, it)
-            }
-        } else {
-            logger.e("FetchUserUseCase: addresses request failed: $addressesResponse")
-            return UseCase.Result.Error("FetchUserUseCase: addresses request failed: $addressesResponse")
+        return runCatching {
+            userManager.getAddresses(userId, refresh = true)
+            UseCase.Result.Success<Unit>()
+        }.getOrElse {
+            UseCase.Result.Error("FetchUserUseCase: addresses request failed.")
         }
-
-        return UseCase.Result.Success<Unit>()
     }
 }

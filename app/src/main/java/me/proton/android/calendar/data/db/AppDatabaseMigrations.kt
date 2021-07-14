@@ -20,13 +20,6 @@ package me.proton.android.calendar.data.db
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import me.proton.core.account.data.db.AccountDatabase
-import me.proton.core.humanverification.data.db.HumanVerificationDatabase
-import me.proton.core.key.data.db.KeySaltDatabase
-import me.proton.core.key.data.db.PublicAddressDatabase
-import me.proton.core.mailsettings.data.db.MailSettingsDatabase
-import me.proton.core.user.data.db.AddressDatabase
-import me.proton.core.user.data.db.UserDatabase
 
 object AppDatabaseMigrations {
 
@@ -68,41 +61,6 @@ object AppDatabaseMigrations {
 
             database.execSQL("CREATE TABLE ${AppDatabase.TABLE_CALENDAR_SUBSCRIPTIONS} (calendarId TEXT NOT NULL PRIMARY KEY, createTime INTEGER NOT NULL, lastUpdateTime INTEGER NOT NULL, status INTEGER NOT NULL, url TEXT NOT NULL, FOREIGN KEY (calendarId) REFERENCES calendars (id) ON DELETE CASCADE ON UPDATE NO ACTION)")
             database.execSQL("CREATE INDEX index_calendar_subscriptions_calendarId ON ${AppDatabase.TABLE_CALENDAR_SUBSCRIPTIONS} (calendarId)")
-        }
-    }
-
-    val MIGRATION_28_29 = object : Migration(28, 29) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            // Create/migrate Core Tables.
-            AccountDatabase.MIGRATION_0.migrate(database)
-            AccountDatabase.MIGRATION_1.migrate(database)
-            AccountDatabase.MIGRATION_2.migrate(database)
-            AccountDatabase.MIGRATION_3.migrate(database)
-            UserDatabase.MIGRATION_0.migrate(database)
-            AddressDatabase.MIGRATION_0.migrate(database)
-            AddressDatabase.MIGRATION_1.migrate(database)
-            KeySaltDatabase.MIGRATION_0.migrate(database)
-            PublicAddressDatabase.MIGRATION_0.migrate(database)
-            HumanVerificationDatabase.MIGRATION_0.migrate(database)
-            MailSettingsDatabase.MIGRATION_0.migrate(database)
-            // Delete all Calendar tables.
-            listOf(
-                "calendars",
-                "events",
-                "users",
-                "addresses",
-                "calendar_settings",
-                "calendar_user_settings",
-                "user_settings",
-                "event_alarms",
-                "calendar_keys",
-                "public_keys",
-                "passphrases",
-                "members",
-            ).forEach {
-                database.execSQL("DELETE FROM $it")
-            }
-            // TODO: Remove tables: users, addresses,
         }
     }
 }

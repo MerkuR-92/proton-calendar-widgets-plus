@@ -6,6 +6,8 @@ import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.data.api.response.AddressResponse
+import me.proton.core.key.data.api.response.UserResponse
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.GET
@@ -76,7 +78,7 @@ data class ServerEventsApiResponse(
     val eventId: String, // new eventId to send with next request
     val refresh: Int, // bitmap, 255 means throw out client cache and reload everything from server, 1 is mail, 2 is contacts
     val more: Int, // 0 or 1 if more events exist and should be fetched
-    val user: UserEntity? = null, // doesn't contain "Action", it's always "update"
+    val user: UserResponse? = null, // doesn't contain "Action", it's always "update"
     val userSettings: UserSettingsEntity? = null,
     val addresses: List<ServerEvent.AddressesApiResponse>? = null,
     val calendars: List<ServerEvent.CalendarsApiResponse>? = null,
@@ -111,7 +113,7 @@ data class ServerCoreEventsApiResponse(
     @SerialName("More")
     val more: Int, // 0 or 1 if more events exist and should be fetched
     @SerialName("User")
-    val user: UserEntity? = null, // doesn't contain "Action", it's always "update"
+    val user: UserResponse? = null, // doesn't contain "Action", it's always "update"
     @SerialName("UserSettings")
     val userSettings: UserSettingsEntity? = null,
     @SerialName("Addresses")
@@ -197,7 +199,7 @@ class ServerEvent {
         @SerialName("Action")
         override val action: Int,
         @SerialName("Address")
-        val address: AddressEntity? = null // all the payloads here are nullable, because action = 0 (delete) sends no payload
+        val address: AddressResponse? = null // all the payloads here are nullable, because action = 0 (delete) sends no payload
     ) : BaseServerEventApiResponse()
 
     @Serializable

@@ -21,12 +21,13 @@ import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.key.domain.verifyText
+import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
-
 
 class TransformEventUseCase(
     private val json: Json,
     private val database: AppDatabase,
+    private val userManager: UserManager,
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
@@ -139,7 +140,7 @@ class TransformEventUseCase(
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
-            val canonicalUserEmails = database.addressesDao().select(userId).map { canonicalizeProtonEmail(it.email) }
+            val canonicalUserEmails = userManager.getAddresses(UserId(userId)).map { canonicalizeProtonEmail(it.email) }
             val attendees = eventEntity.attendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }

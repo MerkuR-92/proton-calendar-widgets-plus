@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 29,
-    "identityHash": "9fad1f56f36518709e699eec7e53038f",
+    "identityHash": "51808967bd18b6d239f12f72d94810e6",
     "entities": [
       {
         "tableName": "AccountEntity",
@@ -1134,7 +1134,7 @@
       },
       {
         "tableName": "calendars",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `color` TEXT NOT NULL, `display` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `type` INTEGER NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `color` TEXT NOT NULL, `display` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `type` INTEGER NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1203,14 +1203,14 @@
         ],
         "foreignKeys": [
           {
-            "table": "users",
+            "table": "UserEntity",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "fkUserId"
             ],
             "referencedColumns": [
-              "id"
+              "userId"
             ]
           }
         ]
@@ -1335,145 +1335,6 @@
         ]
       },
       {
-        "tableName": "users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `keys` TEXT NOT NULL, `email` TEXT, `name` TEXT, `displayName` TEXT, `subscribed` INTEGER NOT NULL, `usedSpace` INTEGER NOT NULL, `maxSpace` INTEGER NOT NULL, `delinquent` INTEGER NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "keys",
-            "columnName": "keys",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "email",
-            "columnName": "email",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "displayName",
-            "columnName": "displayName",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "subscribed",
-            "columnName": "subscribed",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "usedSpace",
-            "columnName": "usedSpace",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "maxSpace",
-            "columnName": "maxSpace",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "delinquent",
-            "columnName": "delinquent",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "addresses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `email` TEXT NOT NULL, `status` INTEGER NOT NULL, `displayName` TEXT, `keys` TEXT NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "email",
-            "columnName": "email",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "status",
-            "columnName": "status",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "displayName",
-            "columnName": "displayName",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "keys",
-            "columnName": "keys",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fkUserId",
-            "columnName": "fkUserId",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [
-          {
-            "name": "index_addresses_fkUserId",
-            "unique": false,
-            "columnNames": [
-              "fkUserId"
-            ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_addresses_fkUserId` ON `${TABLE_NAME}` (`fkUserId`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "users",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "fkUserId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
-        ]
-      },
-      {
         "tableName": "calendar_settings",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `defaultEventDuration` INTEGER NOT NULL, `defaultPartDayNotifications` TEXT NOT NULL, `defaultFullDayNotifications` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
@@ -1540,7 +1401,7 @@
       },
       {
         "tableName": "calendar_user_settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fkUserId` TEXT NOT NULL, `weekLength` INTEGER NOT NULL, `displayWeekNumber` INTEGER NOT NULL, `autoDetectPrimaryTimezone` INTEGER NOT NULL, `primaryTimezone` TEXT NOT NULL, `displaySecondaryTimezone` INTEGER NOT NULL, `secondaryTimezone` TEXT, `viewPreference` INTEGER NOT NULL, `defaultCalendarId` TEXT, PRIMARY KEY(`fkUserId`), FOREIGN KEY(`fkUserId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fkUserId` TEXT NOT NULL, `weekLength` INTEGER NOT NULL, `displayWeekNumber` INTEGER NOT NULL, `autoDetectPrimaryTimezone` INTEGER NOT NULL, `primaryTimezone` TEXT NOT NULL, `displaySecondaryTimezone` INTEGER NOT NULL, `secondaryTimezone` TEXT, `viewPreference` INTEGER NOT NULL, `defaultCalendarId` TEXT, PRIMARY KEY(`fkUserId`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "fkUserId",
@@ -1615,14 +1476,14 @@
         ],
         "foreignKeys": [
           {
-            "table": "users",
+            "table": "UserEntity",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "fkUserId"
             ],
             "referencedColumns": [
-              "id"
+              "userId"
             ]
           }
         ]
@@ -2002,7 +1863,7 @@
       },
       {
         "tableName": "user_settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fkUserId` TEXT NOT NULL, `weekStart` INTEGER NOT NULL, `dateFormat` INTEGER NOT NULL, `timeFormat` INTEGER NOT NULL, PRIMARY KEY(`fkUserId`), FOREIGN KEY(`fkUserId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fkUserId` TEXT NOT NULL, `weekStart` INTEGER NOT NULL, `dateFormat` INTEGER NOT NULL, `timeFormat` INTEGER NOT NULL, PRIMARY KEY(`fkUserId`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "fkUserId",
@@ -2047,14 +1908,14 @@
         ],
         "foreignKeys": [
           {
-            "table": "users",
+            "table": "UserEntity",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "fkUserId"
             ],
             "referencedColumns": [
-              "id"
+              "userId"
             ]
           }
         ]
@@ -2063,7 +1924,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9fad1f56f36518709e699eec7e53038f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51808967bd18b6d239f12f72d94810e6')"
     ]
   }
 }

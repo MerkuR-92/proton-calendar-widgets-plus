@@ -29,12 +29,14 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
-import me.proton.android.calendar.domain.model.User
 import me.proton.android.calendar.domain.usecase.*
+import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.User
+import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
 import java.time.ZoneId
@@ -45,11 +47,11 @@ private const val MAX_CALENDAR_INDICATORS = 5
 
 class CalendarViewModel(
     application: Application,
+    private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,
-    private val usersRepository: UsersRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
-    private val fetchUserUseCase: FetchUserUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : AndroidViewModel(application) {
@@ -85,7 +87,7 @@ class CalendarViewModel(
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
     // Those addresses contain canonical email addresses
-    var userAddresses: LiveData<List<Address>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
+    var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
 
     val initialToday: LocalDate = LocalDate.now()
 
@@ -123,12 +125,12 @@ class CalendarViewModel(
     }
 
     suspend fun selectUser(): User? {
-        val userId = userId.value?.id
+        val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel selectUser")
             return null
         }
-        return usersRepository.selectUserById(userId)
+        return userManager.getUser(userId)
     }
 
     // TODO go back to UserId as String
@@ -145,9 +147,9 @@ class CalendarViewModel(
                 return@flow
             }
 
-            userAddresses = usersRepository.addressesFlow(userId.id).map {
-                val canonicalEmailsAddresses = arrayListOf<Address>()
-                it.forEach { address ->
+            userAddresses = userManager.getAddressesFlow(userId).mapSuccessValueOrNull().map {
+                val canonicalEmailsAddresses = arrayListOf<UserAddress>()
+                it?.forEach { address ->
                     val canonicalEmailAddress = address.copy(email = canonicalizeProtonEmail(address.email))
                     canonicalEmailsAddresses.add(canonicalEmailAddress)
                 }
@@ -170,11 +172,11 @@ class CalendarViewModel(
                 it?.toBoolean() ?: true // Show week numbers by default
             }.asLiveData(Dispatchers.Default)
 
-            timeFormat = usersRepository.flowTimeFormat(userId.id).map {
+            timeFormat = userSettingsRepository.flowTimeFormat(userId.id).map {
                 it ?: 0 // Locale default
             }.asLiveData(Dispatchers.Default)
 
-            weekStart = usersRepository.flowWeekStart(userId.id).map {
+            weekStart = userSettingsRepository.flowWeekStart(userId.id).map {
                 it ?: 0 // Locale default
             }.asLiveData(Dispatchers.Default)
 
