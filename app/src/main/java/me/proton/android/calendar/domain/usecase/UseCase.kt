@@ -10,11 +10,6 @@ interface UseCase {
     }
 
     enum class Error {
-        /* FetchUserUseCase */
-        FREE_USER,
-        DELINQUENT_USER,
-        STORAGE_QUOTA_REACHED,
-
         /* BootstrapCalendarsUseCase */
         NO_CALENDAR,
         NO_ACTIVE_CALENDAR,

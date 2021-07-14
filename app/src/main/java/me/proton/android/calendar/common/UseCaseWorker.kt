@@ -11,8 +11,6 @@ import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import org.koin.core.inject
-import java.util.*
-import kotlin.collections.ArrayList
 
 class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
@@ -35,7 +33,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
-            const val FETCH_ADDRESSES = FetchUserUseCase.WORKER_ID
+            const val FETCH_ADDRESSES = FetchUserAddressesUseCase.WORKER_ID
         }
     }
 
@@ -181,8 +179,8 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getInt(INPUT_PARTICIPATION_STATUS, 0))
             }
             UseCaseId.FETCH_ADDRESSES -> {
-                val fetchUserUseCase: FetchUserUseCase = get()
-                fetchUserUseCase.executeGetAddresses(
+                val fetchUserAddressesUseCase: FetchUserAddressesUseCase = get()
+                fetchUserAddressesUseCase.executeGetAddresses(
                     userId
                 )
             }

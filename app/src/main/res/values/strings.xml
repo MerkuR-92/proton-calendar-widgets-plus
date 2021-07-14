@@ -337,12 +337,8 @@
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
-    <string name="bootstrap_error_free_user_title">ProtonCalendar is only available to paid users for now.</string>
-    <string name="bootstrap_error_free_user_message">The app will be open to all users soon, stay tuned.</string>
-    <string name="bootstrap_error_delinquent_user_title">Problem with payment occurred.</string>
-    <string name="bootstrap_error_delinquent_user_message">To verify that your payment details are up to date visit <a href="https://account.protonmail.com">account.protonmail.com</a></string>
-    <string name="bootstrap_error_store_quota_reached_title">No more storage space available.</string>
-    <string name="bootstrap_error_store_quota_reached_message">To learn more about storage quota visit our <a href="https://protonmail.com/support/knowledge-base/increase-my-storage-space/">knowledge base</a></string>
+    <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>
+    <string name="bootstrap_error_store_quota_reached_learn_more">Learn more</string>
     <string name="bootstrap_error_reset_needed_title">Reset calendar keys</string>
     <string name="bootstrap_error_reset_needed_message">You have reset your password and events linked to the following calendars couldn\'t be decrypted. Any active subscribed calendars will synchronize again after a few minutes.</string>
     <string name="bootstrap_error_update_passphrase_title">Reactivate calendar keys</string>

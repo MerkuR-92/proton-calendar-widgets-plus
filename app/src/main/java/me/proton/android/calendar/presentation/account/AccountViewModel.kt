@@ -28,7 +28,7 @@ class AccountViewModel(
     private val authOrchestrator: AuthOrchestrator,
     private val humanVerificationManager: HumanVerificationManager,
     private val humanVerificationOrchestrator: HumanVerificationOrchestrator,
-    private val fetchUserUseCase: FetchUserUseCase,
+    private val fetchUserAddressesUseCase: FetchUserAddressesUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val userSettingsRepository: UserSettingsRepository,
@@ -75,14 +75,6 @@ class AccountViewModel(
 
     private suspend fun setupUser(userId: UserId, showConfirmationDialog: Boolean = true) {
         _state.tryEmit(State.Processing)
-
-        // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
-        val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId)
-        if (fetchResult !is UseCase.Result.Success<*>) {
-            if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
-            removeUser(userId)
-            return
-        }
 
         val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
         if (bootstrapResult !is UseCase.Result.Success<*>) {

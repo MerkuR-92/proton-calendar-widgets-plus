@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import me.proton.android.calendar.presentation.account.CalendarUserCheck
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.data.repository.AuthRepositoryImpl
 import me.proton.core.auth.domain.ClientSecret
@@ -52,5 +53,5 @@ object AuthModule {
         @ApplicationContext context: Context,
         accountManager: AccountManager,
         userManager: UserManager
-    ): SetupAccountCheck.UserCheck = DefaultUserCheck(context, accountManager, userManager)
+    ): SetupAccountCheck.UserCheck = CalendarUserCheck(context, accountManager, userManager)
 }
