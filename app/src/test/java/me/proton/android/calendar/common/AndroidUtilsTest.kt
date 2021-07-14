@@ -14,6 +14,6 @@ internal class AndroidUtilsTest {
         emails.add("Test.address-1_2+group@customdomain.com")
         val canonicalEmails = canonicalizeProtonEmails(emails)
         assertThat(canonicalEmails["Test.address-1_2+group@protonmail.com"]).isEqualTo("testaddress12@protonmail.com")
-        assertThat(canonicalEmails["Test.address-1_2+group@customdomain.com"]).isEqualTo("Test.address-1_2+group@customdomain.com")
+        assertThat(canonicalEmails["Test.address-1_2+group@customdomain.com"]).isEqualTo("test.address-1_2+group@customdomain.com")
     }
 }

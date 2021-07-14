@@ -22,7 +22,7 @@ object ProtonUtilsImpl : ProtonUtils {
 
     override fun canonicalizeProtonEmail(email:String): String {
         // If user uses a custom domain, we don't apply any canonicalization
-        if (!isProtonDomain(email)) return email
+        if (!isProtonDomain(email)) return email.toLowerCase(Locale.getDefault())
 
         val regex = Regex("(?:\\.|\\-|\\_|\\+.*)(?=.*@)")
         return email.replace(regex, "").toLowerCase(Locale.getDefault())
