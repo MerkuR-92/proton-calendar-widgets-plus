@@ -1560,6 +1560,58 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `cleanRRule part day monthly event with byday scheduled in different timezone`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VTIMEZONE
+    TZID:Pacific/Honolulu
+    X-LIC-LOCATION:Pacific/Honolulu
+    BEGIN:STANDARD
+    TZOFFSETFROM:-1000
+    TZOFFSETTO:-1000
+    TZNAME:HST
+    DTSTART:19700101T000000
+    END:STANDARD
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;TZID=Pacific/Honolulu:20210713T210000
+    DTEND;TZID=Pacific/Honolulu:20210713T220000
+    RRULE:FREQ=MONTHLY;UNTIL=20220902T095959Z;BYDAY=2TU
+    DTSTAMP:20210713T172841Z
+    ORGANIZER;CN=With single edits:mailto:1huhifrk6kvjplpgoglieacf7g@group.cale
+     ndar.google.com
+    UID:5kvolm820qa18mhnghp4dj3aeb@google.com
+    ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=OPT-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+     TRUE;CN=breakingcalendar@protonmail.com;X-NUM-GUESTS=0:mailto:breakingcalen
+     dar@protonmail.com
+    CREATED:20210713T172840Z
+    DESCRIPTION:Test
+    LAST-MODIFIED:20210713T172840Z
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Event with participants
+    TRANSP:OPAQUE
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar!!.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
+        }
+    }
+
+    @Test
     fun `cleanRecurrenceId RECURRENCE-ID with RRULE test`() {
 
         val iCalString = """
