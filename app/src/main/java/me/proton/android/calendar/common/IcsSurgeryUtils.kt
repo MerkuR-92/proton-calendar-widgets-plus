@@ -152,6 +152,9 @@ object IcsSurgeryUtils {
 
         if (!iCalendar.cleanTimezones()) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
+        // If method is not provided, set to PUBLISH by default
+        if (iCalendar.method == null) iCalendar.method = Method.publish()
+
         /* Event properties */
 
         // TODO Once we handle multiple events, allow them to fail separately
