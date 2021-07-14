@@ -310,6 +310,7 @@ class MonthFragment : BaseFragment() {
     private val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             val currentDate = calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
+            if (calendarViewModel.selectedDate.value == currentDate) return
             calendarViewModel.handleDaySelected(currentDate)
         }
     }
