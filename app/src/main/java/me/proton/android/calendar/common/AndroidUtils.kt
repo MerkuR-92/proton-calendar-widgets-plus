@@ -769,7 +769,7 @@ object AndroidUtils {
         }
     }
 
-    fun Guideline.animateHeightChange(toHeightPx: Int, maxHeight: Int? = null, onAnimationEnd: () -> Unit) {
+    fun Guideline.animateGuidelineHeightChange(toHeightPx: Int, maxHeight: Int?, onAnimationEnd: () -> Unit) {
         val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
         if (layoutParams.guideBegin != toHeightPx) {
             val duration =
@@ -791,6 +791,27 @@ object AndroidUtils {
             }
             valueAnimator.start()
             valueAnimator.doOnEnd { onAnimationEnd.invoke() }
+        }
+    }
+
+    interface AnimateGuidelineListener {
+        fun onHeightChange(animatedValue: Int)
+        fun onAnimationEnd()
+    }
+
+    fun Guideline.animateGuidelineHeightChange(toHeightPx: Int, animateGuidelineListener: AnimateGuidelineListener) {
+        val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
+        if (layoutParams.guideBegin != toHeightPx) {
+            val valueAnimator = ValueAnimator.ofInt(layoutParams.guideBegin, toHeightPx)
+            valueAnimator.duration = 300L
+            valueAnimator.addUpdateListener {
+                val animatedValue = valueAnimator.animatedValue as Int
+                layoutParams.guideBegin = animatedValue
+                animateGuidelineListener.onHeightChange(animatedValue)
+                this.layoutParams = layoutParams
+            }
+            valueAnimator.start()
+            valueAnimator.doOnEnd { animateGuidelineListener.onAnimationEnd() }
         }
     }
 
