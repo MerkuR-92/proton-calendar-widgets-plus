@@ -19,7 +19,6 @@ const val OFFLINE_ALARM_ID_PREFIX = "Proton-Android-App-Offline-Alarm-ID:"
 const val ATTENDEE_AUTO_EXPAND_LIMIT = 5
 
 const val CLICK_INTERVAL_MS: Long = 500L
-const val ON_SCROLL_TRIGGER_INTERVAL: Long = 50L
 
 const val WORKER_MAX_RETRY_COUNT = 5
 
@@ -56,8 +55,6 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 const val SESSION_KEY_ALGO = "aes256"
 
-const val DAYS_IN_A_WEEK = 7 // always 7
-
 val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
 val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
@@ -89,6 +86,17 @@ object SharedPreferencesKeys {
     const val VIEW_MODE = "view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
+}
+
+object MiniCalendarGestures {
+    const val MAX_CLICK_DURATION = 1000L
+    const val MAX_FLICK_DURATION = 100L
+    const val MIN_FLICK_DISTANCE = 50
+    const val MAX_CLICK_DISTANCE = 15
+}
+
+object CalendarSettings {
+    const val DAYS_IN_A_WEEK = 7 // always 7
 }
 
 enum class AppTheme(val value: Int) {

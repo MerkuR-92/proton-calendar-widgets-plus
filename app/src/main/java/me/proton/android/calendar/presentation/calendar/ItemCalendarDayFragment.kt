@@ -74,8 +74,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private lateinit var allDayEventCroppedListAdapter: DayViewAllDayEventAdapter
     private lateinit var allDayEventListAdapter: DayViewAllDayEventAdapter
 
-    private lateinit var calendarOnScrollListener: MonthFragment.CalendarOnScrollListener
-    private var canTriggerCalendarOnScrollListener = true
     private var preDrawDone = false
 
     private var onScrollChangeListener: View.OnScrollChangeListener? = null
@@ -89,10 +87,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 }
             }
         }
-    }
-
-    fun setCalendarOnScrollListener(calendarOnScrollListener: MonthFragment.CalendarOnScrollListener) {
-        this.calendarOnScrollListener = calendarOnScrollListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,20 +132,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             dayView.setCurrentTimeView(requireContext(), currentTimeView)
         }
 
-        onScrollChangeListener = View.OnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
+        onScrollChangeListener = View.OnScrollChangeListener { _, _, scrollY, _, _ ->
             if (this.isResumed) calendarViewModel.dayViewScrollYPosition.value = scrollY
-//            if (oldScrollY - scrollY < 0 && oldScrollY > 0) {
-//                v?.run {
-//                    if (!canTriggerCalendarOnScrollListener) return@OnScrollChangeListener
-//                    canTriggerCalendarOnScrollListener = false
-//                    postDelayed({
-//                        canTriggerCalendarOnScrollListener = true
-//                    }, ON_SCROLL_TRIGGER_INTERVAL)
-//                    if (this@ItemCalendarDayFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScrollChange(scrollY, oldScrollY)
-//                }
-//            }
-            if (!this.isResumed) return@OnScrollChangeListener
-            if (this@ItemCalendarDayFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScrollChange(scrollY, oldScrollY)
         }
 
         val scrollView: ScrollView = rootView.findViewById(R.id.day_scroll_view)
@@ -511,17 +493,12 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         if (day_view == null) return
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
-
             // TODO remove UserID livedata
-
             calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
-
                 userId?.let {
                     getEvents(immutableDate, timeZoneId, userAddresses)
                 }
-
             }
-
         }
 
         calendarViewModel.selectedDate.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDate ->
@@ -560,7 +537,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
-                        // TODO
+                        // TODO Loading state for DayView
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         allEvents?.put(
@@ -653,7 +630,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
-                        // TODO
+                        // TODO Handle error for DayView event fetching
                     }
                 }
             }

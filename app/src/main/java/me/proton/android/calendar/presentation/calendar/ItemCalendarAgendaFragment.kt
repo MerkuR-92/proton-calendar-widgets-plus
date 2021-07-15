@@ -11,7 +11,6 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
@@ -56,9 +55,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
 
-    private lateinit var calendarOnScrollListener: MonthFragment.CalendarOnScrollListener
-    private var canTriggerCalendarOnScrollListener = true
-
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment{
             return ItemCalendarAgendaFragment().apply {
@@ -68,10 +64,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                 }
             }
         }
-    }
-
-    fun setCalendarOnScrollListener(calendarOnScrollListener: MonthFragment.CalendarOnScrollListener) {
-        this.calendarOnScrollListener = calendarOnScrollListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,6 +122,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
         val immutableDate = date ?: return
 
+        // Check if recycler view is not null because of the delay
         if (rv_agenda == null) return
 
         rv_agenda.apply {
@@ -176,25 +169,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             }
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
-
-        rv_agenda.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-//                if (dy > 0) {
-//                    recyclerView.run {
-//                        if (!canTriggerCalendarOnScrollListener) return
-//                        canTriggerCalendarOnScrollListener = false
-//                        postDelayed({
-//                            canTriggerCalendarOnScrollListener = true
-//                        }, ON_SCROLL_TRIGGER_INTERVAL)
-//                        if (this@ItemCalendarAgendaFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScroll(dy)
-//                    }
-//                }
-                if (!this@ItemCalendarAgendaFragment.isResumed) return
-                if (this@ItemCalendarAgendaFragment::calendarOnScrollListener.isInitialized) calendarOnScrollListener.onScroll(dy)
-            }
-        })
 
         if (FeatureFlag.NEW_EVENT_DECRYPTION) {
 

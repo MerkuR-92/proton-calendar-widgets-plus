@@ -20,11 +20,14 @@ class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: 
             startingPosition,
             firstDayOfMonth
         )
+
+        // Remove any listeners that belong to destroyed views
         val listenersToRemove = mutableListOf<Int>()
         miniCalendarPositionListeners.forEach {
             if (!it.value.doesViewExist()) listenersToRemove.add(it.key)
         }
         listenersToRemove.forEach { miniCalendarPositionListeners.remove(it) }
+
         miniCalendarPositionListeners[position] = fragment.getMiniCalendarPositionListener()
         return fragment
     }

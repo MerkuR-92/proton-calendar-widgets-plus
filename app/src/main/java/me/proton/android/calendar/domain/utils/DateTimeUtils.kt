@@ -1,16 +1,10 @@
 package me.proton.android.calendar.domain.utils
 
-import androidx.annotation.VisibleForTesting
 import biweekly.util.ICalDate
-import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
-import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.domain.CalendarsRepository
-import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.time.temporal.ChronoField
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 interface DateTimeUtils {

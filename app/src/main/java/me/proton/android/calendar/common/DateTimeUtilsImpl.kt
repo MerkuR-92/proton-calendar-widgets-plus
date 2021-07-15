@@ -1,11 +1,9 @@
 package me.proton.android.calendar.common
 
 import biweekly.util.ICalDate
-import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
+import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
-import me.proton.android.calendar.presentation.calendar.MiniCalendarItem
-import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -59,7 +57,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
     override fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int {
 
         val firstDayOfTheWeekNumber = this.dayOfWeek.value - startWeekOn.value
-        val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+        val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
 
         var monday: LocalDate = this.minusDays(firstDayOfTheWeekOffset.toLong())
         while (monday.dayOfWeek != DayOfWeek.MONDAY) {
@@ -106,6 +104,9 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return weeksToAdd
     }
 
+    /**
+     * Calculate week number in a year
+     */
     override fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int {
         val lastDayWeekNumber = date.withDayOfYear(date.lengthOfYear()).weekNumber(startWeekOn)
         return if (lastDayWeekNumber == 1) date.withDayOfYear(date.lengthOfYear() - 7).weekNumber(startWeekOn)

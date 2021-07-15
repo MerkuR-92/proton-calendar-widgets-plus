@@ -41,15 +41,16 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.animateHeightChange
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.getWeekStartDayOfWeek
-import me.proton.android.calendar.common.AndroidUtils.rotateArrowDownward
-import me.proton.android.calendar.common.AndroidUtils.rotateArrowUpward
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
-import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.DateTimeUtilsImpl.calculateWeekNumberBetween
+import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
+import me.proton.android.calendar.common.MiniCalendarGestures.MAX_CLICK_DISTANCE
+import me.proton.android.calendar.common.MiniCalendarGestures.MAX_CLICK_DURATION
+import me.proton.android.calendar.common.MiniCalendarGestures.MAX_FLICK_DURATION
+import me.proton.android.calendar.common.MiniCalendarGestures.MIN_FLICK_DISTANCE
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
@@ -65,7 +66,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.sqrt
@@ -134,7 +134,7 @@ class MonthFragment : BaseFragment() {
         buttonCreate.setOnSingleClickListener {
             val hasActiveCalendars = !calendarViewModel.activeUserCalendars.value.isNullOrEmpty()
             if (hasActiveCalendars) {
-                // each item in the adapter is one day
+                // Each item in the adapter is one day
                 val currentDate =
                     calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
                 requireActivity().findNavController(R.id.nav_host_fragment_container_view)
@@ -173,16 +173,6 @@ class MonthFragment : BaseFragment() {
                     val monthStartingDate = calendarViewModel.monthViewStartingPositionAndDate.value?.second ?: miniCalendarPagerAdapter.firstDayOfMonth
                     monthStartingDate.plusMonths((position - monthStartingPosition).toLong())
                 } else {
-//                    val firstDayOfTheWeekNumber = miniCalendarPagerAdapter.firstDayOfMonth.dayOfWeek.value - startWeekOn.value
-//                    val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
-//
-//                    val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
-//                    val dayOfTheWeek =
-//                        if (fromPosition - position <= 0) 1
-//                        else 7
-//                    val firstDayOfTheWeek = miniCalendarPagerAdapter.firstDayOfMonth.with(temporalField, dayOfTheWeek.toLong())
-//
-//                    firstDayOfTheWeek.plusWeeks((position - miniCalendarPagerAdapter.startingPosition).toLong())
                     val weekStartingPosition = calendarViewModel.weekViewStartingPositionAndDate.value?.first ?: return
                     val weekStartingDate = calendarViewModel.weekViewStartingPositionAndDate.value?.second ?: return
 
@@ -193,10 +183,8 @@ class MonthFragment : BaseFragment() {
 
                 calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
 
-
                 setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
 
-                TimberLogger.e("Test test onPageSelected position $position firstDay $firstDay")
                 adjustMiniCalendarView(firstDay.withDayOfMonth(1), startWeekOn)
 
                 timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
@@ -231,22 +219,6 @@ class MonthFragment : BaseFragment() {
 
     private fun updateMiniCalendarHeight(miniCalendarPagerLayoutListener: ViewTreeObserver.OnGlobalLayoutListener, startWeekOn: DayOfWeek, isMonthView: Boolean, animateChange: Boolean) {
 
-//        if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.unregisterOnPageChangeCallback(miniCalendarPageChangeCallback)
-//        if (isMonthView) {
-//            val selectedDate = calendarViewModel.selectedDate.value ?: return
-//            val position = miniCalendarPagerAdapter.startingPosition + ChronoUnit.MONTHS.between(miniCalendarPagerAdapter.firstDayOfMonth, selectedDate).toInt()
-//            fromPosition = position
-//            miniCalendarPager.setCurrentItem(position, false)
-//        } else {
-//            val selectedDate = calendarViewModel.selectedDate.value ?: return
-//            val weekStartingPosition = calendarViewModel.weekViewStartingPositionAndDate.value?.first ?: return
-//            val weekStartingDate = calendarViewModel.weekViewStartingPositionAndDate.value?.second ?: return
-//            val position = weekStartingPosition + calculateWeekNumberBetween(weekStartingDate, selectedDate, startWeekOn)
-//            fromPosition = position
-//            miniCalendarPager.setCurrentItem(position, false)
-//        }
-//        if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
-
         val firstDayOfMonth = calendarViewModel.selectedDate.value!!.withDayOfMonth(1)
         val desiredHeight = calculateAdapterHeight(
             requireContext(),
@@ -271,8 +243,6 @@ class MonthFragment : BaseFragment() {
                 true
             )
         }
-
-        TimberLogger.e("Test test adjustMiniCalendarView updateMiniCalendarHeight currentPosDesiredMonthHeight ${calendarViewModel.currentPosDesiredMonthHeight} currentPosDesiredWeekHeight ${calendarViewModel.currentPosDesiredWeekHeight}")
 
         if (viewPagerTopGuideline.height != desiredHeight || !WEEK_COMPONENT) {
             miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
@@ -309,8 +279,8 @@ class MonthFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
 
-        // make sure currently selected month always has desired height, even if adjacent pages make
-        //  entire ViewPager to have different height
+        // Make sure currently selected month always has desired height, even if adjacent pages make
+        // entire ViewPager to have different height
         if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
     }
 
@@ -336,8 +306,8 @@ class MonthFragment : BaseFragment() {
         if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.removeOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
 
         // ViewPager will adjust its height to the largest item it contains and display empty space for
-        //  smaller items, like months with fewer week lines. That's why we need to resize it every time we
-        //  display a month
+        // smaller items, like months with fewer week lines. That's why we need to resize it every time we
+        // display a month
 
         val isMonthView = calendarViewModel.monthView.value ?: true
         val desiredHeight = calculateAdapterHeight(
@@ -363,7 +333,7 @@ class MonthFragment : BaseFragment() {
                 true
             )
         }
-        TimberLogger.e("Test test adjustMiniCalendarView for firstDayOfMonth $firstDayOfMonth currentPosDesiredMonthHeight ${calendarViewModel.currentPosDesiredMonthHeight} currentPosDesiredWeekHeight ${calendarViewModel.currentPosDesiredWeekHeight}")
+
         viewPagerTopGuideline.animateHeightChange(desiredHeight) {
             if (this::miniCalendarPagerLayoutListener.isInitialized) miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
         }
@@ -376,11 +346,6 @@ class MonthFragment : BaseFragment() {
         agendaPager.unregisterOnPageChangeCallback(agendaPageChangeCallback)
     }
 
-    interface CalendarOnScrollListener {
-        fun onScroll(dy: Int)
-        fun onScrollChange(scrollY: Int, oldScrollY: Int)
-    }
-
     interface MonthLayoutOnFinishMoveListener {
         fun fullyExpand(animationEndListener: (() -> Unit))
         fun fullyCollapse(animationEndListener: (() -> Unit))
@@ -391,7 +356,6 @@ class MonthFragment : BaseFragment() {
     class MonthLayoutGestureListener(
         private val context: Context,
         private val calendarViewModel: CalendarViewModel,
-        private val startWeekOn: DayOfWeek,
         private val viewPagerTopGuideline: View,
         private val viewPagerSliderGuideline: View,
         private val miniCalendarPager: ViewPager2,
@@ -405,11 +369,6 @@ class MonthFragment : BaseFragment() {
         private var actionDownY: Float? = null
         private var scrollUp: Boolean = false
         private var scrollDown: Boolean = false
-
-        private val MAX_CLICK_DURATION = 1000L
-        private val MAX_FLICK_DURATION = 100L
-        private val MIN_FLICK_DISTANCE = 50
-        private val MAX_CLICK_DISTANCE = 15
 
         private var pressStartTime: Long = 0
         private var pressedX = 0f
@@ -429,7 +388,6 @@ class MonthFragment : BaseFragment() {
         }
 
         override fun onTouch(v: View?, event: MotionEvent): Boolean {
-            TimberLogger.e("Test test onTouch $event")
 
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> {
@@ -440,19 +398,13 @@ class MonthFragment : BaseFragment() {
 
                     val scrollY = event.y
                     if (oldScrollY != null && scrollY < oldScrollY!!) {
+                        // Scrolling up
                         scrollUp = true
                         scrollDown = false
                         val scrollValue = (scrollY - oldScrollY!!) * -1
-//                        TimberLogger.e("Test test scroll up $scrollValue scrollY $scrollY oldScrollY $oldScrollY miniCalendarPager.y ${miniCalendarPager.y}")
                         val viewPagerGuidelineLayoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
                         if (viewPagerGuidelineLayoutParams.guideBegin > calendarViewModel.currentPosDesiredWeekHeight) {
                             viewPagerGuidelineLayoutParams.guideBegin -= scrollValue.toInt()
-
-//                            val miniCalendarPagerLayoutParams = (miniCalendarPager.layoutParams as ViewGroup.MarginLayoutParams)
-//                            miniCalendarPagerLayoutParams.bottomMargin += scrollValue.toInt()
-//                            miniCalendarPager.layoutParams = miniCalendarPagerLayoutParams
-
-//                            miniCalendarPager.y -= scrollValue.toInt()
 
                             miniCalendarPagerAdapter.miniCalendarsScrollUp(miniCalendarPager.currentItem, scrollValue, viewPagerGuidelineLayoutParams.guideBegin)
 
@@ -461,20 +413,14 @@ class MonthFragment : BaseFragment() {
 
                         }
                     } else if (oldScrollY != null && scrollY > oldScrollY!!) {
+                        // Scrolling down
                         scrollUp = false
                         scrollDown = true
                         val scrollValue = scrollY - oldScrollY!!
-//                        TimberLogger.e("Test test scroll down $scrollValue scrollY $scrollY oldScrollY $oldScrollY miniCalendarPager.y ${miniCalendarPager.y}")
                         val viewPagerGuidelineLayoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
                         val viewPagerSliderGuidelineLayoutParams = (viewPagerSliderGuideline.layoutParams as ConstraintLayout.LayoutParams)
                         if (viewPagerGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) {
                             viewPagerGuidelineLayoutParams.guideBegin += scrollValue.toInt()
-
-//                            val miniCalendarPagerLayoutParams = (miniCalendarPager.layoutParams as ViewGroup.MarginLayoutParams)
-//                            miniCalendarPagerLayoutParams.bottomMargin -= scrollValue.toInt()
-//                            miniCalendarPager.layoutParams = miniCalendarPagerLayoutParams
-
-//                            miniCalendarPager.y += scrollValue.toInt()
 
                             miniCalendarPagerAdapter.miniCalendarsScrollDown(miniCalendarPager.currentItem, scrollValue, viewPagerGuidelineLayoutParams.guideBegin)
 
@@ -482,9 +428,9 @@ class MonthFragment : BaseFragment() {
                             viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
                             if (viewPagerSliderGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) viewPagerSliderGuidelineLayoutParams.guideBegin = calendarViewModel.currentPosDesiredMonthHeight - context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
                             viewPagerSliderGuideline.layoutParams = viewPagerSliderGuidelineLayoutParams
-//                            TimberLogger.e("Test test move position calendarViewModel.currentPosDesiredMonthHeight $calendarViewModel.currentPosDesiredMonthHeight calendarViewModel.currentPosDesiredMonthHeight- ${calendarViewModel.currentPosDesiredMonthHeight - context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)}")
                         }
                     }
+
                     oldScrollY = scrollY
                     return true
                 }
@@ -498,7 +444,6 @@ class MonthFragment : BaseFragment() {
                     pressedY = event.y
                     stayedWithinClickDistance = true
 
-                    TimberLogger.e("Test test ACTION_DOWN $actionDownY")
                     return true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -512,17 +457,13 @@ class MonthFragment : BaseFragment() {
                     val sliderDelegateArea = Rect()
                     sliderView.getHitRect(sliderDelegateArea)
                     val isWithinPager = delegateArea.contains(pressedX.toInt(), pressedY.toInt())
-                    val isWithinSlider = sliderDelegateArea.contains(pressedX.toInt(), pressedY.toInt())
-                    TimberLogger.e("Test test check click event isWithinPager $isWithinPager pressDuration $pressDuration stayedWithinClickDistance $stayedWithinClickDistance monthView ${calendarViewModel.monthView.value}")
-                    TimberLogger.e("Test test check flick event isWithin ${(isWithinPager || isWithinSlider)} pressDuration $pressDuration distance ${distance(pressedX, pressedY, event.x, event.y)} monthView ${calendarViewModel.monthView.value}")
+
                     if (isWithinPager && pressDuration < MAX_CLICK_DURATION && stayedWithinClickDistance && calendarViewModel.monthView.value == true) {
                         // Click event has occurred
-                        TimberLogger.e("Test test click event fully collapse")
                         monthLayoutOnFinishMoveListener.simulateCollapse { }
                         return true
                     } else if (pressDuration < MAX_FLICK_DURATION && distance(pressedX, pressedY, event.x, event.y) > MIN_FLICK_DISTANCE) {
                         // Flick event has occurred
-                        TimberLogger.e("Test test flick event fully collapse")
                         if (calendarViewModel.monthView.value == true) monthLayoutOnFinishMoveListener.simulateCollapse { }
                         else monthLayoutOnFinishMoveListener.simulateExpand { }
                         return true
@@ -532,23 +473,23 @@ class MonthFragment : BaseFragment() {
                     val distanceWithWeekTop = layoutParams.guideBegin - calendarViewModel.currentPosDesiredWeekHeight
                     val distanceWithMonthBottom = calendarViewModel.currentPosDesiredMonthHeight - layoutParams.guideBegin
                     if (distanceWithMonthBottom > distanceWithWeekTop && distanceWithWeekTop != 0 && distanceWithMonthBottom != 0) {
-                        TimberLogger.e("Test test fully collapse distanceWithMonthBottom $distanceWithMonthBottom distanceWithWeekTop $distanceWithWeekTop")
+                        // Finish collapse animation for the user
                         monthLayoutOnFinishMoveListener.fullyCollapse { }
                         miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                     } else if (distanceWithWeekTop != 0 && distanceWithMonthBottom != 0) {
-                        TimberLogger.e("Test test fully expand distanceWithMonthBottom $distanceWithMonthBottom distanceWithWeekTop $distanceWithWeekTop")
+                        // Finish expand animation for the user
                         monthLayoutOnFinishMoveListener.fullyExpand { }
                         miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                     } else if (distanceWithWeekTop == 0 && scrollUp) {
-                        TimberLogger.e("Test test already fully collapse but process distanceWithMonthBottom $distanceWithMonthBottom distanceWithWeekTop $distanceWithWeekTop")
+                        // View is already fully collapsed, continue the process
                         monthLayoutOnFinishMoveListener.fullyCollapse { }
                         miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                     } else if (distanceWithMonthBottom == 0 && scrollDown) {
-                        TimberLogger.e("Test test already fully expand but process distanceWithMonthBottom $distanceWithMonthBottom distanceWithWeekTop $distanceWithWeekTop")
+                        // View is already fully expanded, continue the process
                         monthLayoutOnFinishMoveListener.fullyExpand { }
                         miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                     }
-                    TimberLogger.e("Test test ACTION_UP $actionUpY")
+
                     scrollUp = false
                     scrollDown = false
                     return true
@@ -572,88 +513,8 @@ class MonthFragment : BaseFragment() {
             setCurrentItem(monthStartingPosition, false)
         }
 
-//        val gestureDetector = GestureDetector(requireContext(), CalendarGestureListener(miniCalendarPager))
-//        mini_calendar_slider.setOnTouchListener { v, event ->
-//            gestureDetector.onTouchEvent(event)
-//            v.performClick()
-//        }
-
-        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday, object: CalendarOnScrollListener {
-            override fun onScroll(dy: Int) {
-                TimberLogger.e("Test test AgendaPagerAdapter onScroll dy $dy")
-
-//                if (dy > 0) {
-//                    val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-//                    if (layoutParams.guideBegin > calendarViewModel.currentPosDesiredWeekHeight) {
-//                        layoutParams.guideBegin -= 40
-//                        viewPagerTopGuideline.layoutParams = layoutParams
-//                    } else if (calendarViewModel.monthView.value == true) {
-//                        calendarViewModel.monthView.value = false
-//                        val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
-//                        rotateArrowUpward(mini_calendar_chevron)
-//                        updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
-//                    }
-//                } else if (dy < 0) {
-//                    val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-//                    if (layoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) {
-//                        layoutParams.guideBegin += 40
-//                        viewPagerTopGuideline.layoutParams = layoutParams
-//                    } else if (calendarViewModel.monthView.value == false) {
-//                        calendarViewModel.monthView.value = true
-//                        val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
-//                        rotateArrowDownward(mini_calendar_chevron)
-//                        updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
-//                    }
-//                }
-
-//                if (calendarViewModel.monthView.value == true) {
-//                    calendarViewModel.monthView.value = false
-//                    val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return@AgendaPagerAdapter)
-//                    rotateArrowUpward(mini_calendar_chevron)
-//                    updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
-//                }
-            }
-
-            override fun onScrollChange(scrollY: Int, oldScrollY: Int) { }
-        })
-        dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday, object: CalendarOnScrollListener {
-            override fun onScroll(dy: Int) { }
-
-            override fun onScrollChange(scrollY: Int, oldScrollY: Int) {
-                TimberLogger.e("Test test DayPagerAdapter onScrollChange scrollY $scrollY oldScrollY $oldScrollY ${scrollY - oldScrollY}")
-
-//                if (scrollY > oldScrollY) {
-//                    val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-//                    if (layoutParams.guideBegin > calendarViewModel.currentPosDesiredWeekHeight) {
-//                        layoutParams.guideBegin -= 40
-//                        viewPagerTopGuideline.layoutParams = layoutParams
-//                    } else if (calendarViewModel.monthView.value == true) {
-//                        calendarViewModel.monthView.value = false
-//                        val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
-//                        rotateArrowUpward(mini_calendar_chevron)
-//                        updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
-//                    }
-//                } else if (scrollY < oldScrollY) {
-//                    val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-//                    if (layoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) {
-//                        layoutParams.guideBegin += 40
-//                        viewPagerTopGuideline.layoutParams = layoutParams
-//                    } else if (calendarViewModel.monthView.value == false) {
-//                        calendarViewModel.monthView.value = true
-//                        val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return)
-//                        rotateArrowDownward(mini_calendar_chevron)
-//                        updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
-//                    }
-//                }
-
-//                if (calendarViewModel.monthView.value == true) {
-//                    calendarViewModel.monthView.value = false
-//                    val startWeekOn = getWeekStartDayOfWeek(calendarViewModel.weekStart.value ?: return@DayPagerAdapter)
-//                    rotateArrowUpward(mini_calendar_chevron)
-//                    updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
-//                }
-            }
-        })
+        agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday)
+        dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday)
 
         calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
             if (viewMode == ViewMode.AGENDA) {
@@ -798,10 +659,10 @@ class MonthFragment : BaseFragment() {
                 startWeekOn,
                 false
             )
+
             val onTouchListener = MonthLayoutGestureListener(
                 requireContext(),
                 calendarViewModel,
-                startWeekOn,
                 viewPagerTopGuideline,
                 viewPagerSliderGuideline,
                 miniCalendarPager,
@@ -812,7 +673,10 @@ class MonthFragment : BaseFragment() {
                     override fun fullyExpand(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == false) {
                             calendarViewModel.monthView.value = true
-                            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
+                            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn,
+                                isMonthView = true,
+                                animateChange = true
+                            )
                             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
                             viewPagerTopGuideline.animateHeightChange(calendarViewModel.currentPosDesiredMonthHeight, calendarViewModel.currentPosDesiredMonthHeight) {
@@ -826,7 +690,10 @@ class MonthFragment : BaseFragment() {
                     override fun fullyCollapse(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == true) {
                             calendarViewModel.monthView.value = false
-                            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
+                            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn,
+                                isMonthView = false,
+                                animateChange = true
+                            )
                             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
                             viewPagerTopGuideline.animateHeightChange(calendarViewModel.currentPosDesiredWeekHeight, calendarViewModel.currentPosDesiredMonthHeight) {
@@ -889,7 +756,7 @@ class MonthFragment : BaseFragment() {
             val selectedDate = calendarViewModel.selectedDate.value ?: return@observe
             val startWeekOn = startWeekOn ?: return@observe
             val firstDayOfTheWeekNumber = selectedDate.dayOfWeek.value - startWeekOn.value
-            val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+            val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
             val temporalField = WeekFields.of(startWeekOn, 7 - firstDayOfTheWeekOffset).dayOfWeek()
             val firstDayOfTheWeek = selectedDate.with(temporalField, 1)
             if (monthView == false) calendarViewModel.weekViewStartingPositionAndDate.value = Pair(miniCalendarPager.currentItem, firstDayOfTheWeek)
@@ -965,7 +832,6 @@ class MonthFragment : BaseFragment() {
         headerLayout.addView(weekDayHeaderView)
     }
 
-    // TODO Delete position parameter
     private fun setToolbarMonthYearTitle(localDate: LocalDate, position: Int) {
         val month = SpannableString(localDate.formatMonth(true))
         val year = SpannableString(localDate.year.toString())
@@ -976,7 +842,7 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.lifeCycleScope.launch {
             val desiredHeight = calendarViewModel.currentPosDesiredMonthHeight
             val scrollValue = 10
-            TimberLogger.e("Test test simulate simulateExpandWithScroll $desiredHeight")
+
             for (i in 0..(desiredHeight / 10)) {
                 val viewPagerGuidelineLayoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
                 val viewPagerSliderGuidelineLayoutParams =
@@ -993,17 +859,21 @@ class MonthFragment : BaseFragment() {
                     if (viewPagerGuidelineLayoutParams.guideBegin > calendarViewModel.currentPosDesiredMonthHeight) viewPagerGuidelineLayoutParams.guideBegin =
                         calendarViewModel.currentPosDesiredMonthHeight
                     viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
+
                     if (viewPagerSliderGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) viewPagerSliderGuidelineLayoutParams.guideBegin =
                         calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
                     viewPagerSliderGuideline.layoutParams = viewPagerSliderGuidelineLayoutParams
-
-                    TimberLogger.e("Test test simulate viewPagerGuidelineLayoutParams.guideBegin ${viewPagerGuidelineLayoutParams.guideBegin}")
                 }
-                TimberLogger.e("Test test simulate expand delay ${200L / (desiredHeight / 10)} total ${(200L / (desiredHeight / 10)) * i}")
+
+                // Delay to simulate smooth scrolling
                 delay(200L / (desiredHeight / 10))
             }
+
             calendarViewModel.monthView.value = true
-            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, true, true)
+            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn,
+                isMonthView = true,
+                animateChange = true
+            )
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
             miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
         }
@@ -1013,7 +883,7 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.lifeCycleScope.launch {
             val desiredHeight = calendarViewModel.currentPosDesiredWeekHeight
             val scrollValue = 10
-            TimberLogger.e("Test test simulate simulateCollapseWithScroll $desiredHeight")
+
             for (i in 0..((calendarViewModel.currentPosDesiredMonthHeight - desiredHeight) / 10)) {
                 val viewPagerGuidelineLayoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
                 if (viewPagerGuidelineLayoutParams.guideBegin > calendarViewModel.currentPosDesiredWeekHeight) {
@@ -1027,12 +897,16 @@ class MonthFragment : BaseFragment() {
                     if (viewPagerGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredWeekHeight) viewPagerGuidelineLayoutParams.guideBegin = calendarViewModel.currentPosDesiredWeekHeight
                     viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
                 }
-                TimberLogger.e("Test test simulate collapse delay ${100L / ((calendarViewModel.currentPosDesiredMonthHeight - desiredHeight) / 10)} total ${(100L / ((calendarViewModel.currentPosDesiredMonthHeight - desiredHeight) / 10)) * i}")
+
+                // Delay to simulate smooth scrolling
                 delay(100L / ((calendarViewModel.currentPosDesiredMonthHeight - desiredHeight) / 10))
             }
-            TimberLogger.e("Test test simulate collapse done ${(viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams).guideBegin}")
+
             calendarViewModel.monthView.value = false
-            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn, false, true)
+            updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn,
+                isMonthView = false,
+                animateChange = true
+            )
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
             miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
         }

@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation.calendar
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Paint
@@ -23,12 +22,9 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
-import me.proton.android.calendar.common.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.model.Event
-import me.proton.core.util.kotlin.nullIfBlank
 import java.time.LocalDate
 
 class DayViewAllDayEventAdapter(
@@ -147,19 +143,6 @@ class DayViewAllDayEventAdapter(
             }
 
             itemView.setOnSingleClickListener { clickListener(event) }
-        }
-    }
-}
-
-fun initEventStatus(participationStatus: ParticipationStatus?, context: Context) {
-    when (participationStatus) {
-        ParticipationStatus.ACCEPTED -> {
-        }
-        ParticipationStatus.DECLINED -> {
-        }
-        ParticipationStatus.TENTATIVE -> {
-        }
-        else -> {
         }
     }
 }

@@ -7,8 +7,7 @@ import java.time.LocalDate
 
 class AgendaPagerAdapter(
     activity: FragmentActivity,
-    val startingDate: LocalDate,
-    private val calendarOnScrollListener: MonthFragment.CalendarOnScrollListener
+    val startingDate: LocalDate
 ) : FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
@@ -18,11 +17,9 @@ class AgendaPagerAdapter(
     }
 
     override fun createFragment(position: Int): Fragment {
-        val fragment = ItemCalendarAgendaFragment.newInstance(
+        return ItemCalendarAgendaFragment.newInstance(
             position,
             startingDate.plusDays((position - startingPosition).toLong())
         )
-        fragment.setCalendarOnScrollListener(calendarOnScrollListener)
-        return fragment
     }
 }

@@ -23,7 +23,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
-import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
@@ -45,7 +44,6 @@ import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import java.time.temporal.WeekFields
 import java.util.*
 
 private const val MAX_CALENDAR_INDICATORS = 5
@@ -260,7 +258,6 @@ class CalendarViewModel(
             }
         }
 
-        logger.e("Test test handleSelectedDate postValue date $date")
         _selectedDate.value = date
 
         // adjust Mini Calendar

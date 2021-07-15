@@ -7,8 +7,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
-import me.proton.android.calendar.common.TimberLogger
-import java.util.*
 
 class InterceptTouchConstraintLayout @JvmOverloads constructor(
     context: Context,
@@ -29,56 +27,47 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
         return when (ev.actionMasked) {
             // Always handle the case of the touch gesture being complete.
             MotionEvent.ACTION_DOWN -> {
-                TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN allowScrolling $allowScrolling")
                 if (allowScrolling && WEEK_COMPONENT) {
                     false
                 } else {
                     if (!WEEK_COMPONENT) {
                         val delegateArea = Rect()
                         agendaPager?.getHitRect(delegateArea)
-                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
 
                         val sliderDelegateArea = Rect()
                         sliderView?.getHitRect(sliderDelegateArea)
-                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN sliderDelegateArea $sliderDelegateArea")
                         (!allowScrolling && delegateArea.contains(ev.x.toInt(), ev.y.toInt())) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
                     } else {
                         val delegateArea = Rect()
                         agendaPager?.getHitRect(delegateArea)
-                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
                         delegateArea.contains(ev.x.toInt(), ev.y.toInt())
                     }
                 }
             }
             MotionEvent.ACTION_UP -> {
-                TimberLogger.e("Test test onInterceptTouchEvent ACTION_UP")
-                false // Do not intercept touch event, let the child handle it
+                // Do not intercept touch event, let the child handle it
+                false
             }
             MotionEvent.ACTION_MOVE -> {
-                TimberLogger.e("Test test onInterceptTouchEvent ACTION_MOVE allowScrolling $allowScrolling")
                 if (allowScrolling && WEEK_COMPONENT) {
                     false
                 } else {
                     if (!WEEK_COMPONENT) {
                         val delegateArea = Rect()
                         agendaPager?.getHitRect(delegateArea)
-                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
 
                         val sliderDelegateArea = Rect()
                         sliderView?.getHitRect(sliderDelegateArea)
-                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN sliderDelegateArea $sliderDelegateArea")
                         (!allowScrolling && delegateArea.contains(ev.x.toInt(), ev.y.toInt())) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
                     } else {
                         val delegateArea = Rect()
                         agendaPager?.getHitRect(delegateArea)
-                        TimberLogger.e("Test test onInterceptTouchEvent ACTION_DOWN delegateArea $delegateArea")
                         delegateArea.contains(ev.x.toInt(), ev.y.toInt())
                     }
                 }
             }
             else -> {
-                // In general, we don't want to intercept touch events. They should be
-                // handled by the child view.
+                // In general, we don't want to intercept touch events. They should be handled by the child view.
                 false
             }
         }
