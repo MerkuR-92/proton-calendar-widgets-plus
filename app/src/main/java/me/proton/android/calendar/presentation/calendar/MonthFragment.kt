@@ -470,8 +470,16 @@ class MonthFragment : BaseFragment() {
                     }
 
                     val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-                    val distanceWithWeekTop = layoutParams.guideBegin - calendarViewModel.currentPosDesiredWeekHeight
-                    val distanceWithMonthBottom = calendarViewModel.currentPosDesiredMonthHeight - layoutParams.guideBegin
+                    val distanceWithWeekTop = layoutParams.guideBegin -
+                            calendarViewModel.currentPosDesiredWeekHeight -
+                            if (calendarViewModel.monthView.value == true) // Make it easier to collapse when expanded
+                                (context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) + context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height))
+                            else 0
+                    val distanceWithMonthBottom = calendarViewModel.currentPosDesiredMonthHeight -
+                            layoutParams.guideBegin -
+                            if (calendarViewModel.monthView.value == false) // Make it easier to expand when collapsed
+                                (context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) + context.resources.getDimensionPixelSize(R.dimen.calendar_item_header_height))
+                            else 0
                     if (distanceWithMonthBottom > distanceWithWeekTop && distanceWithWeekTop != 0 && distanceWithMonthBottom != 0) {
                         // Finish collapse animation for the user
                         monthLayoutOnFinishMoveListener.fullyCollapse { }
