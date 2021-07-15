@@ -852,6 +852,15 @@ class MonthFragment : BaseFragment() {
 
             if (!WEEK_COMPONENT) {
 
+                calendarViewModel.monthView.value = true
+                updateMiniCalendarHeight(
+                    miniCalendarPagerLayoutListener, startWeekOn,
+                    isMonthView = true,
+                    animateChange = true
+                )
+                timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+                miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
+
                 var currentHeight = calendarViewModel.currentPosDesiredWeekHeight
                 var scrollValue: Int
                 viewPagerTopGuideline.animateGuidelineHeightChange(
@@ -865,20 +874,22 @@ class MonthFragment : BaseFragment() {
                                 scrollValue.toFloat(),
                                 animatedValue
                             )
+
+                            val viewPagerSliderGuidelineLayoutParams =
+                                (viewPagerSliderGuideline.layoutParams as ConstraintLayout.LayoutParams)
+                            if (viewPagerSliderGuidelineLayoutParams.guideBegin == 0) {
+                                // Update slider guide begin in case it was skipped somehow
+                                viewPagerSliderGuidelineLayoutParams.guideBegin =
+                                    calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(
+                                        R.dimen.calendar_slider_height
+                                    )
+                                viewPagerSliderGuideline.layoutParams = viewPagerSliderGuidelineLayoutParams
+                            }
                         }
 
                         override fun onAnimationEnd() {
                         }
                     })
-
-                calendarViewModel.monthView.value = true
-                updateMiniCalendarHeight(
-                    miniCalendarPagerLayoutListener, startWeekOn,
-                    isMonthView = true,
-                    animateChange = true
-                )
-                timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-                miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
 
             } else {
 
