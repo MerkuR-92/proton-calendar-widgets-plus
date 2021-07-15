@@ -37,7 +37,9 @@ import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -428,6 +430,21 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (WEEK_COMPONENT) {
+            all_day_header.text = requireContext().resources.getString(R.string.event_all_day)
+        } else {
+            val dateFormat = SimpleDateFormat("EEE", DateTimeUtilsImpl.getLocaleForFormatting())
+            all_day_header.text = dateFormat.format(Date.from(date?.atStartOfDay(ZoneId.systemDefault())?.toInstant()))
+            all_day_header_date.text = date?.dayOfMonth.toString()
+            all_day_layout.visibleOrGone(true)
+            all_day_header_date.visibleOrGone(true)
+
+            if (date == LocalDate.now()) {
+                all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+                all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+            }
+        }
+
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
@@ -555,7 +572,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) allDayEvents.takeLast(allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
                             else listOf()
 
-                        all_day_layout.visibleOrGone(!allDayEvents.isNullOrEmpty())
+                        if (WEEK_COMPONENT) all_day_layout.visibleOrGone(!allDayEvents.isNullOrEmpty())
+                        else all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
                         all_day_more_items_layout.removeAllViews()
 
                         val userEmails = userAddresses.map { userAddress -> userAddress.email }
