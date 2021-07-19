@@ -27,6 +27,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UsersRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toBoolean
 import java.util.concurrent.TimeUnit
@@ -40,6 +41,7 @@ class HandleIcsUseCase(
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase,
     private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase
 ) {
 
@@ -167,6 +169,9 @@ class HandleIcsUseCase(
             }
         }
 
+        val immutableExistingEvent = existingEvent
+        val immutableExistingEventEntity = existingEventEntity
+
         if (iCalendar.method.isReply && !isOrganizerMode) {
             return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
         }
@@ -208,7 +213,15 @@ class HandleIcsUseCase(
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel
         val isNewSingleEditCancelled = isNew && existingEvent == null && iCalendar.method.isCancel
 
-        if (isNewNonCancelled || isNewSingleEditCancelled) {
+        val isReInvitation = newEvent.iCalendar.method.isRequest && !newEvent.isCancelled() && existingEvent != null && existingEvent?.isCancelled() == true
+        if (isReInvitation && immutableExistingEvent != null) {
+            val deleteResult = deleteEventUseCase.execute(userId, immutableExistingEvent.id, EventEditDeleteOption.ALL_EVENTS, null)
+            if (deleteResult !is UseCase.Result.Success<*>) {
+                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+            }
+        }
+
+        if (isNewNonCancelled || isNewSingleEditCancelled || isReInvitation) {
             // Create brand new event
             if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
             if (isNewSingleEditCancelled) {
@@ -222,8 +235,6 @@ class HandleIcsUseCase(
             )
         } else {
             // Event already exists, check if we need to update it using the ics content
-            val immutableExistingEvent = existingEvent
-            val immutableExistingEventEntity = existingEventEntity
             if (!isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && newEvent.iCalEvent.dateTimeStamp.value.after(existingEvent?.iCalEvent?.dateTimeStamp?.value)) {
                 if (immutableExistingEventEntity.isProtonProtonInvite?.toBoolean() == true || immutableExistingEvent.sharedEventId == newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID)?.value) {
                     // Event is a proton to proton invite
