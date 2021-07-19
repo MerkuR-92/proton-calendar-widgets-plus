@@ -69,6 +69,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     private var currentMiniCalendarWeekList: List<MiniCalendarItem>? = null
     private var currentMiniCalendarMonthList: List<MiniCalendarItem>? = null
 
+    private var adapter: MiniCalendarPagerAdapter? = null
+
     companion object {
         fun newInstance(position: Int, startingPosition: Int, date: LocalDate) : ItemMiniCalendarFragment{
             return ItemMiniCalendarFragment().apply {
@@ -742,5 +744,14 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 addView(weekdayView)
             }
         }
+    }
+
+    fun setAdapter(adapter: MiniCalendarPagerAdapter) {
+        this.adapter = adapter
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapter?.miniCalendarPositionListeners?.remove(position)
     }
 }

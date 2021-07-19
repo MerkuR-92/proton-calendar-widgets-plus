@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -306,9 +307,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         val summary = event.summary
         eventItemTitle.text = if (summary.isNullOrEmpty()) getString(R.string.default_event_summary) else summary
-        eventItemTitle.viewTreeObserver.addOnDrawListener {
+        eventItemTitle.doOnPreDraw {
             // Check if last line of text view is cut off
-            eventItemTitle?.layout ?: return@addOnDrawListener // TODO An NPE can apparently happen here
+            eventItemTitle.layout ?: return@doOnPreDraw // TODO An NPE can apparently happen here
             val lastVisibleLineNumber: Int = eventItemTitle.layout.getLineForVertical(eventItemTitle.height + eventItemTitle.scrollY)
             if (eventItemTitle.height < eventItemTitle.layout.getLineBottom(lastVisibleLineNumber)) {
                 // If line is cut off, set max line property
@@ -573,7 +574,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             else listOf()
 
                         if (WEEK_COMPONENT) all_day_layout.visibleOrGone(!allDayEvents.isNullOrEmpty())
-                        else all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
+                        else {
+                            all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
+                            if (it.events.isNullOrEmpty()) all_day_no_events.text = getString(R.string.agenda_no_events)
+                            else all_day_no_events.text = getString(R.string.agenda_no_all_day_events)
+                        }
                         all_day_more_items_layout.removeAllViews()
 
                         val userEmails = userAddresses.map { userAddress -> userAddress.email }
@@ -661,5 +666,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             logger.v("ItemCalendarDayFragment: events flow: remove observers in on destroy for $date")
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
+        dayView.removeEventViews()
     }
 }

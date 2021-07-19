@@ -2,7 +2,9 @@ package me.proton.android.calendar.presentation.calendar
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import me.proton.android.calendar.common.TimberLogger
 import java.time.LocalDate
 
 class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: LocalDate) : FragmentStateAdapter(activity) {
@@ -20,14 +22,7 @@ class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: 
             startingPosition,
             firstDayOfMonth
         )
-
-        // Remove any listeners that belong to destroyed views
-        val listenersToRemove = mutableListOf<Int>()
-        miniCalendarPositionListeners.forEach {
-            if (!it.value.doesViewExist()) listenersToRemove.add(it.key)
-        }
-        listenersToRemove.forEach { miniCalendarPositionListeners.remove(it) }
-
+        fragment.setAdapter(this)
         miniCalendarPositionListeners[position] = fragment.getMiniCalendarPositionListener()
         return fragment
     }
