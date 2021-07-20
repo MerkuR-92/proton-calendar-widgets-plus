@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.content.res.Resources
 import biweekly.ICalendar
 import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
@@ -9,7 +8,7 @@ import biweekly.util.ICalDate
 import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.DateTimeUtilsImpl
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.EventUtilsImpl.formatStart
@@ -17,6 +16,9 @@ import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
+import me.proton.android.calendar.common.INVITE_EMAIL_MIME_TYPE
+import me.proton.android.calendar.common.INVITE_ICS_FILE_NAME
+import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -81,10 +83,11 @@ class SendEmailUseCase(
             canonicalizeProtonEmail(it.email) == userAttendeeCanonicalEmail
         }?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
 
-        // TODO Check with core if refresh true can be removed
-        val senderAddress = userManager.getAddresses(userId, refresh = true).find {
-            it.addressId.id == senderAddressId
-        } ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
+        val senderAddress = kotlin.runCatching {
+            userManager.getAddresses(userId, refresh = true).find {
+                it.addressId.id == senderAddressId
+            }
+        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
 
         val attachmentBytes = ics.toByteArray()
 
