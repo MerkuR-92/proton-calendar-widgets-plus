@@ -83,9 +83,18 @@ class SendEmailDirect @Inject constructor(
         sender.useKeys(cryptoContext) {
             arguments.attachments.forEach { attachment ->
 
-                // TODO use KeyHolderContext.encryptAndSignAttachment when it's fixed in core
-                val encryptedData = encryptData(attachment.bytes).split(cryptoContext.pgpCrypto)
-                val signedData = signData(attachment.bytes)
+                val encryptedData = try {
+                    encryptData(attachment.bytes).split(cryptoContext.pgpCrypto)
+                } catch (e: CryptoException) {
+                    logger.e("can't encrypt attachment in SendEmailDirect", e)
+                    return@forEach
+                }
+                val signedData = try {
+                    signData(attachment.bytes)
+                } catch (e: CryptoException) {
+                    logger.e("can't sign attachment in SendEmailDirect", e)
+                    return@forEach
+                }
 
                 attachments[attachment.fileName] = EncryptedAttachment(
                     fileName = attachment.fileName,
