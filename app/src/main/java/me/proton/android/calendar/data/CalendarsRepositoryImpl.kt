@@ -895,9 +895,6 @@ class CalendarsRepositoryImpl(
 
     override suspend fun persistEvents(vararg events: EventEntity) {
 
-        logger.v("persist Event: ")
-        events.forEach { logger.v("${it.id}") }
-
         // update local database first
         database.eventsDao().updateOrInsert(*events)
 

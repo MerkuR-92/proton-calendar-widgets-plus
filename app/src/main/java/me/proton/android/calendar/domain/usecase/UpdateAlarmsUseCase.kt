@@ -27,9 +27,6 @@ class UpdateAlarmsUseCase(
         } else ZonedDateTime.now(ZoneId.of(primaryTimezone))
 
         logger.v("executing UpdateAlarmsUseCase")
-        eventIds.forEach {
-            logger.v("eventId: $it")
-        }
 
         val eventChains = eventIds.mapNotNull {
             val originalEvent = database.eventsDao().selectById(it)?.let { transformEventUseCase.execute(it) }
@@ -59,7 +56,6 @@ class UpdateAlarmsUseCase(
 
             database.eventAlarmsDao().updateOrInsert(*upcomingAlarms.toTypedArray())
 
-            logger.v("upcoming alarms for ${transformedChain.firstOrNull()?.summary}")
             upcomingAlarms.forEach {
                 logger.v("${Instant.ofEpochSecond(it.occurrence).atZone(fromZonedDateTime.zone)}")
             }

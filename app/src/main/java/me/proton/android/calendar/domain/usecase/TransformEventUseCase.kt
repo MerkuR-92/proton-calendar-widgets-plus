@@ -149,8 +149,6 @@ class TransformEventUseCase(
             }
         }
 
-        logger.v("merged calendar: ${iCalendar.printToString()}")
-
         // TODO move sanitising to helper function?
         iCalendar.adjustIncomingAllDayEvent()
 

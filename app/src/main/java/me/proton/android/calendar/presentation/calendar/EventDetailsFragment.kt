@@ -514,11 +514,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
 
-            logger.d("GOT EVENT IN DETAILS FRAGMENT: $event")
-            logger.d("navigation occurrence number: ${navigationArguments.occurrenceNumber}")
-            logger.d("${event?.iCalendar?.printToString()}")
-            logger.d("uid: ${event?.iCalEvent?.uid}")
-            logger.d("id: ${event?.id}")
+            logger.d("uid: ${event.iCalEvent.uid}")
+            logger.d("id: ${event.id}")
 
             // TODO HIDE YEAR WHEN IT'S THE SAME AS CURRENT
 

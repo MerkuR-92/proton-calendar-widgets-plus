@@ -65,10 +65,8 @@ class HandleSaveUseCase(
 
         if (event.isAllDay()) {
             event.iCalendar.adjustOutgoingAllDayEvent(event.defaultTimeZone!!)
-            logger.d("calendar for all-day: " + event.iCalendar.printToString())
         } else if (!event.isAllDay()) {
             event.iCalendar.adjustStartEndTimeZones(eventTimeZoneId, event.defaultTimeZone!!)
-            logger.d("calendar for part-time after adjusting timezones: " + event.iCalendar.printToString())
         }
 
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
@@ -81,11 +79,6 @@ class HandleSaveUseCase(
         val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.getStart(event.defaultTimeZone!!)
 
         event.handleSequence(dbEvent, dbEventWithOccurrence, eventTimeZoneId)
-
-        logger.d("db event =${dbEvent?.iCalendar?.printToString()}")
-        logger.d(("dbEventStartDate : ${dbEventStartDate}"))
-        logger.d(("dbEventWithOccurrence : ${dbEventWithOccurrence?.iCalendar?.printToString()}"))
-        logger.d(("dbEventWithOccurrenceStartDate : ${dbEventWithOccurrenceStartDate}"))
 
         val handleOptionResult = when (editOption) {
             EventEditDeleteOption.THIS_EVENT -> {

@@ -480,8 +480,6 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun observeEventLiveData() {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer {
 
-            logger.v("event in eventform recurrence fragment: ${it.iCalendar.printToString()}")
-
             val radioButtonId = when (it.iCalEvent.recurrenceRule?.value?.frequency) {
                 Frequency.DAILY -> R.id.event_form_recurrence_2
                 Frequency.WEEKLY -> R.id.event_form_recurrence_3

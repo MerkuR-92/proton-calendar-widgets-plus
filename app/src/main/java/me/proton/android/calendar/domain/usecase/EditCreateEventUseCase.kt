@@ -39,13 +39,8 @@ class EditCreateEventUseCase(
         // TODO figure out member-id, it's hardcoded below
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
-        logger.d("executing EditCreateEventUseCase from newEvent: ${newEvent}")
-        logger.d("executing EditCreateEventUseCase from icalendar: ${newEvent.iCalendar.printToString()}")
-
         // 1. split original event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
-
-        //logger.v("shared split: ${calendarSplit.sharedPart.printToString()}")
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member when creating Event")
