@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -16,6 +15,7 @@ import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
 import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
+import me.proton.core.accountmanager.data.db.AccountManagerDatabase
 import me.proton.core.crypto.android.keystore.CryptoConverters
 import me.proton.core.data.room.db.BaseDatabase
 import me.proton.core.data.room.db.CommonConverters
@@ -118,16 +118,29 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 30
+        const val version = 29
 
-        val migrations = listOf(
+        // Migrations before version 29.
+        private val oldMigrations = listOf(
+            AppDatabaseMigrations.MIGRATION_24_25,
+            AppDatabaseMigrations.MIGRATION_25_26,
+            AppDatabaseMigrations.MIGRATION_26_27,
+            AppDatabaseMigrations.MIGRATION_27_28,
+        )
+
+        // Migrations after version 29.
+        private val migrations = listOf(
             AppDatabaseMigrations.MIGRATION_29_30
         )
 
-        fun buildDatabase(context: Context): AppDatabase =
+        fun buildDatabase(context: Context, coreDatabase: AccountManagerDatabase): AppDatabase =
             databaseBuilder<AppDatabase>(context, name)
+                // Add old pre v29 migrations.
+                .apply { oldMigrations.forEach { addMigrations(it) } }
+                // Add unified DB migration.
+                .addMigrations(AppDatabaseMigrations.MIGRATION_28_29(context, coreDatabase))
+                // Add new post v29 migrations.
                 .apply { migrations.forEach { addMigrations(it) } }
-                .fallbackToDestructiveMigrationFrom(28)
                 .build()
     }
 }
@@ -135,7 +148,7 @@ abstract class AppDatabase :
 /**
  * Custom Type Converters for Room.
  */
-private class DatabaseTypeConverters {
+class DatabaseTypeConverters {
 
     @TypeConverter
     fun toListOfJsonElements(value: String): List<JsonElement> {

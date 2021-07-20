@@ -12,6 +12,7 @@ import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
+import me.proton.core.accountmanager.data.db.AccountManagerDatabase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
@@ -41,7 +42,7 @@ val commonModule = module {
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
     single<ValueStoreProvider> { ValueStoreProviderImpl(get()) }
     single<ResourceProvider> { ResourceProviderImpl(androidApplication().resources) }
-    single<AppDatabase> { AppDatabase.buildDatabase(androidApplication()) }
+    single<AppDatabase> { AppDatabase.buildDatabase(androidApplication(), get()) }
     single<Crypto> { CryptoImpl(get()) }
 
 //    factory { new instance every time }
@@ -116,6 +117,7 @@ fun coreModule(
     product: Product,
     apiProvider: ApiProvider,
     accountManager: AccountManager,
+    accountManagerDatabase: AccountManagerDatabase,
     authOrchestrator: AuthOrchestrator,
     humanVerificationManager: HumanVerificationManager,
     humanVerificationOrchestrator: HumanVerificationOrchestrator,
@@ -134,6 +136,7 @@ fun coreModule(
     single<ApiProvider> { apiProvider }
     // TODO: Remove when all *ViewModel/*UseCase will be provided by a Dagger module.
     single<AccountManager> { accountManager }
+    single<AccountManagerDatabase> { accountManagerDatabase }
     // TODO: Remove when AccountViewModel will be provided by a Dagger module.
     factory<AuthOrchestrator> { authOrchestrator }
     single<HumanVerificationManager> { humanVerificationManager }

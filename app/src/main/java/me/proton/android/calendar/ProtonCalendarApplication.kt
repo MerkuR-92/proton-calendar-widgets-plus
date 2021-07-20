@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.core.accountmanager.data.db.AccountManagerDatabase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
@@ -42,6 +43,9 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var accountManagerDatabase: AccountManagerDatabase
 
     @Inject
     lateinit var userManager: UserManager
@@ -102,6 +106,7 @@ class ProtonCalendarApplication : Application() {
                     product,
                     apiProvider,
                     accountManager,
+                    accountManagerDatabase,
                     authOrchestrator,
                     humanVerificationManager,
                     humanVerificationOrchestrator,
