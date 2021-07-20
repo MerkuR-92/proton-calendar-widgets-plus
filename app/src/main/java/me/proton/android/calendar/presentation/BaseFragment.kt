@@ -19,10 +19,6 @@ abstract class BaseFragment : Fragment() {
 
     protected open fun onToolbarCreated(toolbar: Toolbar) {}
 
-    protected fun setProgressBarVisibility(visible: Boolean) {
-        fragment_progress_bar?.visibleOrInvisible(visible)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

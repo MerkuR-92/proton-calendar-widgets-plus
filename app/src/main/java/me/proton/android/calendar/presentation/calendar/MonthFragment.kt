@@ -42,6 +42,7 @@ import me.proton.android.calendar.common.AndroidUtils.animateGuidelineHeightChan
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatMonth
@@ -524,6 +525,10 @@ class MonthFragment : BaseFragment() {
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday)
         dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday)
 
+        calendarViewModel.loading.observe(viewLifecycleOwner) { loading ->
+            fragment_progress_bar?.visibleOrInvisible(loading)
+        }
+
         calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
             if (viewMode == ViewMode.AGENDA) {
                 agendaPager.apply {
@@ -587,9 +592,15 @@ class MonthFragment : BaseFragment() {
         lifecycleScope.launch {
             calendarViewModel.fetchingState.collect {
                 when (it) {
-                    CalendarsRepository.FetchingState.NotNeeded -> setProgressBarVisibility(false)
-                    CalendarsRepository.FetchingState.Fetching -> setProgressBarVisibility(true)
-                    CalendarsRepository.FetchingState.Finished -> setProgressBarVisibility(false)
+                    CalendarsRepository.FetchingState.NotNeeded -> {
+                        calendarViewModel.setLoading(false)
+                    }
+                    CalendarsRepository.FetchingState.Fetching -> {
+                        calendarViewModel.setLoading(true)
+                    }
+                    CalendarsRepository.FetchingState.Finished -> {
+                        calendarViewModel.setLoading(false)
+                    }
                 }
             }
         }
@@ -607,9 +618,9 @@ class MonthFragment : BaseFragment() {
                 // TODO schedule repeating worker job
                 mainViewModel.syncAlarms(userId).observe(viewLifecycleOwner) {
                     if (it is Operation.State.IN_PROGRESS) {
-                        setProgressBarVisibility(true)
+                        calendarViewModel.setLoading(true)
                     } else {
-                        setProgressBarVisibility(false)
+                        calendarViewModel.setLoading(false)
                     }
                 }
             }
@@ -623,9 +634,9 @@ class MonthFragment : BaseFragment() {
                 if (userId != null && !isBackgroundSyncRunning) {
                     mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
                         if (it is Operation.State.IN_PROGRESS) {
-                            setProgressBarVisibility(true)
+                            calendarViewModel.setLoading(true)
                         } else {
-                            setProgressBarVisibility(false)
+                            calendarViewModel.setLoading(false)
                         }
                     }
                 }

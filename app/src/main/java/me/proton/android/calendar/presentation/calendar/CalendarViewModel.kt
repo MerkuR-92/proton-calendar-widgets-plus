@@ -45,6 +45,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.collections.HashMap
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -96,6 +97,10 @@ class CalendarViewModel(
     var viewMode: MutableLiveData<ViewMode> = MutableLiveData(ViewMode.AGENDA)
     var monthView: MutableLiveData<Boolean> = MutableLiveData(true)
     var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    var loading: MutableLiveData<Boolean> = MutableLiveData(false)
+    var currentLoadingProcesses: Int = 0
+    var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf()
 
     // Those addresses contain canonical email addresses
     var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
@@ -713,5 +718,19 @@ class CalendarViewModel(
             return null
         }
         return calendarsRepository.selectCalendarSettings(defaultCalendarId)
+    }
+
+    fun setLoading(loading: Boolean, position: Int? = null) {
+        if (loading) {
+            currentLoadingProcesses++
+            if (position != null) viewPagerFragmentsLoadingState[position] = true
+            this.loading.value = true
+        } else if (position != null) {
+            if (viewPagerFragmentsLoadingState[position] == true && currentLoadingProcesses > 0) currentLoadingProcesses--
+            viewPagerFragmentsLoadingState.remove(position)
+        } else {
+            if (currentLoadingProcesses > 0) currentLoadingProcesses--
+        }
+        if (currentLoadingProcesses == 0) this.loading.value = false
     }
 }

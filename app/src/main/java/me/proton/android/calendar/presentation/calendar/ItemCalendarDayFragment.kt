@@ -555,7 +555,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
-                        // TODO Loading state for DayView
+                        calendarViewModel.setLoading(true, position)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         allEvents?.put(
@@ -651,9 +651,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             layoutParams.bottomMargin = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
                             all_day_more_items_layout.addView(eventView, layoutParams)
                         }
+                        calendarViewModel.setLoading(false, position)
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         // TODO Handle error for DayView event fetching
+                        calendarViewModel.setLoading(false, position)
                     }
                 }
             }
@@ -662,6 +664,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        calendarViewModel.setLoading(false, position)
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove observers in on destroy for $date")
             eventsLiveData.removeObservers(viewLifecycleOwner)
