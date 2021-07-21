@@ -101,11 +101,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         agendaMediator.addSource(calendarViewModel.userAddresses) { value ->
             userAddresses = value
 
-            if (userAddresses?.firstOrNull { it.displayName == null } != null) {
-                // Refresh Addresses for user to fetch displayName values
-                calendarViewModel.refreshAddressesFromServer()
-            }
-
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }

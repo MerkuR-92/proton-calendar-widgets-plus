@@ -33,7 +33,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
-            const val FETCH_ADDRESSES = FetchUserAddressesUseCase.WORKER_ID
         }
     }
 
@@ -177,12 +176,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_EVENT_UID) ?: return Result.failure(),
                     inputData.getStringArray(INPUT_USER_EMAILS)?.toList() ?: return Result.failure(),
                     inputData.getInt(INPUT_PARTICIPATION_STATUS, 0))
-            }
-            UseCaseId.FETCH_ADDRESSES -> {
-                val fetchUserAddressesUseCase: FetchUserAddressesUseCase = get()
-                fetchUserAddressesUseCase.executeGetAddresses(
-                    userId
-                )
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

@@ -13,28 +13,23 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.presentation.*
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.onAddAccountResult
-import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
 import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
-import me.proton.core.user.domain.UserManager
 
 class AccountViewModel(
-    private val userManager: UserManager,
     private val accountManager: AccountManager,
     private val authOrchestrator: AuthOrchestrator,
     private val humanVerificationManager: HumanVerificationManager,
     private val humanVerificationOrchestrator: HumanVerificationOrchestrator,
-    private val fetchUserAddressesUseCase: FetchUserAddressesUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
-    private val keyStoreCrypto: KeyStoreCrypto,
     private val logger: Logger,
     private val product: Product
 ) : ViewModel() {
