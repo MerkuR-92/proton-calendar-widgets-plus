@@ -11,7 +11,8 @@ internal abstract class BaseTest {
             "calendar",
             "",
             1,
-            true
+            true,
+            0
         ), ICalUtilsImpl.parseICalString(iCalString)!!, null, null)!!
     }
 

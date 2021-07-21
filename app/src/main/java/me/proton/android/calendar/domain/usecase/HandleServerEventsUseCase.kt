@@ -235,6 +235,19 @@ class HandleServerEventsUseCase(
                     }
                 )
             }
+            eventsResponse.calendarSubscriptions?.forEach {
+                it.handleAction(
+                    { }, // Can't receive action delete for CalendarSubscription
+                    {
+                        val calendarId = it.calendarSubscriptionEntity?.calendarId
+                        if (justDeletedCalendarIds.contains(calendarId)) {
+                            logger.i("action CREATE/UPDATE for calendarSubscriptions in just deleted calendar")
+                        } else if (calendarId != null) {
+                            calendarsRepository.persistCalendarSubscription(it.calendarSubscriptionEntity)
+                        }
+                    }
+                )
+            }
 
             UseCase.Result.Success<Unit>()
         } catch (e: kotlinx.coroutines.CancellationException) {

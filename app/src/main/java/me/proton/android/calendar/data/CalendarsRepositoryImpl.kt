@@ -421,6 +421,14 @@ class CalendarsRepositoryImpl(
         return database.calendarsDao().flowInactiveCalendars(userId).distinctUntilChanged()
     }
 
+    override fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowUserCalendars(userId).distinctUntilChanged()
+    }
+
+    override fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowSubscribedCalendars(userId).distinctUntilChanged()
+    }
+
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
         //  TODO make sure we have "flags" set!!!!!
         database.calendarsDao().updateOrInsert(calendar.copy(fkUserId = userId))
@@ -441,6 +449,7 @@ class CalendarsRepositoryImpl(
             false
         } else {
             calendarsResponse.data.calendars.forEach {
+                // TODO do boostrap for subscribed calendars to get calendar subscription extra properties
                 persistCalendar(userId.id, it)
             }
             true
@@ -1028,6 +1037,18 @@ class CalendarsRepositoryImpl(
 
     override suspend fun deleteCalendarSettingsById(id: String) {
         database.calendarSettingsDao().deleteById(id)
+    }
+
+    override suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity? {
+        return database.calendarSubscriptionDao().select(calendarId)
+    }
+
+    override suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) {
+        database.calendarSubscriptionDao().updateOrInsert(calendarSubscription)
+    }
+
+    override suspend fun deleteCalendarSubscriptionById(id: String) {
+        database.calendarSubscriptionDao().deleteById(id)
     }
 
     override suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity? {

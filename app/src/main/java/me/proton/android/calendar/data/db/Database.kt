@@ -10,13 +10,15 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_ADDRESSES
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDAR_SUBSCRIPTION
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_USERS
 import me.proton.android.calendar.data.entity.*
 
 @Database(
-    entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class],
-    version = 27,
+    entities = [CalendarEntity::class, EventEntity::class, UserEntity::class, AddressEntity::class, CalendarSettingsEntity::class, CalendarUserSettingsEntity::class, CalendarKeyEntity::class, EventAlarmEntity::class, MemberEntity::class, PassphraseEntity::class, PublicKeyEntity::class, UserSettingsEntity::class, CalendarSubscriptionEntity::class],
+    version = 28,
     exportSchema = true
 )
 @TypeConverters(DatabaseTypeConverters::class)
@@ -27,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun usersDao(): UsersDao
     abstract fun addressesDao(): AddressesDao
     abstract fun calendarSettingsDao(): CalendarSettingsDao
+    abstract fun calendarSubscriptionDao(): CalendarSubscriptionDao
     abstract fun calendarUserSettingsDao(): CalendarUserSettingsDao
     abstract fun userSettingsDao(): UserSettingsDao
     abstract fun calendarKeysDao(): CalendarKeysDao
@@ -46,6 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
         const val TABLE_USER_SETTINGS = "user_settings"
         const val TABLE_EVENT_ALARMS = "event_alarms"
         const val TABLE_CALENDAR_KEYS = "calendar_keys"
+        const val TABLE_CALENDAR_SUBSCRIPTION = "calendar_subscription"
         const val TABLE_PUBLIC_KEYS = "public_keys"
         const val TABLE_PASSPHRASES = "passphrases"
         const val TABLE_MEMBERS = "members"
@@ -71,7 +75,8 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(
                     MIGRATION_24_25,
                     MIGRATION_25_26,
-                    MIGRATION_26_27
+                    MIGRATION_26_27,
+                    MIGRATION_27_28
                 ).build()
     }
 }
@@ -104,6 +109,16 @@ val MIGRATION_26_27 = object : Migration(26, 27) {
     override fun migrate(database: SupportSQLiteDatabase) {
 
         database.execSQL("ALTER TABLE $TABLE_EVENTS ADD COLUMN isProtonProtonInvite INTEGER")
+    }
+}
+
+val MIGRATION_27_28 = object : Migration(27, 28) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+
+        database.execSQL("ALTER TABLE $TABLE_CALENDARS ADD COLUMN type INTEGER NOT NULL DEFAULT 0")
+
+        database.execSQL("CREATE TABLE $TABLE_CALENDAR_SUBSCRIPTION (calendarId TEXT NOT NULL PRIMARY KEY, createTime INTEGER NOT NULL, lastUpdateTime INTEGER NOT NULL, status INTEGER NOT NULL, url TEXT NOT NULL, FOREIGN KEY (calendarId) REFERENCES calendars (id) ON DELETE CASCADE ON UPDATE NO ACTION)")
+        database.execSQL("CREATE INDEX index_calendar_subscription_calendarId ON $TABLE_CALENDAR_SUBSCRIPTION (calendarId)")
     }
 }
 

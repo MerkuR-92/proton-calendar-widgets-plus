@@ -7,16 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_drawer_calendar.view.*
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.core.util.kotlin.toInt
+import java.time.Duration
 
 class CalendarListAdapter(
+    val calendarViewModel: CalendarViewModel,
     val listener: (CalendarEntity) -> Unit
 ) : ListAdapter<CalendarEntity, CalendarListAdapter.ViewHolder>(CalendarEntityDiffCallback()) {
 
@@ -46,7 +52,24 @@ class CalendarListAdapter(
         private val calendarEntityItemCheckBox: CheckBox = view.item_drawer_calendar_checkbox
 
         fun bind(calendarEntity : CalendarEntity, position : Int) {
-            calendarEntityItemTitle.text = calendarEntity.name
+            if (calendarEntity.isDisabled) {
+                calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendarEntity.name)
+                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
+            } else if (calendarEntity.isSubscribed) {
+                calendarViewModel.lifeCycleScope.launch {
+                    val calendarSubscription = calendarViewModel.selectCalendarSubscription(calendarEntity.id)
+                    if (calendarSubscription?.isSynced == true) {
+                        calendarEntityItemTitle.text = calendarEntity.name
+                        calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                    } else {
+                        calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
+                        calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
+                    }
+                }
+            } else {
+                calendarEntityItemTitle.text = calendarEntity.name
+                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+            }
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
 

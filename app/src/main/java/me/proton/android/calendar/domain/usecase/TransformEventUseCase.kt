@@ -10,7 +10,6 @@ import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.ICalUtilsImpl.adjustIncomingAllDayEvent
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.generateXPmToken
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.db.AppDatabase
@@ -159,7 +158,8 @@ class TransformEventUseCase(
                 calendarEntity.name,
                 calendarEntity.color,
                 calendarEntity.flags,
-                calendarEntity.display == 1
+                calendarEntity.display == 1,
+                calendarEntity.type
             ),
             iCalendar = iCalendar,
             verificationStatus = when {

@@ -41,17 +41,22 @@ class BootstrapCalendarsUseCase( // TODO TEST
         if (calendarsResponse !is ApiResponse.Success) {
             logger.e("BootstrapCalendarsUseCase: error getting calendars from API")
             return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API: $calendarsResponse")
-        } else if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
+        }
+
+        // Subscribed calendars do not count for those checks
+        var userCalendars = calendarsResponse.data.calendars.filter { !it.isSubscribed }
+        if (userCalendars.isNotEmpty() && userCalendars.firstOrNull { it.isResetNeeded } != null) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
             return UseCase.Result.Error("BootstrapCalendarsUseCase: error reset needed for calendar", UseCase.Error.RESET_NEEDED)
-        } else if (calendarsResponse.data.calendars.isNotEmpty() &&
-            calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
+        } else if (userCalendars.isNotEmpty() &&
+            userCalendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
             return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
         }
 
         var redoGetCalendars = false
 
-        if (calendarsResponse.data.calendars.isNullOrEmpty()) {
+        // We need to create a default calendar if user has none or has only subscribed calendars
+        if (userCalendars.isNullOrEmpty()) {
 
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
@@ -74,6 +79,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             redoGetCalendars = true
         }
 
+        // We fix both normal and subscribed calendars
         calendarsResponse.data.calendars.forEach {
             if (it.hasIncompleteKeySetup) {
                 // Handle flag INCOMPLETE_SETUP
@@ -104,10 +110,14 @@ class BootstrapCalendarsUseCase( // TODO TEST
             if (calendarsResponse !is ApiResponse.Success) {
                 logger.e("BootstrapCalendarsUseCase: error getting calendars from API after creating default calendar: $calendarsResponse")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API: $calendarsResponse")
-            } else if (calendarsResponse.data.calendars.isNullOrEmpty()) {
+            }
+
+            // Subscribed calendars do not count for those checks
+            userCalendars = calendarsResponse.data.calendars.filter { !it.isSubscribed }
+            if (userCalendars.isNullOrEmpty()) {
                 logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no calendar", UseCase.Error.NO_CALENDAR)
-            } else if (calendarsResponse.data.calendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+            } else if (userCalendars.firstOrNull { it.isActive || it.isDisabled } == null) {
                 logger.e("BootstrapCalendarsUseCase: still no active calendar after creating default calendar")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
             }
@@ -169,6 +179,9 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 calendarsRepository.apply {
                     persistCalendar(userId.id, calendarEntity)
                     persistCalendarSettings(bootstrapResponse.data.calendarSettings)
+                    if (calendarEntity.isSubscribed && bootstrapResponse.data.calendarSubscriptionEntity != null) {
+                        persistCalendarSubscription(bootstrapResponse.data.calendarSubscriptionEntity)
+                    }
                     persistPassphrase(bootstrapResponse.data.passphrase)
                     bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }
                     bootstrapResponse.data.members.forEach { persistMember(it) }

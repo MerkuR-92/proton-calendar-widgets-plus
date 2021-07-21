@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 27,
-    "identityHash": "dd0157eef513417b320d643aac20060c",
+    "version": 28,
+    "identityHash": "e5be0d17a752535cead0237f7fd619af",
     "entities": [
       {
         "tableName": "calendars",
@@ -865,12 +865,77 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "calendar_subscription",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`calendarId` TEXT NOT NULL, `createTime` INTEGER NOT NULL, `lastUpdateTime` INTEGER NOT NULL, `status` INTEGER NOT NULL, `url` TEXT NOT NULL, PRIMARY KEY(`calendarId`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "calendarId",
+            "columnName": "calendarId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createTime",
+            "columnName": "createTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdateTime",
+            "columnName": "lastUpdateTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "calendarId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_calendar_subscription_calendarId",
+            "unique": false,
+            "columnNames": [
+              "calendarId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_calendar_subscription_calendarId` ON `${TABLE_NAME}` (`calendarId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "calendars",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "calendarId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd0157eef513417b320d643aac20060c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e5be0d17a752535cead0237f7fd619af')"
     ]
   }
 }

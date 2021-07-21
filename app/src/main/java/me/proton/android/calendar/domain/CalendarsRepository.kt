@@ -33,6 +33,10 @@ interface CalendarsRepository {
 
     fun flowInactiveCalendars(userId: String): Flow<List<CalendarEntity>>
 
+    fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>>
+
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
     suspend fun updateCalendar(userId: String, calendar: CalendarEntity)
@@ -152,6 +156,13 @@ interface CalendarsRepository {
     suspend fun persistCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
 
     suspend fun deleteCalendarSettingsById(id: String)
+
+    // calendar subscription
+    suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity?
+
+    suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) // calendarId is already there
+
+    suspend fun deleteCalendarSubscriptionById(id: String)
 
     // calendar user settings
     suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity?

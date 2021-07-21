@@ -86,7 +86,8 @@ data class ServerEventsApiResponse(
     val calendarEvents: List<ServerEvent.EventsApiResponse>? = null,
     val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null,
     val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
-    val calendarUserSettings: CalendarUserSettingsEntity? = null
+    val calendarUserSettings: CalendarUserSettingsEntity? = null,
+    val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null,
 )
 
 fun ServerCoreEventsApiResponse.toServerEventsApiResponse() = ServerEventsApiResponse(
@@ -131,7 +132,8 @@ fun ServerCalendarEventsApiResponse.toServerEventsApiResponse() = ServerEventsAp
     calendarPassphrases = this.calendarPassphrases,
     calendarEvents = this.calendarEvents,
     calendarSettings = this.calendarSettings,
-    calendarAlarms = this.calendarAlarms
+    calendarAlarms = this.calendarAlarms,
+    calendarSubscriptions = this.calendarSubscriptions
 )
 
 @Serializable
@@ -151,7 +153,9 @@ data class ServerCalendarEventsApiResponse(
     @SerialName("CalendarSettings")
     val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null,
     @SerialName("CalendarAlarms")
-    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
+    @SerialName("CalendarSubscription")
+    val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null
 )
 
 
@@ -297,6 +301,16 @@ class ServerEvent {
         override val action: Int,
         @SerialName("Alarm")
         val alarm: EventAlarmEntity? = null
+    ) : BaseServerEventApiResponse()
+
+    @Serializable
+    data class CalendarSubscriptionsApiResponse(
+        @SerialName("ID")
+        override val id: String,
+        @SerialName("Action")
+        override val action: Int,
+        @SerialName("CalendarSubscription")
+        val calendarSubscriptionEntity: CalendarSubscriptionEntity? = null
     ) : BaseServerEventApiResponse()
 
 }

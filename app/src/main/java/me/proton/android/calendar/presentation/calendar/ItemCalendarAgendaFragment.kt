@@ -44,7 +44,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private var position: Int? = null
     private var date: LocalDate? = null
 
-    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", 1, true), ICalendar())
+    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", 1, true, 0), ICalendar())
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null

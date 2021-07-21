@@ -69,6 +69,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.*
+import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
@@ -91,8 +92,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val eventViewModel: EventViewModel by viewModel()
     private val mainViewModel: MainViewModel by viewModel()
     private val accountViewModel: AccountViewModel by viewModel()
-    private lateinit var activeCalendarListAdapter: CalendarListAdapter
-    private lateinit var disabledCalendarListAdapter: CalendarListAdapter
+    private lateinit var userCalendarListAdapter: CalendarListAdapter
+    private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -661,31 +662,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initDrawerCalendarsList() {
-        val activeCalendarListView = nav_view_main_content.nav_view_calendars_list
-        val activeCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        activeCalendarListView.layoutManager = activeCalendarsLayoutManager
-        activeCalendarListAdapter = CalendarListAdapter() { calendarEntity ->
+        val userCalendarListView = nav_view_main_content.nav_view_calendars_list
+        val userCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        userCalendarListView.layoutManager = userCalendarsLayoutManager
+        userCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendarEntity ->
             //On Calendar click event
             lifecycleScope.launch {
                 calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display)
                 updateCalendarsDelayed()
             }
         }
-        (activeCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        activeCalendarListView.adapter = activeCalendarListAdapter
+        (userCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        userCalendarListView.adapter = userCalendarListAdapter
 
-        val disabledCalendarListView = nav_view_main_content.nav_view_disabled_calendars_list
-        val disabledCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        disabledCalendarListView.layoutManager = disabledCalendarLayoutManager
-        disabledCalendarListAdapter = CalendarListAdapter() { calendarEntity ->
+        val subscribedCalendarListView = nav_view_main_content.nav_view_subscribed_calendars_list
+        val subscribedCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        subscribedCalendarListView.layoutManager = subscribedCalendarLayoutManager
+        subscribedCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendarEntity ->
             //On Calendar click event
             lifecycleScope.launch {
                 calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display)
                 updateCalendarsDelayed()
             }
         }
-        (disabledCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        disabledCalendarListView.adapter = disabledCalendarListAdapter
+        (subscribedCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        subscribedCalendarListView.adapter = subscribedCalendarListAdapter
     }
 
     private lateinit var updateCalendarsJob: Job
@@ -711,15 +712,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         lifecycleScope.launch {
             calendarViewModel.selectCalendars()
-            calendarViewModel.activeCalendars.observe(this@MainActivity) { activeCalendars ->
-                activeCalendars ?: return@observe
-                activeCalendarListAdapter.submitList(activeCalendars)
-                nav_view_main_content.nav_view_calendars.visibleOrGone(activeCalendars.isNotEmpty())
+            calendarViewModel.userCalendars.observe(this@MainActivity) { userCalendars ->
+                userCalendars ?: return@observe
+                userCalendarListAdapter.submitList(
+                    userCalendars.sortedBy {
+                        it.isDisabled
+                    }
+                )
+                nav_view_main_content.nav_view_calendars.visibleOrGone(userCalendars.isNotEmpty())
             }
-            calendarViewModel.disabledCalendars.observe(this@MainActivity) { disabledCalendars ->
-                disabledCalendars ?: return@observe
-                disabledCalendarListAdapter.submitList(disabledCalendars)
-                nav_view_main_content.nav_view_disabled_calendars.visibleOrGone(disabledCalendars.isNotEmpty())
+            calendarViewModel.subscribedCalendars.observe(this@MainActivity) { subscribedCalendars ->
+                subscribedCalendars ?: return@observe
+                subscribedCalendarListAdapter.submitList(subscribedCalendars)
+                nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
             }
 
             calendarViewModel.inactiveCalendars.observe(this@MainActivity) { inactiveCalendars ->

@@ -120,6 +120,8 @@ class MonthFragment : BaseFragment() {
                             ICalUtilsImpl.generateEventStartTime(timeZoneId)
                         )
                     )
+            } else if (!calendarViewModel.subscribedCalendars.value.isNullOrEmpty()) {
+                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
             } else {
                 requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
             }

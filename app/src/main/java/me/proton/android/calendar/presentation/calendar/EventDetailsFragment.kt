@@ -505,8 +505,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 val deletingEvent = eventState == EventViewModel.EventState.Processing.Deleting
                 loadingAction.visibleOrGone(deletingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented
-                buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent)
-                buttonMenu.visibleOrGone(!event.isAnInvitation && !deletingEvent)
+                buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed)
+                buttonMenu.visibleOrGone(!event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed )
 
                 if (eventState is EventViewModel.EventState.Processing.ChangingAnswer) displayAttendeeAnswerState(eventState.participationStatus)
             }

@@ -35,6 +35,8 @@ data class CalendarEntity(
     val display: Int, // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
     @SerialName("Flags")
     val flags: Int = 1, // Flag not returned for Update/Create calendar. Default for create is 1 but on Update we keep the previous value
+    @SerialName("Type")
+    val type: Int = 0, // normal calendar: 0, subscribed calendar: 1
     @NonNull
     @kotlinx.serialization.Transient
     val fkUserId: String = "" // TODO Split in two classes: One RemoteEntity and one DBEntity
@@ -48,6 +50,8 @@ data class CalendarEntity(
     val hasIncompleteKeySetup: Boolean get() = flags and 8 == 8
     val isResetNeeded: Boolean get() = flags and 4 == 4
     val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
+
+    val isSubscribed: Boolean get() = type == 1
 }
 
 enum class CalendarFlags(val value: Int) {

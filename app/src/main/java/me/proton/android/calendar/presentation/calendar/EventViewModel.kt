@@ -309,7 +309,8 @@ class EventViewModel(
                     defaultCalendar.name,
                     defaultCalendar.color,
                     defaultCalendar.flags,
-                    defaultCalendar.display == 1
+                    defaultCalendar.display == 1,
+                    defaultCalendar.type
                 ), newICalendar
             ) ?: return Result.Error("could not create Event using factory method")
 
@@ -634,7 +635,8 @@ class EventViewModel(
                     calendar.name,
                     calendar.color,
                     calendar.flags,
-                    calendar.display == 1
+                    calendar.display == 1,
+                    calendar.type
                 )
             )
             if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)

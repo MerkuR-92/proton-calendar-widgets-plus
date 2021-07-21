@@ -25,6 +25,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.areTimeZoneOffsetsDif
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -70,6 +71,8 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
+    var userCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var subscribedCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var inactiveCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
@@ -113,6 +116,12 @@ class CalendarViewModel(
         activeCalendars = calendarsRepository.flowActiveCalendars(userId).asLiveData(Dispatchers.Default)
         disabledCalendars = calendarsRepository.flowDisabledCalendars(userId).asLiveData(Dispatchers.Default)
         inactiveCalendars = calendarsRepository.flowInactiveCalendars(userId).asLiveData(Dispatchers.Default)
+        userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
+        subscribedCalendars = calendarsRepository.flowSubscribedCalendars(userId).asLiveData(Dispatchers.Default)
+    }
+
+    suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity? {
+        return calendarsRepository.selectCalendarSubscription(calendarId)
     }
 
     suspend fun selectUser(): User? {

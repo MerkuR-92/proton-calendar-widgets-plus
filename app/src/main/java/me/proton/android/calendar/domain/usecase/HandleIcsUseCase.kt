@@ -209,7 +209,8 @@ class HandleIcsUseCase(
                 existingCalendar?.name ?: defaultCalendar.name,
                 existingCalendar?.color ?: defaultCalendar.color,
                 existingCalendar?.flags ?: defaultCalendar.flags,
-                if (existingCalendar != null) existingCalendar.display == 1 else defaultCalendar.display == 1
+                if (existingCalendar != null) existingCalendar.display == 1 else defaultCalendar.display == 1,
+                existingCalendar?.type ?: defaultCalendar.type
             ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel

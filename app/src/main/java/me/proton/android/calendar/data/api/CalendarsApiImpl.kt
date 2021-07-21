@@ -90,8 +90,8 @@ interface CalendarsApiService : BaseRetrofitApi {
 
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/personal")
     suspend fun updateEventPersonalPart(@Path("calendarId") calendarId: String,
-                                          @Path("eventId") eventId: String,
-                                          @Body body: UpdateEventPersonalPartApiRequest) : EventApiResponse
+                                        @Path("eventId") eventId: String,
+                                        @Body body: UpdateEventPersonalPartApiRequest) : EventApiResponse
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -425,7 +425,9 @@ data class BootstrapApiResponse(
     @SerialName("Members")
     val members: List<MemberEntity>,
     @SerialName("CalendarSettings")
-    val calendarSettings: CalendarSettingsEntity // settings specific to calendar, not user
+    val calendarSettings: CalendarSettingsEntity, // settings specific to calendar, not user
+    @SerialName("CalendarSubscription")
+    val calendarSubscriptionEntity: CalendarSubscriptionEntity? = null // contains extra properties for subscribed calendars
 )
 
 @Serializable

@@ -5,7 +5,8 @@ data class Calendar(
         val name: String,
         val color: String,
         val flags: Int,
-        val display: Boolean
+        val display: Boolean,
+        val type: Int
 ) : BaseModel() {
 
         //Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled
@@ -13,5 +14,7 @@ data class Calendar(
         val isInactive: Boolean get() = (flags and (0 + 2 + 4 + 8 + 16) >= 1)
         val isDisabled: Boolean get() = !isInactive && (flags and (32 + 64) >= 1)
         val isSuperOwnerDisabled: Boolean get() = flags and 64 >= 1
+
+        val isSubscribed: Boolean get() = type == 1
 }
     // TODO fields need to be duplicated here, plus local metadata added
