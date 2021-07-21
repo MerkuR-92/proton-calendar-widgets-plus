@@ -340,7 +340,9 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             }
 
         calendarViewModel.lifeCycleScope.launch {
-            if (!this@ItemMiniCalendarFragment.isResumed) {
+            if (!this@ItemMiniCalendarFragment.isResumed &&
+                ((monthView && firstDay.month != calendarViewModel.selectedDate.value?.month) ||
+                        (!monthView && firstDay.weekNumber(startWeekOn) != calendarViewModel.selectedDate.value?.weekNumber(startWeekOn)))) {
                 delay(300) // TODO Still needed ?
             }
 
