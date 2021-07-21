@@ -10,8 +10,6 @@ interface UserSettingsRepository {
 
     suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity)
 
-    suspend fun hasReactivatedAddressKeys(addressId: String): Boolean
-
     suspend fun selectTimeFormat(userId: String): Int?
 
     fun flowTimeFormat(userId: String): Flow<Int?>

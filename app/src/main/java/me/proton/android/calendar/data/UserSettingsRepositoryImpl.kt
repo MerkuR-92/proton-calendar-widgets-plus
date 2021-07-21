@@ -18,16 +18,6 @@ class UserSettingsRepositoryImpl(
         database.userSettingsDao().updateOrInsert(userSettings.copy(fkUserId = userId))
     }
 
-    override suspend fun hasReactivatedAddressKeys(addressId: String): Boolean {
-        /*
-        val newAddress = address.toAddress(json)
-        val dbAddress = database.addressesDao().selectById(address.id)?.toAddress(json) ?: return false
-        dbAddress.keys.forEach { dbAddressKey ->
-            if (dbAddressKey.active == 0 && newAddress.keys.firstOrNull { it.id == dbAddressKey.id }?.active == 1) return true
-        }*/
-        return false
-    }
-
     override suspend fun selectTimeFormat(userId: String): Int? {
         return database.userSettingsDao().selectTimeFormat(userId)
     }
