@@ -911,8 +911,9 @@ object AndroidUtils {
         setOnCheckedChangeListener(customOnCheckedChangeListener)
     }
 
-    fun getInitials(name: String): String {
+    fun getInitials(name: String, takeFirstOnly: Boolean? = false): String {
         if (name.isBlank()) return ""
+        if (takeFirstOnly == true) return name.toUpperCase().take(1)
         val initials = name.toUpperCase().split(' ')
             .mapNotNull { it.firstOrNull()?.toString() }
             .reduce { acc, s -> acc + s }

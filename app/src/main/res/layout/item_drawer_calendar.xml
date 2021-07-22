@@ -41,6 +41,7 @@
     <View
         android:id="@+id/item_drawer_calendar_divider"
         style="@style/Separator.Dark"
+        android:visibility="invisible"
         android:layout_marginTop="14dp"
         app:layout_constraintTop_toBottomOf="@+id/item_drawer_calendar_title"
         app:layout_constraintStart_toStartOf="@+id/item_drawer_calendar_title"

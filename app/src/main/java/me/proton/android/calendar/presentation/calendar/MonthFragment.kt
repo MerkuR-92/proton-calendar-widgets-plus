@@ -782,7 +782,7 @@ class MonthFragment : BaseFragment() {
             else calendarViewModel.monthViewStartingPositionAndDate.value = Pair(miniCalendarPager.currentItem, selectedDate.withDayOfMonth(1))
         }
 
-        calendarViewModel.activeCalendars.observe(viewLifecycleOwner) { activeCalendars ->
+        calendarViewModel.activeUserCalendars.observe(viewLifecycleOwner) { activeCalendars ->
             val hasActiveCalendars = !activeCalendars.isNullOrEmpty()
             if (hasActiveCalendars) {
                 buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_inverted))

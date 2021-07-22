@@ -19,6 +19,7 @@
     <color name="abbey">#494D55</color>
     <color name="tuna">#303239</color>
     <color name="charade">#262A33</color>
+    <color name="tory_blue">#3C4B88</color>
 
     <!-- design color aliases -->
 
@@ -31,6 +32,7 @@
     <color name="shade_0">@color/white</color>
     <color name="brand_norm">@color/cornflower_blue</color>
     <color name="brand_darken_20">@color/san_marino</color>
+    <color name="brand_darken_40">@color/tory_blue</color>
 
     <!-- constant colors, do not change in dark mode -->
     <color name="text_on_calendar_color">#FFFFFF</color>
