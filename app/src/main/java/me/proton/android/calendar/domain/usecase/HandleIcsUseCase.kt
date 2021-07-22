@@ -69,6 +69,7 @@ class HandleIcsUseCase(
         var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
         if (!OPEN_ICS_FILES || (senderEmail != null && recipientEmail != null)) {
             val canonicalExtrasEmails = canonicalEmailsUseCase.invoke(userId, listOf(senderEmail!!, recipientEmail!!))
+            if (canonicalExtrasEmails.isEmpty()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError // TODO Properly handle network errors in general
             val canonicalSenderEmail = canonicalExtrasEmails[senderEmail]
             val canonicalRecipientEmail = canonicalExtrasEmails[recipientEmail]
 
