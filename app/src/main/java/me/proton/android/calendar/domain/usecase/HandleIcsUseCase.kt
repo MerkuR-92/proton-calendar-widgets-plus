@@ -55,6 +55,8 @@ class HandleIcsUseCase(
 
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
+        if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
+
         val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
             canonicalizeProtonEmail(address.email)
         }
@@ -97,7 +99,6 @@ class HandleIcsUseCase(
             return if (isOrganizerMode) IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Refresh
             else IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
         }
-        if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
 
         if (!iCalendar.method.isRequest &&
             !iCalendar.method.isCancel &&
