@@ -225,7 +225,12 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 lifecycleScope.launch {
 
                     // check if event wasn't changed to invitation shortly before saving
-                    if (!eventViewModel.isEventNew() && eventViewModel.isApiEventAnInvitation() != false) {
+                    val isApiEventAnInvitation = eventViewModel.isApiEventAnInvitation()
+                    if (isApiEventAnInvitation == null) {
+                        view?.displaySnackBar(getString(R.string.snack_event_updated_error))
+                        return@launch
+                    }
+                    if (!eventViewModel.isEventNew() && isApiEventAnInvitation != false) {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.snack_event_edit_with_attendees_error))
                         return@launch
                     }
