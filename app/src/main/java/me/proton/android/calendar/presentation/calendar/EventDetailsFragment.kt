@@ -645,7 +645,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val event = eventViewModel.eventLiveData.value
             val userEmails = calendarViewModel.getUserEmails()
             val userAddresses = calendarViewModel.userAddresses.value
-            if (event != null && userAddresses != null && userEmails != null) {
+            if (event != null && userAddresses != null && userEmails != null && !event.calendar.isSubscribed) {
                 val isActive = event.calendar.isActive
                 val isAddressActive = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
