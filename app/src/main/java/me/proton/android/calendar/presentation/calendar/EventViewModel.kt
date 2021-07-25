@@ -1327,7 +1327,12 @@ class EventViewModel(
             }
 
         val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
-            (calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger) ?: return false).event
+            val event = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
+            if (event == null) {
+                eventState.value = EventState.Idle
+                return false
+            }
+            event
         } else null
 
         val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
