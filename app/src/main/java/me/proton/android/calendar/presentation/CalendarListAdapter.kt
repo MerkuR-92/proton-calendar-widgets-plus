@@ -80,8 +80,10 @@ class CalendarListAdapter(
             }
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
+            setCheckboxStyle(calendarEntityItemCheckBox, calendarEntity)
 
             calendarEntityItemCheckBox.setOnSingleClickListener {
+                setCheckboxStyle(calendarEntityItemCheckBox, calendarEntity)
                 listener(
                     calendarEntity.copy(
                         display = calendarEntityItemCheckBox.isChecked.toInt()
@@ -91,6 +93,19 @@ class CalendarListAdapter(
 
             calendarEntityItemOverlay.setOnSingleClickListener {
                 calendarEntityItemCheckBox.performClick()
+            }
+        }
+
+        private fun setCheckboxStyle(checkBox: CheckBox, calendarEntity: CalendarEntity) {
+            if (checkBox.isChecked) {
+                checkBox.background =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.shape_checkbox_nav_drawer)
+                checkBox.backgroundTintList = null
+            } else {
+                checkBox.background =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.ic_checkbox_off)
+                checkBox.backgroundTintList =
+                    ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
             }
         }
     }

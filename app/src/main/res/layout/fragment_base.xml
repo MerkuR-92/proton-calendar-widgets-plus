@@ -14,8 +14,8 @@
         android:backgroundTint="@color/background_norm"
         app:elevation="0dp"
         >
-        <!-- TOOD elevation = 0 is set so we get rid of liftOnScroll effect on toolbar, because nothing else worked
-        this will break lift on scroll for other fragments with this layout, but at least it fixes month view -->
+        <!-- TODO elevation = 0 is set so we get rid of liftOnScroll effect on toolbar, because nothing else worked
+              this will break lift on scroll for other fragments with this layout, but at least it fixes month view -->
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -32,7 +32,7 @@
                 android:indeterminateTint="@color/brand_norm"
                 android:indeterminateTintMode="src_in"
                 android:layout_gravity="bottom"
-                android:layout_marginBottom="-8dp"/>
+                android:layout_marginBottom="-4dp"/>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/fragment_toolbar"
