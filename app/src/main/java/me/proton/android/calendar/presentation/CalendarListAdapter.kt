@@ -53,6 +53,7 @@ class CalendarListAdapter(
 
         fun bind(calendarEntity : CalendarEntity, position : Int) {
             if (calendarEntity.isDisabled) {
+                // For subscribed calendars we prioritize displaying disabled label over not synced
                 calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendarEntity.name)
                 calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
             } else if (calendarEntity.isSubscribed) {
