@@ -227,7 +227,12 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     // check if event wasn't changed to invitation shortly before saving
                     val isApiEventAnInvitation = eventViewModel.isApiEventAnInvitation()
                     if (isApiEventAnInvitation == null) {
-                        view?.displaySnackBar(getString(R.string.snack_event_updated_error))
+                        view?.displaySnackBar(
+                            getString(
+                                if (eventViewModel.isEventNew()) R.string.snack_event_created_error
+                                else R.string.snack_event_updated_error
+                            )
+                        )
                         return@launch
                     }
                     if (!eventViewModel.isEventNew() && isApiEventAnInvitation != false) {
