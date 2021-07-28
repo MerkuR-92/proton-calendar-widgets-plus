@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Proton Calendar</string>
+    <string name="app_name">ProtonCalendar</string>
 
     <string name="default_event_summary" comment="Event has no title">(no title)</string>
     <string name="default_user_email">(no email address)</string>
@@ -186,8 +186,8 @@
     <string name="event_recurring_update_this_cancel">Cancel</string>
     <string name="event_recurring_update_this_confirm">Update</string>
 
-    <string name="event_allow_contacts_title">Allow Proton Calendar to access your contacts?</string>
-    <string name="event_allow_contacts_description">Proton Calendar needs access to your contacts to provide you with autocompletion</string>
+    <string name="event_allow_contacts_title">Allow ProtonCalendar to access your contacts?</string>
+    <string name="event_allow_contacts_description">ProtonCalendar needs access to your contacts to provide you with autocompletion</string>
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
 
@@ -223,7 +223,7 @@
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
+    <string name="nav_view_version_name">ProtonCalendar %1$s</string>
 
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
@@ -294,8 +294,8 @@
     <string name="update_timezone_dialog_confirmation">Update</string>
     <string name="update_timezone_dialog_cancel">Cancel</string>
 
-    <string name="contacts_permission_dialog_title">Allow Proton Calendar to access your contacts?</string>
-    <string name="contacts_permission_dialog_message">Proton Calendar needs access to your phone contacts to help you easily add them to your events.</string>
+    <string name="contacts_permission_dialog_title">Allow ProtonCalendar to access your contacts?</string>
+    <string name="contacts_permission_dialog_message">ProtonCalendar needs access to your phone contacts to help you easily add them to your events.</string>
     <string name="contacts_permission_dialog_allow">Allow</string>
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
@@ -321,7 +321,7 @@
 
     <!-- Settings -->
     <string name="settings_theme_title">Theme</string>
-    <string name="settings_theme_info">This setting affects only the appearance of the Proton Calendar app on this device. The app will restart after changing the theme.</string>
+    <string name="settings_theme_info">This setting affects only the appearance of the ProtonCalendar app on this device. The app will restart after changing the theme.</string>
     <string name="settings_timezone_title">Time zone</string>
     <string name="settings_update_timezone_title">Ask to update time zone setting</string>
     <string name="settings_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>
@@ -337,7 +337,7 @@
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
-    <string name="bootstrap_error_free_user_title">Proton Calendar is only available to paid users for now.</string>
+    <string name="bootstrap_error_free_user_title">ProtonCalendar is only available to paid users for now.</string>
     <string name="bootstrap_error_free_user_message">The app will be open to all users soon, stay tuned.</string>
     <string name="bootstrap_error_delinquent_user_title">Problem with payment occurred.</string>
     <string name="bootstrap_error_delinquent_user_message">To verify that your payment details are up to date visit <a href="https://account.protonmail.com">account.protonmail.com</a></string>
