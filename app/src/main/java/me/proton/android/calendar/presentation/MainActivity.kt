@@ -374,8 +374,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             val appLinkData: Uri? = actionViewIntent.data
                             val eventId = appLinkData?.getQueryParameter(EVENT_ID)
                             val calendarId = appLinkData?.getQueryParameter(CALENDAR_ID)
-                            if (eventId != null && calendarId != null) {
-                                val recurrenceId = appLinkData.getQueryParameter(RECURRENCE_ID)
+                            val recurrenceId = appLinkData?.getQueryParameter(RECURRENCE_ID)
+                            if (eventId != null && calendarId != null && recurrenceId != null) {
                                 handleAppLinkIntent(eventId, calendarId, recurrenceId)
                             } else {
                                 this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
@@ -405,7 +405,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else navigateTo(Navigation.Deeplink.toMonth())
     }
 
-    private fun handleAppLinkIntent(eventId: String, calendarId: String, recurrenceId: String?) {
+    private fun handleAppLinkIntent(eventId: String, calendarId: String, recurrenceId: String) {
         lifecycleScope.launch {
             val userId = accountViewModel.getPrimaryUserId()
             if (userId == null) {

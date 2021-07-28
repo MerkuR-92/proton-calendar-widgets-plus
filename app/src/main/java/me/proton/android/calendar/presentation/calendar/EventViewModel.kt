@@ -1558,7 +1558,7 @@ class EventViewModel(
         object Error : EventLinkResult()
     }
 
-    suspend fun handleEventLink(userId: UserId, eventId: String, calendarId: String, recurrenceIdTimestamp: String?): EventLinkResult {
+    suspend fun handleEventLink(userId: UserId, eventId: String, calendarId: String, recurrenceIdTimestamp: String): EventLinkResult {
         var eventEntity = calendarsRepository.selectEventEntity(eventId)
         if (eventEntity == null) {
             eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
@@ -1572,7 +1572,7 @@ class EventViewModel(
             // 2. Update on Server
             updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
         }
-        return if (recurrenceIdTimestamp != null) {
+        return if (event.isRecurring()) {
             val calendarUserSettings =
                 calendarsRepository.selectCalendarUserSettings(userId.id) ?: return EventLinkResult.Error
             val timeZoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id

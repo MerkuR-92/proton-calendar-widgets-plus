@@ -87,6 +87,11 @@ enum class AppTheme(val value: Int) {
     SYSTEM_DEFAULT(2)
 }
 
+enum class AlarmAction(val value: Int) {
+    EMAIL(1),
+    DISPLAY(2)
+}
+
 object IcsParsingValidation {
     const val UID_MAX_LENGTH = 191
     const val CONTACT_NAME_MAX_LENGTH = 190

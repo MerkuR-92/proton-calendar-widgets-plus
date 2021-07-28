@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
+import me.proton.android.calendar.common.AlarmAction
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
@@ -34,7 +35,7 @@ class HandleAlarmsUseCase(
         val maxHandledAlarmOccurrenceSeconds = if (alarmEpochSeconds != null) { // handle only event alarms we were supposed to show for this timestamp
 
             // get only those alarms that we were supposed to show for this use case execution
-            val alarmsToDisplayNow = database.eventAlarmsDao().selectUpcoming(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds }
+            val alarmsToDisplayNow = database.eventAlarmsDao().selectUpcoming(alarmEpochSeconds).filter { it.occurrence == alarmEpochSeconds && it.action == AlarmAction.DISPLAY.value }
 
             logger.v("alarms to display at alarmEpochSeconds $alarmEpochSeconds: $alarmsToDisplayNow")
 
@@ -51,7 +52,7 @@ class HandleAlarmsUseCase(
             val lastHandledTimestamp = valueStoreProvider.provideValueStore(userId.id).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP) ?: nowInstant.epochSecond
 
             // if no alarms were ever shown, this will return empty result
-            val alarmsToDisplayNow = database.eventAlarmsDao().select(lastHandledTimestamp + 1, nowInstant.epochSecond).filterOutDuplicates()
+            val alarmsToDisplayNow = database.eventAlarmsDao().select(lastHandledTimestamp + 1, nowInstant.epochSecond).filterOutDuplicates().filter {it.action == AlarmAction.DISPLAY.value }
 
             // TODO get most X recent alarms so we don't bombard user with obsolete alarms if they haven't used the app for a while
 
