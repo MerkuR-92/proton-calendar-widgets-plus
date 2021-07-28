@@ -96,7 +96,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
             else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
             countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption)) {
-            this.view?.displaySnackBar(requireContext().getString(R.string.snack_event_add_alarm_error))
+            this.view?.displaySnackBar(requireContext().getString(R.string.snack_event_maximum_alarm_reached_error))
         } else findNavController().navigateUp()
 
         // TODO

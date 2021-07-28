@@ -511,7 +511,6 @@ class EventViewModel(
     private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
         event.iCalEvent.alarms.clear()
         getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
-            // TODO Remove alarm type check once other types are handled
             if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) event.iCalEvent.addAlarm(it)
         }
     }
@@ -1555,11 +1554,16 @@ class EventViewModel(
         class Success(val occurrenceNumber: Int) : EventLinkResult()
         class DecryptionFailed(val event: Event) : EventLinkResult()
         object EventDoesNotExist : EventLinkResult()
+        object OccurrenceDoesNotExist : EventLinkResult()
         object Error : EventLinkResult()
     }
 
-    suspend fun handleEventLink(userId: UserId, eventId: String, recurrenceIdTimestamp: String?): EventLinkResult {
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return EventLinkResult.EventDoesNotExist
+    suspend fun handleEventLink(userId: UserId, eventId: String, calendarId: String, recurrenceIdTimestamp: String?): EventLinkResult {
+        var eventEntity = calendarsRepository.selectEventEntity(eventId)
+        if (eventEntity == null) {
+            eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
+                ?: return EventLinkResult.EventDoesNotExist
+        }
         val event = transformEventUseCase.execute(eventEntity) ?: return EventLinkResult.Error
         if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
         if (!event.calendar.display) {
@@ -1578,7 +1582,7 @@ class EventViewModel(
                     .toLocalDate(),
                 timeZoneId
             )
-            if (occurrences.isNullOrEmpty()) EventLinkResult.Success(0)
+            if (occurrences.isNullOrEmpty()) EventLinkResult.OccurrenceDoesNotExist
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
     }

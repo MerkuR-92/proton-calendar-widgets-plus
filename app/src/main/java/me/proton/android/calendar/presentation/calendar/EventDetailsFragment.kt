@@ -586,7 +586,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 visibleOrGone(true)
             }
 
-            // TODO Remove filter once other type of alarms are handled
             val alarmLabels = event.iCalEvent.alarms.filter { it.action == Action.display() || it.action == Action.email() }
                 .sortedBy { it.trigger.duration.toMillis() }
                 .mapNotNull { alarm ->

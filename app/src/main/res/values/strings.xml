@@ -241,7 +241,7 @@
     <string name="snack_event_edit_with_attendees_error">Editing events with attendees is not supported yet</string>
     <string name="snack_event_init_error">Error initialising new event</string>
     <string name="snack_event_calendar_error">Error switching calendar</string>
-    <string name="snack_event_add_alarm_error">The maximum number of notifications has been reached</string>
+    <string name="snack_event_maximum_alarm_reached_error">The maximum number of notifications has been reached</string>
     <string name="snack_send_bug_report_success">Report sent, thank you for your feedback</string>
     <string name="snack_send_bug_report_error">Error sending report, please try again later</string>
     <string name="snack_send_bug_report_description_empty">Please provide a description of your report</string>

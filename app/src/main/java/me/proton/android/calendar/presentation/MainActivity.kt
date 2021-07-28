@@ -373,10 +373,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             // Handle app link
                             val appLinkData: Uri? = actionViewIntent.data
                             val eventId = appLinkData?.getQueryParameter(EVENT_ID)
-                            if (eventId != null) {
-                                val calendarId = appLinkData.getQueryParameter(CALENDAR_ID) // TODO Unused for now ?
+                            val calendarId = appLinkData?.getQueryParameter(CALENDAR_ID)
+                            if (eventId != null && calendarId != null) {
                                 val recurrenceId = appLinkData.getQueryParameter(RECURRENCE_ID)
-                                handleAppLinkIntent(eventId, recurrenceId)
+                                handleAppLinkIntent(eventId, calendarId, recurrenceId)
                             } else {
                                 this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
                                 navigateTo(Navigation.Deeplink.toMonth())
@@ -405,14 +405,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else navigateTo(Navigation.Deeplink.toMonth())
     }
 
-    private fun handleAppLinkIntent(eventId: String, recurrenceId: String?) {
+    private fun handleAppLinkIntent(eventId: String, calendarId: String, recurrenceId: String?) {
         lifecycleScope.launch {
             val userId = accountViewModel.getPrimaryUserId()
             if (userId == null) {
                 navigateTo(Navigation.Deeplink.toMonth())
                 return@launch // TODO Display error ?
             }
-            when (val handleEventLinkResult = eventViewModel.handleEventLink(userId, eventId, recurrenceId)) {
+            when (val handleEventLinkResult = eventViewModel.handleEventLink(userId, eventId, calendarId, recurrenceId)) {
                 is EventViewModel.EventLinkResult.Success -> {
                     val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, handleEventLinkResult.occurrenceNumber)
                     navigateTo(eventDetailsDeepLink)
@@ -450,6 +450,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
                 is EventViewModel.EventLinkResult.EventDoesNotExist -> {
                     this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                    navigateTo(Navigation.Deeplink.toMonth())
+                }
+                is EventViewModel.EventLinkResult.OccurrenceDoesNotExist -> {
+                    this@MainActivity.displaySnackBar(getString(R.string.error_occurrence_does_not_exist))
                     navigateTo(Navigation.Deeplink.toMonth())
                 }
                 is EventViewModel.EventLinkResult.Error -> {
