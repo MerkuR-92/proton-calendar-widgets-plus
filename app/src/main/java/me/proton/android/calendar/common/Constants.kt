@@ -120,6 +120,11 @@ object AppLinksQueryParameters {
     const val EVENT_ID = "EventID"
     const val CALENDAR_ID = "CalendarID"
     const val RECURRENCE_ID = "RecurrenceID"
+    const val ACTION = "Action"
+}
+
+object AppLinksAction {
+    const val VIEW = "VIEW"
 }
 
 object FormValidation {

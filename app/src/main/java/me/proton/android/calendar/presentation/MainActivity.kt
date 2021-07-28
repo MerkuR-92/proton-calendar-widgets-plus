@@ -45,6 +45,8 @@ import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.getInitials
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.AppLinksAction.VIEW
+import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
@@ -375,7 +377,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             val eventId = appLinkData?.getQueryParameter(EVENT_ID)
                             val calendarId = appLinkData?.getQueryParameter(CALENDAR_ID)
                             val recurrenceId = appLinkData?.getQueryParameter(RECURRENCE_ID)
-                            if (eventId != null && calendarId != null && recurrenceId != null) {
+                            val action = appLinkData?.getQueryParameter(ACTION)
+                            if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
                                 handleAppLinkIntent(eventId, calendarId, recurrenceId)
                             } else {
                                 this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
