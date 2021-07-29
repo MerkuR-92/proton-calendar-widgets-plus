@@ -87,12 +87,14 @@ class SendEmailDirect @Inject constructor(
                     encryptData(attachment.bytes).split(cryptoContext.pgpCrypto)
                 } catch (e: CryptoException) {
                     logger.e("can't encrypt attachment in SendEmailDirect", e)
+                    attachments[attachment.fileName] = null
                     return@forEach
                 }
                 val signedData = try {
                     signData(attachment.bytes)
                 } catch (e: CryptoException) {
                     logger.e("can't sign attachment in SendEmailDirect", e)
+                    attachments[attachment.fileName] = null
                     return@forEach
                 }
 
