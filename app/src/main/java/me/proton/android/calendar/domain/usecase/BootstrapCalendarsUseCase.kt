@@ -43,9 +43,9 @@ class BootstrapCalendarsUseCase( // TODO TEST
             return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API: $calendarsResponse")
         }
 
-        // Subscribed calendars do not count for those checks
-        var userCalendars = calendarsResponse.data.calendars.filter { !it.isSubscribed }
-        if (userCalendars.isNotEmpty() && userCalendars.firstOrNull { it.isResetNeeded } != null) {
+        // Subscribed calendars do not count when checking if we have active calendars
+        var userCalendars = calendarsResponse.data.calendars.filterNot { it.isSubscribed }
+        if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
             return UseCase.Result.Error("BootstrapCalendarsUseCase: error reset needed for calendar", UseCase.Error.RESET_NEEDED)
         } else if (userCalendars.isNotEmpty() &&
@@ -113,7 +113,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             }
 
             // Subscribed calendars do not count for those checks
-            userCalendars = calendarsResponse.data.calendars.filter { !it.isSubscribed }
+            userCalendars = calendarsResponse.data.calendars.filterNot { it.isSubscribed }
             if (userCalendars.isNullOrEmpty()) {
                 logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no calendar", UseCase.Error.NO_CALENDAR)
@@ -181,6 +181,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
                     persistCalendarSettings(bootstrapResponse.data.calendarSettings)
                     if (calendarEntity.isSubscribed && bootstrapResponse.data.calendarSubscriptionEntity != null) {
                         persistCalendarSubscription(bootstrapResponse.data.calendarSubscriptionEntity)
+                    } else if (calendarEntity.isSubscribed && bootstrapResponse.data.calendarSubscriptionEntity == null) {
+                        logger.e("BootstrapCalendarsUseCase: calendarSubscriptionEntity was null")
                     }
                     persistPassphrase(bootstrapResponse.data.passphrase)
                     bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }

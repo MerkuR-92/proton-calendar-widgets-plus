@@ -17,6 +17,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.core.util.kotlin.toInt
 import java.time.Duration
@@ -25,6 +26,8 @@ class CalendarListAdapter(
     val calendarViewModel: CalendarViewModel,
     val listener: (CalendarEntity) -> Unit
 ) : ListAdapter<CalendarEntity, CalendarListAdapter.ViewHolder>(CalendarEntityDiffCallback()) {
+
+    private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
     class CalendarEntityDiffCallback : DiffUtil.ItemCallback<CalendarEntity>() {
         override fun areItemsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
@@ -46,6 +49,10 @@ class CalendarListAdapter(
         holder.bind(item, position)
     }
 
+    fun setCalendarSubscriptions(calendarSubscriptions: List<CalendarSubscriptionEntity>) {
+        this.calendarSubscriptions = calendarSubscriptions
+    }
+
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val calendarEntityItemOverlay: View = view.item_drawer_calendar_press
         private val calendarEntityItemTitle: TextView = view.item_drawer_calendar_title
@@ -58,7 +65,7 @@ class CalendarListAdapter(
                 calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
             } else if (calendarEntity.isSubscribed) {
                 calendarViewModel.lifeCycleScope.launch {
-                    val calendarSubscription = calendarViewModel.selectCalendarSubscription(calendarEntity.id)
+                    val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
                     if (calendarSubscription?.isSynced == true) {
                         calendarEntityItemTitle.text = calendarEntity.name
                         calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))

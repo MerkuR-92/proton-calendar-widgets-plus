@@ -32,6 +32,6 @@ data class CalendarSubscriptionEntity(
     @SerialName("URL")
     val url: String
 ) {
-    // Calendar is in sync if status is 0 and has been updated in the last 12 hours
-    val isSynced: Boolean get() = status == 0 || ((System.currentTimeMillis() / 1000) - lastUpdateTime < Duration.ofHours(12).toMinutes() * 60)
+    // Calendar is in sync if status is 0 OR has been updated in the last 12 hours
+    val isSynced: Boolean get() = status == 0 || ((System.currentTimeMillis() / 1000) - lastUpdateTime < Duration.ofHours(12).seconds)
 }

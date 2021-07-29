@@ -72,10 +72,11 @@ class CalendarViewModel(
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
     var userCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var subscribedCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var inactiveCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var subscribedCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var calendarSubscriptions: LiveData<List<CalendarSubscriptionEntity>> = MutableLiveData()
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
     var timeFormat: LiveData<Int> = MutableLiveData()
@@ -118,10 +119,7 @@ class CalendarViewModel(
         inactiveCalendars = calendarsRepository.flowInactiveCalendars(userId).asLiveData(Dispatchers.Default)
         userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
         subscribedCalendars = calendarsRepository.flowSubscribedCalendars(userId).asLiveData(Dispatchers.Default)
-    }
-
-    suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity? {
-        return calendarsRepository.selectCalendarSubscription(calendarId)
+        calendarSubscriptions = calendarsRepository.flowCalendarSubscriptions().asLiveData(Dispatchers.Default)
     }
 
     suspend fun selectUser(): User? {

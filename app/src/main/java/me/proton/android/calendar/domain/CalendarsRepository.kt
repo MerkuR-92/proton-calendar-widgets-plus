@@ -160,6 +160,8 @@ interface CalendarsRepository {
     // calendar subscription
     suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity?
 
+    fun flowCalendarSubscriptions(): Flow<List<CalendarSubscriptionEntity>>
+
     suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) // calendarId is already there
 
     suspend fun deleteCalendarSubscriptionById(id: String)

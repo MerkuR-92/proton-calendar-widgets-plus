@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
@@ -54,6 +55,8 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
@@ -69,7 +72,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.*
-import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
@@ -94,6 +96,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val accountViewModel: AccountViewModel by viewModel()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
+
+    private var subscribedCalendars: List<CalendarEntity>? = null
+    private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
+    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -721,10 +727,30 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 )
                 nav_view_main_content.nav_view_calendars.visibleOrGone(userCalendars.isNotEmpty())
             }
-            calendarViewModel.subscribedCalendars.observe(this@MainActivity) { subscribedCalendars ->
-                subscribedCalendars ?: return@observe
-                subscribedCalendarListAdapter.submitList(subscribedCalendars)
-                nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
+
+
+            subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
+                subscribedCalendars = value
+
+                if (subscribedCalendars != null && calendarSubscriptions != null) {
+                    subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+                }
+            }
+            subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
+                calendarSubscriptions = value
+
+                if (subscribedCalendars != null && calendarSubscriptions != null) {
+                    subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+                }
+            }
+            subscribedCalendarsMediator.observe(this@MainActivity) {
+                it?.let {
+                    val subscribedCalendars = it.first
+                    val calendarSubscriptions = it.second
+                    subscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
+                    subscribedCalendarListAdapter.submitList(subscribedCalendars)
+                    nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
+                }
             }
 
             calendarViewModel.inactiveCalendars.observe(this@MainActivity) { inactiveCalendars ->

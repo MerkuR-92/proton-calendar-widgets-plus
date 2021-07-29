@@ -1043,6 +1043,10 @@ class CalendarsRepositoryImpl(
         return database.calendarSubscriptionDao().select(calendarId)
     }
 
+    override fun flowCalendarSubscriptions(): Flow<List<CalendarSubscriptionEntity>> {
+        return database.calendarSubscriptionDao().flowCalendarSubscriptions().distinctUntilChanged()
+    }
+
     override suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) {
         database.calendarSubscriptionDao().updateOrInsert(calendarSubscription)
     }
