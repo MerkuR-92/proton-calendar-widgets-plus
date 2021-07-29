@@ -362,7 +362,6 @@ class MonthFragment : BaseFragment() {
         private val miniCalendarPager: ViewPager2,
         private val miniCalendarPagerAdapter: MiniCalendarPagerAdapter,
         private val agendaPager: ViewPager2,
-        private val sliderView: View,
         private val monthLayoutOnFinishMoveListener: MonthLayoutOnFinishMoveListener
     ): View.OnTouchListener {
         private var oldScrollY: Float? = null
@@ -455,8 +454,6 @@ class MonthFragment : BaseFragment() {
                     val pressDuration = System.currentTimeMillis() - pressStartTime
                     val delegateArea = Rect()
                     agendaPager.getHitRect(delegateArea)
-                    val sliderDelegateArea = Rect()
-                    sliderView.getHitRect(sliderDelegateArea)
                     val isWithinPager = delegateArea.contains(pressedX.toInt(), pressedY.toInt())
 
                     if (isWithinPager && pressDuration < MAX_CLICK_DURATION && stayedWithinClickDistance && calendarViewModel.monthView.value == true) {
@@ -687,7 +684,6 @@ class MonthFragment : BaseFragment() {
                 miniCalendarPager,
                 miniCalendarPagerAdapter,
                 agendaPager,
-                mini_calendar_slider,
                 object : MonthLayoutOnFinishMoveListener {
                     override fun fullyExpand(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == false) {
@@ -854,7 +850,8 @@ class MonthFragment : BaseFragment() {
     private fun setToolbarMonthYearTitle(localDate: LocalDate, position: Int) {
         val month = SpannableString(localDate.formatMonth(true))
         val year = SpannableString(localDate.year.toString())
-        toolbarTitle.text = "$month $year"
+        if (LocalDate.now().year == localDate.year) toolbarTitle.text = "$month"
+        else toolbarTitle.text = "$month $year"
     }
 
     private fun simulateExpandWithScroll(startWeekOn: DayOfWeek) {

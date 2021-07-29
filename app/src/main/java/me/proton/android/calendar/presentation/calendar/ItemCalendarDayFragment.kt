@@ -577,7 +577,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         else {
                             all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
                             if (it.events.isNullOrEmpty()) all_day_no_events.text = getString(R.string.agenda_no_events)
-                            else all_day_no_events.text = getString(R.string.agenda_no_all_day_events)
                         }
                         all_day_more_items_layout.removeAllViews()
 

@@ -568,6 +568,7 @@
                     android:id="@+id/nav_view_timezone_login_layout"
                     android:clickable="true"
                     android:focusable="true"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@+id/nav_view_timezone_separator">

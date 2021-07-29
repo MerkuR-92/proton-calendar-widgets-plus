@@ -19,7 +19,8 @@
 
         <TextView
             android:id="@+id/all_day_header"
-            style="@style/Text.Caption.Weak"
+            style="@style/Text.Caption.Strong"
+            android:textColor="@color/text_hint"
             android:layout_width="71dp"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -39,8 +40,7 @@
             tools:text="24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/all_day_header"
-            android:paddingBottom="10dp"
-            android:layout_marginTop="4dp"/>
+            android:paddingBottom="10dp"/>
 
         <TextView
             android:id="@+id/all_day_no_events"
@@ -48,7 +48,7 @@
             android:textColor="@color/text_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/agenda_no_all_day_events"
+            android:text="@string/agenda_no_events"
             android:visibility="gone"
             tools:visibility="visible"
             app:layout_constraintTop_toTopOf="parent"

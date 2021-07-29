@@ -748,13 +748,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerCalendarsListContent() {
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
-                nav_view_timezone.visibleOrGone(true)
-                nav_view_timezone_login_title.text =
-                    formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
-            }
-        }
+        // Uncomment this to display current timezone in drawer
+        // lifecycleScope.launch(Dispatchers.Main) {
+        //     calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
+        //         nav_view_timezone.visibleOrGone(true)
+        //         nav_view_timezone_login_title.text =
+        //             formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
+        //     }
+        // }
 
         lifecycleScope.launch {
             calendarViewModel.selectCalendars()
