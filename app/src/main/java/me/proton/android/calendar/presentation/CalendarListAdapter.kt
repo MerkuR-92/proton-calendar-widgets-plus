@@ -46,7 +46,7 @@ class CalendarListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item, position)
+        holder.bind(item)
     }
 
     fun setCalendarSubscriptions(calendarSubscriptions: List<CalendarSubscriptionEntity>) {
@@ -58,21 +58,19 @@ class CalendarListAdapter(
         private val calendarEntityItemTitle: TextView = view.item_drawer_calendar_title
         private val calendarEntityItemCheckBox: CheckBox = view.item_drawer_calendar_checkbox
 
-        fun bind(calendarEntity : CalendarEntity, position : Int) {
+        fun bind(calendarEntity : CalendarEntity) {
             if (calendarEntity.isDisabled) {
                 // For subscribed calendars we prioritize displaying disabled label over not synced
                 calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendarEntity.name)
                 calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
             } else if (calendarEntity.isSubscribed) {
-                calendarViewModel.lifeCycleScope.launch {
-                    val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
-                    if (calendarSubscription?.isSynced == true) {
-                        calendarEntityItemTitle.text = calendarEntity.name
-                        calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
-                    } else {
-                        calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
-                        calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
-                    }
+                val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
+                if (calendarSubscription?.isSynced == true) {
+                    calendarEntityItemTitle.text = calendarEntity.name
+                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                } else {
+                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
+                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 }
             } else {
                 calendarEntityItemTitle.text = calendarEntity.name
