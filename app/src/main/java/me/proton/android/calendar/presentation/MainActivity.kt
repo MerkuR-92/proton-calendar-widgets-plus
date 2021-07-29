@@ -338,11 +338,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         when (state) {
             AccountViewModel.State.LoginNeeded -> {
                 var openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
-                if (openIcsIntent == null) {
-                    openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
-                }
                 if (openIcsIntent != null) {
                     Toast.makeText(this, getString(R.string.snack_import_event_signed_out), Toast.LENGTH_LONG).show()
+                } else {
+                    openIcsIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                    if (openIcsIntent != null) {
+                        Toast.makeText(this, getString(R.string.snack_app_link_signed_out), Toast.LENGTH_LONG).show()
+                    }
                 }
                 findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
                 accountViewModel.startLoginWorkflow()

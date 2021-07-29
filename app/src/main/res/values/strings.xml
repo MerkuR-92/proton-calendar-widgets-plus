@@ -256,6 +256,7 @@
     <string name="snack_change_attendee_answer_error">Error sending answer, please try again later</string>
     <string name="snack_network_error">Network error, please try again later</string>
     <string name="snack_import_event_signed_out">You need to sign in to import events</string>
+    <string name="snack_app_link_signed_out">You need to sign in to see your event</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>
