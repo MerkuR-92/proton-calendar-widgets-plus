@@ -95,7 +95,7 @@ class CalendarViewModel(
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
     var viewMode: MutableLiveData<ViewMode> = MutableLiveData(ViewMode.AGENDA)
-    var monthView: MutableLiveData<Boolean> = MutableLiveData(true)
+    var monthView: MutableLiveData<Boolean> = MutableLiveData(false)
     var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)

@@ -212,7 +212,7 @@ class MonthFragment : BaseFragment() {
 
                 if (!initialHeightAdjusted) {
                     initialHeightAdjusted = true
-                    updateMiniCalendarHeight(this, startWeekOn, true, false)
+                    updateMiniCalendarHeight(this, startWeekOn, isMonthView = false, animateChange = false)
                 }
             }
         }
