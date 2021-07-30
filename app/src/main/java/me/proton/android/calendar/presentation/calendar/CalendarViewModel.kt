@@ -72,9 +72,9 @@ class CalendarViewModel(
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
     var userCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var activeCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var disabledCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var inactiveCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var activeUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var disabledUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var inactiveUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var subscribedCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var calendarSubscriptions: LiveData<List<CalendarSubscriptionEntity>> = MutableLiveData()
 
@@ -105,7 +105,7 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel getActiveCalendars")
             return arrayListOf()
         }
-        return calendarsRepository.getActiveCalendars(userId).filter { it.isActive }
+        return calendarsRepository.getActiveUserCalendars(userId).filter { it.isActive }
     }
 
     fun selectCalendars() {
@@ -114,9 +114,9 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
             return
         }
-        activeCalendars = calendarsRepository.flowActiveCalendars(userId).asLiveData(Dispatchers.Default)
-        disabledCalendars = calendarsRepository.flowDisabledCalendars(userId).asLiveData(Dispatchers.Default)
-        inactiveCalendars = calendarsRepository.flowInactiveCalendars(userId).asLiveData(Dispatchers.Default)
+        activeUserCalendars = calendarsRepository.flowActiveUserCalendars(userId).asLiveData(Dispatchers.Default)
+        disabledUserCalendars = calendarsRepository.flowDisabledUserCalendars(userId).asLiveData(Dispatchers.Default)
+        inactiveUserCalendars = calendarsRepository.flowInactiveUserCalendars(userId).asLiveData(Dispatchers.Default)
         userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
         subscribedCalendars = calendarsRepository.flowSubscribedCalendars(userId).asLiveData(Dispatchers.Default)
         calendarSubscriptions = calendarsRepository.flowCalendarSubscriptions().asLiveData(Dispatchers.Default)
@@ -557,7 +557,7 @@ class CalendarViewModel(
             return
         }
 
-        inactiveCalendars.value?.forEach { calendar ->
+        inactiveUserCalendars.value?.forEach { calendar ->
             if (calendar.hasUpdatePassphrase) {
                 // Handle flag UPDATE_PASSPHRASE
                 val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, calendar.id)

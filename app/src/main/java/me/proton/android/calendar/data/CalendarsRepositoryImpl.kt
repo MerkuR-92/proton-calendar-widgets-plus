@@ -409,16 +409,20 @@ class CalendarsRepositoryImpl(
         return database.calendarsDao().selectCalendars(userId)
     }
 
-    override fun flowActiveCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowActiveCalendars(userId).distinctUntilChanged()
+    override suspend fun selectUserCalendars(userId: String): List<CalendarEntity> {
+        return database.calendarsDao().selectUserCalendars(userId)
     }
 
-    override fun flowDisabledCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowDisabledCalendars(userId).distinctUntilChanged()
+    override fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowActiveUserCalendars(userId).distinctUntilChanged()
     }
 
-    override fun flowInactiveCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowInactiveCalendars(userId).distinctUntilChanged()
+    override fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowDisabledUserCalendars(userId).distinctUntilChanged()
+    }
+
+    override fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>> {
+        return database.calendarsDao().flowInactiveUserCalendars(userId).distinctUntilChanged()
     }
 
     override fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>> {
@@ -466,12 +470,12 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    override suspend fun getActiveCalendars(userId: String): List<CalendarEntity> {
-        return selectCalendars(userId).filter { it.isActive }
+    override suspend fun getActiveUserCalendars(userId: String): List<CalendarEntity> {
+        return selectUserCalendars(userId).filter { it.isActive }
     }
 
-    override suspend fun getDisabledCalendars(userId: String): List<CalendarEntity> {
-        return selectCalendars(userId).filter { it.isDisabled }
+    override suspend fun getDisabledUserCalendars(userId: String): List<CalendarEntity> {
+        return selectUserCalendars(userId).filter { it.isDisabled }
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
@@ -1092,10 +1096,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {
-        logger.d("getting default calendars, user ID: ${userId}")
-        logger.d("getting default calendars, calendar user settings: ${selectCalendarUserSettings(userId)}")
-        logger.d("getting default calendars, active calendars: ${getActiveCalendars(userId)}")
-        return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveCalendars(userId).firstOrNull()?.id
+        return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveUserCalendars(userId).firstOrNull()?.id
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

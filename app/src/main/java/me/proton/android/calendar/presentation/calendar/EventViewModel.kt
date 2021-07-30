@@ -232,7 +232,7 @@ class EventViewModel(
                 ?: return Result.Error("EventViewModel: could not get default calendar ID")
             defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
             if (defaultCalendar == null || !defaultCalendar.isActive) {
-                defaultCalendar = calendarsRepository.getActiveCalendars(userId.id).firstOrNull()
+                defaultCalendar = calendarsRepository.getActiveUserCalendars(userId.id).firstOrNull()
                     ?: return Result.Error("EventViewModel: no active calendars for user")
                 defaultCalendarId = defaultCalendar.id
             }

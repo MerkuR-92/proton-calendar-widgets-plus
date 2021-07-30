@@ -756,7 +756,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
 
-            calendarViewModel.inactiveCalendars.observe(this@MainActivity) { inactiveCalendars ->
+            calendarViewModel.inactiveUserCalendars.observe(this@MainActivity) { inactiveCalendars ->
                 inactiveCalendars ?: return@observe
 
                 // TODO Uncomment once calendar key reactivation has been fixed
@@ -774,7 +774,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         inactiveCalendarsJob = lifecycleScope.launch {
             delay(UPDATE_PASSPHRASE_CALENDARS_DELAY.toMillis())
-            val calendarsToUpdate = calendarViewModel.inactiveCalendars.value?.filter { it.hasUpdatePassphrase } ?: return@launch
+            val calendarsToUpdate = calendarViewModel.inactiveUserCalendars.value?.filter { it.hasUpdatePassphrase } ?: return@launch
             calendarViewModel.updatingCalendarPassphrase = true
             this@MainActivity.displayCalendarListMaterialDialog(
                 R.string.bootstrap_error_update_passphrase_title,

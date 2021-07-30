@@ -27,11 +27,13 @@ interface CalendarsRepository {
 
     suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
-    fun flowActiveCalendars(userId: String): Flow<List<CalendarEntity>>
+    suspend fun selectUserCalendars(userId: String): List<CalendarEntity>
 
-    fun flowDisabledCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
-    fun flowInactiveCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
@@ -47,9 +49,9 @@ interface CalendarsRepository {
 
     suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
 
-    suspend fun getActiveCalendars(userId: String): List<CalendarEntity>
+    suspend fun getActiveUserCalendars(userId: String): List<CalendarEntity>
 
-    suspend fun getDisabledCalendars(userId: String): List<CalendarEntity>
+    suspend fun getDisabledUserCalendars(userId: String): List<CalendarEntity>
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 

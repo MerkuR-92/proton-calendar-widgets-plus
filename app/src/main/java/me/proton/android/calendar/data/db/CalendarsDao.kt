@@ -18,13 +18,13 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     abstract fun flowCalendars(userId: String): Flow<List<CalendarEntity>>
 
     @Query("SELECT * FROM calendars WHERE flags == 1 AND type == 0 AND fkUserId = :userId")
-    abstract fun flowActiveCalendars(userId: String): Flow<List<CalendarEntity>>
+    abstract fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     @Query("SELECT * FROM calendars WHERE flags & (32 + 64) >= 32  AND type == 0 AND fkUserId = :userId")
-    abstract fun flowDisabledCalendars(userId: String): Flow<List<CalendarEntity>>
+    abstract fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     @Query("SELECT * FROM calendars WHERE flags & (2 + 4 + 8 + 16) >= 2  AND type == 0 AND fkUserId = :userId")
-    abstract fun flowInactiveCalendars(userId: String): Flow<List<CalendarEntity>>
+    abstract fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     @Query("SELECT * FROM calendars WHERE (flags == 1 OR flags & (32 + 64) >= 32)  AND type == 0 AND fkUserId = :userId")
     abstract fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
@@ -40,6 +40,9 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
 
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
     abstract suspend fun selectCalendars(userId: String): List<CalendarEntity>
+
+    @Query("SELECT * FROM calendars WHERE fkUserId = :userId AND type == 0")
+    abstract suspend fun selectUserCalendars(userId: String): List<CalendarEntity>
 
     @Query("SELECT fkUserId FROM calendars WHERE id = :calendarId")
     abstract suspend fun selectCalendarUserId(calendarId: String): String?

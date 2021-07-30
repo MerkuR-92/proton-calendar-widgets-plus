@@ -108,7 +108,7 @@ class MonthFragment : BaseFragment() {
 
     private fun setToolbarListeners(timeZoneId: ZoneId) {
         buttonCreate.setOnSingleClickListener {
-            val hasActiveCalendars = !calendarViewModel.activeCalendars.value.isNullOrEmpty()
+            val hasActiveCalendars = !calendarViewModel.activeUserCalendars.value.isNullOrEmpty()
             if (hasActiveCalendars) {
                 // each item in the adapter is one day
                 val currentDate =
@@ -348,7 +348,7 @@ class MonthFragment : BaseFragment() {
             miniCalendarPager.viewTreeObserver.addOnGlobalLayoutListener(miniCalendarPagerLayoutListener)
         }
 
-        calendarViewModel.activeCalendars.observe(viewLifecycleOwner) { activeCalendars ->
+        calendarViewModel.activeUserCalendars.observe(viewLifecycleOwner) { activeCalendars ->
             val hasActiveCalendars = !activeCalendars.isNullOrEmpty()
             if (hasActiveCalendars) {
                 buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_inverted))
