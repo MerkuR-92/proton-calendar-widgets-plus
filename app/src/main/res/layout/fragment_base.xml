@@ -80,6 +80,17 @@
                             style="@style/Text.Headline.Small"
                             android:background="@null"/>
 
+                        <ImageView
+                            android:id="@+id/mini_calendar_chevron"
+                            style="@style/Icon.Small"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_chevron_small_down"
+                            app:tint="@color/text_norm"
+                            android:background="@null"
+                            android:visibility="gone"
+                            tools:visibility="visible"
+                            android:layout_gravity="center_vertical"/>
+
                     </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -42,6 +42,7 @@ import me.proton.android.calendar.common.AndroidUtils.animateGuidelineHeightChan
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
@@ -212,6 +213,7 @@ class MonthFragment : BaseFragment() {
 
                 if (!initialHeightAdjusted) {
                     initialHeightAdjusted = true
+                    if (calendarViewModel.monthView.value == true) mini_calendar_chevron.rotation = 180f
                     updateMiniCalendarHeight(this, startWeekOn, isMonthView = false, animateChange = false)
                 }
             }
@@ -688,6 +690,7 @@ class MonthFragment : BaseFragment() {
                     override fun fullyExpand(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == false) {
                             calendarViewModel.monthView.value = true
+                            AndroidUtils.rotateArrowUpward(mini_calendar_chevron)
                             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn,
                                 isMonthView = true,
                                 animateChange = true
@@ -705,6 +708,7 @@ class MonthFragment : BaseFragment() {
                     override fun fullyCollapse(animationEndListener: () -> Unit) {
                         if (calendarViewModel.monthView.value == true) {
                             calendarViewModel.monthView.value = false
+                            AndroidUtils.rotateArrowDownward(mini_calendar_chevron)
                             updateMiniCalendarHeight(miniCalendarPagerLayoutListener, startWeekOn,
                                 isMonthView = false,
                                 animateChange = true
@@ -852,6 +856,7 @@ class MonthFragment : BaseFragment() {
         val year = SpannableString(localDate.year.toString())
         if (LocalDate.now().year == localDate.year) toolbarTitle.text = "$month"
         else toolbarTitle.text = "$month $year"
+        mini_calendar_chevron.visibleOrGone(true)
     }
 
     private fun simulateExpandWithScroll(startWeekOn: DayOfWeek) {
@@ -868,6 +873,7 @@ class MonthFragment : BaseFragment() {
                 )
                 timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                 miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
+                AndroidUtils.rotateArrowUpward(mini_calendar_chevron)
 
                 var currentHeight = calendarViewModel.currentPosDesiredWeekHeight
                 var scrollValue: Int
@@ -929,6 +935,7 @@ class MonthFragment : BaseFragment() {
                     delay(1)
                 }
                 calendarViewModel.monthView.value = true
+                AndroidUtils.rotateArrowUpward(mini_calendar_chevron)
                 updateMiniCalendarHeight(
                     miniCalendarPagerLayoutListener, startWeekOn,
                     isMonthView = true,
@@ -948,6 +955,7 @@ class MonthFragment : BaseFragment() {
 
                 var currentHeight = calendarViewModel.currentPosDesiredMonthHeight
                 var scrollValue: Int
+                AndroidUtils.rotateArrowDownward(mini_calendar_chevron)
                 viewPagerTopGuideline.animateGuidelineHeightChange(
                     desiredHeight,
                     object : AndroidUtils.AnimateGuidelineListener {
@@ -996,6 +1004,7 @@ class MonthFragment : BaseFragment() {
                 }
 
                 calendarViewModel.monthView.value = false
+                AndroidUtils.rotateArrowDownward(mini_calendar_chevron)
                 updateMiniCalendarHeight(
                     miniCalendarPagerLayoutListener, startWeekOn,
                     isMonthView = false,
