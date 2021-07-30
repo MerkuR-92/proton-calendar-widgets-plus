@@ -749,8 +749,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 it?.let {
                     val subscribedCalendars = it.first
                     val calendarSubscriptions = it.second
-                    subscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
+                    val dataSetChanged = subscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
                     subscribedCalendarListAdapter.submitList(subscribedCalendars)
+                    if (dataSetChanged) subscribedCalendarListAdapter.notifyDataSetChanged()
                     nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
                 }
             }

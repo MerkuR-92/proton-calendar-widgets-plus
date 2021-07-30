@@ -49,8 +49,10 @@ class CalendarListAdapter(
         holder.bind(item)
     }
 
-    fun setCalendarSubscriptions(calendarSubscriptions: List<CalendarSubscriptionEntity>) {
+    fun setCalendarSubscriptions(calendarSubscriptions: List<CalendarSubscriptionEntity>): Boolean {
+        val dataSetChanged = this.calendarSubscriptions != calendarSubscriptions
         this.calendarSubscriptions = calendarSubscriptions
+        return dataSetChanged
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
