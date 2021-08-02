@@ -242,7 +242,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
                         val currentList = (rv_agenda.adapter as? EventAdapter)?.currentList
-                        if (currentList == null || currentList.size <= 1) {
+                        if (currentList == null || currentList.size <= 1 && this.isResumed) {
                             calendarViewModel.setLoading(true, position)
                         }
                     }

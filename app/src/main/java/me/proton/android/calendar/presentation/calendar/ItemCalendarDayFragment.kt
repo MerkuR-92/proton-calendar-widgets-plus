@@ -555,7 +555,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
-                        calendarViewModel.setLoading(true, position)
+                        if (this.isResumed) calendarViewModel.setLoading(true, position)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         allEvents?.put(
