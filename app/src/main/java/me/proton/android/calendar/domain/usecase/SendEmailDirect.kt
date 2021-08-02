@@ -12,6 +12,7 @@ import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.pgp.*
 import me.proton.core.crypto.common.pgp.exception.CryptoException
 import me.proton.core.key.domain.*
+import me.proton.core.mailmessage.data.api.request.EmailMessage
 import me.proton.core.mailmessage.domain.entity.*
 import me.proton.core.mailmessage.domain.usecase.SendEmailDirect
 import me.proton.core.network.data.ProtonErrorException
@@ -195,7 +196,7 @@ class SendEmailDirect @Inject constructor(
         val receipt = try {
             emailMessageRepository.sendEmailDirect(
                 userId = sender.userId,
-                encryptedEmail = encryptedEmail,
+                emailMessage = toEmailMessage(encryptedEmail),
                 encryptedPackages = emailPackages.filterNullValues().values.toList(),
                 attachmentKeys = encodedAttachmentKeyPackets //.ifEmpty { null }
             )
@@ -207,6 +208,22 @@ class SendEmailDirect @Inject constructor(
             return Result.Error.Api
         }
         return Result.Success(receipt)
+    }
+
+    // TODO use EncryptedEmail.toEmailMessage() when when we backport this to Core
+    private fun toEmailMessage(encryptedEmail: EncryptedEmail): EmailMessage {
+        return with (encryptedEmail) {
+            EmailMessage(
+                subject = subject,
+                sender = EmailMessage.Address(sender.address, sender.name),
+                to = to.map { EmailMessage.Address(it.address, it.name) },
+                cc = cc.map { EmailMessage.Address(it.address, it.name) },
+                bcc = bcc.map { EmailMessage.Address(it.address, it.name) },
+                body = body,
+                mimeType = mimeType,
+                attachments = attachments.map { EmailMessage.Attachment(it.fileName, it.mimeType, it.contents) }
+            )
+        }
     }
 
     /**
