@@ -48,13 +48,13 @@ import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AppLinksAction.VIEW
 import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
-import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
-import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
+import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -623,6 +623,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let { mainViewModel.handleIntent(intent) }
+
+        if (intent?.action == INVITE_PROTON_INTENT_ACTION || intent?.action == Intent.ACTION_VIEW || intent?.type == INVITE_ICS_MIME_TYPE) {
+            with(accountViewModel) {
+                val state = state.value
+                if (state == AccountViewModel.State.Ready) {
+                    handleAccountState(this, state)
+                }
+            }
+        }
     }
 
     private fun initDrawerListeners() {
