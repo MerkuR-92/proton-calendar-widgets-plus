@@ -68,7 +68,7 @@ object FeatureFlag {
     const val CHANGE_ANSWER = true
     const val OPEN_ICS = true
     const val OPEN_ICS_FILES = false
-    const val APP_LINKS = false
+    const val APP_LINKS = true
     const val ADD_EMAIL_NOTIFICATIONS = false
 }
 
