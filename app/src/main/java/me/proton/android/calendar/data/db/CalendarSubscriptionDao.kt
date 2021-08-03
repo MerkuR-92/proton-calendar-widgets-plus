@@ -9,13 +9,13 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 @Dao
 abstract class CalendarSubscriptionDao : BaseDao<CalendarSubscriptionEntity> {
 
-    @Query("SELECT * FROM calendar_subscription WHERE calendarId = :calendarId")
+    @Query("SELECT * FROM calendar_subscriptions WHERE calendarId = :calendarId")
     abstract suspend fun select(calendarId: String): CalendarSubscriptionEntity?
 
-    @Query("SELECT * FROM calendar_subscription")
+    @Query("SELECT * FROM calendar_subscriptions")
     abstract fun flowCalendarSubscriptions(): Flow<List<CalendarSubscriptionEntity>>
 
-    @Query("DELETE FROM calendar_subscription WHERE calendarId = :calendarId")
+    @Query("DELETE FROM calendar_subscriptions WHERE calendarId = :calendarId")
     abstract suspend fun deleteById(calendarId: String)
 
 }

@@ -10,7 +10,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import java.time.Duration
 
 // = calendar subscription
-@Entity(tableName = AppDatabase.TABLE_CALENDAR_SUBSCRIPTION,
+@Entity(tableName = AppDatabase.TABLE_CALENDAR_SUBSCRIPTIONS,
     foreignKeys = [ForeignKey(
         entity = CalendarEntity::class,
         parentColumns = ["id"],

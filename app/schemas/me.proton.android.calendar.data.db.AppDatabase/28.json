@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 28,
-    "identityHash": "e5be0d17a752535cead0237f7fd619af",
+    "identityHash": "fe768acefd6635d01533cd6ce92f52d4",
     "entities": [
       {
         "tableName": "calendars",
@@ -867,7 +867,7 @@
         ]
       },
       {
-        "tableName": "calendar_subscription",
+        "tableName": "calendar_subscriptions",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`calendarId` TEXT NOT NULL, `createTime` INTEGER NOT NULL, `lastUpdateTime` INTEGER NOT NULL, `status` INTEGER NOT NULL, `url` TEXT NOT NULL, PRIMARY KEY(`calendarId`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
@@ -909,12 +909,12 @@
         },
         "indices": [
           {
-            "name": "index_calendar_subscription_calendarId",
+            "name": "index_calendar_subscriptions_calendarId",
             "unique": false,
             "columnNames": [
               "calendarId"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_calendar_subscription_calendarId` ON `${TABLE_NAME}` (`calendarId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_calendar_subscriptions_calendarId` ON `${TABLE_NAME}` (`calendarId`)"
           }
         ],
         "foreignKeys": [
@@ -935,7 +935,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e5be0d17a752535cead0237f7fd619af')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe768acefd6635d01533cd6ce92f52d4')"
     ]
   }
 }

@@ -154,7 +154,7 @@ data class ServerCalendarEventsApiResponse(
     val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null,
     @SerialName("CalendarAlarms")
     val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
-    @SerialName("CalendarSubscription")
+    @SerialName("CalendarSubscriptions")
     val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null
 )
 
