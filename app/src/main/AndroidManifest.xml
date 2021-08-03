@@ -27,7 +27,6 @@
             android:name=".presentation.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"
             android:theme="@style/AppTheme.DayNight.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
