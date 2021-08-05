@@ -25,6 +25,7 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
+import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import java.time.LocalTime
@@ -623,10 +624,17 @@ class HandleSaveUseCase(
         sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
         if (sendEmailResult is UseCase.Result.Error) {
-            return UseCase.Result.Error(
-                "HandleSaveUseCase: error in send email: ${sendEmailResult.message}",
-                UseCase.Error.EDIT_ERROR_SEND_MAIL
-            )
+            return if (sendEmailResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
+                    UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                )
+            } else {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
+                    UseCase.Error.EDIT_ERROR_SEND_MAIL
+                )
+            }
         } else if (sendEmailResult is UseCase.Result.InvalidParams) {
             return UseCase.Result.Error(
                 "HandleSaveUseCase: invalid params in send email: ${sendEmailResult.message}",
@@ -667,10 +675,17 @@ class HandleSaveUseCase(
                 )
 
                 if (sendEmailResult is UseCase.Result.Error) {
-                    return UseCase.Result.Error(
-                        "HandleSaveUseCase: error in send mail: ${sendEmailResult.message}",
-                        UseCase.Error.CREATE_ERROR_SEND_MAIL
-                    )
+                    return if (sendEmailResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                        UseCase.Result.Error(
+                            "HandleSaveUseCase: error in send mail (create with attendees): ${sendEmailResult.message}",
+                            UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                        )
+                    } else {
+                        UseCase.Result.Error(
+                            "HandleSaveUseCase: error in send mail (create with attendees): ${sendEmailResult.message}",
+                            UseCase.Error.CREATE_ERROR_SEND_MAIL
+                        )
+                    }
                 } else if (sendEmailResult is UseCase.Result.InvalidParams) {
                     return UseCase.Result.Error(
                         "HandleSaveUseCase: invalid params in send mail: ${sendEmailResult.message}",

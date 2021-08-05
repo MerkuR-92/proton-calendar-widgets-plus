@@ -134,6 +134,7 @@ class EventViewModel(
 
         // TODO
         object Idle: EventState()
+        object UserAddressInvalidForEncryption: EventState()
 
         sealed class Processing: EventState() {
             object Saving: Processing()
@@ -570,6 +571,7 @@ class EventViewModel(
         SUCCESS,
         CREATE_ERROR_SEND_MAIL,
         EDIT_ERROR_SEND_MAIL,
+        USER_ADDRESS_INVALID_FOR_ENCRYPTION, // TODO remove the hack when UserAddress problem is solved
         ERROR
     }
 
@@ -608,6 +610,7 @@ class EventViewModel(
             return when (handleSaveResult.error) {
                 UseCase.Error.EDIT_ERROR_SEND_MAIL -> HandleSaveResult.EDIT_ERROR_SEND_MAIL
                 UseCase.Error.CREATE_ERROR_SEND_MAIL -> HandleSaveResult.CREATE_ERROR_SEND_MAIL
+                UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION -> HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION
                 else -> HandleSaveResult.ERROR
             }
         } else if (handleSaveResult is UseCase.Result.InvalidParams) {
@@ -1407,6 +1410,10 @@ class EventViewModel(
                 false
             )
             sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            if (sendEmailUseCaseResult is UseCase.Result.Error && sendEmailUseCaseResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                eventState.value = EventState.UserAddressInvalidForEncryption
+                return false
+            }
             if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
                 eventState.value = EventState.Idle
                 return false

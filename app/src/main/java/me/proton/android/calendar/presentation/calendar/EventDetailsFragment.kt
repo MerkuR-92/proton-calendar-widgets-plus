@@ -19,6 +19,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -495,6 +496,24 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    // TODO remove when the issue with invalid sender Address is fixed
+    private suspend fun invalidUserAddressLogoutHack() {
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        if (sharedPreferences.getBoolean(SharedPreferencesKeys.HACK_USER_ADDRESS_INVALID_FOR_SENDING, false)) {
+            logger.e("EventDetailsFragment: hack was performed but we force logout again")
+        }
+
+        with (sharedPreferences.edit()) {
+            putBoolean(SharedPreferencesKeys.HACK_USER_ADDRESS_INVALID_FOR_SENDING, true)
+            apply()
+        }
+
+        logger.i("EventDetailsFragment: hack detected invalid user address, logging out")
+        accountViewModel.logoutPrimary()
+        calendarViewModel.shutdown()
+    }
+
     private fun observeEventLiveData(coroutineContext: CoroutineContext) {
 
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
@@ -509,6 +528,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 buttonMenu.visibleOrGone(!event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed )
 
                 if (eventState is EventViewModel.EventState.Processing.ChangingAnswer) displayAttendeeAnswerState(eventState.participationStatus)
+
+                if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
+                    lifecycleScope.launch {
+                        invalidUserAddressLogoutHack()
+                    }
+                }
             }
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here

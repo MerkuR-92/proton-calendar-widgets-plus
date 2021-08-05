@@ -338,6 +338,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     jumpToMonthView()
                 } else if (handleSaveResult == EventViewModel.HandleSaveResult.EDIT_ERROR_SEND_MAIL) {
                     view?.displaySnackBar(getString(R.string.snack_event_updated_error_failed_mail))
+                } else if (handleSaveResult == EventViewModel.HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                    invalidUserAddressLogoutHack()
                 } else {
                     view?.displaySnackBar(getString(R.string.snack_event_updated_error))
                 }
@@ -349,6 +351,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         else R.string.snack_event_created_failed_mail))
                     setMonthViewSelectedDay()
                     jumpToMonthView()
+                } else if (handleSaveResult == EventViewModel.HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                    invalidUserAddressLogoutHack()
                 } else {
                     view?.displaySnackBar(getString(R.string.snack_event_created_error))
                 }
@@ -405,10 +409,29 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 jumpToMonthView()
             } else if (handleSaveResult == EventViewModel.HandleSaveResult.EDIT_ERROR_SEND_MAIL) {
                 view?.displaySnackBar(getString(R.string.snack_event_updated_error_failed_mail))
+            } else if (handleSaveResult == EventViewModel.HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                invalidUserAddressLogoutHack()
             } else {
                 view?.displaySnackBar(getString(R.string.snack_event_updated_error))
             }
         }
+    }
+
+    // TODO remove when the issue with invalid sender Address is fixed
+    private suspend fun invalidUserAddressLogoutHack() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        if (sharedPreferences.getBoolean(SharedPreferencesKeys.HACK_USER_ADDRESS_INVALID_FOR_SENDING, false)) {
+            logger.e("EventFormFragment: hack was performed but we force logout again")
+        }
+
+        with (sharedPreferences.edit()) {
+            putBoolean(SharedPreferencesKeys.HACK_USER_ADDRESS_INVALID_FOR_SENDING, true)
+            apply()
+        }
+
+        logger.i("EventFormFragment: hack detected invalid user address, logging out")
+        accountViewModel.logoutPrimary()
+        calendarViewModel.shutdown()
     }
 
     private fun onSuccessEventUpdateCalendarDisplay() {

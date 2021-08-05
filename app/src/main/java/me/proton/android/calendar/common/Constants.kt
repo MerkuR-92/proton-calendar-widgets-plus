@@ -79,6 +79,7 @@ object ApiResponseCode {
 object SharedPreferencesKeys {
     const val THEME = "theme"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
+    const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
 }
 
 enum class AppTheme(val value: Int) {

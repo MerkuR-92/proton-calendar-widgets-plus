@@ -23,7 +23,8 @@ interface UseCase {
 
         /* HandleSaveUseCase */
         EDIT_ERROR_SEND_MAIL,
-        CREATE_ERROR_SEND_MAIL
+        CREATE_ERROR_SEND_MAIL,
+        USER_ADDRESS_INVALID_FOR_ENCRYPTION
     }
 }
 
