@@ -120,7 +120,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // Populate today's entry in the map with a list of example events
         allEvents = LongSparseArray<List<Event>>()
 
-
         dayView = rootView.findViewById(R.id.day_view)
 
         // setHourLabelViews() must be called before the view is rendered so we need to make sure to call it without waiting for first observe value
@@ -131,11 +130,13 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
 
         if (date == LocalDate.now()) {
+            // If is current day, set current time indicator in day view
             val currentTimeView = layoutInflater.inflate(R.layout.item_current_time_indicator, dayView, false)
             dayView.setCurrentTimeView(requireContext(), currentTimeView)
         }
 
         onScrollChangeListener = View.OnScrollChangeListener { _, _, scrollY, _, _ ->
+            // If fragment is the one resumed, save scrolling position to apply it to other days on swipe
             if (this.isResumed) calendarViewModel.dayViewScrollYPosition.value = scrollY
         }
 
@@ -146,6 +147,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 scrollView.setOnScrollChangeListener(null)
                 val jumpToCurrentTime = calendarViewModel.jumpToCurrentTime.value
                 if (jumpToCurrentTime == true) {
+                    // Set scrolling position to current time minus 1 hour
                     calendarViewModel.jumpToCurrentTime.value = false
                     val currentTime = LocalTime.now().hour
                     val yPos = dayView.getHourTop(
@@ -155,6 +157,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                     scrollView.scrollY = yPos
                     if (this@ItemCalendarDayFragment.isResumed) calendarViewModel.dayViewScrollYPosition.value = yPos
                 } else {
+                    // Use previous view scrolling position if it exists
                     scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
                 }
                 scrollView.setOnScrollChangeListener(onScrollChangeListener)
@@ -166,6 +169,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         scrollView.setOnScrollChangeListener(onScrollChangeListener)
 
         dayView.setOnTouchListener { v, event ->
+            // Handle clicks in empty day view spaces to create events
             if (event.action == MotionEvent.ACTION_UP && dayView.areCoordinatesWithinEventGrid(event.x.toInt(), event.y.toInt())) {
                 val startTime = dayView.getTimeForYCoordinate(event.y.toInt())
                 calendarViewModel.lifeCycleScope.launch {
@@ -212,15 +216,17 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private lateinit var updateCurrentTimeIndicatorJob: Job
     private fun updateCurrentTimeIndicatorDelayed() {
+        // Create job to update the current time indicator every minute
         updateCurrentTimeIndicatorJob = lifecycleScope.launch {
             if (date == LocalDate.now()) {
                 if (!dayView.hasCurrentTimeIndicator()) {
+                    // Create time indicator in day view if it doesn't exist yet
                     val currentTimeView = layoutInflater.inflate(R.layout.item_current_time_indicator, dayView, false)
                     dayView.setCurrentTimeView(requireContext(), currentTimeView)
                 }
                 dayView.updateCurrentTimeView()
             } else if (date != LocalDate.now() && dayView.hasCurrentTimeIndicator()) {
-                dayView.removeCurrentTimeView()
+                dayView.removeCurrentTimeView() // Remove current time indicator if this fragment is not current day anymore
             }
             delay(REFRESH_CURRENT_TIME_INDICATOR)
             updateCurrentTimeIndicatorDelayed()
@@ -235,6 +241,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     override fun onResume() {
         super.onResume()
         day_scroll_view.setOnScrollChangeListener(null)
+        // Set scrolling position using previous view value if it exists
         day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
         day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
     }
@@ -308,8 +315,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         val summary = event.summary
         eventItemTitle.text = if (summary.isNullOrEmpty()) getString(R.string.default_event_summary) else summary
         eventItemTitle.doOnPreDraw {
-            // Check if last line of text view is cut off
-            eventItemTitle.layout ?: return@doOnPreDraw // TODO An NPE can apparently happen here
+            // This doOnPreDraw checks if last line of text view is cut off
+            eventItemTitle.layout ?: return@doOnPreDraw // Check eventItemTitle value to avoid NPE
             val lastVisibleLineNumber: Int = eventItemTitle.layout.getLineForVertical(eventItemTitle.height + eventItemTitle.scrollY)
             if (eventItemTitle.height < eventItemTitle.layout.getLineBottom(lastVisibleLineNumber)) {
                 // If line is cut off, set max line property
