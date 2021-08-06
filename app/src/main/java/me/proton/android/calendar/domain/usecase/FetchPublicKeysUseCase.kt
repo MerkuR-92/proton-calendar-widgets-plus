@@ -13,40 +13,27 @@ import me.proton.android.calendar.data.entity.PublicKeyEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.repository.PublicAddressRepository
 
+/**
+ * Forces fetching and caching Public Keys for Authors of Calendar Parts.
+ */
 class FetchPublicKeysUseCase(
     private val logger: Logger,
-    private val keysApi: KeysApi,
-    private val database: AppDatabase
+    private val publicAddressRepository: PublicAddressRepository
 ) : UseCase {
 
     private suspend fun fetchPublicKeys(userId: UserId, email: String): UseCase.Result {
 
-        // TODO
+        val publicAddress = kotlin.runCatching {
+            publicAddressRepository.getPublicAddress(userId, email, refresh = true)
+        }.getOrNull()
 
-        // 1. some emails have no public keys and will "always" fail to fetch them,
-        //  try to optimize this somehow, at least put it in memory and don't try to fetch again for some time
-
-        // 2. we need to refresh the cache once in a while, current logic will not add any new keys
-        //  if we already have any in the database
-
-        if (database.publicKeysDao().select(email).isEmpty()) {
-
-            logger.v("fetching public keys for $email")
-
-            val keysResponse = keysApi.getPublicKeys(userId, email)
-            return if (keysResponse is ApiResponse.Success) {
-                database.publicKeysDao().insert(*keysResponse.data.keys.map { PublicKeyEntity(email, it.flags, it.publicKey) }.toTypedArray())
-                logger.v("persisted public keys for $email -> ${keysResponse.data}")
-                UseCase.Result.Success<Unit>()
-            } else {
-                UseCase.Result.Error("error fetching public keys for email: ")
-            }
-
+        return if (publicAddress != null) {
+            UseCase.Result.Success<Unit>()
+        } else {
+            UseCase.Result.Error("error fetching public keys")
         }
-
-        return UseCase.Result.Success<Unit>()
-
     }
 
     suspend fun execute(userId: UserId, eventEntities: List<EventEntity>): UseCase.Result {

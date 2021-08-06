@@ -236,6 +236,7 @@ class TransformEventUseCase(
 
                 if (eventPart.signature != null) {
 
+                    // refresh = false, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
                     val publicAddressKeys = kotlin.runCatching { publicAddressRepository.getPublicAddress(userId, eventPart.author, refresh = false).keys }.getOrNull()
 
                     if (publicAddressKeys == null || publicAddressKeys.isEmpty()) {
