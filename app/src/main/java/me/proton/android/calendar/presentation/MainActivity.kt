@@ -203,6 +203,22 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             return
         }
 
+        setContentView(R.layout.activity_main)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view)
+
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
+        navController = navHostFragment.navController
+        navView.setupWithNavController(navController)
+
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
+            ), drawerLayout
+        )
+
         intent?.let { mainViewModel.handleIntent(intent) }
 
         with(forceUpdateViewModel) {
@@ -308,22 +324,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             })
         }
-
-        setContentView(R.layout.activity_main)
-
-        drawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
-
-        navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
-        navController = navHostFragment.navController
-
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
-            ), drawerLayout
-        )
-        navView.setupWithNavController(navController)
 
         nav_view_main_content.nav_view_version.text = getString(
             R.string.nav_view_version_name,
