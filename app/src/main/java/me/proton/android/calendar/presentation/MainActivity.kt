@@ -12,7 +12,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
@@ -82,9 +83,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
-    private lateinit var navHostFragment: NavHostFragment
 
     private val logger: Logger by inject()
 
@@ -205,10 +204,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         setContentView(R.layout.activity_main)
 
-        drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
 
-        navHostFragment =
+        val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
         navView.setupWithNavController(navController)
@@ -216,7 +214,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
-            ), drawerLayout
+            ), drawer_layout
         )
 
         intent?.let { mainViewModel.handleIntent(intent) }
@@ -607,7 +605,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.fetchingEvents.postValue(spinnerText)
         }
 
-        drawerLayout.setDrawerLockMode(if (display) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED)
+        drawer_layout.setDrawerLockMode(if (display) LOCK_MODE_LOCKED_CLOSED else LOCK_MODE_UNLOCKED)
 
         val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm
         val statusBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_norm
@@ -631,18 +629,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun initDrawerListeners() {
         //Navigation drawer items on click listeners
         nav_view_main_content.nav_view_user_layout.setOnSingleClickListener {
-            drawerLayout.close()
+            drawer_layout.close()
         }
 
         nav_view_main_content.nav_view_more_bug_press.setOnSingleClickListener {
             navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
-            drawerLayout.close()
+            drawer_layout.close()
         }
         // TODO Remove feature flag
         nav_view_main_content.nav_view_more_settings_layout.visibleOrGone(FeatureFlag.SETTINGS_DRAWER)
         nav_view_main_content.nav_view_more_settings_press.setOnSingleClickListener {
             navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-            drawerLayout.close()
+            drawer_layout.close()
         }
         accountViewModel.hasPrimary.observe(this@MainActivity) { hasPrimary ->
             nav_view_main_content.nav_view_more_logout_layout.isVisible = hasPrimary
@@ -650,11 +648,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
             accountViewModel.logoutPrimary()
-            drawerLayout.close()
+            drawer_layout.close()
         }
         nav_view_main_content.nav_view_more_login_press.setOnSingleClickListener {
             accountViewModel.addAccount()
-            drawerLayout.close()
+            drawer_layout.close()
         }
     }
 
@@ -804,8 +802,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     override fun onBackPressed() {
 
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
             moveTaskToBack(true)
         } else {
