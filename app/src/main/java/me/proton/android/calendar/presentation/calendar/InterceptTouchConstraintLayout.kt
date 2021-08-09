@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 
 class InterceptTouchConstraintLayout @JvmOverloads constructor(
     context: Context,
@@ -27,44 +26,32 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
         return when (ev.actionMasked) {
             // Always handle the case of the touch gesture being complete.
             MotionEvent.ACTION_DOWN -> {
-                if (allowScrolling && WEEK_COMPONENT) {
-                    false
-                } else {
-                    if (!WEEK_COMPONENT) {
-                        val delegateArea = Rect()
-                        agendaPager?.getHitRect(delegateArea)
+                val delegateArea = Rect()
+                agendaPager?.getHitRect(delegateArea)
 
-                        val sliderDelegateArea = Rect()
-                        sliderView?.getHitRect(sliderDelegateArea)
-                        (!allowScrolling && delegateArea.contains(ev.x.toInt(), ev.y.toInt())) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
-                    } else {
-                        val delegateArea = Rect()
-                        agendaPager?.getHitRect(delegateArea)
-                        delegateArea.contains(ev.x.toInt(), ev.y.toInt())
-                    }
-                }
+                val sliderDelegateArea = Rect()
+                sliderView?.getHitRect(sliderDelegateArea)
+
+                (!allowScrolling && delegateArea.contains(
+                    ev.x.toInt(),
+                    ev.y.toInt()
+                )) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
             }
             MotionEvent.ACTION_UP -> {
                 // Do not intercept touch event, let the child handle it
                 false
             }
             MotionEvent.ACTION_MOVE -> {
-                if (allowScrolling && WEEK_COMPONENT) {
-                    false
-                } else {
-                    if (!WEEK_COMPONENT) {
-                        val delegateArea = Rect()
-                        agendaPager?.getHitRect(delegateArea)
+                val delegateArea = Rect()
+                agendaPager?.getHitRect(delegateArea)
 
-                        val sliderDelegateArea = Rect()
-                        sliderView?.getHitRect(sliderDelegateArea)
-                        (!allowScrolling && delegateArea.contains(ev.x.toInt(), ev.y.toInt())) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
-                    } else {
-                        val delegateArea = Rect()
-                        agendaPager?.getHitRect(delegateArea)
-                        delegateArea.contains(ev.x.toInt(), ev.y.toInt())
-                    }
-                }
+                val sliderDelegateArea = Rect()
+                sliderView?.getHitRect(sliderDelegateArea)
+
+                (!allowScrolling && delegateArea.contains(
+                    ev.x.toInt(),
+                    ev.y.toInt()
+                )) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
             }
             else -> {
                 // In general, we don't want to intercept touch events. They should be handled by the child view.

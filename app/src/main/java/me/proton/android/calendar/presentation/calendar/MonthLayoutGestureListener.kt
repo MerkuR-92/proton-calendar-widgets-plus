@@ -15,11 +15,9 @@ class MonthLayoutGestureListener(
     private val calendarViewModel: CalendarViewModel,
     private val viewPagerTopGuideline: View,
     private val viewPagerSliderGuideline: View,
-    private val miniCalendarPager: ViewPager2,
-    private val miniCalendarPagerAdapter: MiniCalendarPagerAdapter,
     private val agendaPager: ViewPager2,
     private val monthLayoutOnFinishMoveListener: MonthLayoutOnFinishMoveListener
-): View.OnTouchListener {
+) : View.OnTouchListener {
     private var oldScrollY: Float? = null
     private var actionUpY: Float? = null
     private var actionDownY: Float? = null
@@ -54,7 +52,13 @@ class MonthLayoutGestureListener(
         when (event.action) {
             MotionEvent.ACTION_MOVE -> {
 
-                if (stayedWithinClickDistance && distance(pressedX, pressedY, event.x, event.y) > MiniCalendarGestures.MAX_CLICK_DISTANCE) {
+                if (stayedWithinClickDistance && distance(
+                        pressedX,
+                        pressedY,
+                        event.x,
+                        event.y
+                    ) > MiniCalendarGestures.MAX_CLICK_DISTANCE
+                ) {
                     stayedWithinClickDistance = false
                 }
 
@@ -65,15 +69,15 @@ class MonthLayoutGestureListener(
                     scrollUp = true
                     scrollDown = false
                     val scrollValue = (scrollY - oldScrollY!!) * -1
-                    val viewPagerGuidelineLayoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-                    if (viewPagerGuidelineLayoutParams.guideBegin > calendarViewModel.currentPosDesiredWeekHeight) {
+                    val viewPagerGuidelineLayoutParams =
+                        (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
+                    if (viewPagerGuidelineLayoutParams.guideBegin > context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)) {
                         viewPagerGuidelineLayoutParams.guideBegin -= scrollValue.toInt()
 
-                        // Trigger ItemMiniCalendarFragment scroll listener
-                        miniCalendarPagerAdapter.miniCalendarsScrollUp(miniCalendarPager.currentItem, scrollValue, viewPagerGuidelineLayoutParams.guideBegin)
-
                         // Set Guidelines guide begin
-                        if (viewPagerGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredWeekHeight) viewPagerGuidelineLayoutParams.guideBegin = calendarViewModel.currentPosDesiredWeekHeight
+                        if (viewPagerGuidelineLayoutParams.guideBegin < context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height))
+                            viewPagerGuidelineLayoutParams.guideBegin =
+                                context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
                         viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
 
                     }
@@ -83,19 +87,23 @@ class MonthLayoutGestureListener(
                     scrollUp = false
                     scrollDown = true
                     val scrollValue = scrollY - oldScrollY!!
-                    val viewPagerGuidelineLayoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
-                    val viewPagerSliderGuidelineLayoutParams = (viewPagerSliderGuideline.layoutParams as ConstraintLayout.LayoutParams)
+                    val viewPagerGuidelineLayoutParams =
+                        (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams)
+                    val viewPagerSliderGuidelineLayoutParams =
+                        (viewPagerSliderGuideline.layoutParams as ConstraintLayout.LayoutParams)
                     if (viewPagerGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) {
                         viewPagerGuidelineLayoutParams.guideBegin += scrollValue.toInt()
 
-                        // Trigger ItemMiniCalendarFragment scroll listener
-                        miniCalendarPagerAdapter.miniCalendarsScrollDown(miniCalendarPager.currentItem, scrollValue, viewPagerGuidelineLayoutParams.guideBegin)
-
                         // Set Guidelines guide begin
-                        if (viewPagerGuidelineLayoutParams.guideBegin > calendarViewModel.currentPosDesiredMonthHeight) viewPagerGuidelineLayoutParams.guideBegin = calendarViewModel.currentPosDesiredMonthHeight
+                        if (viewPagerGuidelineLayoutParams.guideBegin > calendarViewModel.currentPosDesiredMonthHeight)
+                            viewPagerGuidelineLayoutParams.guideBegin =
+                                calendarViewModel.currentPosDesiredMonthHeight
                         viewPagerTopGuideline.layoutParams = viewPagerGuidelineLayoutParams
-                        if (viewPagerSliderGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight) viewPagerSliderGuidelineLayoutParams.guideBegin = calendarViewModel.currentPosDesiredMonthHeight - context.resources.getDimensionPixelSize(
-                            R.dimen.calendar_slider_height)
+                        if (viewPagerSliderGuidelineLayoutParams.guideBegin < calendarViewModel.currentPosDesiredMonthHeight)
+                            viewPagerSliderGuidelineLayoutParams.guideBegin =
+                                calendarViewModel.currentPosDesiredMonthHeight - context.resources.getDimensionPixelSize(
+                                    R.dimen.calendar_slider_height
+                                )
                         viewPagerSliderGuideline.layoutParams = viewPagerSliderGuidelineLayoutParams
                     }
                 }
@@ -122,13 +130,24 @@ class MonthLayoutGestureListener(
                 val pressDuration = System.currentTimeMillis() - pressStartTime
                 val delegateArea = Rect()
                 agendaPager.getHitRect(delegateArea)
-                val isWithinPager = delegateArea.contains(pressedX.toInt(), pressedY.toInt()) // Check if click is within agenda view
+                val isWithinPager =
+                    delegateArea.contains(pressedX.toInt(), pressedY.toInt()) // Check if click is within agenda view
 
-                if (isWithinPager && pressDuration < MiniCalendarGestures.MAX_CLICK_DURATION && stayedWithinClickDistance && calendarViewModel.monthView.value == true) {
+                if (isWithinPager &&
+                    pressDuration < MiniCalendarGestures.MAX_CLICK_DURATION &&
+                    stayedWithinClickDistance &&
+                    calendarViewModel.monthView.value == true
+                ) {
                     // Click event has occurred
                     monthLayoutOnFinishMoveListener.simulateCollapse { }
                     return true
-                } else if (pressDuration < MiniCalendarGestures.MAX_FLICK_DURATION && distance(pressedX, pressedY, event.x, event.y) > MiniCalendarGestures.MIN_FLICK_DISTANCE) {
+                } else if (pressDuration < MiniCalendarGestures.MAX_FLICK_DURATION && distance(
+                        pressedX,
+                        pressedY,
+                        event.x,
+                        event.y
+                    ) > MiniCalendarGestures.MIN_FLICK_DISTANCE
+                ) {
                     // Flick event has occurred
                     if (calendarViewModel.monthView.value == true) monthLayoutOnFinishMoveListener.simulateCollapse { }
                     else monthLayoutOnFinishMoveListener.simulateExpand { }
@@ -139,34 +158,32 @@ class MonthLayoutGestureListener(
 
                 // Check if we're closer to top or bottom so that we finish the animation for the user
                 val distanceWithWeekTop = layoutParams.guideBegin -
-                        calendarViewModel.currentPosDesiredWeekHeight -
+                        context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height) -
                         if (calendarViewModel.monthView.value == true) // Make it easier to collapse when expanded
                             (context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) + context.resources.getDimensionPixelSize(
-                                R.dimen.calendar_item_header_height))
+                                R.dimen.calendar_item_header_height
+                            ))
                         else 0
                 val distanceWithMonthBottom = calendarViewModel.currentPosDesiredMonthHeight -
                         layoutParams.guideBegin -
                         if (calendarViewModel.monthView.value == false) // Make it easier to expand when collapsed
                             (context.resources.getDimensionPixelSize(R.dimen.calendar_item_height) + context.resources.getDimensionPixelSize(
-                                R.dimen.calendar_item_header_height))
+                                R.dimen.calendar_item_header_height
+                            ))
                         else 0
 
                 if (distanceWithMonthBottom > distanceWithWeekTop && distanceWithWeekTop != 0 && distanceWithMonthBottom != 0) {
                     // Finish collapse animation for the user
                     monthLayoutOnFinishMoveListener.fullyCollapse { }
-                    miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                 } else if (distanceWithWeekTop != 0 && distanceWithMonthBottom != 0) {
                     // Finish expand animation for the user
                     monthLayoutOnFinishMoveListener.fullyExpand { }
-                    miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                 } else if (distanceWithWeekTop == 0 && scrollUp) {
                     // View is already fully collapsed, continue the process
                     monthLayoutOnFinishMoveListener.fullyCollapse { }
-                    miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                 } else if (distanceWithMonthBottom == 0 && scrollDown) {
                     // View is already fully expanded, continue the process
                     monthLayoutOnFinishMoveListener.fullyExpand { }
-                    miniCalendarPagerAdapter.resetMiniCalendarsPosition(miniCalendarPager.currentItem)
                 }
 
                 scrollUp = false

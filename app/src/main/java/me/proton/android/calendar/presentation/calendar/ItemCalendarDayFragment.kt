@@ -38,9 +38,7 @@ import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
-import me.proton.android.calendar.common.FeatureFlag.WEEK_COMPONENT
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -82,7 +80,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private var onScrollChangeListener: View.OnScrollChangeListener? = null
 
     companion object {
-        fun newInstance(position: Int, date: LocalDate) : ItemCalendarDayFragment{
+        fun newInstance(position: Int, date: LocalDate): ItemCalendarDayFragment {
             return ItemCalendarDayFragment().apply {
                 arguments = Bundle().apply {
                     putInt(FragmentArguments.POSITION_ARG, position)
@@ -105,7 +103,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView =  inflater.inflate(R.layout.item_calendar_day_fragment, container, false)
+        val rootView = inflater.inflate(R.layout.item_calendar_day_fragment, container, false)
 
         val dayLayout: LinearLayout = rootView.findViewById(R.id.day_layout)
         dayLayout.layoutTransition.setAnimateParentHierarchy(false)
@@ -170,7 +168,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         dayView.setOnTouchListener { v, event ->
             // Handle clicks in empty day view spaces to create events
-            if (event.action == MotionEvent.ACTION_UP && dayView.areCoordinatesWithinEventGrid(event.x.toInt(), event.y.toInt())) {
+            if (event.action == MotionEvent.ACTION_UP && dayView.areCoordinatesWithinEventGrid(
+                    event.x.toInt(),
+                    event.y.toInt()
+                )
+            ) {
                 val startTime = dayView.getTimeForYCoordinate(event.y.toInt())
                 calendarViewModel.lifeCycleScope.launch {
                     val calendarSettings = calendarViewModel.getDefaultCalendarSettings()
@@ -251,14 +253,25 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // The day view needs a list of event views and a corresponding list of event time ranges
         var eventViews: MutableList<View?>? = null
         var eventTimeRanges: MutableList<DayView.EventTimeRange?>? = null
-        val partialDayEvents: List<Event>? = allEvents!![day.timeInMillis]?.filter { it.spansSingleDay(true, timeZoneId = timeZoneId) }
+        val partialDayEvents: List<Event>? =
+            allEvents!![day.timeInMillis]?.filter { it.spansSingleDay(true, timeZoneId = timeZoneId) }
         if (partialDayEvents != null) {
             // Sort the events by start time so the layout happens in correct order
             Collections.sort(partialDayEvents,
                 Comparator<Event> { o1, o2 ->
                     val o1Start = o1.getStart(timeZoneId) // Date Start property can never be null here
                     val o2Start = o2.getStart(timeZoneId) // Date Start property can never be null here
-                    if (o1Start.hour < o2Start.hour) -1 else if (o1Start.hour == o2Start.hour) if (o1Start.minute < o2Start.minute) -1 else if (o1Start.minute == o2Start.minute) 0 else 1 else 1
+                    when {
+                        o1Start.hour < o2Start.hour -> -1
+                        o1Start.hour == o2Start.hour -> {
+                            when {
+                                o1Start.minute < o2Start.minute -> -1
+                                o1Start.minute == o2Start.minute -> 0
+                                else -> 1
+                            }
+                        }
+                        else -> 1
+                    }
                 }
             )
             eventViews = ArrayList()
@@ -272,7 +285,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 // Try to recycle an existing event view if there are enough left, otherwise inflate
                 // a new one
                 val eventView =
-                    if (remaining > 0) recycled[--remaining] else layoutInflater.inflate(R.layout.item_day_view_event_partial, dayView, false)
+                    if (remaining > 0) recycled[--remaining] else layoutInflater.inflate(
+                        R.layout.item_day_view_event_partial,
+                        dayView,
+                        false
+                    )
 
                 setEventViewStatus(eventView, event, userEmails, timeZoneId)
 
@@ -301,7 +318,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // TODO Extract this logic to avoid duplication with EventAdapter (All day) and DayViewAllDayEventAdapter
         val eventItemTitle = eventView.findViewById<View>(R.id.text_title) as TextView
 
-        val viewBackground: LayerDrawable = eventView.findViewById<View>(R.id.view_background).background as LayerDrawable
+        val viewBackground: LayerDrawable =
+            eventView.findViewById<View>(R.id.view_background).background as LayerDrawable
         val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
         val viewBorder: Drawable = viewBackground.findDrawableByLayerId(R.id.border)
         val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
@@ -317,7 +335,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         eventItemTitle.doOnPreDraw {
             // This doOnPreDraw checks if last line of text view is cut off
             eventItemTitle.layout ?: return@doOnPreDraw // Check eventItemTitle value to avoid NPE
-            val lastVisibleLineNumber: Int = eventItemTitle.layout.getLineForVertical(eventItemTitle.height + eventItemTitle.scrollY)
+            val lastVisibleLineNumber: Int =
+                eventItemTitle.layout.getLineForVertical(eventItemTitle.height + eventItemTitle.scrollY)
             if (eventItemTitle.height < eventItemTitle.layout.getLineBottom(lastVisibleLineNumber)) {
                 // If line is cut off, set max line property
                 val lineHeight = eventItemTitle.paint.fontMetrics.bottom - eventItemTitle.paint.fontMetrics.top
@@ -344,7 +363,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         if (event.isInThePast(timeZoneId)) {
             eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
-            ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak)))
+            ImageViewCompat.setImageTintList(
+                decryptionErrorIcon,
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak))
+            )
 
             if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
@@ -360,7 +382,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             } else {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_secondary))
                 viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.background_secondary))
-                decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                decryptionErrorView.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_norm))
                 decryptionErrorView.alpha = 0.1f
             }
         } else {
@@ -381,8 +404,12 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 viewMainSurface.setTint(Color.parseColor(event.calendar.color))
                 viewBorder.setTint(Color.parseColor(event.calendar.color))
                 eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color))
-                ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color)))
-                decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color))
+                ImageViewCompat.setImageTintList(
+                    decryptionErrorIcon,
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color))
+                )
+                decryptionErrorView.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.text_on_calendar_color))
                 decryptionErrorView.alpha = 0.2f
             }
         }
@@ -438,19 +465,15 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (WEEK_COMPONENT) {
-            all_day_header.text = requireContext().resources.getString(R.string.event_all_day)
-        } else {
-            val dateFormat = SimpleDateFormat("EEE", DateTimeUtilsImpl.getLocaleForFormatting())
-            all_day_header.text = dateFormat.format(Date.from(date?.atStartOfDay(ZoneId.systemDefault())?.toInstant()))
-            all_day_header_date.text = date?.dayOfMonth.toString()
-            all_day_layout.visibleOrGone(true)
-            all_day_header_date.visibleOrGone(true)
+        val dateFormat = SimpleDateFormat("EEE", DateTimeUtilsImpl.getLocaleForFormatting())
+        all_day_header.text = dateFormat.format(Date.from(date?.atStartOfDay(ZoneId.systemDefault())?.toInstant()))
+        all_day_header_date.text = date?.dayOfMonth.toString()
+        all_day_layout.visibleOrGone(true)
+        all_day_header_date.visibleOrGone(true)
 
-            if (date == LocalDate.now()) {
-                all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
-                all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
-            }
+        if (date == LocalDate.now()) {
+            all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+            all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
         }
 
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
@@ -512,7 +535,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         updateCurrentTimeIndicatorDelayed()
     }
 
-    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
+    private fun setupItemMiniCalendarContent(
+        timeZoneId: String,
+        timeFormatIs24Hour: Boolean,
+        userAddresses: List<UserAddress>
+    ) {
         val immutableDate = date ?: return
 
         if (day_view == null) return
@@ -538,13 +565,15 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers() &&
                 immutableDate != selectedDate &&
                 immutableDate != selectedDate.minusDays(1) &&
-                immutableDate != selectedDate.plusDays(1)) {
+                immutableDate != selectedDate.plusDays(1)
+            ) {
                 logger.v("ItemCalendarDayFragment: events flow: remove observer for $immutableDate. Selected date is $selectedDate")
                 eventsLiveData.removeObservers(viewLifecycleOwner)
             } else if (this::eventsLiveData.isInitialized && !eventsLiveData.hasActiveObservers() &&
                 (immutableDate == selectedDate ||
                         immutableDate == selectedDate.minusDays(1) ||
-                        immutableDate == selectedDate.plusDays(1))) {
+                        immutableDate == selectedDate.plusDays(1))
+            ) {
                 logger.v("ItemCalendarDayFragment: events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
                 getEvents(immutableDate, timeZoneId, userAddresses)
             }
@@ -580,31 +609,32 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) allDayEvents.takeLast(allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
                             else listOf()
 
-                        if (WEEK_COMPONENT) all_day_layout.visibleOrGone(!allDayEvents.isNullOrEmpty())
-                        else {
-                            all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
-                            if (it.events.isNullOrEmpty()) all_day_no_events.text = getString(R.string.agenda_no_events)
-                            else all_day_no_events.text = null
-                        }
+                        all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
+                        if (it.events.isNullOrEmpty()) all_day_no_events.text = getString(R.string.agenda_no_events)
+                        else all_day_no_events.text = null
                         all_day_more_items_layout.removeAllViews()
 
                         val userEmails = userAddresses.map { userAddress -> userAddress.email }
 
                         /* Cropped list */
-                        val allDayEventsCroppedListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                        val allDayEventsCroppedListLayoutManager =
+                            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                         all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
-                        allDayEventCroppedListAdapter = DayViewAllDayEventAdapter(userEmails, timeZoneId, immutableDate) { event ->
-                            onEventClick(event)
-                        }
+                        allDayEventCroppedListAdapter =
+                            DayViewAllDayEventAdapter(userEmails, timeZoneId, immutableDate) { event ->
+                                onEventClick(event)
+                            }
                         all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
                         allDayEventCroppedListAdapter.submitList(croppedList)
 
                         /* Rest of the list */
-                        val allDayEventsMoreListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                        val allDayEventsMoreListLayoutManager =
+                            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                         all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
-                        allDayEventListAdapter = DayViewAllDayEventAdapter(userEmails, timeZoneId, immutableDate) { event ->
-                            onEventClick(event)
-                        }
+                        allDayEventListAdapter =
+                            DayViewAllDayEventAdapter(userEmails, timeZoneId, immutableDate) { event ->
+                                onEventClick(event)
+                            }
                         all_day_items_list.adapter = allDayEventListAdapter
                         allDayEventListAdapter.submitList(moreEvents)
 
@@ -628,13 +658,20 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             titleParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                             title.layoutParams = titleParams
                             title.gravity = Gravity.CENTER_VERTICAL
-                            title.text = getString(R.string.day_view_all_day_more, allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
+                            title.text = getString(
+                                R.string.day_view_all_day_more,
+                                allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1)
+                            )
                             title.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
 
-                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(R.id.main_surface).setTint(
+                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
+                                R.id.main_surface
+                            ).setTint(
                                 ContextCompat.getColor(requireContext(), R.color.interaction_weak)
                             )
-                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(R.id.side_strip).setTint(
+                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
+                                R.id.side_strip
+                            ).setTint(
                                 ContextCompat.getColor(requireContext(), R.color.interaction_weak)
                             )
 
@@ -653,9 +690,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
                             val layoutParams = LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT,
-                                resources.getDimensionPixelSize(R.dimen.all_day_item_height))
+                                resources.getDimensionPixelSize(R.dimen.all_day_item_height)
+                            )
                             layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_end)
-                            layoutParams.bottomMargin = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
+                            layoutParams.bottomMargin =
+                                resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
                             all_day_more_items_layout.addView(eventView, layoutParams)
                         }
                         calendarViewModel.setLoading(false, position)

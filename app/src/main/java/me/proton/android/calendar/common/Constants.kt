@@ -74,7 +74,6 @@ object FeatureFlag {
     const val OPEN_ICS_FILES = false
     const val APP_LINKS = true
     const val ADD_EMAIL_NOTIFICATIONS = false
-    const val WEEK_COMPONENT = false
 }
 
 object ApiResponseCode {
