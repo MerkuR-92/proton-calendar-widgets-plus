@@ -50,6 +50,7 @@ import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.Animation.HEIGHT_CHANGE_DURATION
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
@@ -756,7 +757,7 @@ object AndroidUtils {
     fun View.animateHeightChange(toHeightPx: Int, onAnimationEnd: () -> Unit) {
         if (this.measuredHeight != toHeightPx) {
             val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
-            valueAnimator.duration = 300L
+            valueAnimator.duration = HEIGHT_CHANGE_DURATION
             valueAnimator.addUpdateListener {
                 val animatedValue = valueAnimator.animatedValue as Int
                 val layoutParams = this.layoutParams.apply {
@@ -773,13 +774,13 @@ object AndroidUtils {
         val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
         if (layoutParams.guideBegin != toHeightPx) {
             val duration =
-                if (maxHeight == null) 300
+                if (maxHeight == null) HEIGHT_CHANGE_DURATION
                 else if (toHeightPx > layoutParams.guideBegin) {
                     val percentLeft = ((toHeightPx - layoutParams.guideBegin) * 100) / toHeightPx
-                    (percentLeft * 300) / 100
+                    (percentLeft * HEIGHT_CHANGE_DURATION) / 100
                 } else {
                     val percentLeft = 100 - (((maxHeight - layoutParams.guideBegin) * 100) / maxHeight)
-                    (percentLeft * 300) / 100
+                    (percentLeft * HEIGHT_CHANGE_DURATION) / 100
                 }
 
             val valueAnimator = ValueAnimator.ofInt(layoutParams.guideBegin, toHeightPx)
@@ -921,6 +922,9 @@ object AndroidUtils {
         return if (initials.length > 2) initials[0].toString() + initials[initials.lastIndex] else initials
     }
 
+    /**
+     * @return Pair<Int, Long> of new height in px and animation duration in ms
+     */
     fun expand(v: View, duration: Long? = null, height: Int? = null): Pair<Int, Long> {
         val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
         val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
@@ -958,6 +962,9 @@ object AndroidUtils {
         return Pair(targetHeight, animation.duration)
     }
 
+    /**
+     * @return Pair<Int, Long> of new height in px and animation duration in ms
+     */
     fun collapse(v: View, duration: Long? = null): Pair<Int, Long> {
         val initialHeight = v.measuredHeight
         TimberLogger.d("animation collapse : initialHeight = ${initialHeight}")

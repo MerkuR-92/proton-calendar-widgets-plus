@@ -94,6 +94,10 @@ object MiniCalendarGestures {
     const val MAX_CLICK_DISTANCE = 15
 }
 
+object Animation {
+    const val HEIGHT_CHANGE_DURATION = 300L
+}
+
 object CalendarSettings {
     const val DAYS_IN_A_WEEK = 7 // always 7
 }

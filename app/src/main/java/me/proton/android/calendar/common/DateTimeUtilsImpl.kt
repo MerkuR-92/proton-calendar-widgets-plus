@@ -261,6 +261,9 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
     override fun LocalDate.isLastDayOfWeekInMonth() = this.plusDays(7).monthValue != this.monthValue
 
+    /**
+     * This returns the excess number of days for the month's last week that are from the upcoming month
+     */
     override fun getLastWeekOfMonthOffset(startWeekOn: DayOfWeek, lastDayOfMonth: LocalDate): Int {
         val weekEnd = startWeekOn.plus(6)
         var offset = 0
