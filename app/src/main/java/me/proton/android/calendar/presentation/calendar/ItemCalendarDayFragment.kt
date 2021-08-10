@@ -70,7 +70,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private lateinit var day: Calendar
     private lateinit var dayView: DayView
 
-    private var allEvents: LongSparseArray<List<Event>>? = null
+    private lateinit var allEvents: List<Event>
 
     private lateinit var allDayEventCroppedListAdapter: DayViewAllDayEventAdapter
     private lateinit var allDayEventListAdapter: DayViewAllDayEventAdapter
@@ -116,7 +116,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         day.set(Calendar.MILLISECOND, 0)
 
         // Populate today's entry in the map with a list of example events
-        allEvents = LongSparseArray<List<Event>>()
+        allEvents = listOf()
 
         dayView = rootView.findViewById(R.id.day_view)
 
@@ -202,6 +202,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // Inflate a label view for each hour the day view will display
         val hour: Calendar = day.clone() as Calendar
         val hourLabelViews: MutableList<View> = ArrayList()
+        val test = LocalTime.now()
         for (i in dayView.startHour..dayView.endHour) {
             hour[Calendar.HOUR_OF_DAY] = i
             val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
@@ -253,61 +254,43 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // The day view needs a list of event views and a corresponding list of event time ranges
         var eventViews: MutableList<View?>? = null
         var eventTimeRanges: MutableList<DayView.EventTimeRange?>? = null
-        val partialDayEvents: List<Event>? =
-            allEvents!![day.timeInMillis]?.filter { it.spansSingleDay(true, timeZoneId = timeZoneId) }
-        if (partialDayEvents != null) {
-            // Sort the events by start time so the layout happens in correct order
-            Collections.sort(partialDayEvents,
-                Comparator<Event> { o1, o2 ->
-                    val o1Start = o1.getStart(timeZoneId) // Date Start property can never be null here
-                    val o2Start = o2.getStart(timeZoneId) // Date Start property can never be null here
-                    when {
-                        o1Start.hour < o2Start.hour -> -1
-                        o1Start.hour == o2Start.hour -> {
-                            when {
-                                o1Start.minute < o2Start.minute -> -1
-                                o1Start.minute == o2Start.minute -> 0
-                                else -> 1
-                            }
-                        }
-                        else -> 1
-                    }
-                }
-            )
-            eventViews = ArrayList()
-            eventTimeRanges = ArrayList<DayView.EventTimeRange?>()
+        val partialDayEvents: List<Event> =
+            allEvents.filter { it.spansSingleDay(true, timeZoneId = timeZoneId) }
+                .sortedBy { it.getStart(timeZoneId).toEpochSecond() }
 
-            // Reclaim all of the existing event views so we can reuse them if needed, this process
-            // can be useful if your day view is hosted in a recycler view for example
-            val recycled: List<View> = dayView.removeEventViews() as List<View>
-            var remaining = recycled.size
-            for (event in partialDayEvents) {
-                // Try to recycle an existing event view if there are enough left, otherwise inflate
-                // a new one
-                val eventView =
-                    if (remaining > 0) recycled[--remaining] else layoutInflater.inflate(
-                        R.layout.item_day_view_event_partial,
-                        dayView,
-                        false
-                    )
+        eventViews = ArrayList()
+        eventTimeRanges = ArrayList<DayView.EventTimeRange?>()
 
-                setEventViewStatus(eventView, event, userEmails, timeZoneId)
+        // Reclaim all of the existing event views so we can reuse them if needed, this process
+        // can be useful if your day view is hosted in a recycler view for example
+        val recycled: List<View> = dayView.removeEventViews() as List<View>
+        var remaining = recycled.size
+        for (event in partialDayEvents) {
+            // Try to recycle an existing event view if there are enough left, otherwise inflate
+            // a new one
+            val eventView =
+                if (remaining > 0) recycled[--remaining] else layoutInflater.inflate(
+                    R.layout.item_day_view_event_partial,
+                    dayView,
+                    false
+                )
 
-                // When an event is clicked, start a new draft event and show the edit event dialog
-                eventView.setOnClickListener {
-                    onEventClick(event)
-                }
-                eventViews.add(eventView)
+            setEventViewStatus(eventView, event, userEmails, timeZoneId)
 
-                // The day view needs the event time ranges in the start minute/end minute format,
-                // so calculate those here
-                val dtStart = event.getStart(timeZoneId)
-                val dtEnd = event.getEnd(timeZoneId)
-                val startMinute: Int = 60 * dtStart.hour + dtStart.minute
-                val eventDuration = Duration.between(dtStart, dtEnd).toMinutes().toInt()
-                val endMinute: Int = startMinute + if (eventDuration < 30) 30 else eventDuration
-                eventTimeRanges.add(DayView.EventTimeRange(startMinute, endMinute))
+            // When an event is clicked, start a new draft event and show the edit event dialog
+            eventView.setOnClickListener {
+                onEventClick(event)
             }
+            eventViews.add(eventView)
+
+            // The day view needs the event time ranges in the start minute/end minute format,
+            // so calculate those here
+            val dtStart = event.getStart(timeZoneId)
+            val dtEnd = event.getEnd(timeZoneId)
+            val startMinute: Int = 60 * dtStart.hour + dtStart.minute
+            val eventDuration = Duration.between(dtStart, dtEnd).toMinutes().toInt()
+            val endMinute: Int = startMinute + if (eventDuration < 30) 30 else eventDuration
+            eventTimeRanges.add(DayView.EventTimeRange(startMinute, endMinute))
         }
 
         // Update the day view with the new events
@@ -315,7 +298,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     }
 
     private fun setEventViewStatus(eventView: View, event: Event, userEmails: List<String>, timeZoneId: String) {
-        // TODO Extract this logic to avoid duplication with EventAdapter (All day) and DayViewAllDayEventAdapter
+
         val eventItemTitle = eventView.findViewById<View>(R.id.text_title) as TextView
 
         val viewBackground: LayerDrawable =
@@ -594,10 +577,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         if (this.isResumed) calendarViewModel.setLoading(true, position)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
-                        allEvents?.put(
-                            day.timeInMillis,
-                            it.events
-                        )
+                        allEvents = it.events
                         onEventsChange(timeZoneId, userAddresses)
 
                         val allDayEvents = it.events.filter { event -> !event.spansSingleDay(true, timeZoneId) }

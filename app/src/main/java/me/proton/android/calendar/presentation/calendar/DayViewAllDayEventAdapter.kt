@@ -70,7 +70,6 @@ class DayViewAllDayEventAdapter(
 
         fun bind(event : Event, position : Int) {
 
-            // TODO Extract this logic to avoid duplication with EventAdapter (All day) and ItemCalendarDayFragment's event boxes
             val participationStatus = event.getParticipationStatus(userEmails)
             viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 

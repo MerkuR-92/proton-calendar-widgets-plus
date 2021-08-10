@@ -276,7 +276,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 false
             )
 
-            if (this.childCount > 7) {
+            if (this.childCount > DAYS_IN_A_WEEK) {
                 val itemLayoutParams: GridLayout.LayoutParams =
                     miniCalendarItemView.layoutParams as GridLayout.LayoutParams
                 itemLayoutParams.topMargin =

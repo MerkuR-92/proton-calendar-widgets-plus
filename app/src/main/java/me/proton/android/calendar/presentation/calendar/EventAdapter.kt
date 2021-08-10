@@ -144,7 +144,6 @@ class EventAdapter(
             // TODO consider databinding
             fun bind(event: Event, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
 
-                // TODO Extract this logic to avoid duplication with DayViewAllDayEventAdapter and ItemCalendarDayFragment's event boxes
                 val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
                 viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 

@@ -99,8 +99,9 @@ class CalendarViewModel(
     var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
-    var currentLoadingProcesses: Int = 0
-    var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf()
+
+    var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
+    var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
 
     // Those addresses contain canonical email addresses
     var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
@@ -710,6 +711,10 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarSettings(defaultCalendarId)
     }
 
+    /**
+     * @param loading define the loading state
+     * @param position fragment position in the view pager
+     */
     fun setLoading(loading: Boolean, position: Int? = null) {
         if (loading) {
             currentLoadingProcesses++
