@@ -700,24 +700,13 @@ class MonthFragment : BaseFragment() {
 
             this.removeAllViews()
 
-            val weekDays = DayOfWeek.values()
-            // We do minus 1 to match java.time DayOfWeek ordinals
-            val weekStart =
-                if (startWeekOn.value == 0) WeekFields.of(Locale.getDefault()).firstDayOfWeek.value - 1 else startWeekOn.value - 1
-            val weekEnd = 7
-            // Iterate from weekStart first
-            weekDays
-                .slice(weekStart until weekEnd) // until excludes weekEnd value
-                .forEach { dayOfWeek ->
-                    setDayHeaderItem(this, dayOfWeek, dayToHighlight == dayOfWeek)
-                }
-            if (weekStart != 0) {
-                // If weekStart was not Monday, iterate from 0 to fill the rest of the days
-                weekDays
-                    .slice(0 until weekStart) // until excludes weekStart value
-                    .forEach { dayOfWeek ->
-                        setDayHeaderItem(this, dayOfWeek, dayToHighlight == dayOfWeek)
-                    }
+            val weekDays = DayOfWeek.values().toList()
+            Collections.rotate(
+                weekDays,
+                DAYS_IN_A_WEEK - (startWeekOn.value - 1)
+            )
+            weekDays.forEach {
+                setDayHeaderItem(this, it, dayToHighlight == it)
             }
         }
     }

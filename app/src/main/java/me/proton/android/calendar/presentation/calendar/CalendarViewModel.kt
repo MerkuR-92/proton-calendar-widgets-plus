@@ -118,6 +118,8 @@ class CalendarViewModel(
     var showAutoDetectPrimaryTimezone = true
     var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
 
+    // TODO Rename
+    // This is used to store the current month mini calendar height when in month mode
     var currentPosDesiredMonthHeight = 0
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {

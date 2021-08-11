@@ -108,13 +108,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         }
         agendaMediator.observe(viewLifecycleOwner) {
             it?.let {
-
-                lifecycleScope.launch {
-                    if (calendarViewModel.selectedDate.value != date) {
-                        delay(300) // TODO Still needed ?
-                    }
-                    setupItemMiniCalendarContent(it.first, it.second, it.third)
-                }
+                setupItemMiniCalendarContent(it.first, it.second, it.third)
             }
         }
     }

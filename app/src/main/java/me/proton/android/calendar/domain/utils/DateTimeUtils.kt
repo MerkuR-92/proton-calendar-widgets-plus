@@ -49,15 +49,7 @@ interface DateTimeUtils {
      */
     fun fallbackTimeZone(timeZone: String, fallbackToDefault: Boolean = true): String?
 
-    fun LocalTime.formatTime(is24Hour: Boolean?): String {
-        return if (is24Hour == true) {
-            this.format(DateTimeFormatter.ofPattern("HH:mm").withLocale(getLocaleForFormatting()))
-        } else if (is24Hour == false) {
-            this.format(DateTimeFormatter.ofPattern("hh:mm a").withLocale(getLocaleForFormatting()))
-        } else {
-            this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocaleForFormatting()))
-        }
-    }
+    fun LocalTime.formatTime(is24Hour: Boolean?, short: Boolean = false): String
 
     // TODO add and change parameters for customisation
     fun LocalDate.formatWithDayOfWeek(showDayOfWeek: Boolean = false): String

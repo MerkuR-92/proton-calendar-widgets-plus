@@ -770,6 +770,10 @@ object AndroidUtils {
         }
     }
 
+    /**
+     * @param toHeightPx is the desired height for the view
+     * @param maxHeight is the maximum expected height of the view, used when collapsing (maxHeight >= toHeightPx)
+     */
     fun Guideline.animateGuidelineHeightChange(toHeightPx: Int, maxHeight: Int?, onAnimationEnd: () -> Unit) {
         val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
         if (layoutParams.guideBegin != toHeightPx) {

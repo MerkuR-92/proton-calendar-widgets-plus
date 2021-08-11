@@ -2,6 +2,7 @@ package me.proton.android.calendar.common
 
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
 import java.text.SimpleDateFormat
@@ -237,11 +238,14 @@ object DateTimeUtilsImpl : DateTimeUtils {
         }
     }
 
-    override fun LocalTime.formatTime(is24Hour: Boolean?): String {
+    override fun LocalTime.formatTime(is24Hour: Boolean?, short: Boolean): String {
         return if (is24Hour == true) {
             this.format(DateTimeFormatter.ofPattern("HH:mm").withLocale(getLocaleForFormatting()))
         } else if (is24Hour == false) {
-            this.format(DateTimeFormatter.ofPattern("hh:mm a").withLocale(getLocaleForFormatting()))
+            this.format(DateTimeFormatter.ofPattern(
+                if (short) "h a"
+                else "hh:mm a"
+            ).withLocale(getLocaleForFormatting()))
         } else {
             this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocaleForFormatting()))
         }

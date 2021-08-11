@@ -38,6 +38,7 @@ import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -67,7 +68,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
 
-    private lateinit var day: Calendar
+    private lateinit var day: LocalTime
     private lateinit var dayView: DayView
 
     private lateinit var allEvents: List<Event>
@@ -109,11 +110,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         dayLayout.layoutTransition.setAnimateParentHierarchy(false)
 
         // Create a new calendar object set to the start of today
-        day = Calendar.getInstance()
-        day.set(Calendar.HOUR_OF_DAY, 0)
-        day.set(Calendar.MINUTE, 0)
-        day.set(Calendar.SECOND, 0)
-        day.set(Calendar.MILLISECOND, 0)
+        day = LocalTime.MIDNIGHT
 
         // Populate today's entry in the map with a list of example events
         allEvents = listOf()
@@ -200,18 +197,13 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private fun setHourLabelViews() {
         val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
         // Inflate a label view for each hour the day view will display
-        val hour: Calendar = day.clone() as Calendar
         val hourLabelViews: MutableList<View> = ArrayList()
-        val test = LocalTime.now()
         for (i in dayView.startHour..dayView.endHour) {
-            hour[Calendar.HOUR_OF_DAY] = i
+            val tmpDay =
+                if (i == 24) LocalTime.MIDNIGHT
+                else day.withHour(i)
             val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
-            hourLabelView.text =
-                if (timeFormatIs24Hour) {
-                    SimpleDateFormat("HH:mm", DateTimeUtilsImpl.getLocaleForFormatting()).format(hour.time)
-                } else {
-                    SimpleDateFormat("h a", DateTimeUtilsImpl.getLocaleForFormatting()).format(hour.time)
-                }
+            hourLabelView.text = tmpDay.formatTime(timeFormatIs24Hour, short = true)
             hourLabelViews.add(hourLabelView)
         }
         dayView.setHourLabelViews(hourLabelViews)
@@ -483,12 +475,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
         agendaMediator.observe(viewLifecycleOwner) {
             it?.let {
-                lifecycleScope.launch {
-                    if (calendarViewModel.selectedDate.value != date) {
-                        delay(300) // TODO Still needed ?
-                    }
-                    setupItemMiniCalendarContent(it.first, it.second, it.third)
-                }
+                setupItemMiniCalendarContent(it.first, it.second, it.third)
             }
         }
 

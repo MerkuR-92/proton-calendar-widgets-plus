@@ -159,12 +159,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         val firstDayMonthView = immutableDate.plusMonths((immutablePosition - immutableStartingPosition).toLong())
 
         calendarViewModel.lifeCycleScope.launch {
-            // Delay process for views that are not in focus
-            if (!this@ItemMiniCalendarFragment.isResumed &&
-                firstDayMonthView.month != calendarViewModel.selectedDate.value?.month
-            ) {
-                delay(300) // TODO Still needed ?
-            }
 
             // Check if view still exists after delay in case of fast swipe
             if (gl_mini_calendar == null) return@launch
