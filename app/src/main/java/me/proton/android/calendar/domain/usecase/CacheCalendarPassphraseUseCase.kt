@@ -9,7 +9,6 @@ import me.proton.core.key.domain.decryptTextOrNull
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
-import me.proton.core.user.domain.extension.primary
 
 /**
  * We can decrypt and cache CalendarPassphrase locally, but we need to update it whenever
@@ -43,11 +42,13 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
             ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no user address")
 
-        val primaryAddress = userManager.getAddresses(userId, refresh = true).primary() ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Primary Address found")
+        val memberAddress = userManager.getAddresses(userId).find {
+            it.email.equals(member.email, ignoreCase = true)
+        } ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Member Address found")
 
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey
-        val plaintextPassphrase = primaryAddress.useKeys(cryptoContext) {
+        val plaintextPassphrase = memberAddress.useKeys(cryptoContext) {
             val decryptedPassphrase = decryptTextOrNull(memberPassphrase.passphrase)
 
             if (verifyText(decryptedPassphrase ?: "", memberPassphrase.signature)) decryptedPassphrase else null
