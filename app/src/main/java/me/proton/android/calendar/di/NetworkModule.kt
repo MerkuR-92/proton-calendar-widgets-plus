@@ -10,7 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import me.proton.android.calendar.common.API_BASE_URL
+import me.proton.android.calendar.common.BASE_URL
 import me.proton.android.calendar.common.CoreLogger
 import me.proton.android.calendar.data.api.CalendarApiClient
 import me.proton.core.crypto.common.context.CryptoContext
@@ -55,7 +55,7 @@ object NetworkModule {
         humanVerificationProvider: HumanVerificationProvider,
         humanVerificationListener: HumanVerificationListener
     ): ApiManagerFactory = ApiManagerFactory(
-        API_BASE_URL,
+        BASE_URL,
         apiClient,
         clientIdProvider,
         serverTimeListener,
@@ -73,7 +73,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideClientIdProvider(protonCookieStore: ProtonCookieStore): ClientIdProvider =
-        ClientIdProviderImpl(API_BASE_URL, protonCookieStore)
+        ClientIdProviderImpl(BASE_URL, protonCookieStore)
 
     @Provides
     @Singleton

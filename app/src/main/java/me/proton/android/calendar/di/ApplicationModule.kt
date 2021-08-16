@@ -20,8 +20,7 @@ object ApplicationModule {
 
     @Provides
     @Singleton
-    fun provideRequiredAccountType(): AccountType =
-        AccountType.Internal
+    fun provideRequiredAccountType(): AccountType = AccountType.Internal
 
     @Provides
     @Singleton

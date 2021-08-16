@@ -8,23 +8,28 @@ import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.usecase.*
-import me.proton.core.account.domain.entity.Account
-import me.proton.core.account.domain.entity.AccountType
-import me.proton.core.account.domain.entity.isReady
+import me.proton.core.account.domain.entity.*
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.presentation.*
 import me.proton.core.auth.presentation.AuthOrchestrator
-import me.proton.core.auth.presentation.onLoginResult
+import me.proton.core.auth.presentation.onAddAccountResult
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.crypto.common.keystore.decryptWith
+import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
+import me.proton.core.humanverification.domain.HumanVerificationManager
+import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
+import me.proton.core.humanverification.presentation.observe
+import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.user.domain.UserManager
 
 class AccountViewModel(
-    private val accountManager: AccountManager,
     private val userManager: UserManager,
+    private val accountManager: AccountManager,
     private val authOrchestrator: AuthOrchestrator,
+    private val humanVerificationManager: HumanVerificationManager,
+    private val humanVerificationOrchestrator: HumanVerificationOrchestrator,
     private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
@@ -32,18 +37,20 @@ class AccountViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val keyStoreCrypto: KeyStoreCrypto,
-    private val logger: Logger
+    private val logger: Logger,
+    private val product: Product
 ) : ViewModel() {
 
     sealed class State {
+        object Initial : State()
         object LoginNeeded : State()
-        object LoginInProgress : State()
+        object StepNeeded : State()
         object Processing : State()
         object Ready : State()
     }
 
+    private val _state = MutableStateFlow<State>(State.Initial)
     private val _hasPrimary = MutableLiveData<Boolean>()
-    private val _state = MutableLiveData<State>()
     private val _errorReport = MutableLiveData<UseCase.Error?>()
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
@@ -74,7 +81,7 @@ class AccountViewModel(
     }
 
     private suspend fun setupUser(userId: UserId, showConfirmationDialog: Boolean = true) {
-        _state.postValue(State.Processing)
+        _state.tryEmit(State.Processing)
 
         // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
         val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId)
@@ -96,7 +103,7 @@ class AccountViewModel(
             return
         }
 
-        _state.postValue(State.Ready)
+        _state.tryEmit(State.Ready)
     }
 
     private suspend fun removeUser(userId: UserId) {
@@ -113,13 +120,8 @@ class AccountViewModel(
         usersRepository.deleteUserById(userId.id)
     }
 
-    private fun finishAppIfNoAccount(context: ComponentActivity) = viewModelScope.launch {
-        if (accountManager.getAccounts().first().isEmpty()) {
-            context.finish()
-        }
-    }
-
-    val state: LiveData<State> = _state
+    // TODO: Merge State & Error in the same StateFlow.
+    val state = _state.asStateFlow()
     val errorReport: LiveData<UseCase.Error?> = _errorReport
     val hasPrimary: LiveData<Boolean> = _hasPrimary
 
@@ -129,12 +131,10 @@ class AccountViewModel(
 
         defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
 
+        // Account state handling.
         with(authOrchestrator) {
             register(context)
-            // Close app if Login screen has been closed.
-            onLoginResult { result -> if (result == null) finishAppIfNoAccount(context) }
-            // General state handling.
-            accountManager.observe(context.lifecycle)
+            accountManager.observe(context.lifecycle, minActiveState = Lifecycle.State.CREATED)
                 .onAccountReady { checkAccount(it) }
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
@@ -146,11 +146,19 @@ class AccountViewModel(
                 .disableInitialNotReadyAccounts()
         }
 
-        // Check if we already have Ready accounts.
+        // HumanVerification State handling.
+        with(humanVerificationOrchestrator) {
+            register(context)
+            humanVerificationManager.observe(context.lifecycle, minActiveState = Lifecycle.State.RESUMED)
+                .onHumanVerificationNeeded { startHumanVerificationWorkflow(it) }
+        }
+
+        // Check if we already have Ready account.
         accountManager.getAccounts().onEach { accounts ->
             when {
-                accounts.isEmpty() -> _state.postValue(State.LoginNeeded)
-                accounts.any { it.isReady() && it.isBootstrapped() } -> _state.postValue(State.Ready)
+                accounts.isEmpty() || accounts.all { it.isDisabled() } -> _state.tryEmit(State.LoginNeeded)
+                accounts.any { it.isReady() && it.isBootstrapped() } -> _state.tryEmit(State.Ready)
+                accounts.any { it.isStepNeeded() } -> _state.tryEmit(State.StepNeeded)
             }
         }.launchIn(context.lifecycleScope)
 
@@ -160,9 +168,12 @@ class AccountViewModel(
         }.launchIn(context.lifecycleScope)
     }
 
-    fun startLoginWorkflow() {
-        _state.postValue(State.LoginInProgress)
-        authOrchestrator.startLoginWorkflow(AccountType.Internal)
+    fun addAccount() {
+        authOrchestrator.startAddAccountWorkflow(AccountType.Internal, product)
+    }
+
+    fun onAddAccountClosed(block: () -> Unit) {
+        authOrchestrator.onAddAccountResult { result -> if (result == null) block() }
     }
 
     suspend fun getPrimaryUserId(): UserId? {

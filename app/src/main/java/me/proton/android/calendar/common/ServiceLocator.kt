@@ -17,6 +17,9 @@ import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
+import me.proton.core.domain.entity.Product
+import me.proton.core.humanverification.domain.HumanVerificationManager
+import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
@@ -71,7 +74,7 @@ val viewModelModule = module {
         )
     }
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
@@ -108,9 +111,12 @@ val useCaseModule = module {
 }
 
 fun coreModule(
+    product: Product,
     apiProvider: ApiProvider,
     accountManager: AccountManager,
     authOrchestrator: AuthOrchestrator,
+    humanVerificationManager: HumanVerificationManager,
+    humanVerificationOrchestrator: HumanVerificationOrchestrator,
     userManager: UserManager,
     keyStoreCrypto: KeyStoreCrypto,
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
@@ -118,12 +124,15 @@ fun coreModule(
     cryptoContext: CryptoContext,
     sendEmailDirect: SendEmailDirect
 ) = module {
+    single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
     single<ApiProvider> { apiProvider }
     // TODO: Remove when all *ViewModel/*UseCase will be provided by a Dagger module.
     single<AccountManager> { accountManager }
     // TODO: Remove when AccountViewModel will be provided by a Dagger module.
-    single<AuthOrchestrator> { authOrchestrator }
+    factory<AuthOrchestrator> { authOrchestrator }
+    single<HumanVerificationManager> { humanVerificationManager }
+    factory<HumanVerificationOrchestrator> { humanVerificationOrchestrator }
     single<UserManager> { userManager }
     single<KeyStoreCrypto> { keyStoreCrypto }
     single<CryptoContext> { cryptoContext }

@@ -15,6 +15,9 @@ import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
+import me.proton.core.domain.entity.Product
+import me.proton.core.humanverification.domain.HumanVerificationManager
+import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
@@ -29,6 +32,9 @@ import javax.inject.Inject
 class ProtonCalendarApplication : Application() {
 
     @Inject
+    lateinit var product: Product
+
+    @Inject
     lateinit var apiProvider: ApiProvider
 
     @Inject
@@ -39,6 +45,12 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var authOrchestrator: AuthOrchestrator
+
+    @Inject
+    lateinit var humanVerificationManager: HumanVerificationManager
+
+    @Inject
+    lateinit var humanVerificationOrchestrator: HumanVerificationOrchestrator
 
     @Inject
     lateinit var keyStoreCrypto: KeyStoreCrypto
@@ -69,8 +81,25 @@ class ProtonCalendarApplication : Application() {
         startKoin {
             androidContext(this@ProtonCalendarApplication)
             modules(
-                commonModule, viewModelModule, repositoryModule, networkModule, useCaseModule,
-                coreModule(apiProvider, accountManager, authOrchestrator, userManager, keyStoreCrypto, getRecipientPublicAddresses, contactEmailsRepository, cryptoContext, sendEmailDirect)
+                commonModule,
+                viewModelModule,
+                repositoryModule,
+                networkModule,
+                useCaseModule,
+                coreModule(
+                    product,
+                    apiProvider,
+                    accountManager,
+                    authOrchestrator,
+                    humanVerificationManager,
+                    humanVerificationOrchestrator,
+                    userManager,
+                    keyStoreCrypto,
+                    getRecipientPublicAddresses,
+                    contactEmailsRepository,
+                    cryptoContext,
+                    sendEmailDirect
+                )
             )
         }
 
