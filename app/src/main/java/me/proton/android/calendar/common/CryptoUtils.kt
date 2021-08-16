@@ -18,20 +18,19 @@ fun UserAddress.isValidForEncryption(cryptoContext: CryptoContext, logger: Logge
 
         val testData = "Test".encodeToByteArray()
 
-        val encryptedData = try {
-            encryptData(testData).split(cryptoContext.pgpCrypto)
-        } catch (e: CryptoException) {
-            logger.e("can't encrypt data in isValidForEncryption", e)
-            null
-        }
-        val signedData = try {
-            signData(testData)
-        } catch (e: CryptoException) {
-            logger.e("can't sign data in isValidForEncryption", e)
-            null
+        val encryptException = kotlin.runCatching { encryptData(testData).split(cryptoContext.pgpCrypto) }.exceptionOrNull()
+
+        encryptException?.let {
+            logger.e("can't encrypt data in isValidForEncryption", it)
         }
 
-        encryptedData != null && signedData != null
+        val signException = kotlin.runCatching { signData(testData) }.exceptionOrNull()
+
+        signException?.let {
+            logger.e("can't sign data in isValidForEncryption", it)
+        }
+
+        encryptException == null && signException == null
 
     }
 
