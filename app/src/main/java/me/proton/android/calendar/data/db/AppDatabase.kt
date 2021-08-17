@@ -15,7 +15,6 @@ import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
 import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
-import me.proton.core.accountmanager.data.db.AccountManagerDatabase
 import me.proton.core.crypto.android.keystore.CryptoConverters
 import me.proton.core.data.room.db.BaseDatabase
 import me.proton.core.data.room.db.CommonConverters
@@ -133,12 +132,12 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_29_30
         )
 
-        fun buildDatabase(context: Context, coreDatabase: AccountManagerDatabase): AppDatabase =
+        fun buildDatabase(context: Context): AppDatabase =
             databaseBuilder<AppDatabase>(context, name)
                 // Add old pre v29 migrations.
                 .apply { oldMigrations.forEach { addMigrations(it) } }
                 // Add unified DB migration.
-                .addMigrations(AppDatabaseMigrations.MIGRATION_28_29(context, coreDatabase))
+                .addMigrations(AppDatabaseMigrations.MIGRATION_28_29(context))
                 // Add new post v29 migrations.
                 .apply { migrations.forEach { addMigrations(it) } }
                 .build()

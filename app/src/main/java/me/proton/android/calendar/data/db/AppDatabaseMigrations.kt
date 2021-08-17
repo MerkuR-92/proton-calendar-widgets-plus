@@ -21,15 +21,27 @@ package me.proton.android.calendar.data.db
 import android.content.Context
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import me.proton.android.calendar.data.api.MailSettingsEntity
 import me.proton.core.account.data.db.AccountDatabase
-import me.proton.core.accountmanager.data.db.AccountManagerDatabase
+import me.proton.core.account.data.entity.AccountEntity
+import me.proton.core.account.data.entity.AccountMetadataEntity
+import me.proton.core.account.data.entity.SessionDetailsEntity
+import me.proton.core.account.data.entity.SessionEntity
 import me.proton.core.data.room.db.extension.*
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
+import me.proton.core.humanverification.data.entity.HumanVerificationEntity
 import me.proton.core.key.data.db.KeySaltDatabase
 import me.proton.core.key.data.db.PublicAddressDatabase
+import me.proton.core.key.data.entity.KeySaltEntity
+import me.proton.core.key.data.entity.PublicAddressEntity
+import me.proton.core.key.data.entity.PublicAddressKeyEntity
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserDatabase
+import me.proton.core.user.data.entity.AddressEntity
+import me.proton.core.user.data.entity.AddressKeyEntity
+import me.proton.core.user.data.entity.UserEntity
+import me.proton.core.user.data.entity.UserKeyEntity
 
 object AppDatabaseMigrations {
 
@@ -63,16 +75,14 @@ object AppDatabaseMigrations {
     /**
      * Copy Core DB into Calendar DB.
      */
-    fun MIGRATION_28_29(context: Context, coreDatabase: AccountManagerDatabase) = object : Migration(28, 29) {
+    fun MIGRATION_28_29(context: Context) = object : Migration(28, 29) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            // Force any migration for coreDatabase by opening then closing it.
-            coreDatabase.openAndClose()
-
             // End current transaction (from FrameworkSQLiteOpenHelper.onUpgrade(db, version, mNewVersion))
             database.setTransactionSuccessful()
             database.endTransaction()
             // Attach old Core DB to current DB (cannot be done within a transaction).
-            val coreDbPath = context.getDatabasePath(AccountManagerDatabase.name).path
+            val coreDbFile = context.getDatabasePath("db-account-manager")
+            val coreDbPath = coreDbFile.path
             database.execSQL("ATTACH DATABASE '$coreDbPath' AS coreDb")
             // Begin transaction for attached migration.
             database.beginTransaction()
@@ -92,21 +102,21 @@ object AppDatabaseMigrations {
 
             // Import all data from Core DB to current DB.
             listOf(
-                "AccountEntity",
-                "AccountMetadataEntity",
-                "AddressEntity",
-                "AddressKeyEntity",
-                "HumanVerificationEntity",
-                "MailSettingsEntity",
-                "PublicAddressEntity",
-                "PublicAddressKeyEntity",
-                "KeySaltEntity",
-                "SessionDetailsEntity",
-                "SessionEntity",
-                "UserEntity",
-                "UserKeyEntity"
+                AccountEntity::class.simpleName,
+                AccountMetadataEntity::class.simpleName,
+                AddressEntity::class.simpleName,
+                AddressKeyEntity::class.simpleName,
+                HumanVerificationEntity::class.simpleName,
+                MailSettingsEntity::class.simpleName,
+                PublicAddressEntity::class.simpleName,
+                PublicAddressKeyEntity::class.simpleName,
+                KeySaltEntity::class.simpleName,
+                SessionDetailsEntity::class.simpleName,
+                SessionEntity::class.simpleName,
+                UserEntity::class.simpleName,
+                UserKeyEntity::class.simpleName
             ).forEach { table ->
-                database.execSQL("INSERT INTO main.$table SELECT * FROM coreDb.$table")
+                runCatching { database.execSQL("INSERT INTO main.$table SELECT * FROM coreDb.$table") }
             }
 
             // End current transaction to detach coreDb.
@@ -138,10 +148,8 @@ object AppDatabaseMigrations {
             database.dropTable(AppDatabase.TABLE_USERS)
             database.dropTable(AppDatabase.TABLE_ADDRESSES)
 
-            // Clear old Core tables.
-            coreDatabase.open()
-            coreDatabase.runInTransaction { coreDatabase.clearAllTables() }
-            coreDatabase.close()
+            // Delete Core Database.
+            coreDbFile.delete()
         }
     }
 

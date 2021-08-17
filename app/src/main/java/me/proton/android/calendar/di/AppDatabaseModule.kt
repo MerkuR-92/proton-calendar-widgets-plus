@@ -27,7 +27,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.core.account.data.db.AccountDatabase
-import me.proton.core.accountmanager.data.db.AccountManagerDatabase
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.key.data.db.KeySaltDatabase
 import me.proton.core.key.data.db.PublicAddressDatabase
@@ -42,19 +41,9 @@ object AppDatabaseModule {
 
     @Provides
     @Singleton
-    fun provideAccountManagerDatabase(
-        @ApplicationContext context: Context,
-    ): AccountManagerDatabase = AccountManagerDatabase.databaseBuilder(context)
-        // This database is only used during migration and needs this workaround for clearAllTables.
-        .allowMainThreadQueries()
-        .build()
-
-    @Provides
-    @Singleton
     fun provideAppDatabase(
-        @ApplicationContext context: Context,
-        coreDatabase: AccountManagerDatabase
-    ): AppDatabase = AppDatabase.buildDatabase(context, coreDatabase)
+        @ApplicationContext context: Context
+    ): AppDatabase = AppDatabase.buildDatabase(context)
 }
 
 @Module

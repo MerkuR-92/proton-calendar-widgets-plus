@@ -46,8 +46,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 81
-        versionName "0.22.0"
+        versionCode 83
+        versionName "0.24.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -125,7 +125,6 @@ dependencies {
     implementation "me.proton.core:account:${rootProject.ext.version.proton_core_account}"
     implementation "me.proton.core:account-manager:${rootProject.ext.version.proton_core_account_manager}"
     implementation "me.proton.core:account-manager-dagger:${rootProject.ext.version.proton_core_account_manager}"
-    implementation "me.proton.core:account-manager-data-db:${rootProject.ext.version.proton_core_account_manager}"
     implementation "me.proton.core:auth:${rootProject.ext.version.proton_core_auth}"
     implementation "me.proton.core:contact:${rootProject.ext.version.proton_core_contact}"
     implementation "me.proton.core:country:${rootProject.ext.version.proton_core_country}"
