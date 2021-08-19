@@ -1119,22 +1119,15 @@ class CalendarsRepositoryImpl(
         return database.eventAlarmsDao().selectByEventId(eventId)
     }
 
-    override suspend fun selectEventAlarms(
-        timestampSecondsStart: Long,
-        timestampSecondsEnd: Long
-    ): List<EventAlarmEntity> {
-        return database.eventAlarmsDao().select(timestampSecondsStart, timestampSecondsEnd)
-    }
-
     override suspend fun selectEventAlarm(eventAlarmId: String): EventAlarmEntity? {
         return database.eventAlarmsDao().select(eventAlarmId)
     }
 
     override suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity> {
-        return database.eventAlarmsDao().selectUpcoming(timestampSeconds)
+        return database.eventAlarmsDao().selectUpcomingInclusive(timestampSeconds)
     }
 
-    override suspend fun selectAllBetweenInclusive(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity> {
+    override suspend fun selectAllEventAlarmsBetween(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity> {
         return database.eventAlarmsDao().selectAllBetweenInclusive(timestampSecondsFrom, timestampSecondsTo)
     }
 

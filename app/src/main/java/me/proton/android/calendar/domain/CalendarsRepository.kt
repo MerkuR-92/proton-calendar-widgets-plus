@@ -211,9 +211,7 @@ interface CalendarsRepository {
     /**
      * Selects EventAlarms that should be shown between [timestampSecondsFrom] and [timestampSecondsTo] inclusive.
      */
-    suspend fun selectAllBetweenInclusive(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity>
-
-    suspend fun selectEventAlarms(timestampSecondsStart: Long, timestampSecondsEnd: Long): List<EventAlarmEntity>
+    suspend fun selectAllEventAlarmsBetween(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity>
 
     suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity)
 
