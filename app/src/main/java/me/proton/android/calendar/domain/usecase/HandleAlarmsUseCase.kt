@@ -25,7 +25,11 @@ class HandleAlarmsUseCase(
     private val valueStoreProvider: ValueStoreProvider
 ) {
 
-    suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null) {
+    companion object {
+        const val WORKER_ID = "HANDLE_ALARMS"
+    }
+
+    suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null): UseCase.Result {
         logger.v("executing HandleAlarmsUseCase, alarmEpochSeconds: $alarmEpochSeconds")
 
         val nowInstant = Instant.now()
@@ -68,6 +72,8 @@ class HandleAlarmsUseCase(
         alarmsToDisplayNext.firstOrNull()?.let {
             rescheduleSystemAlarm(Instant.ofEpochSecond(it.occurrence))
         }
+
+        return UseCase.Result.Success<Unit>()
 
     }
 

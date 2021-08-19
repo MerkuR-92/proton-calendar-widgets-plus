@@ -24,6 +24,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         companion object {
             const val SYNC_SERVER_EVENTS = SyncServerEventsUseCase.WORKER_ID
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
+            const val HANDLE_ALARMS = HandleAlarmsUseCase.WORKER_ID
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
             const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
@@ -43,6 +44,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USE_CASE_ID = "INPUT_USE_CASE_ID"
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
+        const val INPUT_ALARM_EPOCH_SECONDS = "INPUT_ALARM_EPOCH_SECONDS"
         const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
         const val INPUT_ATTENDEE_ID = "INPUT_ATTENDEE_ID"
         const val INPUT_PARTICIPATION_STATUS = "INPUT_PARTICIPATION_STATUS"
@@ -74,6 +76,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         companion object {
             const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
             const val SYNC_ALARMS = "SYNC_ALARMS"
+            const val HANDLE_ALARMS = "HANDLE_ALARMS"
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
             const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
@@ -101,6 +104,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.SYNC_ALARMS -> {
                 val syncAlarmsUseCase: SyncAlarmsUseCase = get()
                 syncAlarmsUseCase.execute(userId)
+            }
+            UseCaseId.HANDLE_ALARMS -> {
+                val alarmEpochSeconds = if (inputData.hasKeyWithValueOfType<Long>(INPUT_ALARM_EPOCH_SECONDS)) {
+                    inputData.getLong(INPUT_ALARM_EPOCH_SECONDS, 0)
+                } else null
+                val handleAlarmsUseCase: HandleAlarmsUseCase = get()
+                handleAlarmsUseCase.execute(userId, alarmEpochSeconds)
             }
             UseCaseId.UPDATE_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
