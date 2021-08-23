@@ -343,20 +343,24 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     }
 
     private fun applyMiniCalendarIndicators(indicators: Map<LocalDate, List<String>>, firstMiniCalendarDay: LocalDate) {
+        gl_mini_calendar.children.forEach {
+            it.ll_calendar_dots.removeAllViews()
+        }
+        val processedViewIndexList = arrayListOf<Int>()
         indicators.forEach { (date, indicatorColors) ->
             val miniCalendarIndex = ChronoUnit.DAYS.between(firstMiniCalendarDay, date).toInt()
             val itemView = gl_mini_calendar.getChildAt(miniCalendarIndex)
             itemView?.let {
                 itemView.ll_calendar_dots.visibleOrInvisible(true)
-                itemView.ll_calendar_dots.apply {
-                    children.forEachIndexed { index, view ->
-                        if (indicatorColors.size - 1 >= index) {
-                            (view as ImageView).drawable.setTint(Color.parseColor(indicatorColors[index]))
-                            view.visibleOrGone(true)
-                        } else {
-                            view.visibleOrGone(false)
-                        }
-                    }
+                processedViewIndexList.add(miniCalendarIndex)
+                indicatorColors.forEach { indicatorColor ->
+                    val miniCalendarDotView = LayoutInflater.from(this.context).inflate(
+                        R.layout.mini_calendar_dot,
+                        itemView.ll_calendar_dots,
+                        false
+                    )
+                    (miniCalendarDotView as ImageView).drawable.setTint(Color.parseColor(indicatorColor))
+                    itemView.ll_calendar_dots.addView(miniCalendarDotView)
                 }
             }
         }

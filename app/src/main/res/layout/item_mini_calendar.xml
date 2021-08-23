@@ -45,44 +45,6 @@
         app:layout_constraintTop_toBottomOf="@+id/itemMiniCalendarText"
         android:showDividers="middle"
         android:divider="@drawable/divider_item_calendar_dots"
-        >
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/shape_calendar_circle_small"
-            app:tint="#E6984C"
-            />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/shape_calendar_circle_small"
-            app:tint="#C3D261"
-            />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/shape_calendar_circle_small"
-            app:tint="#69A9D1"
-            />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/shape_calendar_circle_small"
-            app:tint="#72BB75"
-            />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/shape_calendar_circle_small"
-            app:tint="#CF5858"
-            />
-
-    </LinearLayout>
-
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
