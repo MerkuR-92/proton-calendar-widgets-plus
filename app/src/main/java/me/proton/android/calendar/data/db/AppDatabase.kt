@@ -35,6 +35,11 @@ import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.data.entity.AddressKeyEntity
 import me.proton.core.user.data.entity.UserEntity
 import me.proton.core.user.data.entity.UserKeyEntity
+import me.proton.core.usersettings.data.db.OrganizationDatabase
+import me.proton.core.usersettings.data.db.UserSettingsConverters
+import me.proton.core.usersettings.data.db.UserSettingsDatabase
+import me.proton.core.usersettings.data.entity.OrganizationEntity
+import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
 
 @Database(
     entities = [
@@ -52,6 +57,9 @@ import me.proton.core.user.data.entity.UserKeyEntity
         PublicAddressKeyEntity::class,
         HumanVerificationEntity::class,
         MailSettingsEntity::class,
+        me.proton.core.usersettings.data.entity.UserSettingsEntity::class,
+        OrganizationEntity::class,
+        OrganizationKeysEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -74,6 +82,7 @@ import me.proton.core.user.data.entity.UserKeyEntity
     UserConverters::class,
     CryptoConverters::class,
     HumanVerificationConverters::class,
+    UserSettingsConverters::class,
     // Calendar
     DatabaseTypeConverters::class
 )
@@ -85,14 +94,17 @@ abstract class AppDatabase :
     KeySaltDatabase,
     HumanVerificationDatabase,
     PublicAddressDatabase,
-    MailSettingsDatabase {
+    MailSettingsDatabase,
+    UserSettingsDatabase,
+    OrganizationDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
     abstract fun calendarSettingsDao(): CalendarSettingsDao
     abstract fun calendarSubscriptionDao(): CalendarSubscriptionDao
     abstract fun calendarUserSettingsDao(): CalendarUserSettingsDao
-    abstract fun userSettingsDao(): UserSettingsDao
+    @Deprecated("Use me.proton.core.usersettings module.")
+    abstract fun deprecatedUserSettingsDao(): UserSettingsDao
     abstract fun calendarKeysDao(): CalendarKeysDao
     abstract fun eventAlarmsDao(): EventAlarmsDao
     abstract fun membersDao(): MembersDao
@@ -115,7 +127,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 30
+        const val version = 31
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -128,6 +140,7 @@ abstract class AppDatabase :
         // Migrations after version 29.
         private val migrations = listOf(
             AppDatabaseMigrations.MIGRATION_29_30,
+            AppDatabaseMigrations.MIGRATION_30_31,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

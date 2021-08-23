@@ -62,11 +62,8 @@ object HumanVerificationModule {
     @Provides
     @Singleton
     fun provideUserVerificationRepository(
-        apiProvider: ApiProvider,
-        clientIdProvider: ClientIdProvider,
-        humanVerificationRepository: HumanVerificationRepository
-    ): UserVerificationRepository =
-        UserVerificationRepositoryImpl(apiProvider, clientIdProvider, humanVerificationRepository)
+        apiProvider: ApiProvider
+    ): UserVerificationRepository = UserVerificationRepositoryImpl(apiProvider)
 
     @Provides
     @Singleton

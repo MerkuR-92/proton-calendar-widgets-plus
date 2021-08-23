@@ -42,6 +42,8 @@ import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.data.entity.AddressKeyEntity
 import me.proton.core.user.data.entity.UserEntity
 import me.proton.core.user.data.entity.UserKeyEntity
+import me.proton.core.usersettings.data.db.OrganizationDatabase
+import me.proton.core.usersettings.data.db.UserSettingsDatabase
 
 object AppDatabaseMigrations {
 
@@ -157,6 +159,14 @@ object AppDatabaseMigrations {
         override fun migrate(database: SupportSQLiteDatabase) {
             // Drop unused public_keys table.
             database.dropTable(AppDatabase.TABLE_PUBLIC_KEYS)
+        }
+    }
+
+    val MIGRATION_30_31 = object : Migration(30, 31) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Two new entities/migrations in core.
+            UserSettingsDatabase.MIGRATION_0.migrate(database)
+            OrganizationDatabase.MIGRATION_0.migrate(database)
         }
     }
 }

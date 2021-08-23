@@ -11,22 +11,22 @@ class UserSettingsRepositoryImpl(
 ) : UserSettingsRepository {
 
     override suspend fun selectUserSettings(userId: String): UserSettingsEntity? {
-        return database.userSettingsDao().select(userId)
+        return database.deprecatedUserSettingsDao().select(userId)
     }
 
     override suspend fun persistUserSettings(userId: String, userSettings: UserSettingsEntity) {
-        database.userSettingsDao().updateOrInsert(userSettings.copy(fkUserId = userId))
+        database.deprecatedUserSettingsDao().updateOrInsert(userSettings.copy(fkUserId = userId))
     }
 
     override suspend fun selectTimeFormat(userId: String): Int? {
-        return database.userSettingsDao().selectTimeFormat(userId)
+        return database.deprecatedUserSettingsDao().selectTimeFormat(userId)
     }
 
     override fun flowTimeFormat(userId: String): Flow<Int?> {
-        return database.userSettingsDao().flowTimeFormat(userId).distinctUntilChanged()
+        return database.deprecatedUserSettingsDao().flowTimeFormat(userId).distinctUntilChanged()
     }
 
     override fun flowWeekStart(userId: String): Flow<Int?> {
-        return database.userSettingsDao().flowWeekStart(userId).distinctUntilChanged()
+        return database.deprecatedUserSettingsDao().flowWeekStart(userId).distinctUntilChanged()
     }
 }

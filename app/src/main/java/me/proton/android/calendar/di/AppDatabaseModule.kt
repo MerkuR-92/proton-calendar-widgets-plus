@@ -33,6 +33,8 @@ import me.proton.core.key.data.db.PublicAddressDatabase
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserDatabase
+import me.proton.core.usersettings.data.db.OrganizationDatabase
+import me.proton.core.usersettings.data.db.UserSettingsDatabase
 import javax.inject.Singleton
 
 @Module
@@ -69,4 +71,10 @@ abstract class AppDatabaseBindsModule {
 
     @Binds
     abstract fun provideMailSettingsDatabase(appDatabase: AppDatabase): MailSettingsDatabase
+
+    @Binds
+    abstract fun provideUserSettingsDatabase(appDatabase: AppDatabase): UserSettingsDatabase
+
+    @Binds
+    abstract fun provideOrganizationDatabase(appDatabase: AppDatabase): OrganizationDatabase
 }
