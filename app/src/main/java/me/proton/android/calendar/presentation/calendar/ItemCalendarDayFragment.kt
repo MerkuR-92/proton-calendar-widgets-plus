@@ -124,12 +124,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             setHourLabelViews()
         }
 
-        if (date == LocalDate.now()) {
-            // If is current day, set current time indicator in day view
-            val currentTimeView = layoutInflater.inflate(R.layout.item_current_time_indicator, dayView, false)
-            dayView.setCurrentTimeView(requireContext(), currentTimeView)
-        }
-
         onScrollChangeListener = View.OnScrollChangeListener { _, _, scrollY, _, _ ->
             // If fragment is the one resumed, save scrolling position to apply it to other days on swipe
             if (this.isResumed) calendarViewModel.dayViewScrollYPosition.value = scrollY
@@ -139,24 +133,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         rootView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 scrollView.viewTreeObserver.removeOnPreDrawListener(this)
-                scrollView.setOnScrollChangeListener(null)
-                val jumpToCurrentTime = calendarViewModel.jumpToCurrentTime.value
-                if (jumpToCurrentTime == true) {
-                    // Set scrolling position to current time minus 1 hour
-                    calendarViewModel.jumpToCurrentTime.value = false
-                    val currentTime = LocalTime.now().hour
-                    val yPos = dayView.getHourTop(
-                        if (currentTime > 0) currentTime - 1
-                        else currentTime
-                    )
-                    scrollView.scrollY = yPos
-                    if (this@ItemCalendarDayFragment.isResumed) calendarViewModel.dayViewScrollYPosition.value = yPos
-                } else {
-                    // Use previous view scrolling position if it exists
-                    scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
-                }
-                scrollView.setOnScrollChangeListener(onScrollChangeListener)
-                preDrawDone = true
+                doOnPreDraw(scrollView)
                 return false
             }
         })
@@ -210,21 +187,24 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     }
 
     private lateinit var updateCurrentTimeIndicatorJob: Job
-    private fun updateCurrentTimeIndicatorDelayed() {
+    private fun updateCurrentTimeIndicatorDelayed(timeZoneId: ZoneId) {
         // Create job to update the current time indicator every minute
+        if (this::updateCurrentTimeIndicatorJob.isInitialized && updateCurrentTimeIndicatorJob.isActive) {
+            updateCurrentTimeIndicatorJob.cancel()
+        }
         updateCurrentTimeIndicatorJob = lifecycleScope.launch {
-            if (date == LocalDate.now()) {
+            if (date == LocalDate.now(timeZoneId)) {
                 if (!dayView.hasCurrentTimeIndicator()) {
                     // Create time indicator in day view if it doesn't exist yet
                     val currentTimeView = layoutInflater.inflate(R.layout.item_current_time_indicator, dayView, false)
                     dayView.setCurrentTimeView(requireContext(), currentTimeView)
                 }
-                dayView.updateCurrentTimeView()
-            } else if (date != LocalDate.now() && dayView.hasCurrentTimeIndicator()) {
+                dayView.updateCurrentTimeView(timeZoneId)
+            } else if (date != LocalDate.now(timeZoneId) && dayView.hasCurrentTimeIndicator()) {
                 dayView.removeCurrentTimeView() // Remove current time indicator if this fragment is not current day anymore
             }
             delay(REFRESH_CURRENT_TIME_INDICATOR)
-            updateCurrentTimeIndicatorDelayed()
+            updateCurrentTimeIndicatorDelayed(timeZoneId)
         }
     }
 
@@ -446,13 +426,28 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         all_day_layout.visibleOrGone(true)
         all_day_header_date.visibleOrGone(true)
 
-        if (date == LocalDate.now()) {
-            all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
-            all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
-        }
-
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
+
+            value?.let {
+                day_scroll_view.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+                    override fun onPreDraw(): Boolean {
+                        day_scroll_view.viewTreeObserver.removeOnPreDrawListener(this)
+                        doOnPreDraw(day_scroll_view, it)
+                        return false
+                    }
+                })
+
+                if (date == LocalDate.now(it)) {
+                    all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+                    all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+                } else {
+                    all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
+                    all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                }
+
+                updateCurrentTimeIndicatorDelayed(it)
+            }
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 onEventsChange(timeZoneId!!, userAddresses!!)
@@ -489,20 +484,57 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         calendarViewModel.jumpToCurrentTime.observe(viewLifecycleOwner) { jumpToCurrentTime ->
             if (jumpToCurrentTime && preDrawDone && calendarViewModel.selectedDate.value == date) {
-                calendarViewModel.jumpToCurrentTime.value = false
-                val currentTime = LocalTime.now().hour
-                val yPos = dayView.getHourTop(
-                    if (currentTime > 0) currentTime - 1
-                    else currentTime
-                )
-                day_scroll_view.setOnScrollChangeListener(null)
-                day_scroll_view.smoothScrollTo(0, yPos)
-                if (this@ItemCalendarDayFragment.isResumed) calendarViewModel.dayViewScrollYPosition.value = yPos
-                day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
+                lifecycleScope.launch {
+                    calendarViewModel.jumpToCurrentTime.value = false
+                    val timeZoneId = this@ItemCalendarDayFragment.timeZoneId ?: calendarViewModel.getCalendarUserSettingsPrimaryTimezone()
+                    val currentTime = LocalTime.now(
+                        if (timeZoneId != null) ZoneId.of(timeZoneId)
+                        else ZoneId.systemDefault()
+                    ).hour
+                    val yPos = dayView.getHourTop(
+                        if (currentTime > 0) currentTime - 1
+                        else currentTime
+                    )
+                    day_scroll_view.setOnScrollChangeListener(null)
+                    day_scroll_view.smoothScrollTo(0, yPos)
+                    if (this@ItemCalendarDayFragment.isResumed) calendarViewModel.dayViewScrollYPosition.value = yPos
+                    day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
+                }
             }
         }
+    }
 
-        updateCurrentTimeIndicatorDelayed()
+    private fun doOnPreDraw(scrollView: View, zoneId: ZoneId? = null) {
+        scrollView.setOnScrollChangeListener(null)
+        val jumpToCurrentTime = calendarViewModel.jumpToCurrentTime.value
+        if (jumpToCurrentTime == true) {
+            // Set scrolling position to current time minus 1 hour
+            calendarViewModel.jumpToCurrentTime.value = false
+            lifecycleScope.launch {
+                val timeZoneId =
+                    if (zoneId != null) {
+                        zoneId
+                    } else {
+                        val primaryTimeZone = calendarViewModel.getCalendarUserSettingsPrimaryTimezone()
+                        if (primaryTimeZone != null) ZoneId.of(primaryTimeZone) else null
+                    }
+                timeZoneId?.let {
+                    val currentTime = LocalTime.now(it).hour
+                    val yPos = dayView.getHourTop(
+                        if (currentTime > 0) currentTime - 1
+                        else currentTime
+                    )
+                    scrollView.scrollY = yPos
+                    if (this@ItemCalendarDayFragment.isResumed) calendarViewModel.dayViewScrollYPosition.value = yPos
+                    updateCurrentTimeIndicatorDelayed(it)
+                }
+            }
+        } else {
+            // Use previous view scrolling position if it exists
+            scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+        }
+        scrollView.setOnScrollChangeListener(onScrollChangeListener)
+        preDrawDone = true
     }
 
     private fun setupItemMiniCalendarContent(

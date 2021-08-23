@@ -187,6 +187,8 @@ interface CalendarsRepository {
 
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>
 
+    suspend fun selectCalendarUserSettingsPrimaryTimezone(userId: String): String?
+
     fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?>
 
     suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity)

@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.core.view.ViewCompat;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -209,11 +210,11 @@ public class DayView extends ViewGroup {
     /**
      * Updates the y position of the current time indicator with current LocalTime.now() value
      */
-    public void updateCurrentTimeView() {
+    public void updateCurrentTimeView(ZoneId timeZoneId) {
         if (currentTimeView == null) return;
         currentTimeView.measure(MeasureSpec.makeMeasureSpec(parentWidth, MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(currentTimeDotSize, MeasureSpec.EXACTLY));
-        LocalTime currentTime = LocalTime.now();
+        LocalTime currentTime = LocalTime.now(timeZoneId);
         int top = getHourTop(currentTime.getHour());
         int bottom = getHourBottom(currentTime.getHour());
         int y = top + (bottom - top) * currentTime.getMinute() / 60;

@@ -713,6 +713,15 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarSettings(defaultCalendarId)
     }
 
+    suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getCalendarUserSettingsPrimaryTimezone")
+            return null
+        }
+        return calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
+    }
+
     /**
      * @param loading define the loading state
      * @param position fragment position in the view pager
