@@ -3,15 +3,10 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.data.entity.PublicKeyEntity
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
 

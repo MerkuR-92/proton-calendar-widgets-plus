@@ -62,7 +62,6 @@ import me.proton.core.user.data.entity.UserKeyEntity
         EventAlarmEntity::class,
         MemberEntity::class,
         PassphraseEntity::class,
-        PublicKeyEntity::class,
         UserSettingsEntity::class
     ],
     version = AppDatabase.version,
@@ -98,7 +97,6 @@ abstract class AppDatabase :
     abstract fun eventAlarmsDao(): EventAlarmsDao
     abstract fun membersDao(): MembersDao
     abstract fun passphrasesDao(): PassphrasesDao
-    abstract fun publicKeysDao(): PublicKeysDao
 
     companion object {
 
@@ -117,7 +115,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 29
+        const val version = 30
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -129,7 +127,7 @@ abstract class AppDatabase :
 
         // Migrations after version 29.
         private val migrations = listOf(
-            AppDatabaseMigrations.MIGRATION_29_30
+            AppDatabaseMigrations.MIGRATION_29_30,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

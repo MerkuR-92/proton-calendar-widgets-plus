@@ -118,11 +118,6 @@ internal class TransformEventUseCaseTest {
                 valueStoreProviderMock.provideValueStore(any()).getStringFromSet(any(), any())
             } returns "keyPassphrase"
 
-            // verificationKeys =
-            coEvery {
-                database.publicKeysDao().select(any())
-            } returns listOf()
-
             coEvery { userManagerMock.getAddresses(any()) } returns listOf(
                 UserAddress(
                     userId = UserId("id"),

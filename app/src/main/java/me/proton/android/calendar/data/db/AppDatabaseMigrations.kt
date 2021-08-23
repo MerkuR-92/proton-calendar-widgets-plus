@@ -155,6 +155,7 @@ object AppDatabaseMigrations {
 
     val MIGRATION_29_30 = object : Migration(29, 30) {
         override fun migrate(database: SupportSQLiteDatabase) {
+            // Drop unused public_keys table.
             database.dropTable(AppDatabase.TABLE_PUBLIC_KEYS)
         }
     }
