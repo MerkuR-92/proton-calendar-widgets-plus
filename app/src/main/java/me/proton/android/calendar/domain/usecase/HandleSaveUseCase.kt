@@ -704,7 +704,14 @@ class HandleSaveUseCase(
         val createEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
 
         if (createEventResult is UseCase.Result.Error) {
-            return UseCase.Result.Error("HandleSaveUseCase: error in create event: ${createEventResult.message}")
+            return if (createEventResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}",
+                    UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                )
+            } else {
+                UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}")
+            }
         } else if (createEventResult is UseCase.Result.InvalidParams) {
             return UseCase.Result.InvalidParams("HandleSaveUseCase:invalid params in create event: ${createEventResult.message}")
         }
