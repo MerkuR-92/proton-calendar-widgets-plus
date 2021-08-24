@@ -713,6 +713,17 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
                             day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
                         }
+
+                        all_day_create_event_view.setOnSingleClickListener { view ->
+                            if (allDayEvents.isNullOrEmpty()) {
+                                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                                    .navigate(
+                                        Navigation.Deeplink.toEventCreate(
+                                            immutableDate
+                                        )
+                                    )
+                            }
+                        }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         // TODO Handle error for DayView event fetching
