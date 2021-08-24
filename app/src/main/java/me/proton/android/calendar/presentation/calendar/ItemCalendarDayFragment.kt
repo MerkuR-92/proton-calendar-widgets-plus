@@ -15,6 +15,7 @@ import androidx.cardview.widget.CardView
 import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -695,7 +696,15 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             layoutParams.bottomMargin =
                                 resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
                             all_day_more_items_layout.addView(eventView, layoutParams)
+                            if (all_day_items_list.isVisible.not()) all_day_more_items_layout.visibleOrGone(true)
+                        } else {
+                            all_day_items_list.visibleOrGone(false)
+                            all_day_more_collapse_button.visibleOrGone(false)
                         }
+
+                        if (all_day_items_list.isVisible) all_day_items_list.layoutParams =
+                            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
                         calendarViewModel.setLoading(false, position)
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
