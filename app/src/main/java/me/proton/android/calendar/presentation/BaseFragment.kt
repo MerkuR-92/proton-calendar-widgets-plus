@@ -23,8 +23,6 @@ abstract class BaseFragment : Fragment() {
         fragment_progress_bar?.visibleOrInvisible(visible)
     }
 
-    protected lateinit var toolbar: Toolbar
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,7 +37,7 @@ abstract class BaseFragment : Fragment() {
         // Hide splash screen
         (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
-        toolbar = rootView.findViewById(R.id.fragment_toolbar)
+        val toolbar = rootView.findViewById(R.id.fragment_toolbar) as Toolbar
         toolbar.apply {
             setNavigationIcon(R.drawable.ic_hamburger)
 
