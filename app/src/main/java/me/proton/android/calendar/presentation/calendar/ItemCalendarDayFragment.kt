@@ -706,6 +706,13 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
 
                         calendarViewModel.setLoading(false, position)
+
+                        all_day_more_items_layout.doOnPreDraw {
+                            // This allow us to properly set the scroll position after changes have been made to the all day header
+                            //  because the scroll view top position depends on the all day header height (top to bottom constraint)
+                            day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+                            day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
+                        }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         // TODO Handle error for DayView event fetching
