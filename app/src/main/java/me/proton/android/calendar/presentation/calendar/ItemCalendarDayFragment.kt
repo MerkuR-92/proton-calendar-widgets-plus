@@ -551,7 +551,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             // TODO remove UserID livedata
             calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
                 userId?.let {
-                    getEvents(immutableDate, timeZoneId, userAddresses)
+                    getEvents(immutableDate, timeZoneId, timeFormatIs24Hour, userAddresses)
                 }
             }
         }
@@ -578,12 +578,12 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         immutableDate == selectedDate.plusDays(1))
             ) {
                 logger.v("ItemCalendarDayFragment: events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
-                getEvents(immutableDate, timeZoneId, userAddresses)
+                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour, userAddresses)
             }
         }
     }
 
-    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, userAddresses: List<UserAddress>) {
+    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove already existing observer for $immutableDate")
             eventsLiveData.removeObservers(viewLifecycleOwner)
@@ -621,7 +621,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                         all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
                         allDayEventCroppedListAdapter =
-                            DayViewAllDayEventAdapter(userEmails, timeZoneId, immutableDate) { event ->
+                            DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
                                 onEventClick(event)
                             }
                         all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
@@ -632,7 +632,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                         all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
                         allDayEventListAdapter =
-                            DayViewAllDayEventAdapter(userEmails, timeZoneId, immutableDate) { event ->
+                            DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
                                 onEventClick(event)
                             }
                         all_day_items_list.adapter = allDayEventListAdapter

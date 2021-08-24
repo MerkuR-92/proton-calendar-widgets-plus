@@ -22,6 +22,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.domain.model.Event
@@ -30,6 +31,7 @@ import java.time.LocalDate
 class DayViewAllDayEventAdapter(
     private val userEmails: List<String>,
     private val timeZoneId: String,
+    private val timeFormatIs24Hour: Boolean,
     private val date: LocalDate,
     private val clickListener: (Event) -> Unit
 ) : ListAdapter<Event, DayViewAllDayEventAdapter.ViewHolder>(EventDiffCallback()) {
@@ -77,6 +79,11 @@ class DayViewAllDayEventAdapter(
             if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                 eventItemTitleSide.visibleOrGone(false)
             } else {
+                eventItemTitle.text = view.context.getString(
+                    R.string.multiple_days_event_summary,
+                    event.getStart(timeZoneId).formatTime(timeZoneId, timeFormatIs24Hour),
+                    eventItemTitle.text
+                )
                 eventItemTitleSide.visibleOrGone(true)
                 eventItemTitleSide.text = event.formatFullDayCounter(date, timeZoneId)
             }

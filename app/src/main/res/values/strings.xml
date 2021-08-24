@@ -2,6 +2,7 @@
     <string name="app_name">Proton Calendar</string>
 
     <string name="default_event_summary" comment="Event has no title">(no title)</string>
+    <string name="multiple_days_event_summary">%s %s</string>
     <string name="default_user_email">(no email address)</string>
     <string name="default_user_display_name">(no name)</string>
 
