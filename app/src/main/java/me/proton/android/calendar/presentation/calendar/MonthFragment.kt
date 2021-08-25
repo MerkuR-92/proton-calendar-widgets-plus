@@ -198,20 +198,12 @@ class MonthFragment : BaseFragment() {
      */
     private lateinit var miniCalendarPagerLayoutListener: ViewTreeObserver.OnGlobalLayoutListener
 
-    private var initialHeightAdjusted = false
     private fun setMiniCalendarPagerLayoutListener(startWeekOn: DayOfWeek) {
         miniCalendarPagerLayoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
                 // TODO Null check here because this listener is triggered once even after view has been destroyed
                 if (miniCalendarPager == null) return
-
-                // Adjust mini calendar height when month fragment is created
-                if (!initialHeightAdjusted) {
-                    initialHeightAdjusted = true
-                    if (calendarViewModel.monthView.value == true) mini_calendar_chevron.rotation = 180f
-                    updateMiniCalendarHeight(this, startWeekOn, isMonthView = false, animateChange = false)
-                }
             }
         }
     }
@@ -383,7 +375,13 @@ class MonthFragment : BaseFragment() {
 
         // Switch between Agenda and Day views
         calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
+            fragmentMonthLayout.allowScrolling = viewMode == ViewMode.AGENDA
+            val immutableWeekStart = calendarViewModel.weekStart.value
             if (viewMode == ViewMode.AGENDA) {
+                if (immutableWeekStart != null) {
+                    calendarViewModel.monthView.value = true
+                    simulateExpandWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
+                }
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = agendaPagerAdapter
@@ -392,6 +390,10 @@ class MonthFragment : BaseFragment() {
                 }
                 calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             } else {
+                if (immutableWeekStart != null) {
+                    calendarViewModel.monthView.value = false
+                    simulateCollapseWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
+                }
                 calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
                 agendaPager.apply {
                     val currentItem = this.currentItem // Save currently selected item position
@@ -630,6 +632,17 @@ class MonthFragment : BaseFragment() {
             }
         }
         headerDaysMediator.addSource(calendarViewModel.weekStart) { value ->
+
+            if (startWeekOn == null && value != null) {
+                if (calendarViewModel.viewMode.value == ViewMode.AGENDA) {
+                    calendarViewModel.monthView.value = true
+                    simulateExpandWithScroll(getWeekStartDayOfWeek(value))
+                } else {
+                    calendarViewModel.monthView.value = false
+                    simulateCollapseWithScroll(getWeekStartDayOfWeek(value))
+                }
+            }
+
             startWeekOn = value?.let { getWeekStartDayOfWeek(it) }
 
             if (timeZoneId != null && startWeekOn != null) {
@@ -651,7 +664,7 @@ class MonthFragment : BaseFragment() {
         }
 
         calendarViewModel.monthView.observe(viewLifecycleOwner) { monthView ->
-            fragmentMonthLayout.allowScrolling = !monthView
+            fragmentMonthLayout.allowScrolling = !monthView || calendarViewModel.viewMode.value == ViewMode.AGENDA
         }
 
         calendarViewModel.activeUserCalendars.observe(viewLifecycleOwner) { activeCalendars ->
