@@ -72,6 +72,7 @@ class AccountViewModel(
         _state.tryEmit(State.Processing)
 
         val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
+        bootstrapResult.ifSuccessAndLogErrors(logger) { }
         if (bootstrapResult !is UseCase.Result.Success<*>) {
             if (bootstrapResult is UseCase.Result.Error) {
                 _errorReport.postValue(bootstrapResult.error)
