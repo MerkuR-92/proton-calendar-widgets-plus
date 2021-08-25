@@ -50,7 +50,7 @@
         android:id="@+id/text_title"
         style="@style/Text.Caption.Strong"
         android:textColor="@color/text_on_calendar_color"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
         android:layout_marginTop="5dp"
@@ -58,6 +58,7 @@
         android:ellipsize="end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="Klosterstraße 44, 10179 Berlin, Germany"
         />
 
