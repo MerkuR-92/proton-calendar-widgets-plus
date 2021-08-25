@@ -663,13 +663,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             changeViewMode(ViewMode.DAY)
-            drawerLayout.close()
+            drawer_layout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             changeViewMode(ViewMode.AGENDA)
-            drawerLayout.close()
+            drawer_layout.close()
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->
