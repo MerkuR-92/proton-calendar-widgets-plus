@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.item_agenda_event_all_day.view.*
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
@@ -149,21 +150,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 )
             ) {
                 val startTime = dayView.getTimeForYCoordinate(event.y.toInt())
-                calendarViewModel.lifeCycleScope.launch {
-                    val calendarSettings = calendarViewModel.getDefaultCalendarSettings()
-                    val immutableDate = date
-                    if (calendarSettings == null || immutableDate == null) {
-                        return@launch
-                    }
-                    val truncatedStartTime = LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
-                    requireActivity().findNavController(R.id.nav_host_fragment_container_view)
-                        .navigate(
-                            Navigation.Deeplink.toEventCreate(
-                                immutableDate,
-                                truncatedStartTime
-                            )
-                        )
-                }
+                openCreateEventForm(isAllDay = false, startTime)
                 v.performClick()
             }
             true
@@ -714,15 +701,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
                         }
 
-                        all_day_create_event_view.setOnSingleClickListener { view ->
-                            if (allDayEvents.isNullOrEmpty()) {
-                                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
-                                    .navigate(
-                                        Navigation.Deeplink.toEventCreate(
-                                            immutableDate
-                                        )
-                                    )
-                            }
+                        all_day_create_event_view.setOnSingleClickListener { _ ->
+                            if (allDayEvents.isNullOrEmpty()) openCreateEventForm(isAllDay = true)
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
@@ -742,5 +722,24 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
         dayView.removeEventViews()
+    }
+
+    private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalTime? = null) {
+        val hasActiveCalendars = !calendarViewModel.activeUserCalendars.value.isNullOrEmpty()
+        if (hasActiveCalendars) {
+            val immutableDate = date ?: return
+            val truncatedStartTime =
+                if (!isAllDay && startTime != null) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
+                else null
+            requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                .navigate(
+                    Navigation.Deeplink.toEventCreate(
+                        immutableDate,
+                        truncatedStartTime
+                    )
+                )
+        } else {
+            requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+        }
     }
 }
