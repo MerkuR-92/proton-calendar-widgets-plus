@@ -132,13 +132,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
 
         val scrollView: ScrollView = rootView.findViewById(R.id.day_scroll_view)
-        rootView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                scrollView.viewTreeObserver.removeOnPreDrawListener(this)
-                doOnPreDraw(scrollView)
-                return false
-            }
-        })
+        rootView.doOnPreDraw {
+            doOnPreDraw(scrollView)
+        }
 
         scrollView.setOnScrollChangeListener(onScrollChangeListener)
 
@@ -418,13 +414,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             timeZoneId = value?.id
 
             value?.let {
-                day_scroll_view.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-                    override fun onPreDraw(): Boolean {
-                        day_scroll_view.viewTreeObserver.removeOnPreDrawListener(this)
-                        doOnPreDraw(day_scroll_view, it)
-                        return false
-                    }
-                })
+                day_scroll_view.doOnPreDraw { _ ->
+                    doOnPreDraw(day_scroll_view, it)
+                }
 
                 if (date == LocalDate.now(it)) {
                     all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
@@ -683,7 +675,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             layoutParams.bottomMargin =
                                 resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
                             all_day_more_items_layout.addView(eventView, layoutParams)
-                            if (all_day_items_list.isVisible.not()) all_day_more_items_layout.visibleOrGone(true)
+                            all_day_more_items_layout.visibleOrGone(all_day_items_list.isVisible.not())
                         } else {
                             all_day_items_list.visibleOrGone(false)
                             all_day_more_collapse_button.visibleOrGone(false)
