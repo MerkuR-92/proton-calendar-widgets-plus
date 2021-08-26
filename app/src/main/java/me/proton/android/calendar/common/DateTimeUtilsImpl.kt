@@ -1,8 +1,10 @@
 package me.proton.android.calendar.common
 
 import biweekly.util.ICalDate
+import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
+import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
-import me.proton.android.calendar.presentation.calendar.MiniCalendarItemAdapter
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -13,6 +15,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.IsoFields
 import java.util.*
 import java.util.Locale.getDefault
+import kotlin.math.abs
 
 object DateTimeUtilsImpl : DateTimeUtils {
 
@@ -41,13 +44,21 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
     }
 
+    override fun LocalDate.isBetween(fromDate: LocalDate, toDate: LocalDate): Boolean {
+        val thisLocalDate = this.atTime(LocalTime.MIDNIGHT).atZone(ZoneOffset.UTC)
+        val fromZonedDateTime = fromDate.atTime(LocalTime.MIDNIGHT).atZone(ZoneOffset.UTC)
+        val toZonedDateTime = toDate.atTime(LocalTime.MAX).atZone(ZoneOffset.UTC)
+
+        return thisLocalDate.isBetween(fromZonedDateTime, toZonedDateTime, false, false)
+    }
+
     /**
      * Calculate ISO week number for given date, taking custom week start into account.
      */
     override fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int {
 
         val firstDayOfTheWeekNumber = this.dayOfWeek.value - startWeekOn.value
-        val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + MiniCalendarItemAdapter.CalendarSettings.DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+        val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
 
         var monday: LocalDate = this.minusDays(firstDayOfTheWeekOffset.toLong())
         while (monday.dayOfWeek != DayOfWeek.MONDAY) {
@@ -56,6 +67,51 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
         return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 
+    }
+
+    /**
+     * Calculate week number difference between two dates
+     */
+    override fun calculateWeekNumberBetween(start: LocalDate, end: LocalDate, startWeekOn: DayOfWeek): Int {
+        var startWeekNumber = start.weekNumber(startWeekOn)
+        var endWeekNumber = end.weekNumber(startWeekOn)
+
+        val yearDifference = abs(start.year - end.year)
+        if (yearDifference == 0) return endWeekNumber - startWeekNumber
+
+        // Handle case where first day of year's week number is previous year's last week number
+        if (start.monthValue == 1 && startWeekNumber > 5) startWeekNumber = 0
+        if (end.monthValue == 1 && endWeekNumber > 5) endWeekNumber = 0
+
+        var tmpStart = start
+        var weeksToAdd = 0
+        for (i in 1 until yearDifference) {
+            tmpStart =
+                if (start.year < end.year) tmpStart.plusYears(i.toLong())
+                else tmpStart.minusYears(i.toLong())
+            weeksToAdd += calculateWeekNumberInYear(tmpStart, startWeekOn)
+        }
+
+        if (tmpStart.year + 1 == end.year) {
+            // End is after start
+            weeksToAdd += endWeekNumber + (calculateWeekNumberInYear(start, startWeekOn) - startWeekNumber)
+        } else if (tmpStart.year - 1 == end.year) {
+            // End is before start
+            tmpStart = tmpStart.minusYears(1)
+            weeksToAdd += (calculateWeekNumberInYear(tmpStart, startWeekOn) - endWeekNumber) + startWeekNumber
+            weeksToAdd *= -1 // Turn negative
+        }
+
+        return weeksToAdd
+    }
+
+    /**
+     * Calculate week number in a year
+     */
+    override fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int {
+        val lastDayWeekNumber = date.withDayOfYear(date.lengthOfYear()).weekNumber(startWeekOn)
+        return if (lastDayWeekNumber == 1) date.withDayOfYear(date.lengthOfYear() - 7).weekNumber(startWeekOn)
+        else lastDayWeekNumber
     }
 
     override fun LocalDate.toDate(timeZoneId: String?): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
@@ -182,11 +238,14 @@ object DateTimeUtilsImpl : DateTimeUtils {
         }
     }
 
-    override fun LocalTime.formatTime(is24Hour: Boolean?): String {
+    override fun LocalTime.formatTime(is24Hour: Boolean?, short: Boolean): String {
         return if (is24Hour == true) {
             this.format(DateTimeFormatter.ofPattern("HH:mm").withLocale(getLocaleForFormatting()))
         } else if (is24Hour == false) {
-            this.format(DateTimeFormatter.ofPattern("hh:mm a").withLocale(getLocaleForFormatting()))
+            this.format(DateTimeFormatter.ofPattern(
+                if (short) "h a"
+                else "hh:mm a"
+            ).withLocale(getLocaleForFormatting()))
         } else {
             this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocaleForFormatting()))
         }
@@ -206,6 +265,20 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
     override fun LocalDate.isLastDayOfWeekInMonth() = this.plusDays(7).monthValue != this.monthValue
 
+    /**
+     * This returns the excess number of days for the month's last week that are from the upcoming month
+     */
+    override fun getLastWeekOfMonthOffset(startWeekOn: DayOfWeek, lastDayOfMonth: LocalDate): Int {
+        val weekEnd = startWeekOn.plus(6)
+        var offset = 0
+        (0 until 7).forEach {
+            if (lastDayOfMonth.plusDays(it.toLong()).dayOfWeek == weekEnd) return offset
+            offset++
+        }
+
+        return offset
+    }
+
 // TODO add function for calculating how many days-of-week are there in a given month, we can use it for "backwards" formatting then
 
     override fun LocalDate.weekInMonth(): Int = this.get(ChronoField.ALIGNED_WEEK_OF_MONTH)
@@ -223,7 +296,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
     }
 
     override fun LocalDate.formatDayOfWeek(short: Boolean): String {
-        val dateFormat = SimpleDateFormat(if (short) "E" else "EEEE", getLocaleForFormatting())
+        val dateFormat = SimpleDateFormat(if (short) "EEEEE" else "EEEE", getLocaleForFormatting())
         return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
     }
 
@@ -234,6 +307,12 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return when (Locale.getDefault()) {
             // add mapping for other supported Locales
             else -> Locale.US
+        }
+    }
+
+    override fun Collection<CalendarsRepository.EventsWindow>.getFullyOverlappingWindow(eventsWindow: CalendarsRepository.EventsWindow): CalendarsRepository.EventsWindow? {
+        return this.find {
+            eventsWindow.fromDate.isBetween(it.fromDate, it.toDate) && eventsWindow.toDate.isBetween(it.fromDate, it.toDate)
         }
     }
 

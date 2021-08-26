@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -9,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -36,6 +38,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
+import kotlinx.android.synthetic.main.toolbar_action_primary.view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
@@ -162,6 +165,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.apply()
 
         handleAppTheme()
+    }
+
+    fun changeViewMode(viewMode: ViewMode) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val editor = sharedPreferences.edit()
+        editor.putInt(SharedPreferencesKeys.VIEW_MODE, viewMode.value)
+        editor.apply()
+    }
+
+    fun getLastViewMode(): ViewMode {
+        // By default we display the agenda view
+        return ViewMode.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.AGENDA.value)]
     }
 
     private fun handleAppTheme() {
@@ -310,6 +326,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             })
         }
+        calendarViewModel.viewMode.value = getLastViewMode()
 
         nav_view_main_content.nav_view_version.text = getString(
             R.string.nav_view_version_name,
@@ -642,6 +659,38 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             accountViewModel.addAccount()
             drawer_layout.close()
         }
+
+        nav_view_switcher_day_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.DAY)
+            changeViewMode(ViewMode.DAY)
+            drawer_layout.close()
+        }
+
+        nav_view_switcher_agenda_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
+            changeViewMode(ViewMode.AGENDA)
+            drawer_layout.close()
+        }
+
+        calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->
+            if (viewMode == ViewMode.AGENDA) {
+                // Set selected background
+                nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.brand_darken_40)
+                nav_view_main_content.nav_view_switcher_day_layout.background = null
+
+                // Set icon tint
+                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.santas_gray))
+            } else {
+                // Set selected background
+                nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.brand_darken_40)
+
+                // Set icon tint
+                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.santas_gray))
+                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+            }
+        }
     }
 
     private fun initDrawerHeader() {
@@ -652,7 +701,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             if (user != null) {
                 nav_view_main_content.nav_view_user_name.text = user.displayName?.nullIfBlank() ?: resources.getString(R.string.default_user_display_name)
                 nav_view_main_content.nav_view_user_mail.text = user.email?.nullIfBlank() ?: resources.getString(R.string.default_user_email)
-                val initials: String = getInitials(user.displayName ?: " ")
+                val initials: String = getInitials(user.displayName ?: " ", true)
                 nav_view_main_content.nav_view_user_initials.text = initials
             }
         }
@@ -699,13 +748,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerCalendarsListContent() {
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
-                nav_view_timezone.visibleOrGone(true)
-                nav_view_timezone_login_title.text =
-                    formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
-            }
-        }
+        // Uncomment this to display current timezone in drawer
+        // lifecycleScope.launch(Dispatchers.Main) {
+        //     calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
+        //         nav_view_timezone.visibleOrGone(true)
+        //         nav_view_timezone_login_title.text =
+        //             formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
+        //     }
+        // }
 
         lifecycleScope.launch {
             calendarViewModel.selectCalendars()

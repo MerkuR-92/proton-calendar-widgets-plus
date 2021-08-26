@@ -29,6 +29,8 @@ val SYNC_EVENTS_PERIODIC_DELAY_START = Duration.ofMinutes(5)
 val SYNC_CALENDARS_DELAY = Duration.ofSeconds(3)
 val UPDATE_PASSPHRASE_CALENDARS_DELAY = Duration.ofSeconds(5)
 
+val REFRESH_CURRENT_TIME_INDICATOR = Duration.ofMinutes(1).toMillis()
+
 // TODO change this also in Navigation.kt
 const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_details/"
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="
@@ -61,6 +63,8 @@ val PROTON_OLD_UID = "proton-calendar"
 
 const val MAX_EMAILS_PER_QUERY: Int = 8
 
+const val DAY_VIEW_ALL_DAY_MAX = 3
+
 object FeatureFlag {
     const val NEW_EVENT_DECRYPTION = true
     const val SETTINGS_DRAWER = true
@@ -78,8 +82,24 @@ object ApiResponseCode {
 
 object SharedPreferencesKeys {
     const val THEME = "theme"
+    const val VIEW_MODE = "view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
+}
+
+object MiniCalendarGestures {
+    const val MAX_CLICK_DURATION = 1000L
+    const val MAX_FLICK_DURATION = 100L
+    const val MIN_FLICK_DISTANCE = 50
+    const val MAX_CLICK_DISTANCE = 15
+}
+
+object Animation {
+    const val HEIGHT_CHANGE_DURATION = 300L
+}
+
+object CalendarSettings {
+    const val DAYS_IN_A_WEEK = 7 // always 7
 }
 
 enum class AppTheme(val value: Int) {
@@ -91,6 +111,11 @@ enum class AppTheme(val value: Int) {
 enum class AlarmAction(val value: Int) {
     EMAIL(1),
     DISPLAY(2)
+}
+
+enum class ViewMode(val value: Int) {
+    AGENDA(0),
+    DAY(1)
 }
 
 object IcsParsingValidation {
@@ -179,6 +204,7 @@ object FormValidation {
 
 object FragmentArguments {
     const val POSITION_ARG = "POSITION_ARG"
+    const val STARTING_POSITION_ARG = "STARTING_POSITION_ARG"
     const val DATE_ARG = "DATE_ARG"
 }
 

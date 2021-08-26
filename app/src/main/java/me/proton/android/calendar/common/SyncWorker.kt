@@ -74,7 +74,7 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
         val title = applicationContext.getString(me.proton.android.calendar.R.string.notification_sync)
 
         val notification = notificationBuilder
-            .setSmallIcon(me.proton.android.calendar.R.drawable.ic_calendar_today)
+            .setSmallIcon(me.proton.android.calendar.R.drawable.ic_day)
             .setContentTitle(title)
             .setTicker(title)
             .setPriority(NotificationCompat.PRIORITY_MIN)

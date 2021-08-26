@@ -1,14 +1,10 @@
 package me.proton.android.calendar.domain.utils
 
 import biweekly.util.ICalDate
-import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
-import me.proton.android.calendar.common.allowedTimezoneIds
-import java.text.SimpleDateFormat
+import me.proton.android.calendar.domain.CalendarsRepository
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.time.temporal.ChronoField
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 interface DateTimeUtils {
@@ -22,10 +18,14 @@ interface DateTimeUtils {
      */
     fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean
 
+    fun LocalDate.isBetween(fromDate: LocalDate, toDate: LocalDate): Boolean
+
     /**
      * Calculate ISO week number for given date, taking custom week start into account.
      */
     fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int
+    fun calculateWeekNumberBetween(start: LocalDate, end: LocalDate, startWeekOn: DayOfWeek): Int
+    fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int
     fun LocalDate.toDate(timeZoneId: String? = null): Date
     fun DayOfWeek.format(firstLetter: Boolean = false): String
     fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek
@@ -49,20 +49,14 @@ interface DateTimeUtils {
      */
     fun fallbackTimeZone(timeZone: String, fallbackToDefault: Boolean = true): String?
 
-    fun LocalTime.formatTime(is24Hour: Boolean?): String {
-        return if (is24Hour == true) {
-            this.format(DateTimeFormatter.ofPattern("HH:mm").withLocale(getLocaleForFormatting()))
-        } else if (is24Hour == false) {
-            this.format(DateTimeFormatter.ofPattern("hh:mm a").withLocale(getLocaleForFormatting()))
-        } else {
-            this.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(getLocaleForFormatting()))
-        }
-    }
+    fun LocalTime.formatTime(is24Hour: Boolean?, short: Boolean = false): String
 
     // TODO add and change parameters for customisation
     fun LocalDate.formatWithDayOfWeek(showDayOfWeek: Boolean = false): String
 
     fun LocalDate.isLastDayOfWeekInMonth(): Boolean
+
+    fun getLastWeekOfMonthOffset(startWeekOn: DayOfWeek, lastDayOfMonth: LocalDate): Int
 
 // TODO add function for calculating how many days-of-week are there in a given month, we can use it for "backwards" formatting then
 
@@ -79,4 +73,10 @@ interface DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     fun getLocaleForFormatting(): Locale
+
+    /**
+     * Gets [EventsWindow] from the collection if argument fully overlaps with it.
+     */
+    fun Collection<CalendarsRepository.EventsWindow>.getFullyOverlappingWindow(eventsWindow: CalendarsRepository.EventsWindow): CalendarsRepository.EventsWindow?
+
 }

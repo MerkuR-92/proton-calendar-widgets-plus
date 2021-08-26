@@ -22,6 +22,8 @@
         <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
 
+        <item name="android:colorEdgeEffect">@color/brand_norm</item>
+
         <!--        <item name="android:actionOverflowMenuStyle-->
 
         <!--        in case we need custom font-->
@@ -56,6 +58,7 @@
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="colorAccent">@color/brand_norm</item>
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
+        <item name="android:windowBackground">@drawable/shape_dialogs_rounded</item>
         <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
         <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.App.Body.Text</item>
         <item name="buttonBarPositiveButtonStyle">@style/MaterialDialogButtonStyle</item>
@@ -67,7 +70,7 @@
         <item name="colorAccent">@color/brand_norm</item>
         <item name="colorControlActivated">@color/brand_norm</item>
         <item name="colorControlHighlight">@color/brand_norm</item>
-        <item name="android:windowBackground">@color/background_norm</item>
+        <item name="android:windowBackground">@drawable/shape_dialogs_rounded</item>
         <item name="android:buttonBarPositiveButtonStyle">@style/PickerDialogButtonStyle</item>
         <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
     </style>

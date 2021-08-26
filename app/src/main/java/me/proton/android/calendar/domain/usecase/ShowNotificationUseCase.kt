@@ -104,7 +104,7 @@ class ShowNotificationUseCase(
                     ) // formatting in phone's timezone
 
                     notificationBuilder
-                        .setSmallIcon(R.drawable.ic_calendar_today)
+                        .setSmallIcon(R.drawable.ic_day)
                         .setContentTitle(dbEvent.summary ?: context.getString(R.string.default_event_summary))
                         .setContentText(text)
                         .setContentIntent(pendingIntent)

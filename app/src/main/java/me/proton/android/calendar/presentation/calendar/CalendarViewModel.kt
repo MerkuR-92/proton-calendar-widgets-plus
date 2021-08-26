@@ -23,9 +23,11 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -42,6 +44,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.collections.HashMap
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -65,6 +68,8 @@ class CalendarViewModel(
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
 
+    var dayViewScrollYPosition: MutableLiveData<Int> = MutableLiveData(0)
+
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
@@ -86,6 +91,18 @@ class CalendarViewModel(
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
 
+    var viewMode: MutableLiveData<ViewMode> = MutableLiveData(ViewMode.AGENDA)
+
+    // monthView: true means that mini calendar is fully expanded, false means that it's collapsed
+    var monthView: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    var loading: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
+    var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
+
     // Those addresses contain canonical email addresses
     var userAddresses: LiveData<List<UserAddress>> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
 
@@ -100,6 +117,10 @@ class CalendarViewModel(
 
     var showAutoDetectPrimaryTimezone = true
     var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
+
+    // TODO Rename
+    // This is used to store the current month mini calendar height when in month mode
+    var currentPosDesiredMonthHeight = 0
 
     suspend fun getActiveCalendars(): List<CalendarEntity> {
         val userId = userId.value?.id
@@ -230,19 +251,27 @@ class CalendarViewModel(
     }
 
     fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
-
         // prevent mini-calendar scroll from overriding selected date
         _selectedDate.value?.let {
             if (fromMonthPagerCallback && it.month == date.month && it.year == date.year) {
                 return
             }
+            weekStart.value?.let { weekStart ->
+                val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart)
+                if (fromMonthPagerCallback && monthView.value == false && it.weekNumber(startWeekOn) == date.weekNumber(startWeekOn) && it.year == date.year) {
+                    // TODO is this early return logic really needed for week view here ?
+                    return
+                }
+            }
         }
 
-        _selectedDate.postValue(date)
+        _selectedDate.value = date
 
         // adjust Mini Calendar
-        val monthsOffset = ChronoUnit.MONTHS.between(initialToday.withDayOfMonth(1), date.withDayOfMonth(1)).toInt()
-        val miniCalendarIndex = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition + monthsOffset
+        val monthStartingDate = initialToday.withDayOfMonth(1)
+        val offset = ChronoUnit.MONTHS.between(monthStartingDate, date.withDayOfMonth(1)).toInt()
+        val monthStartingPosition = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
+        val miniCalendarIndex = monthStartingPosition + offset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
             miniCalendarPager.post {
@@ -251,10 +280,17 @@ class CalendarViewModel(
         }
 
         // adjust Agenda
-        val agendaAdapter = (agendaPager.adapter as? AgendaPagerAdapter)
+        val agendaAdapter = if (viewMode.value == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter else agendaPager.adapter as? DayPagerAdapter
         if (agendaAdapter != null) {
-            val selectedDayOffset = ChronoUnit.DAYS.between(agendaAdapter.startingDate, date).toInt()
-            val agendaIndex = agendaAdapter.startingPosition + selectedDayOffset
+            val startingDate =
+                if (viewMode.value == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
+                else (agendaPager.adapter as DayPagerAdapter).startingDate
+            val startingPosition =
+                if (viewMode.value == ViewMode.AGENDA) (agendaPager.adapter as AgendaPagerAdapter).startingPosition
+                else (agendaPager.adapter as DayPagerAdapter).startingPosition
+
+            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, date).toInt()
+            val agendaIndex = startingPosition + selectedDayOffset
 
             if (agendaPager.currentItem != agendaIndex) {
                 agendaPager.post {
@@ -270,8 +306,8 @@ class CalendarViewModel(
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
-            var start = event.getOccurrenceStart(timeZoneId)!!.toLocalDate()
-            val end = event.getOccurrenceEnd(timeZoneId)!!.toLocalDate()
+            var start = event.getOccurrenceStart(timeZoneId).toLocalDate()
+            val end = event.getOccurrenceEnd(timeZoneId).toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
@@ -661,5 +697,46 @@ class CalendarViewModel(
 
     fun getUserEmails(): List<String>? {
         return userAddresses.value?.map { it.email }
+    }
+
+    suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+        if (defaultCalendarId == null) {
+            logger.e("defaultCalendarId was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        return calendarsRepository.selectCalendarSettings(defaultCalendarId)
+    }
+
+    suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getCalendarUserSettingsPrimaryTimezone")
+            return null
+        }
+        return calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
+    }
+
+    /**
+     * @param loading define the loading state
+     * @param position fragment position in the view pager
+     */
+    fun setLoading(loading: Boolean, position: Int? = null) {
+        if (loading) {
+            currentLoadingProcesses++
+            if (position != null) viewPagerFragmentsLoadingState[position] = true
+            this.loading.value = true
+        } else if (position != null) {
+            if (viewPagerFragmentsLoadingState[position] == true && currentLoadingProcesses > 0) currentLoadingProcesses--
+            viewPagerFragmentsLoadingState.remove(position)
+        } else {
+            if (currentLoadingProcesses > 0) currentLoadingProcesses--
+        }
+        if (currentLoadingProcesses == 0) this.loading.value = false
     }
 }

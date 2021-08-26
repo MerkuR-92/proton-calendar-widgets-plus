@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">ProtonCalendar</string>
+    <string name="app_name">Proton Calendar</string>
 
     <string name="default_event_summary" comment="Event has no title">(no title)</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
     <string name="default_user_email">(no email address)</string>
     <string name="default_user_display_name">(no name)</string>
 
@@ -30,6 +31,8 @@
     <string name="agenda_no_events">No events</string>
     <string name="agenda_loading_events">Loading events…</string>
     <string name="agenda_loading_events_error">Error loading events</string>
+
+    <string name="day_view_all_day_more">+ %d more</string>
 
 
     <!-- EVENT DETAILS   -->
@@ -186,8 +189,8 @@
     <string name="event_recurring_update_this_cancel">Cancel</string>
     <string name="event_recurring_update_this_confirm">Update</string>
 
-    <string name="event_allow_contacts_title">Allow ProtonCalendar to access your contacts?</string>
-    <string name="event_allow_contacts_description">ProtonCalendar needs access to your contacts to provide you with autocompletion</string>
+    <string name="event_allow_contacts_title">Allow Proton Calendar to access your contacts?</string>
+    <string name="event_allow_contacts_description">Proton Calendar needs access to your contacts to provide you with autocompletion</string>
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
 
@@ -218,12 +221,15 @@
     <string name="nav_view_disabled_calendars">%s (disabled)</string>
     <string name="nav_view_not_synced_calendars">%s (not synced)</string>
     <string name="nav_view_more">More</string>
+    <string name="nav_view_switcher">View</string>
+    <string name="nav_view_switcher_day">Day</string>
+    <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_timezone">Time zone</string>
     <string name="nav_view_more_settings">Settings</string>
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
-    <string name="nav_view_version_name">ProtonCalendar %1$s</string>
+    <string name="nav_view_version_name">Proton Calendar %1$s</string>
 
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
@@ -294,8 +300,8 @@
     <string name="update_timezone_dialog_confirmation">Update</string>
     <string name="update_timezone_dialog_cancel">Cancel</string>
 
-    <string name="contacts_permission_dialog_title">Allow ProtonCalendar to access your contacts?</string>
-    <string name="contacts_permission_dialog_message">ProtonCalendar needs access to your phone contacts to help you easily add them to your events.</string>
+    <string name="contacts_permission_dialog_title">Allow Proton Calendar to access your contacts?</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar needs access to your phone contacts to help you easily add them to your events.</string>
     <string name="contacts_permission_dialog_allow">Allow</string>
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
@@ -321,7 +327,7 @@
 
     <!-- Settings -->
     <string name="settings_theme_title">Theme</string>
-    <string name="settings_theme_info">This setting affects only the appearance of the ProtonCalendar app on this device. The app will restart after changing the theme.</string>
+    <string name="settings_theme_info">This setting affects only the appearance of the Proton Calendar app on this device. The app will restart after changing the theme.</string>
     <string name="settings_timezone_title">Time zone</string>
     <string name="settings_update_timezone_title">Ask to update time zone setting</string>
     <string name="settings_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>

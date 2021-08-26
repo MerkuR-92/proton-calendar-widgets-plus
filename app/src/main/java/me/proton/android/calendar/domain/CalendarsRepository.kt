@@ -18,6 +18,12 @@ import java.time.ZonedDateTime
 // TODO move to separate package?
 interface CalendarsRepository {
 
+    data class EventsWindow(
+        val fromDate: LocalDate,
+        val toDate: LocalDate,
+        val timeZoneId: String
+    )
+
     suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<InitingState>
 
     suspend fun shutdown()
@@ -180,6 +186,8 @@ interface CalendarsRepository {
     suspend fun updateCalendarUserSettingsDisplayWeekNumber(userId: String, displayWeekNumber: Int)
 
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>
+
+    suspend fun selectCalendarUserSettingsPrimaryTimezone(userId: String): String?
 
     fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?>
 

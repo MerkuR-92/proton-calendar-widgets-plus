@@ -14,8 +14,8 @@
         android:backgroundTint="@color/background_norm"
         app:elevation="0dp"
         >
-        <!-- TOOD elevation = 0 is set so we get rid of liftOnScroll effect on toolbar, because nothing else worked
-        this will break lift on scroll for other fragments with this layout, but at least it fixes month view -->
+        <!-- TODO elevation = 0 is set so we get rid of liftOnScroll effect on toolbar, because nothing else worked
+              this will break lift on scroll for other fragments with this layout, but at least it fixes month view -->
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
                 app:layout_scrollFlags="noScroll"
                 android:background="@null">
 
-                <FrameLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@null">
@@ -54,20 +54,46 @@
                         android:layout_height="?attr/actionBarSize"
                         android:divider="@drawable/divider_toolbar"
                         android:gravity="center_vertical|end"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
                         android:layout_gravity="end"
                         android:orientation="horizontal"
                         android:showDividers="middle"
                         android:background="@null"/>
 
-                    <TextView
-                        android:id="@+id/fragment_toolbar_title"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/fragment_toolbar_title_layout"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        style="@style/Text.Headline.Small"
-                        android:background="@null"/>
+                        android:gravity="start"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/fragment_toolbar_content"
+                        android:orientation="horizontal"
+                        android:background="?attr/selectableItemBackground">
 
-                </FrameLayout>
+                        <TextView
+                            android:id="@+id/fragment_toolbar_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            style="@style/Text.Headline.Small"
+                            android:background="@null"/>
+
+                        <ImageView
+                            android:id="@+id/mini_calendar_chevron"
+                            style="@style/Icon.Small"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_chevron_small_down"
+                            app:tint="@color/text_norm"
+                            android:background="@null"
+                            android:visibility="gone"
+                            tools:visibility="visible"
+                            android:layout_gravity="center_vertical"/>
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.appcompat.widget.Toolbar>
 

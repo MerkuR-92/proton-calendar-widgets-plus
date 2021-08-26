@@ -30,6 +30,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckedTextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Guideline
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -48,6 +50,7 @@ import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.item_popup_error.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.Animation.HEIGHT_CHANGE_DURATION
 import me.proton.android.calendar.common.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDate
@@ -754,7 +757,7 @@ object AndroidUtils {
     fun View.animateHeightChange(toHeightPx: Int, onAnimationEnd: () -> Unit) {
         if (this.measuredHeight != toHeightPx) {
             val valueAnimator = ValueAnimator.ofInt(this.measuredHeight, toHeightPx)
-            valueAnimator.duration = 300L
+            valueAnimator.duration = HEIGHT_CHANGE_DURATION
             valueAnimator.addUpdateListener {
                 val animatedValue = valueAnimator.animatedValue as Int
                 val layoutParams = this.layoutParams.apply {
@@ -767,6 +770,55 @@ object AndroidUtils {
         }
     }
 
+    /**
+     * @param toHeightPx is the desired height for the view
+     * @param maxHeight is the maximum expected height of the view, used when collapsing (maxHeight >= toHeightPx)
+     */
+    fun Guideline.animateGuidelineHeightChange(toHeightPx: Int, maxHeight: Int?, onAnimationEnd: () -> Unit) {
+        val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
+        if (layoutParams.guideBegin != toHeightPx) {
+            val duration =
+                if (maxHeight == null) HEIGHT_CHANGE_DURATION
+                else if (toHeightPx > layoutParams.guideBegin) {
+                    val percentLeft = ((toHeightPx - layoutParams.guideBegin) * 100) / toHeightPx
+                    (percentLeft * HEIGHT_CHANGE_DURATION) / 100
+                } else {
+                    val percentLeft = 100 - (((maxHeight - layoutParams.guideBegin) * 100) / maxHeight)
+                    (percentLeft * HEIGHT_CHANGE_DURATION) / 100
+                }
+
+            val valueAnimator = ValueAnimator.ofInt(layoutParams.guideBegin, toHeightPx)
+            valueAnimator.duration = duration.toLong()
+            valueAnimator.addUpdateListener {
+                val animatedValue = valueAnimator.animatedValue as Int
+                layoutParams.guideBegin = animatedValue
+                this.layoutParams = layoutParams
+            }
+            valueAnimator.start()
+            valueAnimator.doOnEnd { onAnimationEnd.invoke() }
+        }
+    }
+
+    interface AnimateGuidelineListener {
+        fun onHeightChange(animatedValue: Int)
+        fun onAnimationEnd()
+    }
+
+    fun Guideline.animateGuidelineHeightChange(toHeightPx: Int, animateGuidelineListener: AnimateGuidelineListener) {
+        val layoutParams = this.layoutParams as ConstraintLayout.LayoutParams
+        if (layoutParams.guideBegin != toHeightPx) {
+            val valueAnimator = ValueAnimator.ofInt(layoutParams.guideBegin, toHeightPx)
+            valueAnimator.duration = 300L
+            valueAnimator.addUpdateListener {
+                val animatedValue = valueAnimator.animatedValue as Int
+                layoutParams.guideBegin = animatedValue
+                animateGuidelineListener.onHeightChange(animatedValue)
+                this.layoutParams = layoutParams
+            }
+            valueAnimator.start()
+            valueAnimator.doOnEnd { animateGuidelineListener.onAnimationEnd() }
+        }
+    }
 
     /**
      * Listens for changes in EditText, only propagates values within range or forces default when
@@ -864,8 +916,9 @@ object AndroidUtils {
         setOnCheckedChangeListener(customOnCheckedChangeListener)
     }
 
-    fun getInitials(name: String): String {
+    fun getInitials(name: String, takeFirstOnly: Boolean? = false): String {
         if (name.isBlank()) return ""
+        if (takeFirstOnly == true) return name.toUpperCase().take(1)
         val initials = name.toUpperCase().split(' ')
             .mapNotNull { it.firstOrNull()?.toString() }
             .reduce { acc, s -> acc + s }
@@ -873,7 +926,10 @@ object AndroidUtils {
         return if (initials.length > 2) initials[0].toString() + initials[initials.lastIndex] else initials
     }
 
-    fun expand(v: View, duration: Long? = null, height: Int? = null) {
+    /**
+     * @return Pair<Int, Long> of new height in px and animation duration in ms
+     */
+    fun expand(v: View, duration: Long? = null, height: Int? = null): Pair<Int, Long> {
         val matchParentMeasureSpec = View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
         val wrapContentMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
@@ -881,7 +937,7 @@ object AndroidUtils {
         if (targetHeight == 0) {
             TimberLogger.d("animation expand skipped")
             v.visibility = View.VISIBLE
-            return
+            return Pair(0, 0)
         }
         TimberLogger.d("animation expand : targetHeight = ${targetHeight}")
 
@@ -907,9 +963,13 @@ object AndroidUtils {
         animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
         TimberLogger.d("animation expand : duration = ${animation.duration}")
         v.startAnimation(animation)
+        return Pair(targetHeight, animation.duration)
     }
 
-    fun collapse(v: View, duration: Long? = null): Int {
+    /**
+     * @return Pair<Int, Long> of new height in px and animation duration in ms
+     */
+    fun collapse(v: View, duration: Long? = null): Pair<Int, Long> {
         val initialHeight = v.measuredHeight
         TimberLogger.d("animation collapse : initialHeight = ${initialHeight}")
         val animation = object : Animation() {
@@ -933,7 +993,7 @@ object AndroidUtils {
         animation.duration = duration ?: min(animationDuration, MAX_ANIM_DURATION)
         TimberLogger.d("animation collapse : duration = ${animation.duration}")
         v.startAnimation(animation)
-        return initialHeight
+        return Pair(initialHeight, animation.duration)
     }
 
     fun rotateArrowDownward(v: View, duration: Long = 100) {

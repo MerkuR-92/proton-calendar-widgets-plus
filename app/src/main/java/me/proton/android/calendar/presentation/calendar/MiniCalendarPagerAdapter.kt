@@ -5,7 +5,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.time.LocalDate
 
-class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: LocalDate) : FragmentStateAdapter(activity) {
+class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: LocalDate) :
+    FragmentStateAdapter(activity) {
 
     val startingPosition = itemCount / 2
 
@@ -16,7 +17,8 @@ class MiniCalendarPagerAdapter(activity: FragmentActivity, val firstDayOfMonth: 
     override fun createFragment(position: Int): Fragment {
         return ItemMiniCalendarFragment.newInstance(
             position,
-            firstDayOfMonth.plusMonths((position - startingPosition).toLong())
+            startingPosition,
+            firstDayOfMonth
         )
     }
 }
