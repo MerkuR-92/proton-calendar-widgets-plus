@@ -20,6 +20,8 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
+import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.key.domain.repository.PublicAddressRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,6 +33,8 @@ internal class TransformEventUseCaseTest {
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val iCal = ICalUtilsImpl
     private val crypto: Crypto = mockk()
+    private val publicAddressRepositoryMock: PublicAddressRepository = mockk()
+    private val cryptoContextMock: CryptoContext = mockk()
     private lateinit var database: AppDatabase
 
     @BeforeEach
@@ -121,7 +125,9 @@ internal class TransformEventUseCaseTest {
                 testsLogger,
                 valueStoreProviderMock,
                 crypto,
-                iCal
+                iCal,
+                publicAddressRepositoryMock,
+                cryptoContextMock
             )
             val event = useCase.execute(eventEntity)
             assertThat(event).isNotNull()

@@ -1,24 +1,24 @@
 package me.proton.android.calendar.domain.usecase
 
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PersonalEventContentApiRequest
 import me.proton.android.calendar.data.api.UpdateEventPersonalPartApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueKey
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.extension.primary
+import me.proton.core.key.domain.signText
+import me.proton.core.user.domain.UserManager
+import me.proton.core.util.kotlin.equalsNoCase
 
 class UpdatePersonalPartUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
-    private val crypto: Crypto,
-    private val json: Json,
-    private val valueStoreProvider: ValueStoreProvider
+    private val cryptoContext: CryptoContext,
+    private val userManager: UserManager
 ): UseCase {
 
     companion object {
@@ -33,19 +33,15 @@ class UpdatePersonalPartUseCase(
         var personalEventContentApiRequest: PersonalEventContentApiRequest? = null
 
         if (personalPartICalString.isNotEmpty()) {
-            val userAddresses = database.addressesDao().select(userId.id, member.email)
-                .map { it.toAddress(json) } // TODO in the future we will have dropdown with memberID, but now we take first
-            val memberAddressKey =
-                userAddresses.firstOrNull()?.primaryKey
-                    ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part") // TODO how to select address? how to select address-key?
-            val valueStore = valueStoreProvider.provideValueStore(userId.id)
-            val signatureOfPersonalPart = personalPartICalString.run {
-                crypto.signTextDetached(
-                    personalPartICalString,
-                    memberAddressKey.privateKey,
-                    (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray()
-                )
-            } ?: return UseCase.Result.InvalidParams("failed to sign personal part when updating Event personal part")
+
+            val memberAddressKey = userManager.getAddresses(userId, refresh = false).find {
+                it.email.equalsNoCase(member.email)
+            }?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
+
+            val signatureOfPersonalPart = kotlin.runCatching {
+                memberAddressKey.privateKey.signText(cryptoContext, personalPartICalString)
+            }.getOrNull() ?: return UseCase.Result.InvalidParams("failed to sign personal part when updating Event personal part")
+
             personalEventContentApiRequest = PersonalEventContentApiRequest(
                 2,
                 personalPartICalString,

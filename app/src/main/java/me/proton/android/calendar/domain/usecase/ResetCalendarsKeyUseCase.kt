@@ -2,25 +2,27 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.crypto.tink.subtle.Base64
 import com.google.crypto.tink.subtle.Random
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PassphraseApiRequest
 import me.proton.android.calendar.data.api.ResetCalendarApiRequest
 import me.proton.android.calendar.data.api.SetupKeyApiRequest
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.model.AddressKey
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.entity.keyholder.KeyHolderPrivateKey
+import me.proton.core.key.domain.extension.primary
+import me.proton.core.key.domain.signText
+import me.proton.core.user.domain.UserManager
+import me.proton.core.util.kotlin.equalsNoCase
 
 class ResetCalendarsKeyUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,
-    private val valueStoreProvider: ValueStoreProvider,
-    private val json: Json,
-    private val database: AppDatabase
+    private val cryptoContext: CryptoContext,
+    private val userManager: UserManager
 ): UseCase {
 
     suspend fun execute(userId: UserId) : UseCase.Result {
@@ -47,15 +49,16 @@ class ResetCalendarsKeyUseCase(
                         memberEntity.hasPermission(MemberEntity.Permission.ADMIN)
                     } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: no admin member")
 
-                    val address =
-                        database.addressesDao().select(userId.id, adminMember.email).firstOrNull()?.toAddress(json)
-                            ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: No address id found")
+                    val address = userManager.getAddresses(userId, refresh = true).find {
+                        it.email.equalsNoCase(adminMember.email)
+                    } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: No address found")
 
-                    val memberAddressKey = address.primaryKey ?: address.keys.firstOrNull { it.isActive } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: memberAddressKey was null")
+                    val memberAddressKey = address.keys.primary() ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: memberAddressKey was null")
+
                     setupKeyApiRequestMap[calendarId] = getSetupKeyApiRequest(
-                        userId,
-                        address.id,
+                        address.addressId.id,
                         memberAddressKey,
+                        cryptoContext,
                         it.members
                     ) ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: getSetupKeyApiRequest was null")
                 }
@@ -83,17 +86,10 @@ class ResetCalendarsKeyUseCase(
     }
 
     private fun getSetupKeyApiRequest(
-        userId: UserId,
         addressId: String,
-        adminMemberAddressKey: AddressKey,
+        adminMemberAddressKey: KeyHolderPrivateKey,
+        cryptoContext: CryptoContext,
         members: Map<String, String>) : SetupKeyApiRequest? {
-
-        val valueStore = valueStoreProvider.provideValueStore(userId.id)
-        val userPassphrase = valueStore.getString(ValueKey.USER_PASSPHRASE)
-        if (userPassphrase == null) {
-            logger.e("ResetCalendarsKeyUseCase: user passphrase is empty")
-            return null
-        }
 
         // Generate a random 32 bytes passphrase
         val calendarPassphrase = Base64.encode(Random.randBytes(32))
@@ -108,11 +104,7 @@ class ResetCalendarsKeyUseCase(
         }
 
         // Sign the token using the admin member AddressKey
-        val tokenSignature = crypto.signTextDetached(
-            calendarPassphrase,
-            adminMemberAddressKey.privateKey,
-            userPassphrase.toByteArray()
-        )
+        val tokenSignature = kotlin.runCatching { adminMemberAddressKey.privateKey.signText(cryptoContext, calendarPassphrase) }.getOrNull()
         if (tokenSignature == null) {
             logger.e("ResetCalendarsKeyUseCase: signature was null")
             return null

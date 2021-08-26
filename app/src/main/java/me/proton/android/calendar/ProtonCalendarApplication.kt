@@ -18,6 +18,7 @@ import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.domain.entity.Product
 import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
+import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
@@ -59,6 +60,9 @@ class ProtonCalendarApplication : Application() {
     lateinit var getRecipientPublicAddresses: GetRecipientPublicAddresses
 
     @Inject
+    lateinit var publicAddressRepository: PublicAddressRepository
+
+    @Inject
     lateinit var contactEmailsRepository: ContactRepository
 
     @Inject
@@ -98,7 +102,8 @@ class ProtonCalendarApplication : Application() {
                     getRecipientPublicAddresses,
                     contactEmailsRepository,
                     cryptoContext,
-                    sendEmailDirect
+                    sendEmailDirect,
+                    publicAddressRepository
                 )
             )
         }

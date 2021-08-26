@@ -14,20 +14,23 @@ import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.extension.primary
+import me.proton.core.key.domain.signText
+import me.proton.core.user.domain.UserManager
+import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
-import org.koin.ext.getScopeId
 
 class EditCreateEventUseCase(
     private val logger: Logger,
     private val json: Json,
     private val calendarsApi: CalendarsApi,
-    private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val cryptoContext: CryptoContext,
     private val calendarsRepository: CalendarsRepository,
-    private val usersRepository: UsersRepository,
+    private val userManager: UserManager,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
     private val database: AppDatabase,
@@ -36,16 +39,17 @@ class EditCreateEventUseCase(
 
     suspend fun execute(userId: UserId, calendarId: String, newEvent: Event, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
 
-        // TODO figure out member-id, it's hardcoded below
-        val valueStore = valueStoreProvider.provideValueStore(userId.id)
-
         // 1. split original event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
 
         // 2. get Member's AddressKey for signing
         val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member when creating Event")
-        val userAddresses = database.addressesDao().select(userId.id, member.email).map { it.toAddress(json) } // TODO in the future we will have dropdown with memberID, but now we take first
-        val memberAddressKey = userAddresses.firstOrNull()?.primaryKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid AddressKey for Member when creating Event") // TODO how to select address? how to select address-key?
+        val userAddresses = userManager.getAddresses(userId, refresh = false).filter { it.email.equalsNoCase(member.email) }
+        val memberAddress = userAddresses.find {
+            it.email.equalsNoCase(member.email)
+        } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
+
+        val memberAddressKey = memberAddress.keys.primary()?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Primary Address Key for Member")
 
         // 3. get CalendarKey for encrypting
         val calendarPrimaryPrivateKey = database.calendarKeysDao().select(calendarId).firstOrNull { it.isActiveAndPrimary }?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no active primary key for calendar when creating Event")
@@ -76,7 +80,7 @@ class EditCreateEventUseCase(
         // 5. sign and encrypt Shared Parts
         val sharedPartICalString = calendarSplit.sharedPart.printToString()
 
-        val signatureOfSharedPart = crypto.signTextDetached(sharedPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
+        val signatureOfSharedPart = kotlin.runCatching { memberAddressKey.signText(cryptoContext, sharedPartICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfSharedPart")
 
         val sharedPartToEncryptICalString = calendarSplit.sharedPartToEncrypt.printToString()
 
@@ -98,11 +102,14 @@ class EditCreateEventUseCase(
                     ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not extract Calendar Public Key for encrypting"))
                 Ciphertext.from(encryptedSharedPart!!)
             }
-        val signatureOfEncryptedSharedPart = crypto.signTextDetached(sharedPartToEncryptICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
 
-        // 6. sign and encrypt Calendar Parts (optional)
+        val signatureOfEncryptedSharedPart = kotlin.runCatching { memberAddressKey.signText(cryptoContext, sharedPartToEncryptICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfEncryptedSharedPart")
+
+        // 6. sign and encrypt Calendar Parts (not always present)
         val calendarPartICalString = calendarSplit.calendarPart?.printToString()
-        val signatureOfCalendarPart = calendarPartICalString?.run { crypto.signTextDetached(calendarPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray()) }
+        val signatureOfCalendarPart = calendarPartICalString?.run {
+            kotlin.runCatching { memberAddressKey.signText(cryptoContext, calendarPartICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfCalendarPart")
+        }
 
         val calendarPartToEncryptICalString = calendarSplit.calendarPartToEncrypt?.printToString()
         val encryptedCalendarPartCiphertext = if (calendarPartToEncryptICalString != null) {
@@ -115,13 +122,16 @@ class EditCreateEventUseCase(
                 Ciphertext.from(encryptedCalendarPart!!)
             }
         } else null
-        val signatureOfEncryptedCalendarPart = calendarPartToEncryptICalString?.run { crypto.signTextDetached(calendarPartToEncryptICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray()) }
 
-        // 7. sign Personal Part (optional)
+        val signatureOfEncryptedCalendarPart = calendarPartToEncryptICalString?.run {
+            kotlin.runCatching { memberAddressKey.signText(cryptoContext, calendarPartToEncryptICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfEncryptedCalendarPart")
+        }
+
+        // 7. sign Personal Part (not always present)
         val personalPartICalString = calendarSplit.personalPart?.printToString()
-        val signatureOfPersonalPart = personalPartICalString?.run { crypto.signTextDetached(personalPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())  }
+        val signatureOfPersonalPart = personalPartICalString?.run { kotlin.runCatching { memberAddressKey.signText(cryptoContext, personalPartICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfPersonalPart") }
 
-        // 8. sign and encrypt Attendees Part (optional)
+        // 8. sign and encrypt Attendees Part (not always present)
         val attendeesPartICalString = calendarSplit.attendeesPart?.printToString()
 
         val attendeesEventContent =
@@ -135,13 +145,14 @@ class EditCreateEventUseCase(
                     val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, sharedSessionKey ?: return UseCase.Result.InvalidParams("shared session key was null when encrypting attendees"))
                     Ciphertext.from(null, encryptedAttendeesPart!!)
                 }
-                val signatureOfEncryptedAttendeesPart = crypto.signTextDetached(attendeesPartICalString, memberAddressKey.privateKey, (valueStore.getString(ValueKey.USER_PASSPHRASE) ?: "").toByteArray())
+
+                val signatureOfEncryptedAttendeesPart = kotlin.runCatching { memberAddressKey.signText(cryptoContext, attendeesPartICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfEncryptedAttendeesPart")
 
                 listOf(
                     Event.EventPart.Attendee(
                         3,
                         encryptedAttendeesPartCiphertext.encodedDataPacket,
-                        signatureOfEncryptedAttendeesPart!!, // TODO
+                        signatureOfEncryptedAttendeesPart,
                         "" // on server, "author" will be extracted from MemberID and this value ignored
                     )
                 )
@@ -155,13 +166,13 @@ class EditCreateEventUseCase(
                     Event.EventPart.Shared(
                         2,
                         sharedPartICalString,
-                        signatureOfSharedPart!!, // TODO
+                        signatureOfSharedPart,
                         "" // on server, "author" will be extracted from MemberID and this value ignored
                     ),
                     Event.EventPart.Shared(
                         3,
                         encryptedSharedPartCiphertext.encodedDataPacket,
-                        signatureOfEncryptedSharedPart!!, // TODO
+                        signatureOfEncryptedSharedPart,
                         "" // on server, "author" will be extracted from MemberID and this value ignored
                     )
                 )

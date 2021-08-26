@@ -17,6 +17,7 @@ interface ValueStore {
     fun putLongInSet(setName: String, key: String, value: Long)
     fun getLongFromSet(setName: String, key: String): Long?
     fun clearAll()
+    fun removeKey(key: String)
 }
 
 interface ValueStoreProvider {
@@ -24,7 +25,7 @@ interface ValueStoreProvider {
 }
 
 object ValueKey {
-    const val USER_PASSPHRASE = "USER_PASSPHRASE"
+    const val USER_PASSPHRASE = "USER_PASSPHRASE" // TODO deprecated!
     const val LAST_EVENT_ALARM_HANDLED_TIMESTAMP = "LAST_EVENT_ALARM_HANDLED_TIMESTAMP"
     const val LAST_SERVER_EVENT_ID = "LAST_SERVER_EVENT_ID"
 }

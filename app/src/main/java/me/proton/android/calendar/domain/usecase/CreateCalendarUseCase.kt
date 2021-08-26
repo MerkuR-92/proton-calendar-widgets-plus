@@ -1,11 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
-import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.AddressStatus
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -14,30 +11,21 @@ import me.proton.core.user.domain.UserManager
 class CreateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
-    private val database: AppDatabase,
-    private val json: Json,
     private val keySetupUseCase: KeySetupUseCase,
     private val userManager: UserManager
 ): UseCase {
 
     suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1) : UseCase.Result {
 
-        // TODO when we upgrade to core, obtain Primary Key to pass it to KeySetupUseCase and stop using our
-        //  Address model, Primary Key is the one with flags = 3 but there is no getter for it yet
-
-        val validAddressId = userManager.getAddresses(userId, refresh = true).firstOrNull {
+        val address = userManager.getAddresses(userId, refresh = true).firstOrNull {
             it.canSend && it.canReceive
-        }?.addressId ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid address ID found")
-
-        val address = database.addressesDao().select(userId.id).find {
-            it.status == AddressStatus.ENABLED.value && it.id == validAddressId.id
-        }?.toAddress(json) ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid address found")
+        } ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found")
 
         val createCalendarApiRequest =
             CreateCalendarApiRequest(
                 name = name,
                 description = description,
-                addressId = address.id,
+                addressId = address.addressId.id,
                 color = color,
                 display = display
             )
@@ -56,9 +44,8 @@ class CreateCalendarUseCase(
 
                         val keySetupResult = keySetupUseCase.execute(
                             userId,
-                            address.id,
+                            address.addressId.id,
                             calendarId,
-                            address.primaryKey ?: address.keys[0],
                             memberId)
 
                         when (keySetupResult) {
