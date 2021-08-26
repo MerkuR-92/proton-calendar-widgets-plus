@@ -47,7 +47,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 85
-        versionName "0.24.0"
+        versionName "0.24.1"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
