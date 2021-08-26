@@ -21,7 +21,12 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
 import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
+import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.AddressId
+import me.proton.core.user.domain.entity.AddressType
+import me.proton.core.user.domain.entity.UserAddress
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,6 +40,7 @@ internal class TransformEventUseCaseTest {
     private val crypto: Crypto = mockk()
     private val publicAddressRepositoryMock: PublicAddressRepository = mockk()
     private val cryptoContextMock: CryptoContext = mockk()
+    private val userManagerMock: UserManager = mockk()
     private lateinit var database: AppDatabase
 
     @BeforeEach
@@ -112,16 +118,27 @@ internal class TransformEventUseCaseTest {
                 valueStoreProviderMock.provideValueStore(any()).getStringFromSet(any(), any())
             } returns "keyPassphrase"
 
-            // verificationKeys =
-            coEvery {
-                database.publicKeysDao().select(any())
-            } returns listOf()
-
-            coEvery { database.addressesDao().select(any()) } returns listOf(AddressEntity("id", "calendarsingle9@proton.dev", 1, "calendarsingle9", mockk()))
+            coEvery { userManagerMock.getAddresses(any()) } returns listOf(
+                UserAddress(
+                    userId = UserId("id"),
+                    addressId = AddressId("id"),
+                    email = "calendarsingle9@proton.dev",
+                    displayName = "calendarsingle9",
+                    signature = null,
+                    domainId = null,
+                    canSend = true,
+                    canReceive = true,
+                    enabled = true,
+                    type = AddressType.Original,
+                    order = 1,
+                    keys = mockk()
+                )
+            )
 
             val useCase = TransformEventUseCase(
                 json,
                 database,
+                userManagerMock,
                 testsLogger,
                 valueStoreProviderMock,
                 crypto,

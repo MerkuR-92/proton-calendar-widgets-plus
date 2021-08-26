@@ -7,18 +7,26 @@ import me.proton.android.calendar.data.api.ServerEventsApiResponse
 import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.data.extension.toAddress
+import me.proton.core.user.data.extension.toUser
+import me.proton.core.user.domain.entity.AddressId
+import me.proton.core.user.domain.repository.UserAddressRepository
+import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
 import java.time.ZoneId
 
 class HandleServerEventsUseCase(
     private val logger: Logger,
+    private val userRepository: UserRepository,
+    private val userAddressRepository: UserAddressRepository,
     private val calendarsRepository: CalendarsRepository,
-    private val usersRepository: UsersRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
@@ -40,11 +48,11 @@ class HandleServerEventsUseCase(
 
             val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
-            eventsResponse.user?.let {
-                usersRepository.updateUser(it)
+            eventsResponse.user?.toUser()?.let {
+                userRepository.updateUser(it)
             }
             eventsResponse.userSettings?.let {
-                usersRepository.persistUserSettings(userId.id, it)
+                userSettingsRepository.persistUserSettings(userId.id, it)
             }
             eventsResponse.calendarUserSettings?.let {
                 calendarUserSettingsChangedUseCase.execute(userId.id, it)
@@ -110,12 +118,20 @@ class HandleServerEventsUseCase(
 //            var checkCalendarFlags = false
             eventsResponse.addresses?.forEach {
                 it.handleAction(
-                    { usersRepository.deleteAddressById(it.id) },
-                    { usersRepository.persistAddress(userId.id, it.address!!) },
-                    {
-//                        if (!checkCalendarFlags && usersRepository.hasReactivatedAddressKeys(it.address!!)) checkCalendarFlags = true
-                        usersRepository.updateAddress(userId.id, it.address!!)
-                        calendarsRepository.refreshCalendarsFlagsForAddress(it.address.email, it.address.status, userId.id)
+                    delete = {
+                        userAddressRepository.deleteAddresses(listOf(AddressId(it.id)))
+                    },
+                    create = {
+                        it.address?.toAddress(userId)?.let { address ->
+                            userAddressRepository.addAddresses(listOf(address))
+                        }
+                    },
+                    update = {
+                        it.address?.toAddress(userId)?.let { address ->
+                            userAddressRepository.updateAddresses(listOf(address))
+                        }
+                        // if (!checkCalendarFlags && usersRepository.hasReactivatedAddressKeys(it.address!!)) checkCalendarFlags = true
+                        calendarsRepository.refreshCalendarsFlagsForAddress(it.address!!.email, it.address.status.toBoolean(), userId.id)
                     }
                 )
             }

@@ -10,6 +10,8 @@ const val API_HOST = "api.protonmail.ch"
 const val BASE_URL = "https://$API_HOST/"
 const val API_APPLICATION_NAME = "AndroidCalendar"
 
+const val DEFAULT_DOMAIN_HOST = "protonmail.com"
+
 const val USER_AGENT_NAME = "ProtonCalendar"
 
 const val OFFLINE_EVENT_ID_PREFIX = "Proton-Android-App-Offline-Event-ID:"

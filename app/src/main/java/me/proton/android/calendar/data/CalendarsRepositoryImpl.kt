@@ -28,6 +28,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
+import me.proton.core.util.kotlin.toBoolean
 import java.time.*
 import java.time.temporal.TemporalAdjusters
 import java.util.*
@@ -122,7 +123,7 @@ class CalendarsRepositoryImpl(
         }
     }
 
-    override suspend fun refreshCalendarsFlagsForAddress(address: String, status: Int, userId: String) {
+    override suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String) {
         // Members objects are used to link an Address and the Calendars that are part of it
         val members = database.membersDao().selectByAddress(address)
         val calendarIds = ArrayList<String>()
@@ -130,9 +131,9 @@ class CalendarsRepositoryImpl(
         calendarIds.forEach {
             selectCalendar(it)?.let { dbCalendar ->
                 var flags = dbCalendar.flags
-                if (status == AddressStatus.DISABLED.value && !dbCalendar.isDisabled) {
+                if (!enabled && !dbCalendar.isDisabled) {
                     flags = addDisabledFlag(flags, dbCalendar)
-                } else if (status == AddressStatus.ENABLED.value && dbCalendar.isDisabled) {
+                } else if (enabled && dbCalendar.isDisabled) {
                     flags = removeDisabledFlag(flags, dbCalendar)
                 }
                 database.calendarsDao().updateCalendarFlags(dbCalendar.id, flags)

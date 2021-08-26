@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.core.user.data.entity.UserEntity
 import java.time.DayOfWeek
 import java.time.temporal.WeekFields
 import java.util.*
@@ -17,7 +18,7 @@ import java.util.*
 @Entity(tableName = AppDatabase.TABLE_USER_SETTINGS,
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
-        parentColumns = ["id"],
+        parentColumns = ["userId"],
         childColumns = ["fkUserId"],
         onDelete = ForeignKey.CASCADE
     )],

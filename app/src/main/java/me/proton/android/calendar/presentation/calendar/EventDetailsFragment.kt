@@ -69,6 +69,7 @@ import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
+import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -666,7 +667,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             return
         }
         lifecycleScope.launch {
-            val isFreeUser = eventViewModel.user.isFree
+            val isFreeUser = eventViewModel.user.hasSubscription().not()
             val event = eventViewModel.eventLiveData.value
             val userEmails = calendarViewModel.getUserEmails()
             val userAddresses = calendarViewModel.userAddresses.value

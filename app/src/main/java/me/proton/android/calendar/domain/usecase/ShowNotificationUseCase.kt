@@ -16,7 +16,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.MainViewModel
 import java.time.Instant
@@ -28,7 +28,7 @@ class ShowNotificationUseCase(
     private val context: Context,
     private val transformEventUseCase: TransformEventUseCase,
     private val database: AppDatabase,
-    private val usersRepository: UsersRepository
+    private val userSettingsRepository: UserSettingsRepository
 ) {
 
     suspend fun execute(eventAlarms: List<EventAlarmEntity>, userId: String) {
@@ -45,7 +45,7 @@ class ShowNotificationUseCase(
             logger.e("empty displayTimeZoneId in ShowNotificationUseCase")
         }
 
-        val is24Hour = when (usersRepository.selectTimeFormat(userId)) {
+        val is24Hour = when (userSettingsRepository.selectTimeFormat(userId)) {
             0 -> null
             1 -> true
             2 -> false

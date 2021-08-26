@@ -2,14 +2,14 @@ package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 
 class UpdateUserSettingsUseCase(
     private val logger: Logger,
     private val settingsApi: SettingsApi,
-    private val usersRepository: UsersRepository
+    private val userSettingsRepository: UserSettingsRepository
 ): UseCase {
 
     companion object {
@@ -22,7 +22,7 @@ class UpdateUserSettingsUseCase(
             settingsApi.updateUserTimeFormat(userId, timeFormat)
         ) {
             is ApiResponse.Success -> {
-                usersRepository.persistUserSettings(userId.id, updateUserTimeFormatResponse.data.userSettings)
+                userSettingsRepository.persistUserSettings(userId.id, updateUserTimeFormatResponse.data.userSettings)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
@@ -41,7 +41,7 @@ class UpdateUserSettingsUseCase(
             settingsApi.updateUserWeekStart(userId, weekStart)
         ) {
             is ApiResponse.Success -> {
-                usersRepository.persistUserSettings(userId.id, updateUserWeekStartResponse.data.userSettings)
+                userSettingsRepository.persistUserSettings(userId.id, updateUserWeekStartResponse.data.userSettings)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {

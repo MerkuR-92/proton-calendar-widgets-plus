@@ -3,8 +3,8 @@ package me.proton.android.calendar.domain.utils
 import android.content.res.Resources
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
-import me.proton.android.calendar.domain.model.Address
 import me.proton.android.calendar.domain.model.Event
+import me.proton.core.user.domain.entity.UserAddress
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
@@ -12,7 +12,7 @@ interface EventUtils {
 
     // TODO: Once we have proper user management, check if we could get participation status for current user on event init
     fun Event.getParticipationStatus(userEmails: List<String>): ParticipationStatus?
-    fun Event.isUserAddressAllowedSend(userAddresses: List<Address>, isFreeUser: Boolean): Boolean
+    fun Event.isUserAddressAllowedSend(userAddresses: List<UserAddress>, isFreeUser: Boolean): Boolean
     fun Event.updateParticipationStatus(userEmails: List<String>, status: ParticipationStatus)
 
     /**

@@ -9,7 +9,7 @@ import me.proton.core.mailmessage.domain.entity.EncryptedEmail
 interface EmailMessageRepository {
     suspend fun sendEmailDirect(
         userId: UserId,
-        encryptedEmail: EncryptedEmail,
+        emailMessage: me.proton.core.mailmessage.data.api.request.EmailMessage,
         encryptedPackages: List<EncryptedPackage>,
         attachmentKeys: List<String>?
     ): EmailReceipt

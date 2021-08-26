@@ -22,6 +22,8 @@ import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.repository.UserAddressRepository
+import me.proton.core.user.domain.repository.UserRepository
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -43,6 +45,12 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var userManager: UserManager
+
+    @Inject
+    lateinit var userRepository: UserRepository
+
+    @Inject
+    lateinit var userAddressRepository: UserAddressRepository
 
     @Inject
     lateinit var authOrchestrator: AuthOrchestrator
@@ -98,6 +106,8 @@ class ProtonCalendarApplication : Application() {
                     humanVerificationManager,
                     humanVerificationOrchestrator,
                     userManager,
+                    userRepository,
+                    userAddressRepository,
                     keyStoreCrypto,
                     getRecipientPublicAddresses,
                     contactEmailsRepository,

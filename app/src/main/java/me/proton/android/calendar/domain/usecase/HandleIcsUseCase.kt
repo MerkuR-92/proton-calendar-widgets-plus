@@ -24,18 +24,19 @@ import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UsersRepository
+import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
 import java.util.concurrent.TimeUnit
 
 class HandleIcsUseCase(
     private val logger: Logger,
     private val json: Json,
-    private val usersRepository: UsersRepository,
+    private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
@@ -57,14 +58,14 @@ class HandleIcsUseCase(
 
         if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
 
-        val userEmails = usersRepository.getUserAddresses(userId.id)?.map { address ->
+        val userEmails = userManager.getAddresses(userId).map { address ->
             canonicalizeProtonEmail(address.email)
         }
         val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
 
         // Find out if we are in organizer mode or attendee mode
         val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
-        val isOrganizerMode = userEmails?.firstOrNull { canonicalOrganizerEmail == it } != null
+        val isOrganizerMode = userEmails.firstOrNull { canonicalOrganizerEmail == it } != null
 
         var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
         if (!OPEN_ICS_FILES || (senderEmail != null && recipientEmail != null)) {
@@ -73,8 +74,8 @@ class HandleIcsUseCase(
             val canonicalSenderEmail = canonicalExtrasEmails[senderEmail]
             val canonicalRecipientEmail = canonicalExtrasEmails[recipientEmail]
 
-            isCurrentUserSender = userEmails?.contains(canonicalSenderEmail) == true
-            val isCurrentUserRecipient = userEmails?.contains(canonicalRecipientEmail) == true
+            isCurrentUserSender = userEmails.contains(canonicalSenderEmail) == true
+            val isCurrentUserRecipient = userEmails.contains(canonicalRecipientEmail)
 
             if (!isCurrentUserSender && !isCurrentUserRecipient) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
@@ -112,7 +113,7 @@ class HandleIcsUseCase(
 
         // Try to extract the current user from the attendee list if it exists
         val userAttendee = iCalendar.events.first().attendees.find { attendee ->
-            userEmails?.firstOrNull { userEmail ->
+            userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
             } != null

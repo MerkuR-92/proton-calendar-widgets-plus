@@ -78,9 +78,9 @@ class SendEmailUseCase(
         } else getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
-        val senderAddressId = database.addressesDao().select(userId.id).find {
+        val senderAddressId = userManager.getAddresses(userId).find {
             canonicalizeProtonEmail(it.email) == userAttendeeCanonicalEmail
-        }?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
+        }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
 
         val senderAddress = kotlin.runCatching {
             userManager.getAddresses(userId, refresh = true).find {
@@ -171,9 +171,9 @@ class SendEmailUseCase(
 
         val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees: there is no valid first Member when creating Event")
         val senderCanonicalEmail = canonicalizeProtonEmail(member.email)
-        val senderAddressId = database.addressesDao().select(userId.id).find {
+        val senderAddressId = userManager.getAddresses(userId).find {
             canonicalizeProtonEmail(it.email) == senderCanonicalEmail
-        }?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address ID for sender") // TODO better error
+        }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address ID for sender") // TODO better error
 
         // TODO Check with core if refresh true can be removed
         val senderAddress = kotlin.runCatching {

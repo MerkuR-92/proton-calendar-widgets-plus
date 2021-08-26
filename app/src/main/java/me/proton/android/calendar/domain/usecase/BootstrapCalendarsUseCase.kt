@@ -20,7 +20,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val settingsApi: SettingsApi,
-    private val usersRepository: UsersRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val createCalendarUseCase: CreateCalendarUseCase,
@@ -138,7 +138,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
             logger.e("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponse")
             return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponse")
         }
-        usersRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
+        userSettingsRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
 
         val failedCalendarIds = mutableListOf<String>()
 

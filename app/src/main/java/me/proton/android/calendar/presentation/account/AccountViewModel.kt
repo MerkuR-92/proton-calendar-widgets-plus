@@ -13,30 +13,23 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.presentation.*
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.onAddAccountResult
-import me.proton.core.crypto.common.keystore.KeyStoreCrypto
-import me.proton.core.crypto.common.keystore.decryptWith
 import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
 import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
-import me.proton.core.key.domain.extension.primary
-import me.proton.core.user.domain.UserManager
 
 class AccountViewModel(
-    private val userManager: UserManager,
     private val accountManager: AccountManager,
     private val authOrchestrator: AuthOrchestrator,
     private val humanVerificationManager: HumanVerificationManager,
     private val humanVerificationOrchestrator: HumanVerificationOrchestrator,
-    private val fetchUserUseCase: FetchUserUseCase,
     private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
-    private val usersRepository: UsersRepository,
+    private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
-    private val keyStoreCrypto: KeyStoreCrypto,
     private val logger: Logger,
     private val product: Product
 ) : ViewModel() {
@@ -55,7 +48,7 @@ class AccountViewModel(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    private suspend fun Account.isBootstrapped() = usersRepository.selectUserSettings(userId.id) != null
+    private suspend fun Account.isBootstrapped() = userSettingsRepository.selectUserSettings(userId.id) != null
 
     private suspend fun checkAccount(account: Account) {
         runCatching {
@@ -77,14 +70,6 @@ class AccountViewModel(
 
     private suspend fun setupUser(userId: UserId, showConfirmationDialog: Boolean = true) {
         _state.tryEmit(State.Processing)
-
-        // TODO: Maybe save fetchResult and skip this call if callAfterReset is true ?
-        val fetchResult = fetchUserUseCase.executeFetchUserAndAddresses(userId)
-        if (fetchResult !is UseCase.Result.Success<*>) {
-            if (fetchResult is UseCase.Result.Error) _errorReport.postValue(fetchResult.error)
-            removeUser(userId)
-            return
-        }
 
         val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
         if (bootstrapResult !is UseCase.Result.Success<*>) {
@@ -112,7 +97,6 @@ class AccountViewModel(
         // Workers could observe getAccount(userId), and cancel if state == Removed ?
         // How to reproduce: 1) Login. 2) During loading/syncing, logout.
         calendarsRepository.shutdown()
-        usersRepository.deleteUserById(userId.id)
     }
 
     // TODO: Merge State & Error in the same StateFlow.

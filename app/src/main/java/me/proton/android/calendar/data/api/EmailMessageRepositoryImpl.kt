@@ -6,9 +6,7 @@ import me.proton.android.calendar.domain.model.toEmailPackage
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.data.api.MailMessageApi
 import me.proton.core.mailmessage.data.api.request.SendDirectRequest
-import me.proton.core.mailmessage.data.extension.toEmailMessage
 import me.proton.core.mailmessage.domain.entity.EmailReceipt
-import me.proton.core.mailmessage.domain.entity.EncryptedEmail
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.util.kotlin.toInt
 
@@ -18,14 +16,14 @@ class EmailMessageRepositoryImpl(
 
     override suspend fun sendEmailDirect(
         userId: UserId,
-        encryptedEmail: EncryptedEmail,
+        emailMessage: me.proton.core.mailmessage.data.api.request.EmailMessage,
         encryptedPackages: List<EncryptedPackage>,
         attachmentKeys: List<String>?
     ): EmailReceipt =
         provider.get<MailMessageApi>(userId).invoke {
             val response = sendDirect(
                 SendDirectRequest(
-                    emailMessage = encryptedEmail.toEmailMessage(),
+                    emailMessage = emailMessage,
                     autoSaveContacts = false.toInt(),
                     packages = encryptedPackages.map { it.toEmailPackage() },
                     attachmentKeys = attachmentKeys
