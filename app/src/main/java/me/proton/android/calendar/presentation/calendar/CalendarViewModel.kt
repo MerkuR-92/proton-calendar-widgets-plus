@@ -42,6 +42,7 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.coroutines.CoroutineContext
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -366,14 +367,15 @@ class CalendarViewModel(
 
     suspend fun fetchEvents(fromDate: LocalDate,
                             toDate: LocalDate,
-                            timeZoneId: String) {
+                            timeZoneId: String,
+                            coroutineScope: CoroutineScope) {
 
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel fetchEvents")
             return
         }
-        withContext(Dispatchers.IO) {
+        coroutineScope.launch {
             calendarsRepository.fetchEvents(userId, fromDate, toDate, timeZoneId)
         }
     }
