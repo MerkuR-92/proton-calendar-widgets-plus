@@ -450,9 +450,11 @@ object ICalUtilsImpl : ICalUtils {
         val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
-            val event = events.find {
-                it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(occurrence.startDateTime, originalEvent.isAllDay())
-            }?.copy() ?: originalEvent.copy()
+            val event = Event.from(
+                events.find {
+                    it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(occurrence.startDateTime, originalEvent.isAllDay())
+                } ?: originalEvent
+            )
             event.occurrence = occurrence
             event
         }
@@ -480,12 +482,14 @@ object ICalUtilsImpl : ICalUtils {
         val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
-            val event = eventsSharingUid.find {
-                it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
-                    occurrence.startDateTime,
-                    originalEvent.isAllDay()
-                )
-            }?.copy() ?: originalEvent.copy()
+            val event = Event.from(
+                eventsSharingUid.find {
+                    it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
+                        occurrence.startDateTime,
+                        originalEvent.isAllDay()
+                    )
+                } ?: originalEvent
+            )
             event.occurrence = occurrence
             event
         }.filter { // TODO filterFromEnd doesn't work if there are gaps in occurrences caused by single edits

@@ -66,10 +66,16 @@ data class Event private constructor(
 
         /**
          * Makes sure we have deep copy of [ICalendar] object inside [Event].
+         * Copy event with specified id / calendar / iCalendar values
          */
-        fun from(event: Event): Event {
+        fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
-            return event.copy(iCalendar = ICalendar(event.iCalendar).apply { setDefaultTimeZone(defaultTimezoneId) })
+            return event.copy(
+                id = id ?: event.id,
+                calendar = calendar ?: event.calendar,
+                iCalendar = (iCalendar ?: ICalendar(event.iCalendar)).apply {
+                    setDefaultTimeZone(defaultTimezoneId)
+                })
         }
 
         /**

@@ -190,10 +190,7 @@ class HandleSaveUseCase(
                     )
                 }
 
-                val eventToCreate = event.copy( // TODO move to helper method?
-                    id = ICalUtilsImpl.generateOfflineEventId(),
-                    iCalendar = event.iCalendar.clone()
-                )
+                val eventToCreate = Event.from(event, id = ICalUtilsImpl.generateOfflineEventId())
                 // event.uid is still the same
 
                 // delete all recurring properties
@@ -245,7 +242,7 @@ class HandleSaveUseCase(
                     }
                 }
 
-                val eventToCreate = event.copy(iCalendar = event.iCalendar.clone())
+                val eventToCreate = Event.from(event)
                 eventToCreate.iCalEvent.recurrenceRule = null
                 eventToCreate.iCalEvent.exceptionDates.clear()
 
@@ -304,7 +301,7 @@ class HandleSaveUseCase(
         // OR
         // - change UNTIL equal to (previous occurrence from just edited).endDate
         val dbEventToCopy = if (dbEvent.isSingleEdit()) immutableOriginalDbEvent else dbEvent
-        val dbEventToUpdate = dbEventToCopy!!.copy(iCalendar = dbEventToCopy.iCalendar.clone())
+        val dbEventToUpdate = Event.from(dbEventToCopy!!)
         // Bump sequence for original event
         dbEventToUpdate.iCalEvent.setSequence((dbEventToUpdate.iCalEvent.sequence?.value ?: 0) + 1)
         val timezone = event.defaultTimeZone!!
@@ -362,7 +359,8 @@ class HandleSaveUseCase(
 
         // --------------------------------------
 
-        val eventToCreate = event.copy(
+        val eventToCreate = Event.from(
+            event,
             id = ICalUtilsImpl.generateOfflineEventId(),
             iCalendar = event.iCalendar.clone().apply {
                 this.events.first().apply {
@@ -492,10 +490,7 @@ class HandleSaveUseCase(
                     return HandleSaveOptionResult.Error(UseCase.Result.InvalidParams("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
                 }
 
-                val newEvent = event.copy(
-                    id = immutableOriginalDbEvent.id,
-                    iCalendar = event.iCalendar.clone()
-                )
+                val newEvent = Event.from(event, id = immutableOriginalDbEvent.id)
                 newEvent.iCalEvent.recurrenceId = null
                 newEvent.iCalEvent.uid = immutableOriginalDbEvent.iCalEvent.uid
 
@@ -590,10 +585,7 @@ class HandleSaveUseCase(
             if (dbEvent?.isSingleEdit() == true) {
 
                 // clear recurrenceId and use original event id since single edit will replace original event
-                val newEvent = event.copy(
-                    id = originalEventId,
-                    iCalendar = event.iCalendar.clone()
-                )
+                val newEvent = Event.from(event, id = originalEventId)
                 newEvent.iCalEvent.recurrenceId = null
                 newEvent.iCalEvent.exceptionDates.clear()
 
@@ -666,7 +658,7 @@ class HandleSaveUseCase(
 
                 val sendEmailResult = sendEmailUseCase.executeToAttendees(
                     userId,
-                    newEvent.copy(id = this.first(), iCalendar = newEvent.iCalendar.clone() as ICalendar),
+                    Event.from(newEvent, id = this.first()),
                     isCreate,
                     null,
                     sendPreferences,
