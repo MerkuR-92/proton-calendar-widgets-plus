@@ -32,6 +32,9 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
@@ -875,6 +878,41 @@ object ICalUtilsImpl : ICalUtils {
 
         // The EXDATE must be filtered out
         inviteICalendar.events.first().exceptionDates.clear()
+
+        return inviteICalendar.printToString()
+    }
+
+    override fun getCancelIcs(
+        event: Event,
+        attendees: List<Attendee>,
+        sharedEventId: String
+    ): String {
+        val inviteICalendar = event.iCalendar.clone()
+
+        if (inviteICalendar.productId == null) inviteICalendar.setProductId(generateProtonProdId())
+        if (inviteICalendar.version == null) inviteICalendar.version = ICalVersion.V2_0
+
+        // METHOD:REPLY as we answer the REQUEST of the organizer
+        inviteICalendar.setMethod(Method.CANCEL)
+
+        if (inviteICalendar.calendarScale == null) inviteICalendar.calendarScale = CalendarScale.gregorian()
+
+        // Add shared event ID (shared session key is not needed for cancellation)
+        inviteICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+
+        // Replace common names with emails
+        attendees.forEach {
+            it.commonName = it.extractEmail()
+        }
+
+        // Alarms should be dropped
+        inviteICalendar.events.first().alarms.clear()
+
+        // The EXDATE must be filtered out
+        inviteICalendar.events.first().exceptionDates.clear()
+
+        // Status must be set to cancelled
+        inviteICalendar.events.first().status = Status.cancelled()
 
         return inviteICalendar.printToString()
     }

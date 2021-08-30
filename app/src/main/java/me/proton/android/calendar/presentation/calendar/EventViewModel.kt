@@ -75,7 +75,7 @@ class EventViewModel(
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase,
     private val handleSaveUseCase: HandleSaveUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase,
+    private val handleDeleteUseCase: HandleDeleteUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase
 ) : AndroidViewModel(application) {
 
@@ -172,8 +172,14 @@ class EventViewModel(
 
             object Event: Delete()
             object DisabledCalendarRecurring: Delete()
+            object AsAnOrganizer: Delete()
+            object AsAnOrganizerRecurring: Delete()
             data class RecurringEvent(
                 val showThisAndFuture: Boolean
+            ): Delete()
+            data class SendPreferences(
+                val sendPreferencesResults: SendPreferencesResults,
+                val isRecurring: Boolean
             ): Delete()
         }
 
@@ -1062,14 +1068,23 @@ class EventViewModel(
         return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
     }
 
-    fun handleDelete(occurrenceNumber: Int) {
+    suspend fun handleDelete(occurrenceNumber: Int) {
         // Post deleting event value to true to display loading state
         eventState.value = EventState.Processing.Deleting
+
+        val userEmails = userManager.getAddresses(userId).map { address ->
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+        }
+        val deleteAsAnOrganizer = event.isUserOrganizer(userEmails)
 
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
 
-        if (event.isPartOfChain() &&
+        if (deleteAsAnOrganizer) {
+            if (event.isPartOfChain()) eventDialogState.value = EventDialogState.Delete.AsAnOrganizerRecurring
+            else eventDialogState.value = EventDialogState.Delete.AsAnOrganizer
+
+        } else if (event.isPartOfChain() &&
             dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false &&
             event.calendar.isActive) {
 
@@ -1094,9 +1109,9 @@ class EventViewModel(
     suspend fun handleDeleteEvent(occurrenceNumber: Int): UseCase.Result {
         val deleteResult =
             if (dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == true) {
-                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+                handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
             } else {
-                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
+                handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
             }
 
         // Post deleting event value to false to stop loading state
@@ -1106,7 +1121,38 @@ class EventViewModel(
     }
 
     suspend fun handleDeleteDisabledCalendarRecurring(): UseCase.Result {
-        val deleteResult = deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+        val deleteResult = handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+
+        // Post deleting event value to false to stop loading state
+        eventState.value = EventState.Idle
+
+        return deleteResult
+    }
+
+    suspend fun handleDeleteEventAsOrganizer(
+        attendees: List<Attendee>,
+        sendPreferences: Map<Email, SendPreferences>,
+        timeFormatIs24Hours: Boolean,
+        isRecurring: Boolean
+    ): UseCase.Result {
+        // TODO Handle recurring
+        if (isRecurring) {
+            eventState.value = EventState.Idle
+            return UseCase.Result.Error("handleDeleteEventAsOrganizer todo handle delete recurring as organizer")
+        }
+
+        val deleteResult = if (sendPreferences.isNotEmpty()) {
+            handleDeleteUseCase.handleDeleteAsOrganizer(
+                userId,
+                event,
+                attendees,
+                sendPreferences,
+                timeFormatIs24Hours
+            )
+
+        } else {
+            UseCase.Result.Error("handleDeleteEventAsOrganizer sendPreferences was empty")
+        }
 
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
@@ -1117,20 +1163,20 @@ class EventViewModel(
     suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean): UseCase.Result {
         val deleteResult =
             if (selectedIndex == 0) {
-                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
+                handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
             } else if (selectedIndex == 1) {
                 if (showThisAndFuture) {
-                    deleteEventUseCase.execute(
+                    handleDeleteUseCase.handleDelete(
                         userId,
                         event.id,
                         EventEditDeleteOption.THIS_EVENT_AND_FUTURE,
                         occurrenceNumber
                     )
                 } else {
-                    deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+                    handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
                 }
             } else { // it == 2
-                deleteEventUseCase.execute(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
+                handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
             }
 
         // Post deleting event value to false to stop loading state
@@ -1394,7 +1440,7 @@ class EventViewModel(
         val updateTime = Instant.now()
 
         if (sendPreferences.isNotEmpty()) {
-            val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
+            val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                 userId,
                 eventCopy.iCalendar,
                 dbEvent?.iCalendar?.timezoneInfo,
@@ -1480,7 +1526,7 @@ class EventViewModel(
 
         if (sendPreferences.isNotEmpty()) {
             updateParticipationStatusUseCaseResult.returnValue.tryCast<Int> {
-                val sendEmailUseCaseResult = sendEmailUseCase.executeToOrganizer(
+                val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                     userId,
                     eventCopy.iCalendar,
                     dbEvent?.iCalendar?.timezoneInfo,

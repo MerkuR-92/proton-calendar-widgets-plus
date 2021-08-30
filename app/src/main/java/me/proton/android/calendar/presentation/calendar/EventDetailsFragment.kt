@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation.calendar
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.text.TextUtils
 import android.text.format.DateFormat
 import android.text.util.Linkify
 import android.util.TypedValue
@@ -65,6 +66,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
@@ -176,7 +178,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
                     icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
                 ) {
-                    eventViewModel.handleDelete(navigationArguments.occurrenceNumber)
+                    lifecycleScope.launch { eventViewModel.handleDelete(navigationArguments.occurrenceNumber) }
                 }
             }
         }
@@ -294,7 +296,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
                                     val deleteResult = eventViewModel.handleDeleteDisabledCalendarRecurring()
-                                    handleDeleteResult(deleteResult)
+                                    handleDeleteResult(deleteResult, false)
                                 }
                             }
                             .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
@@ -320,7 +322,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 lifecycleScope.launch {
                                     val deleteResult =
                                         eventViewModel.handleDeleteEvent(navigationArguments.occurrenceNumber)
-                                    handleDeleteResult(deleteResult)
+                                    handleDeleteResult(deleteResult, false)
                                 }
                             }
                             .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
@@ -356,7 +358,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         selectedItem,
                                         it.showThisAndFuture
                                     )
-                                    handleDeleteResult(deleteResult)
+                                    handleDeleteResult(deleteResult, false)
                                 }
                                 dialog.dismiss()
                             }
@@ -364,6 +366,106 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                 eventViewModel.eventState.value = EventViewModel.EventState.Idle
                             }
                             .setOnCancelListener { _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnDismissListener {
+                                eventViewModel.eventDialogState.value = null
+                            }
+                            .show()
+                    }
+                    EventViewModel.EventDialogState.Delete.AsAnOrganizer -> {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(
+                                R.string.dialog_title_delete_event_as_organizer
+                            )
+                            .setMessage(
+                                R.string.dialog_description_delete_event_as_organizer
+                            )
+                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                                lifecycleScope.launch {
+                                    handleDeleteAsOrganizerSendPreferences(false)
+                                }
+                            }
+                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnCancelListener {
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnDismissListener {
+                                eventViewModel.eventDialogState.value = null
+                            }
+                            .show()
+                    }
+                    EventViewModel.EventDialogState.Delete.AsAnOrganizerRecurring -> {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(
+                                R.string.dialog_title_delete_recurring_event_as_organizer
+                            )
+                            .setMessage(
+                                R.string.dialog_description_delete_recurring_event_as_organizer
+                            )
+                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                                lifecycleScope.launch {
+                                    handleDeleteAsOrganizerSendPreferences(true)
+                                }
+                            }
+                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnCancelListener {
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnDismissListener {
+                                eventViewModel.eventDialogState.value = null
+                            }
+                            .show()
+                    }
+                    is EventViewModel.EventDialogState.Delete.SendPreferences -> {
+
+                        val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
+                            resources.getString(R.string.event_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
+                        })
+
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.event_attendees_send_prefs_error_title)
+                            .setMessage(
+                                if (it.sendPreferencesResults.sendPreferences.isEmpty()) getString(
+                                    R.string.event_attendees_send_prefs_error_none_message,
+                                    emailsWithErrors
+                                )
+                                else getString(
+                                    R.string.event_attendees_send_prefs_error_some_message,
+                                    emailsWithErrors
+                                )
+                            )
+                            .setPositiveButton(R.string.event_attendees_send_prefs_error_confirm) { _, _ ->
+                                lifecycleScope.launch {
+                                    // Remove attendees whom emails were invalid
+                                    val attendees = eventViewModel.eventLiveData.value?.iCalEvent?.attendees
+                                    if (attendees.isNullOrEmpty()) {
+
+                                        return@launch
+                                    }
+                                    attendees.removeIf { attendee ->
+                                        it.sendPreferencesResults.emailErrors.any { emailError ->
+                                            attendee.extractEmail() == emailError.key
+                                        }
+                                    }
+
+                                    val deleteResult = eventViewModel.handleDeleteEventAsOrganizer(
+                                        attendees,
+                                        it.sendPreferencesResults.sendPreferences,
+                                        calendarViewModel.timeFormatIs24Hour(requireContext()),
+                                        it.isRecurring
+                                    )
+                                    handleDeleteResult(deleteResult, true)
+                                }
+                            }
+                            .setNegativeButton(R.string.event_attendees_send_prefs_error_cancel) { _, _, ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnCancelListener {
                                 eventViewModel.eventState.value = EventViewModel.EventState.Idle
                             }
                             .setOnDismissListener {
@@ -434,9 +536,44 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun handleDeleteResult(deleteResult: UseCase.Result) {
+    private suspend fun handleDeleteAsOrganizerSendPreferences(isRecurring: Boolean) {
+        // TODO try to move the logic to VM
+        val attendees = eventViewModel.eventLiveData.value?.iCalEvent?.attendees
+        val attendeesEmails = attendees?.mapNotNull { it.extractEmail() }
+        if (!attendeesEmails.isNullOrEmpty()) {
+
+            val sendPreferencesResults = eventViewModel.getSendPreferences(attendeesEmails)
+
+            if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+
+                if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
+                    this@EventDetailsFragment.view?.displaySnackBar(getString(R.string.snack_network_error))
+                    eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                } else {
+                    // Display Send Preferences Dialog
+                    eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Delete.SendPreferences(sendPreferencesResults, isRecurring)
+                }
+            } else {
+                val deleteResult = eventViewModel.handleDeleteEventAsOrganizer(
+                    attendees,
+                    sendPreferencesResults.sendPreferences,
+                    calendarViewModel.timeFormatIs24Hour(requireContext()),
+                    isRecurring
+                )
+                handleDeleteResult(deleteResult, true)
+            }
+        } else {
+            this@EventDetailsFragment.view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
+            eventViewModel.eventState.value = EventViewModel.EventState.Idle
+        }
+    }
+
+    private fun handleDeleteResult(deleteResult: UseCase.Result, asOrganizer: Boolean) {
         if (deleteResult is UseCase.Result.Success<*>) {
-            requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
+            requireActivity().displaySnackBar(
+                if (asOrganizer) getString(R.string.snack_event_deleted_as_organizer)
+                else getString(R.string.snack_event_deleted)
+            )
             // Use jumpToMonthView to handle navigation when opening details from notification
             jumpToMonthView()
         } else {
@@ -447,7 +584,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 logger.e("InvalidParams deleting event: ${deleteResult.message}")
             }
 
-            view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
+            view?.displaySnackBar(
+                if (asOrganizer) getString(R.string.snack_event_deleted_as_organizer_error)
+                else getString(R.string.snack_event_deleted_error)
+            )
         }
     }
 
@@ -527,7 +667,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 loadingAction.visibleOrGone(deletingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented
                 buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed)
-                buttonMenu.visibleOrGone(!event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed )
+
+                val enableDeleteEvents = if (event.isAnInvitation) {
+                    val userEmails = calendarViewModel.getUserEmails()
+                    event.isUserOrganizer(userEmails) && !deletingEvent && !event.calendar.isSubscribed
+                } else {
+                    !deletingEvent && !event.calendar.isSubscribed
+                }
+
+                buttonMenu.visibleOrGone(enableDeleteEvents)
 
                 if (eventState is EventViewModel.EventState.Processing.ChangingAnswer) displayAttendeeAnswerState(eventState.participationStatus)
 

@@ -14,6 +14,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
@@ -260,6 +261,13 @@ data class Event private constructor(
         // by default we return false which means we will ignore non-supported combinations
         return false
 
+    }
+
+    fun isUserOrganizer(userEmails: List<String>?): Boolean {
+        return if (this.isAnInvitation) {
+            val organizerEmail = this.iCalEvent.organizer?.extractEmail()
+            organizerEmail != null && userEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(organizerEmail)) == true
+        } else false
     }
 
     // this event might be a single edit so it's technically a separate event in the database,

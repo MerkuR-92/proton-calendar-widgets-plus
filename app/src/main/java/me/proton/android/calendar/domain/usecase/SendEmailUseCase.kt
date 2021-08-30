@@ -9,11 +9,13 @@ import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
@@ -26,6 +28,7 @@ import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.util.*
 
@@ -44,7 +47,7 @@ class SendEmailUseCase(
     private val cryptoContext: CryptoContext
 ): UseCase {
 
-    suspend fun executeToOrganizer(
+    suspend fun sendReplyToOrganizer(
         userId: UserId,
         responseICalendar: ICalendar,
         originalTimeZoneInfo: TimezoneInfo?,
@@ -63,14 +66,14 @@ class SendEmailUseCase(
         val body = getReplyMailBody(participationStatus, userAttendeeEmail, summary)
 
         val ics = if (isProtonProtonInvite && eventEntity != null) {
-            val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer sharedEventID was null")
+            val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer sharedEventID was null")
             val calendarId = eventEntity.calendarId
 
-            val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer: there are no active keys for calendar")
+            val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there are no active keys for calendar")
             val calendarPassphraseList = database.passphrasesDao().select(calendarId)
-            if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer: there are no passphrase for calendar")
+            if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there are no passphrase for calendar")
             val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-            val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer: there is no valid cached Calendar Passphrase")
+            val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there is no valid cached Calendar Passphrase")
 
             val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
 
@@ -80,13 +83,13 @@ class SendEmailUseCase(
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
         val senderAddressId = userManager.getAddresses(userId).find {
             canonicalizeProtonEmail(it.email) == userAttendeeCanonicalEmail
-        }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address ID for sender") // TODO better error
+        }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address ID for sender") // TODO better error
 
         val senderAddress = kotlin.runCatching {
             userManager.getAddresses(userId, refresh = true).find {
                 it.addressId.id == senderAddressId
             }
-        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToOrganizer failed to get address for sender") // TODO better error
+        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address for sender") // TODO better error
 
         if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
             return UseCase.Result.Error("couldn't get UserAddress valid for encryption to organizer", UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION)
@@ -111,7 +114,7 @@ class SendEmailUseCase(
 
         return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments, sendPreferences)) {
             is SendEmailDirect.Result.Success -> return UseCase.Result.Success<Unit>()
-            else -> UseCase.Result.Error("SendEmailUseCase executeToOrganizer failed to send email to organizer: $sendEmailResult")
+            else -> UseCase.Result.Error("SendEmailUseCase sendReplyToOrganizer failed to send email to organizer: $sendEmailResult")
         }
     }
 
@@ -128,7 +131,7 @@ class SendEmailUseCase(
         }
     }
 
-    suspend fun executeToAttendees(
+    suspend fun sendInviteToAttendees(
         userId: UserId,
         newEvent: Event,
         isCreate: Boolean,
@@ -138,23 +141,15 @@ class SendEmailUseCase(
         timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
-        val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours)
+        val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, true)
 
-        val newEventEntity = calendarsRepository.selectEventEntity(newEvent.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to select event entity")
-        val sharedEventId = newEventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees sharedEventID was null")
-        val calendarId = newEventEntity.calendarId
-
-        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees: there are no active keys for calendar")
-        val calendarPassphraseList = database.passphrasesDao().select(calendarId)
-        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees: there are no passphrase for calendar")
-        val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees: there is no valid cached Calendar Passphrase")
-
-        val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(newEventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
+        val newEventEntity = calendarsRepository.selectEventEntity(newEvent.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees failed to select event entity")
+        val sharedPropertiesResult = getSharedProperties(userId, newEventEntity)
+        if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
 
         val event =
-            if (isCreate) transformEventUseCase.execute(newEventEntity) ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to transform event entity")
-            else editedEvent ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees edited event was null")
+            if (isCreate) transformEventUseCase.execute(newEventEntity) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees failed to transform event entity")
+            else editedEvent ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees edited event was null")
 
         if (isCreate) {
             // Add attendees
@@ -165,26 +160,12 @@ class SendEmailUseCase(
 
         val ics = getInviteIcs(
             event,
-            sharedEventId,
-            sharedSessionKey
+            (sharedPropertiesResult.returnValue as Pair<*, *>).first as String,
+            (sharedPropertiesResult.returnValue as Pair<*, *>).second as String
         )
 
-        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees: there is no valid first Member when creating Event")
-        val senderCanonicalEmail = canonicalizeProtonEmail(member.email)
-        val senderAddressId = userManager.getAddresses(userId).find {
-            canonicalizeProtonEmail(it.email) == senderCanonicalEmail
-        }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address ID for sender") // TODO better error
-
-        // TODO Check with core if refresh true can be removed
-        val senderAddress = kotlin.runCatching {
-            userManager.getAddresses(userId, refresh = true).find {
-                it.addressId.id == senderAddressId
-            }
-        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase executeToAttendees failed to get address for sender") // TODO better error
-
-        if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
-            return UseCase.Result.Error("couldn't get UserAddress valid for encryption to attendees", UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION)
-        }
+        val senderAddressResult = getSenderAddress(userId, newEventEntity)
+        if (senderAddressResult !is UseCase.Result.Success<*>) return senderAddressResult
 
         val attachmentBytes = ics.toByteArray()
 
@@ -205,31 +186,118 @@ class SendEmailUseCase(
             )
         )
 
-        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddress, sendEmailArguments, sendPreferences)) {
+        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddressResult.returnValue as UserAddress, sendEmailArguments, sendPreferences)) {
             is SendEmailDirect.Result.Success -> {
 
                 if (!isCreate) return UseCase.Result.Success<Unit>()
 
                 // Edit same event to add attendees if mail(s) have been sent
 
-                val editEventResult = editCreateEventUseCase.execute(userId, calendarId, event)
+                val editEventResult = editCreateEventUseCase.execute(userId, newEventEntity.calendarId, event)
 
                 if (editEventResult is UseCase.Result.InvalidParams) {
-                    logger.e("SendEmailUseCase executeToAttendees invalid params in edit event: ${editEventResult.message}")
+                    logger.e("SendEmailUseCase sendInviteToAttendees invalid params in edit event: ${editEventResult.message}")
                 }
                 if (editEventResult is UseCase.Result.Error) {
-                    logger.e("SendEmailUseCase executeToAttendees error in edit event: ${editEventResult.message}")
+                    logger.e("SendEmailUseCase sendInviteToAttendees error in edit event: ${editEventResult.message}")
                 }
 
                 // If this edit fails then that's too bad, attendees will be notified but the organizer won't see them in the event so hopefully she will retry on her own will
 
                 return UseCase.Result.Success<Unit>()
             }
-            else -> UseCase.Result.Error("SendEmailUseCase executeToAttendees failed to send email to organizer: $sendEmailResult")
+            else -> UseCase.Result.Error("SendEmailUseCase sendInviteToAttendees failed to send email to organizer: $sendEmailResult")
         }
     }
 
-    private fun getEmailContent(newEvent: Event, defaultTimeZone: String, timeFormatIs24Hours: Boolean): Pair<String, String> {
+    suspend fun sendCancellationToAttendees(
+        userId: UserId,
+        event: Event,
+        attendees: List<Attendee>,
+        sendPreferences: Map<Email, SendPreferences>,
+        timeFormatIs24Hours: Boolean
+    ): UseCase.Result {
+
+        val mailContent = getEmailContent(event, event.defaultTimeZone!!, timeFormatIs24Hours, false)
+
+        val eventEntity = calendarsRepository.selectEventEntity(event.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees failed to select event entity")
+        val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees sharedEventID was null")
+
+        val ics = getCancelIcs(
+            event,
+            attendees,
+            sharedEventId
+        )
+
+        val senderAddressResult = getSenderAddress(userId, eventEntity)
+        if (senderAddressResult !is UseCase.Result.Success<*>) return senderAddressResult
+
+        val attachmentBytes = ics.toByteArray()
+
+        val attendeeEmails = attendees.mapNotNull { it.extractEmail() }
+
+        val sendEmailArguments = SendEmailDirect.Arguments(
+            mailContent.first,
+            mailContent.second,
+            INVITE_EMAIL_MIME_TYPE,
+            attendeeEmails,
+            listOf(
+                SendEmailDirect.Arguments.Attachment(
+                    INVITE_ICS_FILE_NAME,
+                    attachmentBytes.size,
+                    INVITE_ICS_MIME_TYPE,
+                    attachmentBytes
+                )
+            )
+        )
+
+        return when (val sendEmailResult = sendEmailDirectUseCase.invoke(senderAddressResult.returnValue as UserAddress, sendEmailArguments, sendPreferences)) {
+            is SendEmailDirect.Result.Success -> {
+                return UseCase.Result.Success<Unit>()
+            }
+            else -> UseCase.Result.Error("SendEmailUseCase sendCancellationToAttendees failed to send email to organizer: $sendEmailResult")
+        }
+    }
+
+    private suspend fun getSharedProperties(userId: UserId, eventEntity: EventEntity): UseCase.Result {
+        val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties sharedEventID was null")
+        val calendarId = eventEntity.calendarId
+
+        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there are no active keys for calendar")
+        val calendarPassphraseList = database.passphrasesDao().select(calendarId)
+        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: there are no passphrase for calendar")
+        val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there is no valid cached Calendar Passphrase")
+
+        val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
+
+        return UseCase.Result.Success(
+            Pair(sharedEventId, sharedSessionKey)
+        )
+    }
+
+    private suspend fun getSenderAddress(userId: UserId, eventEntity: EventEntity): UseCase.Result {
+        val member = database.membersDao().select(eventEntity.calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: there is no valid first Member when creating Event")
+        val senderCanonicalEmail = canonicalizeProtonEmail(member.email)
+        val senderAddressId = userManager.getAddresses(userId).find {
+            canonicalizeProtonEmail(it.email) == senderCanonicalEmail
+        }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
+
+        // TODO Check with core if refresh true can be removed
+        val senderAddress = kotlin.runCatching {
+            userManager.getAddresses(userId, refresh = true).find {
+                it.addressId.id == senderAddressId
+            }
+        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
+
+        if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
+            return UseCase.Result.Error("couldn't get UserAddress valid for encryption to attendees", UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION)
+        }
+
+        return UseCase.Result.Success(senderAddress)
+    }
+
+    private fun getEmailContent(newEvent: Event, defaultTimeZone: String, timeFormatIs24Hours: Boolean, isInvite: Boolean): Pair<String, String> {
         val eventCopy = Event.from(newEvent)
         if (eventCopy.isAllDay()) {
             eventCopy.iCalEvent.setDateEnd(
@@ -241,19 +309,22 @@ class SendEmailUseCase(
             )
         }
         return Pair(
-            getInviteMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours),
-            getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
+            getMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours, isInvite),
+            if (isInvite) getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
+            else resourceProvider.provideString(
+                R.string.event_send_cancel_mail_body,
+                eventCopy.summary ?: resourceProvider.provideString(R.string.default_event_summary)
+            )
         )
     }
 
-
-    private fun getInviteMailSubject(event: Event, timezone: String, timeFormatIs24Hours: Boolean): String {
-        // TODO Move to UseCase once we can use strings resources there
+    private fun getMailSubject(event: Event, timezone: String, timeFormatIs24Hours: Boolean, isInvite: Boolean): String {
         return if (!event.isAllDay()) {
             val dateTimeStart =
                 event.formatStart(timezone, timeFormatIs24Hours)
             resourceProvider.provideString(
-                R.string.event_send_invite_mail_subject_part_day,
+                if (isInvite) R.string.event_send_invite_mail_subject_part_day
+                else R.string.event_send_cancel_mail_subject_part_day,
                 dateTimeStart.first,
                 dateTimeStart.second,
                 DateTimeUtilsImpl.formatTimeZoneId(
@@ -264,7 +335,8 @@ class SendEmailUseCase(
             )
         } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
             resourceProvider.provideString(
-                R.string.event_send_invite_mail_subject_all_day_multiple,
+                if (isInvite) R.string.event_send_invite_mail_subject_all_day_multiple
+                else R.string.event_send_cancel_mail_subject_all_day_multiple,
                 event.formatStart(
                     timezone,
                     timeFormatIs24Hours
@@ -272,7 +344,8 @@ class SendEmailUseCase(
             )
         } else {
             resourceProvider.provideString(
-                R.string.event_send_invite_mail_subject_all_day,
+                if (isInvite) R.string.event_send_invite_mail_subject_all_day
+                else R.string.event_send_cancel_mail_subject_all_day,
                 event.formatStart(
                     timezone,
                     timeFormatIs24Hours
