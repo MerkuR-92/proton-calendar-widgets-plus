@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -246,7 +247,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 launch {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
-                calendarViewModel.userAddresses.observe(viewLifecycleOwner) {
+                calendarViewModel.userAddresses.distinctUntilChanged().observe(viewLifecycleOwner) {
                     handleAttendeeAnswerViewVisibility()
                 }
                 observeEventLiveData(coroutineContext)
@@ -824,7 +825,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?) {
-
         val loading = eventViewModel.eventState.value is EventViewModel.EventState.Processing.ChangingAnswer
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
