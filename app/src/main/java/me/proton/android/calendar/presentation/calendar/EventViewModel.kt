@@ -637,7 +637,8 @@ class EventViewModel(
                 }?.email
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
-            event = event.copy(
+            event = Event.from(
+                event,
                 calendar = Calendar(
                     calendar.id,
                     calendar.name,
@@ -1313,7 +1314,7 @@ class EventViewModel(
         }
         val userParticipationStatus = userAttendee.participationStatus
 
-        val eventCopy = event.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar)
+        val eventCopy = Event.from(event)
         val personalPartICalString =
             if (participationStatus == ParticipationStatus.DECLINED &&
                 event.iCalEvent.alarms != null && event.iCalEvent.alarms.isNotEmpty()

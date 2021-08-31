@@ -12,7 +12,7 @@
 
     <View
         android:id="@+id/selected_background"
-        android:layout_width="28dp"
+        android:layout_width="0dp"
         android:layout_height="28dp"
         android:background="@drawable/ripple_mini_calendar_day_selected"
         android:layout_marginTop="2dp"
@@ -24,7 +24,7 @@
         android:id="@+id/itemMiniCalendarText"
         style="@style/Text.DefaultSmall.Strong"
         android:layout_marginTop="6dp"
-        android:layout_width="0dp"
+        android:layout_width="28dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +36,7 @@
         android:id="@+id/ll_calendar_dots"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:gravity="center|top"
+        android:gravity="center"
         android:orientation="horizontal"
         android:layout_marginTop="6dp"
         app:layout_constraintBottom_toBottomOf="parent"

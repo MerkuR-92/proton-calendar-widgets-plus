@@ -317,7 +317,7 @@ class HandleIcsUseCase(
                 }
             }
 
-            existingEvent.copy(iCalendar = newICalendar)
+            Event.from(existingEvent)
         }
 
         return editCreateEventFromIcs(

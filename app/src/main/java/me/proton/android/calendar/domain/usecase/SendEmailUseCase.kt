@@ -230,7 +230,7 @@ class SendEmailUseCase(
     }
 
     private fun getEmailContent(newEvent: Event, defaultTimeZone: String, timeFormatIs24Hours: Boolean): Pair<String, String> {
-        val eventCopy = newEvent.copy(iCalendar = newEvent.iCalendar.clone() as ICalendar)
+        val eventCopy = Event.from(newEvent)
         if (eventCopy.isAllDay()) {
             eventCopy.iCalEvent.setDateEnd(
                 ICalDate(

@@ -76,17 +76,17 @@ class DayViewAllDayEventAdapter(
             viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
             eventItemTitle.text = if (event.summary.isNullOrEmpty()) view.context.getString(R.string.default_event_summary) else event.summary
-            if (event.spansSingleDay(timeZoneId = timeZoneId)) {
-                eventItemTitleSide.visibleOrGone(false)
-            } else {
-                eventItemTitle.text = view.context.getString(
-                    R.string.multiple_days_event_summary,
-                    event.getStart(timeZoneId).formatTime(timeZoneId, timeFormatIs24Hour),
-                    eventItemTitle.text
-                )
-                eventItemTitleSide.visibleOrGone(true)
+            if (!event.spansSingleDay(timeZoneId = timeZoneId)) {
+                if (event.getStart(timeZoneId).toLocalDate() == date && !event.isAllDay()) {
+                    eventItemTitle.text = view.context.getString(
+                        R.string.multiple_days_event_summary,
+                        event.getStart(timeZoneId).formatTime(timeZoneId, timeFormatIs24Hour),
+                        eventItemTitle.text
+                    )
+                }
                 eventItemTitleSide.text = event.formatFullDayCounter(date, timeZoneId)
-            }
+                eventItemTitleSide.visibleOrGone(true)
+            } else eventItemTitleSide.visibleOrGone(false)
 
             if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
                 decryptionErrorIcon.visibleOrGone(true)
