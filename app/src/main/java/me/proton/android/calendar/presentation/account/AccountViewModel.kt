@@ -1,11 +1,15 @@
 package me.proton.android.calendar.presentation.account
 
+import android.app.Application
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.*
+import androidx.work.WorkManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.account.domain.entity.*
@@ -19,6 +23,7 @@ import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
+import java.util.concurrent.TimeUnit
 
 class AccountViewModel(
     private val accountManager: AccountManager,
@@ -92,11 +97,8 @@ class AccountViewModel(
         valueStoreProvider.provideValueStore(userId.id).clearAll()
     }
 
-    private suspend fun cleanUser(userId: UserId) {
-        // TODO: Stop all running tasks for this user (otherwise -> foreign key SQLiteConstraintException).
-        // UseCases could catch Foreign Key Exceptions, if userId is not anymore present (or logged out).
-        // Workers could observe getAccount(userId), and cancel if state == Removed ?
-        // How to reproduce: 1) Login. 2) During loading/syncing, logout.
+    private suspend fun cleanUser(context: Context) {
+        WorkManager.getInstance(context).cancelAllWork()
         calendarsRepository.shutdown()
     }
 
@@ -122,7 +124,7 @@ class AccountViewModel(
                 .onAccountTwoPassModeFailed { removeUser(it.userId) }
                 .onAccountCreateAddressFailed { removeUser(it.userId) }
                 .onAccountDisabled { removeUser(it.userId) }
-                .onAccountRemoved { cleanUser(it.userId) }
+                .onAccountRemoved { cleanUser(context) }
                 .disableInitialNotReadyAccounts()
         }
 

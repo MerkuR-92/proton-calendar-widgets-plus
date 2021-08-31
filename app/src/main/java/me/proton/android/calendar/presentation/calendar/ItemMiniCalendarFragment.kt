@@ -16,8 +16,7 @@ import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.AndroidUtils.getWeekStartDayOfWeek
@@ -58,6 +57,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     private var indicators: Map<LocalDate, List<String>> = hashMapOf()
 
     private var currentMiniCalendarMonthList: List<MiniCalendarItem>? = null
+
+    private val fetchingEventsScope = CoroutineScope(Dispatchers.IO)
 
     companion object {
         fun newInstance(position: Int, startingPosition: Int, date: LocalDate): ItemMiniCalendarFragment {
@@ -111,6 +112,12 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             startingPosition = it.getInt(STARTING_POSITION_ARG)
             date = it.getSerializable(DATE_ARG) as? LocalDate?
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        if (fetchingEventsScope.isActive) fetchingEventsScope.cancel()
     }
 
     override fun onCreateView(
@@ -174,7 +181,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             val toDate = firstDayOfTheMonth.withDayOfMonth(firstDayOfTheMonth.lengthOfMonth())
                 .plusDays(lastDayOfMonthOffset.toLong())
 
-            calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId)
+            calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId, coroutineScope = fetchingEventsScope)
 
             initialiseMiniCalendarContent(
                 firstDayMonthView,
