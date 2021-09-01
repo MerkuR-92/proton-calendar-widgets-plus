@@ -1135,11 +1135,6 @@ class EventViewModel(
         timeFormatIs24Hours: Boolean,
         isRecurring: Boolean
     ): UseCase.Result {
-        // TODO Handle recurring
-        if (isRecurring) {
-            eventState.value = EventState.Idle
-            return UseCase.Result.Error("handleDeleteEventAsOrganizer todo handle delete recurring as organizer")
-        }
 
         val deleteResult = if (sendPreferences.isNotEmpty()) {
             handleDeleteUseCase.handleDeleteAsOrganizer(
@@ -1147,7 +1142,8 @@ class EventViewModel(
                 event,
                 attendees,
                 sendPreferences,
-                timeFormatIs24Hours
+                timeFormatIs24Hours,
+                isRecurring
             )
 
         } else {

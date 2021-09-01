@@ -187,7 +187,9 @@ class HandleDeleteUseCase( // TODO TESTS
         event: Event,
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
-        timeFormatIs24Hours: Boolean): UseCase.Result {
+        timeFormatIs24Hours: Boolean,
+        isRecurring: Boolean
+    ): UseCase.Result {
 
         val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
             userId,
@@ -215,6 +217,11 @@ class HandleDeleteUseCase( // TODO TESTS
             )
         }
 
-        return handleDelete(userId, event.id, EventEditDeleteOption.THIS_EVENT, 0)
+        return handleDelete(
+            userId,
+            event.id,
+            if (isRecurring) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (isRecurring) null else 0
+        )
     }
 }
