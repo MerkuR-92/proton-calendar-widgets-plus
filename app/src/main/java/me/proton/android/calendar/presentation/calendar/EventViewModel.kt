@@ -54,6 +54,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
+import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
@@ -172,14 +173,17 @@ class EventViewModel(
 
             object Event: Delete()
             object DisabledCalendarRecurring: Delete()
-            object AsAnOrganizer: Delete()
-            object AsAnOrganizerRecurring: Delete()
+            data class AsAnOrganizer(
+                val isRecurring: Boolean,
+                val isDisabled: Boolean
+            ): Delete()
             data class RecurringEvent(
                 val showThisAndFuture: Boolean
             ): Delete()
             data class SendPreferences(
                 val sendPreferencesResults: SendPreferencesResults,
-                val isRecurring: Boolean
+                val isRecurring: Boolean,
+                val isDisabled: Boolean
             ): Delete()
         }
 
@@ -1081,8 +1085,7 @@ class EventViewModel(
         val dbEvent = this.dbEvent
 
         if (deleteAsAnOrganizer) {
-            if (event.isPartOfChain()) eventDialogState.value = EventDialogState.Delete.AsAnOrganizerRecurring
-            else eventDialogState.value = EventDialogState.Delete.AsAnOrganizer
+            eventDialogState.value = EventDialogState.Delete.AsAnOrganizer(isRecurring = event.isPartOfChain(), isDisabled = event.calendar.isDisabled)
 
         } else if (event.isPartOfChain() &&
             dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false &&
@@ -1133,7 +1136,8 @@ class EventViewModel(
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
         timeFormatIs24Hours: Boolean,
-        isRecurring: Boolean
+        isRecurring: Boolean,
+        isDisabled: Boolean
     ): UseCase.Result {
 
         val deleteResult = if (sendPreferences.isNotEmpty()) {
@@ -1143,7 +1147,8 @@ class EventViewModel(
                 attendees,
                 sendPreferences,
                 timeFormatIs24Hours,
-                isRecurring
+                isRecurring,
+                isDisabled
             )
 
         } else {

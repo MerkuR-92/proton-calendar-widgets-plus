@@ -18,8 +18,14 @@
     <string name="dialog_title_delete_event_as_organizer">Delete event</string>
     <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
 
+    <string name="dialog_title_delete_event_as_organizer_disabled">Delete event</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
+
     <string name="dialog_title_delete_recurring_event_as_organizer">Delete recurring event</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
+
+    <string name="dialog_title_delete_recurring_event_as_organizer_disabled">Delete recurring event</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
 
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>

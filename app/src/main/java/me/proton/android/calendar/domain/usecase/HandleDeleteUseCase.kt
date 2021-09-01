@@ -188,33 +188,37 @@ class HandleDeleteUseCase( // TODO TESTS
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
         timeFormatIs24Hours: Boolean,
-        isRecurring: Boolean
+        isRecurring: Boolean,
+        isDisabled: Boolean
     ): UseCase.Result {
 
-        val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
-            userId,
-            event,
-            attendees,
-            sendPreferences,
-            timeFormatIs24Hours
-        )
-        sendCancellationResult.ifSuccessAndLogErrors(logger) { }
+        if (!isDisabled) {
+            // If address is disabled, cancellation can't be sent
+            val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
+                userId,
+                event,
+                attendees,
+                sendPreferences,
+                timeFormatIs24Hours
+            )
+            sendCancellationResult.ifSuccessAndLogErrors(logger) { }
 
-        if (sendCancellationResult is UseCase.Result.Error) {
-            return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                UseCase.Result.Error(
-                    "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}",
-                    UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
-                )
-            } else {
-                UseCase.Result.Error(
-                    "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}"
+            if (sendCancellationResult is UseCase.Result.Error) {
+                return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                    UseCase.Result.Error(
+                        "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}",
+                        UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                    )
+                } else {
+                    UseCase.Result.Error(
+                        "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}"
+                    )
+                }
+            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.Error(
+                    "HandleSaveUseCase: invalid params in send email: ${sendCancellationResult.message}"
                 )
             }
-        } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
-            return UseCase.Result.Error(
-                "HandleSaveUseCase: invalid params in send email: ${sendCancellationResult.message}"
-            )
         }
 
         return handleDelete(
