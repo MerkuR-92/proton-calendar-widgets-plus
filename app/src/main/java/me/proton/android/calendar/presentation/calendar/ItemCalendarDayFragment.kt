@@ -194,7 +194,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     override fun onDestroy() {
         super.onDestroy()
-        updateCurrentTimeIndicatorJob.cancel()
+        if (this::updateCurrentTimeIndicatorJob.isInitialized && updateCurrentTimeIndicatorJob.isActive) updateCurrentTimeIndicatorJob.cancel()
     }
 
     override fun onResume() {
