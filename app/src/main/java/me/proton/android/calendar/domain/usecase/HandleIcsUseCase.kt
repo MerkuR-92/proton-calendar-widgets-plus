@@ -24,7 +24,6 @@ import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
@@ -42,7 +41,7 @@ class HandleIcsUseCase(
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase,
+    private val handleDeleteUseCase: HandleDeleteUseCase,
     private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase
 ) {
 
@@ -219,7 +218,7 @@ class HandleIcsUseCase(
 
         val isReInvitation = newEvent.iCalendar.method.isRequest && !newEvent.isCancelled() && existingEvent != null && existingEvent?.isCancelled() == true
         if (isReInvitation && immutableExistingEvent != null) {
-            val deleteResult = deleteEventUseCase.execute(userId, immutableExistingEvent.id, EventEditDeleteOption.ALL_EVENTS, null)
+            val deleteResult = handleDeleteUseCase.handleDelete(userId, immutableExistingEvent.id, EventEditDeleteOption.ALL_EVENTS, null)
             if (deleteResult !is UseCase.Result.Success<*>) {
                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }

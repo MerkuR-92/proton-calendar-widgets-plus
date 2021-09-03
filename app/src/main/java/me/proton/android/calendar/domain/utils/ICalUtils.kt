@@ -225,4 +225,9 @@ interface ICalUtils {
         sharedEventId: String,
         sharedSessionKey: String,
     ): String
+
+    fun getCancelIcs(
+        event: Event,
+        sharedEventId: String
+    ): String
 }

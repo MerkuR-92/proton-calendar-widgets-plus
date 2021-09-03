@@ -32,6 +32,9 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
@@ -844,39 +847,64 @@ object ICalUtilsImpl : ICalUtils {
         return iCalendar.printToString()
     }
 
+    private fun getBaseIcs(
+        newEvent: Event
+    ): ICalendar {
+
+        val iCalendar = newEvent.iCalendar.clone()
+
+        if (iCalendar.productId == null) iCalendar.setProductId(generateProtonProdId())
+        if (iCalendar.version == null) iCalendar.version = ICalVersion.V2_0
+
+        if (iCalendar.calendarScale == null) iCalendar.calendarScale = CalendarScale.gregorian()
+
+        // Replace common names with emails
+        iCalendar.events.first().attendees.forEach {
+            it.commonName = it.extractEmail()
+        }
+
+        // Alarms should be dropped
+        iCalendar.events.first().alarms.clear()
+
+        // The EXDATE must be filtered out
+        iCalendar.events.first().exceptionDates.clear()
+
+        return iCalendar
+    }
+
     override fun getInviteIcs(
         newEvent: Event,
         sharedEventId: String,
         sharedSessionKey: String
     ): String {
 
-        val inviteICalendar = newEvent.iCalendar.clone()
-
-        if (inviteICalendar.productId == null) inviteICalendar.setProductId(generateProtonProdId())
-        if (inviteICalendar.version == null) inviteICalendar.version = ICalVersion.V2_0
+        val inviteICalendar = getBaseIcs(newEvent)
 
         // METHOD:REPLY as we answer the REQUEST of the organizer
         inviteICalendar.setMethod(Method.REQUEST)
-
-        if (inviteICalendar.calendarScale == null) inviteICalendar.calendarScale = CalendarScale.gregorian()
 
         // Add base64 encoded session key
         inviteICalendar.events.first().setExperimentalProperty(X_PM_SESSION_KEY, sharedSessionKey)
         // Add shared event ID
         inviteICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
 
-        // Replace common names with emails
-        inviteICalendar.events.first().attendees.forEach {
-            it.commonName = it.extractEmail()
-        }
-
-        // Alarms should be dropped
-        inviteICalendar.events.first().alarms.clear()
-
-        // The EXDATE must be filtered out
-        inviteICalendar.events.first().exceptionDates.clear()
-
         return inviteICalendar.printToString()
+    }
+
+    override fun getCancelIcs(
+        event: Event,
+        sharedEventId: String
+    ): String {
+
+        val cancelICalendar = event.iCalendar.clone()
+
+        // METHOD:REPLY as we answer the REQUEST of the organizer
+        cancelICalendar.setMethod(Method.CANCEL)
+
+        // Add shared event ID (shared session key is not needed for cancellation)
+        cancelICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+
+        return cancelICalendar.printToString()
     }
 
 }

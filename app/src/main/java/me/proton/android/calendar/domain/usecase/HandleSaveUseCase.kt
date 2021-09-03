@@ -15,7 +15,6 @@ import me.proton.android.calendar.common.ICalUtilsImpl.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.ICalUtilsImpl.isDateTimeTheSame
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.data.entity.UserSettingsEntity
@@ -25,7 +24,6 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
-import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import java.time.LocalTime
@@ -40,7 +38,7 @@ class HandleSaveUseCase(
     private val calendarsRepository: CalendarsRepository,
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase,
+    private val handleDeleteUseCase: HandleDeleteUseCase,
     private val resourceProvider: ResourceProvider,
     private val sendEmailUseCase: SendEmailUseCase
 ) {
@@ -288,7 +286,7 @@ class HandleSaveUseCase(
             if (dbEvent.isSingleEdit()) dbEventStartDate!!.minusNanos(1) else dbEventWithOccurrenceStartDate!!.minusNanos(
                 1
             )
-        val deleteSingleEditsResult = deleteEventUseCase.execute(userId, eventId, deleteStartDate)
+        val deleteSingleEditsResult = handleDeleteUseCase.handleDeleteSingleEdits(userId, eventId, deleteStartDate)
         deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
         if (deleteSingleEditsResult is UseCase.Result.Error) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: failed to delete single edits: ${deleteSingleEditsResult.message}"))
@@ -482,7 +480,7 @@ class HandleSaveUseCase(
 
                 // TODO Remove duplicated code
                 val deleteSingleEditsResult =
-                    deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                    handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventId, originalEventStartDate.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
                 if (deleteSingleEditsResult is UseCase.Result.Error) {
                     return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
@@ -533,7 +531,7 @@ class HandleSaveUseCase(
 
                 // TODO Remove duplicated code
                 val deleteSingleEditsResult =
-                    deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                    handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventId, originalEventStartDate.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
                 if (deleteSingleEditsResult is UseCase.Result.Error) {
                     return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
@@ -574,7 +572,7 @@ class HandleSaveUseCase(
 
             // TODO Remove duplicated code
             val deleteSingleEditsResult =
-                deleteEventUseCase.execute(userId, originalEventId, originalEventStartDate.minusNanos(1))
+                handleDeleteUseCase.handleDeleteSingleEdits(userId, originalEventId, originalEventStartDate.minusNanos(1))
             deleteSingleEditsResult.ifSuccessAndLogErrors(logger) { }
             if (deleteSingleEditsResult is UseCase.Result.Error) {
                 return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error deleting single edits:  ${deleteSingleEditsResult.message}"))
@@ -604,7 +602,7 @@ class HandleSaveUseCase(
         defaultTimeZone: String,
         timeFormatIs24Hours: Boolean
     ): UseCase.Result {
-        val sendEmailResult = sendEmailUseCase.executeToAttendees(
+        val sendEmailResult = sendEmailUseCase.sendInviteToAttendees(
             userId,
             newEvent,
             isCreate,
@@ -656,7 +654,7 @@ class HandleSaveUseCase(
                     )
                 }
 
-                val sendEmailResult = sendEmailUseCase.executeToAttendees(
+                val sendEmailResult = sendEmailUseCase.sendInviteToAttendees(
                     userId,
                     Event.from(newEvent, id = this.first()),
                     isCreate,

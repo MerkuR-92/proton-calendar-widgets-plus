@@ -51,7 +51,7 @@ class CalendarViewModel(
     private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,
     private val userSettingsRepository: UserSettingsRepository,
-    private val deleteEventUseCase: DeleteEventUseCase,
+    private val handleDeleteUseCase: HandleDeleteUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
@@ -397,7 +397,7 @@ class CalendarViewModel(
 
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-                deleteEventUseCase.execute(userId, eventId, deleteOption, occurrenceNumber) // TODO UserId
+                handleDeleteUseCase.handleDelete(userId, eventId, deleteOption, occurrenceNumber) // TODO UserId
             }
         }.await()
     }

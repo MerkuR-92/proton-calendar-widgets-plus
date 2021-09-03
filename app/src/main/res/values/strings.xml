@@ -15,6 +15,18 @@
     <string name="dialog_title_delete_recurring_event">Delete recurring event</string>
     <string name="dialog_description_delete_recurring_event">Would you like to delete all the events in the series?</string>
 
+    <string name="dialog_title_delete_event_as_organizer">Delete event</string>
+    <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
+
+    <string name="dialog_title_delete_event_as_organizer_disabled">Delete event</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
+
+    <string name="dialog_title_delete_recurring_event_as_organizer">Delete recurring event</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
+
+    <string name="dialog_title_delete_recurring_event_as_organizer_disabled">Delete recurring event</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
+
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_set">Set</string>
@@ -215,6 +227,11 @@
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Cancel</string>
 
+    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancellation of an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day_multiple">Cancellation of an event starting on %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day">Cancellation of an event on %1$s</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been cancelled">%s has been cancelled.</string>
+
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
@@ -234,7 +251,9 @@
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
     <string name="snack_event_deleted">Event deleted</string>
+    <string name="snack_event_deleted_as_organizer">Cancellation sent and event deleted</string>
     <string name="snack_event_deleted_error">Error deleting event</string>
+    <string name="snack_event_deleted_as_organizer_error">Cancellation email cannot be sent, please try again</string>
     <string name="snack_event_opening_error">Error opening event</string>
     <string name="snack_event_saving">Saving event</string>
     <string name="snack_event_deleting">Deleting event</string>

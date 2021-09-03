@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.property.Attendee
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
@@ -9,21 +10,26 @@ import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.core.domain.entity.UserId
+import me.proton.core.mailmessage.domain.entity.Email
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class DeleteEventUseCase( // TODO TESTS
+class HandleDeleteUseCase( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
-    private val calendarsRepository: CalendarsRepository): UseCase {
+    private val calendarsRepository: CalendarsRepository,
+    private val sendEmailUseCase: SendEmailUseCase
+    ): UseCase {
 
-    suspend fun execute(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
+    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -149,7 +155,7 @@ class DeleteEventUseCase( // TODO TESTS
     }
 
     // TODO maybe use UseCase.Params instead of overloaded methods
-    suspend fun execute(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
+    suspend fun handleDeleteSingleEdits(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
         return deleteSingleEditsAfter(userId, eventId, recurrenceIdIsAfter)
     }
 
@@ -176,4 +182,50 @@ class DeleteEventUseCase( // TODO TESTS
         return deleteResult
     }
 
+    suspend fun handleDeleteAsOrganizer(
+        userId: UserId,
+        event: Event,
+        attendees: List<Attendee>,
+        sendPreferences: Map<Email, SendPreferences>,
+        timeFormatIs24Hours: Boolean,
+        isRecurring: Boolean,
+        isDisabled: Boolean
+    ): UseCase.Result {
+
+        if (!isDisabled) {
+            // If address is disabled, cancellation can't be sent
+            val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
+                userId,
+                event,
+                attendees,
+                sendPreferences,
+                timeFormatIs24Hours
+            )
+            sendCancellationResult.ifSuccessAndLogErrors(logger) { }
+
+            if (sendCancellationResult is UseCase.Result.Error) {
+                return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                    UseCase.Result.Error(
+                        "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}",
+                        UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                    )
+                } else {
+                    UseCase.Result.Error(
+                        "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}"
+                    )
+                }
+            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.Error(
+                    "HandleSaveUseCase: invalid params in send email: ${sendCancellationResult.message}"
+                )
+            }
+        }
+
+        return handleDelete(
+            userId,
+            event.id,
+            if (isRecurring) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (isRecurring) null else 0
+        )
+    }
 }
