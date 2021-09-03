@@ -8,27 +8,40 @@
 
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
 
+    <!-- DELETE EVENT DIALOG -->
+
     <string name="dialog_title_delete_event">Delete event</string>
-    <string name="dialog_description_delete_event">Would you like to delete this event?</string>
-    <string name="dialog_title_calendar_picker">Calendar</string>
-
     <string name="dialog_title_delete_recurring_event">Delete recurring event</string>
+
+    <string name="dialog_description_delete_event">Would you like to delete this event?</string>
     <string name="dialog_description_delete_recurring_event">Would you like to delete all the events in the series?</string>
-
-    <string name="dialog_title_delete_event_as_organizer">Delete event</string>
-    <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
-
-    <string name="dialog_title_delete_event_as_organizer_disabled">Delete event</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
-
-    <string name="dialog_title_delete_recurring_event_as_organizer">Delete recurring event</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
-
-    <string name="dialog_title_delete_recurring_event_as_organizer_disabled">Delete recurring event</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event">This event has been updated by the organizer. Would you like to delete this event?</string>
 
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
+
+    <!-- Delete as an organizer -->
+
+    <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
+
+    <!-- Delete as an attendee -->
+
+    <string name="dialog_description_delete_single_event_as_attendee">The organizer of this event will be notified that you decline the invitation. Would you like to delete this event?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">The organizer of this event will not be notified that you decline the invitation as your address is disabled. Would you like to delete this event anyway?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">The organizer of this series of events will be notified that you decline the invitation. Would you like to delete all the events in this series?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">The organizer of this series of events will not be notified that you decline the invitation as your address is disabled. Would you like to delete all the events in this series anyway?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">This event has been updated. The organizer will be notified that you decline the invitation. Would you like to delete this event?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">This event has been updated. The organizer will not be notified that you decline the invitation as your address is disabled. Would you like to delete this event?</string>
+
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Occurrences previously updated by the organizer will be kept, but your answers will be lost</string>
+    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Occurrences previously updated by the organizer will be kept</string>
+
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">The organizer cannot be notified that you decline the invitation:\n\n• %1$s\n\nWould you like to delete the event anyway?</string>
+
     <string name="dialog_button_set">Set</string>
     <string name="dialog_button_ok">OK</string>
 
@@ -324,6 +337,8 @@
     <string name="contacts_permission_dialog_allow">Allow</string>
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
+
+    <string name="dialog_title_calendar_picker">Calendar</string>
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>

@@ -254,6 +254,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
                 observeEventLiveData(coroutineContext)
                 observeEventDialogState(coroutineContext)
+                observeEventSnackState(coroutineContext)
                 attachActionHandlers()
             } else {
                 when (viewModeInitStatus) {
@@ -280,6 +281,25 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    private fun observeEventSnackState(coroutineContext: CoroutineContext) {
+        eventViewModel.eventSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventSnackState ->
+            eventSnackState?.let {
+                when (it) {
+                    is EventViewModel.EventSnackState.DisplaySnack -> {
+                        view?.displaySnackBar(it.message)
+                    }
+                    is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
+                        requireActivity().displaySnackBar(it.message)
+
+                        // Use jumpToMonthView to handle navigation when opening details from notification
+                        jumpToMonthView()
+                    }
+                }
+                eventViewModel.eventSnackState.value = null
+            }
+        }
+    }
+
     private fun observeEventDialogState(coroutineContext: CoroutineContext) {
         eventViewModel.eventDialogState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventDialogState ->
 
@@ -295,8 +315,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             )
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
-                                    val deleteResult = eventViewModel.handleDeleteDisabledCalendarRecurring()
-                                    handleDeleteResult(deleteResult, false)
+                                    eventViewModel.handleDeleteDisabledCalendarRecurring()
                                 }
                             }
                             .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
@@ -320,9 +339,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             )
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
-                                    val deleteResult =
-                                        eventViewModel.handleDeleteEvent(navigationArguments.occurrenceNumber)
-                                    handleDeleteResult(deleteResult, false)
+                                    eventViewModel.handleDeleteEvent(navigationArguments.occurrenceNumber)
                                 }
                             }
                             .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
@@ -353,12 +370,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             }
                             .setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
                                 lifecycleScope.launch {
-                                    val deleteResult = eventViewModel.handleDeleteRecurring(
+                                    eventViewModel.handleDeleteRecurring(
                                         navigationArguments.occurrenceNumber,
                                         selectedItem,
                                         it.showThisAndFuture
                                     )
-                                    handleDeleteResult(deleteResult, false)
                                 }
                                 dialog.dismiss()
                             }
@@ -376,20 +392,22 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventDialogState.Delete.AsAnOrganizer -> {
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(
-                                if (it.isRecurring && it.isDisabled) R.string.dialog_title_delete_recurring_event_as_organizer_disabled
-                                else if (it.isRecurring) R.string.dialog_title_delete_recurring_event_as_organizer
-                                else if (it.isDisabled) R.string.dialog_title_delete_event_as_organizer_disabled
-                                else R.string.dialog_title_delete_event_as_organizer
+                                if (it.isRecurring) R.string.dialog_title_delete_recurring_event
+                                else R.string.dialog_title_delete_event
                             )
                             .setMessage(
-                                if (it.isRecurring && it.isDisabled) R.string.dialog_description_delete_recurring_event_as_organizer_disabled
+                                if (it.isRecurring && it.isCalendarDisabled) R.string.dialog_description_delete_recurring_event_as_organizer_disabled
                                 else if (it.isRecurring) R.string.dialog_description_delete_recurring_event_as_organizer
-                                else if (it.isDisabled) R.string.dialog_description_delete_event_as_organizer_disabled
+                                else if (it.isCalendarDisabled) R.string.dialog_description_delete_event_as_organizer_disabled
                                 else R.string.dialog_description_delete_event_as_organizer
                             )
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
-                                    handleDeleteAsOrganizerSendPreferences(it.isRecurring, it.isDisabled)
+                                    eventViewModel.handleDeleteAsOrganizerSendPreferences(
+                                        it.isRecurring,
+                                        it.isCalendarDisabled,
+                                        calendarViewModel.timeFormatIs24Hour(requireContext())
+                                    )
                                 }
                             }
                             .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
@@ -403,7 +421,68 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             }
                             .show()
                     }
-                    is EventViewModel.EventDialogState.Delete.SendPreferences -> {
+                    is EventViewModel.EventDialogState.Delete.AsAnAttendeeSendPreferences -> {
+
+                        val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
+                            resources.getString(R.string.event_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
+                        })
+                        val sendPrefsFailed = emailsWithErrors.isNotEmpty()
+                        val displayWarning = (it.currentParticipationStatus == ParticipationStatus.ACCEPTED ||
+                                it.currentParticipationStatus == ParticipationStatus.TENTATIVE) &&
+                                it.isEventCanceled.not()
+
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(
+                                if (sendPrefsFailed && displayWarning) R.string.event_organizer_send_prefs_error_title
+                                else if (it.isRecurring || it.isNonStandaloneSingleEdit) R.string.dialog_title_delete_recurring_event
+                                else R.string.dialog_title_delete_event
+                            )
+                            .setMessage(
+                                if (displayWarning.not()) {
+                                    if (it.isNonStandaloneSingleEdit && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+                                    else if (it.isRecurring || (it.isNonStandaloneSingleEdit && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
+                                    else getString(R.string.dialog_description_delete_event)
+                                } else {
+                                    if (sendPrefsFailed) getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
+                                    else if (it.isRecurring) {
+                                        val message = if (it.isAddressDisabled) getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
+                                        else getString(R.string.dialog_description_delete_recurring_event_as_attendee)
+
+                                        val singleEditWarning = if (it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+                                        else if (it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+                                        else ""
+
+                                        if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
+                                        else message
+                                    }
+                                    else if (it.isNonStandaloneSingleEdit && it.isAddressDisabled) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+                                    else if (it.isNonStandaloneSingleEdit) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+                                    else if (it.isAddressDisabled) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
+                                    else getString(R.string.dialog_description_delete_single_event_as_attendee)
+                                }
+                            )
+                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                                lifecycleScope.launch {
+                                    eventViewModel.handleDeleteEventAsAttendee(
+                                        it.userAddress,
+                                        it.sendPreferencesResults.sendPreferences,
+                                        it.isRecurring,
+                                        it.isCalendarDisabled
+                                    )
+                                }
+                            }
+                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnCancelListener {
+                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
+                            }
+                            .setOnDismissListener {
+                                eventViewModel.eventDialogState.value = null
+                            }
+                            .show()
+                    }
+                    is EventViewModel.EventDialogState.Delete.AsAnOrganizerSendPreferences -> {
 
                         val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
                             resources.getString(R.string.event_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
@@ -435,14 +514,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         }
                                     }
 
-                                    val deleteResult = eventViewModel.handleDeleteEventAsOrganizer(
+                                    eventViewModel.handleDeleteEventAsOrganizer(
                                         attendees,
                                         it.sendPreferencesResults.sendPreferences,
                                         calendarViewModel.timeFormatIs24Hour(requireContext()),
                                         it.isRecurring,
-                                        it.isDisabled
+                                        it.isCalendarDisabled
                                     )
-                                    handleDeleteResult(deleteResult, true, it.isDisabled)
                                 }
                             }
                             .setNegativeButton(R.string.event_attendees_send_prefs_error_cancel) { _, _, ->
@@ -516,62 +594,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-        }
-    }
-
-    private suspend fun handleDeleteAsOrganizerSendPreferences(isRecurring: Boolean, isDisabled: Boolean) {
-        // TODO try to move the logic to VM
-        val attendees = eventViewModel.eventLiveData.value?.iCalEvent?.attendees
-        val attendeesEmails = attendees?.mapNotNull { it.extractEmail() }
-        if (!attendeesEmails.isNullOrEmpty()) {
-
-            val sendPreferencesResults = eventViewModel.getSendPreferences(attendeesEmails)
-
-            if (sendPreferencesResults.emailErrors.isNotEmpty()) {
-
-                if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
-                    this@EventDetailsFragment.view?.displaySnackBar(getString(R.string.snack_network_error))
-                    eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                } else {
-                    // Display Send Preferences Dialog
-                    eventViewModel.eventDialogState.value = EventViewModel.EventDialogState.Delete.SendPreferences(sendPreferencesResults, isRecurring, isDisabled)
-                }
-            } else {
-                val deleteResult = eventViewModel.handleDeleteEventAsOrganizer(
-                    attendees,
-                    sendPreferencesResults.sendPreferences,
-                    calendarViewModel.timeFormatIs24Hour(requireContext()),
-                    isRecurring,
-                    isDisabled
-                )
-                handleDeleteResult(deleteResult, true, isDisabled)
-            }
-        } else {
-            this@EventDetailsFragment.view?.displaySnackBar(getString(R.string.snack_event_deleted_error))
-            eventViewModel.eventState.value = EventViewModel.EventState.Idle
-        }
-    }
-
-    private fun handleDeleteResult(deleteResult: UseCase.Result, asOrganizer: Boolean, isDisabled: Boolean = false) {
-        if (deleteResult is UseCase.Result.Success<*>) {
-            requireActivity().displaySnackBar(
-                if (asOrganizer && !isDisabled) getString(R.string.snack_event_deleted_as_organizer)
-                else getString(R.string.snack_event_deleted)
-            )
-            // Use jumpToMonthView to handle navigation when opening details from notification
-            jumpToMonthView()
-        } else {
-
-            if (deleteResult is UseCase.Result.Error) {
-                logger.e("Error deleting event: ${deleteResult.message}")
-            } else if (deleteResult is UseCase.Result.InvalidParams) {
-                logger.e("InvalidParams deleting event: ${deleteResult.message}")
-            }
-
-            view?.displaySnackBar(
-                if (asOrganizer) getString(R.string.snack_event_deleted_as_organizer_error)
-                else getString(R.string.snack_event_deleted_error)
-            )
         }
     }
 
@@ -652,13 +674,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 // TODO Remove attendees condition once edit attendees is implemented
                 buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed)
 
-                val enableDeleteEvents = if (event.isAnInvitation) {
-                    val userEmails = calendarViewModel.getUserEmails()
-                    event.isUserOrganizer(userEmails) && !deletingEvent && !event.calendar.isSubscribed
-                } else {
-                    !deletingEvent && !event.calendar.isSubscribed
-                }
-
+                val enableDeleteEvents = !deletingEvent && !event.calendar.isSubscribed
                 buttonMenu.visibleOrGone(enableDeleteEvents)
 
                 if (eventState is EventViewModel.EventState.Processing.ChangingAnswer) displayAttendeeAnswerState(eventState.participationStatus)

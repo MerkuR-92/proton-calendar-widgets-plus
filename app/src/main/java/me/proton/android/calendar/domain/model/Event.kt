@@ -270,6 +270,13 @@ data class Event private constructor(
         } else false
     }
 
+    fun isUserAttendee(userEmails: List<String>?): Boolean {
+        return if (this.isAnInvitation) {
+            val attendeeEmails = this.iCalEvent.attendees?.mapNotNull { it.extractEmail() }
+            attendeeEmails != null && attendeeEmails.find { userEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(it)) == true } != null
+        } else false
+    }
+
     // this event might be a single edit so it's technically a separate event in the database,
     //  but it's still considered as a part of a chain of events
     fun isPartOfChain(): Boolean = this.isRecurring() || this.isSingleEdit()

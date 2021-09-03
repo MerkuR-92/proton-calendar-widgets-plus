@@ -36,6 +36,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExd
 import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.ICalUtilsImpl.generateProtonProdId
 import me.proton.android.calendar.common.ICalUtilsImpl.generateProtonUid
+import me.proton.android.calendar.common.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
@@ -3417,6 +3418,62 @@ internal class ICalUtilsTest {
         assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
         assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
         assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY")?.value).isEqualTo("sharedSessionKey")
+        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID")?.value).isEqualTo("sharedEventId")
+    }
+
+    @Test
+    fun `getCancelIcs test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20210105T120000
+    DTEND;TZID=Europe/Zurich:20210105T123000
+    ORGANIZER;CN=adamtst@protonmail.com:mailto:adamtst@protonmail.com
+    SEQUENCE:0
+    SUMMARY:Inviting BLT from adamtst
+    STATUS:CONFIRMED
+    DTSTAMP:20210105T101420Z
+    UID:GOmbzP5Ok3Uo7QYgYyb7LCCijGzS@proton.me
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:james@example.com
+    ATTENDEE;CN=james@pm.me;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james2@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=James;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;EMAIL=AmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=IAmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
+
+        val ics = getCancelIcs(
+            Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), eventIcal)!!,
+            "sharedEventId"
+        )
+
+        val responseICalendar = ICalUtilsImpl.parseICalString(ics)!!
+
+        assertThat(responseICalendar.productId.value).isEqualTo(generateProtonProdId())
+        assertThat(responseICalendar.version).isEqualTo(ICalVersion.V2_0)
+        assertThat(responseICalendar.method.value).isEqualTo(Method.CANCEL)
+        assertThat(responseICalendar.calendarScale.value).isEqualTo(CalendarScale.GREGORIAN)
+        assertThat(responseICalendar.events.first().status?.value.isNullOrEmpty())
+        assertThat(responseICalendar.events.first().alarms.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.events.first().attendees.size).isEqualTo(10)
+        assertThat(responseICalendar.events.first().attendees.first().email).isEqualTo("james@example.com")
+        assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
+        assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY")?.value.isNullOrEmpty())
         assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID")?.value).isEqualTo("sharedEventId")
     }
 

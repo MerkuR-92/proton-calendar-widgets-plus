@@ -66,18 +66,19 @@ class SendEmailUseCase(
         val body = getReplyMailBody(participationStatus, userAttendeeEmail, summary)
 
         val ics = if (isProtonProtonInvite && eventEntity != null) {
-            val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer sharedEventID was null")
-            val calendarId = eventEntity.calendarId
+            val sharedPropertiesResult = getSharedProperties(userId, eventEntity)
+            if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
 
-            val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there are no active keys for calendar")
-            val calendarPassphraseList = database.passphrasesDao().select(calendarId)
-            if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there are no passphrase for calendar")
-            val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-            val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there is no valid cached Calendar Passphrase")
-
-            val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
-
-            getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite, sharedEventId, sharedSessionKey)
+            getResponseIcs(
+                responseICalendar,
+                userAttendee,
+                participationStatus,
+                originalTimeZoneInfo,
+                dtStamp,
+                isProtonProtonInvite,
+                (sharedPropertiesResult.returnValue as Pair<*, *>).first as String,
+                (sharedPropertiesResult.returnValue as Pair<*, *>).second as String
+            )
         } else getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
