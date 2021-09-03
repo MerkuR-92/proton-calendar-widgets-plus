@@ -228,7 +228,6 @@ interface ICalUtils {
 
     fun getCancelIcs(
         event: Event,
-        attendees: List<Attendee>,
         sharedEventId: String
     ): String
 }

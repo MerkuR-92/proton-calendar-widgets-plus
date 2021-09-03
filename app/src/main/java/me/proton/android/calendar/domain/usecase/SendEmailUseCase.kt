@@ -225,7 +225,6 @@ class SendEmailUseCase(
 
         val ics = getCancelIcs(
             event,
-            attendees,
             sharedEventId
         )
 
@@ -234,6 +233,7 @@ class SendEmailUseCase(
 
         val attachmentBytes = ics.toByteArray()
 
+        // Only use the attendees that had valid sendPreferences
         val attendeeEmails = attendees.mapNotNull { it.extractEmail() }
 
         val sendEmailArguments = SendEmailDirect.Arguments(
