@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
+import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
@@ -34,8 +35,9 @@ class HandleDeleteUseCase( // TODO TESTS
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val calendarsRepository: CalendarsRepository,
-    private val sendEmailUseCase: SendEmailUseCase
-    ): UseCase {
+    private val sendEmailUseCase: SendEmailUseCase,
+    private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
+): UseCase {
 
     suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
 
@@ -84,10 +86,10 @@ class HandleDeleteUseCase( // TODO TESTS
                         ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
                     else event
                 val occurrenceStart = rootEvent.generateOccurrence(
-                        occurrenceNumber!!,
-                        if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
-                    )?.startDateTime
-                        ?: return UseCase.Result.Error("HandleDeleteUseCase: could not generate occurrence in >delete this and following< events")
+                    occurrenceNumber!!,
+                    if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
+                )?.startDateTime
+                    ?: return UseCase.Result.Error("HandleDeleteUseCase: could not generate occurrence in >delete this and following< events")
 
                 rootEvent.handleDeleteThisAndFuture(occurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
@@ -282,17 +284,44 @@ class HandleDeleteUseCase( // TODO TESTS
             if (sendCancellationResult is UseCase.Result.Error) {
                 return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
                     UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email (cancel as organizer): ${sendCancellationResult.message}",
+                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}",
                         UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
                     )
                 } else {
                     UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email (cancel as organizer): ${sendCancellationResult.message}"
+                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}"
                     )
                 }
             } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
                 return UseCase.Result.Error(
                     "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in send email: ${sendCancellationResult.message}"
+                )
+            }
+
+            // If the email was sent we update the participation status
+
+            val attendeeId = event.currentUserAttendeeId
+            if (attendeeId.isNullOrEmpty()) {
+                return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee attendeeId was null or empty")
+            }
+
+            val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
+                userId,
+                event.calendar.id,
+                event.id,
+                attendeeId,
+                ParticipationStatus.DECLINED.toInt(),
+                null, // No need to update the alarms since the event will be deleted
+                updateTime.epochSecond.toInt()
+            )
+            updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            if (updateParticipationStatusUseCaseResult is UseCase.Result.Error) {
+                return UseCase.Result.Error(
+                    "HandleDeleteUseCase: handleDeleteAsAttendee error in update part stat: ${updateParticipationStatusUseCaseResult.message}"
+                )
+            } else if (updateParticipationStatusUseCaseResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.Error(
+                    "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in update part stat: ${updateParticipationStatusUseCaseResult.message}"
                 )
             }
         }
