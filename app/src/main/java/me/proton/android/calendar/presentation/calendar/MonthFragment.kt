@@ -93,6 +93,8 @@ class MonthFragment : BaseFragment() {
     private var startWeekOn: DayOfWeek? = null
     private var timeZoneId: String? = null
 
+    private var currentViewMode: ViewMode? = null
+
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
         with(buttonCreate) {
@@ -369,8 +371,7 @@ class MonthFragment : BaseFragment() {
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday)
         dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday)
 
-        val viewMode = calendarViewModel.viewMode.value
-        viewMode?.let { initAgendaPager(it) }
+        calendarViewModel.viewMode.value?.let { initAgendaPager(it) }
 
         calendarViewModel.loading.observe(viewLifecycleOwner) { loading ->
             fragment_progress_bar?.visibleOrInvisible(loading)
@@ -658,6 +659,10 @@ class MonthFragment : BaseFragment() {
     }
 
     private fun initAgendaPager(viewMode: ViewMode) {
+        // Skip initAgendaPager if it was already done for specified viewMode
+        if (viewMode == currentViewMode) return
+        currentViewMode = viewMode
+
         fragmentMonthLayout.allowScrolling = viewMode == ViewMode.AGENDA
         val immutableWeekStart = calendarViewModel.weekStart.value
         if (viewMode == ViewMode.AGENDA) {
