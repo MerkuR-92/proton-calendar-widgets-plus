@@ -911,6 +911,9 @@ object ICalUtilsImpl : ICalUtils {
         // Event status is unnecessary
         cancelICalendar.events.first().status = null
 
+        // Refresh DTSTAMP
+        cancelICalendar.events.first().setDateTimeStamp(Date.from(Instant.now()))
+
         return cancelICalendar.printToString()
     }
 
