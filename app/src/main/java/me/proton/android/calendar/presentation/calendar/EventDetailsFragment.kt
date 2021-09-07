@@ -392,19 +392,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventDialogState.Delete.AsAnOrganizer -> {
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(
-                                if (it.isRecurring) R.string.dialog_title_delete_recurring_event
+                                if (it.isPartOfChain) R.string.dialog_title_delete_recurring_event
                                 else R.string.dialog_title_delete_event
                             )
                             .setMessage(
-                                if (it.isRecurring && it.isCalendarDisabled) R.string.dialog_description_delete_recurring_event_as_organizer_disabled
-                                else if (it.isRecurring) R.string.dialog_description_delete_recurring_event_as_organizer
+                                if (it.isPartOfChain && it.isCalendarDisabled) R.string.dialog_description_delete_recurring_event_as_organizer_disabled
+                                else if (it.isPartOfChain) R.string.dialog_description_delete_recurring_event_as_organizer
                                 else if (it.isCalendarDisabled) R.string.dialog_description_delete_event_as_organizer_disabled
                                 else R.string.dialog_description_delete_event_as_organizer
                             )
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
                                     eventViewModel.handleDeleteAsOrganizerSendPreferences(
-                                        it.isRecurring,
+                                        it.isPartOfChain,
                                         it.isCalendarDisabled,
                                         calendarViewModel.timeFormatIs24Hour(requireContext())
                                     )
@@ -434,13 +434,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(
                                 if (sendPrefsFailed && displayWarning) R.string.event_organizer_send_prefs_error_title
-                                else if (it.isRecurring || it.isNonStandaloneSingleEdit) R.string.dialog_title_delete_recurring_event
+                                else if (it.isRecurring || it.isStandaloneSingleEdit.not()) R.string.dialog_title_delete_recurring_event
                                 else R.string.dialog_title_delete_event
                             )
                             .setMessage(
                                 if (displayWarning.not()) {
-                                    if (it.isNonStandaloneSingleEdit && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-                                    else if (it.isRecurring || (it.isNonStandaloneSingleEdit && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
+                                    if (it.isStandaloneSingleEdit.not() && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+                                    else if (it.isRecurring || (it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
                                     else getString(R.string.dialog_description_delete_event)
                                 } else {
                                     if (sendPrefsFailed) getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
@@ -455,8 +455,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
                                         else message
                                     }
-                                    else if (it.isNonStandaloneSingleEdit && it.isAddressDisabled) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
-                                    else if (it.isNonStandaloneSingleEdit) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+                                    else if (it.isStandaloneSingleEdit.not() && it.isAddressDisabled) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+                                    else if (it.isStandaloneSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
                                     else if (it.isAddressDisabled) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
                                     else getString(R.string.dialog_description_delete_single_event_as_attendee)
                                 }
@@ -466,10 +466,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                     eventViewModel.handleDeleteEventAsAttendee(
                                         it.userAddress,
                                         it.sendPreferencesResults.sendPreferences,
-                                        it.isRecurring,
-                                        it.isCalendarDisabled,
                                         it.hasNonCancelledSingleEdit,
-                                        it.hasAnsweredSingleEdit
+                                        it.hasAnsweredSingleEdit,
+                                        navigationArguments.occurrenceNumber,
+                                        it.isStandaloneSingleEdit
                                     )
                                 }
                             }
@@ -520,7 +520,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         attendees,
                                         it.sendPreferencesResults.sendPreferences,
                                         calendarViewModel.timeFormatIs24Hour(requireContext()),
-                                        it.isRecurring,
+                                        it.isPartOfChain,
                                         it.isCalendarDisabled
                                     )
                                 }

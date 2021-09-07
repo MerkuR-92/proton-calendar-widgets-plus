@@ -39,7 +39,7 @@ class HandleDeleteUseCase( // TODO TESTS
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
 ): UseCase {
 
-    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?, deleteSingleEdits: Boolean = true) : UseCase.Result {
+    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?, deleteSingleEdits: Boolean = true, isStandaloneSingleEdit: Boolean = false) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -55,7 +55,7 @@ class HandleDeleteUseCase( // TODO TESTS
 
         // TODO when event is in the middle of chain, we need to select the root event and deal with it accordingly!!!
 
-        var result = when (deleteOption) {
+        val result = when (deleteOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
                 if (event.isRecurring()) {
@@ -64,12 +64,16 @@ class HandleDeleteUseCase( // TODO TESTS
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 } else if (event.isSingleEdit()) {
 
-                    val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
+                    if (!isStandaloneSingleEdit) {
+                        val rootEventEntity = calendarsRepository.selectRootEventEntity(event.uid)
+                        val rootEvent = rootEventEntity?.let { transformEventUseCase.execute(it) }
+                            ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
 
-                    // add EXDATE to root event
-                    rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
-                    val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
-                    editResult.ifSuccessAndLogErrors(logger) {}
+                        // add EXDATE to root event
+                        rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
+                        val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                        editResult.ifSuccessAndLogErrors(logger) {}
+                    }
 
                     // delete the single edit
                     deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
@@ -205,7 +209,7 @@ class HandleDeleteUseCase( // TODO TESTS
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
         timeFormatIs24Hours: Boolean,
-        isRecurring: Boolean,
+        isPartOfChain: Boolean,
         isCalendarDisabled: Boolean
     ): UseCase.Result {
 
@@ -241,8 +245,8 @@ class HandleDeleteUseCase( // TODO TESTS
         return handleDelete(
             userId,
             event.id,
-            if (isRecurring) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
-            if (isRecurring) null else 0
+            if (isPartOfChain) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (isPartOfChain) null else 0
         )
     }
 
@@ -252,12 +256,12 @@ class HandleDeleteUseCase( // TODO TESTS
         event: Event,
         userAddress: UserAddress,
         sendPreferences: Map<Email, SendPreferences>,
-        isRecurring: Boolean,
-        isCalendarDisabled: Boolean,
-        hasNonCancelledSingleEdit: Boolean
+        hasNonCancelledSingleEdit: Boolean,
+        occurrenceNumber: Int,
+        isStandaloneSingleEdit: Boolean
     ): UseCase.Result {
 
-        if (!isCalendarDisabled) {
+        if (!event.calendar.isDisabled) {
 
             val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
                 calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
@@ -337,9 +341,10 @@ class HandleDeleteUseCase( // TODO TESTS
         return handleDelete(
             userId,
             event.id,
-            if (isRecurring) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
-            if (isRecurring) null else 0,
-            !(isRecurring && hasNonCancelledSingleEdit)
+            if (event.isRecurring()) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (event.isRecurring()) null else if (event.isSingleEdit()) occurrenceNumber else 0,
+            !(event.isRecurring() && hasNonCancelledSingleEdit),
+            isStandaloneSingleEdit
         )
     }
 }

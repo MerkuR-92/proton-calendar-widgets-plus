@@ -179,7 +179,7 @@ class EventViewModel(
             object Event: Delete()
             object DisabledCalendarRecurring: Delete()
             data class AsAnOrganizer(
-                val isRecurring: Boolean,
+                val isPartOfChain: Boolean,
                 val isCalendarDisabled: Boolean
             ): Delete()
             data class RecurringEvent(
@@ -187,14 +187,14 @@ class EventViewModel(
             ): Delete()
             data class AsAnOrganizerSendPreferences(
                 val sendPreferencesResults: SendPreferencesResults,
-                val isRecurring: Boolean,
+                val isPartOfChain: Boolean,
                 val isCalendarDisabled: Boolean
             ): Delete()
             data class AsAnAttendeeSendPreferences(
                 val userAddress: UserAddress,
                 val sendPreferencesResults: SendPreferencesResults,
                 val isRecurring: Boolean,
-                val isNonStandaloneSingleEdit: Boolean,
+                val isStandaloneSingleEdit: Boolean,
                 val hasNonCancelledSingleEdit: Boolean,
                 val hasAnsweredSingleEdit: Boolean,
                 val isAddressDisabled: Boolean,
@@ -1118,7 +1118,7 @@ class EventViewModel(
 
         if (deleteAsAnOrganizer) {
             // Check deleteAsAnOrganizer before deleteAsAnAttendee because user can be both organizer and attendee
-            eventDialogState.value = EventDialogState.Delete.AsAnOrganizer(isRecurring = event.isPartOfChain(), isCalendarDisabled = event.calendar.isDisabled)
+            eventDialogState.value = EventDialogState.Delete.AsAnOrganizer(isPartOfChain = event.isPartOfChain(), isCalendarDisabled = event.calendar.isDisabled)
 
         } else if (deleteAsAnAttendee) {
             // Check deleteAsAnAttendee after deleteAsAnOrganizer because user can be both organizer and attendee
@@ -1169,7 +1169,7 @@ class EventViewModel(
         handleDeleteResult(deleteResult, false)
     }
 
-    suspend fun handleDeleteAsOrganizerSendPreferences(isRecurring: Boolean, isCalendarDisabled: Boolean, timeFormatIs24Hour: Boolean) {
+    suspend fun handleDeleteAsOrganizerSendPreferences(isPartOfChain: Boolean, isCalendarDisabled: Boolean, timeFormatIs24Hour: Boolean) {
         val attendees = eventLiveData.value?.iCalEvent?.attendees
         val attendeesEmails = attendees?.mapNotNull { it.extractEmail() }
         if (!attendeesEmails.isNullOrEmpty()) {
@@ -1179,7 +1179,7 @@ class EventViewModel(
                     attendees,
                     emptyMap(),
                     timeFormatIs24Hour,
-                    isRecurring,
+                    isPartOfChain,
                     isCalendarDisabled
                 )
             } else {
@@ -1197,7 +1197,7 @@ class EventViewModel(
                         // Display Send Preferences Dialog
                         eventDialogState.value = EventDialogState.Delete.AsAnOrganizerSendPreferences(
                             sendPreferencesResults,
-                            isRecurring,
+                            isPartOfChain,
                             isCalendarDisabled
                         )
                     }
@@ -1206,7 +1206,7 @@ class EventViewModel(
                         attendees,
                         sendPreferencesResults.sendPreferences,
                         timeFormatIs24Hour,
-                        isRecurring,
+                        isPartOfChain,
                         isCalendarDisabled
                     )
                 }
@@ -1223,7 +1223,7 @@ class EventViewModel(
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
         timeFormatIs24Hours: Boolean,
-        isRecurring: Boolean,
+        isPartOfChain: Boolean,
         isCalendarDisabled: Boolean
     ) {
 
@@ -1234,7 +1234,7 @@ class EventViewModel(
                 attendees,
                 sendPreferences,
                 timeFormatIs24Hours,
-                isRecurring,
+                isPartOfChain,
                 isCalendarDisabled
             )
 
@@ -1286,7 +1286,7 @@ class EventViewModel(
                     userAddress,
                     sendPreferencesResults,
                     isRecurring = event.isRecurring(),
-                    isNonStandaloneSingleEdit = event.isSingleEdit() && isStandaloneSingleEdit.not(),
+                    isStandaloneSingleEdit = isStandaloneSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasSingleEdit ?: false &&
                             getSingleEditsInfo(listOf(userAddress.email))?.hasOnlyCanceledSingleEdit == false,
                     hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasAnsweredSingleEdit.isNullOrEmpty().not(),
@@ -1305,10 +1305,10 @@ class EventViewModel(
     suspend fun handleDeleteEventAsAttendee(
         userAddress: UserAddress,
         sendPreferences: Map<Email, SendPreferences>,
-        isRecurring: Boolean,
-        isCalendarDisabled: Boolean,
         hasNonCancelledSingleEdit: Boolean,
-        hasAnsweredSingleEdit: Boolean
+        hasAnsweredSingleEdit: Boolean,
+        occurrenceNumber: Int,
+        isStandaloneSingleEdit: Boolean
     ) {
 
         val deleteResult = if (sendPreferences.isNotEmpty()) {
@@ -1318,16 +1318,16 @@ class EventViewModel(
                 event,
                 userAddress,
                 sendPreferences,
-                isRecurring,
-                isCalendarDisabled,
-                hasNonCancelledSingleEdit
+                hasNonCancelledSingleEdit,
+                occurrenceNumber,
+                isStandaloneSingleEdit
             )
 
         } else {
             UseCase.Result.Error("handleDeleteEventAsAttendee sendPreferences was empty")
         }
 
-        if (deleteResult is UseCase.Result.Success<*> && isRecurring && hasAnsweredSingleEdit) {
+        if (deleteResult is UseCase.Result.Success<*> && event.isRecurring() && hasAnsweredSingleEdit) {
             // If chain has single edits, update their part stat to NEEDS_ACTION
             clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userAddress.email), ParticipationStatus.NEEDS_ACTION)
         }
@@ -1335,7 +1335,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, true, isCalendarDisabled)
+        handleDeleteResult(deleteResult, true, event.calendar.isDisabled)
     }
 
     suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean) {
