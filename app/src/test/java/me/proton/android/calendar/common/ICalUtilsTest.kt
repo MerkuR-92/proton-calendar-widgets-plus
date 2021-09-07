@@ -1491,6 +1491,78 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `expandOccurrencesWithSingleEdits for an all-day single edit happening one day before original occurrence`() {
+
+        val iCals = listOf( // main chain event starts on 9th, weekly
+            """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210909
+    DTEND;VALUE=DATE:20210910
+    RRULE:FREQ=WEEKLY;BYDAY=TH
+    DTSTAMP:20210907T080028Z
+    UID:1deh57q4naj5bcd2eljvhr7joj@google.com
+    X-MICROSOFT-CDO-OWNERAPPTID:1073665307
+    CREATED:20210907T080028Z
+    LAST-MODIFIED:20210907T080028Z
+    LOCATION:
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Invite from google make SE
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent(), // original occurrence on 16th, changed day to 15th
+            """
+        BEGIN:VCALENDAR
+        PRODID:-//Google Inc//Google Calendar 70.9054//EN
+        VERSION:2.0
+        CALSCALE:GREGORIAN
+        METHOD:REQUEST
+        BEGIN:VEVENT
+        DTSTART;VALUE=DATE:20210915
+        DTEND;VALUE=DATE:20210916
+        DTSTAMP:20210907T091501Z
+        UID:1deh57q4naj5bcd2eljvhr7joj@google.com
+        X-MICROSOFT-CDO-OWNERAPPTID:868858272
+        RECURRENCE-ID;VALUE=DATE:20210916
+        CREATED:20210907T080028Z
+        LAST-MODIFIED:20210907T091500Z
+        LOCATION:
+        SEQUENCE:1
+        STATUS:CONFIRMED
+        SUMMARY:SE: Invite from google make SE 
+        TRANSP:TRANSPARENT
+        END:VEVENT
+        END:VCALENDAR
+            """.trimIndent(), // event on 6th, changed only summary, not time
+        )
+
+        val displayRangeTo = LocalDate.of(2021, 9, 15)
+        val displayTimeZoneId = "Europe/Paris"
+
+        val events = iCals.mapIndexed { index, iCal ->
+            Event.from("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
+                "id",
+                "calendar",
+                "",
+                1,
+                true,
+                0
+            ), ICalUtilsImpl.parseICalString(iCal)!!, null)!!
+        }
+
+        val occurrencesWithSingleEdits = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2021, 9, 15), displayRangeTo, displayTimeZoneId)!!
+        assertThat(occurrencesWithSingleEdits.size == 1)
+        assertThat(occurrencesWithSingleEdits.first().isSingleEdit())
+        assertThat(occurrencesWithSingleEdits.first().summary == "SE: Invite from google make SE")
+    }
+
+    @Test
     fun `filter out ex date from recurring event`() {
 
         val iCalString = """
