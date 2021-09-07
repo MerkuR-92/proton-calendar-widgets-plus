@@ -39,7 +39,7 @@ class HandleDeleteUseCase( // TODO TESTS
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
 ): UseCase {
 
-    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
+    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?, deleteSingleEdits: Boolean = true) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -111,7 +111,14 @@ class HandleDeleteUseCase( // TODO TESTS
                     else event
 
                 // TODO maybe merge this into one request
-                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, rootEvent.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
+                val deleteSingleEditsResult =
+                    if (deleteSingleEdits) {
+                        deleteSingleEditsAfter(
+                            userId,
+                            rootEvent.id,
+                            rootEvent.getStart(ZoneId.systemDefault().id)!!.minusNanos(1)
+                        )
+                    } else UseCase.Result.Success<Unit>()
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
                 val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
@@ -246,7 +253,8 @@ class HandleDeleteUseCase( // TODO TESTS
         userAddress: UserAddress,
         sendPreferences: Map<Email, SendPreferences>,
         isRecurring: Boolean,
-        isCalendarDisabled: Boolean
+        isCalendarDisabled: Boolean,
+        hasNonCancelledSingleEdit: Boolean
     ): UseCase.Result {
 
         if (!isCalendarDisabled) {
@@ -330,7 +338,8 @@ class HandleDeleteUseCase( // TODO TESTS
             userId,
             event.id,
             if (isRecurring) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
-            if (isRecurring) null else 0
+            if (isRecurring) null else 0,
+            !(isRecurring && hasNonCancelledSingleEdit)
         )
     }
 }

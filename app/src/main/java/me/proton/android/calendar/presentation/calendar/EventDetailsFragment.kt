@@ -467,7 +467,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         it.userAddress,
                                         it.sendPreferencesResults.sendPreferences,
                                         it.isRecurring,
-                                        it.isCalendarDisabled
+                                        it.isCalendarDisabled,
+                                        it.hasNonCancelledSingleEdit,
+                                        it.hasAnsweredSingleEdit
                                     )
                                 }
                             }

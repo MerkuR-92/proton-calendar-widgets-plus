@@ -1306,7 +1306,9 @@ class EventViewModel(
         userAddress: UserAddress,
         sendPreferences: Map<Email, SendPreferences>,
         isRecurring: Boolean,
-        isCalendarDisabled: Boolean
+        isCalendarDisabled: Boolean,
+        hasNonCancelledSingleEdit: Boolean,
+        hasAnsweredSingleEdit: Boolean
     ) {
 
         val deleteResult = if (sendPreferences.isNotEmpty()) {
@@ -1317,11 +1319,17 @@ class EventViewModel(
                 userAddress,
                 sendPreferences,
                 isRecurring,
-                isCalendarDisabled
+                isCalendarDisabled,
+                hasNonCancelledSingleEdit
             )
 
         } else {
             UseCase.Result.Error("handleDeleteEventAsAttendee sendPreferences was empty")
+        }
+
+        if (deleteResult is UseCase.Result.Success<*> && isRecurring && hasAnsweredSingleEdit) {
+            // If chain has single edits, update their part stat to NEEDS_ACTION
+            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userAddress.email), ParticipationStatus.NEEDS_ACTION)
         }
 
         // Post deleting event value to false to stop loading state
