@@ -258,7 +258,9 @@ class HandleDeleteUseCase( // TODO TESTS
         sendPreferences: Map<Email, SendPreferences>,
         hasNonCancelledSingleEdit: Boolean,
         occurrenceNumber: Int,
-        isStandaloneSingleEdit: Boolean
+        isStandaloneSingleEdit: Boolean,
+        defaultTimeZone: String,
+        timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
         if (!event.calendar.isDisabled) {
@@ -280,16 +282,17 @@ class HandleDeleteUseCase( // TODO TESTS
             // If address is disabled, cancellation can't be sent
             val sendCancellationResult = sendEmailUseCase.sendReplyToOrganizer(
                 userId,
-                event.iCalendar,
+                event,
                 event.iCalendar.timezoneInfo,
                 userAttendee.copy(),
                 event.iCalEvent.organizer.email,
                 ParticipationStatus.DECLINED,
-                event.summary,
                 sendPreferences,
                 Date.from(updateTime),
                 eventEntity,
-                isProtonProtonInvite ?: false
+                isProtonProtonInvite ?: false,
+                defaultTimeZone,
+                timeFormatIs24Hours
             )
             sendCancellationResult.ifSuccessAndLogErrors(logger) { }
 

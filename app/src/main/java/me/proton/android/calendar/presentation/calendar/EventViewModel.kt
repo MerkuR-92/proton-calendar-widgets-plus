@@ -214,6 +214,7 @@ class EventViewModel(
             data class RecurringEvent(
                 val participationStatus: ParticipationStatus,
                 val dialogType: ChangeAnswerRecurringDialogType,
+                val timeFormatIs24Hours: Boolean
             ): ChangeAnswer()
         }
     }
@@ -1310,7 +1311,8 @@ class EventViewModel(
         hasNonCancelledSingleEdit: Boolean,
         hasAnsweredSingleEdit: Boolean,
         occurrenceNumber: Int,
-        isStandaloneSingleEdit: Boolean
+        isStandaloneSingleEdit: Boolean,
+        timeFormatIs24Hours: Boolean
     ) {
 
         val deleteResult = if (sendPreferences.isNotEmpty()) {
@@ -1322,7 +1324,9 @@ class EventViewModel(
                 sendPreferences,
                 hasNonCancelledSingleEdit,
                 occurrenceNumber,
-                isStandaloneSingleEdit
+                isStandaloneSingleEdit,
+                event.defaultTimeZone!!,
+                timeFormatIs24Hours
             )
 
         } else {
@@ -1462,7 +1466,7 @@ class EventViewModel(
     /**
      * @return show snack with generic error
      */
-    suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus): Boolean {
+    suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus, timeFormatIs24Hours: Boolean): Boolean {
         if (eventState.value is EventState.Processing) return true
 
         val userEmails = userManager.getAddresses(userId).map { address ->
@@ -1491,7 +1495,8 @@ class EventViewModel(
 
                 return if (isStandaloneSingleEdit == true) {
                     handleChangeAnswerSendPreferences(
-                        newParticipationStatus
+                        newParticipationStatus,
+                        timeFormatIs24Hours
                     )
                 } else {
                     // Display Confirmation Dialog
@@ -1501,19 +1506,21 @@ class EventViewModel(
                             overwrite -> ChangeAnswerRecurringDialogType.OVERWRITE
                             isSingleEdit -> ChangeAnswerRecurringDialogType.SINGLE_EDIT
                             else -> ChangeAnswerRecurringDialogType.DEFAULT
-                        }
+                        },
+                        timeFormatIs24Hours
                     )
                     true
                 }
             } else {
                 return handleChangeAnswerSendPreferences(
-                    newParticipationStatus
+                    newParticipationStatus,
+                    timeFormatIs24Hours
                 )
             }
         } else return true
     }
 
-    suspend fun handleChangeAnswerSendPreferences(newParticipationStatus: ParticipationStatus): Boolean {
+    suspend fun handleChangeAnswerSendPreferences(newParticipationStatus: ParticipationStatus, timeFormatIs24Hours: Boolean): Boolean {
         val organizerEmail = event.iCalEvent.organizer.extractEmail()
         if (organizerEmail == null) {
             eventState.value = EventState.Idle
@@ -1533,14 +1540,16 @@ class EventViewModel(
         } else {
             updateParticipationStatus(
                 newParticipationStatus,
-                sendPreferencesResults.sendPreferences
+                sendPreferencesResults.sendPreferences,
+                timeFormatIs24Hours
             )
         }
     }
 
     private suspend fun updateParticipationStatus(
         participationStatus: ParticipationStatus,
-        sendPreferences: Map<Email, SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>,
+        timeFormatIs24Hours: Boolean
     ): Boolean {
         val status = participationStatus.toInt()
 
@@ -1597,9 +1606,9 @@ class EventViewModel(
         val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
 
         if (isProtonProtonInvite == true) {
-            if (!changeAnswerProtonProton(sendPreferences, eventCopy, eventEntity, userAttendee, participationStatus, status, personalPartICalString)) return false
+            if (!changeAnswerProtonProton(sendPreferences, eventCopy, eventEntity, userAttendee, participationStatus, status, personalPartICalString, timeFormatIs24Hours)) return false
         } else {
-            if (!changeAnswer(sendPreferences, eventCopy, userAttendee, participationStatus, status, personalPartICalString)) return false
+            if (!changeAnswer(sendPreferences, eventCopy, userAttendee, participationStatus, status, personalPartICalString, timeFormatIs24Hours)) return false
         }
 
         if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
@@ -1637,22 +1646,25 @@ class EventViewModel(
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
         status: Int,
-        personalPartICalString: String?): Boolean {
+        personalPartICalString: String?,
+        timeFormatIs24Hours: Boolean
+    ): Boolean {
         val updateTime = Instant.now()
 
         if (sendPreferences.isNotEmpty()) {
             val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                 userId,
-                eventCopy.iCalendar,
+                eventCopy,
                 dbEvent?.iCalendar?.timezoneInfo,
                 userAttendee.copy(),
                 event.iCalEvent.organizer.email,
                 participationStatus,
-                event.summary,
                 sendPreferences,
                 Date.from(updateTime),
                 null,
-                false
+                false,
+                event.defaultTimeZone!!,
+                timeFormatIs24Hours
             )
             sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
             if (sendEmailUseCaseResult is UseCase.Result.Error && sendEmailUseCaseResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
@@ -1696,7 +1708,9 @@ class EventViewModel(
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
         status: Int,
-        personalPartICalString: String?): Boolean {
+        personalPartICalString: String?,
+        timeFormatIs24Hours: Boolean
+    ): Boolean {
         if (eventEntity == null) {
             eventState.value = EventState.Idle
             return false
@@ -1729,16 +1743,17 @@ class EventViewModel(
             updateParticipationStatusUseCaseResult.returnValue.tryCast<Int> {
                 val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                     userId,
-                    eventCopy.iCalendar,
+                    eventCopy,
                     dbEvent?.iCalendar?.timezoneInfo,
                     userAttendee.copy(),
                     event.iCalEvent.organizer.email,
                     participationStatus,
-                    event.summary,
                     sendPreferences,
                     Date.from(updateTime), // Use same updateTime as for Update part stat BE call
                     eventEntity,
-                    true
+                    true,
+                    event.defaultTimeZone!!,
+                    timeFormatIs24Hours
                 )
                 sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
                 // Sending the email is optional for proton to proton so we don't care if it failed

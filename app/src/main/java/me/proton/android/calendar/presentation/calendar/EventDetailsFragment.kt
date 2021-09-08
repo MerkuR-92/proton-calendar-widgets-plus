@@ -470,7 +470,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         it.hasNonCancelledSingleEdit,
                                         it.hasAnsweredSingleEdit,
                                         navigationArguments.occurrenceNumber,
-                                        it.isStandaloneSingleEdit
+                                        it.isStandaloneSingleEdit,
+                                        calendarViewModel.timeFormatIs24Hour(requireContext())
                                     )
                                 }
                             }
@@ -549,7 +550,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             )
                             .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
                                 lifecycleScope.launch {
-                                    if (!eventViewModel.handleChangeAnswerSendPreferences(it.participationStatus)) {
+                                    if (!eventViewModel.handleChangeAnswerSendPreferences(it.participationStatus, it.timeFormatIs24Hours)) {
                                         eventViewModel.eventState.value = EventViewModel.EventState.Idle
                                         view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                                         displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
@@ -621,7 +622,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.ACCEPTED)) {
+                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))) {
                     view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                     displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
                 }
@@ -630,7 +631,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.DECLINED)) {
+                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))) {
                     view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                     displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
                 }
@@ -639,7 +640,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.TENTATIVE)) {
+                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))) {
                     view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
                     displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
                 }
