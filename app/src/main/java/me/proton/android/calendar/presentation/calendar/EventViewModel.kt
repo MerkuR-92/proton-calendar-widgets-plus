@@ -194,6 +194,7 @@ class EventViewModel(
                 val userAddress: UserAddress,
                 val sendPreferencesResults: SendPreferencesResults,
                 val isRecurring: Boolean,
+                val isSingleEdit: Boolean,
                 val isStandaloneSingleEdit: Boolean,
                 val hasNonCancelledSingleEdit: Boolean,
                 val hasAnsweredSingleEdit: Boolean,
@@ -1286,6 +1287,7 @@ class EventViewModel(
                     userAddress,
                     sendPreferencesResults,
                     isRecurring = event.isRecurring(),
+                    isSingleEdit = event.isSingleEdit(),
                     isStandaloneSingleEdit = isStandaloneSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasSingleEdit ?: false &&
                             getSingleEditsInfo(listOf(userAddress.email))?.hasOnlyCanceledSingleEdit == false,

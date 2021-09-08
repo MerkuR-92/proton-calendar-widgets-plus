@@ -429,18 +429,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         val sendPrefsFailed = emailsWithErrors.isNotEmpty()
                         val displayWarning = (it.currentParticipationStatus == ParticipationStatus.ACCEPTED ||
                                 it.currentParticipationStatus == ParticipationStatus.TENTATIVE) &&
-                                it.isEventCanceled.not()
+                                it.isEventCanceled.not() &&
+                                !it.isCalendarDisabled
 
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(
                                 if (sendPrefsFailed && displayWarning) R.string.event_organizer_send_prefs_error_title
-                                else if (it.isRecurring || it.isStandaloneSingleEdit.not()) R.string.dialog_title_delete_recurring_event
+                                else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not())) R.string.dialog_title_delete_recurring_event
                                 else R.string.dialog_title_delete_event
                             )
                             .setMessage(
                                 if (displayWarning.not()) {
-                                    if (it.isStandaloneSingleEdit.not() && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-                                    else if (it.isRecurring || (it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
+                                    if (it.isSingleEdit && (it.isSingleEdit && it.isStandaloneSingleEdit.not()) && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+                                    else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
                                     else getString(R.string.dialog_description_delete_event)
                                 } else {
                                     if (sendPrefsFailed) getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
@@ -455,8 +456,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
                                         else message
                                     }
-                                    else if (it.isStandaloneSingleEdit.not() && it.isAddressDisabled) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
-                                    else if (it.isStandaloneSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+                                    else if (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isAddressDisabled) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+                                    else if (it.isSingleEdit && it.isStandaloneSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
                                     else if (it.isAddressDisabled) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
                                     else getString(R.string.dialog_description_delete_single_event_as_attendee)
                                 }
