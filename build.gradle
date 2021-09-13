@@ -34,7 +34,7 @@ buildscript {
                 "proton_core_data": "1.3.1",
                 "proton_core_data_room": "1.3.1",
                 "proton_core_domain": "1.0.4",
-                "proton_core_presentation": "1.5.4",
+                "proton_core_presentation": "1.15.1",
                 "proton_core_payment": "0.2.4",
                 "proton_core_plan": "1.5.2",
                 "proton_core_country": "0.1.6",

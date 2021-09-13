@@ -71,7 +71,6 @@ import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
-import me.proton.core.presentation.utils.showForceUpdate
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -246,14 +245,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         intent?.let { mainViewModel.handleIntent(intent) }
 
-        with(forceUpdateViewModel) {
-            forceUpdate.observe(this@MainActivity, Observer {
-                if (it.forceUpdate) {
-                    supportFragmentManager.showForceUpdate(it.apiErrorMessage)
-                }
-            })
-        }
-
         with(accountViewModel) {
             init(this@MainActivity)
 
@@ -353,6 +344,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
+        if (forceUpdateViewModel.forceUpdate.value?.forceUpdate == true) {
+            return
+        }
         when (state) {
             AccountViewModel.State.LoginNeeded -> {
                 var openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
