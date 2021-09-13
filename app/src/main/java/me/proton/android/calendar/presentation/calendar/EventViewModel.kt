@@ -455,7 +455,7 @@ class EventViewModel(
         val hasSingleEdit: Boolean,
         val hasFutureSingleEdit: Boolean,
         val hasAnsweredSingleEdit: Map<ParticipationStatus, Boolean>,
-        val hasOnlyCanceledSingleEdit: Boolean
+        val hasOnlyCancelledSingleEdits: Boolean
     )
 
     suspend fun getSingleEditsInfo(userEmails: List<String>? = null): SingleEditsInfo? {
@@ -466,7 +466,7 @@ class EventViewModel(
             val dbEvent = dbEvent ?: return null
 
             var hasFutureSingleEdit = false
-            var hasOnlyCanceledSingleEdit = true
+            var hasOnlyCancelledSingleEdits = true
             val hasAnsweredSingleEdit = hashMapOf<ParticipationStatus, Boolean>()
 
             val occurrenceStart = event.getOccurrenceStart(eventTimeZoneId)
@@ -512,12 +512,12 @@ class EventViewModel(
                                     true
                             }
                         }
-                        if (singleEdit.isCancelled().not()) hasOnlyCanceledSingleEdit = false
+                        if (singleEdit.isCancelled().not()) hasOnlyCancelledSingleEdits = false
                     }
                     !singleEdits.isNullOrEmpty()
                 }
 
-            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit, hasAnsweredSingleEdit, hasOnlyCanceledSingleEdit)
+            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit, hasAnsweredSingleEdit, hasOnlyCancelledSingleEdits)
         }
 
         return singleEditsInfo
@@ -1291,7 +1291,7 @@ class EventViewModel(
                     isSingleEdit = event.isSingleEdit(),
                     isStandaloneSingleEdit = isStandaloneSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasSingleEdit ?: false &&
-                            getSingleEditsInfo(listOf(userAddress.email))?.hasOnlyCanceledSingleEdit == false,
+                            getSingleEditsInfo(listOf(userAddress.email))?.hasOnlyCancelledSingleEdits == false,
                     hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasAnsweredSingleEdit.isNullOrEmpty().not(),
                     isAddressDisabled = userAddress.enabled.not(),
                     isCalendarDisabled = event.calendar.isDisabled,

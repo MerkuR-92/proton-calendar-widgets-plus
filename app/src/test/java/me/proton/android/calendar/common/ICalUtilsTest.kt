@@ -1516,7 +1516,7 @@ internal class ICalUtilsTest {
     TRANSP:TRANSPARENT
     END:VEVENT
     END:VCALENDAR
-            """.trimIndent(), // original occurrence on 16th, changed day to 15th
+            """.trimIndent(),
             """
         BEGIN:VCALENDAR
         PRODID:-//Google Inc//Google Calendar 70.9054//EN
@@ -1539,7 +1539,7 @@ internal class ICalUtilsTest {
         TRANSP:TRANSPARENT
         END:VEVENT
         END:VCALENDAR
-            """.trimIndent(), // event on 6th, changed only summary, not time
+            """.trimIndent(), // original occurrence on 16th, changed day to 15th
         )
 
         val displayRangeTo = LocalDate.of(2021, 9, 15)

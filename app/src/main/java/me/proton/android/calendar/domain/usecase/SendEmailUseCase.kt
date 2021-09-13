@@ -313,7 +313,7 @@ class SendEmailUseCase(
             when (mailType) {
                 MailType.CANCELLATION -> getCancelMailBody(eventCopy.summary)
                 MailType.REPLY -> getReplyMailBody(newParticipationStatus, userAttendeeEmail, newEvent.summary)
-                else -> getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
+                MailType.INVITE -> getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
             }
         )
     }
@@ -323,14 +323,16 @@ class SendEmailUseCase(
             when (mailType) {
                 MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_prefix
                 MailType.REPLY -> R.string.event_change_answer_mail_subject_prefix
-                else -> R.string.event_send_invite_mail_subject_prefix
+                MailType.INVITE -> R.string.event_send_invite_mail_subject_prefix
             },
             if (!event.isAllDay()) {
                 val dateTimeStart =
                     event.formatStart(timezone, timeFormatIs24Hours)
                 resourceProvider.provideString(
-                    if (mailType == MailType.CANCELLATION) R.string.event_send_cancel_mail_subject_part_day
-                    else R.string.event_send_invite_mail_subject_part_day,
+                    when (mailType) {
+                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_part_day
+                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_part_day
+                    },
                     dateTimeStart.first,
                     dateTimeStart.second,
                     DateTimeUtilsImpl.formatTimeZoneId(
@@ -341,8 +343,10 @@ class SendEmailUseCase(
                 )
             } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
                 resourceProvider.provideString(
-                    if (mailType == MailType.CANCELLATION) R.string.event_send_cancel_mail_subject_all_day_multiple
-                    else R.string.event_send_invite_mail_subject_all_day_multiple,
+                    when (mailType) {
+                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day_multiple
+                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day_multiple
+                    },
                     event.formatStart(
                         timezone,
                         timeFormatIs24Hours
@@ -350,8 +354,10 @@ class SendEmailUseCase(
                 )
             } else {
                 resourceProvider.provideString(
-                    if (mailType == MailType.CANCELLATION) R.string.event_send_cancel_mail_subject_all_day
-                    else R.string.event_send_invite_mail_subject_all_day,
+                    when (mailType) {
+                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day
+                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day
+                    },
                     event.formatStart(
                         timezone,
                         timeFormatIs24Hours

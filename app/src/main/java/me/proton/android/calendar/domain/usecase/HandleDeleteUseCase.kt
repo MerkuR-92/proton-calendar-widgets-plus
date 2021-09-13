@@ -213,6 +213,7 @@ class HandleDeleteUseCase( // TODO TESTS
         isCalendarDisabled: Boolean
     ): UseCase.Result {
 
+        // The attendees list contains those we successfully fetched send preferences for (only send an email for those, skip sending email if the list is empty)
         if (!isCalendarDisabled && attendees.isNotEmpty()) {
             // If address is disabled, cancellation can't be sent
             val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
