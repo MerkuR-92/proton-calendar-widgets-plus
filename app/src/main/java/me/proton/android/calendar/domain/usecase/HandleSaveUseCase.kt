@@ -39,7 +39,6 @@ class HandleSaveUseCase(
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
-    private val resourceProvider: ResourceProvider,
     private val sendEmailUseCase: SendEmailUseCase
 ) {
 
@@ -70,7 +69,8 @@ class HandleSaveUseCase(
 
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
 
-        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
+        val eventEntity = calendarsRepository.selectEventEntity(event.id)
+        val dbEvent = eventEntity?.let { transformEventUseCase.execute(it) }
         val immutableOriginalDbEvent = originalDbEvent
         val dbEventStartDate = dbEvent?.getStart(event.defaultTimeZone!!)
         val originalDbEventStartDate = immutableOriginalDbEvent?.getStart(event.defaultTimeZone!!)
