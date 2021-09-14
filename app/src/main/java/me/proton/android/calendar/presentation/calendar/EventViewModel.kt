@@ -452,10 +452,11 @@ class EventViewModel(
     }
 
     data class SingleEditsInfo(
+        val singleEdits: List<Event>?,
         val hasSingleEdit: Boolean,
-        val hasFutureSingleEdit: Boolean,
-        val hasAnsweredSingleEdit: Map<ParticipationStatus, Boolean>,
-        val hasOnlyCancelledSingleEdits: Boolean
+        val hasFutureSingleEdit: Boolean?, // Set to null if not checked or not applicable
+        val hasAnsweredSingleEdit: Boolean?, // Set to null if not checked or not applicable
+        val hasNonCancelledSingleEdit: Boolean? // Set to null if not checked or not applicable
     )
 
     suspend fun getSingleEditsInfo(userEmails: List<String>? = null): SingleEditsInfo? {
@@ -465,10 +466,6 @@ class EventViewModel(
             val event = _event.value ?: return null
             val dbEvent = dbEvent ?: return null
 
-            var hasFutureSingleEdit = false
-            var hasOnlyCancelledSingleEdits = true
-            val hasAnsweredSingleEdit = hashMapOf<ParticipationStatus, Boolean>()
-
             val occurrenceStart = event.getOccurrenceStart(eventTimeZoneId)
             val occurrence = event.occurrence
             val allowShowThisAndFuture =
@@ -477,51 +474,58 @@ class EventViewModel(
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
             // We check for single edits only once and in initialise because it may require API calls
-            val hasSingleEdit =
-                if (occurrence?.occurrenceNumber == 1 &&
-                    !allowShowThisAndFuture && (editMode ||
-                            !event.isAnInvitation && userEmails != null)) {
-                    // We don't have option "this and future" when updating first event in chain
-                    // TODO Decide behavior if API call was an error and method returns null
-                    dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
-                } else {
-                    // TODO Decide behavior if API call was an error and method returns null
-                    val singleEdits = calendarsRepository.getSingleEdits(
-                        userId,
-                        dbEvent.uid,
-                        if (editMode || !event.isAnInvitation && userEmails != null)
-                            occurrenceStart
-                        else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
-                        if (editMode || !event.isAnInvitation && userEmails != null)
-                            eventTimeZoneId
-                        else null
-                    )
-                    singleEdits?.forEach { singleEdit ->
-                        if (singleEdit.getStart(eventTimeZoneId).isAfter(occurrenceStart)) {
-                            hasFutureSingleEdit = true
-                        }
-                        // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
-                        if (!editMode && event.isAnInvitation && userEmails != null && !singleEdit.isCancelled()) {
-                            // The only values we need are Accepted, Declined and Tentative
-                            when (singleEdit.getParticipationStatus(userEmails)) {
-                                ParticipationStatus.ACCEPTED -> hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] =
-                                    true
-                                ParticipationStatus.DECLINED -> hasAnsweredSingleEdit[ParticipationStatus.DECLINED] =
-                                    true
-                                ParticipationStatus.TENTATIVE -> hasAnsweredSingleEdit[ParticipationStatus.TENTATIVE] =
-                                    true
-                            }
-                        }
-                        if (singleEdit.isCancelled().not()) hasOnlyCancelledSingleEdits = false
-                    }
-                    !singleEdits.isNullOrEmpty()
-                }
+            singleEditsInfo = if (occurrence?.occurrenceNumber == 1 &&
+                !allowShowThisAndFuture && (editMode ||
+                        !event.isAnInvitation && userEmails != null)) {
+                // We don't have option "this and future" when updating first event in chain
+                // TODO Decide behavior if API call was an error and method returns null
+                val hasSingleEdit = dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
 
-            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit, hasAnsweredSingleEdit, hasOnlyCancelledSingleEdits)
+                SingleEditsInfo(
+                    singleEdits = null,
+                    hasSingleEdit = hasSingleEdit,
+                    hasFutureSingleEdit = null,
+                    hasAnsweredSingleEdit = null,
+                    hasNonCancelledSingleEdit = null
+                )
+            } else {
+                // TODO Decide behavior if API call was an error and method returns null
+                val singleEdits = calendarsRepository.getSingleEdits(
+                    userId,
+                    dbEvent.uid,
+                    if (editMode || !event.isAnInvitation && userEmails != null)
+                        occurrenceStart
+                    else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
+                    if (editMode || !event.isAnInvitation && userEmails != null)
+                        eventTimeZoneId
+                    else null
+                )
+
+                val hasSingleEdit = !singleEdits.isNullOrEmpty()
+                val hasFutureSingleEdit = singleEdits?.any { it.getStart(eventTimeZoneId).isAfter(occurrenceStart) } ?: false
+                val hasAnsweredSingleEdit = singleEdits?.any {
+                    // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
+                    if (!editMode && event.isAnInvitation && userEmails != null && !it.isCancelled()) {
+                        // The only values we need are Accepted, Declined and Tentative
+                        val participationStatus = it.getParticipationStatus(userEmails)
+                        participationStatus == ParticipationStatus.ACCEPTED ||
+                                participationStatus == ParticipationStatus.DECLINED ||
+                                participationStatus == ParticipationStatus.TENTATIVE
+                    } else false
+                } ?: false
+                val hasNonCancelledSingleEdit = singleEdits?.any { it.isCancelled().not() } ?: true
+
+                SingleEditsInfo(
+                    singleEdits = singleEdits,
+                    hasSingleEdit = hasSingleEdit,
+                    hasFutureSingleEdit = hasFutureSingleEdit,
+                    hasAnsweredSingleEdit = hasAnsweredSingleEdit,
+                    hasNonCancelledSingleEdit = hasNonCancelledSingleEdit
+                )
+            }
         }
 
         return singleEditsInfo
-
     }
 
     private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {
@@ -1291,8 +1295,8 @@ class EventViewModel(
                     isSingleEdit = event.isSingleEdit(),
                     isStandaloneSingleEdit = isStandaloneSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasSingleEdit ?: false &&
-                            getSingleEditsInfo(listOf(userAddress.email))?.hasOnlyCancelledSingleEdits == false,
-                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasAnsweredSingleEdit.isNullOrEmpty().not(),
+                            getSingleEditsInfo(listOf(userAddress.email))?.hasNonCancelledSingleEdit == true,
+                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasAnsweredSingleEdit == true,
                     isAddressDisabled = userAddress.enabled.not(),
                     isCalendarDisabled = event.calendar.isDisabled,
                     isEventCanceled = event.isCancelled(),
@@ -1486,12 +1490,23 @@ class EventViewModel(
                     event.uid
                 ) else false
 
-                val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
+                val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit ?: false
+                val hasAnsweredSingleEditToOverwrite =
+                    if (hasAnsweredSingleEdit) {
+                        // Only check if it has any answered single edits
+                        getSingleEditsInfo(userEmails)?.singleEdits?.any {
+                            val participationStatus = it.getParticipationStatus(userEmails)
+                            participationStatus != newParticipationStatus && (
+                                    participationStatus == ParticipationStatus.ACCEPTED ||
+                                            participationStatus == ParticipationStatus.DECLINED ||
+                                            participationStatus == ParticipationStatus.TENTATIVE)
+                        } ?: false
+                    } else false
+
+                // Check if we need to overwrite any answer single edit with the new participation status
                 val overwrite =
                     if (isSingleEdit) false
-                    else hasAnsweredSingleEdit != null &&
-                            ((hasAnsweredSingleEdit[newParticipationStatus] == null && hasAnsweredSingleEdit.isNotEmpty())
-                                    || (hasAnsweredSingleEdit[newParticipationStatus] == true && hasAnsweredSingleEdit.size > 1))
+                    else hasAnsweredSingleEdit && hasAnsweredSingleEditToOverwrite
 
                 return if (isStandaloneSingleEdit == true) {
                     handleChangeAnswerSendPreferences(
