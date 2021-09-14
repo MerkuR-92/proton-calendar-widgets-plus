@@ -35,6 +35,7 @@ import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
@@ -476,7 +477,7 @@ object ICalUtilsImpl : ICalUtils {
     ): List<Event>? {
 
         val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
-        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
+        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
             ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
         } else {
             toDate
@@ -896,13 +897,22 @@ object ICalUtilsImpl : ICalUtils {
         sharedEventId: String
     ): String {
 
-        val cancelICalendar = event.iCalendar.clone()
+        val cancelICalendar = getBaseIcs(event)
 
         // METHOD:REPLY as we answer the REQUEST of the organizer
         cancelICalendar.setMethod(Method.CANCEL)
 
         // Add shared event ID (shared session key is not needed for cancellation)
         cancelICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
+
+        // TODO: Provide complete VTIMEZONE in the ics. In the meantime, we remove it from the ICS
+        cancelICalendar.timezoneInfo.defaultTimezone = null
+
+        // Event status is unnecessary
+        cancelICalendar.events.first().status = null
+
+        // Refresh DTSTAMP
+        cancelICalendar.events.first().setDateTimeStamp(Date.from(Instant.now()))
 
         return cancelICalendar.printToString()
     }

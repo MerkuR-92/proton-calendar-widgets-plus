@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
@@ -45,6 +47,7 @@ import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -77,7 +80,8 @@ class EventViewModel(
     private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase,
     private val handleSaveUseCase: HandleSaveUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
-    private val updateCalendarUseCase: UpdateCalendarUseCase
+    private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val resourceProvider: ResourceProvider
 ) : AndroidViewModel(application) {
 
     sealed class Result {
@@ -128,6 +132,7 @@ class EventViewModel(
 
     val eventState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
     val eventDialogState: MutableStateFlow<EventDialogState?> = MutableStateFlow(null)
+    val eventSnackState: MutableStateFlow<EventSnackState?> = MutableStateFlow(null)
 
     var currentParticipationStatus: ParticipationStatus? = null
 
@@ -174,16 +179,29 @@ class EventViewModel(
             object Event: Delete()
             object DisabledCalendarRecurring: Delete()
             data class AsAnOrganizer(
-                val isRecurring: Boolean,
-                val isDisabled: Boolean
+                val isPartOfChain: Boolean,
+                val isCalendarDisabled: Boolean
             ): Delete()
             data class RecurringEvent(
                 val showThisAndFuture: Boolean
             ): Delete()
-            data class SendPreferences(
+            data class AsAnOrganizerSendPreferences(
+                val sendPreferencesResults: SendPreferencesResults,
+                val isPartOfChain: Boolean,
+                val isCalendarDisabled: Boolean
+            ): Delete()
+            data class AsAnAttendeeSendPreferences(
+                val userAddress: UserAddress,
                 val sendPreferencesResults: SendPreferencesResults,
                 val isRecurring: Boolean,
-                val isDisabled: Boolean
+                val isSingleEdit: Boolean,
+                val isStandaloneSingleEdit: Boolean,
+                val hasNonCancelledSingleEdit: Boolean,
+                val hasAnsweredSingleEdit: Boolean,
+                val isAddressDisabled: Boolean,
+                val isCalendarDisabled: Boolean,
+                val isEventCanceled: Boolean,
+                val currentParticipationStatus: ParticipationStatus,
             ): Delete()
         }
 
@@ -196,9 +214,20 @@ class EventViewModel(
             data class RecurringEvent(
                 val participationStatus: ParticipationStatus,
                 val dialogType: ChangeAnswerRecurringDialogType,
+                val timeFormatIs24Hours: Boolean
             ): ChangeAnswer()
         }
+    }
 
+    sealed class EventSnackState {
+
+        data class DisplaySnack(
+            val message: String,
+        ): EventSnackState()
+
+        data class DisplaySnackReturnToMonth(
+            val message: String,
+        ): EventSnackState()
     }
 
     enum class ChangeAnswerRecurringDialogType {
@@ -423,9 +452,11 @@ class EventViewModel(
     }
 
     data class SingleEditsInfo(
+        val singleEdits: List<Event>?,
         val hasSingleEdit: Boolean,
-        val hasFutureSingleEdit: Boolean,
-        val hasAnsweredSingleEdit: Map<ParticipationStatus, Boolean>
+        val hasFutureSingleEdit: Boolean?, // Set to null if not checked or not applicable
+        val hasAnsweredSingleEdit: Boolean?, // Set to null if not checked or not applicable
+        val hasNonCancelledSingleEdit: Boolean? // Set to null if not checked or not applicable
     )
 
     suspend fun getSingleEditsInfo(userEmails: List<String>? = null): SingleEditsInfo? {
@@ -435,9 +466,6 @@ class EventViewModel(
             val event = _event.value ?: return null
             val dbEvent = dbEvent ?: return null
 
-            var hasFutureSingleEdit = false
-            val hasAnsweredSingleEdit = hashMapOf<ParticipationStatus, Boolean>()
-
             val occurrenceStart = event.getOccurrenceStart(eventTimeZoneId)
             val occurrence = event.occurrence
             val allowShowThisAndFuture =
@@ -446,50 +474,58 @@ class EventViewModel(
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
             // We check for single edits only once and in initialise because it may require API calls
-            val hasSingleEdit =
-                if (occurrence?.occurrenceNumber == 1 &&
-                    !allowShowThisAndFuture && (editMode ||
-                            !event.isAnInvitation && userEmails != null)) {
-                    // We don't have option "this and future" when updating first event in chain
-                    // TODO Decide behavior if API call was an error and method returns null
-                    dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
-                } else {
-                    // TODO Decide behavior if API call was an error and method returns null
-                    val singleEdits = calendarsRepository.getSingleEdits(
-                        userId,
-                        dbEvent.uid,
-                        if (editMode || !event.isAnInvitation && userEmails != null)
-                            occurrenceStart
-                        else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
-                        if (editMode || !event.isAnInvitation && userEmails != null)
-                            eventTimeZoneId
-                        else null
-                    )
-                    singleEdits?.forEach { singleEdit ->
-                        if (singleEdit.getStart(eventTimeZoneId).isAfter(occurrenceStart)) {
-                            hasFutureSingleEdit = true
-                        }
-                        // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
-                        if (!editMode && event.isAnInvitation && userEmails != null && !singleEdit.isCancelled()) {
-                            // The only values we need are Accepted, Declined and Tentative
-                            when (singleEdit.getParticipationStatus(userEmails)) {
-                                ParticipationStatus.ACCEPTED -> hasAnsweredSingleEdit[ParticipationStatus.ACCEPTED] =
-                                    true
-                                ParticipationStatus.DECLINED -> hasAnsweredSingleEdit[ParticipationStatus.DECLINED] =
-                                    true
-                                ParticipationStatus.TENTATIVE -> hasAnsweredSingleEdit[ParticipationStatus.TENTATIVE] =
-                                    true
-                            }
-                        }
-                    }
-                    !singleEdits.isNullOrEmpty()
-                }
+            singleEditsInfo = if (occurrence?.occurrenceNumber == 1 &&
+                !allowShowThisAndFuture && (editMode ||
+                        !event.isAnInvitation && userEmails != null)) {
+                // We don't have option "this and future" when updating first event in chain
+                // TODO Decide behavior if API call was an error and method returns null
+                val hasSingleEdit = dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
 
-            singleEditsInfo = SingleEditsInfo(hasSingleEdit, hasFutureSingleEdit, hasAnsweredSingleEdit)
+                SingleEditsInfo(
+                    singleEdits = null,
+                    hasSingleEdit = hasSingleEdit,
+                    hasFutureSingleEdit = null,
+                    hasAnsweredSingleEdit = null,
+                    hasNonCancelledSingleEdit = null
+                )
+            } else {
+                // TODO Decide behavior if API call was an error and method returns null
+                val singleEdits = calendarsRepository.getSingleEdits(
+                    userId,
+                    dbEvent.uid,
+                    if (editMode || !event.isAnInvitation && userEmails != null)
+                        occurrenceStart
+                    else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
+                    if (editMode || !event.isAnInvitation && userEmails != null)
+                        eventTimeZoneId
+                    else null
+                )
+
+                val hasSingleEdit = !singleEdits.isNullOrEmpty()
+                val hasFutureSingleEdit = singleEdits?.any { it.getStart(eventTimeZoneId).isAfter(occurrenceStart) } ?: false
+                val hasAnsweredSingleEdit = singleEdits?.any {
+                    // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
+                    if (!editMode && event.isAnInvitation && userEmails != null && !it.isCancelled()) {
+                        // The only values we need are Accepted, Declined and Tentative
+                        val participationStatus = it.getParticipationStatus(userEmails)
+                        participationStatus == ParticipationStatus.ACCEPTED ||
+                                participationStatus == ParticipationStatus.DECLINED ||
+                                participationStatus == ParticipationStatus.TENTATIVE
+                    } else false
+                } ?: false
+                val hasNonCancelledSingleEdit = singleEdits?.any { it.isCancelled().not() } ?: true
+
+                SingleEditsInfo(
+                    singleEdits = singleEdits,
+                    hasSingleEdit = hasSingleEdit,
+                    hasFutureSingleEdit = hasFutureSingleEdit,
+                    hasAnsweredSingleEdit = hasAnsweredSingleEdit,
+                    hasNonCancelledSingleEdit = hasNonCancelledSingleEdit
+                )
+            }
         }
 
         return singleEditsInfo
-
     }
 
     private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {
@@ -1076,16 +1112,23 @@ class EventViewModel(
         // Post deleting event value to true to display loading state
         eventState.value = EventState.Processing.Deleting
 
-        val userEmails = userManager.getAddresses(userId).map { address ->
+        val userAddresses = userManager.getAddresses(userId)
+        val userEmails = userAddresses.map { address ->
             ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
         }
         val deleteAsAnOrganizer = event.isUserOrganizer(userEmails)
+        val deleteAsAnAttendee = event.isUserAttendee(userEmails)
 
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
 
         if (deleteAsAnOrganizer) {
-            eventDialogState.value = EventDialogState.Delete.AsAnOrganizer(isRecurring = event.isPartOfChain(), isDisabled = event.calendar.isDisabled)
+            // Check deleteAsAnOrganizer before deleteAsAnAttendee because user can be both organizer and attendee
+            eventDialogState.value = EventDialogState.Delete.AsAnOrganizer(isPartOfChain = event.isPartOfChain(), isCalendarDisabled = event.calendar.isDisabled)
+
+        } else if (deleteAsAnAttendee) {
+            // Check deleteAsAnAttendee after deleteAsAnOrganizer because user can be both organizer and attendee
+            handleDeleteEventAsAttendeeSendPreferences(userAddresses, event)
 
         } else if (event.isPartOfChain() &&
             dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false &&
@@ -1109,7 +1152,7 @@ class EventViewModel(
         }
     }
 
-    suspend fun handleDeleteEvent(occurrenceNumber: Int): UseCase.Result {
+    suspend fun handleDeleteEvent(occurrenceNumber: Int) {
         val deleteResult =
             if (dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == true) {
                 handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
@@ -1120,25 +1163,75 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        return deleteResult
+        handleDeleteResult(deleteResult, false)
     }
 
-    suspend fun handleDeleteDisabledCalendarRecurring(): UseCase.Result {
+    suspend fun handleDeleteDisabledCalendarRecurring() {
         val deleteResult = handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
 
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        return deleteResult
+        handleDeleteResult(deleteResult, false)
+    }
+
+    suspend fun handleDeleteAsOrganizerSendPreferences(isPartOfChain: Boolean, isCalendarDisabled: Boolean, timeFormatIs24Hour: Boolean) {
+        val attendees = eventLiveData.value?.iCalEvent?.attendees
+        val attendeesEmails = attendees?.mapNotNull { it.extractEmail() }
+        if (!attendeesEmails.isNullOrEmpty()) {
+            if (isCalendarDisabled) {
+                // Skip send preferences if calendar is disabled since we won't be sending the email
+                handleDeleteEventAsOrganizer(
+                    attendees,
+                    emptyMap(),
+                    timeFormatIs24Hour,
+                    isPartOfChain,
+                    isCalendarDisabled
+                )
+            } else {
+
+                val sendPreferencesResults = getSendPreferences(attendeesEmails)
+
+                if (sendPreferencesResults.emailErrors.isNotEmpty()) {
+
+                    if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
+                        eventSnackState.value = EventSnackState.DisplaySnack(
+                            resourceProvider.provideString(R.string.snack_network_error)
+                        )
+                        eventState.value = EventState.Idle
+                    } else {
+                        // Display Send Preferences Dialog
+                        eventDialogState.value = EventDialogState.Delete.AsAnOrganizerSendPreferences(
+                            sendPreferencesResults,
+                            isPartOfChain,
+                            isCalendarDisabled
+                        )
+                    }
+                } else {
+                    handleDeleteEventAsOrganizer(
+                        attendees,
+                        sendPreferencesResults.sendPreferences,
+                        timeFormatIs24Hour,
+                        isPartOfChain,
+                        isCalendarDisabled
+                    )
+                }
+            }
+        } else {
+            eventSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_event_deleted_error)
+            )
+            eventState.value = EventState.Idle
+        }
     }
 
     suspend fun handleDeleteEventAsOrganizer(
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
         timeFormatIs24Hours: Boolean,
-        isRecurring: Boolean,
-        isDisabled: Boolean
-    ): UseCase.Result {
+        isPartOfChain: Boolean,
+        isCalendarDisabled: Boolean
+    ) {
 
         val deleteResult = if (sendPreferences.isNotEmpty()) {
             handleDeleteUseCase.handleDeleteAsOrganizer(
@@ -1147,8 +1240,8 @@ class EventViewModel(
                 attendees,
                 sendPreferences,
                 timeFormatIs24Hours,
-                isRecurring,
-                isDisabled
+                isPartOfChain,
+                isCalendarDisabled
             )
 
         } else {
@@ -1158,10 +1251,104 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        return deleteResult
+        handleDeleteResult(deleteResult, true, isCalendarDisabled)
     }
 
-    suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean): UseCase.Result {
+    private suspend fun handleDeleteEventAsAttendeeSendPreferences(userAddresses: List<UserAddress>, event: Event) {
+        val organizerEmail = event.iCalEvent.organizer.extractEmail()
+        if (!organizerEmail.isNullOrEmpty()) {
+
+            val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
+
+            if (sendPreferencesResults.emailErrors.isNotEmpty() &&
+                sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
+
+                eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_network_error))
+                eventState.value = EventState.Idle
+
+            } else {
+                val attendeeEmails = event.iCalEvent.attendees.mapNotNull { it.extractEmail() }
+                val userAddress = userAddresses.find { userAddress ->
+                    attendeeEmails.find { attendeeEmail ->
+                        ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email) == ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                    } != null
+                }
+
+                if (userAddress == null) {
+                    logger.e("Error deleting event: userAddress was null in handleDeleteEventAsAttendee")
+                    eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_deleted_error))
+                    eventState.value = EventState.Idle
+
+                    return
+                }
+
+                val isStandaloneSingleEdit = if (event.isSingleEdit()) calendarsRepository.isStandaloneSingleEdit(
+                    userId,
+                    event.uid
+                ) ?: false
+                else false
+
+                eventDialogState.value = EventDialogState.Delete.AsAnAttendeeSendPreferences(
+                    userAddress,
+                    sendPreferencesResults,
+                    isRecurring = event.isRecurring(),
+                    isSingleEdit = event.isSingleEdit(),
+                    isStandaloneSingleEdit = isStandaloneSingleEdit,
+                    hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasSingleEdit ?: false &&
+                            getSingleEditsInfo(listOf(userAddress.email))?.hasNonCancelledSingleEdit == true,
+                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasAnsweredSingleEdit == true,
+                    isAddressDisabled = userAddress.enabled.not(),
+                    isCalendarDisabled = event.calendar.isDisabled,
+                    isEventCanceled = event.isCancelled(),
+                    event.getParticipationStatus(listOf(userAddress.email)) ?: ParticipationStatus.NEEDS_ACTION
+                )
+            }
+        } else {
+            eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_deleted_error))
+            eventState.value = EventState.Idle
+        }
+    }
+
+    suspend fun handleDeleteEventAsAttendee(
+        userAddress: UserAddress,
+        sendPreferences: Map<Email, SendPreferences>,
+        hasNonCancelledSingleEdit: Boolean,
+        hasAnsweredSingleEdit: Boolean,
+        occurrenceNumber: Int,
+        isStandaloneSingleEdit: Boolean,
+        timeFormatIs24Hours: Boolean
+    ) {
+
+        val deleteResult = if (sendPreferences.isNotEmpty()) {
+
+            handleDeleteUseCase.handleDeleteAsAttendee(
+                userId,
+                event,
+                userAddress,
+                sendPreferences,
+                hasNonCancelledSingleEdit,
+                occurrenceNumber,
+                isStandaloneSingleEdit,
+                event.defaultTimeZone!!,
+                timeFormatIs24Hours
+            )
+
+        } else {
+            UseCase.Result.Error("handleDeleteEventAsAttendee sendPreferences was empty")
+        }
+
+        if (deleteResult is UseCase.Result.Success<*> && event.isRecurring() && hasAnsweredSingleEdit) {
+            // If chain has single edits, update their part stat to NEEDS_ACTION
+            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userAddress.email), ParticipationStatus.NEEDS_ACTION)
+        }
+
+        // Post deleting event value to false to stop loading state
+        eventState.value = EventState.Idle
+
+        handleDeleteResult(deleteResult, true, event.calendar.isDisabled)
+    }
+
+    suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean) {
         val deleteResult =
             if (selectedIndex == 0) {
                 handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
@@ -1183,7 +1370,28 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        return deleteResult
+        handleDeleteResult(deleteResult, false)
+    }
+
+    private fun handleDeleteResult(deleteResult: UseCase.Result, asOrganizer: Boolean, isCalendarDisabled: Boolean = false) {
+        if (deleteResult is UseCase.Result.Success<*>) {
+            eventSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
+                if (asOrganizer && !isCalendarDisabled) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
+                else resourceProvider.provideString(R.string.snack_event_deleted)
+            )
+        } else {
+
+            if (deleteResult is UseCase.Result.Error) {
+                logger.e("Error deleting event: ${deleteResult.message}")
+            } else if (deleteResult is UseCase.Result.InvalidParams) {
+                logger.e("InvalidParams deleting event: ${deleteResult.message}")
+            }
+
+            eventSnackState.value = EventSnackState.DisplaySnack(
+                if (asOrganizer) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer_error)
+                else resourceProvider.provideString(R.string.snack_event_deleted_error)
+            )
+        }
     }
 
     suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
@@ -1262,7 +1470,7 @@ class EventViewModel(
     /**
      * @return show snack with generic error
      */
-    suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus): Boolean {
+    suspend fun handleChangeAnswer(newParticipationStatus: ParticipationStatus, timeFormatIs24Hours: Boolean): Boolean {
         if (eventState.value is EventState.Processing) return true
 
         val userEmails = userManager.getAddresses(userId).map { address ->
@@ -1282,16 +1490,28 @@ class EventViewModel(
                     event.uid
                 ) else false
 
-                val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit
+                val hasAnsweredSingleEdit = getSingleEditsInfo(userEmails)?.hasAnsweredSingleEdit ?: false
+                val hasAnsweredSingleEditToOverwrite =
+                    if (hasAnsweredSingleEdit) {
+                        // Only check if it has any answered single edits
+                        getSingleEditsInfo(userEmails)?.singleEdits?.any {
+                            val participationStatus = it.getParticipationStatus(userEmails)
+                            participationStatus != newParticipationStatus && (
+                                    participationStatus == ParticipationStatus.ACCEPTED ||
+                                            participationStatus == ParticipationStatus.DECLINED ||
+                                            participationStatus == ParticipationStatus.TENTATIVE)
+                        } ?: false
+                    } else false
+
+                // Check if we need to overwrite any answer single edit with the new participation status
                 val overwrite =
                     if (isSingleEdit) false
-                    else hasAnsweredSingleEdit != null &&
-                            ((hasAnsweredSingleEdit[newParticipationStatus] == null && hasAnsweredSingleEdit.isNotEmpty())
-                                    || (hasAnsweredSingleEdit[newParticipationStatus] == true && hasAnsweredSingleEdit.size > 1))
+                    else hasAnsweredSingleEdit && hasAnsweredSingleEditToOverwrite
 
                 return if (isStandaloneSingleEdit == true) {
                     handleChangeAnswerSendPreferences(
-                        newParticipationStatus
+                        newParticipationStatus,
+                        timeFormatIs24Hours
                     )
                 } else {
                     // Display Confirmation Dialog
@@ -1301,19 +1521,21 @@ class EventViewModel(
                             overwrite -> ChangeAnswerRecurringDialogType.OVERWRITE
                             isSingleEdit -> ChangeAnswerRecurringDialogType.SINGLE_EDIT
                             else -> ChangeAnswerRecurringDialogType.DEFAULT
-                        }
+                        },
+                        timeFormatIs24Hours
                     )
                     true
                 }
             } else {
                 return handleChangeAnswerSendPreferences(
-                    newParticipationStatus
+                    newParticipationStatus,
+                    timeFormatIs24Hours
                 )
             }
         } else return true
     }
 
-    suspend fun handleChangeAnswerSendPreferences(newParticipationStatus: ParticipationStatus): Boolean {
+    suspend fun handleChangeAnswerSendPreferences(newParticipationStatus: ParticipationStatus, timeFormatIs24Hours: Boolean): Boolean {
         val organizerEmail = event.iCalEvent.organizer.extractEmail()
         if (organizerEmail == null) {
             eventState.value = EventState.Idle
@@ -1333,14 +1555,16 @@ class EventViewModel(
         } else {
             updateParticipationStatus(
                 newParticipationStatus,
-                sendPreferencesResults.sendPreferences
+                sendPreferencesResults.sendPreferences,
+                timeFormatIs24Hours
             )
         }
     }
 
     private suspend fun updateParticipationStatus(
         participationStatus: ParticipationStatus,
-        sendPreferences: Map<Email, SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>,
+        timeFormatIs24Hours: Boolean
     ): Boolean {
         val status = participationStatus.toInt()
 
@@ -1397,9 +1621,9 @@ class EventViewModel(
         val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
 
         if (isProtonProtonInvite == true) {
-            if (!changeAnswerProtonProton(sendPreferences, eventCopy, eventEntity, userAttendee, participationStatus, status, personalPartICalString)) return false
+            if (!changeAnswerProtonProton(sendPreferences, eventCopy, eventEntity, userAttendee, participationStatus, status, personalPartICalString, timeFormatIs24Hours)) return false
         } else {
-            if (!changeAnswer(sendPreferences, eventCopy, userAttendee, participationStatus, status, personalPartICalString)) return false
+            if (!changeAnswer(sendPreferences, eventCopy, userAttendee, participationStatus, status, personalPartICalString, timeFormatIs24Hours)) return false
         }
 
         if (!event.isSingleEdit() && singleEditsInfo?.hasSingleEdit == true) {
@@ -1437,22 +1661,25 @@ class EventViewModel(
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
         status: Int,
-        personalPartICalString: String?): Boolean {
+        personalPartICalString: String?,
+        timeFormatIs24Hours: Boolean
+    ): Boolean {
         val updateTime = Instant.now()
 
         if (sendPreferences.isNotEmpty()) {
             val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                 userId,
-                eventCopy.iCalendar,
+                eventCopy,
                 dbEvent?.iCalendar?.timezoneInfo,
                 userAttendee.copy(),
                 event.iCalEvent.organizer.email,
                 participationStatus,
-                event.summary,
                 sendPreferences,
                 Date.from(updateTime),
                 null,
-                false
+                false,
+                event.defaultTimeZone!!,
+                timeFormatIs24Hours
             )
             sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
             if (sendEmailUseCaseResult is UseCase.Result.Error && sendEmailUseCaseResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
@@ -1496,7 +1723,9 @@ class EventViewModel(
         userAttendee: Attendee,
         participationStatus: ParticipationStatus,
         status: Int,
-        personalPartICalString: String?): Boolean {
+        personalPartICalString: String?,
+        timeFormatIs24Hours: Boolean
+    ): Boolean {
         if (eventEntity == null) {
             eventState.value = EventState.Idle
             return false
@@ -1529,16 +1758,17 @@ class EventViewModel(
             updateParticipationStatusUseCaseResult.returnValue.tryCast<Int> {
                 val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                     userId,
-                    eventCopy.iCalendar,
+                    eventCopy,
                     dbEvent?.iCalendar?.timezoneInfo,
                     userAttendee.copy(),
                     event.iCalEvent.organizer.email,
                     participationStatus,
-                    event.summary,
                     sendPreferences,
                     Date.from(updateTime), // Use same updateTime as for Update part stat BE call
                     eventEntity,
-                    true
+                    true,
+                    event.defaultTimeZone!!,
+                    timeFormatIs24Hours
                 )
                 sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
                 // Sending the email is optional for proton to proton so we don't care if it failed

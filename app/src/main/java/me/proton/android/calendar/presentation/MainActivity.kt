@@ -8,6 +8,7 @@ import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -77,6 +78,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.*
+import java.lang.IllegalStateException
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
@@ -144,7 +146,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             initDrawerCalendarsListContent()
 
                             withContext(Dispatchers.Main) {
-                                findNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
                             }
                         }
                     }
@@ -202,6 +204,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 logger.i("MainActivity onResume force handleAccountState to get out of limbo")
                 handleAccountState(this, state)
             }
+        }
+    }
+
+    private fun safeFindNavController(@IdRes viewId: Int): NavController {
+        return try {
+            findNavController(viewId)
+        } catch (e: IllegalStateException) {
+            val navHostFragment =
+                supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
+            navHostFragment.navController
         }
     }
 
@@ -353,7 +365,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         Toast.makeText(this, getString(R.string.snack_app_link_signed_out), Toast.LENGTH_LONG).show()
                     }
                 }
-                findNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
+                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
                 accountViewModel.addAccount()
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
@@ -834,7 +846,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_container_view)
+        val navController = safeFindNavController(R.id.nav_host_fragment_container_view)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 

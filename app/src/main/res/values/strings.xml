@@ -8,27 +8,40 @@
 
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
 
+    <!-- DELETE EVENT DIALOG -->
+
     <string name="dialog_title_delete_event">Delete event</string>
-    <string name="dialog_description_delete_event">Would you like to delete this event?</string>
-    <string name="dialog_title_calendar_picker">Calendar</string>
-
     <string name="dialog_title_delete_recurring_event">Delete recurring event</string>
+
+    <string name="dialog_description_delete_event">Would you like to delete this event?</string>
     <string name="dialog_description_delete_recurring_event">Would you like to delete all the events in the series?</string>
-
-    <string name="dialog_title_delete_event_as_organizer">Delete event</string>
-    <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
-
-    <string name="dialog_title_delete_event_as_organizer_disabled">Delete event</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
-
-    <string name="dialog_title_delete_recurring_event_as_organizer">Delete recurring event</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
-
-    <string name="dialog_title_delete_recurring_event_as_organizer_disabled">Delete recurring event</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event">This event has been updated by the organizer. Would you like to delete this event?</string>
 
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
+
+    <!-- Delete as an organizer -->
+
+    <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
+
+    <!-- Delete as an attendee -->
+
+    <string name="dialog_description_delete_single_event_as_attendee">The organizer of this event will be notified that you decline the invitation. Would you like to delete this event?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">The organizer of this event will not be notified that you decline the invitation as your address is disabled. Would you like to delete this event anyway?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">The organizer of this series of events will be notified that you decline the invitation. Would you like to delete all the events in this series?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">The organizer of this series of events will not be notified that you decline the invitation as your address is disabled. Would you like to delete all the events in this series anyway?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">This event has been updated. The organizer will be notified that you decline the invitation. Would you like to delete this event?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">This event has been updated. The organizer will not be notified that you decline the invitation as your address is disabled. Would you like to delete this event?</string>
+
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Occurrences previously updated by the organizer will be kept, but your answers will be lost</string>
+    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Occurrences previously updated by the organizer will be kept</string>
+
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">The organizer cannot be notified that you decline the invitation:\n\n• %1$s\n\nWould you like to delete the event anyway?</string>
+
     <string name="dialog_button_set">Set</string>
     <string name="dialog_button_ok">OK</string>
 
@@ -102,7 +115,7 @@
     <string name="event_change_answer_recurring_single_edit_description">This event has been updated by the organizer. Would you like to change your answer only for this occurrence in this series?</string>
     <string name="event_change_answer_recurring_cancel">Cancel</string>
     <string name="event_change_answer_recurring_confirm">Update</string>
-    <string name="event_change_answer_mail_subject_accepted" comment="Subject of an email when sending response to invitation">Re: Invitation: %1$s</string>
+    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Invitation for %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s has accepted your invitation to %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s has declined your invitation to %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s has tentatively accepted your invitation to %2$s</string>
@@ -206,9 +219,10 @@
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
 
-    <string name="event_send_invite_mail_subject_all_day">Invitation for an event on %1$s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">Invitation for an event starting on %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation for an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_prefix">Invitation for %s</string>
+    <string name="event_send_invite_mail_subject_all_day">an event on %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day_multiple">an event starting on %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">an event starting on %1$s at %2$s %3$s</string>
     <string name="event_send_invite_mail_body">You are invited to %1$s\nWhen: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (all day)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -227,9 +241,10 @@
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Cancel</string>
 
-    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancellation of an event starting on %1$s at %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day_multiple">Cancellation of an event starting on %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">Cancellation of an event on %1$s</string>
+    <string name="event_send_cancel_mail_subject_prefix">Cancellation of %s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day_multiple">an event starting on %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day">an event on %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been cancelled">%s has been cancelled.</string>
 
     <!-- NAVIGATION VIEW   -->
@@ -324,6 +339,8 @@
     <string name="contacts_permission_dialog_allow">Allow</string>
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
+
+    <string name="dialog_title_calendar_picker">Calendar</string>
 
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>

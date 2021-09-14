@@ -1,11 +1,15 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
+import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.handleDeleteThisAndFuture
+import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.ProtonUtilsImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
@@ -13,10 +17,15 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
+import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.toBoolean
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.*
 
 class HandleDeleteUseCase( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
@@ -26,26 +35,27 @@ class HandleDeleteUseCase( // TODO TESTS
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val transformEventUseCase: TransformEventUseCase,
     private val calendarsRepository: CalendarsRepository,
-    private val sendEmailUseCase: SendEmailUseCase
-    ): UseCase {
+    private val sendEmailUseCase: SendEmailUseCase,
+    private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
+): UseCase {
 
-    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?) : UseCase.Result {
+    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?, deleteSingleEdits: Boolean = true, isStandaloneSingleEdit: Boolean = false) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
-        logger.v("executing DeleteEventUseCase $userId, $eventId, $deleteOption, $occurrenceNumber")
+        logger.v("executing HandleDeleteUseCase $userId, $eventId, $deleteOption, $occurrenceNumber")
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId doesn't exist in DB")
-        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId could not be transformed")
+        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
+        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId could not be transformed")
 
-        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: could not get Member for calendar ${event.calendar.id}")
+        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
 
         // We need timezone when adding ex dates to handle DST
         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
 
         // TODO when event is in the middle of chain, we need to select the root event and deal with it accordingly!!!
 
-        var result = when (deleteOption) {
+        val result = when (deleteOption) {
             EventEditDeleteOption.THIS_EVENT -> {
 
                 if (event.isRecurring()) {
@@ -54,12 +64,16 @@ class HandleDeleteUseCase( // TODO TESTS
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 } else if (event.isSingleEdit()) {
 
-                    val rootEvent = calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) } ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: root event for $eventId doesn't exist in DB")
+                    if (!isStandaloneSingleEdit) {
+                        val rootEventEntity = calendarsRepository.selectRootEventEntity(event.uid)
+                        val rootEvent = rootEventEntity?.let { transformEventUseCase.execute(it) }
+                            ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
 
-                    // add EXDATE to root event
-                    rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
-                    val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
-                    editResult.ifSuccessAndLogErrors(logger) {}
+                        // add EXDATE to root event
+                        rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
+                        val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                        editResult.ifSuccessAndLogErrors(logger) {}
+                    }
 
                     // delete the single edit
                     deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
@@ -73,13 +87,13 @@ class HandleDeleteUseCase( // TODO TESTS
 
                 val rootEvent =
                     if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
-                        ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: root event for $eventId doesn't exist in DB")
+                        ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
                     else event
                 val occurrenceStart = rootEvent.generateOccurrence(
-                        occurrenceNumber!!,
-                        if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
-                    )?.startDateTime
-                        ?: return UseCase.Result.Error("DeleteEventUseCase: could not generate occurrence in >delete this and following< events")
+                    occurrenceNumber!!,
+                    if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
+                )?.startDateTime
+                    ?: return UseCase.Result.Error("HandleDeleteUseCase: could not generate occurrence in >delete this and following< events")
 
                 rootEvent.handleDeleteThisAndFuture(occurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
@@ -89,7 +103,7 @@ class HandleDeleteUseCase( // TODO TESTS
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, occurrenceStart.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((editResult is UseCase.Result.Success<*>) && (deleteSingleEditsResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("DeleteEventUseCase: error deleting >this and future< events")
+                if ((editResult is UseCase.Result.Success<*>) && (deleteSingleEditsResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("HandleDeleteUseCase: error deleting >this and future< events")
 
             }
             EventEditDeleteOption.ALL_EVENTS -> {
@@ -97,16 +111,23 @@ class HandleDeleteUseCase( // TODO TESTS
                 // delete single edits and the original event as the last one
                 val rootEvent =
                     if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { transformEventUseCase.execute(it) }
-                        ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: root event for $eventId doesn't exist in DB")
+                        ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
                     else event
 
                 // TODO maybe merge this into one request
-                val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, rootEvent.getStart(ZoneId.systemDefault().id)!!.minusNanos(1))
+                val deleteSingleEditsResult =
+                    if (deleteSingleEdits) {
+                        deleteSingleEditsAfter(
+                            userId,
+                            rootEvent.id,
+                            rootEvent.getStart(ZoneId.systemDefault().id)!!.minusNanos(1)
+                        )
+                    } else UseCase.Result.Success<Unit>()
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
                 val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((deleteSingleEditsResult is UseCase.Result.Success<*>) && (deleteResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("DeleteEventUseCase: error deleting >all< events")
+                if ((deleteSingleEditsResult is UseCase.Result.Success<*>) && (deleteResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("HandleDeleteUseCase: error deleting >all< events")
             }
         }
 
@@ -129,7 +150,7 @@ class HandleDeleteUseCase( // TODO TESTS
                 val errorEventIds = syncResponse.data.responses.mapNotNull {
                     if (it.response.code == ApiResponseCode.EVENT_DOES_NOT_EXIST) {
                         // ignore error if event didn't exist on server
-                        logger.i("DeleteEventUseCase event didn't exist on server anymore")
+                        logger.i("HandleDeleteUseCase event didn't exist on server anymore")
                         null
                     } else {
                         logger.e("error deleting event on server: ${it.response.code} ${it.response.error}")
@@ -146,11 +167,11 @@ class HandleDeleteUseCase( // TODO TESTS
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success<Unit>()
                 } else {
-                    UseCase.Result.Error("DeleteEventUseCase: there were errors when deleting events")
+                    UseCase.Result.Error("HandleDeleteUseCase: there were errors when deleting events")
                 }
             }
-            is ApiResponse.Error -> UseCase.Result.Error("DeleteEventUseCase: error in sync events: ${syncResponse.error}")
-            is ApiResponse.Exception -> UseCase.Result.Error("DeleteEventUseCase: error in sync events: ${syncResponse.exception.message ?: "(no exception message)"}")
+            is ApiResponse.Error -> UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.exception.message ?: "(no exception message)"}")
         }
     }
 
@@ -161,10 +182,10 @@ class HandleDeleteUseCase( // TODO TESTS
 
     private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId doesn't exist in DB")
-        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: event $eventId could not be transformed")
+        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
+        val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId could not be transformed")
 
-        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("DeleteEventUseCase: could not get Member for calendar ${event.calendar.id}")
+        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
 
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, event.uid, 0, 100) // TODO paging
         val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { transformEventUseCase.execute(it) } else return UseCase.Result.Error("error fetching events sharing UID")
@@ -188,11 +209,12 @@ class HandleDeleteUseCase( // TODO TESTS
         attendees: List<Attendee>,
         sendPreferences: Map<Email, SendPreferences>,
         timeFormatIs24Hours: Boolean,
-        isRecurring: Boolean,
-        isDisabled: Boolean
+        isPartOfChain: Boolean,
+        isCalendarDisabled: Boolean
     ): UseCase.Result {
 
-        if (!isDisabled) {
+        // The attendees list contains those we successfully fetched send preferences for (only send an email for those, skip sending email if the list is empty)
+        if (!isCalendarDisabled && attendees.isNotEmpty()) {
             // If address is disabled, cancellation can't be sent
             val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
                 userId,
@@ -206,17 +228,17 @@ class HandleDeleteUseCase( // TODO TESTS
             if (sendCancellationResult is UseCase.Result.Error) {
                 return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
                     UseCase.Result.Error(
-                        "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}",
+                        "HandleDeleteUseCase: handleDeleteAsOrganizer error in send email (cancel as organizer): ${sendCancellationResult.message}",
                         UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
                     )
                 } else {
                     UseCase.Result.Error(
-                        "HandleSaveUseCase: error in send email (cancel as organizer): ${sendCancellationResult.message}"
+                        "HandleDeleteUseCase: handleDeleteAsOrganizer error in send email (cancel as organizer): ${sendCancellationResult.message}"
                     )
                 }
             } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
                 return UseCase.Result.Error(
-                    "HandleSaveUseCase: invalid params in send email: ${sendCancellationResult.message}"
+                    "HandleDeleteUseCase: handleDeleteAsOrganizer invalid params in send email: ${sendCancellationResult.message}"
                 )
             }
         }
@@ -224,8 +246,109 @@ class HandleDeleteUseCase( // TODO TESTS
         return handleDelete(
             userId,
             event.id,
-            if (isRecurring) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
-            if (isRecurring) null else 0
+            if (isPartOfChain) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (isPartOfChain) null else 0
+        )
+    }
+
+
+    suspend fun handleDeleteAsAttendee(
+        userId: UserId,
+        event: Event,
+        userAddress: UserAddress,
+        sendPreferences: Map<Email, SendPreferences>,
+        hasNonCancelledSingleEdit: Boolean,
+        occurrenceNumber: Int,
+        isStandaloneSingleEdit: Boolean,
+        defaultTimeZone: String,
+        timeFormatIs24Hours: Boolean
+    ): UseCase.Result {
+
+        if (!event.calendar.isDisabled) {
+
+            val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
+                calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
+                    ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee fetchEventById event was null")
+            } else null
+
+            val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
+            val updateTime = Instant.now()
+
+            val userAttendee = event.iCalEvent.attendees.find { attendee ->
+                val attendeeEmail = attendee.extractEmail()
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                    .equals(ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email), ignoreCase = true)
+            } ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee userAttendee was null")
+
+            // If address is disabled, cancellation can't be sent
+            val sendCancellationResult = sendEmailUseCase.sendReplyToOrganizer(
+                userId,
+                event,
+                event.iCalendar.timezoneInfo,
+                userAttendee.copy(),
+                event.iCalEvent.organizer.email,
+                ParticipationStatus.DECLINED,
+                sendPreferences,
+                Date.from(updateTime),
+                eventEntity,
+                isProtonProtonInvite ?: false,
+                defaultTimeZone,
+                timeFormatIs24Hours
+            )
+            sendCancellationResult.ifSuccessAndLogErrors(logger) { }
+
+            if (sendCancellationResult is UseCase.Result.Error) {
+                return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                    UseCase.Result.Error(
+                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}",
+                        UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                    )
+                } else {
+                    UseCase.Result.Error(
+                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}"
+                    )
+                }
+            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.Error(
+                    "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in send email: ${sendCancellationResult.message}"
+                )
+            }
+
+            // If the email was sent we update the participation status
+
+            val attendeeId = event.currentUserAttendeeId
+            if (attendeeId.isNullOrEmpty()) {
+                return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee attendeeId was null or empty")
+            }
+
+            val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
+                userId,
+                event.calendar.id,
+                event.id,
+                attendeeId,
+                ParticipationStatus.DECLINED.toInt(),
+                null, // No need to update the alarms since the event will be deleted
+                updateTime.epochSecond.toInt()
+            )
+            updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            if (updateParticipationStatusUseCaseResult is UseCase.Result.Error) {
+                return UseCase.Result.Error(
+                    "HandleDeleteUseCase: handleDeleteAsAttendee error in update part stat: ${updateParticipationStatusUseCaseResult.message}"
+                )
+            } else if (updateParticipationStatusUseCaseResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.Error(
+                    "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in update part stat: ${updateParticipationStatusUseCaseResult.message}"
+                )
+            }
+        }
+
+        return handleDelete(
+            userId,
+            event.id,
+            if (event.isRecurring() || (event.isSingleEdit() && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (event.isRecurring() || (event.isSingleEdit() && event.calendar.isDisabled)) null else if (event.isSingleEdit()) occurrenceNumber else 0,
+            !(event.isRecurring() && hasNonCancelledSingleEdit),
+            isStandaloneSingleEdit
         )
     }
 }

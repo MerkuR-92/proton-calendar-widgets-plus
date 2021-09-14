@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.ICalendar
 import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
@@ -9,11 +8,9 @@ import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.EventUtilsImpl.formatStart
-import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
@@ -49,36 +46,37 @@ class SendEmailUseCase(
 
     suspend fun sendReplyToOrganizer(
         userId: UserId,
-        responseICalendar: ICalendar,
+        event: Event,
         originalTimeZoneInfo: TimezoneInfo?,
         userAttendee: Attendee,
         organizerEmail: String,
         participationStatus: ParticipationStatus,
-        summary: String?,
         sendPreferences: Map<Email, SendPreferences>,
         dtStamp: Date,
         eventEntity: EventEntity?,
-        isProtonProtonInvite: Boolean
+        isProtonProtonInvite: Boolean,
+        defaultTimeZone: String,
+        timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
         val userAttendeeEmail = userAttendee.extractEmail() ?: return UseCase.Result.InvalidParams("SendEmailUseCase userAttendee has empty email")
-        val subject = getReplyMailSubject(summary)
-        val body = getReplyMailBody(participationStatus, userAttendeeEmail, summary)
+        val mailContent = getEmailContent(event, defaultTimeZone, timeFormatIs24Hours, MailType.REPLY, participationStatus, userAttendeeEmail)
 
         val ics = if (isProtonProtonInvite && eventEntity != null) {
-            val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer sharedEventID was null")
-            val calendarId = eventEntity.calendarId
+            val sharedPropertiesResult = getSharedProperties(userId, eventEntity)
+            if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
 
-            val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there are no active keys for calendar")
-            val calendarPassphraseList = database.passphrasesDao().select(calendarId)
-            if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there are no passphrase for calendar")
-            val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-            val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer: there is no valid cached Calendar Passphrase")
-
-            val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
-
-            getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite, sharedEventId, sharedSessionKey)
-        } else getResponseIcs(responseICalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
+            getResponseIcs(
+                event.iCalendar,
+                userAttendee,
+                participationStatus,
+                originalTimeZoneInfo,
+                dtStamp,
+                isProtonProtonInvite,
+                (sharedPropertiesResult.returnValue as Pair<*, *>).first as String,
+                (sharedPropertiesResult.returnValue as Pair<*, *>).second as String
+            )
+        } else getResponseIcs(event.iCalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
         val senderAddressId = userManager.getAddresses(userId).find {
@@ -98,8 +96,8 @@ class SendEmailUseCase(
         val attachmentBytes = ics.toByteArray()
 
         val sendEmailArguments = SendEmailDirect.Arguments(
-            subject,
-            body,
+            mailContent.first,
+            mailContent.second,
             INVITE_EMAIL_MIME_TYPE,
             listOf(organizerEmail),
             listOf(
@@ -118,19 +116,6 @@ class SendEmailUseCase(
         }
     }
 
-    private fun getReplyMailSubject(summary: String?): String {
-        return resourceProvider.provideString(R.string.event_change_answer_mail_subject_accepted, summary ?: resourceProvider.provideString(R.string.default_event_summary))
-    }
-
-    private fun getReplyMailBody(participationStatus: ParticipationStatus, userAttendeeEmail: String, summary: String?): String {
-        return when (participationStatus) {
-            ParticipationStatus.ACCEPTED -> resourceProvider.provideString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail, summary ?: resourceProvider.provideString(R.string.default_event_summary))
-            ParticipationStatus.DECLINED -> resourceProvider.provideString(R.string.event_change_answer_mail_body_declined, userAttendeeEmail, summary ?: resourceProvider.provideString(R.string.default_event_summary))
-            ParticipationStatus.TENTATIVE -> resourceProvider.provideString(R.string.event_change_answer_mail_body_tentative, userAttendeeEmail, summary ?: resourceProvider.provideString(R.string.default_event_summary))
-            else -> "" // TODO Shouldn't happen ?
-        }
-    }
-
     suspend fun sendInviteToAttendees(
         userId: UserId,
         newEvent: Event,
@@ -141,7 +126,7 @@ class SendEmailUseCase(
         timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
-        val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, true)
+        val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, MailType.INVITE)
 
         val newEventEntity = calendarsRepository.selectEventEntity(newEvent.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees failed to select event entity")
         val sharedPropertiesResult = getSharedProperties(userId, newEventEntity)
@@ -218,7 +203,7 @@ class SendEmailUseCase(
         timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
-        val mailContent = getEmailContent(event, event.defaultTimeZone!!, timeFormatIs24Hours, false)
+        val mailContent = getEmailContent(event, event.defaultTimeZone!!, timeFormatIs24Hours, MailType.CANCELLATION)
 
         val eventEntity = calendarsRepository.selectEventEntity(event.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees failed to select event entity")
         val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees sharedEventID was null")
@@ -297,7 +282,20 @@ class SendEmailUseCase(
         return UseCase.Result.Success(senderAddress)
     }
 
-    private fun getEmailContent(newEvent: Event, defaultTimeZone: String, timeFormatIs24Hours: Boolean, isInvite: Boolean): Pair<String, String> {
+    enum class MailType {
+        INVITE,
+        REPLY,
+        CANCELLATION
+    }
+
+    private fun getEmailContent(
+        newEvent: Event,
+        defaultTimeZone: String,
+        timeFormatIs24Hours: Boolean,
+        mailType: MailType,
+        newParticipationStatus: ParticipationStatus? = null,
+        userAttendeeEmail: String? = null
+    ): Pair<String, String> {
         val eventCopy = Event.from(newEvent)
         if (eventCopy.isAllDay()) {
             eventCopy.iCalEvent.setDateEnd(
@@ -309,53 +307,71 @@ class SendEmailUseCase(
             )
         }
         return Pair(
-            getMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours, isInvite),
-            if (isInvite) getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
-            else resourceProvider.provideString(
-                R.string.event_send_cancel_mail_body,
-                eventCopy.summary ?: resourceProvider.provideString(R.string.default_event_summary)
-            )
+            // Subject
+            getMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours, mailType),
+            // Body
+            when (mailType) {
+                MailType.CANCELLATION -> getCancelMailBody(eventCopy.summary)
+                MailType.REPLY -> getReplyMailBody(newParticipationStatus, userAttendeeEmail, newEvent.summary)
+                MailType.INVITE -> getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
+            }
         )
     }
 
-    private fun getMailSubject(event: Event, timezone: String, timeFormatIs24Hours: Boolean, isInvite: Boolean): String {
-        return if (!event.isAllDay()) {
-            val dateTimeStart =
-                event.formatStart(timezone, timeFormatIs24Hours)
-            resourceProvider.provideString(
-                if (isInvite) R.string.event_send_invite_mail_subject_part_day
-                else R.string.event_send_cancel_mail_subject_part_day,
-                dateTimeStart.first,
-                dateTimeStart.second,
-                DateTimeUtilsImpl.formatTimeZoneId(
-                    timezone,
-                    event.iCalEvent.dateStart.value.toInstant(),
-                    displayId = false
+    private fun getMailSubject(event: Event, timezone: String, timeFormatIs24Hours: Boolean, mailType: MailType): String {
+        return resourceProvider.provideString(
+            when (mailType) {
+                MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_prefix
+                MailType.REPLY -> R.string.event_change_answer_mail_subject_prefix
+                MailType.INVITE -> R.string.event_send_invite_mail_subject_prefix
+            },
+            if (!event.isAllDay()) {
+                val dateTimeStart =
+                    event.formatStart(timezone, timeFormatIs24Hours)
+                resourceProvider.provideString(
+                    when (mailType) {
+                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_part_day
+                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_part_day
+                    },
+                    dateTimeStart.first,
+                    dateTimeStart.second,
+                    DateTimeUtilsImpl.formatTimeZoneId(
+                        timezone,
+                        event.iCalEvent.dateStart.value.toInstant(),
+                        displayId = false
+                    )
                 )
-            )
-        } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
-            resourceProvider.provideString(
-                if (isInvite) R.string.event_send_invite_mail_subject_all_day_multiple
-                else R.string.event_send_cancel_mail_subject_all_day_multiple,
-                event.formatStart(
-                    timezone,
-                    timeFormatIs24Hours
-                ).first
-            )
-        } else {
-            resourceProvider.provideString(
-                if (isInvite) R.string.event_send_invite_mail_subject_all_day
-                else R.string.event_send_cancel_mail_subject_all_day,
-                event.formatStart(
-                    timezone,
-                    timeFormatIs24Hours
-                ).first
-            )
-        }
+            } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
+                resourceProvider.provideString(
+                    when (mailType) {
+                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day_multiple
+                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day_multiple
+                    },
+                    event.formatStart(
+                        timezone,
+                        timeFormatIs24Hours
+                    ).first
+                )
+            } else {
+                resourceProvider.provideString(
+                    when (mailType) {
+                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day
+                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day
+                    },
+                    event.formatStart(
+                        timezone,
+                        timeFormatIs24Hours
+                    ).first
+                )
+            }
+        )
     }
 
-    private fun getInviteMailBody(event: Event, timezone: String, timeFormatIs24Hours: Boolean): String {
-        // TODO Move to UseCase once we can use strings resources there
+    private fun getInviteMailBody(
+        event: Event,
+        timezone: String,
+        timeFormatIs24Hours: Boolean
+    ): String {
         val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
         val formattedDateEnd = event.formatEnd(timezone, timeFormatIs24Hours)
         var body = resourceProvider.provideString(
@@ -401,5 +417,21 @@ class SendEmailUseCase(
             event.description
         )
         return body
+    }
+
+    private fun getCancelMailBody(summary: String?): String {
+        return resourceProvider.provideString(
+            R.string.event_send_cancel_mail_body,
+            summary ?: resourceProvider.provideString(R.string.default_event_summary)
+        )
+    }
+
+    private fun getReplyMailBody(participationStatus: ParticipationStatus?, userAttendeeEmail: String?, summary: String?): String {
+        return when (participationStatus) {
+            ParticipationStatus.ACCEPTED -> resourceProvider.provideString(R.string.event_change_answer_mail_body_accepted, userAttendeeEmail ?: "", summary ?: resourceProvider.provideString(R.string.default_event_summary))
+            ParticipationStatus.DECLINED -> resourceProvider.provideString(R.string.event_change_answer_mail_body_declined, userAttendeeEmail ?: "", summary ?: resourceProvider.provideString(R.string.default_event_summary))
+            ParticipationStatus.TENTATIVE -> resourceProvider.provideString(R.string.event_change_answer_mail_body_tentative, userAttendeeEmail ?: "", summary ?: resourceProvider.provideString(R.string.default_event_summary))
+            else -> "" // TODO Shouldn't happen ?
+        }
     }
 }

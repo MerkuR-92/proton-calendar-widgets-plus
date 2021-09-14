@@ -36,6 +36,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExd
 import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.ICalUtilsImpl.generateProtonProdId
 import me.proton.android.calendar.common.ICalUtilsImpl.generateProtonUid
+import me.proton.android.calendar.common.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.ICalUtilsImpl.getResponseIcs
@@ -1487,6 +1488,78 @@ internal class ICalUtilsTest {
         assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence.size).isEqualTo(1)
         assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence[0].occurrence!!.occurrenceNumber == 1)
 
+    }
+
+    @Test
+    fun `expandOccurrencesWithSingleEdits for an all-day single edit happening one day before original occurrence`() {
+
+        val iCals = listOf( // main chain event starts on 9th, weekly
+            """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210909
+    DTEND;VALUE=DATE:20210910
+    RRULE:FREQ=WEEKLY;BYDAY=TH
+    DTSTAMP:20210907T080028Z
+    UID:1deh57q4naj5bcd2eljvhr7joj@google.com
+    X-MICROSOFT-CDO-OWNERAPPTID:1073665307
+    CREATED:20210907T080028Z
+    LAST-MODIFIED:20210907T080028Z
+    LOCATION:
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Invite from google make SE
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent(),
+            """
+        BEGIN:VCALENDAR
+        PRODID:-//Google Inc//Google Calendar 70.9054//EN
+        VERSION:2.0
+        CALSCALE:GREGORIAN
+        METHOD:REQUEST
+        BEGIN:VEVENT
+        DTSTART;VALUE=DATE:20210915
+        DTEND;VALUE=DATE:20210916
+        DTSTAMP:20210907T091501Z
+        UID:1deh57q4naj5bcd2eljvhr7joj@google.com
+        X-MICROSOFT-CDO-OWNERAPPTID:868858272
+        RECURRENCE-ID;VALUE=DATE:20210916
+        CREATED:20210907T080028Z
+        LAST-MODIFIED:20210907T091500Z
+        LOCATION:
+        SEQUENCE:1
+        STATUS:CONFIRMED
+        SUMMARY:SE: Invite from google make SE 
+        TRANSP:TRANSPARENT
+        END:VEVENT
+        END:VCALENDAR
+            """.trimIndent(), // original occurrence on 16th, changed day to 15th
+        )
+
+        val displayRangeTo = LocalDate.of(2021, 9, 15)
+        val displayTimeZoneId = "Europe/Paris"
+
+        val events = iCals.mapIndexed { index, iCal ->
+            Event.from("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
+                "id",
+                "calendar",
+                "",
+                1,
+                true,
+                0
+            ), ICalUtilsImpl.parseICalString(iCal)!!, null)!!
+        }
+
+        val occurrencesWithSingleEdits = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2021, 9, 15), displayRangeTo, displayTimeZoneId)!!
+        assertThat(occurrencesWithSingleEdits.size == 1)
+        assertThat(occurrencesWithSingleEdits.first().isSingleEdit())
+        assertThat(occurrencesWithSingleEdits.first().summary == "SE: Invite from google make SE")
     }
 
     @Test
@@ -3417,6 +3490,62 @@ internal class ICalUtilsTest {
         assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
         assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
         assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY")?.value).isEqualTo("sharedSessionKey")
+        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID")?.value).isEqualTo("sharedEventId")
+    }
+
+    @Test
+    fun `getCancelIcs test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20210105T120000
+    DTEND;TZID=Europe/Zurich:20210105T123000
+    ORGANIZER;CN=adamtst@protonmail.com:mailto:adamtst@protonmail.com
+    SEQUENCE:0
+    SUMMARY:Inviting BLT from adamtst
+    STATUS:CONFIRMED
+    DTSTAMP:20210105T101420Z
+    UID:GOmbzP5Ok3Uo7QYgYyb7LCCijGzS@proton.me
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:james@example.com
+    ATTENDEE;CN=james@pm.me;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james2@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:mailto:james@example.com
+    ATTENDEE;CN=james@pm.me;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=James;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=james@example.com;EMAIL=AmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    ATTENDEE;CN=IAmNotAnEmail;EMAIL=IAmNotAnEmail;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT:IAmNotAnEmail
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
+
+        val ics = getCancelIcs(
+            Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), eventIcal)!!,
+            "sharedEventId"
+        )
+
+        val responseICalendar = ICalUtilsImpl.parseICalString(ics)!!
+
+        assertThat(responseICalendar.productId.value).isEqualTo(generateProtonProdId())
+        assertThat(responseICalendar.version).isEqualTo(ICalVersion.V2_0)
+        assertThat(responseICalendar.method.value).isEqualTo(Method.CANCEL)
+        assertThat(responseICalendar.calendarScale.value).isEqualTo(CalendarScale.GREGORIAN)
+        assertThat(responseICalendar.events.first().status?.value.isNullOrEmpty())
+        assertThat(responseICalendar.events.first().alarms.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.events.first().attendees.size).isEqualTo(10)
+        assertThat(responseICalendar.events.first().attendees.first().email).isEqualTo("james@example.com")
+        assertThat(responseICalendar.events.first().attendees.first().participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
+        assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
+        assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY")?.value.isNullOrEmpty())
         assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID")?.value).isEqualTo("sharedEventId")
     }
 
