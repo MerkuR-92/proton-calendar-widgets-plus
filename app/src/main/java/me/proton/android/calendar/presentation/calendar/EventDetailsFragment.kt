@@ -465,7 +465,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
                                     eventViewModel.handleDeleteEventAsAttendee(
-                                        it.userAddress,
+                                        it.userEmail,
                                         it.sendPreferencesResults.sendPreferences,
                                         it.hasNonCancelledSingleEdit,
                                         it.hasAnsweredSingleEdit,

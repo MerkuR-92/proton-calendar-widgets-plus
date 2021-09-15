@@ -191,7 +191,7 @@ class EventViewModel(
                 val isCalendarDisabled: Boolean
             ): Delete()
             data class AsAnAttendeeSendPreferences(
-                val userAddress: UserAddress,
+                val userEmail: String,
                 val sendPreferencesResults: SendPreferencesResults,
                 val isRecurring: Boolean,
                 val isSingleEdit: Boolean,
@@ -1278,6 +1278,8 @@ class EventViewModel(
                     return
                 }
 
+                val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email)
+
                 val isStandaloneSingleEdit = if (event.isSingleEdit()) calendarsRepository.isStandaloneSingleEdit(
                     userId,
                     event.uid
@@ -1285,18 +1287,18 @@ class EventViewModel(
                 else false
 
                 eventDialogState.value = EventDialogState.Delete.AsAnAttendeeSendPreferences(
-                    userAddress,
+                    userEmail,
                     sendPreferencesResults,
                     isRecurring = event.isRecurring(),
                     isSingleEdit = event.isSingleEdit(),
                     isStandaloneSingleEdit = isStandaloneSingleEdit,
-                    hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasSingleEdit ?: false &&
-                            getSingleEditsInfo(listOf(userAddress.email))?.hasNonCancelledSingleEdit == true,
-                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userAddress.email))?.hasAnsweredSingleEdit == true,
+                    hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasSingleEdit ?: false &&
+                            getSingleEditsInfo(listOf(userEmail))?.hasNonCancelledSingleEdit == true,
+                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasAnsweredSingleEdit == true,
                     isAddressDisabled = userAddress.enabled.not(),
                     isCalendarDisabled = event.calendar.isDisabled,
                     isEventCanceled = event.isCancelled(),
-                    event.getParticipationStatus(listOf(userAddress.email)) ?: ParticipationStatus.NEEDS_ACTION
+                    event.getParticipationStatus(listOf(userEmail)) ?: ParticipationStatus.NEEDS_ACTION
                 )
             }
         } else {
@@ -1306,7 +1308,7 @@ class EventViewModel(
     }
 
     suspend fun handleDeleteEventAsAttendee(
-        userAddress: UserAddress,
+        userEmail: String,
         sendPreferences: Map<Email, SendPreferences>,
         hasNonCancelledSingleEdit: Boolean,
         hasAnsweredSingleEdit: Boolean,
@@ -1318,7 +1320,7 @@ class EventViewModel(
         val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
                 userId,
                 Event.from(event),
-                userAddress,
+                userEmail,
                 sendPreferences,
                 hasNonCancelledSingleEdit,
                 occurrenceNumber,
@@ -1329,7 +1331,7 @@ class EventViewModel(
 
         if (deleteResult is UseCase.Result.Success<*> && event.isRecurring() && hasAnsweredSingleEdit) {
             // If chain has single edits, update their part stat to NEEDS_ACTION
-            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userAddress.email), ParticipationStatus.NEEDS_ACTION)
+            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userEmail), ParticipationStatus.NEEDS_ACTION)
         }
 
         // Post deleting event value to false to stop loading state

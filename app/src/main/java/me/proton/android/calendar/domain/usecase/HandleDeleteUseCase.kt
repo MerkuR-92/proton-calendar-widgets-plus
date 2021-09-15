@@ -255,7 +255,7 @@ class HandleDeleteUseCase( // TODO TESTS
     suspend fun handleDeleteAsAttendee(
         userId: UserId,
         event: Event,
-        userAddress: UserAddress,
+        userEmail: String,
         sendPreferences: Map<Email, SendPreferences>,
         hasNonCancelledSingleEdit: Boolean,
         occurrenceNumber: Int,
@@ -277,7 +277,7 @@ class HandleDeleteUseCase( // TODO TESTS
             val userAttendee = event.iCalEvent.attendees.find { attendee ->
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
-                    .equals(ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email), ignoreCase = true)
+                    .equals(userEmail, ignoreCase = true)
             } ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee userAttendee was null")
 
             // If address is disabled, cancellation can't be sent
