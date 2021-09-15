@@ -1236,7 +1236,7 @@ class EventViewModel(
         val deleteResult =
             handleDeleteUseCase.handleDeleteAsOrganizer(
                 userId,
-                event,
+                Event.from(event),
                 attendees,
                 sendPreferences,
                 timeFormatIs24Hours,
@@ -1317,7 +1317,7 @@ class EventViewModel(
 
         val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
                 userId,
-                event,
+                Event.from(event),
                 userAddress,
                 sendPreferences,
                 hasNonCancelledSingleEdit,
