@@ -1247,7 +1247,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, isCalendarDisabled)
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, !isCalendarDisabled)
     }
 
     private suspend fun handleDeleteEventAsAttendeeSendPreferences(userAddresses: List<UserAddress>, event: Event) {
@@ -1337,7 +1337,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, event.calendar.isDisabled)
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, !event.calendar.isDisabled && sendPreferences.isNotEmpty())
     }
 
     suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean) {
@@ -1371,11 +1371,11 @@ class EventViewModel(
         NO_PARTICIPANTS
     }
 
-    private fun handleDeleteResult(deleteResult: UseCase.Result, deleteType: DeleteType, isCalendarDisabled: Boolean = false) {
+    private fun handleDeleteResult(deleteResult: UseCase.Result, deleteType: DeleteType, mailSent: Boolean? = null) {
         if (deleteResult is UseCase.Result.Success<*>) {
             eventSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
-                if (deleteType == DeleteType.AS_AN_ORGANIZER && !isCalendarDisabled) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
-                else if (deleteType == DeleteType.AS_AN_ATTENDEE && !isCalendarDisabled) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
+                if (deleteType == DeleteType.AS_AN_ORGANIZER && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
+                else if (deleteType == DeleteType.AS_AN_ATTENDEE && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
                 else resourceProvider.provideString(R.string.snack_event_deleted)
             )
         } else {

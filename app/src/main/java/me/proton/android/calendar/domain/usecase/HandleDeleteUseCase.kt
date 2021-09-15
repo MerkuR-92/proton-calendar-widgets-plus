@@ -264,7 +264,7 @@ class HandleDeleteUseCase( // TODO TESTS
         timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
-        if (!event.calendar.isDisabled) {
+        if (!event.calendar.isDisabled && sendPreferences.isNotEmpty()) {
 
             val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
                 calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
