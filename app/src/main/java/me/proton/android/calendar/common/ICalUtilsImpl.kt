@@ -906,7 +906,7 @@ object ICalUtilsImpl : ICalUtils {
         cancelICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
 
         // TODO: Provide complete VTIMEZONE in the ics. In the meantime, we remove it from the ICS
-        cancelICalendar.timezoneInfo.defaultTimezone = null
+        cancelICalendar.timezoneInfo.timezones.clear()
 
         // Event status is unnecessary
         cancelICalendar.events.first().status = null
