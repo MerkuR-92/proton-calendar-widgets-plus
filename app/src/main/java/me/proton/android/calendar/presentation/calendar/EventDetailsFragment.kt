@@ -507,11 +507,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .setPositiveButton(R.string.event_attendees_send_prefs_error_confirm) { _, _ ->
                                 lifecycleScope.launch {
                                     // Remove attendees whom emails were invalid
-                                    val attendees = eventViewModel.eventLiveData.value?.iCalEvent?.attendees
-                                    if (attendees.isNullOrEmpty()) {
-
-                                        return@launch
+                                    val attendees = mutableListOf<Attendee>()
+                                    eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.let { eventAttendees ->
+                                        attendees.addAll(eventAttendees)
                                     }
+
                                     attendees.removeIf { attendee ->
                                         it.sendPreferencesResults.emailErrors.any { emailError ->
                                             attendee.extractEmail() == emailError.key
