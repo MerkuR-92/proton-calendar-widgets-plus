@@ -889,6 +889,9 @@ object ICalUtilsImpl : ICalUtils {
         // Add shared event ID
         inviteICalendar.events.first().setExperimentalProperty(X_PM_SHARED_EVENT_ID, sharedEventId)
 
+        // TODO: Provide complete VTIMEZONE in the ics. In the meantime, we remove it from the ICS
+        inviteICalendar.timezoneInfo.timezones.clear()
+
         return inviteICalendar.printToString()
     }
 
