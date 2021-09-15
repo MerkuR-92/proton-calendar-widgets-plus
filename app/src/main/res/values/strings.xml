@@ -267,6 +267,7 @@
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
     <string name="snack_event_deleted">Event deleted</string>
     <string name="snack_event_deleted_as_organizer">Cancellation sent and event deleted</string>
+    <string name="snack_event_deleted_as_attendee">Response sent and event deleted</string>
     <string name="snack_event_deleted_error">Error deleting event</string>
     <string name="snack_event_deleted_as_organizer_error">Cancellation email cannot be sent, please try again</string>
     <string name="snack_event_opening_error">Error opening event</string>

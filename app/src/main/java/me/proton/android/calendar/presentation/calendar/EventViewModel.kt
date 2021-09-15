@@ -1163,7 +1163,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, false)
+        handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
     }
 
     suspend fun handleDeleteDisabledCalendarRecurring() {
@@ -1172,7 +1172,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, false)
+        handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
     }
 
     suspend fun handleDeleteAsOrganizerSendPreferences(isPartOfChain: Boolean, isCalendarDisabled: Boolean, timeFormatIs24Hour: Boolean) {
@@ -1247,7 +1247,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, true, isCalendarDisabled)
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, isCalendarDisabled)
     }
 
     private suspend fun handleDeleteEventAsAttendeeSendPreferences(userAddresses: List<UserAddress>, event: Event) {
@@ -1335,7 +1335,7 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, true, event.calendar.isDisabled)
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, event.calendar.isDisabled)
     }
 
     suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean) {
@@ -1360,13 +1360,20 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, false)
+        handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
     }
 
-    private fun handleDeleteResult(deleteResult: UseCase.Result, asOrganizer: Boolean, isCalendarDisabled: Boolean = false) {
+    enum class DeleteType {
+        AS_AN_ORGANIZER,
+        AS_AN_ATTENDEE,
+        NO_PARTICIPANTS
+    }
+
+    private fun handleDeleteResult(deleteResult: UseCase.Result, deleteType: DeleteType, isCalendarDisabled: Boolean = false) {
         if (deleteResult is UseCase.Result.Success<*>) {
             eventSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
-                if (asOrganizer && !isCalendarDisabled) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
+                if (deleteType == DeleteType.AS_AN_ORGANIZER && !isCalendarDisabled) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
+                else if (deleteType == DeleteType.AS_AN_ATTENDEE && !isCalendarDisabled) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
                 else resourceProvider.provideString(R.string.snack_event_deleted)
             )
         } else {
@@ -1378,8 +1385,7 @@ class EventViewModel(
             }
 
             eventSnackState.value = EventSnackState.DisplaySnack(
-                if (asOrganizer) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer_error)
-                else resourceProvider.provideString(R.string.snack_event_deleted_error)
+                resourceProvider.provideString(R.string.snack_event_deleted_error)
             )
         }
     }
