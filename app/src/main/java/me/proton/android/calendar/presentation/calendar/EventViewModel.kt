@@ -1233,7 +1233,7 @@ class EventViewModel(
         isCalendarDisabled: Boolean
     ) {
 
-        val deleteResult = if (sendPreferences.isNotEmpty()) {
+        val deleteResult =
             handleDeleteUseCase.handleDeleteAsOrganizer(
                 userId,
                 event,
@@ -1243,10 +1243,6 @@ class EventViewModel(
                 isPartOfChain,
                 isCalendarDisabled
             )
-
-        } else {
-            UseCase.Result.Error("handleDeleteEventAsOrganizer sendPreferences was empty")
-        }
 
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
@@ -1319,9 +1315,7 @@ class EventViewModel(
         timeFormatIs24Hours: Boolean
     ) {
 
-        val deleteResult = if (sendPreferences.isNotEmpty()) {
-
-            handleDeleteUseCase.handleDeleteAsAttendee(
+        val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
                 userId,
                 event,
                 userAddress,
@@ -1332,10 +1326,6 @@ class EventViewModel(
                 event.defaultTimeZone!!,
                 timeFormatIs24Hours
             )
-
-        } else {
-            UseCase.Result.Error("handleDeleteEventAsAttendee sendPreferences was empty")
-        }
 
         if (deleteResult is UseCase.Result.Success<*> && event.isRecurring() && hasAnsweredSingleEdit) {
             // If chain has single edits, update their part stat to NEEDS_ACTION
