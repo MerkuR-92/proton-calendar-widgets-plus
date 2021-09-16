@@ -1314,7 +1314,8 @@ class EventViewModel(
         hasAnsweredSingleEdit: Boolean,
         occurrenceNumber: Int,
         isStandaloneSingleEdit: Boolean,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendReply: Boolean
     ) {
 
         val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
@@ -1326,7 +1327,8 @@ class EventViewModel(
                 occurrenceNumber,
                 isStandaloneSingleEdit,
                 event.defaultTimeZone!!,
-                timeFormatIs24Hours
+                timeFormatIs24Hours,
+                sendReply
             )
 
         if (deleteResult is UseCase.Result.Success<*> && event.isRecurring() && hasAnsweredSingleEdit) {
@@ -1336,8 +1338,7 @@ class EventViewModel(
 
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
-
-        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, !event.calendar.isDisabled && sendPreferences.isNotEmpty())
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, !event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply)
     }
 
     suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean) {

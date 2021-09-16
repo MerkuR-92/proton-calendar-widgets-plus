@@ -261,10 +261,11 @@ class HandleDeleteUseCase( // TODO TESTS
         occurrenceNumber: Int,
         isStandaloneSingleEdit: Boolean,
         defaultTimeZone: String,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendReply: Boolean
     ): UseCase.Result {
 
-        if (!event.calendar.isDisabled && sendPreferences.isNotEmpty()) {
+        if (!event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply) {
 
             val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
                 calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event

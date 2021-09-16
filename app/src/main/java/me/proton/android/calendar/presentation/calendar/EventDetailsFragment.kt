@@ -471,7 +471,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         it.hasAnsweredSingleEdit,
                                         navigationArguments.occurrenceNumber,
                                         it.isStandaloneSingleEdit,
-                                        calendarViewModel.timeFormatIs24Hour(requireContext())
+                                        calendarViewModel.timeFormatIs24Hour(requireContext()),
+                                        displayWarning
                                     )
                                 }
                             }
@@ -821,10 +822,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val userAddresses = calendarViewModel.userAddresses.value
             if (event != null && userAddresses != null && userEmails != null && !event.calendar.isSubscribed) {
                 val isActive = event.calendar.isActive
-                val isAddressActive = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
+                val isUserAddressAllowedSend = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
 
-                if (participationStatus != null && isActive && isAddressActive && !event.isCancelled()) {
+                if (participationStatus != null && isActive && isUserAddressAllowedSend && !event.isCancelled()) {
                     section_answer.visibleOrGone(true)
                     displayAttendeeAnswerState(participationStatus)
                 } else section_answer.visibleOrGone(false)
