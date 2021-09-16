@@ -265,6 +265,8 @@ class HandleDeleteUseCase( // TODO TESTS
         sendReply: Boolean
     ): UseCase.Result {
 
+        var emailSent = false
+
         if (!event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply) {
 
             val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
@@ -341,9 +343,11 @@ class HandleDeleteUseCase( // TODO TESTS
                     "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in update part stat: ${updateParticipationStatusUseCaseResult.message}"
                 )
             }
+
+            emailSent = true
         }
 
-        return handleDelete(
+        val handleDeleteResult = handleDelete(
             userId,
             event.id,
             if (event.isRecurring() || (event.isSingleEdit() && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
@@ -351,5 +355,9 @@ class HandleDeleteUseCase( // TODO TESTS
             !(event.isRecurring() && hasNonCancelledSingleEdit),
             isStandaloneSingleEdit
         )
+
+        return if (handleDeleteResult is UseCase.Result.Success<*>) {
+            UseCase.Result.Success(emailSent)
+        } else handleDeleteResult
     }
 }

@@ -1340,9 +1340,14 @@ class EventViewModel(
             clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userEmail), ParticipationStatus.DECLINED)
         }
 
+        var emailSent = false
+        if (deleteResult is UseCase.Result.Success<*>) {
+            deleteResult.returnValue.tryCast<Boolean> { emailSent = this }
+        }
+
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
-        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, !event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply)
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, emailSent)
     }
 
     suspend fun handleDeleteRecurring(occurrenceNumber: Int, selectedIndex: Int, showThisAndFuture: Boolean) {
