@@ -1293,7 +1293,11 @@ class EventViewModel(
                     isStandaloneSingleEdit = isStandaloneSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasSingleEdit ?: false &&
                             getSingleEditsInfo(listOf(userEmail))?.hasNonCancelledSingleEdit == true,
-                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasAnsweredSingleEdit == true,
+                    hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userEmail))?.singleEdits?.any {
+                        val participationStatus = it.getParticipationStatus(listOf(userEmail))
+                        participationStatus == ParticipationStatus.ACCEPTED ||
+                                participationStatus == ParticipationStatus.TENTATIVE
+                    } ?: false, // We only care about single edits answered with YES or MAYBE
                     isAddressAllowedToSend = userAddress.enabled && userAddress.canSend,
                     isCalendarDisabled = event.calendar.isDisabled,
                     isEventCanceled = event.isCancelled(),
@@ -1318,21 +1322,22 @@ class EventViewModel(
     ) {
 
         val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
-                userId,
-                Event.from(event),
-                userEmail,
-                sendPreferences,
-                hasNonCancelledSingleEdit,
-                occurrenceNumber,
-                isStandaloneSingleEdit,
-                event.defaultTimeZone!!,
-                timeFormatIs24Hours,
-                sendReply
-            )
+            userId,
+            Event.from(event),
+            userEmail,
+            sendPreferences,
+            hasNonCancelledSingleEdit,
+            occurrenceNumber,
+            isStandaloneSingleEdit,
+            event.defaultTimeZone!!,
+            timeFormatIs24Hours,
+            sendReply
+        )
 
         if (deleteResult is UseCase.Result.Success<*> && event.isRecurring() && hasAnsweredSingleEdit) {
             // If chain has single edits, update their part stat to NEEDS_ACTION
-            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userEmail), ParticipationStatus.NEEDS_ACTION)
+            // By passing DECLINED as the last parameter here we make it so that single edits with DECLINED status are not reset
+            clearSingleEditsParticipationStatus(event.calendar.id, event.uid, listOf(userEmail), ParticipationStatus.DECLINED)
         }
 
         // Post deleting event value to false to stop loading state
