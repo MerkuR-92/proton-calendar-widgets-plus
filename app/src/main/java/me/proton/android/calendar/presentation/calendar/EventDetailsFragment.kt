@@ -438,7 +438,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .setMessage(
                                 if (displayWarning.not()) {
                                     if (it.isSingleEdit && (it.isSingleEdit && it.isStandaloneSingleEdit.not()) && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-                                    else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
+                                    else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) {
+                                        val message = getString(R.string.dialog_description_delete_recurring_event)
+
+                                        val singleEditWarning = if (it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+                                        else if (it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+                                        else ""
+
+                                        if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
+                                        else message
+                                    }
                                     else getString(R.string.dialog_description_delete_event)
                                 } else {
                                     // Dialog order: 1- Address disabled warning. 2- Send prefs dialog. 3- Others.
