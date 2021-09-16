@@ -19,7 +19,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
@@ -198,7 +197,7 @@ class EventViewModel(
                 val isStandaloneSingleEdit: Boolean,
                 val hasNonCancelledSingleEdit: Boolean,
                 val hasAnsweredSingleEdit: Boolean,
-                val isAddressDisabled: Boolean,
+                val isAddressAllowedToSend: Boolean,
                 val isCalendarDisabled: Boolean,
                 val isEventCanceled: Boolean,
                 val currentParticipationStatus: ParticipationStatus,
@@ -1295,7 +1294,7 @@ class EventViewModel(
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasSingleEdit ?: false &&
                             getSingleEditsInfo(listOf(userEmail))?.hasNonCancelledSingleEdit == true,
                     hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasAnsweredSingleEdit == true,
-                    isAddressDisabled = userAddress.enabled.not(),
+                    isAddressAllowedToSend = userAddress.enabled && userAddress.canSend,
                     isCalendarDisabled = event.calendar.isDisabled,
                     isEventCanceled = event.isCancelled(),
                     event.getParticipationStatus(listOf(userEmail)) ?: ParticipationStatus.NEEDS_ACTION
