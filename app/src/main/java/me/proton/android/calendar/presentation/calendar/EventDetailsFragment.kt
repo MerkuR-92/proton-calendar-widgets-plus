@@ -472,7 +472,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         navigationArguments.occurrenceNumber,
                                         it.isStandaloneSingleEdit,
                                         calendarViewModel.timeFormatIs24Hour(requireContext()),
-                                        displayWarning
+                                        displayWarning && !it.isAddressDisabled && !sendPrefsFailed
                                     )
                                 }
                             }
