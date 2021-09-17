@@ -255,16 +255,19 @@ class HandleDeleteUseCase( // TODO TESTS
     suspend fun handleDeleteAsAttendee(
         userId: UserId,
         event: Event,
-        userAddress: UserAddress,
+        userEmail: String,
         sendPreferences: Map<Email, SendPreferences>,
         hasNonCancelledSingleEdit: Boolean,
         occurrenceNumber: Int,
         isStandaloneSingleEdit: Boolean,
         defaultTimeZone: String,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendReply: Boolean
     ): UseCase.Result {
 
-        if (!event.calendar.isDisabled) {
+        var emailSent = false
+
+        if (!event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply) {
 
             val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
                 calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
@@ -277,7 +280,7 @@ class HandleDeleteUseCase( // TODO TESTS
             val userAttendee = event.iCalEvent.attendees.find { attendee ->
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
-                    .equals(ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email), ignoreCase = true)
+                    .equals(userEmail, ignoreCase = true)
             } ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee userAttendee was null")
 
             // If address is disabled, cancellation can't be sent
@@ -340,9 +343,11 @@ class HandleDeleteUseCase( // TODO TESTS
                     "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in update part stat: ${updateParticipationStatusUseCaseResult.message}"
                 )
             }
+
+            emailSent = true
         }
 
-        return handleDelete(
+        val handleDeleteResult = handleDelete(
             userId,
             event.id,
             if (event.isRecurring() || (event.isSingleEdit() && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
@@ -350,5 +355,9 @@ class HandleDeleteUseCase( // TODO TESTS
             !(event.isRecurring() && hasNonCancelledSingleEdit),
             isStandaloneSingleEdit
         )
+
+        return if (handleDeleteResult is UseCase.Result.Success<*>) {
+            UseCase.Result.Success(emailSent)
+        } else handleDeleteResult
     }
 }

@@ -62,12 +62,9 @@ import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
@@ -441,13 +438,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             .setMessage(
                                 if (displayWarning.not()) {
                                     if (it.isSingleEdit && (it.isSingleEdit && it.isStandaloneSingleEdit.not()) && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-                                    else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) getString(R.string.dialog_description_delete_recurring_event)
-                                    else getString(R.string.dialog_description_delete_event)
-                                } else {
-                                    if (sendPrefsFailed) getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
-                                    else if (it.isRecurring) {
-                                        val message = if (it.isAddressDisabled) getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
-                                        else getString(R.string.dialog_description_delete_recurring_event_as_attendee)
+                                    else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) {
+                                        val message = getString(R.string.dialog_description_delete_recurring_event)
 
                                         val singleEditWarning = if (it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
                                         else if (it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
@@ -456,22 +448,41 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
                                         else message
                                     }
-                                    else if (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isAddressDisabled) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
-                                    else if (it.isSingleEdit && it.isStandaloneSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
-                                    else if (it.isAddressDisabled) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
-                                    else getString(R.string.dialog_description_delete_single_event_as_attendee)
+                                    else getString(R.string.dialog_description_delete_event)
+                                } else {
+                                    // Dialog order: 1- Address disabled warning. 2- Send prefs dialog. 3- Others.
+                                    when {
+                                        !it.isAddressAllowedToSend -> getDeleteAsAnAttendeeWarningMessage(
+                                            it.isRecurring,
+                                            it.hasAnsweredSingleEdit,
+                                            it.hasNonCancelledSingleEdit,
+                                            it.isSingleEdit,
+                                            it.isStandaloneSingleEdit,
+                                            it.isAddressAllowedToSend
+                                        )
+                                        sendPrefsFailed -> getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
+                                        else -> getDeleteAsAnAttendeeWarningMessage(
+                                            it.isRecurring,
+                                            it.hasAnsweredSingleEdit,
+                                            it.hasNonCancelledSingleEdit,
+                                            it.isSingleEdit,
+                                            it.isStandaloneSingleEdit,
+                                            it.isAddressAllowedToSend
+                                        )
+                                    }
                                 }
                             )
                             .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                                 lifecycleScope.launch {
                                     eventViewModel.handleDeleteEventAsAttendee(
-                                        it.userAddress,
+                                        it.userEmail,
                                         it.sendPreferencesResults.sendPreferences,
                                         it.hasNonCancelledSingleEdit,
                                         it.hasAnsweredSingleEdit,
                                         navigationArguments.occurrenceNumber,
                                         it.isStandaloneSingleEdit,
-                                        calendarViewModel.timeFormatIs24Hour(requireContext())
+                                        calendarViewModel.timeFormatIs24Hour(requireContext()),
+                                        displayWarning && it.isAddressAllowedToSend && !sendPrefsFailed
                                     )
                                 }
                             }
@@ -594,6 +605,31 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
         }
+    }
+
+    private fun getDeleteAsAnAttendeeWarningMessage(
+        isRecurring: Boolean,
+        hasAnsweredSingleEdit: Boolean,
+        hasNonCancelledSingleEdit: Boolean,
+        isSingleEdit: Boolean,
+        isStandaloneSingleEdit: Boolean,
+        isAddressAllowedToSend: Boolean
+    ): String {
+        return if (isRecurring) {
+            val message = if (!isAddressAllowedToSend) getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
+            else getString(R.string.dialog_description_delete_recurring_event_as_attendee)
+
+            val singleEditWarning = if (hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+            else if (hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+            else ""
+
+            if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
+            else message
+        }
+        else if (isSingleEdit && isStandaloneSingleEdit.not() && !isAddressAllowedToSend) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+        else if (isSingleEdit && isStandaloneSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+        else if (!isAddressAllowedToSend) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
+        else getString(R.string.dialog_description_delete_single_event_as_attendee)
     }
 
     private fun attachActionHandlers() {
@@ -821,10 +857,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val userAddresses = calendarViewModel.userAddresses.value
             if (event != null && userAddresses != null && userEmails != null && !event.calendar.isSubscribed) {
                 val isActive = event.calendar.isActive
-                val isAddressActive = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
+                val isUserAddressAllowedSend = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
 
-                if (participationStatus != null && isActive && isAddressActive && !event.isCancelled()) {
+                if (participationStatus != null && isActive && isUserAddressAllowedSend && !event.isCancelled()) {
                     section_answer.visibleOrGone(true)
                     displayAttendeeAnswerState(participationStatus)
                 } else section_answer.visibleOrGone(false)

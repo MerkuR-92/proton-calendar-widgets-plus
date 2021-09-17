@@ -57,7 +57,7 @@ object EventUtilsImpl : EventUtils {
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userAddress.email, ignoreCase = true)
             }
             userAddress?.let {
-                return it.enabled && (!isFreeUser || !(isFreeUser && isShortDomainAddress(it.email)))
+                return it.enabled && it.canSend
             }
         }
         return false

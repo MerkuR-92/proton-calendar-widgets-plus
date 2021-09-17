@@ -144,7 +144,7 @@ class SendEmailUseCase(
         }
 
         val ics = getInviteIcs(
-            event,
+            Event.from(event),
             (sharedPropertiesResult.returnValue as Pair<*, *>).first as String,
             (sharedPropertiesResult.returnValue as Pair<*, *>).second as String
         )

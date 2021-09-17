@@ -3472,11 +3472,16 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
+        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), eventIcal)!!
+        event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getInviteIcs(
-            Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), eventIcal)!!,
+            event,
             "sharedEventId",
             "sharedSessionKey"
         )
+
+        // TODO: Provide complete VTIMEZONE in the ics. In the meantime, we remove it from the ICS
+        assertThat(ics.contains("VTIMEZONE")).isFalse()
 
         val responseICalendar = ICalUtilsImpl.parseICalString(ics)!!
 
