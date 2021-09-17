@@ -821,6 +821,9 @@ object ICalUtilsImpl : ICalUtils {
         iCalendar.calendarScale = CalendarScale.gregorian()
         originalTimeZoneInfo?.let { iCalendar.timezoneInfo = originalTimeZoneInfo }
 
+        // TODO: Provide complete VTIMEZONE in the ics. In the meantime, we remove it from the ICS
+        iCalendar.timezoneInfo.timezones.clear()
+
         val event = VEvent()
         event.addAttendee(userAttendee)
         responseICalendar.events.first().organizer?.let { event.organizer = it }
