@@ -8,11 +8,6 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
-import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
-import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
-import me.proton.android.calendar.common.ICalUtilsImpl.setStart
-import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
-import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
@@ -22,8 +17,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.LocalTime
 
 internal class HandleSaveUseCaseTest {
 
