@@ -54,6 +54,7 @@ import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
@@ -80,7 +81,8 @@ class EventViewModel(
     private val handleSaveUseCase: HandleSaveUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val networkManager: NetworkManager
 ) : AndroidViewModel(application) {
 
     sealed class Result {
@@ -1108,6 +1110,8 @@ class EventViewModel(
     }
 
     suspend fun handleDelete(occurrenceNumber: Int) {
+        if (!checkNetworkState()) return
+
         // Post deleting event value to true to display loading state
         eventState.value = EventState.Processing.Deleting
 
@@ -1886,5 +1890,17 @@ class EventViewModel(
             if (occurrences.isNullOrEmpty()) EventLinkResult.OccurrenceDoesNotExist
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
+    }
+
+    private fun checkNetworkState(): Boolean {
+
+        if (networkManager.isConnectedToNetwork().not()) {
+            eventSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_network_error)
+            )
+            return false
+        }
+
+        return true
     }
 }

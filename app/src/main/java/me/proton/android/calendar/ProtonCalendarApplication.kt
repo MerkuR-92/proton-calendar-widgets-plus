@@ -21,6 +21,7 @@ import me.proton.core.humanverification.presentation.HumanVerificationOrchestrat
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -85,6 +86,9 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var sendEmailDirect: SendEmailDirect
 
+    @Inject
+    lateinit var networkManager: NetworkManager
+
     private val logger: Logger by inject()
 
     override fun onCreate() {
@@ -113,7 +117,8 @@ class ProtonCalendarApplication : Application() {
                     contactEmailsRepository,
                     cryptoContext,
                     sendEmailDirect,
-                    publicAddressRepository
+                    publicAddressRepository,
+                    networkManager
                 )
             )
         }
