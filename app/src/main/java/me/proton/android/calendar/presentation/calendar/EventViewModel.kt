@@ -1274,7 +1274,8 @@ class EventViewModel(
                 val attendeeEmails = event.iCalEvent.attendees.mapNotNull { it.extractEmail() }
                 val userAddress = userAddresses.find { userAddress ->
                     attendeeEmails.find { attendeeEmail ->
-                        ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email) == ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                        ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true) ==
+                                ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
                     } != null
                 }
 
@@ -1286,7 +1287,7 @@ class EventViewModel(
                     return
                 }
 
-                val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email)
+                val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true)
 
                 val isStandaloneSingleEdit = if (event.isSingleEdit()) calendarsRepository.isStandaloneSingleEdit(
                     userId,
@@ -1491,7 +1492,7 @@ class EventViewModel(
         if (eventState.value is EventState.Processing) return true
 
         val userEmails = userManager.getAddresses(userId).map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
 
         currentParticipationStatus = event.getParticipationStatus(userEmails) ?: ParticipationStatus.NEEDS_ACTION
@@ -1586,13 +1587,13 @@ class EventViewModel(
         val status = participationStatus.toInt()
 
         val userEmails = userManager.getAddresses(userId).map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
 
         val userAttendee = event.iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
                     .equals(userEmail, ignoreCase = true)
             } != null
         }

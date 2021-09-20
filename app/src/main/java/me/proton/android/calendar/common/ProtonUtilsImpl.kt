@@ -11,7 +11,7 @@ object ProtonUtilsImpl : ProtonUtils {
         return regex.matches(email)
     }
 
-    override fun canonicalizeProtonEmails(emails: List<String>): Map<String, String> {
+    override fun canonicalizeProtonEmails(emails: List<String>, forceCanonicalization: Boolean): Map<String, String> {
         val canonicalEmails = hashMapOf<String, String>()
         emails.forEach {
             val canonicalEmail = canonicalizeProtonEmail(it)
@@ -20,9 +20,11 @@ object ProtonUtilsImpl : ProtonUtils {
         return canonicalEmails
     }
 
-    override fun canonicalizeProtonEmail(email:String): String {
-        // If user uses a custom domain, we don't apply any canonicalization
-        if (!isProtonDomain(email)) return email.toLowerCase(Locale.getDefault())
+    override fun canonicalizeProtonEmail(email: String, forceCanonicalization: Boolean): String {
+        // If user uses a custom domain, we don't apply any canonicalization.
+        //  Can be forced with forceCanonicalization when we are certain the address belongs to a Proton user.
+        //  forceCanonicalization should be used when comparing email with an attendee email, but not for the organizer.
+        if (!forceCanonicalization && !isProtonDomain(email)) return email.toLowerCase(Locale.getDefault())
 
         val regex = Regex("(?:\\.|\\-|\\_|\\+.*)(?=.*@)")
         return email.replace(regex, "").toLowerCase(Locale.getDefault())
