@@ -81,8 +81,7 @@ class EventViewModel(
     private val handleSaveUseCase: HandleSaveUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
-    private val resourceProvider: ResourceProvider,
-    private val networkManager: NetworkManager
+    private val resourceProvider: ResourceProvider
 ) : AndroidViewModel(application) {
 
     sealed class Result {
@@ -1110,8 +1109,6 @@ class EventViewModel(
     }
 
     suspend fun handleDelete(occurrenceNumber: Int) {
-        if (!checkNetworkState()) return
-
         // Post deleting event value to true to display loading state
         eventState.value = EventState.Processing.Deleting
 
@@ -1891,17 +1888,5 @@ class EventViewModel(
             if (occurrences.isNullOrEmpty()) EventLinkResult.OccurrenceDoesNotExist
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
-    }
-
-    private fun checkNetworkState(): Boolean {
-
-        if (networkManager.isConnectedToNetwork().not()) {
-            eventSnackState.value = EventSnackState.DisplaySnack(
-                resourceProvider.provideString(R.string.snack_network_error)
-            )
-            return false
-        }
-
-        return true
     }
 }

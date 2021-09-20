@@ -175,6 +175,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
                     icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
                 ) {
+                    if (mainViewModel.isConnectedToNetwork.not()) {
+                        view?.displaySnackBar(getString(R.string.snack_network_error))
+                        return@displayPopupMenu
+                    }
                     lifecycleScope.launch { eventViewModel.handleDelete(navigationArguments.occurrenceNumber) }
                 }
             }

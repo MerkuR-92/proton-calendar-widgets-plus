@@ -13,6 +13,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.core.domain.entity.UserId
+import me.proton.core.network.domain.NetworkManager
 import java.io.BufferedReader
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -22,9 +23,12 @@ class MainViewModel(
     application: Application,
     private val accountViewModel: AccountViewModel,
     private val handleIcsUseCase: HandleIcsUseCase,
+    private val networkManager: NetworkManager
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
+
+    val isConnectedToNetwork get() = networkManager.isConnectedToNetwork()
 
     /**
      * Try to open maps with event location.
