@@ -1246,7 +1246,12 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, !isCalendarDisabled)
+        var emailSent = false
+        if (deleteResult is UseCase.Result.Success<*>) {
+            deleteResult.returnValue.tryCast<Boolean> { emailSent = this }
+        }
+
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, emailSent)
     }
 
     private suspend fun handleDeleteEventAsAttendeeSendPreferences(userAddresses: List<UserAddress>, event: Event) {

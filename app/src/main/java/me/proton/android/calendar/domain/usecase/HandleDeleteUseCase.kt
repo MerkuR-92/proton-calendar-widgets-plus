@@ -213,6 +213,8 @@ class HandleDeleteUseCase( // TODO TESTS
         isCalendarDisabled: Boolean
     ): UseCase.Result {
 
+        var emailSent = false
+
         // The attendees list contains those we successfully fetched send preferences for (only send an email for those, skip sending email if the list is empty)
         if (!isCalendarDisabled && attendees.isNotEmpty()) {
             // If address is disabled, cancellation can't be sent
@@ -241,14 +243,20 @@ class HandleDeleteUseCase( // TODO TESTS
                     "HandleDeleteUseCase: handleDeleteAsOrganizer invalid params in send email: ${sendCancellationResult.message}"
                 )
             }
+
+            emailSent = true
         }
 
-        return handleDelete(
+        val handleDeleteResult = handleDelete(
             userId,
             event.id,
             if (isPartOfChain) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
             if (isPartOfChain) null else 0
         )
+
+        return if (handleDeleteResult is UseCase.Result.Success<*>) {
+            UseCase.Result.Success(emailSent)
+        } else handleDeleteResult
     }
 
 
