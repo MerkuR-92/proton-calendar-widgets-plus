@@ -1328,9 +1328,11 @@ class EventViewModel(
         sendReply: Boolean
     ) {
 
+        val cancelledSingleEdits = getSingleEditsInfo(listOf(userEmail))?.singleEdits?.filter { it.isCancelled() }
         val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
             userId,
             Event.from(event),
+            cancelledSingleEdits,
             userEmail,
             sendPreferences,
             hasNonCancelledSingleEdit,

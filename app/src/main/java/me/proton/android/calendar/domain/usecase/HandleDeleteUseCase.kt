@@ -263,6 +263,7 @@ class HandleDeleteUseCase( // TODO TESTS
     suspend fun handleDeleteAsAttendee(
         userId: UserId,
         event: Event,
+        cancelledSingleEdits: List<Event>?,
         userEmail: String,
         sendPreferences: Map<Email, SendPreferences>,
         hasNonCancelledSingleEdit: Boolean,
@@ -365,6 +366,11 @@ class HandleDeleteUseCase( // TODO TESTS
         )
 
         return if (handleDeleteResult is UseCase.Result.Success<*>) {
+            // Try to delete any existing cancelled single edits. Silently fail.
+            if (!cancelledSingleEdits.isNullOrEmpty()) {
+                val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
+                deleteEvents(userId, cancelledSingleEdits.map { it.id }, event.calendar.id, member.id)
+            }
             UseCase.Result.Success(emailSent)
         } else handleDeleteResult
     }
