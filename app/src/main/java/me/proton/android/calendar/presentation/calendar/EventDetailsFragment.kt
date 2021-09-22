@@ -445,8 +445,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                     else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) {
                                         val message = getString(R.string.dialog_description_delete_recurring_event)
 
-                                        val singleEditWarning = if (it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
-                                        else if (it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+                                        val singleEditWarning = if (!it.isCalendarDisabled && it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+                                        else if (!it.isCalendarDisabled && it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
                                         else ""
 
                                         if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
