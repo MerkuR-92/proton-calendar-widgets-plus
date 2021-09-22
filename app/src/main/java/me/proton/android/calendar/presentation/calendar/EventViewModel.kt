@@ -54,7 +54,6 @@ import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
-import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
@@ -195,7 +194,7 @@ class EventViewModel(
                 val sendPreferencesResults: SendPreferencesResults,
                 val isRecurring: Boolean,
                 val isSingleEdit: Boolean,
-                val isStandaloneSingleEdit: Boolean,
+                val isOrphanSingleEdit: Boolean,
                 val hasNonCancelledSingleEdit: Boolean,
                 val hasAnsweredSingleEdit: Boolean,
                 val isAddressAllowedToSend: Boolean,
@@ -1286,7 +1285,7 @@ class EventViewModel(
 
                 val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true)
 
-                val isStandaloneSingleEdit = if (event.isSingleEdit()) calendarsRepository.isStandaloneSingleEdit(
+                val isOrphanSingleEdit = if (event.isSingleEdit()) calendarsRepository.isOrphanSingleEdit(
                     userId,
                     event.uid
                 ) ?: false
@@ -1297,7 +1296,7 @@ class EventViewModel(
                     sendPreferencesResults,
                     isRecurring = event.isRecurring(),
                     isSingleEdit = event.isSingleEdit(),
-                    isStandaloneSingleEdit = isStandaloneSingleEdit,
+                    isOrphanSingleEdit = isOrphanSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasSingleEdit ?: false &&
                             getSingleEditsInfo(listOf(userEmail))?.hasNonCancelledSingleEdit == true,
                     hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userEmail))?.singleEdits?.any {
@@ -1323,7 +1322,7 @@ class EventViewModel(
         hasNonCancelledSingleEdit: Boolean,
         hasAnsweredSingleEdit: Boolean,
         occurrenceNumber: Int,
-        isStandaloneSingleEdit: Boolean,
+        isOrphanSingleEdit: Boolean,
         timeFormatIs24Hours: Boolean,
         sendReply: Boolean
     ) {
@@ -1337,7 +1336,7 @@ class EventViewModel(
             sendPreferences,
             hasNonCancelledSingleEdit,
             occurrenceNumber,
-            isStandaloneSingleEdit,
+            isOrphanSingleEdit,
             event.defaultTimeZone!!,
             timeFormatIs24Hours,
             sendReply
@@ -1502,7 +1501,7 @@ class EventViewModel(
 
             if (event.isPartOfChain()) {
                 val isSingleEdit = event.isSingleEdit()
-                val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(
+                val isOrphanSingleEdit = if (isSingleEdit) calendarsRepository.isOrphanSingleEdit(
                     userId,
                     event.uid
                 ) else false
@@ -1525,7 +1524,7 @@ class EventViewModel(
                     if (isSingleEdit) false
                     else hasAnsweredSingleEdit && hasAnsweredSingleEditToOverwrite
 
-                return if (isStandaloneSingleEdit == true) {
+                return if (isOrphanSingleEdit == true) {
                     handleChangeAnswerSendPreferences(
                         newParticipationStatus,
                         timeFormatIs24Hours

@@ -5,6 +5,7 @@ import biweekly.property.Attendee
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
+import me.proton.android.calendar.common.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
@@ -39,7 +40,7 @@ class HandleDeleteUseCase( // TODO TESTS
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
 ): UseCase {
 
-    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?, deleteSingleEdits: Boolean = true, isStandaloneSingleEdit: Boolean = false) : UseCase.Result {
+    suspend fun handleDelete(userId: UserId, eventId: String, deleteOption: EventEditDeleteOption, occurrenceNumber: Int?, deleteSingleEdits: Boolean = true, isOrphanSingleEdit: Boolean = false) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
 
@@ -64,19 +65,36 @@ class HandleDeleteUseCase( // TODO TESTS
                     editCreateEventUseCase.execute(userId, event.calendar.id, event)
                 } else if (event.isSingleEdit()) {
 
-                    if (!isStandaloneSingleEdit) {
+                    if (!isOrphanSingleEdit) {
                         val rootEventEntity = calendarsRepository.selectRootEventEntity(event.uid)
                         val rootEvent = rootEventEntity?.let { transformEventUseCase.execute(it) }
                             ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
 
                         // add EXDATE to root event
                         rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
-                        val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
-                        editResult.ifSuccessAndLogErrors(logger) {}
-                    }
 
-                    // delete the single edit
-                    deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                        val isStandaloneSingleEdit = calendarsRepository.isStandaloneSingleEdit(
+                            userId,
+                            event.uid,
+                            event.iCalEvent.recurrenceId,
+                            timezone ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: timezone was null for isStandaloneSingleEdit"),
+                            occurrenceNumber
+                        ) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: isStandaloneSingleEdit was null, error in call for getEventsByUid")
+
+                        if (isStandaloneSingleEdit) {
+                            // delete single edit and root event
+                            deleteEvents(userId, listOf(event.id, rootEvent.id), rootEvent.calendar.id, member.id)
+                        } else {
+                            val editResult = editCreateEventUseCase.execute(userId, rootEvent.calendar.id, rootEvent)
+                            editResult.ifSuccessAndLogErrors(logger) {}
+
+                            // delete the single edit
+                            deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                        }
+                    } else {
+                        // delete the single edit
+                        deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                    }
                 } else {
                     // delete the non-recurring event
                     deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
@@ -268,7 +286,7 @@ class HandleDeleteUseCase( // TODO TESTS
         sendPreferences: Map<Email, SendPreferences>,
         hasNonCancelledSingleEdit: Boolean,
         occurrenceNumber: Int,
-        isStandaloneSingleEdit: Boolean,
+        isOrphanSingleEdit: Boolean,
         defaultTimeZone: String,
         timeFormatIs24Hours: Boolean,
         sendReply: Boolean
@@ -359,10 +377,10 @@ class HandleDeleteUseCase( // TODO TESTS
         val handleDeleteResult = handleDelete(
             userId,
             event.id,
-            if (event.isRecurring() || (event.isSingleEdit() && !isStandaloneSingleEdit && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
-            if (event.isRecurring() || (event.isSingleEdit() && !isStandaloneSingleEdit && event.calendar.isDisabled)) null else if (event.isSingleEdit()) occurrenceNumber else 0,
+            if (event.isRecurring() || (event.isSingleEdit() && !isOrphanSingleEdit && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (event.isRecurring() || (event.isSingleEdit() && !isOrphanSingleEdit && event.calendar.isDisabled)) null else if (event.isSingleEdit()) occurrenceNumber else 0,
             !(event.isRecurring() && hasNonCancelledSingleEdit) || event.calendar.isDisabled,
-            isStandaloneSingleEdit
+            isOrphanSingleEdit
         )
 
         return if (handleDeleteResult is UseCase.Result.Success<*>) {
