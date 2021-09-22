@@ -359,8 +359,8 @@ class HandleDeleteUseCase( // TODO TESTS
         val handleDeleteResult = handleDelete(
             userId,
             event.id,
-            if (event.isRecurring() || (event.isSingleEdit() && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
-            if (event.isRecurring() || (event.isSingleEdit() && event.calendar.isDisabled)) null else if (event.isSingleEdit()) occurrenceNumber else 0,
+            if (event.isRecurring() || (event.isSingleEdit() && !isStandaloneSingleEdit && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
+            if (event.isRecurring() || (event.isSingleEdit() && !isStandaloneSingleEdit && event.calendar.isDisabled)) null else if (event.isSingleEdit()) occurrenceNumber else 0,
             !(event.isRecurring() && hasNonCancelledSingleEdit) || event.calendar.isDisabled,
             isStandaloneSingleEdit
         )
