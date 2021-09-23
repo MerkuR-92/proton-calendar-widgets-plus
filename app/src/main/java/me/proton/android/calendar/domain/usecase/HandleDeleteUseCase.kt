@@ -51,7 +51,7 @@ class HandleDeleteUseCase( // TODO TESTS
 
         // TODO migrate to /sync route and handle recurring deletes
 
-        logger.v("executing HandleDeleteUseCase $userId, $eventId, $deleteOption, $occurrenceNumber $deleteSingleEdits $isStandaloneSingleEdit")
+        logger.v("executing HandleDeleteUseCase $userId, $eventId, $deleteOption, $occurrenceNumber $deleteSingleEdits $isOrphanSingleEdit")
 
         val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
         val event = transformEventUseCase.execute(eventEntity) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId could not be transformed")
