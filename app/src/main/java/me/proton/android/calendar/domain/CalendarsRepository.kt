@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain
 
+import biweekly.property.RecurrenceId
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
@@ -126,7 +127,9 @@ interface CalendarsRepository {
 
     suspend fun getSingleEdits(userId: UserId, eventUid: String, stopAfter: ZonedDateTime? = null,  timeZoneId: String? = null): List<Event>?
 
-    suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String): Boolean?
+    suspend fun isOrphanSingleEdit(userId: UserId, eventUid: String): Boolean?
+
+    suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String, occurrenceNumber: Int): Boolean?
 
     suspend fun persistEvents(vararg events: EventEntity)
 

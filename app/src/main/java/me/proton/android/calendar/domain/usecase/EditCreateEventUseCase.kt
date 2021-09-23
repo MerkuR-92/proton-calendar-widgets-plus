@@ -217,12 +217,12 @@ class EditCreateEventUseCase(
                 if (createLinkedEventAsAttendee) {
                     // The array must only contain one Attendee (the user itself) with his own token and answered participation status
                     val userEmails = userAddresses.map { address ->
-                        canonicalizeProtonEmail(address.email)
+                        canonicalizeProtonEmail(address.email, forceCanonicalization = true)
                     }
                     val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
                         userEmails.firstOrNull { userEmail ->
                             val attendeeEmail = attendee.extractEmail()
-                            attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                            attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(userEmail, ignoreCase = true)
                         } != null
                     } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from newEvent")
                     listOf(userAttendee)

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data
 
+import biweekly.property.RecurrenceId
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -12,6 +13,8 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.DateTimeUtilsImpl.getFullyOverlappingWindow
+import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
+import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.ICalUtilsImpl
@@ -636,7 +639,7 @@ class CalendarsRepositoryImpl(
             }
 
         }.onStart {
-            
+
             eventsCacheMutex.withLock {
 
                 val overlappingWindow = eventsCache.keys.getFullyOverlappingWindow(eventsWindow)
@@ -895,18 +898,47 @@ class CalendarsRepositoryImpl(
         } else return null
     }
 
-    override suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String): Boolean? {
+    /**
+     * User is invited to only one occurrence of a recurring event
+     */
+    override suspend fun isOrphanSingleEdit(userId: UserId, eventUid: String): Boolean? {
         // Check if single edit is the only occurrence of a recurring event
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             // If an event with the same UID has no recurrenceId then we have occurrence(s) of the main series
-            eventsSharingUidResponse.data.events.firstOrNull { eventEntity ->
+            eventsSharingUidResponse.data.events.none { eventEntity ->
                 val sharedEvents = eventEntity.sharedEvents.map {
                     json.decodeFromJsonElement<Event.EventPart.Shared>(it)
                 }
                 val iCal = ICalUtilsImpl.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
                 iCal?.events?.first()?.recurrenceId == null
-            } == null
+            }
+        } else null
+    }
+
+    /**
+     * Main chain has no other occurrences left and event is the only single edit
+     */
+    override suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String, occurrenceNumber: Int): Boolean? {
+        // Check if single edit is the only occurrence of a recurring event
+        val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
+        return if (eventsSharingUidResponse is ApiResponse.Success) {
+
+            val skeletonEvents = eventsSharingUidResponse.data.events.mapNotNull { eventEntity ->
+                val skeletonEventEntity = SkeletonEventEntity(eventEntity.id, eventEntity.calendarId, eventEntity.sharedEvents)
+                skeletonEventEntity.toSkeletonEvent(json)
+            }
+
+            val singleEdits = skeletonEvents.filter { skeletonEvent ->
+                skeletonEvent.iCalEvent.recurrenceId != null
+            }
+            if (singleEdits.size > 1) return false
+
+            val rootEvent = skeletonEvents.firstOrNull { it.iCalEvent.recurrenceId == null } ?: return false // If it has no root event then it is an orphan single edit
+
+            val isStandaloneSingleEdit = rootEvent.generateFirstRealOccurrenceSince(skeletonEvents, rootEvent.getStart(timeZoneId)) == null &&
+                    (singleEdits.isNullOrEmpty() || singleEdits.firstOrNull()?.iCalEvent?.recurrenceId == eventRecurrenceId)
+            isStandaloneSingleEdit
         } else null
     }
 

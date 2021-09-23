@@ -194,7 +194,7 @@ class EventViewModel(
                 val sendPreferencesResults: SendPreferencesResults,
                 val isRecurring: Boolean,
                 val isSingleEdit: Boolean,
-                val isStandaloneSingleEdit: Boolean,
+                val isOrphanSingleEdit: Boolean,
                 val hasNonCancelledSingleEdit: Boolean,
                 val hasAnsweredSingleEdit: Boolean,
                 val isAddressAllowedToSend: Boolean,
@@ -1246,7 +1246,12 @@ class EventViewModel(
         // Post deleting event value to false to stop loading state
         eventState.value = EventState.Idle
 
-        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, !isCalendarDisabled)
+        var emailSent = false
+        if (deleteResult is UseCase.Result.Success<*>) {
+            deleteResult.returnValue.tryCast<Boolean> { emailSent = this }
+        }
+
+        handleDeleteResult(deleteResult, DeleteType.AS_AN_ORGANIZER, emailSent)
     }
 
     private suspend fun handleDeleteEventAsAttendeeSendPreferences(userAddresses: List<UserAddress>, event: Event) {
@@ -1265,7 +1270,8 @@ class EventViewModel(
                 val attendeeEmails = event.iCalEvent.attendees.mapNotNull { it.extractEmail() }
                 val userAddress = userAddresses.find { userAddress ->
                     attendeeEmails.find { attendeeEmail ->
-                        ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email) == ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                        ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true) ==
+                                ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
                     } != null
                 }
 
@@ -1277,9 +1283,9 @@ class EventViewModel(
                     return
                 }
 
-                val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email)
+                val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true)
 
-                val isStandaloneSingleEdit = if (event.isSingleEdit()) calendarsRepository.isStandaloneSingleEdit(
+                val isOrphanSingleEdit = if (event.isSingleEdit()) calendarsRepository.isOrphanSingleEdit(
                     userId,
                     event.uid
                 ) ?: false
@@ -1290,7 +1296,7 @@ class EventViewModel(
                     sendPreferencesResults,
                     isRecurring = event.isRecurring(),
                     isSingleEdit = event.isSingleEdit(),
-                    isStandaloneSingleEdit = isStandaloneSingleEdit,
+                    isOrphanSingleEdit = isOrphanSingleEdit,
                     hasNonCancelledSingleEdit = getSingleEditsInfo(listOf(userEmail))?.hasSingleEdit ?: false &&
                             getSingleEditsInfo(listOf(userEmail))?.hasNonCancelledSingleEdit == true,
                     hasAnsweredSingleEdit = getSingleEditsInfo(listOf(userEmail))?.singleEdits?.any {
@@ -1316,19 +1322,21 @@ class EventViewModel(
         hasNonCancelledSingleEdit: Boolean,
         hasAnsweredSingleEdit: Boolean,
         occurrenceNumber: Int,
-        isStandaloneSingleEdit: Boolean,
+        isOrphanSingleEdit: Boolean,
         timeFormatIs24Hours: Boolean,
         sendReply: Boolean
     ) {
 
+        val cancelledSingleEdits = getSingleEditsInfo(listOf(userEmail))?.singleEdits?.filter { it.isCancelled() }
         val deleteResult = handleDeleteUseCase.handleDeleteAsAttendee(
             userId,
             Event.from(event),
+            cancelledSingleEdits,
             userEmail,
             sendPreferences,
             hasNonCancelledSingleEdit,
             occurrenceNumber,
-            isStandaloneSingleEdit,
+            isOrphanSingleEdit,
             event.defaultTimeZone!!,
             timeFormatIs24Hours,
             sendReply
@@ -1482,7 +1490,7 @@ class EventViewModel(
         if (eventState.value is EventState.Processing) return true
 
         val userEmails = userManager.getAddresses(userId).map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
 
         currentParticipationStatus = event.getParticipationStatus(userEmails) ?: ParticipationStatus.NEEDS_ACTION
@@ -1493,7 +1501,7 @@ class EventViewModel(
 
             if (event.isPartOfChain()) {
                 val isSingleEdit = event.isSingleEdit()
-                val isStandaloneSingleEdit = if (isSingleEdit) calendarsRepository.isStandaloneSingleEdit(
+                val isOrphanSingleEdit = if (isSingleEdit) calendarsRepository.isOrphanSingleEdit(
                     userId,
                     event.uid
                 ) else false
@@ -1516,7 +1524,7 @@ class EventViewModel(
                     if (isSingleEdit) false
                     else hasAnsweredSingleEdit && hasAnsweredSingleEditToOverwrite
 
-                return if (isStandaloneSingleEdit == true) {
+                return if (isOrphanSingleEdit == true) {
                     handleChangeAnswerSendPreferences(
                         newParticipationStatus,
                         timeFormatIs24Hours
@@ -1577,13 +1585,13 @@ class EventViewModel(
         val status = participationStatus.toInt()
 
         val userEmails = userManager.getAddresses(userId).map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
 
         val userAttendee = event.iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
                     .equals(userEmail, ignoreCase = true)
             } != null
         }

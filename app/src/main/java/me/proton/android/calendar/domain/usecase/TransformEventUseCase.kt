@@ -140,19 +140,19 @@ class TransformEventUseCase(
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
-            val canonicalUserEmails = userManager.getAddresses(UserId(userId)).map { canonicalizeProtonEmail(it.email) }
+            val canonicalUserEmails = userManager.getAddresses(UserId(userId)).map { canonicalizeProtonEmail(it.email, forceCanonicalization = true) }
             val attendees = eventEntity.attendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter(X_PM_TOKEN) ?: generateXPmToken(
-                    canonicalizeProtonEmail(attendee.extractEmail() ?: ""),
+                    canonicalizeProtonEmail(attendee.extractEmail() ?: "", forceCanonicalization = true),
                     iCalendar.events.first().uid.value
                 )
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.extractEmail() ?: "") }) currentUserAttendeeId =
+                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.extractEmail() ?: "", forceCanonicalization = true) }) currentUserAttendeeId =
                         attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }

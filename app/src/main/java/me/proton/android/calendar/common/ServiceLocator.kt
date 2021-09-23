@@ -5,6 +5,7 @@ import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.di.NetworkModule
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
 import me.proton.android.calendar.domain.usecase.*
@@ -23,6 +24,8 @@ import me.proton.core.humanverification.presentation.HumanVerificationOrchestrat
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.data.NetworkManager
+import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -70,6 +73,7 @@ val viewModelModule = module {
     viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
+            get(),
             get(),
             get(),
             get()
@@ -126,7 +130,8 @@ fun coreModule(
     contactEmailsRepository: ContactRepository,
     cryptoContext: CryptoContext,
     sendEmailDirect: SendEmailDirect,
-    publicAddressRepository: PublicAddressRepository
+    publicAddressRepository: PublicAddressRepository,
+    networkManager: NetworkManager
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -145,4 +150,5 @@ fun coreModule(
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), contactEmailsRepository, get(), get(), get(), getRecipientPublicAddresses) }
     factory<SendEmailDirect> { sendEmailDirect /*SendEmailDirect(get(), get(), get(), get())*/ }
     single<PublicAddressRepository> { publicAddressRepository }
+    single<NetworkManager> { networkManager }
 }

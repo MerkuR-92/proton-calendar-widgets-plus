@@ -175,6 +175,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
                     icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
                 ) {
+                    if (mainViewModel.isConnectedToNetwork.not()) {
+                        view?.displaySnackBar(getString(R.string.snack_network_error))
+                        return@displayPopupMenu
+                    }
                     lifecycleScope.launch { eventViewModel.handleDelete(navigationArguments.occurrenceNumber) }
                 }
             }
@@ -432,17 +436,17 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(
                                 if (sendPrefsFailed && displayWarning) R.string.event_organizer_send_prefs_error_title
-                                else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not())) R.string.dialog_title_delete_recurring_event
+                                else if (it.isRecurring || (it.isSingleEdit && it.isOrphanSingleEdit.not())) R.string.dialog_title_delete_recurring_event
                                 else R.string.dialog_title_delete_event
                             )
                             .setMessage(
                                 if (displayWarning.not()) {
-                                    if (it.isSingleEdit && (it.isSingleEdit && it.isStandaloneSingleEdit.not()) && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-                                    else if (it.isRecurring || (it.isSingleEdit && it.isStandaloneSingleEdit.not() && it.isCalendarDisabled)) {
+                                    if (it.isSingleEdit && (it.isSingleEdit && it.isOrphanSingleEdit.not()) && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+                                    else if (it.isRecurring || (it.isSingleEdit && it.isOrphanSingleEdit.not() && it.isCalendarDisabled)) {
                                         val message = getString(R.string.dialog_description_delete_recurring_event)
 
-                                        val singleEditWarning = if (it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
-                                        else if (it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+                                        val singleEditWarning = if (!it.isCalendarDisabled && it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+                                        else if (!it.isCalendarDisabled && it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
                                         else ""
 
                                         if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
@@ -457,7 +461,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                             it.hasAnsweredSingleEdit,
                                             it.hasNonCancelledSingleEdit,
                                             it.isSingleEdit,
-                                            it.isStandaloneSingleEdit,
+                                            it.isOrphanSingleEdit,
                                             it.isAddressAllowedToSend
                                         )
                                         sendPrefsFailed -> getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
@@ -466,7 +470,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                             it.hasAnsweredSingleEdit,
                                             it.hasNonCancelledSingleEdit,
                                             it.isSingleEdit,
-                                            it.isStandaloneSingleEdit,
+                                            it.isOrphanSingleEdit,
                                             it.isAddressAllowedToSend
                                         )
                                     }
@@ -480,7 +484,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                                         it.hasNonCancelledSingleEdit,
                                         it.hasAnsweredSingleEdit,
                                         navigationArguments.occurrenceNumber,
-                                        it.isStandaloneSingleEdit,
+                                        it.isOrphanSingleEdit,
                                         calendarViewModel.timeFormatIs24Hour(requireContext()),
                                         displayWarning && it.isAddressAllowedToSend && !sendPrefsFailed
                                     )
@@ -612,7 +616,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         hasAnsweredSingleEdit: Boolean,
         hasNonCancelledSingleEdit: Boolean,
         isSingleEdit: Boolean,
-        isStandaloneSingleEdit: Boolean,
+        isOrphanSingleEdit: Boolean,
         isAddressAllowedToSend: Boolean
     ): String {
         return if (isRecurring) {
@@ -626,8 +630,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
             else message
         }
-        else if (isSingleEdit && isStandaloneSingleEdit.not() && !isAddressAllowedToSend) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
-        else if (isSingleEdit && isStandaloneSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+        else if (isSingleEdit && isOrphanSingleEdit.not() && !isAddressAllowedToSend) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+        else if (isSingleEdit && isOrphanSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
         else if (!isAddressAllowedToSend) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
         else getString(R.string.dialog_description_delete_single_event_as_attendee)
     }
