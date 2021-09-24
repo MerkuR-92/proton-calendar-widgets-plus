@@ -6,6 +6,7 @@ import me.proton.android.calendar.domain.model.EncryptedPackage
 import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.crypto.common.pgp.SessionKey
 import me.proton.core.key.domain.encryptSessionKey
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.mailmessage.domain.entity.Email
@@ -18,10 +19,10 @@ class GenerateEmailPackageUseCase @Inject constructor(
         signedEncryptedBodyMime: Pair<ByteArray, ByteArray>?,
         recipientEmail: Email,
         sendPreferences: SendPreferences,
-        decryptedAttachmentSessionKeys: MutableList<ByteArray>,
-        decryptedBodySessionKey: ByteArray,
+        decryptedAttachmentSessionKeys: MutableList<SessionKey>,
+        decryptedBodySessionKey: SessionKey,
         encryptedBodyDataPacket: ByteArray,
-        decryptedMimeBodySessionKey: ByteArray,
+        decryptedMimeBodySessionKey: SessionKey,
         encryptedMimeBodyDataPacket: ByteArray
     ): EncryptedPackage? {
 
@@ -77,13 +78,13 @@ class GenerateEmailPackageUseCase @Inject constructor(
                     mimeType = "multipart/mixed",
                     body = Base64.encode(encryptedMimeBodyDataPacket),
                     type = PackageType.ClearMime.type,
-                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedMimeBodySessionKey), SESSION_KEY_ALGO)
+                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedMimeBodySessionKey.key), SESSION_KEY_ALGO)
                 )
 
             } else { // Cleartext
 
                 val packageAttachmentKeys = decryptedAttachmentSessionKeys.map {
-                    EncryptedPackage.Key(Base64.encode(it), SESSION_KEY_ALGO)
+                    EncryptedPackage.Key(Base64.encode(it.key), SESSION_KEY_ALGO)
                 }
 
                 EncryptedPackage(
@@ -92,7 +93,7 @@ class GenerateEmailPackageUseCase @Inject constructor(
                     body = Base64.encode(encryptedBodyDataPacket),
                     type = PackageType.Cleartext.type,
                     attachmentKeys = packageAttachmentKeys,
-                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedBodySessionKey), SESSION_KEY_ALGO)
+                    bodyKey = EncryptedPackage.Key(Base64.encode(decryptedBodySessionKey.key), SESSION_KEY_ALGO)
                 )
 
             }

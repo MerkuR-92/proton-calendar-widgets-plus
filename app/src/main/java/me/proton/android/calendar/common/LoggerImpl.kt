@@ -7,7 +7,7 @@ import me.proton.core.util.kotlin.LoggerLogTag
 import org.jetbrains.annotations.NonNls
 import timber.log.Timber
 
-object CoreLogger : Logger {
+object LoggerImpl : Logger {
 
     private const val HTTP_ERROR_UNAUTHORIZED = 401
     private const val HTTP_ERROR_NOT_FOUND = 404

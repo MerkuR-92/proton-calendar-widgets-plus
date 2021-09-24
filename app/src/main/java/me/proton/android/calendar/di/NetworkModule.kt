@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.BASE_URL
-import me.proton.android.calendar.common.CoreLogger
 import me.proton.android.calendar.data.api.CalendarApiClient
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.network.data.*
@@ -59,7 +58,6 @@ object NetworkModule {
         apiClient,
         clientIdProvider,
         serverTimeListener,
-        CoreLogger,
         networkManager,
         networkPrefs,
         sessionProvider,

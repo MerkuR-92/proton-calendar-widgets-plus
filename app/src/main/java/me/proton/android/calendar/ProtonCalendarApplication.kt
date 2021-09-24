@@ -28,6 +28,7 @@ import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.util.kotlin.CoreLogger
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -129,6 +130,7 @@ class ProtonCalendarApplication : Application() {
             )
         }
 
+        CoreLogger.set(LoggerImpl)
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         } else {
