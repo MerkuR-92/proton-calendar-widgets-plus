@@ -371,7 +371,7 @@ class EventViewModel(
                 newVEvent.setEnd(endZonedDateTime.toLocalDate())
             }
 
-        } else { // create new all-day event
+        } else { // create new part-day event
             newVEvent.setStart(startDate, startTime, eventTimeZoneId)
             newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), eventTimeZoneId)
             newICalendar.setStartTimeZone(eventTimeZoneId)
