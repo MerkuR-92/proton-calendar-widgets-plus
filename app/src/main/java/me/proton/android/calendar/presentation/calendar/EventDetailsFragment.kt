@@ -251,7 +251,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
                 calendarViewModel.userAddresses.distinctUntilChanged().observe(viewLifecycleOwner) {
-                    handleAttendeeAnswerViewVisibility()
+                    handleAttendeeAnswerViewVisibility(updateSelectedButton = false)
                 }
                 observeEventLiveData(coroutineContext)
                 observeEventDialogState(coroutineContext)
@@ -848,7 +848,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         })
     }
 
-    private fun handleAttendeeAnswerViewVisibility() {
+    /**
+     * updateSelectedButton should be set to false if we only mean to update the whole component visibility
+     *  without updating the participation status value
+     **/
+    private fun handleAttendeeAnswerViewVisibility(updateSelectedButton: Boolean = true) {
         if (!CHANGE_ANSWER) {
             // TODO Remove feature flag
             section_answer.visibleOrGone(false)
@@ -866,7 +870,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 if (participationStatus != null && isActive && isUserAddressAllowedSend && !event.isCancelled()) {
                     section_answer.visibleOrGone(true)
-                    displayAttendeeAnswerState(participationStatus)
+                    if (updateSelectedButton) displayAttendeeAnswerState(participationStatus)
                 } else section_answer.visibleOrGone(false)
             } else section_answer.visibleOrGone(false)
         }

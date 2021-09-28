@@ -16,3 +16,4 @@
 .externalNativeBuild
 .cxx
 /.idea/misc.xml
+.idea/deploymentTargetDropDown.xml
