@@ -109,6 +109,12 @@ kapt {
     correctErrorTypes true
 }
 
+tasks.register("getArchivesName"){
+    doLast {
+        println archivesBaseName
+    }
+}
+
 tasks.withType(Test) {
     testLogging {
         events "passed", "skipped", "failed"
