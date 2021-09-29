@@ -694,8 +694,18 @@ class CalendarViewModel(
         }?.email
     }
 
-    fun getUserEmails(): List<String>? {
-        return userAddresses.value?.map { it.email }
+    fun getUserEmails(specificUserAddresses: List<UserAddress>? = null): List<String>? {
+        val userAddresses = specificUserAddresses ?: userAddresses.value
+        return userAddresses?.map { it.email }
+    }
+
+    suspend fun getUserAddresses(): List<UserAddress>? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getUserAddresses")
+            return null
+        }
+        return userManager.getAddresses(userId)
     }
 
     suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {
