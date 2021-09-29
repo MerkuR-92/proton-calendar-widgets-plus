@@ -42,7 +42,6 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.coroutines.CoroutineContext
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -696,6 +695,15 @@ class CalendarViewModel(
 
     fun getUserEmails(): List<String>? {
         return userAddresses.value?.map { it.email }
+    }
+
+    suspend fun getUserAddresses(): List<UserAddress>? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getUserAddresses")
+            return null
+        }
+        return userManager.getAddresses(userId)
     }
 
     suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {
