@@ -12,6 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/item_change_answer_button_layout"
         android:background="@drawable/shape_background_rounded_answer_event"
+        android:backgroundTint="@color/woodsmoke"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
