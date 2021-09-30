@@ -716,8 +716,8 @@ class MonthFragment : BaseFragment() {
                 object : AndroidUtils.AnimateGuidelineListener {
                     override fun onHeightChange(animatedValue: Int) {
                         val viewPagerSliderGuidelineLayoutParams =
-                            (viewPagerSliderGuideline.layoutParams as ConstraintLayout.LayoutParams)
-                        if (viewPagerSliderGuidelineLayoutParams.guideBegin == 0) {
+                            (viewPagerSliderGuideline?.layoutParams as? ConstraintLayout.LayoutParams)
+                        if (viewPagerSliderGuidelineLayoutParams?.guideBegin == 0) {
                             // Update slider guide begin in case it was skipped somehow
                             viewPagerSliderGuidelineLayoutParams.guideBegin =
                                 calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(
