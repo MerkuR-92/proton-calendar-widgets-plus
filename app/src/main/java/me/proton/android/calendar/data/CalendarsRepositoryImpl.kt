@@ -595,7 +595,7 @@ class CalendarsRepositoryImpl(
 
     }
 
-    private fun createEventsFlow(eventsWindow: CalendarsRepository.EventsWindow): Flow<CalendarsRepository.GetEventsResult<Event>> {
+    private fun createEventsFlow(eventsWindow: CalendarsRepository.EventsWindow, allowCached: Boolean): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->
 
@@ -640,22 +640,26 @@ class CalendarsRepositoryImpl(
 
         }.onStart {
 
-            eventsCacheMutex.withLock {
+            if (allowCached) {
+                eventsCacheMutex.withLock {
 
-                val overlappingWindow = eventsCache.keys.getFullyOverlappingWindow(eventsWindow)
+                    val overlappingWindow = eventsCache.keys.getFullyOverlappingWindow(eventsWindow)
 
-                if (overlappingWindow != null) {
-                    val overlappingEvents = eventsCache[overlappingWindow]?.filter { it.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId) }
-                    if (overlappingEvents == null) {
-                        logger.e("events not found in cache")
-                        emit(CalendarsRepository.GetEventsResult.InProgress)
+                    if (overlappingWindow != null) {
+                        val overlappingEvents = eventsCache[overlappingWindow]?.filter { it.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId) }
+                        if (overlappingEvents == null) {
+                            logger.v("events not found in cache")
+                            emit(CalendarsRepository.GetEventsResult.InProgress)
+                        } else {
+                            logger.v("returning skeleton events from cache ($eventsWindow): ${overlappingEvents.size} in total")
+                            emit(CalendarsRepository.GetEventsResult.Success(overlappingEvents))
+                        }
                     } else {
-                        logger.v("returning skeleton events from cache ($eventsWindow): ${overlappingEvents.size} in total")
-                        emit(CalendarsRepository.GetEventsResult.Success(overlappingEvents))
+                        emit(CalendarsRepository.GetEventsResult.InProgress)
                     }
-                } else {
-                    emit(CalendarsRepository.GetEventsResult.InProgress)
                 }
+            } else {
+                emit(CalendarsRepository.GetEventsResult.InProgress)
             }
 
         }.retry(1) {
@@ -670,12 +674,13 @@ class CalendarsRepositoryImpl(
     override fun getEvents(
         fromDate: LocalDate,
         toDate: LocalDate,
-        timeZoneId: String
+        timeZoneId: String,
+        allowCached: Boolean
     ): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
-        return createEventsFlow(eventsWindow)
+        return createEventsFlow(eventsWindow, allowCached)
     }
 
     private fun createSkeletonsFlow(
