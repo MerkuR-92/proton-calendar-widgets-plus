@@ -686,20 +686,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->
             if (viewMode == ViewMode.AGENDA) {
                 // Set selected background
-                nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.brand_darken_40)
+                nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                 nav_view_main_content.nav_view_switcher_day_layout.background = null
 
                 // Set icon tint
-                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
-                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.santas_gray))
+                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
             } else {
                 // Set selected background
                 nav_view_main_content.nav_view_switcher_agenda_layout.background = null
-                nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.brand_darken_40)
+                nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
 
                 // Set icon tint
-                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.santas_gray))
-                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
             }
         }
     }
