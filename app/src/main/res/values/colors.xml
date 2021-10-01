@@ -79,11 +79,6 @@
 
     <!--    TODO below maybe won't be used-->
 
-
-    <color name="textColorPrimary">#000000</color>
-    <color name="textColorSecondary">#80848e</color>
-
     <color name="textColorValidationError">#F44336</color>
 
-    <color name="controlHighlight">#1F657ee4</color> <!--12% alpha on colorPrimary-->
 </resources>
