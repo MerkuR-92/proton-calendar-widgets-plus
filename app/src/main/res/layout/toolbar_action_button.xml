@@ -10,7 +10,7 @@
         android:layout_gravity="center"
         android:layout_width="@dimen/action_background_size"
         android:layout_height="@dimen/action_background_size"
-        android:background="@drawable/ripple_action_secondary_oval"
+        android:background="@drawable/ripple_action_button_oval"
         android:tint="@color/icon_norm"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
