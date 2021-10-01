@@ -37,8 +37,8 @@
 
     <style name="AppTheme.DayNight.Splash">
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:statusBarColor">@color/brand_norm</item>
-        <item name="android:navigationBarColor">@color/brand_norm</item>
+        <item name="android:statusBarColor">@color/splash_screen_color</item>
+        <item name="android:navigationBarColor">@color/splash_screen_color</item>
     </style>
 
     <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">

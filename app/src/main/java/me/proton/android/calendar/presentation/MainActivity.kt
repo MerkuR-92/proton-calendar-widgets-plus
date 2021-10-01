@@ -624,15 +624,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         drawer_layout.setDrawerLockMode(if (display) LOCK_MODE_LOCKED_CLOSED else LOCK_MODE_UNLOCKED)
 
         val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm
-        val statusBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_norm
+        val statusBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_norm
 
         window.setBackgroundDrawableResource(backgroundDrawable)
         window.statusBarColor =  resources.getColor(statusBarBackgroundColor, null)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
-            val navigationBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_norm
+            val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_norm
             window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
         } else {
-            val navigationBarBackgroundColor = if (display) R.color.brand_norm else R.color.background_navigation_bar
+            val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_navigation_bar
             window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
         }
     }

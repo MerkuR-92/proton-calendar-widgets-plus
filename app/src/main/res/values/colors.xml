@@ -136,4 +136,7 @@
     <!-- navigation bar color used for api < 27 -->
     <color name="background_navigation_bar">@color/woodsmoke</color>
 
+    <!-- Splash screen color -->
+    <color name="splash_screen_color">@color/brand_norm</color>
+
 </resources>
