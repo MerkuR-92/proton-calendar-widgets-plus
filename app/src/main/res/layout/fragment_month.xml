@@ -89,7 +89,7 @@
                 android:layout_width="40dp"
                 android:layout_height="4dp"
                 android:background="@drawable/shape_background_square_rounded_dark"
-                android:backgroundTint="@color/interaction_weak"
+                android:backgroundTint="@color/interaction_weak_norm"
                 android:layout_gravity="center"/>
 
         </LinearLayout>

@@ -164,7 +164,7 @@
     </style>
 
     <style name="AttendeeChip" parent="@style/Widget.MaterialComponents.Chip.Choice">
-        <item name="chipBackgroundColor">@color/interaction_weak</item>
+        <item name="chipBackgroundColor">@color/interaction_weak_norm</item>
         <item name="android:textColor">@color/text_norm</item>
         <item name="android:textAppearance">@style/Text.Default</item>
         <item name="android:textAlignment">center</item>

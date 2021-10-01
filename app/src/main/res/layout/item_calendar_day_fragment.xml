@@ -132,7 +132,7 @@
             android:id="@+id/all_day_view_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/lines_norm"
+            android:background="@color/separator_norm"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -141,7 +141,7 @@
             android:id="@+id/all_day_view_vertical_separator"
             android:layout_width="1dp"
             android:layout_height="0dp"
-            android:background="@color/lines_norm"
+            android:background="@color/separator_norm"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/all_day_view_separator"
             app:layout_constraintEnd_toStartOf="@+id/all_day_list_scroll_view"/>
@@ -165,7 +165,7 @@
             app:eventMargin="0dp"
             app:halfHourDividerColor="@color/background_norm"
             app:halfHourHeight="@dimen/half_hour_height"
-            app:hourDividerColor="@color/lines_norm"
+            app:hourDividerColor="@color/separator_norm"
             app:hourLabelMarginEnd="4dp"
             app:hourLabelWidth="@dimen/hour_label_width"
             app:hourLabelDividerOverflow="10dp"
