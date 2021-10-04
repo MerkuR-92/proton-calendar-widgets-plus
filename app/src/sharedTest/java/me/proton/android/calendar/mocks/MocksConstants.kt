@@ -1,6 +1,8 @@
 package me.proton.android.calendar.mocks
 
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.entity.AddressId
+import me.proton.core.user.domain.entity.AddressType
 import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.Role
 
@@ -41,7 +43,7 @@ const val singleEditEventId = "singleEditEventId"
 
 const val eventUid = "eventUid@proton.me"
 
-const val attendeeEmail = "attendee@email.com"
+const val attendeeEmail = "attendee@pm.me"
 const val attendeeName = "attendeeName"
 
 const val sharedEventId = "sharedEventId"
@@ -56,9 +58,18 @@ const val weekStart = 1
 const val dateFormat = 1
 const val timeFormat = 1
 
-const val userEmail = "userEmail@email.com"
+const val userEmail = "userEmail@pm.me"
 const val userName = "userName"
 const val userDisplayName = "displayName"
+
+val addressId = AddressId("addressId")
+
+const val canSend = true
+const val canReceive = true
+const val enabled = true
+const val order = 1
+
+val addressType = AddressType.Original
 
 const val currency = "EUR"
 const val credit = 50
@@ -81,9 +92,6 @@ val baseIcs = """
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Proton Technologies//AndroidCalendar 0.25.1//EN
-    BEGIN:VTIMEZONE
-    TZID:Europe/Paris
-    END:VTIMEZONE
     BEGIN:VEVENT
     DTSTAMP:20210914T132502Z
     UID:eventUid@proton.me
@@ -105,9 +113,6 @@ val recurringIcs = """
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Proton Technologies//AndroidCalendar 0.25.1//EN
-    BEGIN:VTIMEZONE
-    TZID:Europe/Paris
-    END:VTIMEZONE
     BEGIN:VEVENT
     DTSTAMP:20210914T132502Z
     UID:eventUid@proton.me
@@ -130,9 +135,6 @@ val singleEditIcs = """
     BEGIN:VCALENDAR
     VERSION:2.0
     PRODID:-//Proton Technologies//AndroidCalendar 0.25.1//EN
-    BEGIN:VTIMEZONE
-    TZID:Europe/Paris
-    END:VTIMEZONE
     BEGIN:VEVENT
     DTSTAMP:20210914T132502Z
     UID:eventUid@proton.me

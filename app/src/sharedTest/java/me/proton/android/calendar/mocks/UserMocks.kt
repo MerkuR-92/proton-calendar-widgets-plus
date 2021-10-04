@@ -1,7 +1,13 @@
 package me.proton.android.calendar.mocks
 
 import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.core.key.domain.extension.areAllLocked
+import me.proton.core.key.domain.useKeys
+import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.AddressId
+import me.proton.core.user.domain.entity.AddressType
 import me.proton.core.user.domain.entity.User
+import me.proton.core.user.domain.entity.UserAddress
 
 object UserMocks {
 
@@ -31,6 +37,23 @@ object UserMocks {
             subscribed = subscribed,
             delinquent = delinquent,
             keys = emptyList()
+        )
+    }
+
+    fun getUserAddress(canSendParam: Boolean? = null, canReceiveParam: Boolean? = null, enabledParam: Boolean? = null): UserAddress {
+        return UserAddress(
+            userId = userId,
+            addressId = addressId,
+            email = userEmail,
+            displayName = userDisplayName,
+            signature = null, // TODO
+            domainId = null, // TODO
+            canSend = canSendParam ?: canSend,
+            canReceive = canReceiveParam ?: canReceive,
+            enabled = enabledParam ?: enabled,
+            type = addressType,
+            order = order,
+            keys = emptyList() // TODO
         )
     }
 }

@@ -1,8 +1,11 @@
 package me.proton.android.calendar.mocks
 
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.domain.model.Calendar
+import me.proton.core.util.kotlin.toBoolean
 
 object CalendarMocks {
 
@@ -40,6 +43,17 @@ object CalendarMocks {
             secondaryTimezone = null, // TODO
             viewPreference = viewPreference,
             defaultCalendarId = calendarId
+        )
+    }
+
+    fun getCalendar(hasDisabledCalendar: Boolean = false): Calendar {
+        return Calendar(
+            calendarId,
+            calendarName,
+            calendarColor,
+            if (hasDisabledCalendar) CalendarFlags.DISABLED.value else calendarFlags,
+            calendarDisplay.toBoolean(),
+            calendarType
         )
     }
 }

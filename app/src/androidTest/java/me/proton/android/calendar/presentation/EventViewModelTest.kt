@@ -7,8 +7,9 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import biweekly.util.Frequency
 import io.mockk.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -22,13 +23,17 @@ import me.proton.android.calendar.mocks.CalendarMocks.getCalendarUserSettingsEnt
 import me.proton.android.calendar.mocks.EventMocks.getEvent
 import me.proton.android.calendar.mocks.EventMocks.getEventEntity
 import me.proton.android.calendar.mocks.UserMocks.getUser
+import me.proton.android.calendar.mocks.UserMocks.getUserAddress
 import me.proton.android.calendar.mocks.UserMocks.getUserSettingsEntity
+import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.user.domain.UserManager
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -37,14 +42,13 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-internal class EventViewModelTest {
+internal class EventViewModelTest: KoinComponent {
 
     @get:Rule
     var rule = InstantTaskExecutorRule()
 
     private lateinit var appDatabaseMock: AppDatabase
-    private lateinit var protonCalendarApplicationMock: Application
-    private lateinit var resourceProviderMock: ResourceProvider
+    private lateinit var protonCalendarApplication: Application
 
     private val calendarsRepositoryMock: CalendarsRepository = mockk()
     private val userSettingsRepositoryMock: UserSettingsRepository = mockk()
@@ -63,12 +67,15 @@ internal class EventViewModelTest {
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
 
+    private val resourceProvider: ResourceProvider by inject()
+    private val resourceProviderMock: ResourceProvider = mockk()
+
     @Before
     fun beforeEach() {
         clearAllMocks()
         appDatabaseMock = mockk()
-        protonCalendarApplicationMock = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-        resourceProviderMock = mockk()
+        val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        protonCalendarApplication = application
 
         coEvery { calendarsRepositoryMock.getDefaultCalendarId(userId.id) } returns calendarId
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns getCalendarEntity()
@@ -90,7 +97,7 @@ internal class EventViewModelTest {
 
     private fun getEventViewModel(): EventViewModel {
         return EventViewModel(
-            application = protonCalendarApplicationMock,
+            application = protonCalendarApplication,
             userManager = userManagerMock,
             calendarsRepository = calendarsRepositoryMock,
             userSettingsRepository = userSettingsRepositoryMock,
@@ -298,5 +305,94 @@ internal class EventViewModelTest {
             assert(singleEditsInfo?.hasFutureSingleEdit == true)
             assert(singleEditsInfo?.hasNonCancelledSingleEdit == true)
         }
+    }
+
+    /**
+     * EventViewModel delete flow tests
+     */
+
+    @Test
+    fun deleteSingleEventTest() {
+//        runBlocking {
+//
+//            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+//            coEvery { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, 0) } returns UseCase.Result.Success<Unit>()
+//
+//            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_event)
+//            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+//            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(R.string.dialog_button_delete)
+//            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+//            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+//
+//            val occurrenceNumber = 0
+//            val eventViewModel = getInitialisedEventViewModel(
+//                editMode = false,
+//                eventId = eventId,
+//                occurrenceNumber = occurrenceNumber,
+//                initStartDate = null,
+//                initStartTime = null
+//            )
+//
+//            val provideDisplayDialog = object : BaseDialogFragment.DisplayDialog {
+//                override fun alertDialog(
+//                    title: String,
+//                    message: String,
+//                    positiveButton: String,
+//                    negativeButton: String,
+//                    alertDialogListener: BaseDialogFragment.AlertDialogListener
+//                ) {
+//                    alertDialogListener.onPositive(this@runBlocking)
+//                }
+//            }
+//
+//            withContext(Dispatchers.Default) {
+//                eventViewModel.handleDelete(provideDisplayDialog, occurrenceNumber)
+//            }
+//
+//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
+//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_event) }
+//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+//
+//            assert(eventViewModel.eventState.value == EventViewModel.EventState.Idle)
+//            assert(eventViewModel.eventSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+//                resourceProviderMock.provideString(R.string.snack_event_deleted)
+//            ))
+//        }
+    }
+
+    @Test
+    fun deleteDisabledCalendarRecurringEventTest() {
+//        runBlocking {
+//
+//            coEvery { transformEventUseCaseMock.execute(any()) } returns getEvent(isRecurring = true, hasDisabledCalendar = true)
+//
+//            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+//            coEvery { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) } returns UseCase.Result.Success<Unit>()
+//
+//            val occurrenceNumber = 1
+//            val eventViewModel = getInitialisedEventViewModel(
+//                editMode = false,
+//                eventId = eventId,
+//                occurrenceNumber = occurrenceNumber,
+//                initStartDate = null,
+//                initStartTime = null
+//            )
+//
+//            // Called on delete click
+//            eventViewModel.handleDelete(occurrenceNumber)
+//
+//            assert(eventViewModel.eventState.value == EventViewModel.EventState.Processing.Deleting)
+//            assert(eventViewModel.eventDialogState.value == EventViewModel.EventDialogState.Delete.DisabledCalendarRecurring)
+//
+//            // Called on confirmation dialog click
+//            eventViewModel.handleDeleteDisabledCalendarRecurring()
+//
+//            assert(eventViewModel.eventState.value == EventViewModel.EventState.Idle)
+//            assert(eventViewModel.eventSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+//                resourceProviderMock.provideString(R.string.snack_event_deleted)
+//            ))
+//        }
     }
 }
