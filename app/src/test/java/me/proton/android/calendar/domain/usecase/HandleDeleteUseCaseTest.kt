@@ -1,28 +1,25 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.util.Log
-import biweekly.property.Attendee
-import biweekly.util.Frequency
-import biweekly.util.Recurrence
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.ApiResponseCode
-import me.proton.android.calendar.common.ICalUtilsImpl
-import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
-import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.mocks.CalendarMocks.getCalendarUserSettingsEntity
+import me.proton.android.calendar.mocks.EventMocks.getEvent
+import me.proton.android.calendar.mocks.EventMocks.getEventEntity
+import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
-import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.*
 
 
 internal class HandleDeleteUseCaseTest {
@@ -40,8 +37,6 @@ internal class HandleDeleteUseCaseTest {
     private val updateParticipationStatusUseCaseMock: UpdateParticipationStatusUseCase = mockk()
 
     private val testsLogger = TestsLogger
-
-    private val userId = UserId("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
 
     @BeforeEach
     fun `before each`() {
@@ -110,20 +105,6 @@ internal class HandleDeleteUseCaseTest {
         )
     }
 
-    private fun getCalendarUserSettingsEntity(): CalendarUserSettingsEntity {
-        return CalendarUserSettingsEntity(
-            fkUserId = userId.id,
-            weekLength = 7,
-            displayWeekNumber = 1,
-            autoDetectPrimaryTimezone = 1,
-            primaryTimezone = "Europe/Paris",
-            displaySecondaryTimezone = 0,
-            secondaryTimezone = null,
-            viewPreference = 0,
-            defaultCalendarId = "calendarId"
-        )
-    }
-
     enum class SyncEventErrorType {
         ERROR_EVENT_DOES_NOT_EXIST,
         ERROR_DELETING_ON_SERVER,
@@ -167,74 +148,6 @@ internal class HandleDeleteUseCaseTest {
         coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
         return event
-    }
-
-    private fun getEvent(isRecurring: Boolean = false, hasAttendees: Boolean = false): Event {
-        val baseICalIcs = """
-            BEGIN:VCALENDAR
-            VERSION:2.0
-            PRODID:-//Proton Technologies//AndroidCalendar 0.25.1//EN
-            BEGIN:VTIMEZONE
-            TZID:Europe/Paris
-            END:VTIMEZONE
-            BEGIN:VEVENT
-            DTSTAMP:20210914T132502Z
-            UID:m-AMDWMT5erCPBet63epq0Sx4USc@proton.me
-            STATUS:CONFIRMED
-            SEQUENCE:0
-            DTSTART;TZID=Europe/Paris:20210914T153000
-            DTEND;TZID=Europe/Paris:20210914T160000
-            SUMMARY:Single event
-            BEGIN:VALARM
-            ACTION:DISPLAY
-            TRIGGER;RELATED=START:-PT15M
-            END:VALARM
-            END:VEVENT
-            END:VCALENDAR
-        """.trimIndent()
-
-        val baseICal = ICalUtilsImpl.parseICalString(baseICalIcs)!!
-
-        // Recurring event
-        if (isRecurring) baseICal.events.first().setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).interval(1).count(10).build())
-
-        // Event with attendees
-        if (hasAttendees) baseICal.events.first().addAttendee(Attendee("adamtst", "adamtst@pm.me"))
-
-        baseICal.setDefaultTimeZone("Europe/Paris")
-
-        return Event.from(
-            "id",
-            Calendar(
-                "calendarId",
-                "calendar",
-                "",
-                1,
-                true,
-                0
-            ),
-            baseICal,
-            null
-        )!!
-    }
-
-    private fun getEventEntity(): EventEntity {
-        return EventEntity(
-            "id",
-            "calendarId",
-            "sharedEventId",
-            "calendarKeyPacket",
-            0L,
-            0L,
-            1,
-            "sharedKeyPacket",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            null
-        )
     }
 
     @Test

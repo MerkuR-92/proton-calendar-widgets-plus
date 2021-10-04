@@ -1,37 +1,30 @@
 package me.proton.android.calendar.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import biweekly.property.Attendee
-import biweekly.property.RecurrenceId
 import biweekly.util.Frequency
-import biweekly.util.Recurrence
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
-import me.proton.android.calendar.common.ICalUtilsImpl
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
-import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.UserSettingsRepository
-import me.proton.android.calendar.domain.model.Calendar
-import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.mocks.CalendarMocks.getCalendarEntity
+import me.proton.android.calendar.mocks.CalendarMocks.getCalendarSettingsEntity
+import me.proton.android.calendar.mocks.CalendarMocks.getCalendarUserSettingsEntity
+import me.proton.android.calendar.mocks.EventMocks.getEvent
+import me.proton.android.calendar.mocks.EventMocks.getEventEntity
+import me.proton.android.calendar.mocks.UserMocks.getUser
+import me.proton.android.calendar.mocks.UserMocks.getUserSettingsEntity
 import me.proton.android.calendar.presentation.calendar.EventViewModel
-import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
-import me.proton.core.user.domain.entity.Delinquent
-import me.proton.core.user.domain.entity.Role
-import me.proton.core.user.domain.entity.User
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +33,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -70,16 +62,6 @@ internal class EventViewModelTest {
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
-
-    private val userId = UserId("IXFh2TE4LI11sd0GYf94r7fddHNMdZvicfoWMACCjPTS-oNjpBjeclhKlIs6N48-GB5w-zM6uqX_9HFgEnzhYQ==")
-    private val calendarId = "calendarId"
-    private val calendarSettingsId = "calendarSettingsId"
-    private val eventId = "eventId"
-    private val singleEditEventId = "singleEditEventId"
-    private val eventUid = "m-AMDWMT5erCPBet63epq0Sx4USc@proton.me"
-
-    private val defaultTimezone = "Europe/Paris"
-    private val defaultEventDuration = 30
 
     @Before
     fun beforeEach() {
@@ -169,147 +151,8 @@ internal class EventViewModelTest {
         return eventViewModel
     }
 
-    private fun getCalendarEntity(): CalendarEntity {
-        return CalendarEntity(
-            id = calendarId,
-            name = "CalendarName",
-            description = "CalendarDescription",
-            color = "#000000",
-            display = 1,
-            flags = 1,
-            type = 0,
-            fkUserId = userId.id
-        )
-    }
-
-    private fun getCalendarSettingsEntity(): CalendarSettingsEntity {
-        return CalendarSettingsEntity(
-            id = calendarSettingsId,
-            calendarId = calendarId,
-            defaultEventDuration = defaultEventDuration,
-            defaultPartDayNotifications = emptyList(), // TODO Test default part day notifications
-            defaultFullDayNotifications = emptyList() // TODO Test default full day notifications
-        )
-    }
-
-    private fun getCalendarUserSettingsEntity(): CalendarUserSettingsEntity {
-        return CalendarUserSettingsEntity(
-            fkUserId = userId.id,
-            weekLength = 7,
-            displayWeekNumber = 1,
-            autoDetectPrimaryTimezone = 1,
-            primaryTimezone = defaultTimezone,
-            displaySecondaryTimezone = 0,
-            secondaryTimezone = null,
-            viewPreference = 0,
-            defaultCalendarId = calendarId
-        )
-    }
-
-    private fun getUserSettingsEntity(): UserSettingsEntity {
-        return UserSettingsEntity(
-            fkUserId = userId.id,
-            weekStart = 1, // 0: Locale default, 1: Monday, 6: Saturday 7: Sunday
-            dateFormat = 1, // 0: Locale default, 1: DD_MM_YYYY, 2: MM_DD_YYYY, 3: YYYY_MM_DD
-            timeFormat = 1 // 0: Locale default, 1: 24H, 2: 12H
-        )
-    }
-
-    private fun getUser(): User {
-        return User(
-            userId = userId,
-            email = "user@email.com",
-            name = "UserName",
-            displayName = "DisplayName",
-            currency = "EUR",
-            credit = 50,
-            usedSpace = 0,
-            maxSpace = 3096,
-            maxUpload = 3096,
-            role = Role.NoOrganization,
-            private = true,
-            services = 1,
-            subscribed = 1,
-            delinquent = Delinquent.None,
-            keys = emptyList()
-        )
-    }
-
-    private fun getEvent(isRecurring: Boolean = false, hasAttendees: Boolean = false, isSingleEdit: Boolean = false): Event {
-        val baseICalIcs = """
-            BEGIN:VCALENDAR
-            VERSION:2.0
-            PRODID:-//Proton Technologies//AndroidCalendar 0.25.1//EN
-            BEGIN:VTIMEZONE
-            TZID:Europe/Paris
-            END:VTIMEZONE
-            BEGIN:VEVENT
-            DTSTAMP:20210914T132502Z
-            UID:m-AMDWMT5erCPBet63epq0Sx4USc@proton.me
-            STATUS:CONFIRMED
-            SEQUENCE:0
-            DTSTART;TZID=Europe/Paris:20210914T153000
-            DTEND;TZID=Europe/Paris:20210914T160000
-            SUMMARY:Single event
-            BEGIN:VALARM
-            ACTION:DISPLAY
-            TRIGGER;RELATED=START:-PT15M
-            END:VALARM
-            END:VEVENT
-            END:VCALENDAR
-        """.trimIndent()
-
-        val baseICal = ICalUtilsImpl.parseICalString(baseICalIcs)!!
-
-        // Recurring event
-        if (isRecurring) baseICal.events.first().setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).interval(1).count(10).build())
-        // All day single edit on second occurrence
-        else if (isSingleEdit) baseICal.events.first().recurrenceId = RecurrenceId(
-            LocalDate.of(2021, 9, 15).toDate(TimeZone.getDefault().id),
-            false
-        )
-
-        // Event with attendees
-        if (hasAttendees) baseICal.events.first().addAttendee(Attendee("adamtst", "adamtst@pm.me"))
-
-        baseICal.setDefaultTimeZone(defaultTimezone)
-
-        return Event.from(
-            if (isSingleEdit) singleEditEventId else eventId,
-            Calendar(
-                calendarId,
-                "calendar",
-                "",
-                1,
-                true,
-                0
-            ),
-            baseICal,
-            null
-        )!!
-    }
-
-    private fun getEventEntity(isSingleEdit: Boolean = false): EventEntity {
-        return EventEntity(
-            if (isSingleEdit) singleEditEventId else eventId,
-            calendarId,
-            "sharedEventId",
-            "calendarKeyPacket",
-            0L,
-            0L,
-            1,
-            "sharedKeyPacket",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            null
-        )
-    }
-
     /**
-     *   EventViewModel.initialise Tests
+     *  EventViewModel.initialise Tests
      */
 
     @Test
@@ -368,9 +211,7 @@ internal class EventViewModelTest {
     fun initialiseViewEventDetailsTest() {
         runBlocking {
 
-            val eventViewModel = getEventViewModel()
-            eventViewModel.initialise(
-                userId,
+            val eventViewModel = getInitialisedEventViewModel(
                 editMode = false,
                 eventId = eventId,
                 occurrenceNumber = 0,
@@ -389,7 +230,8 @@ internal class EventViewModelTest {
                 eventId = eventId,
                 occurrenceNumber = 0,
                 initStartDate = null,
-                initStartTime = null)
+                initStartTime = null
+            )
         }
     }
 
@@ -414,7 +256,8 @@ internal class EventViewModelTest {
                 eventId = singleEditEventId,
                 occurrenceNumber = 2,
                 initStartDate = null,
-                initStartTime = null)
+                initStartTime = null
+            )
 
             // Test: Clone RRule from original event in DB if we are in edit mode
             assert(eventViewModel.eventLiveData.value?.iCalEvent?.recurrenceRule?.value != null)
@@ -422,6 +265,38 @@ internal class EventViewModelTest {
 
             assert(eventViewModel.eventLiveData.value?.id == singleEditEventId)
 
+        }
+    }
+
+    /**
+     *  EventViewModel.getSingleEditsInfo Tests
+     */
+
+    @Test
+    fun getSingleEditsInfoTest() {
+        runBlocking {
+
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(hasAttendees = true)
+
+            coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf(
+                getEvent(hasAttendees = true, isSingleEdit = true)
+            )
+
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = 0,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val singleEditsInfo = eventViewModel.getSingleEditsInfo(listOf(attendeeEmail))
+
+            assert(singleEditsInfo?.singleEdits?.size == 1)
+            assert(singleEditsInfo?.hasSingleEdit == true)
+            assert(singleEditsInfo?.hasAnsweredSingleEdit == true)
+            assert(singleEditsInfo?.hasFutureSingleEdit == true)
+            assert(singleEditsInfo?.hasNonCancelledSingleEdit == true)
         }
     }
 }
