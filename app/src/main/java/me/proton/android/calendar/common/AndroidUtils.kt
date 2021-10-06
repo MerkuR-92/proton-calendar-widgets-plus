@@ -462,6 +462,16 @@ object AndroidUtils {
             ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys -> R.string.event_send_prefs_trusted_keys_signature_invalid
         }
 
+    fun ObtainSendPreferencesUseCase.Result.Error.formatSendPreferencesError(): Int =
+        when (this) {
+            ObtainSendPreferencesUseCase.Result.Error.AddressDisabled -> R.string.event_send_prefs_error_address_disabled
+            ObtainSendPreferencesUseCase.Result.Error.GettingContactPreferences -> R.string.event_send_prefs_error_getting_contact
+            ObtainSendPreferencesUseCase.Result.Error.NetworkError -> R.string.event_send_prefs_error_network
+            ObtainSendPreferencesUseCase.Result.Error.TrustedKeysInvalid -> R.string.event_send_prefs_trusted_keys_invalid
+            ObtainSendPreferencesUseCase.Result.Error.PublicKeysInvalid -> R.string.event_send_prefs_public_keys_invalid
+            ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys -> R.string.event_send_prefs_trusted_keys_signature_invalid
+        }
+
     fun formatAlarm(
         resources: Resources,
         isAllDay: Boolean,
