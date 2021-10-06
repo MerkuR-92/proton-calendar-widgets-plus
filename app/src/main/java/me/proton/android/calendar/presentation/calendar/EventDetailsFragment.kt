@@ -3,7 +3,6 @@ package me.proton.android.calendar.presentation.calendar
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.text.TextUtils
 import android.text.format.DateFormat
 import android.text.util.Linkify
 import android.util.TypedValue
@@ -11,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -30,7 +28,6 @@ import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Organizer
 import biweekly.property.Status
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.event_info.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
@@ -48,7 +45,6 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.collapse
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.expand
-import me.proton.android.calendar.common.AndroidUtils.formatSendPreferencesError
 import me.proton.android.calendar.common.AndroidUtils.getInitials
 import me.proton.android.calendar.common.AndroidUtils.getParticipationStatusPriorityValue
 import me.proton.android.calendar.common.AndroidUtils.getText
@@ -69,6 +65,7 @@ import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
 import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
+import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -122,10 +119,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override fun onBackPressedCustom() {
 
         val immutableChangeAnswerLoading =
-            eventViewModel.eventState.value is EventViewModel.EventState.Processing.ChangingAnswer
+            eventViewModel.attendeeAnswerState.value?.second
         val immutableDeletingEvent = eventViewModel.eventState.value == EventViewModel.EventState.Processing.Deleting
 
-        if (immutableChangeAnswerLoading) {
+        if (immutableChangeAnswerLoading == true) {
             view?.displaySnackBar(getString(R.string.snack_event_changing_answer))
             return
         }
@@ -179,7 +176,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         view?.displaySnackBar(getString(R.string.snack_network_error))
                         return@displayPopupMenu
                     }
-                    lifecycleScope.launch { eventViewModel.handleDelete(navigationArguments.occurrenceNumber) }
+                    lifecycleScope.launch {
+                        eventViewModel.onDeleteClick(
+                            provideDisplayDialog(),
+                            navigationArguments.occurrenceNumber,
+                            calendarViewModel.timeFormatIs24Hour(requireContext())
+                        )
+                    }
                 }
             }
         }
@@ -250,11 +253,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 launch {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
-                calendarViewModel.userAddresses.distinctUntilChanged().observe(viewLifecycleOwner) {
-                    handleAttendeeAnswerViewVisibility(updateSelectedButton = false)
+                calendarViewModel.userAddresses.distinctUntilChanged().observe(viewLifecycleOwner) { userAddresses ->
+                    handleAttendeeAnswerViewVisibility(userAddresses)
                 }
                 observeEventLiveData(coroutineContext)
-                observeEventDialogState(coroutineContext)
                 observeEventSnackState(coroutineContext)
                 attachActionHandlers()
             } else {
@@ -301,341 +303,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun observeEventDialogState(coroutineContext: CoroutineContext) {
-        eventViewModel.eventDialogState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventDialogState ->
-
-            eventDialogState?.let {
-                when (it) {
-                    EventViewModel.EventDialogState.Delete.DisabledCalendarRecurring -> {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(
-                                R.string.dialog_title_delete_recurring_event
-                            )
-                            .setMessage(
-                                R.string.dialog_description_delete_recurring_event
-                            )
-                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
-                                lifecycleScope.launch {
-                                    eventViewModel.handleDeleteDisabledCalendarRecurring()
-                                }
-                            }
-                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnCancelListener {
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    EventViewModel.EventDialogState.Delete.Event -> {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(
-                                R.string.dialog_title_delete_event
-                            )
-                            .setMessage(
-                                R.string.dialog_description_delete_event
-                            )
-                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
-                                lifecycleScope.launch {
-                                    eventViewModel.handleDeleteEvent(navigationArguments.occurrenceNumber)
-                                }
-                            }
-                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnCancelListener {
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    is EventViewModel.EventDialogState.Delete.RecurringEvent -> {
-                        var selectedItem = 0
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
-                        builder.setTitle(getString(R.string.dialog_title_delete_recurring_event))
-                            .setSingleChoiceItems(
-                                listOfNotNull(
-                                    getString(R.string.event_recurring_edit_this),
-                                    if (it.showThisAndFuture) getString(R.string.event_recurring_edit_this_and_future)
-                                    else null,
-                                    getString(R.string.event_recurring_edit_all_events)
-                                ).toTypedArray(),
-                                0
-                            ) { _, item ->
-                                selectedItem = item
-                            }
-                            .setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
-                                lifecycleScope.launch {
-                                    eventViewModel.handleDeleteRecurring(
-                                        navigationArguments.occurrenceNumber,
-                                        selectedItem,
-                                        it.showThisAndFuture
-                                    )
-                                }
-                                dialog.dismiss()
-                            }
-                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnCancelListener { _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    is EventViewModel.EventDialogState.Delete.AsAnOrganizer -> {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(
-                                if (it.isPartOfChain) R.string.dialog_title_delete_recurring_event
-                                else R.string.dialog_title_delete_event
-                            )
-                            .setMessage(
-                                if (it.isPartOfChain && it.isCalendarDisabled) R.string.dialog_description_delete_recurring_event_as_organizer_disabled
-                                else if (it.isPartOfChain) R.string.dialog_description_delete_recurring_event_as_organizer
-                                else if (it.isCalendarDisabled) R.string.dialog_description_delete_event_as_organizer_disabled
-                                else R.string.dialog_description_delete_event_as_organizer
-                            )
-                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
-                                lifecycleScope.launch {
-                                    eventViewModel.handleDeleteAsOrganizerSendPreferences(
-                                        it.isPartOfChain,
-                                        it.isCalendarDisabled,
-                                        calendarViewModel.timeFormatIs24Hour(requireContext())
-                                    )
-                                }
-                            }
-                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnCancelListener {
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    is EventViewModel.EventDialogState.Delete.AsAnAttendeeSendPreferences -> {
-
-                        val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
-                            resources.getString(R.string.event_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
-                        })
-                        val sendPrefsFailed = emailsWithErrors.isNotEmpty()
-                        val displayWarning = (it.currentParticipationStatus == ParticipationStatus.ACCEPTED ||
-                                it.currentParticipationStatus == ParticipationStatus.TENTATIVE) &&
-                                it.isEventCanceled.not() &&
-                                !it.isCalendarDisabled
-
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(
-                                if (sendPrefsFailed && displayWarning) R.string.event_organizer_send_prefs_error_title
-                                else if (it.isRecurring || (it.isSingleEdit && it.isOrphanSingleEdit.not())) R.string.dialog_title_delete_recurring_event
-                                else R.string.dialog_title_delete_event
-                            )
-                            .setMessage(
-                                if (displayWarning.not()) {
-                                    if (it.isSingleEdit && (it.isSingleEdit && it.isOrphanSingleEdit.not()) && it.isCalendarDisabled.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-                                    else if (it.isRecurring || (it.isSingleEdit && it.isOrphanSingleEdit.not() && it.isCalendarDisabled)) {
-                                        val message = getString(R.string.dialog_description_delete_recurring_event)
-
-                                        val singleEditWarning = if (!it.isCalendarDisabled && it.hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
-                                        else if (!it.isCalendarDisabled && it.hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
-                                        else ""
-
-                                        if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
-                                        else message
-                                    }
-                                    else getString(R.string.dialog_description_delete_event)
-                                } else {
-                                    // Dialog order: 1- Address disabled warning. 2- Send prefs dialog. 3- Others.
-                                    when {
-                                        !it.isAddressAllowedToSend -> getDeleteAsAnAttendeeWarningMessage(
-                                            it.isRecurring,
-                                            it.hasAnsweredSingleEdit,
-                                            it.hasNonCancelledSingleEdit,
-                                            it.isSingleEdit,
-                                            it.isOrphanSingleEdit,
-                                            it.isAddressAllowedToSend
-                                        )
-                                        sendPrefsFailed -> getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
-                                        else -> getDeleteAsAnAttendeeWarningMessage(
-                                            it.isRecurring,
-                                            it.hasAnsweredSingleEdit,
-                                            it.hasNonCancelledSingleEdit,
-                                            it.isSingleEdit,
-                                            it.isOrphanSingleEdit,
-                                            it.isAddressAllowedToSend
-                                        )
-                                    }
-                                }
-                            )
-                            .setPositiveButton(R.string.dialog_button_delete) { _, _ ->
-                                lifecycleScope.launch {
-                                    eventViewModel.handleDeleteEventAsAttendee(
-                                        it.userEmail,
-                                        it.sendPreferencesResults.sendPreferences,
-                                        it.hasNonCancelledSingleEdit,
-                                        it.hasAnsweredSingleEdit,
-                                        navigationArguments.occurrenceNumber,
-                                        it.isOrphanSingleEdit,
-                                        calendarViewModel.timeFormatIs24Hour(requireContext()),
-                                        displayWarning && it.isAddressAllowedToSend && !sendPrefsFailed
-                                    )
-                                }
-                            }
-                            .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnCancelListener {
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    is EventViewModel.EventDialogState.Delete.AsAnOrganizerSendPreferences -> {
-
-                        val emailsWithErrors = TextUtils.join("\n• ", it.sendPreferencesResults.emailErrors.map { entry ->
-                            resources.getString(R.string.event_send_prefs_error_template, entry.key, entry.value.formatSendPreferencesError(resources))
-                        })
-
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(R.string.event_attendees_send_prefs_error_title)
-                            .setMessage(
-                                if (it.sendPreferencesResults.sendPreferences.isEmpty()) getString(
-                                    R.string.event_attendees_send_prefs_error_none_message,
-                                    emailsWithErrors
-                                )
-                                else getString(
-                                    R.string.event_attendees_send_prefs_error_some_message,
-                                    emailsWithErrors
-                                )
-                            )
-                            .setPositiveButton(R.string.event_attendees_send_prefs_error_confirm) { _, _ ->
-                                lifecycleScope.launch {
-                                    // Remove attendees whom emails were invalid
-                                    val attendees = eventViewModel.eventLiveData.value?.iCalEvent?.attendees?.filter { attendee ->
-                                        it.sendPreferencesResults.emailErrors.any { emailError ->
-                                            attendee.extractEmail() == emailError.key
-                                        }.not()
-                                    } ?: listOf()
-
-                                    eventViewModel.handleDeleteEventAsOrganizer(
-                                        attendees,
-                                        it.sendPreferencesResults.sendPreferences,
-                                        calendarViewModel.timeFormatIs24Hour(requireContext()),
-                                        it.isPartOfChain,
-                                        it.isCalendarDisabled
-                                    )
-                                }
-                            }
-                            .setNegativeButton(R.string.event_attendees_send_prefs_error_cancel) { _, _, ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnCancelListener {
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    is EventViewModel.EventDialogState.ChangeAnswer.RecurringEvent -> {
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(R.string.event_change_answer_recurring_title)
-                            .setMessage(
-                                when(it.dialogType) {
-                                    EventViewModel.ChangeAnswerRecurringDialogType.OVERWRITE -> R.string.event_change_answer_recurring_overwrite_description
-                                    EventViewModel.ChangeAnswerRecurringDialogType.SINGLE_EDIT -> R.string.event_change_answer_recurring_single_edit_description
-                                    else -> R.string.event_change_answer_recurring_description
-                                }
-                            )
-                            .setPositiveButton(R.string.event_change_answer_recurring_confirm) { _, _ ->
-                                lifecycleScope.launch {
-                                    if (!eventViewModel.handleChangeAnswerSendPreferences(it.participationStatus, it.timeFormatIs24Hours)) {
-                                        eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                                        view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                                        displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                                    }
-                                }
-                            }
-                            .setNegativeButton(R.string.event_change_answer_recurring_cancel) { _, _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                            }
-                            .setOnCancelListener {
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                    is EventViewModel.EventDialogState.ChangeAnswer.SendPreferences -> {
-                        // Reset change answer buttons to previous state
-                        displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-
-                        val errorMessage = getString(when (it.participationStatus) {
-                            ParticipationStatus.ACCEPTED -> R.string.event_organizer_send_prefs_message_accepted_title
-                            ParticipationStatus.DECLINED -> R.string.event_organizer_send_prefs_message_declined_title
-                            ParticipationStatus.TENTATIVE -> R.string.event_organizer_send_prefs_message_tentative_title
-                            else -> R.string.event_organizer_send_prefs_message_default_title
-                        })
-
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setTitle(R.string.event_organizer_send_prefs_error_title)
-                            .setMessage(resources.getString(R.string.event_send_prefs_error_template, errorMessage, it.obtainError.formatSendPreferencesError(resources)))
-                            .setPositiveButton(R.string.event_organizer_send_prefs_button_title) { _, _ ->
-                            }
-                            .setOnCancelListener { _ ->
-                                eventViewModel.eventState.value = EventViewModel.EventState.Idle
-                                displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                            }
-                            .setOnDismissListener {
-                                eventViewModel.eventDialogState.value = null
-                            }
-                            .show()
-                    }
-                }
-            }
-
-        }
-    }
-
-    private fun getDeleteAsAnAttendeeWarningMessage(
-        isRecurring: Boolean,
-        hasAnsweredSingleEdit: Boolean,
-        hasNonCancelledSingleEdit: Boolean,
-        isSingleEdit: Boolean,
-        isOrphanSingleEdit: Boolean,
-        isAddressAllowedToSend: Boolean
-    ): String {
-        return if (isRecurring) {
-            val message = if (!isAddressAllowedToSend) getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
-            else getString(R.string.dialog_description_delete_recurring_event_as_attendee)
-
-            val singleEditWarning = if (hasAnsweredSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
-            else if (hasNonCancelledSingleEdit) getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
-            else ""
-
-            if (singleEditWarning.isNotEmpty()) getString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
-            else message
-        }
-        else if (isSingleEdit && isOrphanSingleEdit.not() && !isAddressAllowedToSend) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
-        else if (isSingleEdit && isOrphanSingleEdit.not()) getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
-        else if (!isAddressAllowedToSend) getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
-        else getString(R.string.dialog_description_delete_single_event_as_attendee)
-    }
-
     private fun attachActionHandlers() {
         section_location.text_header.setOnSingleClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
@@ -657,28 +324,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))) {
-                    view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                    displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                }
+                eventViewModel.handleChangeAnswer(provideDisplayDialog(), ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))
             }
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))) {
-                    view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                    displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                }
+                eventViewModel.handleChangeAnswer(provideDisplayDialog(), ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))
             }
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                if (!eventViewModel.handleChangeAnswer(ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))) {
-                    view?.displaySnackBar(requireContext().getString(R.string.snack_change_attendee_answer_error))
-                    displayAttendeeAnswerState(eventViewModel.currentParticipationStatus)
-                }
+                eventViewModel.handleChangeAnswer(provideDisplayDialog(), ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))
             }
         }
     }
@@ -706,6 +364,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
             (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
+            eventViewModel.attendeeAnswerState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { attendeeAnswerState ->
+                attendeeAnswerState?.let { displayAttendeeAnswerState(attendeeAnswerState.first, attendeeAnswerState.second) }
+            }
+
             eventViewModel.eventState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
                 // Update action bar buttons visibility
                 val deletingEvent = eventState == EventViewModel.EventState.Processing.Deleting
@@ -715,8 +377,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                 val enableDeleteEvents = !deletingEvent && !event.calendar.isSubscribed
                 buttonMenu.visibleOrGone(enableDeleteEvents)
-
-                if (eventState is EventViewModel.EventState.Processing.ChangingAnswer) displayAttendeeAnswerState(eventState.participationStatus)
 
                 if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
                     lifecycleScope.launch {
@@ -735,6 +395,30 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             // TODO display signature verification result
 //                text_event_title.text = "SIGNATURE VERIFICATION: ${event.verificationStatus}\n\n" + event.summary + "\n"
+
+            // Make a copy of the list so we can freely remove organizer if also is an attendee
+            val attendeeList = ArrayList(event.iCalEvent.attendees)
+            section_attendees.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
+            if (attendeeList.isNotEmpty()) {
+                initParticipantsItem(attendeeList)
+
+                // Check if organizer is also an attendee to display its status
+                val organizerAttendee =
+                    attendeeList.find { it.extractEmail().equals(event.iCalEvent.organizer.extractEmail(), ignoreCase = true) }
+                val organizer = event.iCalEvent.organizer
+                if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
+
+                initAttendeeList(attendeeList, organizerAttendee)
+
+                lifecycleScope.launch {
+                    val userAddresses = calendarViewModel.getUserAddresses() ?: return@launch
+                    val userEmails = userAddresses.map { it.email }
+                    val participationStatus = event.getParticipationStatus(userEmails)
+                    displayAttendeeAnswerState(participationStatus, false)
+
+                    handleAttendeeAnswerViewVisibility(userAddresses)
+                }
+            }
 
             with(section_event_info) {
 
@@ -828,23 +512,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     visibleOrGone(true)
                 }
             }
-
-            // Make a copy of the list so we can freely remove organizer if also is an attendee
-            val attendeeList = ArrayList(event.iCalEvent.attendees)
-            section_attendees.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
-            if (attendeeList.isNotEmpty()) {
-                initParticipantsItem(attendeeList)
-
-                // Check if organizer is also an attendee to display its status
-                val organizerAttendee =
-                    attendeeList.find { it.extractEmail().equals(event.iCalEvent.organizer.extractEmail(), ignoreCase = true) }
-                val organizer = event.iCalEvent.organizer
-                if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
-
-                initAttendeeList(attendeeList, organizerAttendee)
-
-                handleAttendeeAnswerViewVisibility()
-            }
         })
     }
 
@@ -852,7 +519,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
      * updateSelectedButton should be set to false if we only mean to update the whole component visibility
      *  without updating the participation status value
      **/
-    private fun handleAttendeeAnswerViewVisibility(updateSelectedButton: Boolean = true) {
+    private fun handleAttendeeAnswerViewVisibility(userAddresses: List<UserAddress>) {
         if (!CHANGE_ANSWER) {
             // TODO Remove feature flag
             section_answer.visibleOrGone(false)
@@ -861,16 +528,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             val isFreeUser = eventViewModel.user.hasSubscription().not()
             val event = eventViewModel.eventLiveData.value
-            val userAddresses = calendarViewModel.getUserAddresses()
-            val userEmails = userAddresses?.map { it.email } // Emails are canonicalized in getParticipationStatus
-            if (event != null && userAddresses != null && userEmails != null && !event.calendar.isSubscribed) {
+            val userEmails = userAddresses.map { it.email } // Emails are canonicalized in getParticipationStatus
+            if (event != null && !event.calendar.isSubscribed) {
                 val isActive = event.calendar.isActive
                 val isUserAddressAllowedSend = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
 
                 if (participationStatus != null && isActive && isUserAddressAllowedSend && !event.isCancelled()) {
                     section_answer.visibleOrGone(true)
-                    if (updateSelectedButton) displayAttendeeAnswerState(participationStatus)
                 } else section_answer.visibleOrGone(false)
             } else section_answer.visibleOrGone(false)
         }
@@ -1015,9 +680,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?) {
-        val loading = eventViewModel.eventState.value is EventViewModel.EventState.Processing.ChangingAnswer
-
+    private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean) {
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
         section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
