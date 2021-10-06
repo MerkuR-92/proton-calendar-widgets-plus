@@ -70,6 +70,11 @@ interface DateTimeUtils {
     fun LocalDate.formatDayOfWeek(short: Boolean = false): String
 
     /**
+     * Returns "Mon", "Tue"...
+     */
+    fun LocalDate.formatDayOfWeekMedium(): String
+
+    /**
      * We only allow Locales used to format date & time that our application is translated to.
      */
     fun getLocaleForFormatting(): Locale

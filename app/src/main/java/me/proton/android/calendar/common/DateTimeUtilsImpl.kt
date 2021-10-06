@@ -2,7 +2,6 @@ package me.proton.android.calendar.common
 
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
 import java.text.SimpleDateFormat
@@ -297,6 +296,11 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
     override fun LocalDate.formatDayOfWeek(short: Boolean): String {
         val dateFormat = SimpleDateFormat(if (short) "EEEEE" else "EEEE", getLocaleForFormatting())
+        return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+    }
+
+    override fun LocalDate.formatDayOfWeekMedium(): String {
+        val dateFormat = SimpleDateFormat("EEE", getLocaleForFormatting())
         return dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
     }
 

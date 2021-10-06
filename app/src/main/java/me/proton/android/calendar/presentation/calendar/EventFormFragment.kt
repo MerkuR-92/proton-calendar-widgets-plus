@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
@@ -69,7 +70,6 @@ import java.time.ZoneId
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
-
 class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
@@ -78,6 +78,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private val eventViewModel: EventViewModel by sharedViewModel()
     private val accountViewModel: AccountViewModel by sharedViewModel()
     private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
+    private val widgetRefresher: WidgetRefresher by inject()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -148,7 +149,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     }
                 }
             }
-        } else findNavController().navigateUp()
+        } else jumpToMonthView()
     }
 
     override fun onNavigationIconClicked(): Boolean {
@@ -332,6 +333,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             if (eventViewModel.eventLiveData.value?.isSyncedWithApi() == true) {
                 if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) {
+                    widgetRefresher.refresh()
                     onSuccessEventUpdateCalendarDisplay()
                     requireActivity().displaySnackBar(getString(R.string.snack_event_updated))
                     setMonthViewSelectedDay()
@@ -345,6 +347,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 }
             } else {
                 if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS || handleSaveResult == EventViewModel.HandleSaveResult.CREATE_ERROR_SEND_MAIL) {
+                    widgetRefresher.refresh()
                     onSuccessEventUpdateCalendarDisplay()
                     requireActivity().displaySnackBar(getString(
                         if (handleSaveResult == EventViewModel.HandleSaveResult.SUCCESS) R.string.snack_event_created

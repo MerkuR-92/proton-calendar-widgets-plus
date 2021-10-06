@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -30,7 +31,8 @@ class BootstrapCalendarsUseCase( // TODO TEST
     private val keySetupUseCase: KeySetupUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val serverEventsApi: ServerEventsApi,
-    private val valueStoreProvider: ValueStoreProvider
+    private val valueStoreProvider: ValueStoreProvider,
+    private val widgetRefresher: WidgetRefresher
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String, showConfirmationDialog: Boolean): UseCase.Result {
@@ -215,6 +217,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                                     logger.v("persisting events in bootstrap: ${it.size}")
                                     calendarsRepository.persistEvents(*it.toTypedArray())
                                     updateAlarmsUseCase.execute(userId.id, it.map { it.id })
+                                    widgetRefresher.refresh()
                                 }
                             }
                         }

@@ -1,11 +1,12 @@
 package me.proton.android.calendar.common
 
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.di.NetworkModule
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
 import me.proton.android.calendar.domain.usecase.*
@@ -24,7 +25,6 @@ import me.proton.core.humanverification.presentation.HumanVerificationOrchestrat
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
-import me.proton.core.network.data.NetworkManager
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
@@ -46,6 +46,7 @@ val commonModule = module {
     single<ResourceProvider> { ResourceProviderImpl(androidApplication().resources) }
     single<AppDatabase> { AppDatabase.buildDatabase(androidApplication()) }
     single<Crypto> { CryptoImpl(get()) }
+    single<WidgetRefresher> { CalendarWidgetRefresher(androidApplication()) }
 
 //    factory { new instance every time }
 //    single(named("special logger")) { TimberLogger } -> single { SpecialRepository(get("special logger")) }
@@ -79,7 +80,7 @@ val viewModelModule = module {
             get()
         )
     }
-    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
@@ -87,7 +88,7 @@ val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleDeleteUseCase> { HandleDeleteUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
@@ -101,7 +102,7 @@ val useCaseModule = module {
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get()) }
-    factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get()) }
+    factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<GetCanonicalEmailsUseCase> { GetCanonicalEmailsUseCase(get(), get()) }
     factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
