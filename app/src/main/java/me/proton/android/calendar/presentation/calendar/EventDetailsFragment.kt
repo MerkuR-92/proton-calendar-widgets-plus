@@ -120,7 +120,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         val immutableChangeAnswerLoading =
             eventViewModel.attendeeAnswerState.value?.second
-        val immutableDeletingEvent = eventViewModel.eventState.value == EventViewModel.EventState.Processing.Deleting
+        val immutableDeletingEvent = eventViewModel.eventDetailsState.value == EventViewModel.EventState.Processing.Deleting
 
         if (immutableChangeAnswerLoading == true) {
             view?.displaySnackBar(getString(R.string.snack_event_changing_answer))
@@ -285,7 +285,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun observeEventSnackState(coroutineContext: CoroutineContext) {
-        eventViewModel.eventSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventSnackState ->
+        eventViewModel.eventDetailsSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventSnackState ->
             eventSnackState?.let {
                 when (it) {
                     is EventViewModel.EventSnackState.DisplaySnack -> {
@@ -297,8 +297,21 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         // Use jumpToMonthView to handle navigation when opening details from notification
                         jumpToMonthView()
                     }
+                    is EventViewModel.EventSnackState.DisplaySnackReturnToMonthOnSpecificDay -> {
+                        requireActivity().displaySnackBar(it.message)
+
+                        if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
+                            // Call default method for selection if pagers have been initialised
+                            if (calendarViewModel.pagersInitialised) calendarViewModel.handleDaySelected(it.newSelectedDate)
+                            // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
+                            else calendarViewModel.updateSelectedLocalDate = it.newSelectedDate
+                        }
+
+                        // Use jumpToMonthView to handle navigation when opening details from notification
+                        jumpToMonthView()
+                    }
                 }
-                eventViewModel.eventSnackState.value = null
+                eventViewModel.eventDetailsSnackState.value = null
             }
         }
     }
@@ -368,7 +381,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 attendeeAnswerState?.let { displayAttendeeAnswerState(attendeeAnswerState.first, attendeeAnswerState.second) }
             }
 
-            eventViewModel.eventState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
+            eventViewModel.eventDetailsState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
                 // Update action bar buttons visibility
                 val deletingEvent = eventState == EventViewModel.EventState.Processing.Deleting
                 loadingAction.visibleOrGone(deletingEvent)

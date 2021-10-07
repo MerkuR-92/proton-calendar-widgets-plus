@@ -116,20 +116,20 @@ abstract class BaseDialogFragment : DialogFragment() {
             message: String,
             positiveButton: String,
             negativeButton: String,
-            alertDialogListener: AlertDialogListener
+            alertDialogListener: AlertDialogListener?
         )
         fun pickerDialog(
             title: String,
             items: Array<String>,
-            selectedIndex: Int,
+            defaultSelectedItem: Int,
             positiveButton: String,
             negativeButton: String,
-            alertDialogListener: AlertDialogListener
+            alertDialogListener: AlertDialogListener?
         )
     }
 
     interface AlertDialogListener {
-        fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int = 0)
+        fun onPositive(selectedItem: Int = 0)
         fun onNegative()
         fun onCancel()
         fun onDismiss()
@@ -142,22 +142,22 @@ abstract class BaseDialogFragment : DialogFragment() {
                 message: String,
                 positiveButton: String,
                 negativeButton: String,
-                alertDialogListener: AlertDialogListener
+                alertDialogListener: AlertDialogListener?
             ) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(title)
                     .setMessage(message)
                     .setPositiveButton(positiveButton) { _, _ ->
-                        alertDialogListener.onPositive(lifecycleScope)
+                        alertDialogListener?.onPositive()
                     }
                     .setNegativeButton(negativeButton) { _, _ ->
-                        alertDialogListener.onNegative()
+                        alertDialogListener?.onNegative()
                     }
                     .setOnCancelListener {
-                        alertDialogListener.onCancel()
+                        alertDialogListener?.onCancel()
                     }
                     .setOnDismissListener {
-                        alertDialogListener.onDismiss()
+                        alertDialogListener?.onDismiss()
                     }
                     .show()
             }
@@ -165,28 +165,28 @@ abstract class BaseDialogFragment : DialogFragment() {
             override fun pickerDialog(
                 title: String,
                 items: Array<String>,
-                selectedIndex: Int,
+                defaultSelectedItem: Int,
                 positiveButton: String,
                 negativeButton: String,
-                alertDialogListener: AlertDialogListener
+                alertDialogListener: AlertDialogListener?
             ) {
-                var selectedItem = selectedIndex
+                var selectedItem = defaultSelectedItem
                 AlertDialog.Builder(requireContext())
                     .setTitle(title)
-                    .setSingleChoiceItems(items, selectedIndex) { _, item ->
+                    .setSingleChoiceItems(items, defaultSelectedItem) { _, item ->
                         selectedItem = item
                     }
                     .setPositiveButton(positiveButton) { _, _ ->
-                        alertDialogListener.onPositive(lifecycleScope, selectedItem)
+                        alertDialogListener?.onPositive(selectedItem)
                     }
                     .setNegativeButton(negativeButton) { _, _ ->
-                        alertDialogListener.onNegative()
+                        alertDialogListener?.onNegative()
                     }
                     .setOnCancelListener { _ ->
-                        alertDialogListener.onCancel()
+                        alertDialogListener?.onCancel()
                     }
                     .setOnDismissListener {
-                        alertDialogListener.onDismiss()
+                        alertDialogListener?.onDismiss()
                     }
                     .show()
             }

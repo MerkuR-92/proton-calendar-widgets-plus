@@ -101,8 +101,6 @@ class EventViewModel(
         class Error(val message: String) : Result()
     }
 
-    private var coroutineScope = CoroutineScope(Dispatchers.Default)
-
     private lateinit var userId: UserId
 
     private var timeStartBackup: LocalTime? = null
@@ -140,8 +138,12 @@ class EventViewModel(
     var recurrenceManuallyEdited: Boolean = false
     private var singleEditsInfo: SingleEditsInfo? = null
 
-    val eventState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
-    val eventSnackState: MutableStateFlow<EventSnackState?> = MutableStateFlow(null)
+    val eventDetailsState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
+    val eventFormState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
+
+    val eventDetailsSnackState: MutableStateFlow<EventSnackState?> = MutableStateFlow(null)
+    val eventFormSnackState: MutableStateFlow<EventSnackState?> = MutableStateFlow(null)
+
     val attendeeAnswerState: MutableStateFlow<Pair<ParticipationStatus, Boolean>?> = MutableStateFlow(null)
 
     private var currentParticipationStatus: ParticipationStatus = ParticipationStatus.NEEDS_ACTION
@@ -194,7 +196,14 @@ class EventViewModel(
         initStartTime: String? /*TODO in the future also endDate for multi-day events*/
     ): Result {
 
-        eventState.value = EventState.Idle
+        if (editMode) {
+            eventFormState.value = EventState.Idle
+            eventFormSnackState.value = null
+        } else {
+            eventDetailsState.value = EventState.Idle
+            eventDetailsSnackState.value = null
+        }
+
 
         // reset backup values
         timeStartBackup = null
@@ -585,7 +594,7 @@ class EventViewModel(
                 // check if event wasn't changed to invitation shortly before saving
                 val isApiEventAnInvitation = isApiEventAnInvitation()
                 if (!isEventNew() && isApiEventAnInvitation == null) {
-                    eventSnackState.value = EventSnackState.DisplaySnack(
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(
                         resourceProvider.provideString(
                             if (isEventNew()) R.string.snack_event_created_error
                             else R.string.snack_event_updated_error
@@ -594,13 +603,13 @@ class EventViewModel(
                     return
                 }
                 if (!isEventNew() && isApiEventAnInvitation != false) {
-                    eventSnackState.value = EventSnackState.DisplaySnack(
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_event_edit_with_attendees_error)
                     )
                     return
                 }
 
-                eventState.value = EventState.Processing.Saving
+                eventFormState.value = EventState.Processing.Saving
 
                 val dbEvent = dbEvent
                 val shouldShowConfirmationPicker = !isEventNew() &&
@@ -620,8 +629,8 @@ class EventViewModel(
                             resourceProvider.provideString(R.string.event_add_participants_dialog_confirm),
                             resourceProvider.provideString(R.string.event_add_participants_dialog_cancel),
                             object: BaseDialogFragment.AlertDialogListener {
-                                override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                                    coroutineScope.launch {
+                                override fun onPositive(selectedItem: Int) {
+                                    CoroutineScope(Dispatchers.Main).launch {
                                         handleSaveAttendeesSendPreferences(
                                             displayDialog,
                                             true,
@@ -630,8 +639,8 @@ class EventViewModel(
                                         )
                                     }
                                 }
-                                override fun onNegative() { eventState.value = EventState.Idle }
-                                override fun onCancel() { eventState.value = EventState.Idle }
+                                override fun onNegative() { eventFormState.value = EventState.Idle }
+                                override fun onCancel() { eventFormState.value = EventState.Idle }
                                 override fun onDismiss() {}
                             }
                         )
@@ -643,8 +652,8 @@ class EventViewModel(
                             resourceProvider.provideString(R.string.event_send_invite_dialog_confirm),
                             resourceProvider.provideString(R.string.event_send_invite_dialog_cancel),
                             object: BaseDialogFragment.AlertDialogListener {
-                                override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                                    coroutineScope.launch {
+                                override fun onPositive(selectedItem: Int) {
+                                    CoroutineScope(Dispatchers.Main).launch {
                                         handleSaveAttendeesSendPreferences(
                                             displayDialog,
                                             false,
@@ -653,8 +662,8 @@ class EventViewModel(
                                         )
                                     }
                                 }
-                                override fun onNegative() { eventState.value = EventState.Idle }
-                                override fun onCancel() { eventState.value = EventState.Idle }
+                                override fun onNegative() { eventFormState.value = EventState.Idle }
+                                override fun onCancel() { eventFormState.value = EventState.Idle }
                                 override fun onDismiss() {}
                             }
                         )
@@ -668,7 +677,7 @@ class EventViewModel(
             }
 
         } else {
-            eventSnackState.value = EventSnackState.DisplaySnack(
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.event_alert_invalid_start_end_date)
             )
         }
@@ -688,8 +697,8 @@ class EventViewModel(
             if (sendPreferencesResults.emailErrors.isNotEmpty()) {
 
                 if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
-                    eventState.value = EventState.Idle
-                    eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_network_error))
+                    eventFormState.value = EventState.Idle
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_network_error))
                 } else {
                     // Display Send Preferences Dialog
 //                    eventDialogState.value = EventDialogState.Save.SendPreferences(sendPreferencesResults, isAddParticipants)
@@ -717,8 +726,8 @@ class EventViewModel(
                         resourceProvider.provideString(R.string.event_attendees_send_prefs_error_confirm),
                         resourceProvider.provideString(R.string.event_attendees_send_prefs_error_cancel),
                         object: BaseDialogFragment.AlertDialogListener {
-                            override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                                coroutineScope.launch {
+                            override fun onPositive(selectedItem: Int) {
+                                CoroutineScope(Dispatchers.Main).launch {
                                     // Remove attendees whom emails were invalid
                                     eventLiveData.value?.iCalEvent?.attendees?.removeIf { attendee ->
                                         sendPreferencesResults.emailErrors.any { emailError ->
@@ -740,8 +749,8 @@ class EventViewModel(
                                     )
                                 }
                             }
-                            override fun onNegative() { eventState.value = EventState.Idle }
-                            override fun onCancel() { eventState.value = EventState.Idle }
+                            override fun onNegative() { eventFormState.value = EventState.Idle }
+                            override fun onCancel() { eventFormState.value = EventState.Idle }
                             override fun onDismiss() {}
                         }
                     )
@@ -785,20 +794,20 @@ class EventViewModel(
         }
 
         // stop loading state
-        eventState.value = EventState.Idle
+        eventFormState.value = EventState.Idle
 
         if (handleSaveResult == HandleSaveResult.SUCCESS) { // TODO remove duplicated code here and below
-            updateCalendarDisplay(event.calendar, 1)
-            eventSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+            if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+            eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
                 resourceProvider.provideString(R.string.snack_event_updated),
                 eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate()
             )
         } else if (handleSaveResult == HandleSaveResult.EDIT_ERROR_SEND_MAIL) {
-            eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error_failed_mail))
+            eventFormSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error_failed_mail))
         } else if (handleSaveResult == HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-            eventState.value = EventState.UserAddressInvalidForEncryption
+            eventFormState.value = EventState.UserAddressInvalidForEncryption
         } else {
-            eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error))
+            eventFormSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error))
         }
     }
 
@@ -832,12 +841,12 @@ class EventViewModel(
                     if (showThisAndFuture) resourceProvider.provideString(R.string.event_recurring_edit_this_and_future) else null,
                     resourceProvider.provideString(R.string.event_recurring_edit_all_events)
                 ).toTypedArray(),
-                selectedIndex = 0,
+                defaultSelectedItem = 0,
                 resourceProvider.provideString(R.string.dialog_button_ok),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
                 object: BaseDialogFragment.AlertDialogListener {
-                    override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                        coroutineScope.launch {
+                    override fun onPositive(selectedItem: Int) {
+                        CoroutineScope(Dispatchers.Main).launch {
                             val eventEditDeleteOption =
                                 if (selectedItem == 0) {
                                     EventEditDeleteOption.THIS_EVENT
@@ -894,8 +903,8 @@ class EventViewModel(
                             }
                         }
                     }
-                    override fun onNegative() { eventState.value = EventState.Idle }
-                    override fun onCancel() { eventState.value = EventState.Idle }
+                    override fun onNegative() { eventFormState.value = EventState.Idle }
+                    override fun onCancel() { eventFormState.value = EventState.Idle }
                     override fun onDismiss() {}
                 }
             )
@@ -919,35 +928,35 @@ class EventViewModel(
             }
 
             // stop loading state
-            eventState.value = EventState.Idle
+            eventFormState.value = EventState.Idle
 
             if (eventLiveData.value?.isSyncedWithApi() == true) {
                 if (handleSaveResult == HandleSaveResult.SUCCESS) {
-                    updateCalendarDisplay(event.calendar, 1)
-                    eventSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+                    if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+                    eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
                         resourceProvider.provideString(R.string.snack_event_updated),
                         eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate()
                     )
                 } else if (handleSaveResult == HandleSaveResult.EDIT_ERROR_SEND_MAIL) {
-                    eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error_failed_mail))
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error_failed_mail))
                 } else if (handleSaveResult == HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                    eventState.value = EventState.UserAddressInvalidForEncryption
+                    eventFormState.value = EventState.UserAddressInvalidForEncryption
                 } else {
-                    eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error))
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_updated_error))
                 }
             } else {
                 if (handleSaveResult == HandleSaveResult.SUCCESS || handleSaveResult == HandleSaveResult.CREATE_ERROR_SEND_MAIL) {
-                    updateCalendarDisplay(event.calendar, 1)
-                    eventSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+                    if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+                    eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
                         resourceProvider.provideString(
                             if (handleSaveResult == HandleSaveResult.SUCCESS) R.string.snack_event_created
                             else R.string.snack_event_created_failed_mail),
                         eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate()
                     )
                 } else if (handleSaveResult == HandleSaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                    eventState.value = EventState.UserAddressInvalidForEncryption
+                    eventFormState.value = EventState.UserAddressInvalidForEncryption
                 } else {
-                    eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_created_error))
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_created_error))
                 }
             }
         }
@@ -967,13 +976,13 @@ class EventViewModel(
             resourceProvider.provideString(R.string.event_recurring_update_this_confirm),
             resourceProvider.provideString(R.string.event_recurring_update_this_cancel),
             object: BaseDialogFragment.AlertDialogListener {
-                override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                    coroutineScope.launch {
+                override fun onPositive(selectedItem: Int) {
+                    CoroutineScope(Dispatchers.Main).launch {
                         handleSaveWithOption(eventEditDeleteOption, sendPreferences, occurrenceNumber, timeFormatIs24Hour)
                     }
                 }
-                override fun onNegative() { eventState.value = EventState.Idle }
-                override fun onCancel() { eventState.value = EventState.Idle }
+                override fun onNegative() { eventFormState.value = EventState.Idle }
+                override fun onCancel() { eventFormState.value = EventState.Idle }
                 override fun onDismiss() {}
             }
         )
@@ -987,7 +996,7 @@ class EventViewModel(
     ): HandleSaveResult {
 
         // Post saving event value to true to trigger loading state
-        eventState.value = EventState.Processing.Saving
+        eventFormState.value = EventState.Processing.Saving
 
         val eventCopy = Event.from(event)
 
@@ -1008,7 +1017,7 @@ class EventViewModel(
         handleSaveResult.ifSuccessAndLogErrors(logger) {}
 
         // Post saving event value to false to hide loading state
-        eventState.value = EventState.Idle
+        eventFormState.value = EventState.Idle
 
         if (handleSaveResult is UseCase.Result.Error) {
             return when (handleSaveResult.error) {
@@ -1463,7 +1472,7 @@ class EventViewModel(
 
     suspend fun onDeleteClick(displayDialog: BaseDialogFragment.DisplayDialog, occurrenceNumber: Int, timeFormatIs24Hour: Boolean) {
         // Post deleting event value to true to display loading state
-        eventState.value = EventState.Processing.Deleting
+        eventDetailsState.value = EventState.Processing.Deleting
 
         val userAddresses = userManager.getAddresses(userId)
         val userEmails = userAddresses.map { address ->
@@ -1493,8 +1502,8 @@ class EventViewModel(
                 resourceProvider.provideString(R.string.dialog_button_delete),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
                 object: BaseDialogFragment.AlertDialogListener {
-                    override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                        coroutineScope.launch {
+                    override fun onPositive(selectedItem: Int) {
+                        CoroutineScope(Dispatchers.Main).launch {
                             handleDeleteAsOrganizerSendPreferences(
                                 displayDialog,
                                 isPartOfChain,
@@ -1503,8 +1512,8 @@ class EventViewModel(
                             )
                         }
                     }
-                    override fun onNegative() { eventState.value = EventState.Idle }
-                    override fun onCancel() { eventState.value = EventState.Idle }
+                    override fun onNegative() { eventDetailsState.value = EventState.Idle }
+                    override fun onCancel() { eventDetailsState.value = EventState.Idle }
                     override fun onDismiss() {}
                 }
             )
@@ -1528,12 +1537,12 @@ class EventViewModel(
                     if (showThisAndFuture) resourceProvider.provideString(R.string.event_recurring_edit_this_and_future) else null,
                     resourceProvider.provideString(R.string.event_recurring_edit_all_events)
                 ).toTypedArray(),
-                selectedIndex = 0,
+                defaultSelectedItem = 0,
                 resourceProvider.provideString(R.string.dialog_button_ok),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
                 object: BaseDialogFragment.AlertDialogListener {
-                    override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                        coroutineScope.launch {
+                    override fun onPositive(selectedItem: Int) {
+                        CoroutineScope(Dispatchers.Main).launch {
                             handleDeleteRecurring(
                                 occurrenceNumber,
                                 selectedItem,
@@ -1541,8 +1550,8 @@ class EventViewModel(
                             )
                         }
                     }
-                    override fun onNegative() { eventState.value = EventState.Idle }
-                    override fun onCancel() { eventState.value = EventState.Idle }
+                    override fun onNegative() { eventDetailsState.value = EventState.Idle }
+                    override fun onCancel() { eventDetailsState.value = EventState.Idle }
                     override fun onDismiss() {}
                 }
             )
@@ -1561,13 +1570,13 @@ class EventViewModel(
                     resourceProvider.provideString(R.string.dialog_button_delete),
                     resourceProvider.provideString(R.string.dialog_button_cancel),
                     object: BaseDialogFragment.AlertDialogListener {
-                        override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                            coroutineScope.launch {
+                        override fun onPositive(selectedItem: Int) {
+                            CoroutineScope(Dispatchers.Main).launch {
                                 handleDeleteDisabledCalendarRecurring()
                             }
                         }
-                        override fun onNegative() { eventState.value = EventState.Idle }
-                        override fun onCancel() { eventState.value = EventState.Idle }
+                        override fun onNegative() { eventDetailsState.value = EventState.Idle }
+                        override fun onCancel() { eventDetailsState.value = EventState.Idle }
                         override fun onDismiss() {}
                     }
                 )
@@ -1579,13 +1588,13 @@ class EventViewModel(
                     resourceProvider.provideString(R.string.dialog_button_delete),
                     resourceProvider.provideString(R.string.dialog_button_cancel),
                     object: BaseDialogFragment.AlertDialogListener {
-                        override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                            coroutineScope.launch {
+                        override fun onPositive(selectedItem: Int) {
+                            CoroutineScope(Dispatchers.Main).launch {
                                 handleDeleteEvent(occurrenceNumber)
                             }
                         }
-                        override fun onNegative() { eventState.value = EventState.Idle }
-                        override fun onCancel() { eventState.value = EventState.Idle }
+                        override fun onNegative() { eventDetailsState.value = EventState.Idle }
+                        override fun onCancel() { eventDetailsState.value = EventState.Idle }
                         override fun onDismiss() {}
                     }
                 )
@@ -1602,7 +1611,7 @@ class EventViewModel(
             }
 
         // Post deleting event value to false to stop loading state
-        eventState.value = EventState.Idle
+        eventDetailsState.value = EventState.Idle
 
         handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
     }
@@ -1611,7 +1620,7 @@ class EventViewModel(
         val deleteResult = handleDeleteUseCase.handleDelete(userId, event.id, EventEditDeleteOption.ALL_EVENTS, null)
 
         // Post deleting event value to false to stop loading state
-        eventState.value = EventState.Idle
+        eventDetailsState.value = EventState.Idle
 
         handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
     }
@@ -1641,10 +1650,10 @@ class EventViewModel(
                 if (sendPreferencesResults.emailErrors.isNotEmpty()) {
 
                     if (sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
-                        eventSnackState.value = EventSnackState.DisplaySnack(
+                        eventDetailsSnackState.value = EventSnackState.DisplaySnack(
                             resourceProvider.provideString(R.string.snack_network_error)
                         )
-                        eventState.value = EventState.Idle
+                        eventDetailsState.value = EventState.Idle
                     } else {
                         // Display Send Preferences Dialog
                         val emailsWithErrors = TextUtils.join("\n• ", sendPreferencesResults.emailErrors.map { entry ->
@@ -1671,8 +1680,8 @@ class EventViewModel(
                             resourceProvider.provideString(R.string.event_attendees_send_prefs_error_confirm),
                             resourceProvider.provideString(R.string.dialog_button_cancel),
                             object: BaseDialogFragment.AlertDialogListener {
-                                override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                                    coroutineScope.launch {
+                                override fun onPositive(selectedItem: Int) {
+                                    CoroutineScope(Dispatchers.Main).launch {
                                         // Remove attendees whom emails were invalid
                                         val filteredAttendees = eventLiveData.value?.iCalEvent?.attendees?.filter { attendee ->
                                             sendPreferencesResults.emailErrors.any { emailError ->
@@ -1689,8 +1698,8 @@ class EventViewModel(
                                         )
                                     }
                                 }
-                                override fun onNegative() { eventState.value = EventState.Idle }
-                                override fun onCancel() { eventState.value = EventState.Idle }
+                                override fun onNegative() { eventDetailsState.value = EventState.Idle }
+                                override fun onCancel() { eventDetailsState.value = EventState.Idle }
                                 override fun onDismiss() {}
                             }
                         )
@@ -1706,10 +1715,10 @@ class EventViewModel(
                 }
             }
         } else {
-            eventSnackState.value = EventSnackState.DisplaySnack(
+            eventDetailsSnackState.value = EventSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.snack_event_deleted_error)
             )
-            eventState.value = EventState.Idle
+            eventDetailsState.value = EventState.Idle
         }
     }
 
@@ -1733,7 +1742,7 @@ class EventViewModel(
             )
 
         // Post deleting event value to false to stop loading state
-        eventState.value = EventState.Idle
+        eventDetailsState.value = EventState.Idle
 
         var emailSent = false
         if (deleteResult is UseCase.Result.Success<*>) {
@@ -1758,8 +1767,8 @@ class EventViewModel(
             if (sendPreferencesResults.emailErrors.isNotEmpty() &&
                 sendPreferencesResults.emailErrors.any { it.value == ObtainSendPreferencesUseCase.Result.Error.NetworkError }) {
 
-                eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_network_error))
-                eventState.value = EventState.Idle
+                eventDetailsSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_network_error))
+                eventDetailsState.value = EventState.Idle
 
             } else {
                 val attendeeEmails = event.iCalEvent.attendees.mapNotNull { it.extractEmail() }
@@ -1772,8 +1781,8 @@ class EventViewModel(
 
                 if (userAddress == null) {
                     logger.e("Error deleting event: userAddress was null in handleDeleteEventAsAttendee")
-                    eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_deleted_error))
-                    eventState.value = EventState.Idle
+                    eventDetailsSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_deleted_error))
+                    eventDetailsState.value = EventState.Idle
 
                     return
                 }
@@ -1837,8 +1846,8 @@ class EventViewModel(
                     resourceProvider.provideString(R.string.dialog_button_delete),
                     resourceProvider.provideString(R.string.dialog_button_cancel),
                     object: BaseDialogFragment.AlertDialogListener {
-                        override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                            coroutineScope.launch {
+                        override fun onPositive(selectedItem: Int) {
+                            CoroutineScope(Dispatchers.Main).launch {
                                 handleDeleteEventAsAttendee(
                                     userEmail,
                                     sendPreferencesResults.sendPreferences,
@@ -1851,15 +1860,15 @@ class EventViewModel(
                                 )
                             }
                         }
-                        override fun onNegative() { eventState.value = EventState.Idle }
-                        override fun onCancel() { eventState.value = EventState.Idle }
+                        override fun onNegative() { eventDetailsState.value = EventState.Idle }
+                        override fun onCancel() { eventDetailsState.value = EventState.Idle }
                         override fun onDismiss() {}
                     }
                 )
             }
         } else {
-            eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_deleted_error))
-            eventState.value = EventState.Idle
+            eventDetailsSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_event_deleted_error))
+            eventDetailsState.value = EventState.Idle
         }
     }
 
@@ -1975,7 +1984,7 @@ class EventViewModel(
         }
 
         // Post deleting event value to false to stop loading state
-        eventState.value = EventState.Idle
+        eventDetailsState.value = EventState.Idle
         handleDeleteResult(deleteResult, DeleteType.AS_AN_ATTENDEE, emailSent)
     }
 
@@ -1999,7 +2008,7 @@ class EventViewModel(
             }
 
         // Post deleting event value to false to stop loading state
-        eventState.value = EventState.Idle
+        eventDetailsState.value = EventState.Idle
 
         handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
     }
@@ -2013,7 +2022,7 @@ class EventViewModel(
     private fun handleDeleteResult(deleteResult: UseCase.Result, deleteType: DeleteType, mailSent: Boolean? = null) {
         if (deleteResult is UseCase.Result.Success<*>) {
             widgetRefresher.refresh()
-            eventSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
+            eventDetailsSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                 if (deleteType == DeleteType.AS_AN_ORGANIZER && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
                 else if (deleteType == DeleteType.AS_AN_ATTENDEE && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
                 else resourceProvider.provideString(R.string.snack_event_deleted)
@@ -2026,7 +2035,7 @@ class EventViewModel(
                 logger.e("InvalidParams deleting event: ${deleteResult.message}")
             }
 
-            eventSnackState.value = EventSnackState.DisplaySnack(
+            eventDetailsSnackState.value = EventSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.snack_event_deleted_error)
             )
         }
@@ -2110,7 +2119,7 @@ class EventViewModel(
         newParticipationStatus: ParticipationStatus,
         timeFormatIs24Hours: Boolean
     ) {
-        if (eventState.value is EventState.Processing) return
+        if (eventDetailsState.value is EventState.Processing) return
 
         val userEmails = userManager.getAddresses(userId).map { address ->
             ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
@@ -2173,8 +2182,8 @@ class EventViewModel(
                         resourceProvider.provideString(R.string.event_change_answer_recurring_confirm),
                         resourceProvider.provideString(R.string.dialog_button_cancel),
                         object: BaseDialogFragment.AlertDialogListener {
-                            override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {
-                                coroutineScope.launch {
+                            override fun onPositive(selectedItem: Int) {
+                                CoroutineScope(Dispatchers.Main).launch {
                                     handleChangeAnswerSendPreferences(
                                         displayDialog,
                                         newParticipationStatus,
@@ -2203,7 +2212,7 @@ class EventViewModel(
     }
 
     private fun handleErrorSendingAnswer() {
-        eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_change_attendee_answer_error))
+        eventDetailsSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_change_attendee_answer_error))
         // Reset change answer buttons to previous state and remove loading state
         attendeeAnswerState.value = Pair(currentParticipationStatus, false)
     }
@@ -2244,16 +2253,11 @@ class EventViewModel(
                 ),
                 resourceProvider.provideString(R.string.event_organizer_send_prefs_button_title),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
-                    override fun onPositive(coroutineScope: CoroutineScope, selectedItem: Int) {}
-                    override fun onNegative() {}
-                    override fun onCancel() {}
-                    override fun onDismiss() {}
-                }
+                null
             )
 
             if (emailError is ObtainSendPreferencesUseCase.Result.Error.NetworkError) {
-                eventSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_change_attendee_answer_error))
+                eventDetailsSnackState.value = EventSnackState.DisplaySnack(resourceProvider.provideString(R.string.snack_change_attendee_answer_error))
             }
         } else {
             updateParticipationStatus(
@@ -2388,7 +2392,7 @@ class EventViewModel(
             )
             sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
             if (sendEmailUseCaseResult is UseCase.Result.Error && sendEmailUseCaseResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                eventState.value = EventState.UserAddressInvalidForEncryption
+                eventDetailsState.value = EventState.UserAddressInvalidForEncryption
                 return
             }
             if (sendEmailUseCaseResult !is UseCase.Result.Success<*>) {
@@ -2555,9 +2559,7 @@ class EventViewModel(
         }
         val event = transformEventUseCase.execute(eventEntity) ?: return EventLinkResult.Error
         if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
-        if (!event.calendar.display) {
-            updateCalendarDisplay(event.calendar, 1)
-        }
+        if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
         return if (event.isRecurring()) {
             val calendarUserSettings =
                 calendarsRepository.selectCalendarUserSettings(userId.id) ?: return EventLinkResult.Error

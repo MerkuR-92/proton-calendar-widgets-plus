@@ -93,7 +93,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
     override fun onBackPressedCustom() {
-        val processingEvent = eventViewModel.eventState.value is EventViewModel.EventState.Processing
+        val processingEvent = eventViewModel.eventFormState.value is EventViewModel.EventState.Processing
         if (processingEvent) {
             view?.displaySnackBar(getString(R.string.snack_event_saving))
             return
@@ -146,7 +146,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onNavigationIconClicked(): Boolean {
-        val processingEvent = eventViewModel.eventState.value is EventViewModel.EventState.Processing
+        val processingEvent = eventViewModel.eventFormState.value is EventViewModel.EventState.Processing
         if (processingEvent) {
             view?.displaySnackBar(getString(R.string.snack_event_saving))
             return true
@@ -304,7 +304,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 findNavController().navigateUp()
             }
 
-            eventViewModel.eventState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
+            eventViewModel.eventFormState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
                 val processingEvent = eventState is EventViewModel.EventState.Processing
 
                 // Update action bar buttons visibility
@@ -476,7 +476,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun observeEventSnackState(coroutineContext: CoroutineContext) {
-        eventViewModel.eventSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventSnackState ->
+        eventViewModel.eventFormSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventSnackState ->
             eventSnackState?.let {
                 when (it) {
                     is EventViewModel.EventSnackState.DisplaySnack -> {
@@ -502,7 +502,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         jumpToMonthView()
                     }
                 }
-                eventViewModel.eventSnackState.value = null
+                eventViewModel.eventFormSnackState.value = null
             }
         }
     }
