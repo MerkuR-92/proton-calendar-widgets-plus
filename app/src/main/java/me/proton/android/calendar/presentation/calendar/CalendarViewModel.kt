@@ -57,6 +57,8 @@ class CalendarViewModel(
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     var initialised = false
 
