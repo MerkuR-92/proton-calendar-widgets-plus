@@ -1,89 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- color palette -->
+    <!-- GLOBAL COLORS -->
+
+    <color name="chambray">#3C4B88</color>
+    <color name="san_marino">#5064B6</color>
+    <color name="cornflower_blue">#657EE4</color>
+    <color name="portage">#8498E9</color>
+    <color name="perano">#A2B1EE</color>
 
     <color name="woodsmoke">#17181C</color>
+    <color name="charade">#25272C</color>
+    <color name="tuna">#303239</color>
+    <color name="abbey">#494D55</color>
     <color name="storm_gray">#727680</color>
+    <color name="santas_gray">#9CA0AA</color>
+
+    <color name="port_gore">#1C223D</color>
+    <color name="pickled_bluewood">#29304D</color>
+    <color name="rhino">#353E60</color>
+
     <color name="french_gray">#BABDC6</color>
+    <color name="mischka">#DADCE3</color>
     <color name="athens_gray">#EAECF1</color>
-    <color name="cornflower_blue">#657EE4</color>
     <color name="whisper">#F5F6FA</color>
     <color name="white">#FFFFFF</color>
-    <color name="mischka">#DADCE3</color>
-    <color name="pomegranate">#E84118</color>
-    <color name="lime_green">#44BD32</color>
-    <color name="saffron">#FBC531</color>
-    <color name="santas_gray">#9CA0AA</color>
-    <color name="san_marino">#5064B6</color>
-    <color name="abbey">#494D55</color>
-    <color name="tuna">#303239</color>
-    <color name="charade">#262A33</color>
-    <color name="tory_blue">#3C4B88</color>
 
-    <!-- design color aliases -->
+    <color name="pomegranate">#E84118</color>
+    <color name="sunglow">#FBC531</color>
+    <color name="apple">#44BD32</color>
+
+    <!-- SHARED GROUPS -->
+
+    <!-- Brand -->
+
+    <color name="brand_darken_40">@color/chambray</color>
+    <color name="brand_darken_20">@color/san_marino</color>
+    <color name="brand_norm">@color/cornflower_blue</color>
+    <color name="brand_lighten_20">@color/portage</color>
+    <color name="brand_lighten_40">@color/perano</color>
+
+    <!-- Notification -->
+
+    <color name="notification_error">@color/pomegranate</color>
+    <color name="notification_warning">@color/sunglow</color>
+    <color name="notification_success">@color/apple</color>
+
+    <!-- Interaction -->
+
+    <color name="interaction_norm">@color/brand_norm</color>
+    <color name="interaction_pressed">@color/brand_darken_20</color>
+    <color name="interaction_disabled">@color/brand_lighten_40</color>
+
+    <!-- Floaty -->
+
+    <color name="floaty_background">@color/tuna</color>
+    <color name="floaty_pressed">@color/woodsmoke</color>
+    <color name="floaty_text">@color/white</color>
+
+    <!-- LIGHT UI -->
+
+    <!-- Shade -->
 
     <color name="shade_100">@color/woodsmoke</color>
     <color name="shade_80">@color/storm_gray</color>
     <color name="shade_60">@color/santas_gray</color>
+    <color name="shade_50">@color/french_gray</color>
     <color name="shade_40">@color/mischka</color>
     <color name="shade_20">@color/athens_gray</color>
     <color name="shade_10">@color/whisper</color>
     <color name="shade_0">@color/white</color>
-    <color name="brand_norm">@color/cornflower_blue</color>
-    <color name="brand_darken_20">@color/san_marino</color>
-    <color name="brand_darken_40">@color/tory_blue</color>
 
-    <!-- constant colors, do not change in dark mode -->
-    <color name="text_on_calendar_color">#FFFFFF</color>
-    <!-- navigation bar color used for api < 27 -->
-    <color name="background_navigation_bar">@color/woodsmoke</color>
-
-    <!-- colors to use in the app -->
+    <!-- Text -->
 
     <color name="text_norm">@color/shade_100</color>
     <color name="text_weak">@color/shade_80</color>
     <color name="text_hint">@color/shade_60</color>
+    <color name="text_disabled">@color/shade_50</color>
     <color name="text_inverted">@color/shade_0</color>
 
-    <color name="interaction_norm">@color/brand_norm</color>
-    <color name="interaction_norm_pressed">@color/brand_darken_20</color>
-    <color name="interaction_strong">@color/shade_100</color>
-    <color name="interaction_strong_pressed">@color/shade_80</color>
-    <color name="interaction_weak">@color/shade_20</color>
-    <color name="interaction_weak_pressed">@color/shade_40</color>
-    <color name="interaction_weak_disabled">@color/shade_10</color>
-    <color name="interaction_weak_disabled_pressed">@color/shade_20</color>
+    <!-- Icon -->
 
     <color name="icon_norm">@color/shade_100</color>
     <color name="icon_weak">@color/shade_80</color>
     <color name="icon_hint">@color/shade_60</color>
+    <color name="icon_disabled">@color/shade_50</color>
     <color name="icon_inverted">@color/shade_0</color>
-    <color name="icon_disabled">@color/shade_60</color>
 
-    <color name="separator_norm">@color/shade_20</color>
+    <!-- Interaction strong -->
+
+    <color name="interaction_strong_norm">@color/shade_100</color>
+    <color name="interaction_strong_pressed">@color/shade_80</color>
+
+    <!-- Interaction weak -->
+
+    <color name="interaction_weak_norm">@color/shade_20</color>
+    <color name="interaction_weak_pressed">@color/shade_40</color>
+    <color name="interaction_weak_disabled">@color/shade_10</color>
+
+    <!-- Background-->
 
     <color name="background_norm">@color/shade_0</color>
     <color name="background_secondary">@color/shade_10</color>
 
-    <color name="notification_error">@color/pomegranate</color>
-    <color name="notification_success">@color/lime_green</color>
-    <color name="notification_warning">@color/saffron</color>
+    <!-- Separator-->
 
-    <color name="current_time_indicator">@color/pomegranate</color>
+    <color name="separator_norm">@color/shade_20</color>
 
-    <!--  DAY VIEW  -->
-    <color name="lines_norm">@color/shade_20</color>
+    <!-- Sidebar-->
+
+    <color name="sidebar_background">@color/port_gore</color>
+    <color name="sidebar_interaction_weak_norm">@color/pickled_bluewood</color>
+    <color name="sidebar_interaction_weak_pressed">@color/rhino</color>
+    <color name="sidebar_separator">@color/pickled_bluewood</color>
+    <color name="sidebar_text_norm">@color/white</color>
+    <color name="sidebar_text_weak">@color/santas_gray</color>
+    <color name="sidebar_icon_norm">@color/white</color>
+    <color name="sidebar_icon_weak">@color/santas_gray</color>
+    <color name="sidebar_interaction_pressed">@color/san_marino</color>
 
 
 
-    <!--    TODO below maybe won't be used-->
+    <!-- colors to use in the app -->
 
-
-    <color name="textColorPrimary">#000000</color>
-    <color name="textColorSecondary">#80848e</color>
+    <color name="interaction_norm_pressed">@color/brand_darken_20</color>
+    <color name="interaction_weak_disabled_pressed">@color/shade_20</color>
 
     <color name="textColorValidationError">#F44336</color>
 
-    <color name="controlHighlight">#1F657ee4</color> <!--12% alpha on colorPrimary-->
+    <color name="current_time_indicator">@color/pomegranate</color>
+
+    <!-- constant colors, do not change in dark mode -->
+    <color name="text_on_calendar_color">#FFFFFF</color>
+
+    <!-- navigation bar color used for api < 27 -->
+    <color name="background_navigation_bar">@color/woodsmoke</color>
+
+    <!-- Splash screen color -->
+    <color name="splash_screen_color">@color/brand_norm</color>
+
 </resources>

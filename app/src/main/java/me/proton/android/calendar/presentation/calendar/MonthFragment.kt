@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_header.view.*
-import kotlinx.android.synthetic.main.toolbar_action_primary.view.*
+import kotlinx.android.synthetic.main.toolbar_action_button.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -96,23 +96,13 @@ class MonthFragment : BaseFragment() {
     private var currentViewMode: ViewMode? = null
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_primary, fragment_toolbar_content, false)
-        with(buttonCreate) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
-                ContextCompat.getDrawable(
-                    this.context,
-                    R.drawable.ic_plus
-                )
-            )
+        buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
+        with (buttonCreate) {
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
         }
-        buttonToday = layoutInflater.inflate(R.layout.toolbar_action_secondary, fragment_toolbar_content, false)
-        with(buttonToday) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
-                ContextCompat.getDrawable(
-                    this.context,
-                    R.drawable.ic_today
-                )
-            )
+        buttonToday = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
+        with (buttonToday) {
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_today))
         }
 
         // TODO extract somewhere to remove boilerplate
@@ -584,15 +574,11 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.activeUserCalendars.observe(viewLifecycleOwner) { activeCalendars ->
             val hasActiveCalendars = !activeCalendars.isNullOrEmpty()
             if (hasActiveCalendars) {
-                buttonCreate.imageButton.imageTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_inverted))
-                buttonCreate.imageButton.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_oval)
+                buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm))
+                buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_button_oval)
             } else {
-                buttonCreate.imageButton.imageTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_disabled))
-                buttonCreate.imageButton.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_primary_disabled_oval)
+                buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_disabled))
+                buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_button_disabled_oval)
             }
         }
     }

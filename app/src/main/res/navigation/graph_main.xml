@@ -11,12 +11,6 @@
         android:label=""
         tools:layout="@layout/fragment_month">
         <action
-            android:id="@+id/action_nav_calendar_to_nav_contacts"
-            app:destination="@id/nav_contacts" />
-        <action
-            android:id="@+id/action_nav_calendar_to_nav_feedback"
-            app:destination="@id/nav_feedback" />
-        <action
             android:id="@+id/action_nav_calendar_to_nav_event_details"
             app:destination="@id/nav_event_details" />
         <action
@@ -40,17 +34,6 @@
             android:id="@+id/deepLink7"
             app:uri="proton-calendar://protonmail.com/month/details?date={date}" />
     </fragment>
-
-    <fragment
-        android:id="@+id/nav_contacts"
-        android:name="me.proton.android.calendar.presentation.contacts.ContactsFragment"
-        android:label=""
-        tools:layout="@layout/fragment_contacts"/>
-    <fragment
-        android:id="@+id/nav_feedback"
-        android:name="me.proton.android.calendar.presentation.feedback.FeedbackFragment"
-        android:label=""
-        tools:layout="@layout/fragment_feedback"/>
 
     <dialog
         android:id="@+id/nav_settings"

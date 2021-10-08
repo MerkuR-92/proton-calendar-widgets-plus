@@ -12,7 +12,6 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.collection.LongSparseArray
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
@@ -646,12 +645,12 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
                                 R.id.main_surface
                             ).setTint(
-                                ContextCompat.getColor(requireContext(), R.color.interaction_weak)
+                                ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
                             )
                             (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
                                 R.id.side_strip
                             ).setTint(
-                                ContextCompat.getColor(requireContext(), R.color.interaction_weak)
+                                ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
                             )
 
                             // When an event is clicked, start a new draft event and show the edit event dialog

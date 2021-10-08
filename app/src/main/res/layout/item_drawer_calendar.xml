@@ -5,12 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/woodsmoke"
+    tools:background="@color/sidebar_background"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <include
+    <View
         android:id="@+id/item_drawer_calendar_press"
-        layout="@layout/view_press_overlay"
+        android:background="@drawable/ripple_nav_items"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,7 +36,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         tools:text="Reminders"
-        style="@style/Text.DefaultSmall.Dark"
+        style="@style/Text.DefaultSmall"
+        android:textColor="@color/sidebar_text_norm"
         android:layout_marginTop="14dp"
         android:layout_marginEnd="@dimen/spacing_element"
         android:layout_marginStart="@dimen/spacing_element"
@@ -46,7 +47,8 @@
 
     <View
         android:id="@+id/item_drawer_calendar_divider"
-        style="@style/Separator.Dark"
+        style="@style/Separator"
+        android:background="@color/sidebar_separator"
         android:visibility="invisible"
         android:layout_marginTop="14dp"
         app:layout_constraintTop_toBottomOf="@+id/item_drawer_calendar_title"
