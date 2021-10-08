@@ -34,7 +34,7 @@
         app:layout_constraintEnd_toStartOf="@+id/event_attendees_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="8 Participants" />
+        tools:text="8 participants" />
 
     <TextView
         android:id="@+id/event_attendees_description"
