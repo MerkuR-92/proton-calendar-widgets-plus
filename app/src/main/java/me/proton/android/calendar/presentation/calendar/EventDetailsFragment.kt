@@ -237,7 +237,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus =
-                if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
                 else withContext(Dispatchers.Default) {
                     eventViewModel.initialise(
                         userId,
@@ -249,7 +249,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     )
                 }
 
-            if (viewModeInitStatus == EventViewModel.Result.Success) {
+            if (viewModeInitStatus == EventViewModel.InitResult.Success) {
                 launch {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
@@ -261,19 +261,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 attachActionHandlers()
             } else {
                 when (viewModeInitStatus) {
-                    EventViewModel.Result.OccurrenceDoesNotExist -> {
+                    EventViewModel.InitResult.OccurrenceDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(
                             requireContext(),
                             getString(R.string.error_occurrence_does_not_exist)
                         )
                     }
-                    EventViewModel.Result.EventDoesNotExist -> {
+                    EventViewModel.InitResult.EventDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(
                             requireContext(),
                             getString(R.string.error_event_does_not_exist)
                         )
                     }
-                    is EventViewModel.Result.Error -> {
+                    is EventViewModel.InitResult.Error -> {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                     }

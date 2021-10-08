@@ -90,11 +90,13 @@ class EventViewModel(
     private val handleAlarmsUseCase: HandleAlarmsUseCase
 ) : AndroidViewModel(application) {
 
-    sealed class Result {
-        object Success : Result()
-        object OccurrenceDoesNotExist : Result()
-        object EventDoesNotExist : Result()
-        class Error(val message: String) : Result()
+    sealed class InitResult {
+        object Success : InitResult()
+        object OccurrenceDoesNotExist : InitResult()
+        object EventDoesNotExist : InitResult()
+        class InitEvent(val event: Event) : InitResult()
+        class InitDefaultCalendar(val calendar: CalendarEntity?) : InitResult()
+        class Error(val message: String) : InitResult()
     }
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -112,8 +114,8 @@ class EventViewModel(
 
     private lateinit var event: Event
 
-    // original event from database, from before it has been edited
-    var dbEvent: Event? = null
+    // Original event from database, from before it has been edited
+    private var dbEvent: Event? = null
 
     private var eventCustomPartialDayAlarmsSave: ArrayList<VAlarm>? = null
     private var eventCustomAllDayAlarmsSave: ArrayList<VAlarm>? = null
@@ -150,6 +152,10 @@ class EventViewModel(
 
     // TODO Remove once we allow creating events with email notifications
     var hasEmailNotifications: Boolean = false
+
+    // Recurrence temp values
+    var tempRecurrenceUntilLocalDate: LocalDate? = null
+    var tempMonthlyRepeatOption: MonthlyRepeatOnOption = MonthlyRepeatOnOption.ON_DAY_X
 
     sealed class EventState {
 
@@ -190,17 +196,10 @@ class EventViewModel(
         viewModelJob.cancel()
     }
 
-    // TODO: Initialise is called a second time for same eventId if we open event form from event details
-    //  Check if any case require us to pass through it again or if we keep the init data we had from details
-    suspend fun initialise(
-        userId: UserId,
-        editMode: Boolean,
-        eventId: String?,
-        occurrenceNumber: Int?,
-        initStartDate: String?,
-        initStartTime: String? /*TODO in the future also endDate for multi-day events*/
-    ): Result {
-
+    /**
+     * Resets the EventViewModel data with its default values
+     */
+    private fun resetEventViewModelValues(editMode: Boolean) {
         if (editMode) {
             eventFormState.value = EventState.Idle
             eventFormSnackState.value = null
@@ -208,7 +207,6 @@ class EventViewModel(
             eventDetailsState.value = EventState.Idle
             eventDetailsSnackState.value = null
         }
-
 
         // reset backup values
         timeStartBackup = null
@@ -223,191 +221,273 @@ class EventViewModel(
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
         hasEmailNotifications = false
+    }
+
+    /**
+     * Calling this method first is mandatory before using the EventViewModel as it initialises it with all the necessary values.
+     */
+    suspend fun initialise(
+        userId: UserId,
+        editMode: Boolean,
+        eventId: String?,
+        occurrenceNumber: Int?,
+        initStartDate: String?,
+        initStartTime: String?
+    ): InitResult {
+
+        resetEventViewModelValues(editMode)
 
         this.editMode = editMode
-
         this.userId = userId
-
         this.isCreate = eventId == null
 
-        var defaultCalendar: CalendarEntity? = null
-        if (editMode) {
-            var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
-                ?: return Result.Error("EventViewModel: could not get default calendar ID")
-            defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
-            if (defaultCalendar == null || !defaultCalendar.isActive) {
-                defaultCalendar = calendarsRepository.getActiveUserCalendars(userId.id).firstOrNull()
-                    ?: return Result.Error("EventViewModel: no active calendars for user")
-                defaultCalendarId = defaultCalendar.id
-            }
+        // Default calendar and its settings is only needed in edit mode
+        val defaultCalendar: CalendarEntity? =
+            if (editMode) {
+                // Get default calendar and its settings if we are in edit mode
+                val initializeDefaultCalendarResult = initializeDefaultCalendar()
+                if (initializeDefaultCalendarResult !is InitResult.InitDefaultCalendar) {
+                    // Handle initialisation error
+                    return initializeDefaultCalendarResult
+                } else {
+                    // Use default calendar
+                    initializeDefaultCalendarResult.calendar
+                }
+            } else null
 
-            if (!loadSettingsForCalendar(defaultCalendarId)) return Result.Error("EventViewModel: could not get CalendarSettings")
-        }
+        // Default calendar is mandatory on event creation
+        if (eventId == null && defaultCalendar == null) return InitResult.Error("EventViewModel: could not get default calendar")
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
-            ?: return Result.Error("EventViewModel: could not get Calendar User Settings")
+            ?: return InitResult.Error("EventViewModel: could not get Calendar User Settings")
         userSettings = userSettingsRepository.selectUserSettings(userId.id)
-            ?: return Result.Error("EventViewModel: could not get User Settings")
+            ?: return InitResult.Error("EventViewModel: could not get User Settings")
 
-        user = userManager.getUserOrNull(userId, logger) ?: return Result.Error("EventViewModel: could not get User")
+        user = userManager.getUserOrNull(userId, logger) ?: return InitResult.Error("EventViewModel: could not get User")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
         event = if (eventId == null) {
 
-            if (defaultCalendar == null) return Result.Error("EventViewModel: could not get default calendar")
-
-            eventTimeZoneId = displayTimeZoneId
-
-            val newICalendar = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
-            val newVEvent = newICalendar.events.first()
-
-            // if there is no requested start date, we take today
-            val startDate =
-                if (initStartDate != null) LocalDate.parse(initStartDate)
-                else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
-            // if there is no requested start time, we calculate it according to "now"
-            val startTime =
-                if (initStartTime != null) LocalTime.parse(initStartTime)
-                else ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
-                    .truncatedTo(ChronoUnit.HOURS)
-                    .toLocalTime()
-            // end Zoned Date Time according to default event duration
-            val endZonedDateTime = ZonedDateTime.of(
-                startDate,
-                startTime,
-                ZoneId.of(eventTimeZoneId)
-            ).plusMinutes(
-                this.calendarSettings.defaultEventDuration.toLong()
-            )
-
-            timeStartBackup = startTime
-            timeEndBackup = endZonedDateTime.toLocalTime() // this time can be before timeStartBackup at this point
-
-            // TODO GUI takes timezone from iCalendar's "default timezone", maybe this should be moved to "Event" model?
-            newICalendar.setDefaultTimeZone(eventTimeZoneId)
-
-            if (initStartTime == null) { // create new all-day event
-
-                newVEvent.setStart(startDate)
-
-                // event end time goes over midnight
-                if (endZonedDateTime.dayOfYear != startDate.dayOfYear) {
-                    newVEvent.setEnd(endZonedDateTime.toLocalDate().minusDays(1))
-                    timeEndBackup = timeStartBackup // workaround TODO we could force-change date-end to next-day
-                } else {
-                    newVEvent.setEnd(endZonedDateTime.toLocalDate())
-                }
-
-            } else { // create new all-day event
-                newVEvent.setStart(startDate, startTime, eventTimeZoneId)
-                newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), eventTimeZoneId)
-                newICalendar.setStartTimeZone(eventTimeZoneId)
-                newICalendar.setEndTimeZone(eventTimeZoneId)
+            val initialiseCreateEventResult = initialiseCreateEvent(defaultCalendar!!, initStartDate, initStartTime)
+            if (initialiseCreateEventResult !is InitResult.InitEvent) {
+                // Handle initialisation error
+                return initialiseCreateEventResult
+            } else {
+                // Use initialised event
+                initialiseCreateEventResult.event
             }
-
-            val newEvent = Event.from(
-                ICalUtilsImpl.generateOfflineEventId(), Calendar(
-                    defaultCalendar.id,
-                    defaultCalendar.name,
-                    defaultCalendar.color,
-                    defaultCalendar.flags,
-                    defaultCalendar.display == 1,
-                    defaultCalendar.type
-                ), newICalendar
-            ) ?: return Result.Error("could not create Event using factory method")
-
-            setDefaultAlarms(newEvent, this.calendarSettings)
-            newEvent
 
         } else {
 
-            val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
-            dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
-            else null
-
-            if (dbEvent == null) return Result.EventDoesNotExist
-
-            val eventStartTimeZone =
-                dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id
-                    ?: displayTimeZoneId
-
-            eventTimeZoneId = eventStartTimeZone
-
-            val timeZoneForOccurrence = if (editMode) {
-                eventTimeZoneId
+            val initialiseEditEventResult = initialiseEditEvent(eventId, occurrenceNumber)
+            if (initialiseEditEventResult !is InitResult.InitEvent) {
+                // Handle initialisation error
+                return initialiseEditEventResult
             } else {
-                displayTimeZoneId
+                // Use initialised event
+                initialiseEditEventResult.event
             }
-
-            // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
-            val dbEventWithOccurrence = occurrenceNumber?.let {
-                dbEvent?.let {
-                    Event.withOccurrence(
-                        it,
-                        occurrenceNumber,
-                        timeZoneForOccurrence
-                    )
-                }
-            }
-            // return error only if event dbEvent is recurring, if it's a single edit it's okay that occurrence can't be generated
-            if (occurrenceNumber != null && (dbEvent?.isRecurring() == true) && dbEventWithOccurrence == null) return Result.OccurrenceDoesNotExist
-
-            val adjustedEvent =
-                (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
-
-                    if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
-                        this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence).toLocalDate().minusDays(1))
-                    }
-
-                    // default timezone in iCalendar is used for GUI
-                    this.iCalendar.setDefaultTimeZone(timeZoneForOccurrence)
-
-                    if (editMode) {
-                        // Setup event time backup values
-                        if (this.isAllDay()) {
-                            val startTime = ICalUtilsImpl.generateEventStartTime(ZoneId.of(eventTimeZoneId))
-                            timeStartBackup = startTime
-                            timeEndBackup =
-                                startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
-                        } else {
-                            timeStartBackup = this.getStart(timeZoneForOccurrence).toLocalTime()
-                            timeEndBackup = this.getEnd(timeZoneForOccurrence).toLocalTime()
-                        }
-
-                        // Clone RRule from original event in DB if we are in edit mode
-                        val eventUid = dbEvent?.uid
-                        if (dbEvent?.isSingleEdit() == true && eventUid != null) {
-                            // We store reference to originalDbEvent for later use
-                            originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
-                                ?.let { transformEventUseCase.execute(it) }
-                            this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
-                        }
-                    }
-
-                }
-
-            if (adjustedEvent != null) {
-
-                if (dbEvent != null && listOf(adjustedEvent).filterOutOccurrencesByExdates(
-                        dbEvent!!,
-                        timeZoneForOccurrence
-                    ).isEmpty()
-                ) {
-                    return Result.OccurrenceDoesNotExist
-                }
-
-                adjustedEvent
-
-            } else return Result.Error("EventViewModel: could not generate event with occurrence in EventViewModel")
         }
 
         hasEmailNotifications = event.hasEmailNotifications
 
         _event.postValue(event)
 
-        return Result.Success
+        return InitResult.Success
+    }
+
+    /**
+     * @returns Default calendar (and load calendar settings to be stored in calendarSettings) or InitResult error.
+     */
+    private suspend fun initializeDefaultCalendar(): InitResult {
+        // Try to get default calendar id if it exists
+        var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+            ?: return InitResult.Error("EventViewModel: could not get default calendar ID")
+
+        // Try to get default calendar if it exists
+        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+
+        if (defaultCalendar == null || !defaultCalendar.isActive) {
+            // Fallback to first active user calendar
+            defaultCalendar = calendarsRepository.getActiveUserCalendars(userId.id).firstOrNull()
+                ?: return InitResult.Error("EventViewModel: no active calendars for user")
+            defaultCalendarId = defaultCalendar.id
+        }
+
+        // Load settings for given calendar id and stores them in calendarSettings
+        if (!loadSettingsForCalendar(defaultCalendarId)) return InitResult.Error("EventViewModel: could not get CalendarSettings")
+
+        return InitResult.InitDefaultCalendar(defaultCalendar)
+    }
+
+    /**
+     * @returns Initialised new event or InitResult error
+     */
+    private fun initialiseCreateEvent(
+        defaultCalendar: CalendarEntity,
+        initStartDate: String?,
+        initStartTime: String?
+    ): InitResult {
+
+        eventTimeZoneId = displayTimeZoneId
+
+        val newICalendar = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
+        val newVEvent = newICalendar.events.first()
+
+        // If there is no requested start date, we take today
+        val startDate =
+            if (initStartDate != null) LocalDate.parse(initStartDate)
+            else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
+
+        // If there is no requested start time, we calculate it according to "now"
+        val startTime =
+            if (initStartTime != null) LocalTime.parse(initStartTime)
+            else ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
+                .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
+                .truncatedTo(ChronoUnit.HOURS)
+                .toLocalTime()
+
+        // End Zoned Date Time according to default event duration
+        val endZonedDateTime = ZonedDateTime.of(
+            startDate,
+            startTime,
+            ZoneId.of(eventTimeZoneId)
+        ).plusMinutes(
+            this.calendarSettings.defaultEventDuration.toLong()
+        )
+
+        timeStartBackup = startTime
+        timeEndBackup = endZonedDateTime.toLocalTime() // this time can be before timeStartBackup at this point
+
+        // TODO GUI takes timezone from iCalendar's "default timezone", maybe this should be moved to "Event" model?
+        newICalendar.setDefaultTimeZone(eventTimeZoneId)
+
+        if (initStartTime == null) { // create new all-day event
+
+            newVEvent.setStart(startDate)
+
+            // event end time goes over midnight
+            if (endZonedDateTime.dayOfYear != startDate.dayOfYear) {
+                newVEvent.setEnd(endZonedDateTime.toLocalDate().minusDays(1))
+                timeEndBackup = timeStartBackup // workaround TODO we could force-change date-end to next-day
+            } else {
+                newVEvent.setEnd(endZonedDateTime.toLocalDate())
+            }
+
+        } else { // create new all-day event
+            newVEvent.setStart(startDate, startTime, eventTimeZoneId)
+            newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), eventTimeZoneId)
+            newICalendar.setStartTimeZone(eventTimeZoneId)
+            newICalendar.setEndTimeZone(eventTimeZoneId)
+        }
+
+        val newEvent = Event.from(
+            ICalUtilsImpl.generateOfflineEventId(), Calendar(
+                defaultCalendar.id,
+                defaultCalendar.name,
+                defaultCalendar.color,
+                defaultCalendar.flags,
+                defaultCalendar.display == 1,
+                defaultCalendar.type
+            ), newICalendar
+        ) ?: return InitResult.Error("could not create Event using factory method")
+
+        setDefaultAlarms(newEvent, this.calendarSettings)
+        return InitResult.InitEvent(newEvent)
+    }
+
+    /**
+     * @returns Initialised existing event or InitResult error
+     */
+    private suspend fun initialiseEditEvent(
+        eventId: String,
+        occurrenceNumber: Int?
+    ): InitResult {
+
+        val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
+        dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
+        else null
+
+        if (dbEvent == null) return InitResult.EventDoesNotExist
+
+        val eventStartTimeZone =
+            dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id
+                ?: displayTimeZoneId
+
+        eventTimeZoneId = eventStartTimeZone
+
+        val timeZoneForOccurrence =
+            if (editMode) eventTimeZoneId
+            else displayTimeZoneId
+
+        // we have to generate occurrence in event's timezone, because otherwise we will overwrite it with default calendar's timezone
+        val dbEventWithOccurrence = occurrenceNumber?.let {
+            dbEvent?.let {
+                Event.withOccurrence(
+                    it,
+                    occurrenceNumber,
+                    timeZoneForOccurrence
+                )
+            }
+        }
+        // return error only if event dbEvent is recurring, if it's a single edit it's okay that occurrence can't be generated
+        if (occurrenceNumber != null && (dbEvent?.isRecurring() == true) && dbEventWithOccurrence == null) return InitResult.OccurrenceDoesNotExist
+
+        val adjustedEvent =
+            (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
+
+                if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
+                    this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence).toLocalDate().minusDays(1))
+                }
+
+                // default timezone in iCalendar is used for GUI
+                this.iCalendar.setDefaultTimeZone(timeZoneForOccurrence)
+
+                if (editMode) {
+                    // Setup event time backup values
+                    if (this.isAllDay()) {
+                        val startTime = ICalUtilsImpl.generateEventStartTime(ZoneId.of(eventTimeZoneId))
+                        timeStartBackup = startTime
+                        timeEndBackup =
+                            startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())
+                    } else {
+                        timeStartBackup = this.getStart(timeZoneForOccurrence).toLocalTime()
+                        timeEndBackup = this.getEnd(timeZoneForOccurrence).toLocalTime()
+                    }
+
+                    // Clone RRule from original event in DB if we are in edit mode
+                    val eventUid = dbEvent?.uid
+                    if (dbEvent?.isSingleEdit() == true && eventUid != null) {
+                        // We store reference to originalDbEvent for later use
+                        originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
+                            ?.let { transformEventUseCase.execute(it) }
+                        this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
+                    }
+                }
+
+            }
+
+        return if (adjustedEvent != null) {
+
+            if (dbEvent != null &&
+                listOf(adjustedEvent).filterOutOccurrencesByExdates(dbEvent!!, timeZoneForOccurrence).isEmpty()
+            ) {
+                return InitResult.OccurrenceDoesNotExist
+            }
+
+            InitResult.InitEvent(adjustedEvent)
+
+        } else InitResult.Error("EventViewModel: could not generate event with occurrence in EventViewModel")
+    }
+
+    /**
+     * Loads calendar settings for given calendar id and stores them locally if it exists
+     */
+    private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {
+        val settings = calendarsRepository.selectCalendarSettings(calendarId)
+        if (settings != null) calendarSettings = settings
+        return settings != null
     }
 
     data class SingleEditsInfo(
@@ -418,6 +498,9 @@ class EventViewModel(
         val hasNonCancelledSingleEdit: Boolean? // Set to null if not checked or not applicable
     )
 
+    /**
+     * @returns SingleEditsInfo object if it exists, or fetches data and creates it
+     */
     suspend fun getSingleEditsInfo(userEmails: List<String>? = null): SingleEditsInfo? {
 
         if (singleEditsInfo == null) {
@@ -433,71 +516,58 @@ class EventViewModel(
                         !event.isEventFirstOccurrence(dbEvent, eventTimeZoneId)
 
             // We check for single edits only once and in initialise because it may require API calls
-            singleEditsInfo = if (occurrence?.occurrenceNumber == 1 &&
-                !allowShowThisAndFuture && (editMode ||
-                        !event.isAnInvitation && userEmails != null)) {
-                // We don't have option "this and future" when updating first event in chain
-                // TODO Decide behavior if API call was an error and method returns null
-                val hasSingleEdit = dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
+            singleEditsInfo =
+                if (occurrence?.occurrenceNumber == 1 && !allowShowThisAndFuture &&
+                    (editMode || !event.isAnInvitation && userEmails != null)) {
 
-                SingleEditsInfo(
-                    singleEdits = null,
-                    hasSingleEdit = hasSingleEdit,
-                    hasFutureSingleEdit = null,
-                    hasAnsweredSingleEdit = null,
-                    hasNonCancelledSingleEdit = null
-                )
-            } else {
-                // TODO Decide behavior if API call was an error and method returns null
-                val singleEdits = calendarsRepository.getSingleEdits(
-                    userId,
-                    dbEvent.uid,
-                    if (editMode || !event.isAnInvitation && userEmails != null)
-                        occurrenceStart
-                    else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
-                    if (editMode || !event.isAnInvitation && userEmails != null)
-                        eventTimeZoneId
-                    else null
-                )
+                    // We don't have option "this and future" when updating first event in chain
+                    // TODO Decide behavior if API call was an error and method returns null
+                    val hasSingleEdit = dbEvent.isRecurring() && calendarsRepository.hasSingleEdits(userId, dbEvent.uid) == true
 
-                val hasSingleEdit = !singleEdits.isNullOrEmpty()
-                val hasFutureSingleEdit = singleEdits?.any { it.getStart(eventTimeZoneId).isAfter(occurrenceStart) } ?: false
-                val hasAnsweredSingleEdit = singleEdits?.any {
-                    // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
-                    if (!editMode && event.isAnInvitation && userEmails != null && !it.isCancelled()) {
-                        // The only values we need are Accepted, Declined and Tentative
-                        val participationStatus = it.getParticipationStatus(userEmails)
-                        participationStatus == ParticipationStatus.ACCEPTED ||
-                                participationStatus == ParticipationStatus.DECLINED ||
-                                participationStatus == ParticipationStatus.TENTATIVE
-                    } else false
-                } ?: false
-                val hasNonCancelledSingleEdit = singleEdits?.any { it.isCancelled().not() } ?: true
+                    SingleEditsInfo(
+                        singleEdits = null,
+                        hasSingleEdit = hasSingleEdit,
+                        hasFutureSingleEdit = null,
+                        hasAnsweredSingleEdit = null,
+                        hasNonCancelledSingleEdit = null
+                    )
+                } else {
 
-                SingleEditsInfo(
-                    singleEdits = singleEdits,
-                    hasSingleEdit = hasSingleEdit,
-                    hasFutureSingleEdit = hasFutureSingleEdit,
-                    hasAnsweredSingleEdit = hasAnsweredSingleEdit,
-                    hasNonCancelledSingleEdit = hasNonCancelledSingleEdit
-                )
-            }
+                    // TODO Decide behavior if API call was an error and method returns null
+                    val singleEdits = calendarsRepository.getSingleEdits(
+                        userId,
+                        dbEvent.uid,
+                        if (editMode || !event.isAnInvitation && userEmails != null) occurrenceStart
+                        else null, // Fetch all SE when event has attendees in order to check for hasAnsweredSingleEdit
+                        if (editMode || !event.isAnInvitation && userEmails != null) eventTimeZoneId
+                        else null
+                    )
+
+                    val hasSingleEdit = !singleEdits.isNullOrEmpty()
+                    val hasFutureSingleEdit = singleEdits?.any { it.getStart(eventTimeZoneId).isAfter(occurrenceStart) } ?: false
+                    val hasAnsweredSingleEdit = singleEdits?.any {
+                        // We only need hasAnsweredSingleEdit for change answer in event details view (if event has attendees)
+                        if (!editMode && event.isAnInvitation && userEmails != null && !it.isCancelled()) {
+                            // The only values we need are Accepted, Declined and Tentative
+                            val participationStatus = it.getParticipationStatus(userEmails)
+                            participationStatus == ParticipationStatus.ACCEPTED ||
+                                    participationStatus == ParticipationStatus.DECLINED ||
+                                    participationStatus == ParticipationStatus.TENTATIVE
+                        } else false
+                    } ?: false
+                    val hasNonCancelledSingleEdit = singleEdits?.any { it.isCancelled().not() } ?: true
+
+                    SingleEditsInfo(
+                        singleEdits = singleEdits,
+                        hasSingleEdit = hasSingleEdit,
+                        hasFutureSingleEdit = hasFutureSingleEdit,
+                        hasAnsweredSingleEdit = hasAnsweredSingleEdit,
+                        hasNonCancelledSingleEdit = hasNonCancelledSingleEdit
+                    )
+                }
         }
 
         return singleEditsInfo
-    }
-
-    private suspend fun loadSettingsForCalendar(calendarId: String): Boolean {
-        return withContext(Dispatchers.Default) {
-            val settings = calendarsRepository.selectCalendarSettings(calendarId)
-            if (settings != null) {
-                calendarSettings = settings
-                true
-            } else {
-                false
-            }
-        }
-
     }
 
     private fun getDefaultAlarms(calendarSettings: CalendarSettingsEntity, isAllDay: Boolean): List<VAlarm> {
@@ -526,10 +596,6 @@ class EventViewModel(
             if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) event.iCalEvent.addAlarm(it)
         }
     }
-
-    // recurrence temp values
-    var tempRecurrenceUntilLocalDate: LocalDate? = null
-    var tempMonthlyRepeatOption: MonthlyRepeatOnOption = MonthlyRepeatOnOption.ON_DAY_X
 
     /**
      * Resets temporary values for Recurrence

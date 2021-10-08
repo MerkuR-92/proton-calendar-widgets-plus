@@ -54,7 +54,6 @@ import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWE
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import org.koin.android.ext.android.inject
@@ -107,7 +106,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     lifecycleScope.launch {
                         val userId = accountViewModel.getPrimaryUserId()
                         val viewModeInitStatus =
-                            if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                            if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
                             else eventViewModel.initialise(
                                 userId,
                                 editMode = false,
@@ -116,23 +115,23 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                                 null,
                                 null
                             )
-                        if (viewModeInitStatus == EventViewModel.Result.Success) {
+                        if (viewModeInitStatus == EventViewModel.InitResult.Success) {
                             findNavController().navigateUp()
                         } else {
                             when (viewModeInitStatus) {
-                                EventViewModel.Result.OccurrenceDoesNotExist -> {
+                                EventViewModel.InitResult.OccurrenceDoesNotExist -> {
                                     AndroidUtils.displaySimpleOkAlert(
                                         requireContext(),
                                         getString(R.string.error_occurrence_does_not_exist)
                                     )
                                 }
-                                EventViewModel.Result.EventDoesNotExist -> {
+                                EventViewModel.InitResult.EventDoesNotExist -> {
                                     AndroidUtils.displaySimpleOkAlert(
                                         requireContext(),
                                         getString(R.string.error_event_does_not_exist)
                                     )
                                 }
-                                is EventViewModel.Result.Error -> {
+                                is EventViewModel.InitResult.Error -> {
                                     logger.e(viewModeInitStatus.message)
                                     requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                                 }
@@ -263,7 +262,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus = withContext(Dispatchers.Default) {
-                if (userId == null) EventViewModel.Result.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
                 else eventViewModel.initialise(
                     userId,
                     editMode = true,
@@ -274,7 +273,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 )
             }
 
-            if (viewModeInitStatus == EventViewModel.Result.Success) {
+            if (viewModeInitStatus == EventViewModel.InitResult.Success) {
                 if (navigationArguments.eventId == null) {
                     event_form_title.requestFocus()
                     requireContext().showKeyboard()
@@ -287,13 +286,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 attachActionHandlers()
             } else {
                 when (viewModeInitStatus) {
-                    EventViewModel.Result.OccurrenceDoesNotExist -> {
+                    EventViewModel.InitResult.OccurrenceDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_does_not_exist))
                     }
-                    EventViewModel.Result.EventDoesNotExist -> {
+                    EventViewModel.InitResult.EventDoesNotExist -> {
                         AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_does_not_exist))
                     }
-                    is EventViewModel.Result.Error -> {
+                    is EventViewModel.InitResult.Error -> {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(
                             if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
