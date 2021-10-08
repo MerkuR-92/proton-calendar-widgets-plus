@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.presentation.calendar.EventViewModel
@@ -144,22 +145,24 @@ abstract class BaseDialogFragment : DialogFragment() {
                 negativeButton: String,
                 alertDialogListener: AlertDialogListener?
             ) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(title)
-                    .setMessage(message)
-                    .setPositiveButton(positiveButton) { _, _ ->
-                        alertDialogListener?.onPositive()
-                    }
-                    .setNegativeButton(negativeButton) { _, _ ->
-                        alertDialogListener?.onNegative()
-                    }
-                    .setOnCancelListener {
-                        alertDialogListener?.onCancel()
-                    }
-                    .setOnDismissListener {
-                        alertDialogListener?.onDismiss()
-                    }
-                    .show()
+                CoroutineScope(Dispatchers.Main).launch {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setPositiveButton(positiveButton) { _, _ ->
+                            alertDialogListener?.onPositive()
+                        }
+                        .setNegativeButton(negativeButton) { _, _ ->
+                            alertDialogListener?.onNegative()
+                        }
+                        .setOnCancelListener {
+                            alertDialogListener?.onCancel()
+                        }
+                        .setOnDismissListener {
+                            alertDialogListener?.onDismiss()
+                        }
+                        .show()
+                }
             }
 
             override fun pickerDialog(
@@ -170,25 +173,27 @@ abstract class BaseDialogFragment : DialogFragment() {
                 negativeButton: String,
                 alertDialogListener: AlertDialogListener?
             ) {
-                var selectedItem = defaultSelectedItem
-                AlertDialog.Builder(requireContext())
-                    .setTitle(title)
-                    .setSingleChoiceItems(items, defaultSelectedItem) { _, item ->
-                        selectedItem = item
-                    }
-                    .setPositiveButton(positiveButton) { _, _ ->
-                        alertDialogListener?.onPositive(selectedItem)
-                    }
-                    .setNegativeButton(negativeButton) { _, _ ->
-                        alertDialogListener?.onNegative()
-                    }
-                    .setOnCancelListener { _ ->
-                        alertDialogListener?.onCancel()
-                    }
-                    .setOnDismissListener {
-                        alertDialogListener?.onDismiss()
-                    }
-                    .show()
+                CoroutineScope(Dispatchers.Main).launch {
+                    var selectedItem = defaultSelectedItem
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(title)
+                        .setSingleChoiceItems(items, defaultSelectedItem) { _, item ->
+                            selectedItem = item
+                        }
+                        .setPositiveButton(positiveButton) { _, _ ->
+                            alertDialogListener?.onPositive(selectedItem)
+                        }
+                        .setNegativeButton(negativeButton) { _, _ ->
+                            alertDialogListener?.onNegative()
+                        }
+                        .setOnCancelListener { _ ->
+                            alertDialogListener?.onCancel()
+                        }
+                        .setOnDismissListener {
+                            alertDialogListener?.onDismiss()
+                        }
+                        .show()
+                }
             }
         }
     }
