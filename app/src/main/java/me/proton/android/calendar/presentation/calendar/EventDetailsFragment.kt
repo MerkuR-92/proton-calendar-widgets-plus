@@ -118,15 +118,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onBackPressedCustom() {
 
-        val immutableChangeAnswerLoading =
-            eventViewModel.attendeeAnswerState.value?.second
-        val immutableDeletingEvent = eventViewModel.eventDetailsState.value == EventViewModel.EventState.Processing.Deleting
+        val changingAnswer = eventViewModel.attendeeAnswerState.value?.second
+        val deletingEvent = eventViewModel.eventDetailsState.value == EventViewModel.EventState.Processing.Deleting
 
-        if (immutableChangeAnswerLoading == true) {
+        if (changingAnswer == true) {
             view?.displaySnackBar(getString(R.string.snack_event_changing_answer))
             return
         }
-        if (immutableDeletingEvent) {
+        if (deletingEvent) {
             view?.displaySnackBar(getString(R.string.snack_event_deleting))
             return
         }
@@ -337,19 +336,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                eventViewModel.handleChangeAnswer(provideDisplayDialog(), ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))
+                eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))
             }
         }
         section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                eventViewModel.handleChangeAnswer(provideDisplayDialog(), ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))
+                eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))
             }
         }
         section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
             lifecycleScope.launch {
                 // Ignore the result if true
-                eventViewModel.handleChangeAnswer(provideDisplayDialog(), ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))
+                eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))
             }
         }
     }
