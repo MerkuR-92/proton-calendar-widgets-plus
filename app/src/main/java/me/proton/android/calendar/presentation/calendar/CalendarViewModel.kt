@@ -148,7 +148,7 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel selectUser")
             return null
         }
-        return userManager.getUser(userId)
+        return userManager.getUserOrNull(userId, logger)
     }
 
     // TODO go back to UserId as String

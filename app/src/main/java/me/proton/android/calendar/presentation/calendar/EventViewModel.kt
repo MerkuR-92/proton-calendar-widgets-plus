@@ -287,9 +287,7 @@ class EventViewModel(
         userSettings = userSettingsRepository.selectUserSettings(userId.id)
             ?: return Result.Error("EventViewModel: could not get User Settings")
 
-        runCatching {
-            user = userManager.getUser(userId)
-        }.getOrElse { return Result.Error("EventViewModel: could not get User") }
+        user = userManager.getUserOrNull(userId, logger) ?: return Result.Error("EventViewModel: could not get User")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 

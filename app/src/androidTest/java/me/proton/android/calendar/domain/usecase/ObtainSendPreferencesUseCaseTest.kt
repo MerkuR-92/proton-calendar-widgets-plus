@@ -6,12 +6,12 @@ import ezvcard.Ezvcard
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.MailSettingsApiResponse
 import me.proton.android.calendar.domain.api.MailSettingsApi
+import me.proton.android.calendar.domain.model.PackageType
 import me.proton.core.contact.domain.entity.Contact
 import me.proton.core.contact.domain.entity.ContactCard
 import me.proton.core.contact.domain.entity.ContactEmail
