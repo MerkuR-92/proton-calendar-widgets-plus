@@ -50,7 +50,7 @@ internal class HandleSaveUseCaseTest {
         runBlocking {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = false, hasAttendees = false)
+            val event = getEvent(isRecurring = false)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -81,7 +81,7 @@ internal class HandleSaveUseCaseTest {
         runBlocking {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = true, hasAttendees = false)
+            val event = getEvent(isRecurring = true)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -112,7 +112,7 @@ internal class HandleSaveUseCaseTest {
         runBlocking {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = false, hasAttendees = true)
+            val event = getEvent(isRecurring = false, isOrganizer = true)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -147,7 +147,7 @@ internal class HandleSaveUseCaseTest {
         runBlocking {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = true, hasAttendees = true)
+            val event = getEvent(isRecurring = true, isOrganizer = true)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */

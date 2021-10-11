@@ -5,16 +5,24 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import biweekly.parameter.ParticipationStatus
+import biweekly.property.Attendee
 import biweekly.util.Frequency
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.AndroidUtils.toInt
+import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.UserSettingsRepository
+import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.mocks.CalendarMocks.getCalendarEntity
@@ -22,12 +30,14 @@ import me.proton.android.calendar.mocks.CalendarMocks.getCalendarSettingsEntity
 import me.proton.android.calendar.mocks.CalendarMocks.getCalendarUserSettingsEntity
 import me.proton.android.calendar.mocks.EventMocks.getEvent
 import me.proton.android.calendar.mocks.EventMocks.getEventEntity
+import me.proton.android.calendar.mocks.UserMocks.getSendPreferences
 import me.proton.android.calendar.mocks.UserMocks.getUser
 import me.proton.android.calendar.mocks.UserMocks.getUserAddress
 import me.proton.android.calendar.mocks.UserMocks.getUserSettingsEntity
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.user.domain.UserManager
+import me.proton.core.util.kotlin.toBoolean
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,6 +73,7 @@ internal class EventViewModelTest: KoinComponent {
     private val handleSaveUseCaseMock: HandleSaveUseCase = mockk()
     private val handleDeleteUseCaseMock: HandleDeleteUseCase = mockk()
     private val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
+    private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -111,7 +122,8 @@ internal class EventViewModelTest: KoinComponent {
             handleSaveUseCase = handleSaveUseCaseMock,
             handleDeleteUseCase = handleDeleteUseCaseMock,
             updateCalendarUseCase = updateCalendarUseCaseMock,
-            resourceProvider = resourceProviderMock
+            resourceProvider = resourceProviderMock,
+            handleAlarmsUseCase = handleAlarmsUseCaseMock
         )
     }
 
@@ -156,6 +168,31 @@ internal class EventViewModelTest: KoinComponent {
         }
 
         return eventViewModel
+    }
+
+    private fun provideDisplayDialog(selectedItem: Int = 0, selectPositive: Boolean = true): BaseDialogFragment.DisplayDialog {
+        return object: BaseDialogFragment.DisplayDialog {
+            override fun alertDialog(
+                title: String,
+                message: String,
+                positiveButton: String,
+                negativeButton: String,
+                alertDialogListener: BaseDialogFragment.AlertDialogListener?
+            ) {
+                if (selectPositive) alertDialogListener?.onPositive()
+            }
+
+            override fun pickerDialog(
+                title: String,
+                items: Array<String>,
+                defaultSelectedItem: Int,
+                positiveButton: String,
+                negativeButton: String,
+                alertDialogListener: BaseDialogFragment.AlertDialogListener?
+            ) {
+                if (selectPositive) alertDialogListener?.onPositive(selectedItem)
+            }
+        }
     }
 
     /**
@@ -283,10 +320,12 @@ internal class EventViewModelTest: KoinComponent {
     fun getSingleEditsInfoTest() {
         runBlocking {
 
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(hasAttendees = true)
+            // Mock event with attendee (user as organizer)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isOrganizer = true)
 
+            // Mock single edit with attendee (user as organizer)
             coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf(
-                getEvent(hasAttendees = true, isSingleEdit = true)
+                getEvent(isOrganizer = true, isSingleEdit = true)
             )
 
             val eventViewModel = getInitialisedEventViewModel(
@@ -312,87 +351,280 @@ internal class EventViewModelTest: KoinComponent {
      */
 
     @Test
-    fun deleteSingleEventTest() {
-//        runBlocking {
-//
-//            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
-//            coEvery { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, 0) } returns UseCase.Result.Success<Unit>()
-//
-//            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_event)
-//            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_description_delete_event)
-//            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(R.string.dialog_button_delete)
-//            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
-//            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
-//
-//            val occurrenceNumber = 0
-//            val eventViewModel = getInitialisedEventViewModel(
-//                editMode = false,
-//                eventId = eventId,
-//                occurrenceNumber = occurrenceNumber,
-//                initStartDate = null,
-//                initStartTime = null
-//            )
-//
-//            val provideDisplayDialog = object : BaseDialogFragment.DisplayDialog {
-//                override fun alertDialog(
-//                    title: String,
-//                    message: String,
-//                    positiveButton: String,
-//                    negativeButton: String,
-//                    alertDialogListener: BaseDialogFragment.AlertDialogListener
-//                ) {
-//                    alertDialogListener.onPositive(this@runBlocking)
-//                }
-//            }
-//
-//            withContext(Dispatchers.Default) {
-//                eventViewModel.handleDelete(provideDisplayDialog, occurrenceNumber)
-//            }
-//
-//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
-//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_event) }
-//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
-//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
-//            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
-//
-//            assert(eventViewModel.eventState.value == EventViewModel.EventState.Idle)
-//            assert(eventViewModel.eventSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
-//                resourceProviderMock.provideString(R.string.snack_event_deleted)
-//            ))
-//        }
+    fun deleteEventTest() {
+        runBlocking {
+
+            // Get current user address
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(R.string.dialog_button_delete)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+
+            val occurrenceNumber = 0
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val provideDisplayDialog = provideDisplayDialog()
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, 0) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
     }
 
     @Test
     fun deleteDisabledCalendarRecurringEventTest() {
-//        runBlocking {
-//
-//            coEvery { transformEventUseCaseMock.execute(any()) } returns getEvent(isRecurring = true, hasDisabledCalendar = true)
-//
-//            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
-//            coEvery { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) } returns UseCase.Result.Success<Unit>()
-//
-//            val occurrenceNumber = 1
-//            val eventViewModel = getInitialisedEventViewModel(
-//                editMode = false,
-//                eventId = eventId,
-//                occurrenceNumber = occurrenceNumber,
-//                initStartDate = null,
-//                initStartTime = null
-//            )
-//
-//            // Called on delete click
-//            eventViewModel.handleDelete(occurrenceNumber)
-//
-//            assert(eventViewModel.eventState.value == EventViewModel.EventState.Processing.Deleting)
-//            assert(eventViewModel.eventDialogState.value == EventViewModel.EventDialogState.Delete.DisabledCalendarRecurring)
-//
-//            // Called on confirmation dialog click
-//            eventViewModel.handleDeleteDisabledCalendarRecurring()
-//
-//            assert(eventViewModel.eventState.value == EventViewModel.EventState.Idle)
-//            assert(eventViewModel.eventSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
-//                resourceProviderMock.provideString(R.string.snack_event_deleted)
-//            ))
-//        }
+        runBlocking {
+
+            // Mock recurring event with disabled calendar
+            coEvery { transformEventUseCaseMock.execute(any()) } returns getEvent(isRecurring = true, hasDisabledCalendar = true)
+
+            // Get current user address
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_recurring_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event) } returns protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(R.string.dialog_button_delete)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+
+            val occurrenceNumber = 1
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog(), occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
+    }
+
+    /**
+     * EventViewModel save flow tests
+     */
+
+    @Test
+    fun createAllDayEventTest() {
+        runBlocking {
+
+            // Get address for current user
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Schedule alarms if any
+            coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
+
+            // Display calendar if it was hidden
+            coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, 1) } just Runs
+            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+
+            // Handle save use case call
+            coEvery {
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+            } returns UseCase.Result.Success<Unit>()
+
+            // Success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_created) } returns protonCalendarApplication.getString(R.string.snack_event_created)
+
+            val occurrenceNumber = 1
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = true,
+                eventId = null,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            // Store initialised event
+            val event = eventViewModel.eventLiveData.value
+
+            val provideDisplayDialog = provideDisplayDialog()
+
+            withContext(Dispatchers.Default) {
+                // Start save
+                eventViewModel.onSaveClick(provideDisplayDialog, null, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle save use case
+            coVerify(exactly = 1) {
+                handleSaveUseCaseMock.handleSave(
+                    editOption = null,
+                    occurrenceNumber = 1,
+                    timeFormatIs24Hours = timeFormat.toBoolean(),
+                    sendPreferences = mapOf(),
+                    event = event!!,
+                    originalDbEvent = null,
+                    userSettings = getUserSettingsEntity(),
+                    eventTimeZoneId = defaultTimezone,
+                    userId = userId,
+                    recurrenceManuallyEdited = false,
+                    isCreate = true
+                )
+            }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_created) }
+
+            assert(eventViewModel.eventFormState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventFormSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+                resourceProvider.provideString(
+                    R.string.snack_event_created
+                ),
+                event!!.getStart(defaultTimezone).toLocalDate()
+            ))
+        }
+    }
+
+    /**
+     * EventViewModel change answer flow tests
+     */
+
+    @Test
+    fun changeAnswerExternalEventTest() {
+        runBlocking {
+
+            // Mock event with user as attendee
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isAttendee = true)
+
+            // Get address for current user
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Get canonical and send preferences for organizer
+            coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(organizerEmail, organizerEmail))
+            coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
+                Pair(organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
+                    sendPreferences = getSendPreferences()
+                ))
+            )
+
+            // Send reply email
+            coEvery { sendEmailUseCaseMock.sendReplyToOrganizer(
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()
+            ) } returns UseCase.Result.Success<Unit>()
+
+            // Set participation status on server
+            coEvery { updateParticipationStatusUseCaseMock.execute(
+                any(), any(), any(), any(), any(), any(), any()
+            ) } returns UseCase.Result.Success<Unit>()
+
+            // Display calendar if it was hidden
+            coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, 1) } just Runs
+            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+
+            // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
+            coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
+                EventApiResponse(
+                    event = getEventEntity()
+                )
+            )
+
+            val occurrenceNumber = 0
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val eventCopy = Event.from(eventViewModel.eventLiveData.value!!)
+
+            assert(eventViewModel.eventLiveData.value?.getParticipationStatus(listOf(userEmail)) == ParticipationStatus.DECLINED)
+
+            val provideDisplayDialog = provideDisplayDialog()
+
+            withContext(Dispatchers.Default) {
+                // Start change answer
+                eventViewModel.onChangeAnswerClick(provideDisplayDialog, ParticipationStatus.ACCEPTED, timeFormat.toBoolean())
+            }
+
+            val userAttendee = Attendee(userName, userEmail)
+            userAttendee.participationStatus = ParticipationStatus.DECLINED
+            coVerify(exactly = 1) { sendEmailUseCaseMock.sendReplyToOrganizer(
+                userId = userId,
+                event = eventCopy,
+                originalTimeZoneInfo = any(), // TODO
+                userAttendee = userAttendee,
+                organizerEmail = organizerEmail,
+                participationStatus = ParticipationStatus.ACCEPTED,
+                sendPreferences = mapOf(Pair(organizerEmail, getSendPreferences())),
+                dtStamp = any(), // updateTime = Instant.now()
+                eventEntity = null,
+                isProtonProtonInvite = false,
+                defaultTimeZone = defaultTimezone,
+                timeFormatIs24Hours = timeFormat.toBoolean()
+            ) }
+            coVerify(exactly = 1) { updateParticipationStatusUseCaseMock.execute(
+                userId = userId,
+                    calendarId = calendarId,
+                    eventId = eventId,
+                    attendeeId = attendeeId,
+                    status = ParticipationStatus.ACCEPTED.toInt(),
+                    personalPartICalString = null,
+                    updateTime = any() // updateTime = Instant.now()
+            ) }
+
+            assert(eventViewModel.eventLiveData.value?.getParticipationStatus(listOf(userEmail)) == ParticipationStatus.ACCEPTED)
+            assert(eventViewModel.attendeeAnswerState.value == Pair(ParticipationStatus.ACCEPTED, false))
+        }
     }
 }

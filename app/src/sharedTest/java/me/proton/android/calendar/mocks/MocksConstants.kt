@@ -1,5 +1,6 @@
 package me.proton.android.calendar.mocks
 
+import me.proton.android.calendar.domain.model.PackageType
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.AddressType
@@ -46,9 +47,14 @@ const val eventUid = "eventUid@proton.me"
 const val attendeeEmail = "attendee@pm.me"
 const val attendeeName = "attendeeName"
 
+const val organizerEmail = "organizer@pm.me"
+const val organizerName = "organizerName"
+
 const val sharedEventId = "sharedEventId"
 const val calendarKeyPacket = "calendarKeyPacket"
 const val sharedKeyPacket = "sharedKeyPacket"
+
+const val attendeeId = "attendeeId"
 
 /**
  * User mocks
@@ -82,6 +88,12 @@ const val subscribed = 1
 
 val role = Role.NoOrganization
 val delinquent = Delinquent.None
+
+const val encrypt: Boolean = true
+const val sign: Boolean = true
+val pgpScheme: PackageType = PackageType.ProtonMail
+const val mimeType: String = "" // TODO
+const val publicKey: String = "" // TODO
 
 /**
  * Event Ics mocks

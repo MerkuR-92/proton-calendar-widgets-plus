@@ -1,6 +1,7 @@
 package me.proton.android.calendar.mocks
 
 import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.key.domain.extension.areAllLocked
 import me.proton.core.key.domain.useKeys
 import me.proton.core.user.domain.UserManager
@@ -54,6 +55,16 @@ object UserMocks {
             type = addressType,
             order = order,
             keys = emptyList() // TODO
+        )
+    }
+
+    fun getSendPreferences(): SendPreferences {
+        return SendPreferences(
+            encrypt = encrypt,
+            sign = sign,
+            pgpScheme = pgpScheme,
+            mimeType = mimeType,
+            publicKey = publicKey
         )
     }
 }

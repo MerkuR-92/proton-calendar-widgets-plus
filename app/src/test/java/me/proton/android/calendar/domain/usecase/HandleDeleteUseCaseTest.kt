@@ -139,11 +139,11 @@ internal class HandleDeleteUseCaseTest {
         )
     }
 
-    private fun prepareEvent(isRecurring: Boolean = false, hasAttendees: Boolean = false): Event {
+    private fun prepareEvent(isRecurring: Boolean = false): Event {
 
         // TODO Handle Single edits by preparing second set of EventEntity & Event and mocking transformEventUseCaseMock parameter to match either
 
-        val event = getEvent(isRecurring, hasAttendees)
+        val event = getEvent(isRecurring = isRecurring)
 
         coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
@@ -155,7 +155,7 @@ internal class HandleDeleteUseCaseTest {
         runBlocking {
 
             // Make sure to call prepare method
-            val event = prepareEvent(isRecurring = false, hasAttendees = false)
+            val event = prepareEvent(isRecurring = false)
 
             /* Delete single event */
             assert(
@@ -182,7 +182,7 @@ internal class HandleDeleteUseCaseTest {
         runBlocking {
 
             // Make sure to call prepare method
-            val event = prepareEvent(isRecurring = false, hasAttendees = false)
+            val event = prepareEvent(isRecurring = false)
 
             /* Delete single event that doesn't exist on server anymore */
             coEvery { calendarsApiMock.syncEvents(userId, any(), any()) } returns ApiResponse.Success(
@@ -213,7 +213,7 @@ internal class HandleDeleteUseCaseTest {
         runBlocking {
 
             // Make sure to call prepare method
-            val event = prepareEvent(isRecurring = false, hasAttendees = false)
+            val event = prepareEvent(isRecurring = false)
 
             coEvery { calendarsApiMock.syncEvents(userId, any(), any()) } returns ApiResponse.Success(
                 getSyncEventsApiResponse(SyncEventErrorType.ERROR_DELETING_ON_SERVER)
