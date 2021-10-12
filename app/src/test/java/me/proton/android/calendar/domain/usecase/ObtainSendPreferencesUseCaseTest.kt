@@ -11,6 +11,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.common.extractSignedVCard
+import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.MailSettingsApiResponse
 import me.proton.android.calendar.domain.api.MailSettingsApi
@@ -91,7 +92,7 @@ internal class ObtainSendPreferencesUseCaseTest {
             "contact_external_pinned_key@email.com" to contactExternalPinnedKeyPublicAddress
         )
 
-        coEvery { userManagerMock.getUser(userId) } returns userMock
+        coEvery { userManagerMock.getUserOrNull(userId, logger) } returns userMock
     }
 
     @Test

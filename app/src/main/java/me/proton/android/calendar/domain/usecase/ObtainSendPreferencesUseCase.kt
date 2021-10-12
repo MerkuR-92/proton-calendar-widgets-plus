@@ -2,10 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import androidx.annotation.VisibleForTesting
 import ezvcard.VCard
-import me.proton.android.calendar.common.extractSignedVCard
-import me.proton.android.calendar.common.getGroupForEmail
-import me.proton.android.calendar.common.getKeysForGroup
-import me.proton.android.calendar.common.getProperty
+import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.MailSettingsApi
@@ -56,6 +53,8 @@ class ObtainSendPreferencesUseCase(
         canonicalEmails: Map<Email, Email>
     ): Map<Email, Result> {
 
+        val user = userManager.getUserOrNull(userId, logger)
+
         // 1. get User's Mail Settings
         val mailSettings = mailSettingsApi.getMailSettings(userId).valueOrNullAndLogErrors(
             logger,
@@ -66,7 +65,7 @@ class ObtainSendPreferencesUseCase(
         val contactEmails =
             kotlin.runCatching { contactEmailsRepository.getContactEmails(userId, refresh = true) }.getOrNull()
 
-        if (mailSettings == null || contactEmails == null) {
+        if (mailSettings == null || contactEmails == null || user == null) {
             return canonicalEmails.mapValues { Result.Error.NetworkError }
         }
 
@@ -93,7 +92,6 @@ class ObtainSendPreferencesUseCase(
         }
 
         // 6. obtain VCards for those contacts
-        val user = userManager.getUser(userId)
         val validVCards = fullContactsWithCustomPreferences.filterNullValues().mapValues { entry ->
             entry.value.extractSignedVCard(user, cryptoContext, logger).also {
                 if (it == null) result[entry.key] = Result.Error.NoCorrectlySignedTrustedKeys
