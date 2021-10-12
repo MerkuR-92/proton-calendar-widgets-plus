@@ -46,6 +46,8 @@ const val eventUid = "eventUid@proton.me"
 
 const val attendeeEmail = "attendee@pm.me"
 const val attendeeName = "attendeeName"
+const val secondAttendeeEmail = "secondAttendee@pm.me"
+const val secondAttendeeName = "secondAttendeeName"
 
 const val organizerEmail = "organizer@pm.me"
 const val organizerName = "organizerName"
