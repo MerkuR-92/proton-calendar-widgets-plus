@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mini_calendar_dot"
     android:layout_gravity="center"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="4dp"
+    android:layout_height="4dp"
     android:src="@drawable/shape_calendar_circle_small"
     app:tint="#CF5858"
     />
