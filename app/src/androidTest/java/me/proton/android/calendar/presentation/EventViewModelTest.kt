@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import biweekly.util.Frequency
+import biweekly.util.Recurrence
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
@@ -98,12 +99,11 @@ internal class EventViewModelTest: KoinComponent {
         coEvery { userManagerMock.getUser(userId) } returns getUser()
 
         coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns getEventEntity()
-        coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
 
     }
 
     /**
-     *   Utils private methods
+     * Utils private methods
      */
 
     private fun getEventViewModel(): EventViewModel {
@@ -196,7 +196,12 @@ internal class EventViewModelTest: KoinComponent {
     }
 
     /**
-     *  EventViewModel.initialise Tests
+     * EventViewModel.initialise tests:
+     *  initialiseCreateAllDayEventTest -> Initialise EventVM for creating an all day event
+     *  initialiseCreatePartDayEventTest -> Initialise EventVM for creating a part day event
+     *  initialiseViewEventDetailsTest -> Initialise EventVM for opening details of existing event
+     *  initialiseEditEventTest -> Initialise EventVM for editing an event
+     *  initialiseEditSingleEditTest -> Initialise EventVM for editing a single edit
      */
 
     @Test
@@ -255,6 +260,9 @@ internal class EventViewModelTest: KoinComponent {
     fun initialiseViewEventDetailsTest() {
         runBlocking {
 
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = false,
                 eventId = eventId,
@@ -268,6 +276,9 @@ internal class EventViewModelTest: KoinComponent {
     @Test
     fun initialiseEditEventTest() {
         runBlocking {
+
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
@@ -313,7 +324,8 @@ internal class EventViewModelTest: KoinComponent {
     }
 
     /**
-     *  EventViewModel.getSingleEditsInfo Tests
+     * EventViewModel.getSingleEditsInfo tests:
+     *  getSingleEditsInfoTest -> Get single edits info for event with one declined future non cancelled single edit
      */
 
     @Test
@@ -321,7 +333,7 @@ internal class EventViewModelTest: KoinComponent {
         runBlocking {
 
             // Mock event with attendee (user as organizer)
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isOrganizer = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isRecurring = true, isOrganizer = true)
 
             // Mock single edit with attendee (user as organizer)
             coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf(
@@ -331,7 +343,7 @@ internal class EventViewModelTest: KoinComponent {
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = false,
                 eventId = eventId,
-                occurrenceNumber = 0,
+                occurrenceNumber = 1,
                 initStartDate = null,
                 initStartTime = null
             )
@@ -347,12 +359,22 @@ internal class EventViewModelTest: KoinComponent {
     }
 
     /**
-     * EventViewModel delete flow tests
+     * EventViewModel delete flow tests:
+     *  deleteEventTest -> Delete single event
+     *  deleteSingleOccurrenceRecurringEventTest -> Delete single occurrence recurring
+     *  deleteRecurringEventOptionThisTest -> Delete recurring from first occurrence with option "This"
+     *  deleteRecurringEventOptionThisAndFutureTest -> Delete recurring from second occurrence with option "This & future"
+     *  deleteRecurringEventOptionAllTest -> Delete recurring from second occurrence with option "All"
+     *  deleteDisabledCalendarRecurringEventTest -> Delete recurring event in disabled calendar
+     *  deleteEventChangingAnswerTest -> Try to delete event while changing answer
      */
 
     @Test
     fun deleteEventTest() {
         runBlocking {
+
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
 
             // Get current user address
             coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
@@ -392,6 +414,254 @@ internal class EventViewModelTest: KoinComponent {
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_event) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
+    }
+
+    @Test
+    fun deleteSingleOccurrenceRecurringEventTest() {
+        runBlocking {
+
+            // Mock event
+            val event = getEvent(isRecurring = true)
+            // Set recurrence count to 1
+            event.iCalEvent.setRecurrenceRule(Recurrence.Builder(event.iCalEvent.recurrenceRule.value).count(1).build())
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
+
+            // Get current user address
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(R.string.dialog_button_delete)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+
+            val occurrenceNumber = 1
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val provideDisplayDialog = provideDisplayDialog()
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
+    }
+
+    @Test
+    fun deleteRecurringEventOptionThisTest() {
+        runBlocking {
+
+            // Mock event
+            val event = getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
+
+            // Get current user address
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_recurring_event)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_this) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_this)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_all_events) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_all_events)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_ok) } returns protonCalendarApplication.getString(R.string.dialog_button_ok)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+
+            val occurrenceNumber = 1
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            // Select option this
+            val provideDisplayDialog = provideDisplayDialog(selectedItem = 0)
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, occurrenceNumber) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_this) }
+            verify(exactly = 0) { resourceProviderMock.provideString(R.string.event_recurring_edit_this_and_future) } // This and future is hidden when first occurrence is selected
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_all_events) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_ok) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
+    }
+
+    @Test
+    fun deleteRecurringEventOptionThisAndFutureTest() {
+        runBlocking {
+
+            // Mock event
+            val event = getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
+
+            // Get current user address
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_recurring_event)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_this) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_this)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_this_and_future) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_this_and_future)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_all_events) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_all_events)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_ok) } returns protonCalendarApplication.getString(R.string.dialog_button_ok)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+
+            val occurrenceNumber = 2
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            // Select option this and future
+            val provideDisplayDialog = provideDisplayDialog(selectedItem = 1)
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT_AND_FUTURE, occurrenceNumber) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_this) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_this_and_future) } // This and future is hidden when first occurrence is selected
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_all_events) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_ok) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
+    }
+
+    @Test
+    fun deleteRecurringEventOptionAllTest() {
+        runBlocking {
+
+            // Mock event
+            val event = getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
+
+            // Get current user address
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(getUserAddress())
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(R.string.dialog_title_delete_recurring_event)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_this) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_this)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_this_and_future) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_this_and_future)
+            coEvery { resourceProviderMock.provideString(R.string.event_recurring_edit_all_events) } returns protonCalendarApplication.getString(R.string.event_recurring_edit_all_events)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_ok) } returns protonCalendarApplication.getString(R.string.dialog_button_ok)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(R.string.snack_event_deleted)
+
+            val occurrenceNumber = 2
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            // Select option all
+            val provideDisplayDialog = provideDisplayDialog(selectedItem = 2)
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_this) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_this_and_future) } // This and future is hidden when first occurrence is selected
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_recurring_edit_all_events) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_ok) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
 
             // Success snack
@@ -459,8 +729,43 @@ internal class EventViewModelTest: KoinComponent {
         }
     }
 
+    @Test
+    fun deleteEventChangingAnswerTest() {
+        runBlocking {
+
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(any()) } returns getEvent()
+
+            val occurrenceNumber = 1
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            // Simulate changing answer state
+            eventViewModel.attendeeAnswerState.value = Pair(ParticipationStatus.ACCEPTED, true)
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog(), occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Success snack
+            verify(exactly = 0) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            // Handle delete use case
+            coVerify(exactly = 0) { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+        }
+    }
+
     /**
-     * EventViewModel save flow tests
+     * EventViewModel save flow tests:
+     *  createAllDayEventTest -> Create an all day event
      */
 
     @Test
@@ -536,6 +841,7 @@ internal class EventViewModelTest: KoinComponent {
 
     /**
      * EventViewModel change answer flow tests
+     *  changeAnswerExternalEventTest -> Change answer for external invite
      */
 
     @Test
