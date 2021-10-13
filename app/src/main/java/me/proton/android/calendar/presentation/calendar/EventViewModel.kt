@@ -94,8 +94,8 @@ class EventViewModel(
         object Success : InitResult()
         object OccurrenceDoesNotExist : InitResult()
         object EventDoesNotExist : InitResult()
-        class InitEvent(val event: Event) : InitResult()
-        class InitDefaultCalendar(val calendar: CalendarEntity?) : InitResult()
+        class InitEventSuccess(val event: Event) : InitResult()
+        class InitDefaultCalendarSuccess(val calendar: CalendarEntity?) : InitResult()
         class Error(val message: String) : InitResult()
     }
 
@@ -176,12 +176,8 @@ class EventViewModel(
         ): EventSnackState()
 
         data class DisplaySnackReturnToMonth(
-            val message: String
-        ): EventSnackState()
-
-        data class DisplaySnackReturnToMonthOnSpecificDay(
             val message: String,
-            val newSelectedDate: LocalDate?
+            val newSelectedDate: LocalDate? = null
         ): EventSnackState()
     }
 
@@ -246,7 +242,7 @@ class EventViewModel(
             if (editMode) {
                 // Get default calendar and its settings if we are in edit mode
                 val initializeDefaultCalendarResult = initializeDefaultCalendar()
-                if (initializeDefaultCalendarResult !is InitResult.InitDefaultCalendar) {
+                if (initializeDefaultCalendarResult !is InitResult.InitDefaultCalendarSuccess) {
                     // Handle initialisation error
                     return initializeDefaultCalendarResult
                 } else {
@@ -270,7 +266,7 @@ class EventViewModel(
         event = if (eventId == null) {
 
             val initialiseCreateEventResult = initialiseNewEvent(defaultCalendar!!, initStartDate, initStartTime)
-            if (initialiseCreateEventResult !is InitResult.InitEvent) {
+            if (initialiseCreateEventResult !is InitResult.InitEventSuccess) {
                 // Handle initialisation error
                 return initialiseCreateEventResult
             } else {
@@ -281,7 +277,7 @@ class EventViewModel(
         } else {
 
             val initialiseEditEventResult = initialiseExistingEvent(eventId, occurrenceNumber)
-            if (initialiseEditEventResult !is InitResult.InitEvent) {
+            if (initialiseEditEventResult !is InitResult.InitEventSuccess) {
                 // Handle initialisation error
                 return initialiseEditEventResult
             } else {
@@ -318,7 +314,7 @@ class EventViewModel(
         // Load settings for given calendar id and stores them in calendarSettings
         if (!loadSettingsForCalendar(defaultCalendarId)) return InitResult.Error("EventViewModel: could not get CalendarSettings")
 
-        return InitResult.InitDefaultCalendar(defaultCalendar)
+        return InitResult.InitDefaultCalendarSuccess(defaultCalendar)
     }
 
     /**
@@ -394,7 +390,7 @@ class EventViewModel(
         ) ?: return InitResult.Error("could not create Event using factory method")
 
         setDefaultAlarms(newEvent, this.calendarSettings)
-        return InitResult.InitEvent(newEvent)
+        return InitResult.InitEventSuccess(newEvent)
     }
 
     /**
@@ -476,7 +472,7 @@ class EventViewModel(
                 return InitResult.OccurrenceDoesNotExist
             }
 
-            InitResult.InitEvent(adjustedEvent)
+            InitResult.InitEventSuccess(adjustedEvent)
 
         } else InitResult.Error("EventViewModel: could not generate event with occurrence in EventViewModel")
     }
@@ -1295,7 +1291,7 @@ class EventViewModel(
                     ),
                     resourceProvider.provideString(R.string.event_add_participants_dialog_confirm),
                     resourceProvider.provideString(R.string.event_add_participants_dialog_cancel),
-                    object: BaseDialogFragment.AlertDialogListener {
+                    object: BaseDialogFragment.DialogListener {
                         override fun onPositive(selectedItem: Int) {
                             coroutineScope.launch {
                                 saveEventWithAttendeesSendPreferences(
@@ -1321,7 +1317,7 @@ class EventViewModel(
                     resourceProvider.provideString(R.string.event_send_invite_dialog_description),
                     resourceProvider.provideString(R.string.event_send_invite_dialog_confirm),
                     resourceProvider.provideString(R.string.event_send_invite_dialog_cancel),
-                    object: BaseDialogFragment.AlertDialogListener {
+                    object: BaseDialogFragment.DialogListener {
                         override fun onPositive(selectedItem: Int) {
                             coroutineScope.launch {
                                 saveEventWithAttendeesSendPreferences(
@@ -1380,7 +1376,7 @@ class EventViewModel(
                             ),
                             resourceProvider.provideString(R.string.event_attendees_send_prefs_error_confirm),
                             resourceProvider.provideString(R.string.event_attendees_send_prefs_error_cancel),
-                            object: BaseDialogFragment.AlertDialogListener {
+                            object: BaseDialogFragment.DialogListener {
                                 override fun onPositive(selectedItem: Int) {
                                     coroutineScope.launch {
 
@@ -1518,7 +1514,7 @@ class EventViewModel(
                 defaultSelectedItem = 0,
                 resourceProvider.provideString(R.string.dialog_button_ok),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
 
@@ -1600,7 +1596,7 @@ class EventViewModel(
                 message,
                 resourceProvider.provideString(R.string.event_recurring_update_this_confirm),
                 resourceProvider.provideString(R.string.event_recurring_update_this_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
 
@@ -1694,7 +1690,7 @@ class EventViewModel(
                     eventFormState.value = EventState.Idle
 
                     // Display event updated snack and return to month view with focus on the event's start date
-                    eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+                    eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                         resourceProvider.provideString(R.string.snack_event_updated),
                         eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate()
                     )
@@ -1737,7 +1733,7 @@ class EventViewModel(
                 eventFormState.value = EventState.Idle
 
                 // Display event created snack and return to month view with focus on the event's start date
-                eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+                eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                     resourceProvider.provideString(
                         if (saveResult == SaveResult.SUCCESS) R.string.snack_event_created
                         else R.string.snack_event_created_failed_mail), // Display event created but invitation failed to be sent snack
@@ -1840,7 +1836,7 @@ class EventViewModel(
                 ),
                 resourceProvider.provideString(R.string.dialog_button_delete),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
                             // Get send preferences for attendees
@@ -1920,7 +1916,7 @@ class EventViewModel(
                             },
                             resourceProvider.provideString(R.string.event_attendees_send_prefs_error_confirm),
                             resourceProvider.provideString(R.string.dialog_button_cancel),
-                            object: BaseDialogFragment.AlertDialogListener {
+                            object: BaseDialogFragment.DialogListener {
                                 override fun onPositive(selectedItem: Int) {
                                     coroutineScope.launch {
                                         // Remove attendees whom emails were invalid
@@ -2093,7 +2089,7 @@ class EventViewModel(
                     ),
                     resourceProvider.provideString(R.string.dialog_button_delete),
                     resourceProvider.provideString(R.string.dialog_button_cancel),
-                    object: BaseDialogFragment.AlertDialogListener {
+                    object: BaseDialogFragment.DialogListener {
                         override fun onPositive(selectedItem: Int) {
                             coroutineScope.launch {
                                 // Finish delete flow
@@ -2241,7 +2237,7 @@ class EventViewModel(
                 defaultSelectedItem = 0,
                 resourceProvider.provideString(R.string.dialog_button_ok),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
                             // Finish delete recurring flow
@@ -2294,7 +2290,7 @@ class EventViewModel(
                 resourceProvider.provideString(R.string.dialog_description_delete_recurring_event),
                 resourceProvider.provideString(R.string.dialog_button_delete),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
                             // Delete all events from chain
@@ -2325,7 +2321,7 @@ class EventViewModel(
                 resourceProvider.provideString(R.string.dialog_description_delete_event),
                 resourceProvider.provideString(R.string.dialog_button_delete),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
 
@@ -2491,7 +2487,7 @@ class EventViewModel(
                 ),
                 resourceProvider.provideString(R.string.event_change_answer_recurring_confirm),
                 resourceProvider.provideString(R.string.dialog_button_cancel),
-                object: BaseDialogFragment.AlertDialogListener {
+                object: BaseDialogFragment.DialogListener {
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
                             changeAnswerSendPreferences(

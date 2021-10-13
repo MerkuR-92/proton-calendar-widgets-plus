@@ -293,12 +293,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
 
-                        // Use jumpToMonthView to handle navigation when opening details from notification
-                        jumpToMonthView()
-                    }
-                    is EventViewModel.EventSnackState.DisplaySnackReturnToMonthOnSpecificDay -> {
-                        requireActivity().displaySnackBar(it.message)
-
                         if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
                             // Call default method for selection if pagers have been initialised
                             if (calendarViewModel.pagersInitialised) calendarViewModel.handleDaySelected(it.newSelectedDate)
