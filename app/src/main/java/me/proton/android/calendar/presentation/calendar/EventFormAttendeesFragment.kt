@@ -216,7 +216,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val scrollUp = attendeeList.size > attendeeListAdapter.currentList.size
 
                 attendeeListAdapter.submitList(attendeeList) {
-                    if (scrollUp) nav_event_form_attendees_list.smoothScrollToPosition(0) // Scroll up top to new attendee
+                    if (scrollUp) nav_event_form_attendees_list?.smoothScrollToPosition(0) // Scroll up top to new attendee
                 }
 
                 nav_event_form_attendees_list_header.visibleOrGone(attendeeList.isNotEmpty())
