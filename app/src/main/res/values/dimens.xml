@@ -87,5 +87,8 @@
     <dimen name="widget_padding">8dp</dimen>
     <dimen name="widget_padding_event_normal">4dp</dimen>
     <dimen name="widget_padding_event_separator">24dp</dimen>
+    <dimen name="widget_calendar_item_height">40dp</dimen>
+    <dimen name="widget_calendar_item_height_with_interaction_margin">44dp</dimen>
+    <dimen name="widget_calendar_item_interaction_margin">2dp</dimen>
 
 </resources>

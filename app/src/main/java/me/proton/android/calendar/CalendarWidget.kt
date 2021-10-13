@@ -236,6 +236,7 @@ internal data class WidgetEvent(
     val summary: String,
     val subheaderContent: String,
     val isCancelledOrDeclined: Boolean,
+    val needsAction: Boolean,
     val isEncrypted: Boolean,
     // LocalDate that this Event spans, not necessarily the same as dateStart
     val happensOn: LocalDate,
@@ -305,6 +306,8 @@ internal class CalendarWidgetRemoteViewsFactory(
 
         val subheaderContent = "${dateText}${locationText ?: ""}"
 
+        val participationStatus = this.getParticipationStatus(userEmails)
+
         return WidgetEvent(
             id = this.id,
             summary = this.summary ?: resourceProvider.provideString(R.string.default_event_summary),
@@ -316,7 +319,8 @@ internal class CalendarWidgetRemoteViewsFactory(
             fullDayCounter = fullDayCounterString,
             occurrenceNumber = this.occurrence?.occurrenceNumber ?: 0,
             calendarColor = this.calendar.color,
-            isCancelledOrDeclined = this.isCancelled() || this.getParticipationStatus(userEmails) == ParticipationStatus.DECLINED,
+            isCancelledOrDeclined = this.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
+            needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
             isEncrypted = this.decryptionStatus == Event.DecryptionStatus.FAILURE
         )
     }
@@ -395,6 +399,13 @@ internal class CalendarWidgetRemoteViewsFactory(
 
         // add spacing after last event in a day
         remoteView.setViewVisibility(R.id.v_event_spacing, if (event.showBottomSpacing) View.VISIBLE else View.GONE)
+
+        // set style of calendar bar
+        if (event.needsAction) {
+            remoteView.setImageViewResource(R.id.iv_calendar_bar, R.drawable.ic_calendar_bar_unanswered)
+        } else {
+            remoteView.setImageViewResource(R.id.iv_calendar_bar, R.drawable.shape_calendar_bar)
+        }
 
         // tint calendar bar
         remoteView.setInt(R.id.iv_calendar_bar, "setColorFilter", Color.parseColor(event.calendarColor))

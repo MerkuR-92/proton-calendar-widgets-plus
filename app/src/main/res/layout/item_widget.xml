@@ -12,7 +12,8 @@
     <RelativeLayout
         android:id="@+id/rl_event_day_container"
         android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/widget_calendar_item_height_with_interaction_margin"
+        android:padding="@dimen/widget_calendar_item_interaction_margin"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="8dp"
@@ -21,8 +22,7 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/ripple_mini_calendar_day"
         android:clickable="true"
-        android:focusable="true"
-        android:padding="2dp">
+        android:focusable="true">
 
         <TextView
             android:id="@+id/tv_event_day_of_week"
@@ -42,7 +42,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_event_day_of_week"
-
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
@@ -53,9 +52,11 @@
     <ImageView
         android:id="@+id/iv_calendar_bar"
         android:layout_width="4dp"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_alignTop="@id/rl_event_day_container"
         android:layout_alignBottom="@id/rl_event_day_container"
+        android:layout_marginTop="@dimen/widget_calendar_item_interaction_margin"
+        android:layout_marginBottom="@dimen/widget_calendar_item_interaction_margin"
         android:layout_toEndOf="@id/rl_event_day_container"
         android:src="@drawable/shape_calendar_bar"
         app:tint="@color/brand_norm" />
@@ -72,7 +73,7 @@
         android:background="@drawable/ripple_mini_calendar_day"
         android:clickable="true"
         android:focusable="true"
-        android:padding="2dp">
+        android:padding="@dimen/widget_calendar_item_interaction_margin">
 
         <TextView
             android:id="@+id/tv_event_header"

@@ -49,7 +49,7 @@
         android:layout_alignTop="@id/rl_header_container"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/widget_padding"
-        android:background="@drawable/ripple_action_navigation_oval"
+        android:background="@drawable/ripple_action_button_oval"
         android:src="@drawable/ic_plus"
         android:tint="@color/icon_norm" />
 

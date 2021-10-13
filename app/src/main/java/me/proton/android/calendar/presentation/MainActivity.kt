@@ -148,7 +148,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                             withContext(Dispatchers.Main) {
                                 // if we're navigating from outside of the app to create new Event, check if there's active Calendar
-                                val activeCals = calendarViewModel.getActiveCalendars()
                                 if (uri.isDeeplinkToEventCreate()) {
                                     if (calendarViewModel.getActiveCalendars().isEmpty()) {
                                         safeFindNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toMonth())
