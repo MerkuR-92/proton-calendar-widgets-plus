@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.app.Application
 import android.text.TextUtils
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.work.*
 import biweekly.ICalendar
@@ -2123,7 +2124,8 @@ class EventViewModel(
     /**
      * @returns the message to be displayed in delete as an attendee confirmation dialog
      */
-    private fun getDeleteAsAnAttendeeMessage(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun getDeleteAsAnAttendeeMessage(
         displayWarning: Boolean,
         isCalendarDisabled: Boolean,
         sendPrefsFailed: Boolean,

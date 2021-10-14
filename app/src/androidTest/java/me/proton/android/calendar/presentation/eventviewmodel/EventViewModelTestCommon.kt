@@ -74,7 +74,7 @@ open class EventViewModelTestCommon: KoinComponent {
      * Utils private methods
      */
 
-    private fun getEventViewModel(): EventViewModel {
+    fun getEventViewModel(): EventViewModel {
         return EventViewModel(
             application = protonCalendarApplication,
             userManager = userManagerMock,

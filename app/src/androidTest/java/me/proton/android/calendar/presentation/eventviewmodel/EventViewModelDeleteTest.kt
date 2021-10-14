@@ -12,10 +12,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.ProtonUtilsImpl
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.mocks.EventMocks.getEvent
+import me.proton.android.calendar.mocks.EventMocks.getEventEntity
+import me.proton.android.calendar.mocks.UserMocks.getSendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
@@ -38,7 +42,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent()
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
 
             // Handle delete use case
             coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
@@ -100,10 +104,10 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event
-            val event = EventMocks.getEvent(isRecurring = true)
+            val event = getEvent(isRecurring = true)
             // Set recurrence count to 1
             event.iCalEvent.setRecurrenceRule(Recurrence.Builder(event.iCalEvent.recurrenceRule.value).count(1).build())
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
 
             // Handle delete use case
             coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
@@ -165,8 +169,8 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event
-            val event = EventMocks.getEvent(isRecurring = true)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns event
+            val event = getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
 
             // Handle delete use case
             coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
@@ -233,8 +237,8 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event
-            val event = EventMocks.getEvent(isRecurring = true)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns event
+            val event = getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
 
             // Handle delete use case
             coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
@@ -303,8 +307,8 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event
-            val event = EventMocks.getEvent(isRecurring = true)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns event
+            val event = getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
 
             // Handle delete use case
             coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
@@ -373,7 +377,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock recurring event with disabled calendar
-            coEvery { transformEventUseCaseMock.execute(any()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(any()) } returns getEvent(
                 isRecurring = true,
                 hasDisabledCalendar = true
             )
@@ -436,7 +440,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(any()) } returns EventMocks.getEvent()
+            coEvery { transformEventUseCaseMock.execute(any()) } returns getEvent()
 
             val occurrenceNumber = 1
             val eventViewModel = getInitialisedEventViewModel(
@@ -473,7 +477,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with attendees (user as the organizer)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(
                 isOrganizer = true
             )
 
@@ -558,7 +562,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with attendees (user as the organizer) and disabled calendar
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(
                 isOrganizer = true,
                 hasDisabledCalendar = true
             )
@@ -644,7 +648,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with attendees (user as the organizer)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(
                 isOrganizer = true,
                 isRecurring = true
             )
@@ -730,7 +734,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with attendees (user as the organizer) and disabled calendar
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(
                 isOrganizer = true,
                 isRecurring = true,
                 hasDisabledCalendar = true
@@ -817,7 +821,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with attendees (user as the organizer)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(
                 isOrganizer = true
             )
 
@@ -884,7 +888,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with attendees (user as the organizer)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(
                 isOrganizer = true
             )
 
@@ -1004,11 +1008,11 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
         runBlocking {
 
             // Mock event with two attendees (user as the organizer)
-            val event = EventMocks.getEvent(isOrganizer = true)
+            val event = getEvent(isOrganizer = true)
             val secondAttendee = Attendee(secondAttendeeName, secondAttendeeEmail)
             secondAttendee.participationStatus = ParticipationStatus.DECLINED
             event.iCalEvent.addAttendee(secondAttendee)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.getEventEntity()) } returns event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns event
 
             // Handle delete use case with emailSent to true
             coEvery { handleDeleteUseCaseMock.handleDeleteAsOrganizer(any(), any(), any(), any(), any(), any(), any()) } returns UseCase.Result.Success(true)
@@ -1116,6 +1120,392 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
                 resourceProviderMock.provideString(R.string.snack_event_deleted_as_organizer)
             ))
         }
+    }
+
+    /**
+     * Event with attendees (with user as attendee)
+     */
+    @Test
+    fun deleteEventAsAnAttendeeTest() {
+        runBlocking {
+
+            // Mock event with attendees (user as the attendee)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns
+                    getEvent(isAttendee = true, participationStatus = ParticipationStatus.ACCEPTED)
+
+            // Mock single edits info (no single edits)
+            coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf()
+
+            // Handle delete use case with emailSent to false (empty send preferences)
+            coEvery { handleDeleteUseCaseMock.handleDeleteAsAttendee(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns
+                    UseCase.Result.Success(true)
+
+            // Get canonical and send preferences for organizer
+            coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
+                organizerEmail, organizerEmail
+            ))
+            coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
+                Pair(organizerEmail, ObtainSendPreferencesUseCase.Result.Success(getSendPreferences()))
+            )
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(
+                R.string.dialog_title_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_single_event_as_attendee) } returns protonCalendarApplication.getString(
+                R.string.dialog_description_delete_single_event_as_attendee)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(
+                R.string.dialog_button_delete)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(
+                R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted_as_attendee) } returns protonCalendarApplication.getString(
+                R.string.snack_event_deleted_as_attendee)
+
+            val occurrenceNumber = 0
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val eventCopy = Event.from(eventViewModel.eventLiveData.value!!)
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog(), occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDeleteAsAttendee(
+                userId = userId,
+                event = eventCopy,
+                cancelledSingleEdits = emptyList(),
+                userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userEmail),
+                sendPreferences = mapOf(Pair(organizerEmail, getSendPreferences())),
+                hasNonCancelledSingleEdit = false,
+                occurrenceNumber = occurrenceNumber,
+                isOrphanSingleEdit = false,
+                defaultTimeZone = defaultTimezone,
+                timeFormatIs24Hours = timeFormat.toBoolean(),
+                sendReply = true
+            ) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_single_event_as_attendee) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted_as_attendee) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted_as_attendee)
+            ))
+        }
+    }
+
+    /**
+     * Event with attendees (with user as attendee) with some send preferences error
+     */
+    @Test
+    fun deleteEventAsAnAttendeeSendPreferencesErrorTest() {
+        runBlocking {
+
+            // Mock event with attendees (user as the attendee)
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns
+                    getEvent(isAttendee = true, participationStatus = ParticipationStatus.ACCEPTED)
+
+            // Mock single edits info (no single edits)
+            coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf()
+
+            // Handle delete use case with emailSent to false (empty send preferences)
+            coEvery { handleDeleteUseCaseMock.handleDeleteAsAttendee(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns
+                    UseCase.Result.Success(false)
+
+            // Get canonical and send preferences for organizer
+            coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
+                organizerEmail, organizerEmail
+            ))
+            coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
+                Pair(organizerEmail, ObtainSendPreferencesUseCase.Result.Error.AddressDisabled)
+            )
+
+            // Email with error mock
+            coEvery { resourceProviderMock.provideString(R.string.event_send_prefs_error_address_disabled) } returns
+                    protonCalendarApplication.getString(R.string.event_send_prefs_error_address_disabled)
+            val emailError = protonCalendarApplication.getString(
+                R.string.event_send_prefs_error_template,
+                organizerEmail,
+                protonCalendarApplication.getString(R.string.event_send_prefs_error_address_disabled)
+            )
+            coEvery { resourceProviderMock.provideString(
+                R.string.event_send_prefs_error_template,
+                organizerEmail,
+                protonCalendarApplication.getString(R.string.event_send_prefs_error_address_disabled)
+            ) } returns emailError
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.event_organizer_send_prefs_error_title) } returns protonCalendarApplication.getString(
+                R.string.event_organizer_send_prefs_error_title)
+            coEvery { resourceProviderMock.provideString(R.string.event_delete_as_attendee_send_prefs_error_message, emailError) } returns protonCalendarApplication.getString(
+                R.string.event_delete_as_attendee_send_prefs_error_message, emailError)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(
+                R.string.dialog_button_delete)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(
+                R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted) } returns protonCalendarApplication.getString(
+                R.string.snack_event_deleted)
+
+            val occurrenceNumber = 0
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val eventCopy = Event.from(eventViewModel.eventLiveData.value!!)
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog(), occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDeleteAsAttendee(
+                userId = userId,
+                event = eventCopy,
+                cancelledSingleEdits = emptyList(),
+                userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userEmail),
+                sendPreferences = mapOf(),
+                hasNonCancelledSingleEdit = false,
+                occurrenceNumber = occurrenceNumber,
+                isOrphanSingleEdit = false,
+                defaultTimeZone = defaultTimezone,
+                timeFormatIs24Hours = timeFormat.toBoolean(),
+                sendReply = false
+            ) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_organizer_send_prefs_error_title) }
+            verify(exactly = 1) { resourceProviderMock.provideString(
+                R.string.event_delete_as_attendee_send_prefs_error_message,
+                emailError
+            ) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Send preferences dialog content
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_send_prefs_error_address_disabled) }
+            verify(exactly = 1) { resourceProviderMock.provideString(
+                R.string.event_send_prefs_error_template,
+                organizerEmail,
+                protonCalendarApplication.getString(R.string.event_send_prefs_error_address_disabled)
+            ) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
+                resourceProviderMock.provideString(R.string.snack_event_deleted)
+            ))
+        }
+    }
+
+    @Test
+    fun getDeleteAsAnAttendeeMessageTest() {
+
+        val eventViewModel = getEventViewModel()
+
+        /*
+        val displayWarning =
+        (currentParticipationStatus == ParticipationStatus.ACCEPTED || currentParticipationStatus == ParticipationStatus.TENTATIVE) &&
+         isEventCanceled.not() &&
+         !isCalendarDisabled
+         */
+
+        var result = ""
+        var message = ""
+        var singleEditWarning = ""
+
+        var displayWarning = false
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        message = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event) } returns message
+        singleEditWarning = protonCalendarApplication.getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee) } returns singleEditWarning
+        result = protonCalendarApplication.getString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        )
+        coEvery { resourceProviderMock.provideString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        ) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = true,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        message = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event) } returns message
+        singleEditWarning = protonCalendarApplication.getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee) } returns singleEditWarning
+        result = protonCalendarApplication.getString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        )
+        coEvery { resourceProviderMock.provideString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        ) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = true,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = true,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        /*
+        return if (displayWarning.not()) {
+            // Display basic delete event message
+            if (isSingleEdit && (isSingleEdit && isOrphanSingleEdit.not()) && isCalendarDisabled.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+            else if (isRecurring || (isSingleEdit && isOrphanSingleEdit.not() && isCalendarDisabled)) {
+                val message = resourceProvider.provideString(R.string.dialog_description_delete_recurring_event)
+
+                val singleEditWarning = if (!isCalendarDisabled && hasAnsweredSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+                else if (!isCalendarDisabled && hasNonCancelledSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+                else ""
+
+                // Add single edit warning if needed
+                if (singleEditWarning.isNotEmpty()) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
+                else message
+            }
+            else resourceProvider.provideString(R.string.dialog_description_delete_event)
+        } else {
+            // Display extended dialog message if event has ACCEPTED / TENTATIVE answer, is not canceled, and calendar is enabled
+            // Dialog priority order: 1- Address disabled warning. 2- Send prefs dialog. 3- Others.
+            if (sendPrefsFailed && isAddressAllowedToSend) {
+                resourceProvider.provideString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
+            } else {
+                if (isRecurring) {
+                    val message = if (!isAddressAllowedToSend) resourceProvider.provideString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
+                    else resourceProvider.provideString(R.string.dialog_description_delete_recurring_event_as_attendee)
+
+                    val singleEditWarning = if (hasAnsweredSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+                    else if (hasNonCancelledSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+                    else ""
+
+                    // Add single edit warning if needed
+                    if (singleEditWarning.isNotEmpty()) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
+                    else message
+                }
+                else if (isSingleEdit && isOrphanSingleEdit.not() && !isAddressAllowedToSend) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+                else if (isSingleEdit && isOrphanSingleEdit.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+                else if (!isAddressAllowedToSend) resourceProvider.provideString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
+                else resourceProvider.provideString(R.string.dialog_description_delete_single_event_as_attendee)
+            }
+        }
+         */
     }
 
 }

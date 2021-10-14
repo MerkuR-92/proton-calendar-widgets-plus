@@ -17,7 +17,8 @@ object EventMocks {
         isAttendee: Boolean = false,
         isProtonProtonInvite: Boolean? = null,
         isSingleEdit: Boolean = false,
-        hasDisabledCalendar: Boolean = false
+        hasDisabledCalendar: Boolean = false,
+        participationStatus: ParticipationStatus = ParticipationStatus.DECLINED
     ): Event {
 
         val ics = when {
@@ -50,7 +51,7 @@ object EventMocks {
                 userName,
                 userEmail
             )
-            attendee.participationStatus = ParticipationStatus.DECLINED
+            attendee.participationStatus = participationStatus
             iCalendar.events.first().addAttendee(attendee)
 
             // Set default organizer
