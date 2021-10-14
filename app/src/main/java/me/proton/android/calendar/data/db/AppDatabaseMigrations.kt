@@ -79,17 +79,7 @@ object AppDatabaseMigrations {
      */
     fun MIGRATION_28_29(context: Context) = object : Migration(28, 29) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            // End current transaction (from FrameworkSQLiteOpenHelper.onUpgrade(db, version, mNewVersion))
-            database.setTransactionSuccessful()
-            database.endTransaction()
-            // Attach old Core DB to current DB (cannot be done within a transaction).
-            val coreDbFile = context.getDatabasePath("db-account-manager")
-            val coreDbPath = coreDbFile.path
-            database.execSQL("ATTACH DATABASE '$coreDbPath' AS coreDb")
-            // Begin transaction for attached migration.
-            database.beginTransaction()
-
-            // Create all needed tables.
+            // Create all needed tables before attaching old Core DB.
             AccountDatabase.MIGRATION_0.migrate(database)
             AccountDatabase.MIGRATION_1.migrate(database)
             AccountDatabase.MIGRATION_2.migrate(database)
@@ -101,6 +91,16 @@ object AppDatabaseMigrations {
             HumanVerificationDatabase.MIGRATION_0.migrate(database)
             PublicAddressDatabase.MIGRATION_0.migrate(database)
             MailSettingsDatabase.MIGRATION_0.migrate(database)
+
+            // End current transaction (from FrameworkSQLiteOpenHelper.onUpgrade(db, version, mNewVersion))
+            database.setTransactionSuccessful()
+            database.endTransaction()
+            // Attach old Core DB to current DB (cannot be done within a transaction).
+            val coreDbFile = context.getDatabasePath("db-account-manager")
+            val coreDbPath = coreDbFile.path
+            database.execSQL("ATTACH DATABASE '$coreDbPath' AS coreDb")
+            // Begin transaction for attached migration.
+            database.beginTransaction()
 
             // Import all data from Core DB to current DB.
             listOf(
