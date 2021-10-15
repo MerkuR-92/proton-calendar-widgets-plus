@@ -353,18 +353,12 @@ internal class CalendarWidgetRemoteViewsFactory(
                 Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
             )
             remoteView.setInt(
-                R.id.tv_event_header_day_indicator,
-                "setPaintFlags",
-                Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
-            )
-            remoteView.setInt(
                 R.id.tv_event_subheader,
                 "setPaintFlags",
                 Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
             )
         } else {
             remoteView.setInt(R.id.tv_event_header, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
-            remoteView.setInt(R.id.tv_event_header_day_indicator, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
             remoteView.setInt(R.id.tv_event_subheader, "setPaintFlags", Paint.ANTI_ALIAS_FLAG)
         }
 
