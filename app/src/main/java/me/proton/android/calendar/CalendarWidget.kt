@@ -310,7 +310,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
         return WidgetEvent(
             id = this.id,
-            summary = this.summary ?: resourceProvider.provideString(R.string.default_event_summary),
+            summary = this.summary?.takeIfNotBlank() ?: resourceProvider.provideString(R.string.default_event_summary),
             subheaderContent = subheaderContent,
             happensOn = happensOn,
             showDateColumn = showDateColumn,
