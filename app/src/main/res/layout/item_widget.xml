@@ -119,6 +119,7 @@
             android:layout_height="8dp"
             android:layout_marginTop="6dp"
             android:layout_toEndOf="@id/decryption_error_icon"
+            android:layout_toStartOf="@id/tv_event_header_day_indicator"
             android:alpha="0.1"
             android:background="@drawable/shape_background_decryption_error"
             android:backgroundTint="@color/text_norm" />
