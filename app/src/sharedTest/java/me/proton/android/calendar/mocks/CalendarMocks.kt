@@ -9,23 +9,23 @@ import me.proton.core.util.kotlin.toBoolean
 
 object CalendarMocks {
 
-    fun getCalendarEntity(): CalendarEntity {
+    fun getCalendarEntity(id: String = calendarId, isDisabled: Boolean = false): CalendarEntity {
         return CalendarEntity(
-            id = calendarId,
+            id = id,
             name = calendarName,
             description = calendarDescription,
             color = calendarColor,
             display = calendarDisplay,
-            flags = calendarFlags,
+            flags = if (isDisabled) CalendarFlags.DISABLED.value else calendarFlags,
             type = calendarType,
             fkUserId = userId.id
         )
     }
 
-    fun getCalendarSettingsEntity(): CalendarSettingsEntity {
+    fun getCalendarSettingsEntity(id: String = calendarId): CalendarSettingsEntity {
         return CalendarSettingsEntity(
             id = calendarSettingsId,
-            calendarId = calendarId,
+            calendarId = id,
             defaultEventDuration = defaultEventDuration,
             defaultPartDayNotifications = emptyList(), // TODO Test default part day notifications
             defaultFullDayNotifications = emptyList() // TODO Test default full day notifications

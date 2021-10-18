@@ -4,8 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import biweekly.util.Frequency
 import io.mockk.coEvery
+import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.mocks.CalendarMocks.getCalendarEntity
+import me.proton.android.calendar.mocks.CalendarMocks.getCalendarSettingsEntity
 import me.proton.android.calendar.mocks.EventMocks.getEvent
 import me.proton.android.calendar.mocks.EventMocks.getEventEntity
 import org.junit.Test
@@ -120,6 +123,79 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
                 initStartDate = null,
                 initStartTime = null
             )
+        }
+    }
+
+    /**
+     * Initialise EventVM for editing an event with no default calendar
+     */
+    @Test
+    fun initialiseEditEventNoDefaultCalendarTest() {
+        runBlocking {
+
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+
+            // No default calendar
+            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns null
+
+            // Alternative calendar
+            val alternativeCalendarId = "alternativeCalendarId"
+            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(getCalendarEntity(id = alternativeCalendarId))
+
+            // Alternative calendar settings
+            coEvery { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) } returns getCalendarSettingsEntity(id = alternativeCalendarId)
+
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = true,
+                eventId = eventId,
+                occurrenceNumber = 0,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
+
+            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) }
+
+            assert(eventViewModel.calendarSettings.calendarId == alternativeCalendarId)
+        }
+    }
+
+    /**
+     * Initialise EventVM for editing an event with disabled default calendar
+     */
+    @Test
+    fun initialiseEditEventDisabledDefaultCalendarTest() {
+        runBlocking {
+
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+
+            // No default calendar
+            val calendarEntity = getCalendarEntity(isDisabled = true)
+            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns calendarEntity
+
+            // Alternative calendar
+            val alternativeCalendarId = "alternativeCalendarId"
+            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(getCalendarEntity(id = alternativeCalendarId))
+
+            // Alternative calendar settings
+            coEvery { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) } returns getCalendarSettingsEntity(id = alternativeCalendarId)
+
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = true,
+                eventId = eventId,
+                occurrenceNumber = 0,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
+
+            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) }
+
+            assert(eventViewModel.calendarSettings.calendarId == alternativeCalendarId)
         }
     }
 

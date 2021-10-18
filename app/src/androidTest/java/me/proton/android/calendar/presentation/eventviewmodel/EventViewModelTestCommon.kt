@@ -115,8 +115,6 @@ open class EventViewModelTestCommon: KoinComponent {
         if (editMode) {
             coVerify(exactly = 1) { calendarsRepositoryMock.getDefaultCalendarId(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendar(any()) }
-            // TODO Uncomment this when testing invalid default calendar
-            //coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(any()) }
         }
 

@@ -121,7 +121,8 @@ class EventViewModel(
     private var eventCustomPartialDayAlarmsSave: ArrayList<VAlarm>? = null
     private var eventCustomAllDayAlarmsSave: ArrayList<VAlarm>? = null
 
-    private lateinit var calendarSettings: CalendarSettingsEntity
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var calendarSettings: CalendarSettingsEntity
 
     private var originalDbEvent: Event? = null
 
@@ -2139,7 +2140,7 @@ class EventViewModel(
     ): String {
         return if (displayWarning.not()) {
             // Display basic delete event message
-            if (isSingleEdit && (isSingleEdit && isOrphanSingleEdit.not()) && isCalendarDisabled.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+            if (isSingleEdit && isOrphanSingleEdit.not() && isCalendarDisabled.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event)
             else if (isRecurring || (isSingleEdit && isOrphanSingleEdit.not() && isCalendarDisabled)) {
                 val message = resourceProvider.provideString(R.string.dialog_description_delete_recurring_event)
 

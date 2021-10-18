@@ -97,6 +97,68 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
     }
 
     /**
+     * Single event error
+     */
+    @Test
+    fun deleteEventErrorTest() {
+        runBlocking {
+
+            // Mock event
+            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+
+            // Handle delete use case
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Error("error message")
+
+            // Delete confirmation dialog
+            coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(
+                R.string.dialog_title_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns protonCalendarApplication.getString(
+                R.string.dialog_description_delete_event)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_delete) } returns protonCalendarApplication.getString(
+                R.string.dialog_button_delete)
+            coEvery { resourceProviderMock.provideString(R.string.dialog_button_cancel) } returns protonCalendarApplication.getString(
+                R.string.dialog_button_cancel)
+
+            // Delete success snack
+            coEvery { resourceProviderMock.provideString(R.string.snack_event_deleted_error) } returns protonCalendarApplication.getString(
+                R.string.snack_event_deleted_error)
+
+            val occurrenceNumber = 0
+            val eventViewModel = getInitialisedEventViewModel(
+                editMode = false,
+                eventId = eventId,
+                occurrenceNumber = occurrenceNumber,
+                initStartDate = null,
+                initStartTime = null
+            )
+
+            val provideDisplayDialog = provideDisplayDialog()
+
+            withContext(Dispatchers.Default) {
+                // Start delete
+                eventViewModel.onDeleteClick(provideDisplayDialog, occurrenceNumber, timeFormat.toBoolean())
+            }
+
+            // Handle delete use case
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, 0) }
+
+            // Delete confirmation dialog
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_description_delete_event) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_delete) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_button_cancel) }
+
+            // Success snack
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_deleted_error) }
+
+            assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
+            assert(eventViewModel.eventDetailsSnackState.value == EventViewModel.EventSnackState.DisplaySnack(
+                resourceProviderMock.provideString(R.string.snack_event_deleted_error)
+            ))
+        }
+    }
+
+    /**
      * Single occurrence recurring
      */
     @Test
@@ -1326,17 +1388,13 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
         val eventViewModel = getEventViewModel()
 
-        /*
-        val displayWarning =
-        (currentParticipationStatus == ParticipationStatus.ACCEPTED || currentParticipationStatus == ParticipationStatus.TENTATIVE) &&
-         isEventCanceled.not() &&
-         !isCalendarDisabled
-         */
-
         var result = ""
         var message = ""
         var singleEditWarning = ""
 
+        /**
+         * Tests with displayWarning at false
+         */
         var displayWarning = false
 
         result = protonCalendarApplication.getString(R.string.dialog_description_delete_non_standalone_single_edit_event)
@@ -1465,47 +1523,331 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             )
         )
 
-        /*
-        return if (displayWarning.not()) {
-            // Display basic delete event message
-            if (isSingleEdit && (isSingleEdit && isOrphanSingleEdit.not()) && isCalendarDisabled.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event)
-            else if (isRecurring || (isSingleEdit && isOrphanSingleEdit.not() && isCalendarDisabled)) {
-                val message = resourceProvider.provideString(R.string.dialog_description_delete_recurring_event)
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = true,
+                isAddressAllowedToSend = true
+            )
+        )
 
-                val singleEditWarning = if (!isCalendarDisabled && hasAnsweredSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
-                else if (!isCalendarDisabled && hasNonCancelledSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
-                else ""
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = true,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = true,
+                isAddressAllowedToSend = true
+            )
+        )
 
-                // Add single edit warning if needed
-                if (singleEditWarning.isNotEmpty()) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
-                else message
-            }
-            else resourceProvider.provideString(R.string.dialog_description_delete_event)
-        } else {
-            // Display extended dialog message if event has ACCEPTED / TENTATIVE answer, is not canceled, and calendar is enabled
-            // Dialog priority order: 1- Address disabled warning. 2- Send prefs dialog. 3- Others.
-            if (sendPrefsFailed && isAddressAllowedToSend) {
-                resourceProvider.provideString(R.string.event_delete_as_attendee_send_prefs_error_message, emailsWithErrors)
-            } else {
-                if (isRecurring) {
-                    val message = if (!isAddressAllowedToSend) resourceProvider.provideString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
-                    else resourceProvider.provideString(R.string.dialog_description_delete_recurring_event_as_attendee)
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_event)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_event) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = true,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
 
-                    val singleEditWarning = if (hasAnsweredSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
-                    else if (hasNonCancelledSingleEdit) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
-                    else ""
-
-                    // Add single edit warning if needed
-                    if (singleEditWarning.isNotEmpty()) resourceProvider.provideString(R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee, message, singleEditWarning)
-                    else message
-                }
-                else if (isSingleEdit && isOrphanSingleEdit.not() && !isAddressAllowedToSend) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
-                else if (isSingleEdit && isOrphanSingleEdit.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
-                else if (!isAddressAllowedToSend) resourceProvider.provideString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
-                else resourceProvider.provideString(R.string.dialog_description_delete_single_event_as_attendee)
-            }
-        }
+        /**
+         * Tests with displayWarning at true
          */
+        displayWarning = true
+
+        val emailWithErrors = "emailWithErrors"
+        result = protonCalendarApplication.getString(R.string.event_delete_as_attendee_send_prefs_error_message, emailWithErrors)
+        coEvery { resourceProviderMock.provideString(R.string.event_delete_as_attendee_send_prefs_error_message, emailWithErrors) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = true,
+                emailsWithErrors = emailWithErrors,
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        message = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled) } returns message
+        singleEditWarning = protonCalendarApplication.getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee) } returns singleEditWarning
+        result = protonCalendarApplication.getString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        )
+        coEvery { resourceProviderMock.provideString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        ) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = true,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = false
+            )
+        )
+
+        message = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled) } returns message
+        singleEditWarning = protonCalendarApplication.getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee) } returns singleEditWarning
+        result = protonCalendarApplication.getString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        )
+        coEvery { resourceProviderMock.provideString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        ) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = true,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = false
+            )
+        )
+
+        message = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event_as_attendee) } returns message
+        singleEditWarning = protonCalendarApplication.getString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee) } returns singleEditWarning
+        result = protonCalendarApplication.getString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        )
+        coEvery { resourceProviderMock.provideString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        ) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = true,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        message = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event_as_attendee) } returns message
+        singleEditWarning = protonCalendarApplication.getString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee) } returns singleEditWarning
+        result = protonCalendarApplication.getString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        )
+        coEvery { resourceProviderMock.provideString(
+            R.string.dialog_description_warning_delete_recurring_with_single_edit_as_attendee,
+            message,
+            singleEditWarning
+        ) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = true,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event_as_attendee_disabled) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = false
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_recurring_event_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_recurring_event_as_attendee) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = true,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = false
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event_as_attendee) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_single_event_as_attendee_disabled) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = true,
+                emailsWithErrors = emailWithErrors,
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = false
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_single_event_as_attendee_disabled)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_single_event_as_attendee_disabled) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = false
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_single_event_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_single_event_as_attendee) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = true,
+                isOrphanSingleEdit = true,
+                isAddressAllowedToSend = true
+            )
+        )
+
+        result = protonCalendarApplication.getString(R.string.dialog_description_delete_single_event_as_attendee)
+        coEvery { resourceProviderMock.provideString(R.string.dialog_description_delete_single_event_as_attendee) } returns result
+        assert(
+            result == eventViewModel.getDeleteAsAnAttendeeMessage(
+                displayWarning = displayWarning,
+                isCalendarDisabled = false,
+                sendPrefsFailed = false,
+                emailsWithErrors = "",
+                isRecurring = false,
+                hasAnsweredSingleEdit = false,
+                hasNonCancelledSingleEdit = false,
+                isSingleEdit = false,
+                isOrphanSingleEdit = false,
+                isAddressAllowedToSend = true
+            )
+        )
     }
 
 }
