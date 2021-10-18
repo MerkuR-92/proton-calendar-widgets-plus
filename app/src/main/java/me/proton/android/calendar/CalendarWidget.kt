@@ -161,9 +161,9 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
     }
 
     private fun createOpenAppIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
-        action = Intent.ACTION_MAIN
+        data = Navigation.Deeplink.toMonth(LocalDate.now())
+        action = MainViewModel.INTENT_ACTION_SHOW_DAY
         addCategory(Intent.CATEGORY_LAUNCHER)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
     private fun createNewEventIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
