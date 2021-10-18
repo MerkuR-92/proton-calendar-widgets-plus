@@ -72,7 +72,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         super.onReceive(context, intent)
 
         intent?.let {
-            if (it.action == Intent.ACTION_TIME_CHANGED || it.action == Intent.ACTION_TIMEZONE_CHANGED) {
+            if (it.action == Intent.ACTION_TIME_CHANGED || it.action == Intent.ACTION_TIMEZONE_CHANGED || it.action == Intent.ACTION_DATE_CHANGED) {
                 sendRefreshBroadcast(context)
             }
         }
