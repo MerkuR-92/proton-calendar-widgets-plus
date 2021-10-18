@@ -145,9 +145,9 @@ open class EventViewModelTestCommon: KoinComponent {
                 message: String,
                 positiveButton: String,
                 negativeButton: String,
-                alertDialogListener: BaseDialogFragment.AlertDialogListener?
+                dialogListener: BaseDialogFragment.DialogListener?
             ) {
-                if (selectPositive) alertDialogListener?.onPositive()
+                if (selectPositive) dialogListener?.onPositive()
             }
 
             override fun pickerDialog(
@@ -156,9 +156,9 @@ open class EventViewModelTestCommon: KoinComponent {
                 defaultSelectedItem: Int,
                 positiveButton: String,
                 negativeButton: String,
-                alertDialogListener: BaseDialogFragment.AlertDialogListener?
+                dialogListener: BaseDialogFragment.DialogListener?
             ) {
-                if (selectPositive) alertDialogListener?.onPositive(selectedItem)
+                if (selectPositive) dialogListener?.onPositive(selectedItem)
             }
         }
     }

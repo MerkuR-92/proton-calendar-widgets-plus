@@ -88,7 +88,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_created) }
 
             assert(eventViewModel.eventFormState.value == EventViewModel.EventState.Idle)
-            assert(eventViewModel.eventFormSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonthOnSpecificDay(
+            assert(eventViewModel.eventFormSnackState.value == EventViewModel.EventSnackState.DisplaySnackReturnToMonth(
                 resourceProviderMock.provideString(
                     R.string.snack_event_created
                 ),
