@@ -66,13 +66,13 @@ class SendEmailDirect @Inject constructor(
     ): Result {
 
         // Encrypt and sign attachments and body, create payload for sender.
-        val decryptedAttachmentSessionKeys = mutableListOf<ByteArray>()
+        val decryptedAttachmentSessionKeys = mutableListOf<SessionKey>()
         val encodedAttachmentKeyPackets = mutableListOf<String>()
 
-        lateinit var decryptedPlaintextBodySessionKey: ByteArray
+        lateinit var decryptedPlaintextBodySessionKey: SessionKey
         lateinit var encryptedPlaintextBodyDataPacket: ByteArray
 
-        lateinit var decryptedMimeBodySessionKey: ByteArray
+        lateinit var decryptedMimeBodySessionKey: SessionKey
         lateinit var encryptedMimeBodyDataPacket: ByteArray
 
         // Map<Email, Pair<KeyPacket, DataPacket>>

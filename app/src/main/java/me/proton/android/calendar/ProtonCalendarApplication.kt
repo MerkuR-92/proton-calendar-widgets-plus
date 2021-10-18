@@ -1,6 +1,7 @@
 package me.proton.android.calendar
 
 import android.app.Application
+import androidx.lifecycle.ProcessLifecycleOwner
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
@@ -10,6 +11,7 @@ import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
@@ -22,9 +24,11 @@ import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.domain.NetworkManager
+import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.util.kotlin.CoreLogger
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -89,6 +93,9 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var networkManager: NetworkManager
 
+    @Inject
+    lateinit var forceUpdateViewModel: ForceUpdateViewModel
+
     private val logger: Logger by inject()
 
     override fun onCreate() {
@@ -123,6 +130,7 @@ class ProtonCalendarApplication : Application() {
             )
         }
 
+        CoreLogger.set(LoggerImpl)
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         } else {
@@ -133,6 +141,12 @@ class ProtonCalendarApplication : Application() {
         ShowNotificationUseCase.createNotificationChannels(this)
 
         SyncWorker.setup(this, logger)
+
+        forceUpdateViewModel.forceUpdate.observe(ProcessLifecycleOwner.get()) {
+            if (it.forceUpdate) {
+                startActivity(ForceUpdateActivity(this, it.apiErrorMessage))
+            }
+        }
     }
 
 }
