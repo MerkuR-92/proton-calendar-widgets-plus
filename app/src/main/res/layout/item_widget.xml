@@ -40,11 +40,11 @@
             android:id="@+id/tv_event_day_of_month"
             style="@style/Text.Subheadline"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_event_day_of_week"
+            android:layout_height="match_parent"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
+            android:paddingTop="14sp"
             tools:text="13" />
 
     </RelativeLayout>
@@ -145,7 +145,7 @@
     <FrameLayout
         android:id="@+id/v_event_spacing"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="10dp"
         android:layout_below="@id/rl_event_day_container"
         android:visibility="gone"
         tools:visibility="visible" />
