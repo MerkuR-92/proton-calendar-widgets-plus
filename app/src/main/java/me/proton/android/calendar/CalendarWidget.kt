@@ -522,7 +522,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
     override fun getCount(): Int = adapterData.size
 
-    override fun getLoadingView(): RemoteViews? = null
+    override fun getLoadingView(): RemoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.item_widget_loading)
 
     override fun getViewTypeCount() = 1
 
