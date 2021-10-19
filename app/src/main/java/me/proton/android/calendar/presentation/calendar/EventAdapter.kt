@@ -110,7 +110,7 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default)
                 }
 
-                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {
@@ -229,7 +229,7 @@ class EventAdapter(
                     }
                 }
 
-                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {

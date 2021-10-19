@@ -307,7 +307,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             fullDayCounter = fullDayCounterString,
             occurrenceNumber = this.occurrence?.occurrenceNumber ?: 0,
             calendarColor = this.calendar.color,
-            isCancelledOrDeclined = this.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
+            isCancelledOrDeclined = this.decryptionStatus == Event.DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
             isEncrypted = this.decryptionStatus == Event.DecryptionStatus.FAILURE
         )
