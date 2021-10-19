@@ -109,7 +109,8 @@ class EventViewModel(
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
 
-    private var eventEdited = false
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var eventEdited = false
     private var editMode = false
     private var isCreate = false
 
@@ -1220,8 +1221,7 @@ class EventViewModel(
                 if (!isEventNew() && isApiEventAnInvitation != false) {
                     eventFormSnackState.value = EventSnackState.DisplaySnack(
                         resourceProvider.provideString(
-                            if (isApiEventAnInvitation == null && isEventNew()) R.string.snack_event_created_error
-                            else if (isApiEventAnInvitation == null) R.string.snack_event_updated_error
+                            if (isApiEventAnInvitation == null) R.string.snack_event_updated_error
                             else R.string.snack_event_edit_with_attendees_error
                         )
                     )
@@ -1312,7 +1312,7 @@ class EventViewModel(
             }
         } else {
 
-            // Display Send Invitation Dialog (create an event with attendees)
+            // Display Send Invitation Dialog (create an event with attendees / add attendees to a single event)
             uiScope.launch {
                 displayDialog.alertDialog(
                     resourceProvider.provideString(R.string.event_send_invite_dialog_title),
@@ -1344,7 +1344,7 @@ class EventViewModel(
      */
     private suspend fun saveEventWithAttendeesSendPreferences(
         displayDialog: BaseDialogFragment.DisplayDialog,
-        isAddParticipants: Boolean,
+        isAddParticipantsToRecurring: Boolean,
         occurrenceNumber: Int,
         timeFormatIs24Hour: Boolean
     ) {
@@ -1390,8 +1390,8 @@ class EventViewModel(
                                         }
 
                                         // We continue the save flow without the invalid attendees
-                                        if (isAddParticipants) {
-                                            // Adding attendees to an existing event
+                                        if (isAddParticipantsToRecurring) {
+                                            // Adding attendees to an existing recurring event
                                             handleSave(
                                                 EventEditDeleteOption.ALL_EVENTS,
                                                 occurrenceNumber,
@@ -1399,7 +1399,7 @@ class EventViewModel(
                                                 sendPreferencesResults.sendPreferences
                                             )
                                         } else {
-                                            // Create an event with attendees
+                                            // Create an event with attendees / Add attendees to a single event
                                             saveEvent(
                                                 displayDialog,
                                                 sendPreferencesResults.sendPreferences,
@@ -1419,8 +1419,8 @@ class EventViewModel(
             } else {
 
                 // No send preferences errors, we continue the save flow
-                if (isAddParticipants) {
-                    // Adding attendees to an existing event
+                if (isAddParticipantsToRecurring) {
+                    // Adding attendees to an existing recurring event
                     handleSave(
                         EventEditDeleteOption.ALL_EVENTS,
                         occurrenceNumber,
@@ -1428,7 +1428,7 @@ class EventViewModel(
                         sendPreferencesResults.sendPreferences
                     )
                 } else {
-                    // Create an event with attendees
+                    // Create an event with attendees / Add attendees to a single event
                     saveEvent(
                         displayDialog,
                         sendPreferencesResults.sendPreferences,

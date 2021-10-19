@@ -1,21 +1,18 @@
 package me.proton.android.calendar.mocks
 
-import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarFlags
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
-import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.util.kotlin.toBoolean
 
 object CalendarMocks {
 
-    fun getCalendarEntity(id: String = calendarId, isDisabled: Boolean = false): CalendarEntity {
+    fun getCalendarEntity(id: String = calendarId, isDisabled: Boolean = false, isHidden: Boolean = false): CalendarEntity {
         return CalendarEntity(
             id = id,
             name = calendarName,
             description = calendarDescription,
             color = calendarColor,
-            display = calendarDisplay,
+            display = if (isHidden) 0 else calendarDisplay,
             flags = if (isDisabled) CalendarFlags.DISABLED.value else calendarFlags,
             type = calendarType,
             fkUserId = userId.id
@@ -46,14 +43,23 @@ object CalendarMocks {
         )
     }
 
-    fun getCalendar(hasDisabledCalendar: Boolean = false): Calendar {
+    fun getCalendar(hasDisabledCalendar: Boolean = false, isHidden: Boolean = false): Calendar {
         return Calendar(
             calendarId,
             calendarName,
             calendarColor,
             if (hasDisabledCalendar) CalendarFlags.DISABLED.value else calendarFlags,
-            calendarDisplay.toBoolean(),
+            if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType
+        )
+    }
+
+    fun getMemberEntity(memberEmail: String = userEmail): MemberEntity {
+        return MemberEntity(
+            id = memberId,
+            permissions = MemberEntity.Permission.SUPEROWNER.value,
+            email = memberEmail,
+            calendarId = calendarId
         )
     }
 }

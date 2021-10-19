@@ -72,6 +72,8 @@ const val userDisplayName = "displayName"
 
 val addressId = AddressId("addressId")
 
+const val memberId = "memberId"
+
 const val canSend = true
 const val canReceive = true
 const val enabled = true

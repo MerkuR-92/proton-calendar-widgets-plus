@@ -763,11 +763,11 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             val attendee = Attendee(attendeeName, attendeeEmail)
             attendee.participationStatus = ParticipationStatus.DECLINED
             coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDeleteAsOrganizer(
-                userId,
-                eventCopy,
-                listOf(attendee),
-                mapOf(Pair(attendeeEmail, UserMocks.getSendPreferences())),
-                timeFormat.toBoolean(),
+                userId = userId,
+                event = eventCopy,
+                attendees = listOf(attendee),
+                sendPreferences = mapOf(Pair(attendeeEmail, getSendPreferences())),
+                timeFormatIs24Hours = timeFormat.toBoolean(),
                 isPartOfChain = true,
                 isCalendarDisabled = false
             ) }

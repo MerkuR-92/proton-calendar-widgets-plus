@@ -156,7 +156,7 @@ internal class HandleSaveUseCaseTest {
                     editOption = null,
                     occurrenceNumber = 1,
                     timeFormatIs24Hours = true,
-                    sendPreferences = mapOf(),
+                    sendPreferences = mapOf(), // TODO Mock send prefs
                     event = event,
                     originalDbEvent = null,
                     userSettings = getUserSettingsEntity(),
