@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
+import android.net.Uri
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
@@ -19,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import me.proton.android.calendar.CalendarWidget.Companion.EXTRA_APP_WIDGET_ID
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatDayOfWeekMedium
@@ -29,6 +31,7 @@ import me.proton.android.calendar.common.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -65,8 +68,6 @@ class CalendarWidgetRefresher(private val context: Context) : WidgetRefresher {
 class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
     private val logger: Logger by inject()
-    private val accountManager: AccountManager by inject()
-    private val userManager: UserManager by inject()
 
     override fun onReceive(context: Context, intent: Intent?) {
         super.onReceive(context, intent)
@@ -105,8 +106,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
             PendingIntent.getActivity(context, 0, createOpenAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT)
         remoteViews.setOnClickPendingIntent(R.id.rl_header_container, openAppPendingIntent)
 
-        // show hint for logged out user
-        handleUserLoggedOut(remoteViews)
+        // open the app when user clicks on main info text
         remoteViews.setOnClickPendingIntent(R.id.tv_widget_main_info_text, openAppPendingIntent)
 
         // intent for "Refresh" button
@@ -126,6 +126,10 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         // intent for RemoteViewService that creates the ListView with Events
         val remoteViewsServiceIntent = Intent(context, CalendarWidgetRemoteViewsService::class.java)
+        // we need to pass the AppWidgetID to RemoteViewsService
+        remoteViewsServiceIntent.putExtra(EXTRA_APP_WIDGET_ID, appWidgetId)
+        // without "data" property, extras are ignored when comparing intents
+        remoteViewsServiceIntent.data = Uri.parse("dummy://calendar.proton.me/widget/${appWidgetId}")
         remoteViews.setRemoteAdapter(
             R.id.lv_widget,
             remoteViewsServiceIntent
@@ -140,26 +144,6 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         appWidgetManager.notifyAppWidgetViewDataChanged(intArrayOf(appWidgetId), R.id.lv_widget)
     }
 
-    private fun handleUserLoggedOut(remoteViews: RemoteViews) {
-
-        runBlocking {
-            withContext(Dispatchers.Default) {
-                val userLoggedOut = kotlin.runCatching {
-                    userManager.getAddresses(
-                        accountManager.getPrimaryAccount().firstOrNull()?.userId ?: UserId(""),
-                        refresh = false
-                    )
-                }.getOrNull().isNullOrEmpty()
-
-                if (userLoggedOut) {
-                    remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.VISIBLE)
-                } else {
-                    remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.GONE)
-                }
-            }
-        }
-    }
-
     private fun createOpenAppIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
         data = Navigation.Deeplink.toMonth(LocalDate.now())
         action = MainViewModel.INTENT_ACTION_SHOW_DAY
@@ -169,7 +153,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
     private fun createNewEventIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
         action = MainViewModel.INTENT_ACTION_NEW_EVENT
         addCategory(Intent.CATEGORY_LAUNCHER)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // TODO figure out the "not going back to create new event"
     }
 
     /**
@@ -188,6 +172,8 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
     companion object {
 
         const val WIDGET_DAYS_AHEAD = 14
+
+        const val EXTRA_APP_WIDGET_ID = "EXTRA_APP_WIDGET_ID"
 
         private fun createWidgetRefreshIntent(context: Context): Intent {
             val widgetManager = AppWidgetManager.getInstance(context)
@@ -221,6 +207,7 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         return CalendarWidgetRemoteViewsFactory(
+            intent.getIntExtra(EXTRA_APP_WIDGET_ID, -1),
             resourceProvider,
             calendarsRepository,
             accountManager,
@@ -249,6 +236,7 @@ internal data class WidgetEvent(
 )
 
 internal class CalendarWidgetRemoteViewsFactory(
+    private val appWidgetId: Int,
     private val resourceProvider: ResourceProvider,
     private val calendarsRepository: CalendarsRepository,
     private val accountManager: AccountManager,
@@ -440,6 +428,13 @@ internal class CalendarWidgetRemoteViewsFactory(
                     userManager.getAddresses(userId ?: UserId(""), refresh = false).map { it.email }
                 }.getOrNull() ?: emptyList()
 
+                // show or hide "logged out" or "loading" info
+                if (userEmails.isEmpty()) { // user is logged out
+                    displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_please_log_in))
+                } else {
+                    displayMainInfoText(if (adapterData.isEmpty()) resourceProvider.provideString(R.string.calendar_widget_loading_events) else null)
+                }
+
                 val is24Hour = if (userId != null) {
                     userSettingsRepository.selectUserSettings(userId.id)
                         ?.timeFormatIs24Hour(DateFormat.is24HourFormat(applicationContext)) ?: true
@@ -493,6 +488,11 @@ internal class CalendarWidgetRemoteViewsFactory(
                     }
                 }
 
+                // show or hide "no upcoming events" only if user is logged in
+                if (userEmails.isNotEmpty()) {
+                    displayMainInfoText(if (widgetEvents.isEmpty()) resourceProvider.provideString(R.string.calendar_widget_no_upcoming_events) else null)
+                }
+
                 // add special dummy WidgetEvent if there are no Events to show for today
                 if (widgetEvents.isNotEmpty() && widgetEvents.first().happensOn != fromDate) {
                     widgetEvents.add(
@@ -514,6 +514,22 @@ internal class CalendarWidgetRemoteViewsFactory(
                 adapterData = widgetEvents
             }
         }
+    }
+
+    private fun displayMainInfoText(text: String?) {
+
+        val widgetManager = AppWidgetManager.getInstance(applicationContext)
+
+        val remoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.calendar_widget)
+        if (text != null) {
+            remoteViews.setTextViewText(R.id.tv_widget_main_info_text, text)
+            remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.VISIBLE)
+        } else {
+            remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.INVISIBLE)
+        }
+        
+        widgetManager.updateAppWidget(appWidgetId, remoteViews)
+
     }
 
     override fun onCreate() {}

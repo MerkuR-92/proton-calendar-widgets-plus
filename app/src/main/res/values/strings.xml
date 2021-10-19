@@ -395,6 +395,8 @@
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Proton Calendar widget</string>
     <string name="calendar_widget_no_upcoming_events_today">No upcoming events today</string>
+    <string name="calendar_widget_loading_events">Loading events…</string>
+    <string name="calendar_widget_no_upcoming_events">No upcoming events</string>
     <string name="calendar_widget_please_log_in">Sign in to see your events</string>
     <string name="calendar_widget_part_day_event_starts_at">Starts at %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Ends at %1$s</string>
