@@ -1669,6 +1669,10 @@ class EventViewModel(
         _event.postValue(event)
 
         eventState.value = EventState.Idle
+
+        // Force the Widget to refresh, because we just changed the Event answer
+        widgetRefresher.refresh()
+
         return true
     }
 
