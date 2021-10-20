@@ -2784,26 +2784,24 @@ class EventViewModel(
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
 
         if (updateParticipationStatusUseCaseResult is UseCase.Result.Success<*> && sendPreferences.isNotEmpty()) {
-            updateParticipationStatusUseCaseResult.returnValue.tryCast<Int> {
 
-                // If we updated the participation status on BE, we send the reply to the organizer. We consider sending the reply to be optional.
-                val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
-                    userId,
-                    eventCopy,
-                    dbEvent?.iCalendar?.timezoneInfo,
-                    userAttendee.copy(),
-                    event.iCalEvent.organizer.email,
-                    participationStatus,
-                    sendPreferences,
-                    Date.from(updateTime), // Use same updateTime as for Update part stat BE call
-                    eventEntity,
-                    true,
-                    event.defaultTimeZone!!,
-                    timeFormatIs24Hours
-                )
-                sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
-                // Do not return use case result. Sending the email is optional for proton to proton so we don't care if it failed
-            }
+            // If we updated the participation status on BE, we send the reply to the organizer. We consider sending the reply to be optional.
+            val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
+                userId,
+                eventCopy,
+                dbEvent?.iCalendar?.timezoneInfo,
+                userAttendee.copy(),
+                event.iCalEvent.organizer.email,
+                participationStatus,
+                sendPreferences,
+                Date.from(updateTime), // Use same updateTime as for Update part stat BE call
+                eventEntity,
+                true,
+                event.defaultTimeZone!!,
+                timeFormatIs24Hours
+            )
+            sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            // Do not return use case result. Sending the email is optional for proton to proton so we don't care if it failed
         }
 
         handleChangeAnswerResult(

@@ -1,9 +1,13 @@
 package me.proton.android.calendar.mocks
 
+import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
+import biweekly.parameter.Related
 import biweekly.property.Attendee
 import biweekly.property.ExceptionDates
 import biweekly.property.Organizer
+import biweekly.property.Trigger
+import biweekly.util.Duration
 import biweekly.util.ICalDate
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -30,6 +34,7 @@ object EventMocks {
         hasDisabledCalendar: Boolean = false,
         hasExDate: Boolean = false,
         hasHiddenCalendar: Boolean = false,
+        hasDefaultAlarms: Boolean = true,
         participationStatus: ParticipationStatus = ParticipationStatus.DECLINED
     ): Event {
 
@@ -84,6 +89,11 @@ object EventMocks {
             ).toInstant()
             exceptionDates.values.add(ICalDate(Date.from(newUntilDate), true))
             iCalendar.events.first().addExceptionDates(exceptionDates)
+        }
+
+        if (hasDefaultAlarms) {
+            // One alarm 15 minutes before
+            iCalendar.events.first().addAlarm(VAlarm.display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START), null))
         }
 
         iCalendar.setDefaultTimeZone(defaultTimezone)

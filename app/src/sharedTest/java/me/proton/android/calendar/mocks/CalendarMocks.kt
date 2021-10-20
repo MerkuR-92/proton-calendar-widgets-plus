@@ -1,5 +1,8 @@
 package me.proton.android.calendar.mocks
 
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.util.kotlin.toBoolean
@@ -24,8 +27,8 @@ object CalendarMocks {
             id = calendarSettingsId,
             calendarId = id,
             defaultEventDuration = defaultEventDuration,
-            defaultPartDayNotifications = emptyList(), // TODO Test default part day notifications
-            defaultFullDayNotifications = emptyList() // TODO Test default full day notifications
+            defaultPartDayNotifications = listOf(Json.decodeFromString<JsonElement>("{\"Type\":1,\"Trigger\":\"-PT15M\"}")), // One alarm 15 minutes before
+            defaultFullDayNotifications = listOf(Json.decodeFromString<JsonElement>("{\"Type\":1,\"Trigger\":\"-PT15H\"}")) // One day before at 9am
         )
     }
 

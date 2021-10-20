@@ -125,8 +125,12 @@ open class EventViewModelTestCommon: KoinComponent {
         if (eventId != null && eventId == singleEditEventId) {
             // If we edit existing single edit event
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any()) }
-            coVerify(exactly = 2) { transformEventUseCaseMock.execute(any()) }
+            if (editMode) {
+                coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any()) }
+                coVerify(exactly = 2) { transformEventUseCaseMock.execute(any()) }
+            } else {
+                coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
+            }
         } else if (eventId != null) {
             // If we edit existing event
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
