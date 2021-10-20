@@ -16,6 +16,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
@@ -45,6 +46,7 @@ internal class CalendarRepositoryTest {
     private val transformEventUseCaseMock: TransformEventUseCase = mockk()
     private val fetchEventsUseCaseMock: FetchEventsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
+    private val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -260,7 +262,8 @@ internal class CalendarRepositoryTest {
             fetchEventsUseCaseMock,
             updateAlarmsUseCaseMock,
             calendarsApiMock,
-            json
+            json,
+            calendarWidgetRefresherMock
         )
     }
 

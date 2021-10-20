@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
@@ -47,7 +48,8 @@ class CalendarsRepositoryImpl(
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
-    private val json: Json
+    private val json: Json,
+    private val widgetRefresher: WidgetRefresher
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
@@ -490,6 +492,7 @@ class CalendarsRepositoryImpl(
 
     override suspend fun updateCalendarDisplay(calendarId: String, display: Int) {
         database.calendarsDao().updateCalendarDisplay(calendarId, display)
+        widgetRefresher.refresh()
     }
 
     override fun eventsFlow(
