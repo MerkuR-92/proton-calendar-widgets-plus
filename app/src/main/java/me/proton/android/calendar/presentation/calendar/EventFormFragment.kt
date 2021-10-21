@@ -957,7 +957,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
-                val calendars = calendarViewModel.activeUserCalendars.value
+                val calendars = calendarViewModel.userCalendars.value?.filter { it.isActive }
 
                 // TODO Save active calendars in calendar VM to avoid triggering click effect when not needed
                 if (calendars == null || calendars.size <= 1) return@launch
