@@ -37,6 +37,7 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.toBoolean
+import org.koin.core.get
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -54,7 +55,9 @@ class CalendarViewModel(
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
-    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : AndroidViewModel(application) {
+    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
+    private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase
+    ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -84,6 +87,7 @@ class CalendarViewModel(
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
     var timeFormat: LiveData<Int> = MutableLiveData()
+    var defaultCalendarId: LiveData<String?> = MutableLiveData()
     var autoDetectPrimaryTimezone: LiveData<Boolean> = MutableLiveData()
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
@@ -188,6 +192,10 @@ class CalendarViewModel(
 
             displayWeekNumber = calendarsRepository.flowCalendarUserSettingsDisplayWeekNumber(userId.id).map {
                 it?.toBoolean() ?: true // Show week numbers by default
+            }.asLiveData(Dispatchers.Default)
+
+            defaultCalendarId = calendarsRepository.flowCalendarUserDefaultCalendarId(userId.id).map {
+                it
             }.asLiveData(Dispatchers.Default)
 
             timeFormat = userSettingsRepository.flowTimeFormat(userId.id).map {
@@ -473,6 +481,20 @@ class CalendarViewModel(
             .build()
 
         return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    suspend fun updateDefaultCalendarId(defaultCalendarId: String): Boolean {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel updateDefaultCalendarId")
+            return false
+        }
+        val updateCalendarUserSettingsUseCaseResult = updateCalendarUserSettingsUseCase.executeDefaultCalendarId(
+            userId,
+            defaultCalendarId
+        )
+
+        return updateCalendarUserSettingsUseCaseResult is UseCase.Result.Success<*>
     }
 
     fun updateTimeFormat(timeFormat: Int) : LiveData<Operation.State> {

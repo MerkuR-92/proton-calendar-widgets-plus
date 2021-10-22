@@ -299,6 +299,8 @@
     <string name="snack_network_error">Network error, please try again later</string>
     <string name="snack_import_event_signed_out">You need to sign in to import events</string>
     <string name="snack_app_link_signed_out">You need to sign in to see your event</string>
+    <string name="snack_update_default_calendar">Default calendar updated</string>
+    <string name="snack_update_default_calendar_error">Error updating default calendar, please try again later</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>

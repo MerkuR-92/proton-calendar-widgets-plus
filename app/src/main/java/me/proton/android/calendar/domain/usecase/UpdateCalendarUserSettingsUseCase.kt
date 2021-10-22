@@ -20,6 +20,7 @@ class UpdateCalendarUserSettingsUseCase(
         const val WORKER_ID_TZ = "WORKER_ID_TZ"
         const val WORKER_ID_AUTO_DETECT = "WORKER_ID_AUTO_DETECT"
         const val WORKER_ID_WEEK_NUMBER = "WORKER_ID_WEEK_NUMBER"
+        const val WORKER_ID_DEFAULT_CALENDAR_ID = "WORKER_ID_DEFAULT_CALENDAR_ID"
     }
 
     suspend fun executePrimaryTimezone(userId: UserId, primaryTimezone: String): UseCase.Result {
@@ -82,6 +83,29 @@ class UpdateCalendarUserSettingsUseCase(
             is ApiResponse.Exception -> {
                 logger.e("api error updating calendar user display week number: $updateCalendarUserDisplayWeekNumberResponse")
                 UseCase.Result.Error(updateCalendarUserDisplayWeekNumberResponse.exception.message ?: "(no exception message)")
+            }
+        }
+    }
+
+    suspend fun executeDefaultCalendarId(userId: UserId, defaultCalendarId: String): UseCase.Result {
+        return when (
+            val updateCalendarUserDefaultCalendarIdResponse =
+                settingsApi.updateCalendarUserDefaultCalendarId(userId, defaultCalendarId)
+        ) {
+            is ApiResponse.Success -> {
+                calendarsRepository.updateCalendarUserDefaultCalendarId(
+                    userId.id,
+                    defaultCalendarId
+                )
+                UseCase.Result.Success<Unit>()
+            }
+            is ApiResponse.Error -> {
+                logger.e("api error updating calendar user default calendar id: $updateCalendarUserDefaultCalendarIdResponse")
+                UseCase.Result.Error(updateCalendarUserDefaultCalendarIdResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                logger.e("api error updating calendar user default calendar id: $updateCalendarUserDefaultCalendarIdResponse")
+                UseCase.Result.Error(updateCalendarUserDefaultCalendarIdResponse.exception.message ?: "(no exception message)")
             }
         }
     }

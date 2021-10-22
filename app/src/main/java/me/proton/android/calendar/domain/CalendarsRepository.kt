@@ -191,6 +191,10 @@ interface CalendarsRepository {
 
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>
 
+    suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String)
+
+    fun flowCalendarUserDefaultCalendarId(userId: String): Flow<String?>
+
     suspend fun selectCalendarUserSettingsPrimaryTimezone(userId: String): String?
 
     fun flowCalendarUserSettingsPrimaryTimezone(userId: String): Flow<String?>

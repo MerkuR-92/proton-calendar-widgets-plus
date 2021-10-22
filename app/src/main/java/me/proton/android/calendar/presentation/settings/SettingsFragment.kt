@@ -15,13 +15,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.work.Operation
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_general_settings.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
@@ -87,28 +90,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
             userCalendars ?: return@observe
 
-            lifecycleScope.launch {
-                val calendarEmails = hashMapOf<String, String>()
-                userCalendars.forEach { userCalendar ->
-                    val calendarEmail = eventViewModel.getCalendarEmail(userCalendar.id)
-                    calendarEmail?.let {
-                        calendarEmails[userCalendar.id] = it
-                    }
-                }
-                val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
-                defaultCalendarId?.let {
-                    this@SettingsFragment.defaultCalendarId = defaultCalendarId
-                    settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-                }
-                settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
-                settingsUserCalendarListAdapter.submitList(
-                    userCalendars.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }.sortedByDescending {
-                        it.id == defaultCalendarId // Default will appear first
-                    }
-                )
-            }
+            refreshUserCalendarList(userCalendars)
         }
 
         val settingsSubscribedCalendarListView = settings_subscribed_calendars_list
@@ -159,8 +141,54 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
         }
+
+        calendarViewModel.defaultCalendarId.observe(viewLifecycleOwner) { defaultCalendarId ->
+            defaultCalendarId ?: return@observe
+
+            if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
+                this@SettingsFragment.defaultCalendarId = defaultCalendarId
+                calendarViewModel.userCalendars.value?.let { refreshUserCalendarList(it) }
+            }
+        }
     }
 
+    /**
+     * @param userCalendars updated user calendar list
+     * Refreshes the user calendar list with the new set of data. Get the emails linked to each calendar and
+     * get the current default calendar id. Sort the list by following order: default / active / disabled.
+     */
+    private fun refreshUserCalendarList(userCalendars: List<CalendarEntity>) {
+        lifecycleScope.launch {
+            val calendarEmails = hashMapOf<String, String>()
+            userCalendars.forEach { userCalendar ->
+                val calendarEmail = eventViewModel.getCalendarEmail(userCalendar.id)
+                calendarEmail?.let {
+                    calendarEmails[userCalendar.id] = it
+                }
+            }
+            val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
+            var dataSetChanged = false
+            defaultCalendarId?.let {
+                this@SettingsFragment.defaultCalendarId = defaultCalendarId
+                dataSetChanged = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
+            }
+            settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
+            settingsUserCalendarListAdapter.submitList(
+                userCalendars.sortedBy {
+                    it.isDisabled // Disabled will appear last
+                }.sortedByDescending {
+                    it.id == defaultCalendarId // Default will appear first
+                }
+            )
+            if (dataSetChanged) settingsUserCalendarListAdapter.notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * Displays the bottom sheet dialog with the calendar name as a header, and the following button as a content:
+     * Edit, Mark as default, Delete.
+     * Buttons visibility varies with the calendar type and status.
+     */
     private fun showBottomSheetDialog(calendarEntity: CalendarEntity) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
@@ -192,6 +220,15 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         markDefaultPress?.setOnSingleClickListener {
+            lifecycleScope.launch {
+                val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendarEntity.id)
+                if (updateDefaultCalendarId) {
+                    calendarViewModel.userCalendars.value?.let { refreshUserCalendarList(it) }
+                    view?.displaySnackBar(requireContext().getString(R.string.snack_update_default_calendar))
+                } else {
+                    view?.displaySnackBar(requireContext().getString(R.string.snack_update_default_calendar_error))
+                }
+            }
             bottomSheetDialog.dismiss()
         }
 

@@ -71,7 +71,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
             get(),
