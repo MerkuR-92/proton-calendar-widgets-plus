@@ -1,22 +1,30 @@
 package me.proton.android.calendar.presentation.settings
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -44,6 +52,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private var subscribedCalendars: List<CalendarEntity>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
+    private var defaultCalendarId: String = ""
+
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
     }
@@ -69,7 +79,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settingsCalendarListView.layoutManager = settingsCalendarLayoutManager
         settingsUserCalendarListAdapter = SettingsCalendarListAdapter() { calendarEntity ->
             //On Calendar click event
-            // TODO
+            showBottomSheetDialog(calendarEntity)
         }
         (settingsCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         settingsCalendarListView.adapter = settingsUserCalendarListAdapter
@@ -86,7 +96,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     }
                 }
                 val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
-                defaultCalendarId?.let { settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId) }
+                defaultCalendarId?.let {
+                    this@SettingsFragment.defaultCalendarId = defaultCalendarId
+                    settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
+                }
                 settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
                 settingsUserCalendarListAdapter.submitList(
                     userCalendars.sortedBy {
@@ -103,7 +116,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settingsSubscribedCalendarListView.layoutManager = settingsSubscribedCalendarLayoutManager
         settingsSubscribedCalendarListAdapter = SettingsCalendarListAdapter() { calendarEntity ->
             //On Calendar click event
-            // TODO
+            showBottomSheetDialog(calendarEntity)
         }
         (settingsSubscribedCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         settingsSubscribedCalendarListView.adapter = settingsSubscribedCalendarListAdapter
@@ -146,5 +159,52 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
         }
+    }
+
+    private fun showBottomSheetDialog(calendarEntity: CalendarEntity) {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+
+        // Workaround to make sure we have the correct navigation bar color.
+        // TODO update once we change splash screen and how we handle navigation bar colors
+        val window = bottomSheetDialog.window
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+            val navigationBarBackgroundColor = R.color.background_norm
+            window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        } else {
+            val navigationBarBackgroundColor = R.color.background_navigation_bar
+            window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        }
+
+        bottomSheetDialog.setContentView(R.layout.dialog_calendar_settings)
+
+        val calendarIcon = bottomSheetDialog.findViewById<ImageView>(R.id.dialog_calendar_settings_calendar_icon)
+        calendarIcon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
+
+        val calendarName = bottomSheetDialog.findViewById<TextView>(R.id.dialog_calendar_settings_calendar_title)
+        calendarName?.text = calendarEntity.name
+
+        val editPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_edit_press)
+        val markDefaultPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_default_press)
+        val deletePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_delete_press)
+
+        editPress?.setOnSingleClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        markDefaultPress?.setOnSingleClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        deletePress?.setOnSingleClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
+        deleteLayout?.visibleOrGone(DELETE_CALENDAR)
+
+        val markAsDefaultLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
+        markAsDefaultLayout?.visibleOrGone(calendarEntity.id != defaultCalendarId && calendarEntity.isActive && calendarEntity.isSubscribed.not())
+
+        bottomSheetDialog.show()
     }
 }

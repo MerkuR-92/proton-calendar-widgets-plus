@@ -51,6 +51,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_today">Today</string>
     <string name="action_create_event">Create event</string>
+    <string name="action_mark_default">Mark as default</string>
 
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">No events</string>

@@ -24,6 +24,7 @@
 
         <item name="android:colorEdgeEffect">@color/brand_norm</item>
 
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 
     <style name="AppTheme.DayNight">
@@ -73,6 +74,21 @@
         <item name="appWidgetRadius">@dimen/widget_background_corner_radius</item>
         <item name="appWidgetPadding">@dimen/widget_padding</item>
         <item name="appWidgetInnerRadius">8dp</item>
+    </style>
+
+    <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+        <item name="backgroundColor">@color/background_norm</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+    </style>
+
+    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">8dp</item>
+        <item name="cornerSizeTopLeft">8dp</item>
     </style>
 
 </resources>
