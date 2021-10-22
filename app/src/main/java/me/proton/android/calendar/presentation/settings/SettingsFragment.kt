@@ -1,28 +1,29 @@
 package me.proton.android.calendar.presentation.settings
 
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_settings.*
+import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.AndroidUtils.formattedTimeZoneToId
-import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
-import me.proton.android.calendar.common.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
-import me.proton.android.calendar.presentation.MainActivity
+import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import java.time.DayOfWeek
-import java.time.Instant
 
 class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
@@ -34,6 +35,14 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     override val navigateUp = true
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val eventViewModel: EventViewModel by sharedViewModel()
+
+    private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
+    private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter
+
+    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
+    private var subscribedCalendars: List<CalendarEntity>? = null
+    private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -51,118 +60,91 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        settings_week_numbers_press.setOnClickListener {
-            settings_week_numbers_switch.performClick()
+        settings_general_press.setOnClickListener {
+            findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
         }
-        settings_week_numbers_switch.setOnClickListener {
+
+        val settingsCalendarListView = settings_calendars_list
+        val settingsCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        settingsCalendarListView.layoutManager = settingsCalendarLayoutManager
+        settingsUserCalendarListAdapter = SettingsCalendarListAdapter() { calendarEntity ->
+            //On Calendar click event
+            // TODO
+        }
+        (settingsCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        settingsCalendarListView.adapter = settingsUserCalendarListAdapter
+
+        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
+            userCalendars ?: return@observe
+
             lifecycleScope.launch {
-                calendarViewModel.updateDisplayWeekNumber(settings_week_numbers_switch.isChecked)
-            }
-        }
-
-        settings_update_timezone_press.setOnClickListener {
-            settings_update_timezone_switch.performClick()
-        }
-        settings_update_timezone_switch.setOnClickListener {
-            lifecycleScope.launch {
-                calendarViewModel.updateAutoDetectPrimaryTimezone(settings_update_timezone_switch.isChecked)
-            }
-        }
-
-        settings_timezone_press.setOnSingleClickListener {
-            val forInstant = Instant.now()
-            val formattedTimeZoneIds = allowedTimezoneIds.map {
-                formatTimeZoneId(it, forInstant)
-            }.toTypedArray()
-            formattedTimeZoneIds.sortFormattedTimeZoneIds()
-            val defaultTimeZone = calendarViewModel.timeZoneId.value?.id
-            val selectedIndex =
-                if (defaultTimeZone == null) -1
-                else formattedTimeZoneIds.indexOf(formatTimeZoneId(defaultTimeZone, forInstant))
-
-            AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
-                lifecycleScope.launch {
-                    calendarViewModel.updatePrimaryTimezone(formattedTimeZoneIds[it].formattedTimeZoneToId())
-                }
-            }
-        }
-
-        val appThemes = resources.getStringArray(R.array.app_themes)
-        settings_theme_value.text = appThemes[(activity as MainActivity).getAppTheme().value]
-
-        // TODO Handle themes for Android P and below
-        settings_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            settings_theme_press.setOnSingleClickListener {
-                AndroidUtils.displaySingleChoicePicker(
-                    requireContext(),
-                    getString(R.string.settings_theme_title),
-                    appThemes,
-                    AppTheme.values().indexOf((activity as MainActivity).getAppTheme())
-                ) { index ->
-                    settings_theme_value.text = appThemes[index]
-                    (activity as MainActivity).changeAppTheme(AppTheme.values()[index])
-                }
-            }
-        }
-
-        val timeFormats = resources.getStringArray(R.array.time_formats)
-        settings_time_format_press.setOnSingleClickListener {
-            AndroidUtils.displaySingleChoicePicker(
-                requireContext(),
-                getString(R.string.settings_time_format_title),
-                timeFormats,
-                timeFormats.indexOf(settings_time_format_value.text)
-            ) { index ->
-                settings_time_format_value.text = timeFormats[index]
-                calendarViewModel.updateTimeFormat(index)
-            }
-        }
-
-        val weekStartValues = resources.getStringArray(R.array.week_start)
-        settings_week_start_press.setOnSingleClickListener {
-            AndroidUtils.displaySingleChoicePicker(
-                requireContext(),
-                null,
-                weekStartValues,
-                weekStartValues.indexOf(settings_week_start_value.text)) { index ->
-                lifecycleScope.launch {
-                    val weekStart = when (index) {
-                        2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
-                        3 -> DayOfWeek.SUNDAY.value // 7 is value for Sunday and index 3 in available days string array
-                        else -> index
+                val calendarEmails = hashMapOf<String, String>()
+                userCalendars.forEach { userCalendar ->
+                    val calendarEmail = eventViewModel.getCalendarEmail(userCalendar.id)
+                    calendarEmail?.let {
+                        calendarEmails[userCalendar.id] = it
                     }
-                    calendarViewModel.updateWeekStart(weekStart)
+                }
+                val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
+                defaultCalendarId?.let { settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId) }
+                settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
+                settingsUserCalendarListAdapter.submitList(
+                    userCalendars.sortedBy {
+                        it.isDisabled // Disabled will appear last
+                    }.sortedByDescending {
+                        it.id == defaultCalendarId // Default will appear first
+                    }
+                )
+            }
+        }
+
+        val settingsSubscribedCalendarListView = settings_subscribed_calendars_list
+        val settingsSubscribedCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        settingsSubscribedCalendarListView.layoutManager = settingsSubscribedCalendarLayoutManager
+        settingsSubscribedCalendarListAdapter = SettingsCalendarListAdapter() { calendarEntity ->
+            //On Calendar click event
+            // TODO
+        }
+        (settingsSubscribedCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        settingsSubscribedCalendarListView.adapter = settingsSubscribedCalendarListAdapter
+
+        subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
+            subscribedCalendars = value
+
+            if (subscribedCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            }
+        }
+        subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
+            calendarSubscriptions = value
+
+            if (subscribedCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            }
+        }
+        subscribedCalendarsMediator.observe(viewLifecycleOwner) {
+            it?.let {
+                lifecycleScope.launch {
+                    val subscribedCalendars = it.first
+                    val calendarSubscriptions = it.second
+
+                    val dataSetChanged =
+                        settingsSubscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
+
+                    val calendarEmails = hashMapOf<String, String>()
+                    subscribedCalendars.forEach { userCalendar ->
+                        val calendarEmail = eventViewModel.getCalendarEmail(userCalendar.id)
+                        calendarEmail?.let {
+                            calendarEmails[userCalendar.id] = it
+                        }
+                    }
+                    settingsSubscribedCalendarListAdapter.setCalendarEmails(calendarEmails)
+
+                    settingsSubscribedCalendarListAdapter.submitList(subscribedCalendars)
+                    if (dataSetChanged) settingsSubscribedCalendarListAdapter.notifyDataSetChanged()
+                    settings_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
                 }
             }
-        }
-
-        // Observers
-
-        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
-            settings_time_format_value.text = timeFormats[timeFormat]
-        }
-
-        calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            settings_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)
-        }
-
-        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
-            settings_week_start_value.text = when (weekStart) {
-                DayOfWeek.SATURDAY.value -> weekStartValues[2] // 6 is value for Saturday and index 2 in available days string array
-                DayOfWeek.SUNDAY.value -> weekStartValues[3] // 7 is value for Sunday and index 3 in available days string array
-                else -> weekStartValues[weekStart]
-            }
-        }
-
-        calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
-            settings_week_numbers_switch.isChecked = displayWeekNumber
-            settings_week_numbers_switch.jumpDrawablesToCurrentState()
-        }
-
-        calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
-            settings_update_timezone_switch.isChecked = autoDetectPrimaryTimezone
-            settings_update_timezone_switch.jumpDrawablesToCurrentState()
         }
     }
 }

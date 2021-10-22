@@ -84,6 +84,10 @@
         <item name="android:textColor">@color/text_inverted</item>
     </style>
 
+    <style name="Text.DefaultSmall.Strong.Brand">
+        <item name="android:textColor">@color/brand_norm</item>
+    </style>
+
     <style name="Text.Caption">
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif</item>
@@ -133,6 +137,11 @@
     <style name="Icon.Small">
         <item name="android:layout_width">@dimen/small_icon_size</item>
         <item name="android:layout_height">@dimen/small_icon_size</item>
+    </style>
+
+    <style name="ColoredDot">
+        <item name="android:layout_width">@dimen/dot_icon_size</item>
+        <item name="android:layout_height">@dimen/dot_icon_size</item>
     </style>
 
     <style name="InputText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">

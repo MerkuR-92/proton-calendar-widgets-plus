@@ -649,9 +649,7 @@ class EventViewModel(
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
             if (event.iCalEvent.organizer != null) {
-                val organizerEmail = calendarsRepository.selectMembers(calendar.id).firstOrNull {
-                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-                }?.email
+                val organizerEmail = getCalendarEmail(calendar.id)
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
             event = Event.from(
@@ -1093,9 +1091,7 @@ class EventViewModel(
                 logger.i("EventViewModel: User was null in allowSend")
                 return false
             }
-        val email = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
+        val email = getCalendarEmail(event.calendar.id)
         if (email == null) {
             logger.i("EventViewModel: Email from selectMembers was null in allowSend")
             return false
@@ -1123,9 +1119,7 @@ class EventViewModel(
                 attendee
             )
             if (event.iCalEvent.organizer == null) {
-                val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
-                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-                }?.email
+                val organizerEmail = getCalendarEmail(event.calendar.id)
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
         } else {
@@ -2924,5 +2918,11 @@ class EventViewModel(
             if (occurrences.isNullOrEmpty()) EventLinkResult.OccurrenceDoesNotExist
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
+    }
+
+    suspend fun getCalendarEmail(calendarId: String): String? {
+        return calendarsRepository.selectMembers(calendarId).firstOrNull {
+            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+        }?.email
     }
 }

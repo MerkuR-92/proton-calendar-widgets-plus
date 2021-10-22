@@ -720,6 +720,15 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarSettings(defaultCalendarId)
     }
 
+    suspend fun getDefaultCalendarId(): String? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
+            return null
+        }
+        return calendarsRepository.getDefaultCalendarId(userId.id)
+    }
+
     suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
         val userId = userId.value
         if (userId == null) {

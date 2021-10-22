@@ -41,8 +41,18 @@
         android:label=""
         tools:layout="@layout/fragment_settings">
         <action
-            android:id="@+id/action_nav_settings_to_nav_event_form"
-            app:destination="@id/nav_event_form" />
+            android:id="@+id/action_nav_settings_to_nav_general_settings"
+            app:destination="@id/nav_general_settings" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_general_settings"
+        android:name="me.proton.android.calendar.presentation.settings.GeneralSettingsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_general_settings">
+        <action
+            android:id="@+id/action_nav_general_settings_to_nav_settings"
+            app:destination="@id/nav_settings" />
     </dialog>
 
     <dialog

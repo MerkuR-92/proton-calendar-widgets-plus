@@ -10,11 +10,10 @@
 
     <ImageView
         android:id="@+id/item_calendar_dialog_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:src="@drawable/ic_dot"
-        style="@style/Icon"
+        style="@style/ColoredDot"
         app:layout_constraintTop_toTopOf="@+id/item_calendar_dialog_title"
+        app:layout_constraintBottom_toBottomOf="@+id/item_calendar_dialog_title"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView

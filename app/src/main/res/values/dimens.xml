@@ -45,6 +45,7 @@
     <dimen name="default_icon_size">24dp</dimen>
     <dimen name="small_icon_size">16dp</dimen>
     <dimen name="badge_icon_size">20dp</dimen>
+    <dimen name="dot_icon_size">18dp</dimen>
 
     <dimen name="default_separator_margin_top">20dp</dimen>
 
@@ -55,11 +56,13 @@
     <dimen name="attendee_item_vertical_margin">14dp</dimen>
     <dimen name="attendee_item_vertical_margin_large">18dp</dimen>
 
+    <dimen name="settings_calendar_badges_margin">6dp</dimen>
 
     <dimen name="material_dialog_inset_start">24dp</dimen>
     <dimen name="material_dialog_inset_end">24dp</dimen>
 
     <dimen name="week_day_chip_max_size">50dp</dimen>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>

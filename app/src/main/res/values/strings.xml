@@ -258,6 +258,7 @@
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_timezone">Time zone</string>
     <string name="nav_view_more_settings">Settings</string>
+    <string name="nav_view_more_general_settings">General</string>
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
@@ -373,6 +374,14 @@
     <string name="settings_time_format_title">Time format</string>
     <string name="settings_week_numbers_title">Show week numbers</string>
     <string name="settings_value_placeholder">Tap to select</string>
+
+    <string name="settings_general_title">General</string>
+    <string name="settings_general_info">Theme, timezone, calendar layout etc.</string>
+    <string name="settings_calendars">My calendars</string>
+    <string name="settings_subscribed_calendars">Subscribed calendars</string>
+    <string name="settings_calendar_default" comment="Lowercase first letter is intentional">default</string>
+    <string name="settings_calendar_disabled" comment="Lowercase first letter is intentional">disabled</string>
+    <string name="settings_calendar_not_synced" comment="Lowercase first letter is intentional">not synced</string>
 
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
