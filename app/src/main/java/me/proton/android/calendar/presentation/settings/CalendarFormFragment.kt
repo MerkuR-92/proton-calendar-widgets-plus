@@ -3,7 +3,6 @@ package me.proton.android.calendar.presentation.settings
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,10 +25,6 @@ import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.item_calendar_color_picker.view.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
@@ -39,16 +34,18 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.CalendarForm.CALENDAR_NAME_CHARACTER_LIMIT
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
-import me.proton.core.util.kotlin.all
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import java.time.ZonedDateTime
+import java.time.LocalDate
+import java.time.ZoneId
 
 class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
@@ -61,11 +58,11 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = true
 
+    private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
 
     private val logger: Logger by inject()
-    private val json: Json by inject()
 
     private lateinit var loadingAction: View
     private lateinit var buttonSave: View
@@ -74,8 +71,6 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     private var selectedColor: String? = null // TODO Maybe turn into livedata in VM and observe to update form icon
     private var selectedDefaultEventDuration: String? = null // TODO Maybe turn into livedata in VM and observe to update form icon
-    private var defaultPartDayAlarms: ArrayList<VAlarm> = arrayListOf()
-    private var defaultAllDayAlarms: ArrayList<VAlarm> = arrayListOf()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -132,6 +127,27 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         initOnClickListeners()
+
+        calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
+            calendar_form_default_event_notifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
+            displayNotifications(
+                allDay = false,
+                defaultPartDayAlarms,
+                calendar_form_default_event_notifications_list,
+                calendar_form_default_event_notifications_icon,
+                calendar_form_default_event_notifications_press
+            )
+        }
+        calendarFormViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->
+            calendar_form_default_all_day_event_notifications.visibleOrGone(defaultAllDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
+            displayNotifications(
+                allDay = true,
+                defaultAllDayAlarms,
+                calendar_form_default_all_day_event_notifications_list,
+                calendar_form_default_all_day_event_notifications_icon,
+                calendar_form_default_all_day_event_notifications_press
+            )
+        }
     }
 
     private fun initUpdateCalendarForm(calendarId: String) {
@@ -157,52 +173,35 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
             // Calendar color
             calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
-            selectedColor = calendarEntity.color // TODO Use LiveData ?
+            selectedColor = calendarEntity.color // TODO Use LiveData
 
             // Default event duration
             calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, calendarSettings.defaultEventDuration.toString())
-            selectedDefaultEventDuration = calendarSettings.defaultEventDuration.toString()
+            selectedDefaultEventDuration = calendarSettings.defaultEventDuration.toString() // TODO Use LiveData
 
             // Default part day event notifications
-            defaultPartDayAlarms = setDefaultAlarms(calendarSettings.defaultPartDayNotifications)
-            displayNotifications(allDay = false)
+            calendarFormViewModel.setDefaultAlarms(calendarSettings.defaultPartDayNotifications, isAllDay = false)
 
             // Default all day event notifications
-            defaultAllDayAlarms = setDefaultAlarms(calendarSettings.defaultFullDayNotifications)
-            displayNotifications(allDay = true)
+            calendarFormViewModel.setDefaultAlarms(calendarSettings.defaultFullDayNotifications, isAllDay = true)
         }
     }
 
-    private fun setDefaultAlarms(defaultNotifications: List<JsonElement>): ArrayList<VAlarm> {
-        val alarms = ArrayList<VAlarm>()
-        defaultNotifications.mapNotNull {
-            if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
-                it
-            ) else null
-        }.forEach { alarm ->
-            alarm.parseTrigger()?.let {
-                if (alarm.type == 0) {
-                    alarms.add(VAlarm.email(it, null, null))
-                } else {
-                    alarms.add(VAlarm.display(it, null))
-                }
-            }
-        }
-        return alarms
-    }
+    private fun displayNotifications(
+        allDay: Boolean,
+        alarms: List<VAlarm>,
+        alarmsListView: ViewGroup,
+        notificationIcon: View,
+        itemViewPress: View
+    ) {
+        alarmsListView.removeAllViews()
+        notificationIcon.visibleOrGone(true)
 
-    private fun displayNotifications(allDay: Boolean) {
-        (if (allDay) calendar_form_default_all_day_event_notifications_list else calendar_form_default_event_notifications_list)
-            .removeAllViews()
-        (if (allDay) calendar_form_default_all_day_event_notifications_icon else calendar_form_default_event_notifications_icon)
-            .visibleOrGone(true)
-
-        val alarms = if (allDay) defaultAllDayAlarms else defaultPartDayAlarms
         alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
             val alarmView = layoutInflater.inflate(
                 R.layout.item_alarm_text_button,
-                (if (allDay) calendar_form_default_all_day_event_notifications_list else calendar_form_default_event_notifications_list),
+                alarmsListView,
                 false
             )
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
@@ -210,7 +209,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     resources,
                     allDay,
                     calendarViewModel.timeFormatIs24Hour(requireContext()),
-                    ZonedDateTime.now(),
+                    LocalDate.now().toDate(ZoneId.systemDefault().id).toZonedDateTime(ZoneId.systemDefault().id, false), // TODO Simplify this
                     alarm
                 )
                 isClickable = false
@@ -218,31 +217,24 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
                 setOnSingleClickListener {
                     requireActivity().clearFocusAndHideKeyboard(view)
-                    (if (allDay) defaultAllDayAlarms else defaultPartDayAlarms).removeAt(index)
-                    (if (allDay) calendar_form_default_all_day_event_notifications_list else calendar_form_default_event_notifications_list)
-                        .removeView(alarmView)
+                    calendarFormViewModel.handleAlarmChange(alarm, allDay, isDelete = true)
                 }
                 isClickable = true
             }
             if (index == 0) {
-                (if (allDay) calendar_form_default_all_day_event_notifications_icon else calendar_form_default_event_notifications_icon)
-                    .visibleOrGone(false)
+                notificationIcon.visibleOrGone(false)
             }
-            (if (allDay) calendar_form_default_all_day_event_notifications_list else calendar_form_default_event_notifications_list)
-                .addView(alarmView)
+            alarmsListView.addView(alarmView)
         }
 
         // "add alarm" button
-        (if (allDay) calendar_form_default_all_day_event_notifications_press else calendar_form_default_event_notifications_press)
-            .setOnSingleClickListener {
-                requireActivity().clearFocusAndHideKeyboard(view)
-
-                // TODO Navigate to alarm form
-            }
-        (if (allDay) calendar_form_default_all_day_event_notifications else calendar_form_default_event_notifications)
-            .visibleOrGone(
-                (if (allDay) defaultAllDayAlarms else defaultPartDayAlarms).size < DEFAULT_NOTIFICATIONS_COUNT_MAX
-            )
+        itemViewPress.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            val bundle = Bundle()
+            bundle.putBoolean(FragmentArguments.IS_ALL_DAY_ARG, allDay)
+            bundle.putBoolean(FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG, true)
+            findNavController().navigate(R.id.nav_event_form_alarm, bundle)
+        }
     }
 
     private fun initCreateCalendarForm() {

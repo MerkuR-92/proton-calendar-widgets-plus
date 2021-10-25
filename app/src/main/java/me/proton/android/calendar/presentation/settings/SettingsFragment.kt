@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +14,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.work.Operation
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_general_settings.*
@@ -28,7 +26,7 @@ import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
-import me.proton.android.calendar.common.NavControllerArgumentKeys.CALENDAR_ID
+import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.BaseDialogFragment
@@ -218,7 +216,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
         editPress?.setOnSingleClickListener {
             val bundle = Bundle()
-            bundle.putString(CALENDAR_ID, calendarEntity.id)
+            bundle.putString(CALENDAR_ID_ARG, calendarEntity.id)
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form, bundle)
             bottomSheetDialog.dismiss()
         }

@@ -154,10 +154,6 @@ object AppLinksAction {
     const val VIEW = "VIEW"
 }
 
-object NavControllerArgumentKeys {
-    const val CALENDAR_ID = "calendarId"
-}
-
 object FormValidation {
 
     val MIN_SUPPORTED_DATETIME = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.of("UTC"))
@@ -218,6 +214,10 @@ object FragmentArguments {
     const val POSITION_ARG = "POSITION_ARG"
     const val STARTING_POSITION_ARG = "STARTING_POSITION_ARG"
     const val DATE_ARG = "DATE_ARG"
+
+    const val CALENDAR_ID_ARG = "calendarId"
+    const val IS_ALL_DAY_ARG = "isAllDay"
+    const val IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG = "isCalendarDefaultEventNotification"
 }
 
 object CustomICalPropertyParameter {

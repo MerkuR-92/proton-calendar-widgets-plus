@@ -927,9 +927,8 @@ class EventViewModel(
         this.tempAlarmTime = time
     }
 
-    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null): Boolean {
-        if (isAlarmLimitReached()) return false
-        val duration = if (event.isAllDay()) {
+    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null, isAllDay: Boolean): VAlarm? {
+        val duration = if (isAllDay) {
             when (alarmTypeOption) {
                 0 -> Duration.builder().prior(false).hours(9).build() // on the day at 9:00
                 1 -> Duration.builder().prior(true).hours(6).build() // day before at 18:00
@@ -1024,12 +1023,16 @@ class EventViewModel(
                 SendByOption.EMAIL -> VAlarm.email(Trigger(duration, Related.START), null, null, emptyList())
             }
 
-            event.iCalEvent.addAlarm(alarm)
-            saveUserEditedAlarms()
-            _event.postValue(event)
+            return alarm
         }
 
-        return true
+        return null
+    }
+
+    fun saveAlarm(alarm: VAlarm) {
+        event.iCalEvent.addAlarm(alarm)
+        saveUserEditedAlarms()
+        _event.postValue(event)
     }
 
     fun handleAlarmDelete(index: Int) {

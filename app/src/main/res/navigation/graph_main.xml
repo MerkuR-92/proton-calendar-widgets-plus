@@ -152,7 +152,16 @@
     <dialog
         android:id="@+id/nav_event_form_alarm"
         android:name="me.proton.android.calendar.presentation.calendar.EventFormAlarmFragment"
-        android:label="EventFormAlarmFragment" />
+        android:label="EventFormAlarmFragment">
+        <argument
+            android:name="isAllDay"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="isCalendarDefaultEventNotification"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </dialog>
     <dialog
         android:id="@+id/nav_event_form_recurrence"
         android:name="me.proton.android.calendar.presentation.calendar.EventFormRecurrenceFragment"
