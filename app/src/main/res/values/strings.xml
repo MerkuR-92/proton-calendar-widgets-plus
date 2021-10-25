@@ -251,8 +251,8 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
-    <string name="nav_view_disabled_calendars">%s (disabled)</string>
-    <string name="nav_view_not_synced_calendars">%s (not synced)</string>
+    <string name="nav_view_disabled_calendars">%s (Disabled)</string>
+    <string name="nav_view_not_synced_calendars">%s (Not synced)</string>
     <string name="nav_view_more">More</string>
     <string name="nav_view_switcher">View</string>
     <string name="nav_view_switcher_day">Day</string>
@@ -382,9 +382,9 @@
     <string name="settings_general_info">Theme, timezone, calendar layout etc.</string>
     <string name="settings_calendars">My calendars</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
-    <string name="settings_calendar_default" comment="Lowercase first letter is intentional">default</string>
-    <string name="settings_calendar_disabled" comment="Lowercase first letter is intentional">disabled</string>
-    <string name="settings_calendar_not_synced" comment="Lowercase first letter is intentional">not synced</string>
+    <string name="settings_calendar_default">Default</string>
+    <string name="settings_calendar_disabled">Disabled</string>
+    <string name="settings_calendar_not_synced">Not synced</string>
 
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
