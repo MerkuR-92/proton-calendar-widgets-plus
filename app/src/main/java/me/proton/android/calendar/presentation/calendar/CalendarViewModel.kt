@@ -742,6 +742,24 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarSettings(defaultCalendarId)
     }
 
+    suspend fun getCalendarSettings(calendarId: String): CalendarSettingsEntity? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        return calendarsRepository.selectCalendarSettings(calendarId)
+    }
+
+    suspend fun getCalendarEntity(calendarId: String): CalendarEntity? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        return calendarsRepository.selectCalendar(calendarId)
+    }
+
     suspend fun getDefaultCalendarId(): String? {
         val userId = userId.value
         if (userId == null) {

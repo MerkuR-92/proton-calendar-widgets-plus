@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/item_calendar_color_picker_outer"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/shape_circle_large"
+        android:backgroundTint="@color/brand_darken_20"/>
+
+    <ImageView
+        android:id="@+id/item_calendar_color_picker_main"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="@+id/item_calendar_color_picker_outer"
+        app:layout_constraintBottom_toBottomOf="@+id/item_calendar_color_picker_outer"
+        app:layout_constraintStart_toStartOf="@+id/item_calendar_color_picker_outer"
+        app:layout_constraintEnd_toEndOf="@+id/item_calendar_color_picker_outer"
+        android:background="@drawable/shape_circle_large"
+        android:backgroundTint="@color/brand_norm"/>
+
+    <ImageView
+        android:id="@+id/item_calendar_color_picker_inner"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="@+id/item_calendar_color_picker_outer"
+        app:layout_constraintBottom_toBottomOf="@+id/item_calendar_color_picker_outer"
+        app:layout_constraintStart_toStartOf="@+id/item_calendar_color_picker_outer"
+        app:layout_constraintEnd_toEndOf="@+id/item_calendar_color_picker_outer"
+        android:background="@drawable/shape_circle_large"
+        android:backgroundTint="@color/white"/>
+
+    <ImageView
+        android:id="@+id/item_calendar_color_picker_filled"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="visible"
+        tools:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/shape_circle_large"
+        android:backgroundTint="@color/brand_norm"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

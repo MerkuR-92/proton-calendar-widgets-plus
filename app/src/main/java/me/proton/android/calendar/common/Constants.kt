@@ -154,6 +154,10 @@ object AppLinksAction {
     const val VIEW = "VIEW"
 }
 
+object NavControllerArgumentKeys {
+    const val CALENDAR_ID = "calendarId"
+}
+
 object FormValidation {
 
     val MIN_SUPPORTED_DATETIME = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.of("UTC"))
@@ -201,6 +205,13 @@ object FormValidation {
     const val ATTENDEE_MAX_ALLOWED = 100
     const val ATTENDEE_MAX_CHIP_ALLOWED = 4
 
+}
+
+object CalendarForm {
+    const val CALENDAR_NAME_CHARACTER_LIMIT = 100
+    const val DEFAULT_NOTIFICATIONS_COUNT_MAX = 5
+
+    val EVENT_DEFAULT_DURATION = arrayListOf("30", "60", "90", "120")
 }
 
 object FragmentArguments {

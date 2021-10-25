@@ -301,6 +301,7 @@
     <string name="snack_app_link_signed_out">You need to sign in to see your event</string>
     <string name="snack_update_default_calendar">Default calendar updated</string>
     <string name="snack_update_default_calendar_error">Error updating default calendar, please try again later</string>
+    <string name="snack_calendar_init_error">Error loading calendar information</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>
@@ -385,6 +386,23 @@
     <string name="settings_calendar_default">Default</string>
     <string name="settings_calendar_disabled">Disabled</string>
     <string name="settings_calendar_not_synced">Not synced</string>
+
+    <!-- Calendar form -->
+    <string name="calendar_form_create_title">Create calendar</string>
+    <string name="calendar_form_update_title">Update calendar</string>
+    <string name="calendar_form_create">Create</string>
+    <string name="calendar_form_update">Update</string>
+    <string name="calendar_form_name">Name</string>
+    <string name="calendar_form_name_placeholder">Add a calendar name</string>
+    <string name="calendar_form_name_character_limit">%d/%d characters</string>
+    <string name="calendar_form_color">Calendar color</string>
+    <string name="calendar_form_default_event_duration">Default event duration</string>
+    <string name="calendar_form_default_event_duration_value">%s minutes</string>
+    <string name="calendar_form_default_event_notifications">Default event notifications</string>
+    <string name="calendar_form_default_all_day_event_notifications">Default full-day event notifications</string>
+    <string name="calendar_form_add_notification">Add notification</string>
+    <string name="calendar_form_default_email">Default email</string>
+    <string name="calendar_form_default_email_value_error">Failed to load default email</string>
 
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>

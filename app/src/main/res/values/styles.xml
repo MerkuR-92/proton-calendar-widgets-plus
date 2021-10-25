@@ -148,10 +148,10 @@
         <item name="boxStrokeColor">@color/brand_norm</item>
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">1dp</item>
-        <item name="boxCornerRadiusTopStart">3dp</item>
-        <item name="boxCornerRadiusTopEnd">3dp</item>
-        <item name="boxCornerRadiusBottomStart">3dp</item>
-        <item name="boxCornerRadiusBottomEnd">3dp</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
         <item name="boxBackgroundColor">@color/background_secondary</item>
     </style>
 
