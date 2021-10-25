@@ -331,6 +331,8 @@
     <string name="snack_app_link_invalid">Invalid link to the event</string>
     <string name="snack_app_link_error">Error opening event</string>
 
+    <string name="snack_notification_already_added">The notification has already been added</string>
+
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
     <string name="error_occurrence_does_not_exist">The occurrence does not exist</string>

@@ -1030,6 +1030,13 @@ class EventViewModel(
     }
 
     fun saveAlarm(alarm: VAlarm) {
+        val currentAlarms = event.iCalEvent.alarms
+        if (currentAlarms?.contains(alarm) == true) {
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_notification_already_added)
+            )
+            return
+        }
         event.iCalEvent.addAlarm(alarm)
         saveUserEditedAlarms()
         _event.postValue(event)

@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_calendar_form.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.item_calendar_color_picker.view.*
+import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
@@ -46,6 +48,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.coroutines.CoroutineContext
 
 class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
@@ -127,6 +130,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         initOnClickListeners()
+
+        observeCalendarFormSnackState(coroutineContext)
 
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
             calendar_form_default_event_notifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
@@ -294,5 +299,24 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         logger.e("Init calendar form error: $message")
         requireActivity().displaySnackBar(getString(R.string.snack_calendar_init_error))
         findNavController().navigateUp()
+    }
+
+    private fun observeCalendarFormSnackState(coroutineContext: CoroutineContext) {
+        calendarFormViewModel.calendarFormSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { calendarFormSnackState ->
+            calendarFormSnackState?.let {
+                when (it) {
+                    is CalendarFormViewModel.CalendarFormSnackState.DisplaySnack -> {
+                        view?.displaySnackBar(it.message)
+                    }
+                    is CalendarFormViewModel.CalendarFormSnackState.DisplaySnackReturnToMonth -> {
+                        requireActivity().displaySnackBar(it.message)
+
+                        // Use jumpToMonthView to handle navigation when opening details from notification
+                        onBackPressedCustom()
+                    }
+                }
+                calendarFormViewModel.calendarFormSnackState.value = null
+            }
+        }
     }
 }
