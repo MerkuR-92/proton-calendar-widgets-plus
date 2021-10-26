@@ -528,7 +528,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.INVISIBLE)
         }
         
-        widgetManager.updateAppWidget(appWidgetId, remoteViews)
+        widgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
 
     }
 
