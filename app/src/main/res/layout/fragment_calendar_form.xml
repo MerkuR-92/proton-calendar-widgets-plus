@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             style="@style/Text.Default"
             tools:text="Holidays"
-            android:inputType="number"
+            android:maxLength="100"
             android:paddingTop="@dimen/default_margin_text_vertical"
             android:paddingBottom="@dimen/default_margin_text_vertical"
             android:paddingStart="@dimen/default_inner_padding_start"

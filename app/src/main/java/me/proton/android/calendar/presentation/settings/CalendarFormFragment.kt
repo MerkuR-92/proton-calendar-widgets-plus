@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -39,6 +40,7 @@ import me.proton.android.calendar.common.CalendarForm.DEFAULT_NOTIFICATIONS_COUN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.FragmentArguments
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
@@ -71,9 +73,6 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var buttonSave: View
 
     private var calendarId: String? = null
-
-    private var selectedColor: String? = null // TODO Maybe turn into livedata in VM and observe to update form icon
-    private var selectedDefaultEventDuration: String? = null // TODO Maybe turn into livedata in VM and observe to update form icon
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -131,8 +130,18 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         initOnClickListeners()
 
+        calendar_form_name_input.doAfterTextChanged {
+            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, it?.length, CALENDAR_NAME_CHARACTER_LIMIT)
+        }
+
         observeCalendarFormSnackState(coroutineContext)
 
+        calendarFormViewModel.defaultEventDuration.observe(viewLifecycleOwner) { defaultEventDuration ->
+            calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, defaultEventDuration.toString())
+        }
+        calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
+            calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarColor))
+        }
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
             calendar_form_default_event_notifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
             displayNotifications(
@@ -177,12 +186,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             calendar_form_default_email_value.text = calendarEmail ?: getString(R.string.calendar_form_default_email_value_error)
 
             // Calendar color
-            calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
-            selectedColor = calendarEntity.color // TODO Use LiveData
+            calendarFormViewModel.handleCalendarColor(calendarEntity.color)
 
             // Default event duration
-            calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, calendarSettings.defaultEventDuration.toString())
-            selectedDefaultEventDuration = calendarSettings.defaultEventDuration.toString() // TODO Use LiveData
+            calendarFormViewModel.handleDefaultEventDuration(calendarSettings.defaultEventDuration)
 
             // Default part day event notifications
             calendarFormViewModel.setDefaultAlarms(calendarSettings.defaultPartDayNotifications, isAllDay = false)
@@ -264,9 +271,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
             // Set grid view with color list
             val calendarColorPickerGridView = view.dialog_calendar_color_picker_layout
-            calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), selectedColor) { calendarColor ->
-                selectedColor = calendarColor // TODO Remove once selectedColor is livedata
-                calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarColor)) // TODO Remove once selectedColor is livedata
+            calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), calendarFormViewModel.calendarColor.value) { calendarColor ->
+                calendarFormViewModel.handleCalendarColor(calendarColor)
                 dialog?.dismiss()
             }
 
@@ -284,12 +290,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
             dialog = builder.setSingleChoiceItems(
                 CalendarForm.EVENT_DEFAULT_DURATION.toTypedArray(),
-                CalendarForm.EVENT_DEFAULT_DURATION.indexOf(selectedDefaultEventDuration)
+                calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION.indexOf(it.toString()) } ?: 0
             ) { _, item ->
-                selectedDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION[item] // TODO Remove once selectedDefaultEventDuration is livedata
-                calendar_form_default_event_duration_value.text = getString(
-                    R.string.calendar_form_default_event_duration_value, CalendarForm.EVENT_DEFAULT_DURATION[item] // TODO Remove once selectedDefaultEventDuration is livedata
-                )
+                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION[item].toInt())
                 dialog?.dismiss()
             }.show()
         }

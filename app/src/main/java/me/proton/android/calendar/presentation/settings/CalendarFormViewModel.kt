@@ -13,6 +13,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.core.network.domain.NetworkManager
@@ -41,10 +42,15 @@ class CalendarFormViewModel(
 
     val calendarFormSnackState: MutableStateFlow<CalendarFormSnackState?> = MutableStateFlow(null)
 
-    val selectedColor: LiveData<String> = MutableLiveData()
-    val selectedDefaultEventDuration: LiveData<String> = MutableLiveData()
+    private val _calendarColor = MutableLiveData<String>()
+    val calendarColor: LiveData<String> = _calendarColor
+
+    private val _defaultEventDuration = MutableLiveData<Int>()
+    val defaultEventDuration: LiveData<Int> = _defaultEventDuration
+
     private val _defaultPartDayAlarms = MutableLiveData(arrayListOf<VAlarm>())
     val defaultPartDayAlarms: LiveData<ArrayList<VAlarm>> = _defaultPartDayAlarms
+
     private val _defaultAllDayAlarms = MutableLiveData(arrayListOf<VAlarm>())
     val defaultAllDayAlarms: LiveData<ArrayList<VAlarm>> = _defaultAllDayAlarms
 
@@ -111,5 +117,13 @@ class CalendarFormViewModel(
         }
         if (isAllDay) _defaultAllDayAlarms.value = alarms
         else _defaultPartDayAlarms.value = alarms
+    }
+
+    fun handleCalendarColor(calendarColor: String) {
+        _calendarColor.value = calendarColor
+    }
+
+    fun handleDefaultEventDuration(defaultEventDuration: Int) {
+        _defaultEventDuration.value = defaultEventDuration
     }
 }
