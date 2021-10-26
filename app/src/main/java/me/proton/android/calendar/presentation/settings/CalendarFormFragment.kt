@@ -18,14 +18,10 @@ import androidx.navigation.fragment.navArgs
 import biweekly.component.VAlarm
 import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_calendar_color_picker.*
 import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.*
-import kotlinx.android.synthetic.main.dialog_checkbox.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_calendar_form.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
-import kotlinx.android.synthetic.main.fragment_settings.*
-import kotlinx.android.synthetic.main.item_calendar_color_picker.view.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -40,9 +36,9 @@ import me.proton.android.calendar.common.CalendarForm.DEFAULT_NOTIFICATIONS_COUN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.FragmentArguments
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.ext.android.inject
@@ -65,7 +61,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel()
+    private val accountViewModel: AccountViewModel by sharedViewModel()
 
     private val logger: Logger by inject()
 
@@ -75,7 +71,27 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private var calendarId: String? = null
 
     override fun onBackPressedCustom() {
-        findNavController().navigateUp()
+        // Display snack and return if we're saving the calendar changes
+        val processingCalendar = calendarFormViewModel.calendarFormState.value is CalendarFormViewModel.CalendarFormState.Processing
+        if (processingCalendar) {
+            view?.displaySnackBar(getString(R.string.snack_calendar_saving))
+            return
+        }
+
+        // Save calendar name in VM
+        calendarFormViewModel.handleCalendarName(calendar_form_name_input.text.toString())
+
+        // Check if we need to display discard changes dialog
+        if (calendarFormViewModel.hasFormBeenEdited()) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.event_discard_changes_title)
+                .setMessage(R.string.event_discard_changes_description)
+                .setPositiveButton(R.string.event_discard_changes_confirm) { _, _ ->
+                    findNavController().navigateUp()
+                }
+                .setNegativeButton(R.string.event_discard_changes_cancel) { _, _ -> }
+                .show()
+        } else findNavController().navigateUp()
     }
 
     override fun onNavigationIconClicked(): Boolean {
@@ -91,7 +107,15 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 else R.string.calendar_form_create
             )
             setOnSingleClickListener {
-                // TODO On save click
+                // Save calendar name in VM
+                calendarFormViewModel.handleCalendarName(calendar_form_name_input.text.toString())
+
+                lifecycleScope.launch {
+                    if (calendarFormViewModel.hasFormBeenEdited()) {
+                        // Save new form values
+                        calendarFormViewModel.handleSaveCalendarForm()
+                    } else findNavController().navigateUp()
+                }
             }
         }
 
@@ -122,10 +146,19 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             if (calendarId != null) getString(R.string.calendar_form_update_title)
             else getString(R.string.calendar_form_create_title)
 
-        calendarId?.let {
-            initUpdateCalendarForm(it)
-        } ?: run {
-            initCreateCalendarForm()
+        lifecycleScope.launch {
+            val userId = accountViewModel.getPrimaryUserId() ?: run {
+                logger.e("UserId was null in CalendarFormFragment onViewCreated")
+                requireActivity().displaySnackBar(getString(R.string.snack_calendar_init_error))
+                findNavController().navigateUp()
+                return@launch
+            }
+
+            calendarId?.let {
+                calendarFormViewModel.initUpdateCalendarForm(userId, it)
+            } ?: run {
+                calendarFormViewModel.initCreateCalendarForm(userId)
+            }
         }
 
         initOnClickListeners()
@@ -135,7 +168,20 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         observeCalendarFormSnackState(coroutineContext)
+        observeCalendarFormValues()
+    }
 
+    private fun observeCalendarFormValues() {
+
+        calendarFormViewModel.calendarName.observe(viewLifecycleOwner) { calendarName ->
+            calendar_form_name_input.setText(calendarName)
+            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, calendarName.length,
+                CALENDAR_NAME_CHARACTER_LIMIT
+            )
+        }
+        calendarFormViewModel.calendarEmail.observe(viewLifecycleOwner) { calendarEmail ->
+            calendar_form_default_email_value.text = calendarEmail
+        }
         calendarFormViewModel.defaultEventDuration.observe(viewLifecycleOwner) { defaultEventDuration ->
             calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, defaultEventDuration.toString())
         }
@@ -162,43 +208,39 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 calendar_form_default_all_day_event_notifications_press
             )
         }
-    }
 
-    private fun initUpdateCalendarForm(calendarId: String) {
-        lifecycleScope.launch {
-            val calendarEntity = calendarViewModel.getCalendarEntity(calendarId) ?: run {
-                handleInitError("CalendarEntity was null in initUpdateCalendarForm")
-                return@launch
+        calendarFormViewModel.calendarFormState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
+            val processingEvent = eventState is CalendarFormViewModel.CalendarFormState.Processing
+
+            // Update action bar buttons visibility
+            loadingAction.visibleOrGone(processingEvent)
+            buttonSave.visibleOrGone(!processingEvent)
+
+            // Disable/Enable all items linked to actions from our view
+            calendar_form_name_input.isEnabled = !processingEvent
+            calendar_form_name_input_layout.isEnabled = !processingEvent
+            calendar_form_color_press.isEnabled = !processingEvent
+            calendar_form_default_event_duration_press.isEnabled = !processingEvent
+
+            calendar_form_default_event_notifications_press.isEnabled = !processingEvent
+            for (i in 0 until calendar_form_default_event_notifications_list.childCount) {
+                // Disable the delete buttons from inside alarm items views
+                calendar_form_default_event_notifications_list.getChildAt(i)
+                    .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
 
-            val calendarSettings = calendarViewModel.getCalendarSettings(calendarId) ?: run {
-                handleInitError("CalendarSettings was null in initUpdateCalendarForm")
-                return@launch
+            calendar_form_default_all_day_event_notifications_press.isEnabled = !processingEvent
+            for (i in 0 until calendar_form_default_all_day_event_notifications_list.childCount) {
+                // Disable the delete buttons from inside alarm items views
+                calendar_form_default_all_day_event_notifications_list.getChildAt(i)
+                    .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
-
-            val calendarEmail = eventViewModel.getCalendarEmail(calendarId)
-
-            // Calendar name
-            calendar_form_name_input.setText(calendarEntity.name)
-            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, calendarEntity.name.length, CALENDAR_NAME_CHARACTER_LIMIT)
-
-            // Calendar default email
-            calendar_form_default_email_value.text = calendarEmail ?: getString(R.string.calendar_form_default_email_value_error)
-
-            // Calendar color
-            calendarFormViewModel.handleCalendarColor(calendarEntity.color)
-
-            // Default event duration
-            calendarFormViewModel.handleDefaultEventDuration(calendarSettings.defaultEventDuration)
-
-            // Default part day event notifications
-            calendarFormViewModel.setDefaultAlarms(calendarSettings.defaultPartDayNotifications, isAllDay = false)
-
-            // Default all day event notifications
-            calendarFormViewModel.setDefaultAlarms(calendarSettings.defaultFullDayNotifications, isAllDay = true)
         }
     }
 
+    /**
+     * Display notifications list and register listeners for add / remove notifications.
+     */
     private fun displayNotifications(
         allDay: Boolean,
         alarms: List<VAlarm>,
@@ -227,19 +269,18 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 isClickable = false
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
+                // Remove notification listener
                 setOnSingleClickListener {
                     requireActivity().clearFocusAndHideKeyboard(view)
                     calendarFormViewModel.handleAlarmChange(alarm, allDay, isDelete = true)
                 }
                 isClickable = true
             }
-            if (index == 0) {
-                notificationIcon.visibleOrGone(false)
-            }
+            if (index == 0) notificationIcon.visibleOrGone(false)
             alarmsListView.addView(alarmView)
         }
 
-        // "add alarm" button
+        // Add notification listener
         itemViewPress.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val bundle = Bundle()
@@ -298,12 +339,6 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun handleInitError(message: String) {
-        logger.e("Init calendar form error: $message")
-        requireActivity().displaySnackBar(getString(R.string.snack_calendar_init_error))
-        findNavController().navigateUp()
-    }
-
     private fun observeCalendarFormSnackState(coroutineContext: CoroutineContext) {
         calendarFormViewModel.calendarFormSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { calendarFormSnackState ->
             calendarFormSnackState?.let {
@@ -311,11 +346,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     is CalendarFormViewModel.CalendarFormSnackState.DisplaySnack -> {
                         view?.displaySnackBar(it.message)
                     }
-                    is CalendarFormViewModel.CalendarFormSnackState.DisplaySnackReturnToMonth -> {
+                    is CalendarFormViewModel.CalendarFormSnackState.DisplaySnackNavigateUp -> {
                         requireActivity().displaySnackBar(it.message)
 
-                        // Use jumpToMonthView to handle navigation when opening details from notification
-                        onBackPressedCustom()
+                        findNavController().navigateUp()
                     }
                 }
                 calendarFormViewModel.calendarFormSnackState.value = null

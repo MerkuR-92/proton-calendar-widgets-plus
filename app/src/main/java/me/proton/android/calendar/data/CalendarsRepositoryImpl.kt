@@ -1091,6 +1091,10 @@ class CalendarsRepositoryImpl(
         database.calendarSettingsDao().insert(calendarSettings)
     }
 
+    override suspend fun updateCalendarSettings(calendarSettings: CalendarSettingsEntity) {
+        database.calendarSettingsDao().updateOrInsert(calendarSettings)
+    }
+
     override suspend fun deleteCalendarSettingsById(id: String) {
         database.calendarSettingsDao().deleteById(id)
     }

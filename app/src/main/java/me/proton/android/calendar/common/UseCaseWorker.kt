@@ -116,7 +116,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             }
             UseCaseId.UPDATE_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
-                updateCalendarUseCase.executeUpdate(
+                updateCalendarUseCase.executeUpdateFromDb(
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure())
             }

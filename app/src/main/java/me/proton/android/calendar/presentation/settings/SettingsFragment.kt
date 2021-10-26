@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_general_settings.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
+import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -45,6 +47,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     override val navigateUp = true
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
 
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
@@ -147,6 +150,20 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
                 calendarViewModel.userCalendars.value?.let { refreshUserCalendarList(it) }
+            }
+        }
+
+        calendarFormViewModel.calendarSettingsSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { calendarSettingsSnackState ->
+            calendarSettingsSnackState?.let {
+                when (it) {
+                    is CalendarFormViewModel.CalendarFormSnackState.DisplaySnackNavigateUp -> {
+                        view?.displaySnackBar(it.message)
+
+                        findNavController().navigateUp()
+                    }
+                    else -> { } // We do not use the other values
+                }
+                calendarFormViewModel.calendarSettingsSnackState.value = null
             }
         }
     }

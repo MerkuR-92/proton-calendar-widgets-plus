@@ -83,7 +83,7 @@ val viewModelModule = module {
     }
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get()) }
+    viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
@@ -95,7 +95,7 @@ val useCaseModule = module {
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleDeleteUseCase> { HandleDeleteUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get()) }
+    factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get()) }
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
@@ -116,6 +116,7 @@ val useCaseModule = module {
     factory<HandleIcsUseCase> { HandleIcsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get(), get()) }
     factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get()) }
 }
 
 fun coreModule(

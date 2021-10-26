@@ -167,6 +167,8 @@ interface CalendarsRepository {
 
     suspend fun persistCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
 
+    suspend fun updateCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
+
     suspend fun deleteCalendarSettingsById(id: String)
 
     // calendar subscription

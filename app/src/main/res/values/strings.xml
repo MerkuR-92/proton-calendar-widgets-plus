@@ -302,6 +302,10 @@
     <string name="snack_update_default_calendar">Default calendar updated</string>
     <string name="snack_update_default_calendar_error">Error updating default calendar, please try again later</string>
     <string name="snack_calendar_init_error">Error loading calendar information</string>
+    <string name="snack_update_calendar_error">Error updating calendar information, please try again later</string>
+    <string name="snack_update_calendar_settings_error">Error updating some calendar information, please try again later</string>
+    <string name="snack_update_calendar_success">Calendar updated</string>
+    <string name="snack_calendar_saving">Saving calendar</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>

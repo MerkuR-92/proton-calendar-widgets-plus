@@ -1113,7 +1113,7 @@ class EventViewModel(
         // 1. Update in DB
         calendarsRepository.updateCalendarDisplay(calendar.id, display)
         // 2. Update on Server
-        updateCalendarUseCase.executeUpdate(userId, calendar.id)
+        updateCalendarUseCase.executeUpdateFromDb(userId, calendar.id)
     }
 
     suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
@@ -2849,12 +2849,7 @@ class EventViewModel(
         // Update the event participation status to reflect changes in view
         event.updateParticipationStatus(userEmails, participationStatus)
 
-        if (!event.calendar.display) {
-            // 1. Update in DB
-            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
-            // 2. Update on Server
-            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
-        }
+        if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
 
         _event.postValue(event)
 
