@@ -9,6 +9,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.usecase.*
@@ -36,7 +37,8 @@ class AccountViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val logger: Logger,
-    private val product: Product
+    private val product: Product,
+    private val widgetRefresher: WidgetRefresher
 ) : ViewModel() {
 
     sealed class State {
@@ -100,6 +102,7 @@ class AccountViewModel(
     private suspend fun cleanUser(context: Context) {
         WorkManager.getInstance(context).cancelAllWork()
         calendarsRepository.shutdown()
+        widgetRefresher.refresh()
     }
 
     // TODO: Merge State & Error in the same StateFlow.

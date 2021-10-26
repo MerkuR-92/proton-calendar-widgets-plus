@@ -431,8 +431,10 @@ internal class CalendarWidgetRemoteViewsFactory(
                 // show or hide "logged out" or "loading" info
                 if (userEmails.isEmpty()) { // user is logged out
                     displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_please_log_in))
+                    displayCreateNewEventButton(display = false)
                 } else {
                     displayMainInfoText(if (adapterData.isEmpty()) resourceProvider.provideString(R.string.calendar_widget_loading_events) else null)
+                    displayCreateNewEventButton(display = true)
                 }
 
                 val is24Hour = if (userId != null) {
@@ -528,6 +530,17 @@ internal class CalendarWidgetRemoteViewsFactory(
             remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.INVISIBLE)
         }
         
+        widgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
+
+    }
+
+    private fun displayCreateNewEventButton(display: Boolean) {
+
+        val widgetManager = AppWidgetManager.getInstance(applicationContext)
+
+        val remoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.calendar_widget)
+        remoteViews.setViewVisibility(R.id.ib_plus, if (display) View.VISIBLE else View.INVISIBLE)
+
         widgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
 
     }
