@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +48,7 @@ import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
+import kotlin.random.Random
 
 class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
@@ -79,7 +81,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Save calendar name in VM
-        calendarFormViewModel.handleCalendarName(calendar_form_name_input.text.toString())
+        calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
 
         // Check if we need to display discard changes dialog
         if (calendarFormViewModel.hasFormBeenEdited()) {
@@ -107,8 +109,13 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 else R.string.calendar_form_create
             )
             setOnSingleClickListener {
+                if (calendar_form_name_value.text.toString().isEmpty()) {
+                    view?.displaySnackBar(getString(R.string.snack_create_calendar_empty_name_error))
+                    return@setOnSingleClickListener
+                }
+
                 // Save calendar name in VM
-                calendarFormViewModel.handleCalendarName(calendar_form_name_input.text.toString())
+                calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
 
                 lifecycleScope.launch {
                     if (calendarFormViewModel.hasFormBeenEdited()) {
@@ -140,6 +147,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        calendarFormViewModel.resetFormValues()
+
         calendarId = navigationArguments.calendarId
 
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text =
@@ -147,23 +156,23 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             else getString(R.string.calendar_form_create_title)
 
         lifecycleScope.launch {
-            val userId = accountViewModel.getPrimaryUserId() ?: run {
-                logger.e("UserId was null in CalendarFormFragment onViewCreated")
-                requireActivity().displaySnackBar(getString(R.string.snack_calendar_init_error))
-                findNavController().navigateUp()
-                return@launch
-            }
-
             calendarId?.let {
-                calendarFormViewModel.initUpdateCalendarForm(userId, it)
+                // Init form for existing calendar
+                calendarFormViewModel.initUpdateCalendarForm(it)
             } ?: run {
-                calendarFormViewModel.initCreateCalendarForm(userId)
+                // Init character limit text
+                calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
+
+                // Use random color from array as calendar color
+                val calendarColors = resources.getStringArray(R.array.calendar_colors)
+                // Init form for new calendar
+                calendarFormViewModel.initCreateCalendarForm(calendarColors[(0..calendarColors.lastIndex).random()])
             }
         }
 
-        initOnClickListeners()
+        initOnClickListeners(calendarId == null)
 
-        calendar_form_name_input.doAfterTextChanged {
+        calendar_form_name_value.doAfterTextChanged {
             calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, it?.length, CALENDAR_NAME_CHARACTER_LIMIT)
         }
 
@@ -174,7 +183,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun observeCalendarFormValues() {
 
         calendarFormViewModel.calendarName.observe(viewLifecycleOwner) { calendarName ->
-            calendar_form_name_input.setText(calendarName)
+            calendar_form_name_value.setText(calendarName)
             calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, calendarName.length,
                 CALENDAR_NAME_CHARACTER_LIMIT
             )
@@ -186,6 +195,12 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, defaultEventDuration.toString())
         }
         calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
+            if (calendarColor.isEmpty()) {
+                // Value was reset. Set to background_norm to avoid seeing the color being refreshed
+                calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                return@observe
+            }
+
             calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarColor))
         }
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
@@ -217,8 +232,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             buttonSave.visibleOrGone(!processingEvent)
 
             // Disable/Enable all items linked to actions from our view
-            calendar_form_name_input.isEnabled = !processingEvent
-            calendar_form_name_input_layout.isEnabled = !processingEvent
+            calendar_form_name_value.isEnabled = !processingEvent
             calendar_form_color_press.isEnabled = !processingEvent
             calendar_form_default_event_duration_press.isEnabled = !processingEvent
 
@@ -290,12 +304,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun initCreateCalendarForm() {
-        lifecycleScope.launch {
-        }
-    }
-
-    private fun initOnClickListeners() {
+    private fun initOnClickListeners(isCreate: Boolean) {
 
         // Calendar color
         calendar_form_color_press.setOnSingleClickListener {
@@ -321,6 +330,23 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             dialog = MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
                 .show()
+        }
+
+        // Calendar email (can only be changed for create calendar)
+        calendar_form_default_email_press.visibleOrGone(isCreate)
+        calendar_form_default_email_press.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+
+            var dialog: AlertDialog? = null
+            val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+            val userEmails = calendarFormViewModel.userEmails ?: return@setOnSingleClickListener
+            dialog = builder.setSingleChoiceItems(
+                userEmails.toTypedArray(),
+                calendarFormViewModel.calendarEmail.value?.let { userEmails.indexOf(it) } ?: 0
+            ) { _, item ->
+                calendarFormViewModel.handleCalendarEmail(userEmails[item])
+                dialog?.dismiss()
+            }.show()
         }
 
         // Default event duration

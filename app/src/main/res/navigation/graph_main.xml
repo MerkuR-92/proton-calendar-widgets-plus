@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_nav_calendar_to_nav_settings"
             app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_calendar_form"
+            app:destination="@id/nav_calendar_form" />
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />

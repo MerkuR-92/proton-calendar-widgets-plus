@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
@@ -705,6 +706,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             changeViewMode(ViewMode.AGENDA)
+            drawer_layout.close()
+        }
+
+        nav_view_calendars_create.setOnSingleClickListener {
+            navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
             drawer_layout.close()
         }
 

@@ -1,8 +1,10 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
+import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -12,13 +14,15 @@ class CreateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val keySetupUseCase: KeySetupUseCase,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
-    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1) : UseCase.Result {
+    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String = "") : UseCase.Result {
 
         val address = userManager.getAddresses(userId, refresh = true).firstOrNull {
-            it.canSend && it.canReceive
+            if (email.isNotEmpty()) it.email == email
+            else it.canSend && it.canReceive
         } ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found")
 
         val createCalendarApiRequest =
@@ -34,26 +38,35 @@ class CreateCalendarUseCase(
         return when (val createCalendarApiResponse = calendarsApi.createCalendar(userId, createCalendarApiRequest)) {
             is ApiResponse.Success -> {
 
+                // Save calendar in DB
+                calendarsRepository.persistCalendar(userId.id, createCalendarApiResponse.data.calendar)
+
                 val calendarId = createCalendarApiResponse.data.calendar.id
 
                 // Get member created for address
                 return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
                     is ApiResponse.Success -> {
 
+                        memberListApiResponse.data.members.firstOrNull()?.let { memberEntity ->
+                            calendarsRepository.persistMember(memberEntity)
+                        }
                         val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("CreateCalendarUseCase: memberId was null")
 
                         val keySetupResult = keySetupUseCase.execute(
                             userId,
                             address.addressId.id,
                             calendarId,
-                            memberId)
+                            memberId
+                        )
 
                         when (keySetupResult) {
                             is UseCase.Result.InvalidParams -> { logger.e("CreateCalendarUseCase: InvalidParams in KeySetupUseCase: ${keySetupResult.message}") }
                             is UseCase.Result.Error -> { logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}") }
                         }
 
-                        return keySetupResult
+                        if (keySetupResult is UseCase.Result.Success<*>) {
+                            return UseCase.Result.Success(calendarId)
+                        } else keySetupResult
                     }
                     is ApiResponse.Error -> UseCase.Result.Error("CreateCalendarUseCase: error fetching members: ${memberListApiResponse.error}")
                     is ApiResponse.Exception -> UseCase.Result.Error("CreateCalendarUseCase: error fetching members: ${memberListApiResponse.exception.message ?: "(no exception message)"}")

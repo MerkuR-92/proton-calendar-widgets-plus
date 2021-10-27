@@ -54,8 +54,7 @@ class SettingsCalendarListAdapter(
 
     fun setCalendarSubscriptions(calendarSubscriptions: List<CalendarSubscriptionEntity>): Boolean {
         val dataSetChanged = this.calendarSubscriptions != calendarSubscriptions
-//        this.calendarSubscriptions = calendarSubscriptions
-        this.calendarSubscriptions = listOf(calendarSubscriptions.first().copy(status = 1))
+        this.calendarSubscriptions = calendarSubscriptions
         return dataSetChanged
     }
 

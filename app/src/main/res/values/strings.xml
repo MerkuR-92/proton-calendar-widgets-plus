@@ -305,7 +305,10 @@
     <string name="snack_update_calendar_error">Error updating calendar information, please try again later</string>
     <string name="snack_update_calendar_settings_error">Error updating some calendar information, please try again later</string>
     <string name="snack_update_calendar_success">Calendar updated</string>
+    <string name="snack_create_calendar_success">Calendar created</string>
     <string name="snack_calendar_saving">Saving calendar</string>
+    <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
+    <string name="snack_create_calendar_empty_name_error">Name required</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>
@@ -409,6 +412,7 @@
     <string name="calendar_form_add_notification">Add notification</string>
     <string name="calendar_form_default_email">Default email</string>
     <string name="calendar_form_default_email_value_error">Failed to load default email</string>
+    <string name="calendar_form_name_hint">Add a calendar name</string>
 
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>

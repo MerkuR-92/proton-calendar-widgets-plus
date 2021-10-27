@@ -222,6 +222,19 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
+                <ImageView
+                    android:id="@+id/nav_view_calendars_create"
+                    android:layout_width="40dp"
+                    android:layout_height="0dp"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_plus"
+                    style="@style/Icon"
+                    app:tint="@color/sidebar_icon_weak"
+                    android:layout_marginEnd="@dimen/spacing_element_small"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_divider_top"
+                    app:layout_constraintBottom_toTopOf="@+id/nav_view_calendars_separator"/>
+
                 <View
                     android:id="@+id/nav_view_calendars_separator"
                     style="@style/Separator"

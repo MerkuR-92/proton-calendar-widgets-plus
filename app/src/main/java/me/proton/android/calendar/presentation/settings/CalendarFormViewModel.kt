@@ -6,24 +6,33 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import biweekly.component.VAlarm
+import biweekly.parameter.Related
+import biweekly.property.Trigger
+import biweekly.util.Duration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.AndroidUtils.tryCast
+import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
+import me.proton.core.user.domain.UserManager
 
 class CalendarFormViewModel(
     application: Application,
@@ -33,7 +42,10 @@ class CalendarFormViewModel(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
-    private val updateCalendarUseCase: UpdateCalendarUseCase
+    private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val userManager: UserManager,
+    private val accountManager: AccountManager,
+    private val createCalendarUseCase: CreateCalendarUseCase
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -68,7 +80,7 @@ class CalendarFormViewModel(
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
 
-    private val _calendarName = MutableLiveData<String>()
+    private val _calendarName = MutableLiveData("")
     val calendarName: LiveData<String> = _calendarName
 
     private val _calendarEmail = MutableLiveData<String>()
@@ -91,6 +103,8 @@ class CalendarFormViewModel(
     private var calendarEdited = false
     private var calendarSettingsEdited = false
 
+    var userEmails: List<String>? = null
+
     private var viewModelJob = Job()
 
     override fun onCleared() {
@@ -98,10 +112,28 @@ class CalendarFormViewModel(
         viewModelJob.cancel()
     }
 
-    suspend fun initUpdateCalendarForm(userId: UserId, calendarId: String) {
+    fun resetFormValues() {
+        _calendarName.value = ""
+        _calendarColor.value = ""
+        _calendarEmail.value = ""
+        _defaultEventDuration.value = EVENT_DEFAULT_DURATION.first().toInt()
+        _defaultPartDayAlarms.value = arrayListOf()
+        _defaultAllDayAlarms.value = arrayListOf()
+    }
+
+    suspend fun initUpdateCalendarForm(calendarId: String) {
+
+        val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
+            logger.e("UserId was null in CalendarFormViewModel initUpdateCalendarForm")
+            // Use settings snack state here to display snack in calendar settings view
+            calendarSettingsSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_calendar_init_error)
+            )
+            return
+        }
+        _userId.value = userId
 
         _calendarId = calendarId
-        _userId.value = userId
 
         val calendarEntity = getCalendarEntity(calendarId) ?: run {
             logger.e("CalendarEntity was null in initUpdateCalendarForm")
@@ -128,7 +160,7 @@ class CalendarFormViewModel(
         // Calendar name
         handleCalendarName(calendarEntity.name)
 
-        // Calendar default email (can't be updated in form)
+        // Calendar default email (can't be updated for existing calendar)
         _calendarEmail.value = calendarEmail ?: ""
 
         // Calendar color
@@ -148,12 +180,61 @@ class CalendarFormViewModel(
         calendarSettingsEdited = false
     }
 
-    suspend fun initCreateCalendarForm(userId: UserId) {
-        // TODO
+    suspend fun initCreateCalendarForm(calendarColor: String) {
+
+        val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
+            logger.e("UserId was null in CalendarFormViewModel initCreateCalendarForm")
+            calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_calendar_init_error)
+            )
+            return
+        }
+        _userId.value = userId
+
+        // Save user emails for calendar email picker dialog
+        userEmails = userManager.getAddresses(userId).filter { it.enabled }.map { it.email }
+
+        val defaultUserEmail = userManager.getUser(userId).email // TODO Can be null, what do we take next ?
+        defaultUserEmail?.let { handleCalendarEmail(defaultUserEmail) }
+
+        // Set default calendar color (picked randomly from the colors array)
+        handleCalendarColor(calendarColor)
+
+        // Set default event duration
+        handleDefaultEventDuration(EVENT_DEFAULT_DURATION.first().toInt())
+
+        // Set default part day event notification (15 minutes before)
+        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START), null), false)
+
+        // Set default all day event notification (1 day before at 9am)
+        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null), true)
+
+        // Make sure to set those values to false after having initialized the form with default values
+        calendarEdited = false
+        calendarSettingsEdited = false
     }
 
     fun hasFormBeenEdited(): Boolean {
         return calendarEdited || calendarSettingsEdited
+    }
+
+    private fun setDefaultAlarms(defaultNotifications: List<JsonElement>, isAllDay: Boolean) {
+        val alarms = ArrayList<VAlarm>()
+        defaultNotifications.mapNotNull {
+            if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
+                it
+            ) else null
+        }.forEach { alarm ->
+            alarm.parseTrigger()?.let {
+                if (alarm.type == 0) {
+                    alarms.add(VAlarm.email(it, null, null))
+                } else {
+                    alarms.add(VAlarm.display(it, null))
+                }
+            }
+        }
+        if (isAllDay) _defaultAllDayAlarms.value = alarms
+        else _defaultPartDayAlarms.value = alarms
     }
 
     fun handleAlarmChange(alarm: VAlarm, isAllDay: Boolean, isDelete: Boolean = false) {
@@ -196,25 +277,6 @@ class CalendarFormViewModel(
         }
     }
 
-    private fun setDefaultAlarms(defaultNotifications: List<JsonElement>, isAllDay: Boolean) {
-        val alarms = ArrayList<VAlarm>()
-        defaultNotifications.mapNotNull {
-            if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
-                it
-            ) else null
-        }.forEach { alarm ->
-            alarm.parseTrigger()?.let {
-                if (alarm.type == 0) {
-                    alarms.add(VAlarm.email(it, null, null))
-                } else {
-                    alarms.add(VAlarm.display(it, null))
-                }
-            }
-        }
-        if (isAllDay) _defaultAllDayAlarms.value = alarms
-        else _defaultPartDayAlarms.value = alarms
-    }
-
     fun handleCalendarName(calendarName: String) {
         if (_calendarName.value == calendarName) return
         calendarEdited = true
@@ -231,6 +293,12 @@ class CalendarFormViewModel(
         if (_defaultEventDuration.value == defaultEventDuration) return
         calendarSettingsEdited = true
         _defaultEventDuration.value = defaultEventDuration
+    }
+
+    fun handleCalendarEmail(calendarEmail: String) {
+        if (_calendarEmail.value == calendarEmail) return
+        calendarEdited = true
+        _calendarEmail.value = calendarEmail
     }
 
     suspend fun handleSaveCalendarForm() {
@@ -293,7 +361,41 @@ class CalendarFormViewModel(
             // Set loading state
             calendarFormState.value = CalendarFormState.Processing.Saving
 
-            // TODO
+            // Create calendar
+            val createDefaultCalendarResult = createCalendarUseCase.execute(
+                userId = userId,
+                name = _calendarName.value!!,
+                color = _calendarColor.value!!,
+                email = _calendarEmail.value!!
+            )
+            if (createDefaultCalendarResult !is UseCase.Result.Success<*>) {
+                calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
+                    resourceProvider.provideString(R.string.snack_create_calendar_error)
+                )
+            }
+
+            if (createDefaultCalendarResult is UseCase.Result.Success<*>) {
+                createDefaultCalendarResult.returnValue.tryCast<String> {
+                    // Update newly created calendar settings
+                    val updateCalendarSettingsUseCaseResult = updateCalendarSettingsUseCase.updateCalendarSettings(
+                        userId,
+                        this,
+                        _defaultEventDuration.value,
+                        _defaultPartDayAlarms.value,
+                        _defaultAllDayAlarms.value
+                    )
+                    if (updateCalendarSettingsUseCaseResult !is UseCase.Result.Success<*>) {
+                        calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
+                            resourceProvider.provideString(R.string.snack_create_calendar_error)
+                        )
+                    }
+                }
+            }
+
+            // Use settings snack state here to display snack in calendar settings view
+            calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_create_calendar_success)
+            )
 
             // Clear loading state
             calendarFormState.value = CalendarFormState.Idle

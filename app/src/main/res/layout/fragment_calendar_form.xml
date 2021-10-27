@@ -20,29 +20,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/calendar_form_name_input_layout"
+    <EditText
+        android:id="@+id/calendar_form_name_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/InputText"
+        style="@style/Text.Default"
+        android:hint="@string/calendar_form_name_hint"
         android:layout_marginTop="4dp"
+        android:inputType="textMultiLine|textCapSentences"
+        android:maxLength="100"
+        android:background="@drawable/shape_input_text"
+        android:paddingTop="@dimen/default_margin_text_vertical"
+        android:paddingBottom="@dimen/default_margin_text_vertical"
+        android:paddingStart="@dimen/default_inner_padding_start"
+        android:paddingEnd="@dimen/default_inner_padding_end"
         app:layout_constraintTop_toBottomOf="@+id/calendar_form_name_title"
         app:layout_constraintStart_toStartOf="@+id/calendar_form_name_title"
-        app:layout_constraintEnd_toEndOf="@+id/calendar_form_name_title">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/calendar_form_name_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Text.Default"
-            tools:text="Holidays"
-            android:maxLength="100"
-            android:paddingTop="@dimen/default_margin_text_vertical"
-            android:paddingBottom="@dimen/default_margin_text_vertical"
-            android:paddingStart="@dimen/default_inner_padding_start"
-            android:paddingEnd="@dimen/default_inner_padding_end"/>
-
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintEnd_toEndOf="@+id/calendar_form_name_title"/>
 
     <TextView
         android:id="@+id/calendar_form_name_character_limit"
@@ -51,7 +45,7 @@
         tools:text="@string/calendar_form_name_character_limit"
         style="@style/Text.Caption.Weak"
         android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@+id/calendar_form_name_input_layout"
+        app:layout_constraintTop_toBottomOf="@+id/calendar_form_name_value"
         app:layout_constraintStart_toStartOf="@+id/calendar_form_name_title"
         app:layout_constraintEnd_toEndOf="@+id/calendar_form_name_title"/>
 
@@ -85,6 +79,7 @@
             android:id="@+id/calendar_form_color_icon"
             style="@style/ColoredDot"
             android:src="@drawable/ic_dot"
+            app:tint="@color/background_norm"
             android:layout_marginStart="@dimen/default_inner_padding_start"
             app:layout_constraintBottom_toBottomOf="@+id/calendar_form_color"
             app:layout_constraintTop_toTopOf="@+id/calendar_form_color"
@@ -126,7 +121,6 @@
             layout="@layout/view_press_overlay"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
