@@ -19,6 +19,7 @@
 
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_close">Close</string>
 
     <!-- Delete as an organizer -->
 

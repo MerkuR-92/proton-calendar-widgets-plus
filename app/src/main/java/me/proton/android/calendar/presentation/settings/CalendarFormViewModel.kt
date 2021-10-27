@@ -188,6 +188,18 @@ class CalendarFormViewModel(
 
     suspend fun initCreateCalendarForm(calendarColor: String) {
 
+        // Set default calendar color (picked randomly from the colors array)
+        handleCalendarColor(calendarColor)
+
+        // Set default event duration
+        handleDefaultEventDuration(EVENT_DEFAULT_DURATION.first().toInt())
+
+        // Set default part day event notification (15 minutes before)
+        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START), null), false)
+
+        // Set default all day event notification (1 day before at 9am)
+        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null), true)
+
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in CalendarFormViewModel initCreateCalendarForm")
             calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
@@ -202,18 +214,6 @@ class CalendarFormViewModel(
 
         val defaultUserEmail = userManager.getUser(userId).email // TODO Can be null, what do we take next ?
         defaultUserEmail?.let { handleCalendarEmail(defaultUserEmail) }
-
-        // Set default calendar color (picked randomly from the colors array)
-        handleCalendarColor(calendarColor)
-
-        // Set default event duration
-        handleDefaultEventDuration(EVENT_DEFAULT_DURATION.first().toInt())
-
-        // Set default part day event notification (15 minutes before)
-        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START), null), false)
-
-        // Set default all day event notification (1 day before at 9am)
-        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null), true)
 
         // Make sure to set those values to false after having initialized the form with default values
         calendarEdited = false

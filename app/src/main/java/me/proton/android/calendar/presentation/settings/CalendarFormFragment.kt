@@ -329,6 +329,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             // Display dialog
             dialog = MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
+                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
                 .show()
         }
 
@@ -346,7 +347,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             ) { _, item ->
                 calendarFormViewModel.handleCalendarEmail(userEmails[item])
                 dialog?.dismiss()
-            }.show()
+            }
+                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
+                .show()
         }
 
         // Default event duration
@@ -361,7 +364,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             ) { _, item ->
                 calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION[item].toInt())
                 dialog?.dismiss()
-            }.show()
+            }
+                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
+                .show()
         }
     }
 
