@@ -414,6 +414,12 @@
     <string name="calendar_form_default_email_value_error">Failed to load default email</string>
     <string name="calendar_form_name_hint">Add a calendar name</string>
 
+    <string name="create_calendar_limit_reached_free">You have reached the maximum number of calendars.</string>
+    <string name="create_calendar_limit_reached_paid_title">20-calendar maximum reached</string>
+    <string name="create_calendar_limit_reached_paid_message">Delete unused calendars to create new calendars.</string>
+    <string name="create_calendar_limit_reached_paid_manage">Manage calendars</string>
+    <string name="create_calendar_limit_reached_close">Close</string>
+
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>

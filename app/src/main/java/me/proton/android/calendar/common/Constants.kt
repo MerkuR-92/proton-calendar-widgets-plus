@@ -65,6 +65,9 @@ const val MAX_EMAILS_PER_QUERY: Int = 8
 
 const val DAY_VIEW_ALL_DAY_MAX = 3
 
+const val MAX_CALENDAR_PAID = 20
+const val MAX_CALENDAR_FREE = 1
+
 object FeatureFlag {
     const val NEW_EVENT_DECRYPTION = true
     const val SETTINGS_DRAWER = true

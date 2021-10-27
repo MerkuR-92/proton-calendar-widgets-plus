@@ -36,6 +36,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.toBoolean
 import org.koin.core.get
 import java.time.LocalDate
@@ -785,5 +786,15 @@ class CalendarViewModel(
             if (currentLoadingProcesses > 0) currentLoadingProcesses--
         }
         if (currentLoadingProcesses == 0) this.loading.value = false
+    }
+
+    suspend fun isFreeUser(): Boolean? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel isFreeUser")
+            return null
+        }
+        val user = userManager.getUserOrNull(userId, logger)
+        return user?.hasSubscription() == false
     }
 }

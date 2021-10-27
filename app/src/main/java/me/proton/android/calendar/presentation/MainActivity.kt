@@ -710,8 +710,36 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_calendars_create.setOnSingleClickListener {
-            navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
-            drawer_layout.close()
+            lifecycleScope.launch {
+                // Check if calendar limit was reached
+                val userCalendarsNumber = calendarViewModel.userCalendars.value?.size ?: return@launch
+                val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
+                if (isFreeUser && userCalendarsNumber >= MAX_CALENDAR_FREE) {
+                    // Display limit reached for free user dialog
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setMessage(R.string.create_calendar_limit_reached_free)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                        }
+                        .show()
+                }
+                if (!isFreeUser && userCalendarsNumber >= MAX_CALENDAR_PAID) {
+                    // Display limit reached for paid user dialog
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
+                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
+                            // Open calendar settings view
+                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                            drawer_layout.close()
+                        }
+                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                        }
+                        .show()
+                }
+                // If limit has not been reached, open create calendar form
+                navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
+                drawer_layout.close()
+            }
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->

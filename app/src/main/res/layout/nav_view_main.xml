@@ -231,6 +231,7 @@
                     style="@style/Icon"
                     app:tint="@color/sidebar_icon_weak"
                     android:layout_marginEnd="@dimen/spacing_element_small"
+                    android:background="@drawable/ripple_nav_items"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_divider_top"
                     app:layout_constraintBottom_toTopOf="@+id/nav_view_calendars_separator"/>
