@@ -119,6 +119,12 @@ class CalendarFormViewModel(
         _defaultEventDuration.value = EVENT_DEFAULT_DURATION.first().toInt()
         _defaultPartDayAlarms.value = arrayListOf()
         _defaultAllDayAlarms.value = arrayListOf()
+        _calendarId = null
+        calendarFormSnackState.value = null
+        calendarSettingsSnackState.value = null
+        calendarEdited = false
+        calendarSettingsEdited = false
+        userEmails = null
     }
 
     suspend fun initUpdateCalendarForm(calendarId: String) {

@@ -831,9 +831,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.selectCalendars()
             calendarViewModel.userCalendars.observe(this@MainActivity) { userCalendars ->
                 userCalendars ?: return@observe
+                val defaultCalendarId = calendarViewModel.defaultCalendarId.value
                 userCalendarListAdapter.submitList(
                     userCalendars.sortedBy {
-                        it.isDisabled
+                        it.isDisabled // Disabled will appear last
+                    }.sortedByDescending {
+                        it.id == defaultCalendarId // Default will appear first
                     }
                 )
                 nav_view_main_content.nav_view_calendars.visibleOrGone(userCalendars.isNotEmpty())
