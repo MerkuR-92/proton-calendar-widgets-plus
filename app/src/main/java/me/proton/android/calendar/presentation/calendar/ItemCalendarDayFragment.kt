@@ -573,6 +573,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
                         if (this.isResumed) calendarViewModel.setLoading(true, position)
+                        all_day_no_events.visibleOrGone(true)
+                        all_day_no_events.text = resources.getString(R.string.agenda_loading_events)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         allEvents = it.events
@@ -699,6 +701,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         // TODO Handle error for DayView event fetching
                         calendarViewModel.setLoading(false, position)
+                        all_day_no_events.visibleOrGone(true)
+                        all_day_no_events.text = resources.getString(R.string.agenda_loading_events_error)
                     }
                 }
             }
