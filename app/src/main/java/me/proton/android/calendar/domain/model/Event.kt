@@ -178,19 +178,26 @@ data class Event private constructor(
 
     fun isAllDay(): Boolean = iCalEvent.dateStart?.value?.hasTime() == false && (if (iCalEvent.dateEnd != null) iCalEvent.dateEnd?.value?.hasTime() == false else true)
 
+    /**
+     * Attention: part-time Event ending at 00:00 is not considered to span the end-day.
+     */
     fun spansSingleDay(actualEndDate: Boolean = false, timeZoneId: String? = null): Boolean {
 
-        val dateStart = this.getStart(timeZoneId ?: ZoneId.systemDefault().id).toLocalDate()
-        val dateEnd = this.getEnd(timeZoneId ?: ZoneId.systemDefault().id).toLocalDate()
-
-        if (dateStart == null) {
-            return false
-        }
+        val dateTimeStart = this.getStart(timeZoneId ?: ZoneId.systemDefault().id)
+        val dateStart = dateTimeStart.toLocalDate()
+        val dateTimeEnd = this.getEnd(timeZoneId ?: ZoneId.systemDefault().id)
+        val dateEnd = dateTimeEnd.toLocalDate()
 
         return if (isAllDay()) {
             dateEnd == null || dateStart == dateEnd.minusDays(if (actualEndDate) 0 else 1)
         } else {
-            dateStart == dateEnd
+
+            // for part-day Event, if it ends on Midnight, we don't count it spanning that last day
+            if (dateTimeEnd.toLocalTime() == LocalTime.MIDNIGHT) {
+                dateStart == dateEnd.minusDays(1)
+            } else {
+                dateStart == dateEnd
+            }
         }
     }
 

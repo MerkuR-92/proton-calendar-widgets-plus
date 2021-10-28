@@ -204,6 +204,11 @@ interface ICalUtils {
     fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event>
 
     /**
+     * Copies all multi-day events across each day in the range, so we can display them day by day.
+     */
+    fun List<Event>.explodeDayByDay(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Map<LocalDate, List<Event>>
+
+    /**
      * Filters out original Events that have occurrences with RECURRENCE-ID pointing to
      * that original Event.
      */

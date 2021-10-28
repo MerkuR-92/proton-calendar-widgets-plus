@@ -256,4 +256,9 @@
         <item name="colorControlNormal">#eaecf1</item>
     </style>
 
+    <style name="Widget.ProtonCalendar.AppWidget.Container" parent="android:Widget">
+        <item name="android:id">@android:id/background</item>
+        <item name="android:background">?android:attr/colorBackground</item>
+    </style>
+    
 </resources>

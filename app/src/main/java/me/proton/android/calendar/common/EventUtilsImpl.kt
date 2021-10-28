@@ -81,18 +81,18 @@ object EventUtilsImpl : EventUtils {
     /**
      * For given LocalDate and TimeZoneId, returns
      * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
+     *
+     * // TODO it will return nonsensical values if the Event doesn't span the [date]
      */
     override fun Event.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> {
 
-        return if (spansSingleDay(timeZoneId = timeZoneId)) {
-            Pair(1, 1)
-        } else {
+        val occurrenceStart = getOccurrenceStart(timeZoneId).toLocalDate()
+        val occurrenceEndAdjustedForMidnight = getOccurrenceEnd(timeZoneId).toLocalDate().minusDays(if (getOccurrenceEnd(timeZoneId).toLocalTime() == LocalTime.MIDNIGHT) 1 else 0)
 
-            val todayOffset = ChronoUnit.DAYS.between(getOccurrenceStart(timeZoneId).toLocalDate(), date).toInt() + 1
-            val durationInDays = ChronoUnit.DAYS.between(getOccurrenceStart(timeZoneId).toLocalDate(), getOccurrenceEnd(timeZoneId).toLocalDate()).toInt() + (if (this.isAllDay()) 0 else 1)
+        val todayOffset = ChronoUnit.DAYS.between(occurrenceStart, date).toInt() + 1
+        val durationInDays = ChronoUnit.DAYS.between(occurrenceStart, occurrenceEndAdjustedForMidnight).toInt() + 1
 
-            Pair(todayOffset, durationInDays)
-        }
+        return Pair(todayOffset, durationInDays)
     }
 
     override fun Event.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
@@ -142,8 +142,6 @@ object EventUtilsImpl : EventUtils {
     override fun Event.formatEnd(timeZoneId: String, is24Hour: Boolean) = formatDateOrDateTimeProperty(iCalEvent.dateEnd, timeZoneId, is24Hour, isAllDay())
 
     override fun Event.formatStartEndForActualEndDate(timeZoneId: String, resources: Resources, is24Hour: Boolean): String {
-        TimberLogger.d("format startend for timezone=$timeZoneId")
-        TimberLogger.d("format startend with occurrence=${this.occurrence}")
         return if (this.spansSingleDay(actualEndDate = true, timeZoneId = timeZoneId)) {
 
             // TODO cleanup and check against requirements

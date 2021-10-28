@@ -136,6 +136,8 @@ class MainViewModel(
 
     companion object {
         const val INTENT_ACTION_SHOW_EVENT_DETAILS = "INTENT_ACTION_SHOW_EVENT_DETAILS"
+        const val INTENT_ACTION_SHOW_DAY = "INTENT_ACTION_SHOW_DAY"
+        const val INTENT_ACTION_NEW_EVENT = "INTENT_ACTION_NEW_EVENT"
 
         fun createMainIntentToShowEventDetails(context: Context, eventId: String, occurrenceNumber: Int?): Intent {
             return Intent(context, MainActivity::class.java).apply {

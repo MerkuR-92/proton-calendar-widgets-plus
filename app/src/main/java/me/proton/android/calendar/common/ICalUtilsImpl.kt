@@ -24,12 +24,14 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
+import me.proton.android.calendar.common.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.DateTimeUtilsImpl.startEndOverlapsWithFullDayRange
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekInMonth
+import me.proton.android.calendar.common.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
@@ -765,6 +767,32 @@ object ICalUtilsImpl : ICalUtils {
                 ?: emptyList()
         )
         return result
+    }
+
+    override fun List<Event>.explodeDayByDay(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Map<LocalDate, List<Event>> {
+
+        val result = mutableMapOf<LocalDate, MutableList<Event>>()
+
+        this.forEach { event ->
+
+            val startDate = event.getStart(timeZoneId).toLocalDate()
+
+            if (event.spansSingleDay(timeZoneId = timeZoneId)) {
+                result[startDate] = (result[startDate] ?: mutableListOf()).apply { add(event) }
+            } else {
+                val spansDays = event.calculateFullDayCounter(startDate, timeZoneId).second
+                for (dayNumber in 0 until spansDays) {
+                    result[startDate.plusDays(dayNumber.toLong())] = (result[startDate.plusDays(dayNumber.toLong())] ?: mutableListOf()).apply { add(event) }
+                }
+            }
+
+        }
+
+        return result.filterKeys { it.isBetween(fromDate, toDate) }
     }
 
     /**

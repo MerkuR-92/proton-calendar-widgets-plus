@@ -18,6 +18,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.AndroidUtils.tryCast
@@ -80,7 +81,8 @@ class EventViewModel(
     private val handleSaveUseCase: HandleSaveUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val widgetRefresher: WidgetRefresher
 ) : AndroidViewModel(application) {
 
     sealed class Result {
@@ -1389,6 +1391,7 @@ class EventViewModel(
 
     private fun handleDeleteResult(deleteResult: UseCase.Result, deleteType: DeleteType, mailSent: Boolean? = null) {
         if (deleteResult is UseCase.Result.Success<*>) {
+            widgetRefresher.refresh()
             eventSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                 if (deleteType == DeleteType.AS_AN_ORGANIZER && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
                 else if (deleteType == DeleteType.AS_AN_ATTENDEE && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
@@ -1666,6 +1669,10 @@ class EventViewModel(
         _event.postValue(event)
 
         eventState.value = EventState.Idle
+
+        // Force the Widget to refresh, because we just changed the Event answer
+        widgetRefresher.refresh()
+
         return true
     }
 

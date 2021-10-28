@@ -163,8 +163,6 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             nav_event_form_attendees_search_input.text.clear()
         }
 
-        val userEmails = calendarViewModel.userAddresses.value?.map { it.email } ?: listOf()
-
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_list.layoutManager = attendeesLayoutManager
         attendeeListAdapter = AddAttendeeListAdapter(false) {
@@ -178,7 +176,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         val searchAttendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         nav_event_form_attendees_search_list.layoutManager = searchAttendeesLayoutManager
         searchAttendeeListAdapter = AddAttendeeListAdapter(true) {
-            addAttendee(it, userEmails)
+            addAttendee(it)
         }
         (nav_event_form_attendees_search_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         nav_event_form_attendees_search_list.adapter = searchAttendeeListAdapter
@@ -232,7 +230,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         requireContext().showKeyboard()
     }
 
-    private fun addAttendee(attendee: Attendee, userEmails: List<String>) {
+    private fun addAttendee(attendee: Attendee) {
         lifecycleScope.launch {
             val tmpAttendeeList = ArrayList(eventViewModel.eventLiveData.value?.iCalEvent?.attendees ?: listOf<Attendee>())
 
@@ -252,6 +250,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                     return@launch
                 }
 
+                val userEmails = calendarViewModel.getUserAddresses()?.map { it.email } ?: listOf()
                 if (userEmails.firstOrNull { it.equals(canonicalEmail, true) } != null) {
                     view?.displaySnackBar(getString(R.string.snack_add_self_as_participant))
                     searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility

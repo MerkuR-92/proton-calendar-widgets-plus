@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import android.content.Context
 import android.util.Log
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.domain.*
@@ -8,6 +9,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -39,6 +41,7 @@ internal class SyncServerEventsUseCaseTest {
     private val keySetupUseCaseMock: KeySetupUseCase = mockk()
     private val handleEventsMetadataUseCaseMock: HandleEventsMetadataUseCase = mockk()
     private val calendarsApiMock: CalendarsApi = mockk()
+    private val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     private val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
     private val fetchPublicKeysUseCaseMock: FetchPublicKeysUseCase = mockk()
@@ -92,6 +95,8 @@ internal class SyncServerEventsUseCaseTest {
         every { valueStoreProviderMock.provideValueStore(userId.id) } returns valueStoreMock
         every { valueStoreMock.putString(any(), any()) } just Runs
         every { valueStoreMock.putStringInSet(any(), any(), any()) } just Runs
+
+        every { calendarWidgetRefresherMock.refresh() } just runs
     }
 
     @Test
@@ -256,7 +261,8 @@ internal class SyncServerEventsUseCaseTest {
                 calendarsApiMock,
                 updateAlarmsUseCaseMock,
                 calendarsRepositoryMock,
-                fetchPublicKeysUseCaseMock
+                fetchPublicKeysUseCaseMock,
+                calendarWidgetRefresherMock
             )
 
             val handleServerEventsUseCase = HandleServerEventsUseCase(
@@ -297,6 +303,10 @@ internal class SyncServerEventsUseCaseTest {
 
             coVerify(exactly = 1) {
                 fetchPublicKeysUseCaseMock.execute(any(), any())
+            }
+
+            coVerify(exactly = 1) {
+                calendarWidgetRefresherMock.refresh()
             }
 
             coVerify(exactly = 1) {

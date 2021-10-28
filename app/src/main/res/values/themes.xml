@@ -68,4 +68,11 @@
         <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
     </style>
 
+    <style name="AppTheme.DayNight.AppWidgetContainer">
+        <!-- use @android:dimen/system_app_widget_background_radius in dimens-31 when we switch to targetSdk 31 -->
+        <item name="appWidgetRadius">@dimen/widget_background_corner_radius</item>
+        <item name="appWidgetPadding">@dimen/widget_padding</item>
+        <item name="appWidgetInnerRadius">8dp</item>
+    </style>
+
 </resources>

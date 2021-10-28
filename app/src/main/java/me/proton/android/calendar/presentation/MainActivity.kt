@@ -36,6 +36,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
@@ -56,7 +57,6 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
-import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.IcsSurgeryUtils.HandleIcsResult.Error
@@ -77,6 +77,9 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.*
 import java.lang.IllegalStateException
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
@@ -144,7 +147,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             initDrawerCalendarsListContent()
 
                             withContext(Dispatchers.Main) {
-                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+                                // if we're navigating from outside of the app to create new Event, check if there's active Calendar
+                                if (uri.isDeeplinkToEventCreate()) {
+                                    if (calendarViewModel.getActiveCalendars().isEmpty()) {
+                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toMonth())
+                                        displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                                    } else safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+                                } else {
+                                    safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
+                                }
                             }
                         }
                     }
@@ -220,7 +231,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
-        if (!isTaskRoot && intent.action != INVITE_PROTON_INTENT_ACTION && intent.action != Intent.ACTION_VIEW && intent.type != INVITE_ICS_MIME_TYPE) {
+        if (!isTaskRoot && intent.action != INVITE_PROTON_INTENT_ACTION && intent.action != Intent.ACTION_VIEW && intent.type != INVITE_ICS_MIME_TYPE && intent.action != MainViewModel.INTENT_ACTION_NEW_EVENT && intent.action != MainViewModel.INTENT_ACTION_SHOW_DAY && intent.action != MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS) {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
             //  at the top of the stack (ie: the last state of this task)
@@ -369,6 +380,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val eventDetailsIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
+                val showDayIntent =
+                    mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_DAY)
+
+                val newEventIntent =
+                    mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_NEW_EVENT)
+
                 if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
                     logger.v("converting deeplink and navigating manually")
 
@@ -383,6 +400,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         navigateTo(Navigation.Deeplink.toMonth())
                     }
 
+                } else if (newEventIntent != null) {
+
+                    navigateTo(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtilsImpl.generateEventStartTime(ZoneId.systemDefault())))
+
+                } else if (showDayIntent != null && showDayIntent.data != null) {
+
+                    val dayToShow = showDayIntent.data?.getQueryParameter("date")?.let { LocalDate.parse(it) }
+
+                    if (dayToShow != null) {
+                        navigateTo(Navigation.Deeplink.toMonth(dayToShow))
+                    } else {
+                        logger.e("could not get date from INTENT_ACTION_SHOW_DAY")
+                        navigateTo(Navigation.Deeplink.toMonth())
+                    }
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {

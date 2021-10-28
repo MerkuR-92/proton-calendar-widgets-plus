@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.EventAlarmEntity
@@ -22,6 +23,7 @@ class HandleEventsMetadataUseCase(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val calendarsRepository: CalendarsRepository,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
+    private val widgetRefresher: WidgetRefresher
 ) : UseCase {
 
     val now = Instant.now()
@@ -61,6 +63,7 @@ class HandleEventsMetadataUseCase(
 
                                 updateAlarmsUseCase.execute(userId.id, entities.map { it.id })
                                 fetchPublicKeysUseCase.execute(userId, entities)
+                                widgetRefresher.refresh()
                             }
 
                             // EventEntities belonging to Calendars that don't exist locally, inserting

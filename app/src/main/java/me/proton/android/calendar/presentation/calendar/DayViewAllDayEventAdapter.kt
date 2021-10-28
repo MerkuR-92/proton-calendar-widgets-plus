@@ -142,7 +142,7 @@ class DayViewAllDayEventAdapter(
                 }
             }
 
-            if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+            if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                 eventItemTitle.paintFlags = eventItemTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             } else {
                 eventItemTitle.paintFlags = eventItemTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()

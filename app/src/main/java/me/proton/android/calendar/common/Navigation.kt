@@ -1,7 +1,6 @@
 package me.proton.android.calendar.common
 
 import android.net.Uri
-import me.proton.android.calendar.domain.Logger
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -24,3 +23,7 @@ object Navigation {
     }
 
 }
+
+fun Uri.isDeeplinkToEventCreate() =
+    (this.pathSegments.indexOf("event") == 0 && this.pathSegments.indexOf("create") == 1
+        && this.queryParameterNames.contains("initStartDate") && this.queryParameterNames.contains("initStartTime"))

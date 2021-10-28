@@ -95,7 +95,8 @@ interface CalendarsRepository {
     fun getEvents(
         fromDate: LocalDate,
         toDate: LocalDate,
-        timeZoneId: String
+        timeZoneId: String,
+        allowCached: Boolean
     ): Flow<GetEventsResult<Event>>
 
     /**

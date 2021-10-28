@@ -170,9 +170,9 @@ internal class EventTest {
         var displayTimeZoneId = "UTC"
         assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
 
-        // Europe/Vilnius makes event end at midnight, so counts as ending on next day
+        // Europe/Vilnius makes event end at midnight, so counts as ending on the same day
         displayTimeZoneId = "Europe/Vilnius"
-        assertFalse(event.spansSingleDay(timeZoneId = displayTimeZoneId))
+        assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
 
         // Europe/Samara makes event start and end on next day
         displayTimeZoneId = "Europe/Samara"

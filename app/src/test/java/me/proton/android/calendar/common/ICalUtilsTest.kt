@@ -29,6 +29,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl.adjustToWeekStart
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.createNewVEvent
 import me.proton.android.calendar.common.ICalUtilsImpl.eventStartZonedDateTimeToDate
+import me.proton.android.calendar.common.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOccurencesByRecurrenceId
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOutDuplicates
@@ -3557,6 +3558,109 @@ internal class ICalUtilsTest {
         assertThat(responseICalendar.events.first().exceptionDates.isNullOrEmpty()).isTrue()
         assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SESSION-KEY")?.value.isNullOrEmpty())
         assertThat(responseICalendar.events.first().getExperimentalProperty("X-PM-SHARED-EVENT-ID")?.value).isEqualTo("sharedEventId")
+    }
+
+    @Test
+    fun `explode Events day by day for Widget`() {
+
+        val allDayMultiDayString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.24.2//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTAMP:20210920T083644Z
+    DTSTART;VALUE=DATE:20210920
+    SEQUENCE:0
+    SUMMARY:2-day all-day
+    STATUS:CONFIRMED
+    UID:l8ZA-04Xv8ukoH2DnuFpQDHEXb7Y@proton.me
+    DTEND;VALUE=DATE:20210922
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15H
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+        """.trimIndent()
+
+        val partDayMultiDayString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.24.2//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTAMP:20210920T083552Z
+    DTSTART;TZID=Europe/Zurich:20210920T110000
+    DTEND;TZID=Europe/Zurich:20210922T120000
+    SEQUENCE:0
+    SUMMARY:3-day part-time\, 11:00 to 12:00
+    STATUS:CONFIRMED
+    UID:FUAdf8hlugTj5Aiuz7DkIEfpaf_-@proton.me
+        """.trimIndent()
+
+        val oneHourEvent = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.24.2//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTAMP:20210920T131204Z
+    DTSTART;TZID=Europe/Zurich:20210922T153000
+    DTEND;TZID=Europe/Zurich:20210922T163000
+    SEQUENCE:0
+    SUMMARY:Regular 1-hour event
+    STATUS:CONFIRMED
+    UID:gWEfn3xdkmfX6rJ8w-q5IT3jnbJG@proton.me
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+        """.trimIndent()
+
+        val displayTimeZoneId = "Europe/Zurich"
+
+        val events = listOf(
+            Event.from("event-all-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!)!!,
+            Event.from("event-part-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!)!!,
+            Event.from("event-1-hour", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), ICalUtilsImpl.parseICalString(oneHourEvent)!!)!!,
+        )
+
+        val explodedEvents = events.explodeDayByDay(LocalDate.of(2021, 9, 20), LocalDate.of(2021, 9, 22), displayTimeZoneId)
+
+        // multi-day events start on first day of the window
+        with(explodedEvents) {
+            assertThat(this.flatMap { it.value }.size).isEqualTo(6)
+
+            assertThat(this[LocalDate.of(2021, 9, 20)]?.find { it.summary == "2-day all-day" }).isNotNull()
+            assertThat(this[LocalDate.of(2021, 9, 21)]?.find { it.summary == "2-day all-day" }).isNotNull()
+
+            assertThat(this[LocalDate.of(2021, 9, 20)]?.find { it.summary == "3-day part-time, 11:00 to 12:00" }).isNotNull()
+            assertThat(this[LocalDate.of(2021, 9, 21)]?.find { it.summary == "3-day part-time, 11:00 to 12:00" }).isNotNull()
+            assertThat(this[LocalDate.of(2021, 9, 22)]?.find { it.summary == "3-day part-time, 11:00 to 12:00" }).isNotNull()
+
+            assertThat(this[LocalDate.of(2021, 9, 22)]?.find { it.summary == "Regular 1-hour event" }).isNotNull()
+        }
+
+        val explodedEventsAlreadyHappening = events.explodeDayByDay(LocalDate.of(2021, 9, 21), LocalDate.of(2021, 9, 21), displayTimeZoneId)
+
+        // multi-day events start before the window and end after it
+        with(explodedEventsAlreadyHappening) {
+            assertThat(this.flatMap { it.value }.size).isEqualTo(2)
+
+            assertThat(this[LocalDate.of(2021, 9, 21)]?.find { it.summary == "2-day all-day" }).isNotNull()
+
+            assertThat(this[LocalDate.of(2021, 9, 21)]?.find { it.summary == "3-day part-time, 11:00 to 12:00" }).isNotNull()
+        }
+
     }
 
     @Test
