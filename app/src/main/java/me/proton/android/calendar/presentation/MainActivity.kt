@@ -709,37 +709,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
+            onClickCreateCalendar()
+        }
+
         nav_view_calendars_create.setOnSingleClickListener {
-            lifecycleScope.launch {
-                // Check if calendar limit was reached
-                val userCalendarsNumber = calendarViewModel.userCalendars.value?.size ?: return@launch
-                val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
-                if (isFreeUser && userCalendarsNumber >= MAX_CALENDAR_FREE) {
-                    // Display limit reached for free user dialog
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setMessage(R.string.create_calendar_limit_reached_free)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-                        }
-                        .show()
-                }
-                if (!isFreeUser && userCalendarsNumber >= MAX_CALENDAR_PAID) {
-                    // Display limit reached for paid user dialog
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
-                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
-                            // Open calendar settings view
-                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                            drawer_layout.close()
-                        }
-                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-                        }
-                        .show()
-                }
-                // If limit has not been reached, open create calendar form
-                navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
-                drawer_layout.close()
-            }
+            onClickCreateCalendar()
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->
@@ -759,6 +734,42 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 // Set icon tint
                 nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                 nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+            }
+        }
+    }
+
+    private fun onClickCreateCalendar() {
+        lifecycleScope.launch {
+            // Check if calendar limit was reached
+            when (calendarViewModel.isUserCalendarLimitReached()) {
+                CalendarViewModel.UserCalendarLimit.ERROR -> { } // We ignore and do nothing
+                CalendarViewModel.UserCalendarLimit.NOT_REACHED -> {
+                    // If limit has not been reached, open create calendar form
+                    navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
+                    drawer_layout.close()
+                }
+                CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                    // Display limit reached for free user dialog
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setMessage(R.string.create_calendar_limit_reached_free)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                        }
+                        .show()
+                }
+                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+                    // Display limit reached for paid user dialog
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
+                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
+                            // Open calendar settings view
+                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                            drawer_layout.close()
+                        }
+                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                        }
+                        .show()
+                }
             }
         }
     }
@@ -831,6 +842,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.selectCalendars()
             calendarViewModel.userCalendars.observe(this@MainActivity) { userCalendars ->
                 userCalendars ?: return@observe
+                nav_view_calendars_list_add_layout.visibleOrGone(userCalendars.isEmpty())
+                nav_view_calendars_create.visibleOrGone(!userCalendars.isEmpty())
                 val defaultCalendarId = calendarViewModel.defaultCalendarId.value
                 userCalendarListAdapter.submitList(
                     userCalendars.sortedBy {
@@ -839,7 +852,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         it.id == defaultCalendarId // Default will appear first
                     }
                 )
-                nav_view_main_content.nav_view_calendars.visibleOrGone(userCalendars.isNotEmpty())
             }
 
 

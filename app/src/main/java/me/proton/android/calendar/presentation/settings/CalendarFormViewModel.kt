@@ -307,7 +307,7 @@ class CalendarFormViewModel(
         _calendarEmail.value = calendarEmail
     }
 
-    suspend fun handleSaveCalendarForm() {
+    suspend fun handleSaveCalendarForm(returnToSettings: Boolean) {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarFormViewModel handleSaveCalendarForm")
@@ -398,10 +398,17 @@ class CalendarFormViewModel(
                 }
             }
 
-            // Use settings snack state here to display snack in calendar settings view
-            calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
-                resourceProvider.provideString(R.string.snack_create_calendar_success)
-            )
+            if (returnToSettings) {
+                // Use settings snack state here to display snack in calendar settings view
+                calendarSettingsSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
+                    resourceProvider.provideString(R.string.snack_create_calendar_success)
+                )
+            } else {
+                // Use form snack state here to display snack in month view
+                calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
+                    resourceProvider.provideString(R.string.snack_create_calendar_success)
+                )
+            }
 
             // Clear loading state
             calendarFormState.value = CalendarFormState.Idle

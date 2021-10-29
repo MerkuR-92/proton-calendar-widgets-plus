@@ -120,7 +120,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 lifecycleScope.launch {
                     if (calendarFormViewModel.hasFormBeenEdited()) {
                         // Save new form values
-                        calendarFormViewModel.handleSaveCalendarForm()
+                        val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings || calendarId != null
+                        calendarFormViewModel.handleSaveCalendarForm(returnToSettings)
                     } else findNavController().navigateUp()
                 }
             }

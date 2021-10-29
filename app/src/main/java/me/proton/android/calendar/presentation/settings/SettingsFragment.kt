@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_general_settings.*
 import kotlinx.android.synthetic.main.fragment_settings.*
@@ -75,8 +76,17 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        settings_general_press.setOnClickListener {
+        settings_general_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
+        }
+
+        settings_calendars_list_add_layout_press.setOnSingleClickListener {
+            findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
+        }
+        lifecycleScope.launch {
+            settings_calendars_list_add_layout.visibleOrGone(
+                calendarViewModel.isUserCalendarLimitReached() == CalendarViewModel.UserCalendarLimit.NOT_REACHED
+            )
         }
 
         val settingsCalendarListView = settings_calendars_list

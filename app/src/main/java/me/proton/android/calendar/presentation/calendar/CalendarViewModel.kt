@@ -38,7 +38,6 @@ import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.toBoolean
-import org.koin.core.get
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -796,5 +795,21 @@ class CalendarViewModel(
         }
         val user = userManager.getUserOrNull(userId, logger)
         return user?.hasSubscription() == false
+    }
+
+    enum class UserCalendarLimit {
+        ERROR,
+        NOT_REACHED,
+        FREE_REACHED,
+        PAID_REACHED
+    }
+
+    suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
+        val userCalendarsNumber = userCalendars.value?.size ?: return UserCalendarLimit.ERROR
+        val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
+
+        if (isFreeUser && userCalendarsNumber >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
+        if (!isFreeUser && userCalendarsNumber >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
+        return UserCalendarLimit.NOT_REACHED
     }
 }
