@@ -43,6 +43,7 @@ const val DEFAULT_CALENDAR_COLOR = "#657EE4"
 
 const val INVITE_ICS_FILE_NAME = "invite.ics"
 const val INVITE_ICS_MIME_TYPE = "text/calendar"
+const val INVITE_ICS_MIME_TYPE_TEMPLATE = "text/calendar; method=%s"
 const val INVITE_EMAIL_MIME_TYPE = "text/plain"
 const val INVITE_PROTON_INTENT_ACTION = "me.proton.android.calendar.intent.action.CTA_OPEN_ICS"
 const val INVITE_PROTON_EXTRA_SENDER_EMAIL = "me.proton.android.calendar.intent.extra.ICS_SENDER_EMAIL"

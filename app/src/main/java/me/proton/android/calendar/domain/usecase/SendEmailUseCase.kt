@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
+import biweekly.property.Method
 import biweekly.util.ICalDate
 import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
@@ -104,7 +105,7 @@ class SendEmailUseCase(
                 SendEmailDirect.Arguments.Attachment(
                     INVITE_ICS_FILE_NAME,
                     attachmentBytes.size,
-                    INVITE_ICS_MIME_TYPE,
+                    INVITE_ICS_MIME_TYPE_TEMPLATE.format(Method.REPLY),
                     attachmentBytes
                 )
             )
@@ -165,7 +166,7 @@ class SendEmailUseCase(
                 SendEmailDirect.Arguments.Attachment(
                     INVITE_ICS_FILE_NAME,
                     attachmentBytes.size,
-                    INVITE_ICS_MIME_TYPE,
+                    INVITE_ICS_MIME_TYPE_TEMPLATE.format(Method.REQUEST),
                     attachmentBytes
                 )
             )
@@ -230,7 +231,7 @@ class SendEmailUseCase(
                 SendEmailDirect.Arguments.Attachment(
                     INVITE_ICS_FILE_NAME,
                     attachmentBytes.size,
-                    INVITE_ICS_MIME_TYPE,
+                    INVITE_ICS_MIME_TYPE_TEMPLATE.format(Method.CANCEL),
                     attachmentBytes
                 )
             )
