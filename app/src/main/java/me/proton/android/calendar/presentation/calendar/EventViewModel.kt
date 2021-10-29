@@ -1683,6 +1683,9 @@ class EventViewModel(
             when (saveResult) {
                 SaveResult.SUCCESS -> {
 
+                    // Refresh the widget on success
+                    widgetRefresher.refresh()
+
                     // Display the event's calendar if it was hidden
                     if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
 
@@ -1725,6 +1728,9 @@ class EventViewModel(
 
             // Save result for create new event
             if (saveResult == SaveResult.SUCCESS || saveResult == SaveResult.CREATE_ERROR_SEND_MAIL) {
+
+                // Refresh the widget on success
+                widgetRefresher.refresh()
 
                 // Display the event's calendar if it was hidden
                 if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)

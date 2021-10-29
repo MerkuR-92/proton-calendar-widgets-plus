@@ -37,7 +37,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
@@ -70,7 +69,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
     private val accountViewModel: AccountViewModel by sharedViewModel()
-    private val widgetRefresher: WidgetRefresher by inject()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
