@@ -3,10 +3,16 @@ package me.proton.android.calendar.presentation
 import android.app.Dialog
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 
 // TODO maybe remove DialogFragment whatsoever
@@ -99,6 +105,93 @@ abstract class BaseDialogFragment : DialogFragment() {
         return object : Dialog(requireActivity(), theme) {
             override fun onBackPressed() {
                 onBackPressedCustom()
+            }
+        }
+    }
+
+    interface DisplayDialog {
+        fun alertDialog(
+            title: String,
+            message: String,
+            positiveButton: String,
+            negativeButton: String,
+            dialogListener: DialogListener?
+        )
+        fun pickerDialog(
+            title: String,
+            items: Array<String>,
+            defaultSelectedItem: Int,
+            positiveButton: String,
+            negativeButton: String,
+            dialogListener: DialogListener?
+        )
+    }
+
+    interface DialogListener {
+        fun onPositive(selectedItem: Int = 0)
+        fun onNegative()
+        fun onCancel()
+        fun onDismiss()
+    }
+
+    fun provideDisplayDialog(): DisplayDialog {
+        return object: DisplayDialog {
+            override fun alertDialog(
+                title: String,
+                message: String,
+                positiveButton: String,
+                negativeButton: String,
+                dialogListener: DialogListener?
+            ) {
+                lifecycleScope.launch {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setPositiveButton(positiveButton) { _, _ ->
+                            dialogListener?.onPositive()
+                        }
+                        .setNegativeButton(negativeButton) { _, _ ->
+                            dialogListener?.onNegative()
+                        }
+                        .setOnCancelListener {
+                            dialogListener?.onCancel()
+                        }
+                        .setOnDismissListener {
+                            dialogListener?.onDismiss()
+                        }
+                        .show()
+                }
+            }
+
+            override fun pickerDialog(
+                title: String,
+                items: Array<String>,
+                defaultSelectedItem: Int,
+                positiveButton: String,
+                negativeButton: String,
+                dialogListener: DialogListener?
+            ) {
+                lifecycleScope.launch {
+                    var selectedItem = defaultSelectedItem
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(title)
+                        .setSingleChoiceItems(items, defaultSelectedItem) { _, item ->
+                            selectedItem = item
+                        }
+                        .setPositiveButton(positiveButton) { _, _ ->
+                            dialogListener?.onPositive(selectedItem)
+                        }
+                        .setNegativeButton(negativeButton) { _, _ ->
+                            dialogListener?.onNegative()
+                        }
+                        .setOnCancelListener { _ ->
+                            dialogListener?.onCancel()
+                        }
+                        .setOnDismissListener {
+                            dialogListener?.onDismiss()
+                        }
+                        .show()
+                }
             }
         }
     }
