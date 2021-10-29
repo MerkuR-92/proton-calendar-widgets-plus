@@ -3,11 +3,9 @@ package me.proton.android.calendar.presentation.eventviewmodel
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
-import io.mockk.clearAllMocks
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -44,6 +42,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val handleDeleteUseCaseMock: HandleDeleteUseCase = mockk()
     val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
     val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
+    val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -68,6 +67,8 @@ open class EventViewModelTestCommon: KoinComponent {
         coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
 
         coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.getEventEntity()
+
+        coEvery { calendarWidgetRefresherMock.refresh() } just Runs
     }
 
     /**
@@ -91,6 +92,7 @@ open class EventViewModelTestCommon: KoinComponent {
             handleDeleteUseCase = handleDeleteUseCaseMock,
             updateCalendarUseCase = updateCalendarUseCaseMock,
             resourceProvider = resourceProviderMock,
+            widgetRefresher = calendarWidgetRefresherMock,
             handleAlarmsUseCase = handleAlarmsUseCaseMock
         )
     }
