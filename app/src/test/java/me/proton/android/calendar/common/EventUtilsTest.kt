@@ -42,6 +42,36 @@ internal class EventUtilsTest {
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isTrue()
 
     }
+    
+    @Test
+    fun `spans single day for part-time zero-duration at Midnight`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.25.4//EN
+    BEGIN:VEVENT
+    DTSTAMP:20210915T195051Z
+    DTSTART;TZID=Europe/Zurich:20210915T000000
+    DTEND;TZID=Europe/Zurich:20210915T000000
+    SEQUENCE:0
+    SUMMARY:Zero-duration start/ends at Midnight
+    STATUS:CONFIRMED
+    UID:v1uZ9ssGTcP5Lc28MTWj-VjQSPv3@proton.me
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent()
+
+        val timeZoneId = "Europe/Zurich"
+        val event = Event.from(
+            "id",
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            ICalUtilsImpl.parseICalString(iCalString)!!
+        )!!
+
+        assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isTrue()
+
+    }
 
     @Test
     fun `spans single day for part-time 2-day ending at Midnight`() {
@@ -191,6 +221,36 @@ internal class EventUtilsTest {
 
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 9, 15), timeZoneId)).isEqualTo(Pair(1, 2))
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 9, 16), timeZoneId)).isEqualTo(Pair(2, 2))
+
+    }
+
+    @Test
+    fun `calculate full day counter for part-time zero-duration`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.25.4//EN
+    BEGIN:VEVENT
+    DTSTAMP:20210915T195051Z
+    DTSTART;TZID=Europe/Zurich:20210915T000000
+    DTEND;TZID=Europe/Zurich:20210915T000000
+    SEQUENCE:0
+    SUMMARY:Zero-duration starts/ends at Midnight
+    STATUS:CONFIRMED
+    UID:v1uZ9ssGTcP5Lc28MTWj-VjQSPv3@proton.me
+    END:VEVENT
+    END:VCALENDAR
+            """.trimIndent()
+
+        val timeZoneId = "Europe/Zurich"
+        val event = Event.from(
+            "id",
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            ICalUtilsImpl.parseICalString(iCalString)!!
+        )!!
+
+        assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 9, 15), timeZoneId)).isEqualTo(Pair(1, 1))
 
     }
 

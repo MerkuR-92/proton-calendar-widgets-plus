@@ -92,7 +92,8 @@ object EventUtilsImpl : EventUtils {
         val todayOffset = ChronoUnit.DAYS.between(occurrenceStart, date).toInt() + 1
         val durationInDays = ChronoUnit.DAYS.between(occurrenceStart, occurrenceEndAdjustedForMidnight).toInt() + 1
 
-        return Pair(todayOffset, durationInDays)
+        // special case for zero-duration event
+        return Pair(todayOffset, if (durationInDays == 0) 1 else durationInDays)
     }
 
     override fun Event.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
@@ -525,6 +526,11 @@ object EventUtilsImpl : EventUtils {
 
         val dateTimeStart = this.getOccurrenceStart(timeZoneId)
         val dateTimeEnd = this.getOccurrenceEnd(timeZoneId)
+
+        // zero-duration part-time event, special case because of excluding last day of checked range
+        if (!this.isAllDay() && dateTimeStart == dateTimeEnd) {
+            return dateTimeStart.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)
+        }
 
         return (dateTimeStart.isBetween(fromDateTime, toDateTime, excludeFrom = false, excludeTo = true)) // starts in the range
                 || (dateTimeEnd.isBetween(fromDateTime, toDateTime, excludeFrom = true, excludeTo = false)) // ends in the range

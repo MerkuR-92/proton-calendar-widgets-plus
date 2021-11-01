@@ -748,8 +748,8 @@ internal class ICalUtilsTest {
     BEGIN:VCALENDAR
     VERSION:2.0
     BEGIN:VEVENT
-    DTSTART;TZID=/Europe/Budapest:20200625T000000
-    DTEND;TZID=/Europe/Budapest:20200625T003000
+    DTSTART;TZID=UTC:20200625T000000
+    DTEND;TZID=UTC:20200625T003000
     SUMMARY:part-day on 25th Jun, starts at midnight
     UID:EEB9eHnvGPpXK62b799jf9kL8OpG@proton.me
     DTSTAMP:20200625T133626Z
@@ -766,7 +766,7 @@ internal class ICalUtilsTest {
             true,
             0
         ), iCal, null)!!
-        val displayTimeZoneId = "Europe/Vilnius"
+        val displayTimeZoneId = "UTC"
 
                 assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 24),
@@ -801,14 +801,73 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `part-day zero-duration even overlaps with full day range`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=UTC:20200625T000000
+    DTEND;TZID=UTC:20200625T000000
+    SUMMARY:zero-duration on 25th Jun, starts at midnight
+    UID:EEB9eHnvGPpXK62b799jf9kL8OpG@proton.me
+    DTSTAMP:20200625T133626Z
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+        val displayTimeZoneId = "UTC"
+
+        assertThat(event.overlapsWithFullDayRange(
+            LocalDate.of(2020, 6, 24),
+            LocalDate.of(2020, 6, 24),
+            displayTimeZoneId
+        )).isFalse()
+
+        assertThat(event.overlapsWithFullDayRange(
+            LocalDate.of(2020, 6, 24),
+            LocalDate.of(2020, 6, 25),
+            displayTimeZoneId
+        )).isTrue()
+
+        assertThat(event.overlapsWithFullDayRange(
+            LocalDate.of(2020, 6, 25),
+            LocalDate.of(2020, 6, 25),
+            displayTimeZoneId
+        )).isTrue()
+
+        assertThat(event.overlapsWithFullDayRange(
+            LocalDate.of(2020, 6, 25),
+            LocalDate.of(2020, 6, 26),
+            displayTimeZoneId
+        )).isTrue()
+
+        assertThat(event.overlapsWithFullDayRange(
+            LocalDate.of(2020, 6, 27),
+            LocalDate.of(2020, 6, 27),
+            displayTimeZoneId
+        )).isFalse()
+
+    }
+
+    @Test
     fun `multi-day part-day event overlaps with full day range`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
     VERSION:2.0
     BEGIN:VEVENT
-    DTSTART;TZID=/Europe/Budapest:20200625T000000
-    DTEND;TZID=/Europe/Budapest:20200627T003000
+    DTSTART;TZID=UTC:20200625T000000
+    DTEND;TZID=UTC:20200627T003000
     SUMMARY:part-day on 25th Jun until 27 Jun, starts at midnight
     UID:EEB9eHnvGPpXK62b799jf9kL8OpG@proton.me
     DTSTAMP:20200625T133626Z
@@ -825,7 +884,7 @@ internal class ICalUtilsTest {
             true,
             0
         ), iCal, null)!!
-        val displayTimeZoneId = "Europe/Vilnius"
+        val displayTimeZoneId = "UTC"
 
         assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 24),

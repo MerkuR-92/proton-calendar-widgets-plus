@@ -192,8 +192,10 @@ data class Event private constructor(
             dateEnd == null || dateStart == dateEnd.minusDays(if (actualEndDate) 0 else 1)
         } else {
 
-            // for part-day Event, if it ends on Midnight, we don't count it spanning that last day
-            if (dateTimeEnd.toLocalTime() == LocalTime.MIDNIGHT) {
+            if (dateTimeStart == dateTimeEnd) {
+                true
+            } else if (dateTimeEnd.toLocalTime() == LocalTime.MIDNIGHT) {
+                // for part-day Event, if it ends on Midnight, we don't count it spanning that last day
                 dateStart == dateEnd.minusDays(1)
             } else {
                 dateStart == dateEnd
