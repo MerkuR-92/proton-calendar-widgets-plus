@@ -80,9 +80,7 @@ import org.koin.core.KoinComponent
 import java.io.*
 import java.lang.IllegalStateException
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
 
@@ -294,6 +292,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         dialogTitle = R.string.bootstrap_error_update_passphrase_title
                         dialogMessage = R.string.bootstrap_error_update_passphrase_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
+                    }
+                    UseCase.Error.SOME_CALENDARS_FAILED_BOOTSTRAP -> {
+                        dialogTitle = R.string.bootstrap_error_some_calendars_failed_title
+                        dialogMessage = R.string.bootstrap_error_some_calendars_failed_message
                     }
                 }
 

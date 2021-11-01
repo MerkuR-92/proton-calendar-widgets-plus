@@ -164,7 +164,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
         }
 
         return if (failedCalendarIds.isNotEmpty()) {
-            UseCase.Result.Error("calendar bootstrap failed for: ${failedCalendarIds.joinToString(separator = ", ")}")
+            UseCase.Result.Error("calendar bootstrap failed for: ${failedCalendarIds.joinToString(separator = ", ")}", UseCase.Error.SOME_CALENDARS_FAILED_BOOTSTRAP)
         } else {
 
             // sync alarms right after downloading calendars and events
