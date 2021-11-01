@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import androidx.annotation.VisibleForTesting
+import com.proton.gopenpgp.crypto.Crypto
 import ezvcard.VCard
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
@@ -11,6 +12,7 @@ import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
+import me.proton.core.crypto.common.pgp.Armored
 import me.proton.core.crypto.common.pgp.getFingerprintOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.entity.key.PublicAddress
@@ -178,6 +180,9 @@ class ObtainSendPreferencesUseCase(
 
             // pinned key is obsolete
             if (matchingPublicAddressKey?.isObsolete() == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
+
+            // pinned key is expired
+            if (isKeyExpired(pinnedPublicKey) == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
         }
 
         if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return SendPreferencesOrError.Error.PublicKeysInvalid
@@ -291,5 +296,9 @@ class ObtainSendPreferencesUseCase(
      * If true, do not use the key to encrypt new messages, but can verify signatures.
      */
     private fun PublicAddressKey.isObsolete() = !(this.flags and 2 == 2)
+
+    private fun isKeyExpired(armoredKey: Armored): Boolean? {
+        return kotlin.runCatching { Crypto.newKeyFromArmored(armoredKey).isExpired }.getOrNull()
+    }
 
 }
