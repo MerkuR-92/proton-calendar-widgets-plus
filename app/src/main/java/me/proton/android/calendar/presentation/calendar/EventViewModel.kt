@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar
 
 import android.app.Application
 import android.text.TextUtils
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.work.*
 import biweekly.ICalendar
@@ -108,7 +109,8 @@ class EventViewModel(
     private var timeStartBackup: LocalTime? = null
     private var timeEndBackup: LocalTime? = null
 
-    private var eventEdited = false
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var eventEdited = false
     private var editMode = false
     private var isCreate = false
 
@@ -120,7 +122,8 @@ class EventViewModel(
     private var eventCustomPartialDayAlarmsSave: ArrayList<VAlarm>? = null
     private var eventCustomAllDayAlarmsSave: ArrayList<VAlarm>? = null
 
-    private lateinit var calendarSettings: CalendarSettingsEntity
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var calendarSettings: CalendarSettingsEntity
 
     private var originalDbEvent: Event? = null
 
@@ -137,7 +140,7 @@ class EventViewModel(
     lateinit var userSettings: UserSettingsEntity
     lateinit var user: User
 
-    var recurrenceManuallyEdited: Boolean = false
+    var rruleManuallyEdited: Boolean = false
     private var singleEditsInfo: SingleEditsInfo? = null
 
     val eventDetailsState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
@@ -213,7 +216,7 @@ class EventViewModel(
         eventCustomAllDayAlarmsSave = null
         dbEvent = null
         originalDbEvent = null
-        recurrenceManuallyEdited = false
+        rruleManuallyEdited = false
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
         hasEmailNotifications = false
@@ -371,7 +374,7 @@ class EventViewModel(
                 newVEvent.setEnd(endZonedDateTime.toLocalDate())
             }
 
-        } else { // create new all-day event
+        } else { // create new part-day event
             newVEvent.setStart(startDate, startTime, eventTimeZoneId)
             newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), eventTimeZoneId)
             newICalendar.setStartTimeZone(eventTimeZoneId)
@@ -790,7 +793,7 @@ class EventViewModel(
         customMonthly: Boolean = false
     ) {
         markEventAsEdited()
-        recurrenceManuallyEdited = true
+        rruleManuallyEdited = true
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -1218,8 +1221,7 @@ class EventViewModel(
                 if (!isEventNew() && isApiEventAnInvitation != false) {
                     eventFormSnackState.value = EventSnackState.DisplaySnack(
                         resourceProvider.provideString(
-                            if (isApiEventAnInvitation == null && isEventNew()) R.string.snack_event_created_error
-                            else if (isApiEventAnInvitation == null) R.string.snack_event_updated_error
+                            if (isApiEventAnInvitation == null) R.string.snack_event_updated_error
                             else R.string.snack_event_edit_with_attendees_error
                         )
                     )
@@ -1310,7 +1312,7 @@ class EventViewModel(
             }
         } else {
 
-            // Display Send Invitation Dialog (create an event with attendees)
+            // Display Send Invitation Dialog (create an event with attendees / add attendees to a single event)
             uiScope.launch {
                 displayDialog.alertDialog(
                     resourceProvider.provideString(R.string.event_send_invite_dialog_title),
@@ -1342,7 +1344,7 @@ class EventViewModel(
      */
     private suspend fun saveEventWithAttendeesSendPreferences(
         displayDialog: BaseDialogFragment.DisplayDialog,
-        isAddParticipants: Boolean,
+        isAddParticipantsToRecurring: Boolean,
         occurrenceNumber: Int,
         timeFormatIs24Hour: Boolean
     ) {
@@ -1388,8 +1390,8 @@ class EventViewModel(
                                         }
 
                                         // We continue the save flow without the invalid attendees
-                                        if (isAddParticipants) {
-                                            // Adding attendees to an existing event
+                                        if (isAddParticipantsToRecurring) {
+                                            // Adding attendees to an existing recurring event
                                             handleSave(
                                                 EventEditDeleteOption.ALL_EVENTS,
                                                 occurrenceNumber,
@@ -1397,7 +1399,7 @@ class EventViewModel(
                                                 sendPreferencesResults.sendPreferences
                                             )
                                         } else {
-                                            // Create an event with attendees
+                                            // Create an event with attendees / Add attendees to a single event
                                             saveEvent(
                                                 displayDialog,
                                                 sendPreferencesResults.sendPreferences,
@@ -1417,8 +1419,8 @@ class EventViewModel(
             } else {
 
                 // No send preferences errors, we continue the save flow
-                if (isAddParticipants) {
-                    // Adding attendees to an existing event
+                if (isAddParticipantsToRecurring) {
+                    // Adding attendees to an existing recurring event
                     handleSave(
                         EventEditDeleteOption.ALL_EVENTS,
                         occurrenceNumber,
@@ -1426,7 +1428,7 @@ class EventViewModel(
                         sendPreferencesResults.sendPreferences
                     )
                 } else {
-                    // Create an event with attendees
+                    // Create an event with attendees / Add attendees to a single event
                     saveEvent(
                         displayDialog,
                         sendPreferencesResults.sendPreferences,
@@ -1533,7 +1535,7 @@ class EventViewModel(
                                 }
 
                             val message =
-                                if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && recurrenceManuallyEdited && hasRecurrenceRuleBeenEdited()) {
+                                if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && rruleManuallyEdited && hasRecurrenceRuleBeenEdited()) {
                                     // Display warning dialog for this event option if recurrence rule has been edited
                                     resourceProvider.provideString(R.string.event_recurring_update_this_description)
                                 } else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (hasExDates() || hasSingleEdit)) {
@@ -1642,7 +1644,7 @@ class EventViewModel(
             userSettings,
             eventTimeZoneId,
             userId,
-            recurrenceManuallyEdited,
+            rruleManuallyEdited,
             isCreate
         )
 
@@ -2123,7 +2125,8 @@ class EventViewModel(
     /**
      * @returns the message to be displayed in delete as an attendee confirmation dialog
      */
-    private fun getDeleteAsAnAttendeeMessage(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun getDeleteAsAnAttendeeMessage(
         displayWarning: Boolean,
         isCalendarDisabled: Boolean,
         sendPrefsFailed: Boolean,
@@ -2137,7 +2140,7 @@ class EventViewModel(
     ): String {
         return if (displayWarning.not()) {
             // Display basic delete event message
-            if (isSingleEdit && (isSingleEdit && isOrphanSingleEdit.not()) && isCalendarDisabled.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event)
+            if (isSingleEdit && isOrphanSingleEdit.not() && isCalendarDisabled.not()) resourceProvider.provideString(R.string.dialog_description_delete_non_standalone_single_edit_event)
             else if (isRecurring || (isSingleEdit && isOrphanSingleEdit.not() && isCalendarDisabled)) {
                 val message = resourceProvider.provideString(R.string.dialog_description_delete_recurring_event)
 
@@ -2781,26 +2784,24 @@ class EventViewModel(
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
 
         if (updateParticipationStatusUseCaseResult is UseCase.Result.Success<*> && sendPreferences.isNotEmpty()) {
-            updateParticipationStatusUseCaseResult.returnValue.tryCast<Int> {
 
-                // If we updated the participation status on BE, we send the reply to the organizer. We consider sending the reply to be optional.
-                val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
-                    userId,
-                    eventCopy,
-                    dbEvent?.iCalendar?.timezoneInfo,
-                    userAttendee.copy(),
-                    event.iCalEvent.organizer.email,
-                    participationStatus,
-                    sendPreferences,
-                    Date.from(updateTime), // Use same updateTime as for Update part stat BE call
-                    eventEntity,
-                    true,
-                    event.defaultTimeZone!!,
-                    timeFormatIs24Hours
-                )
-                sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
-                // Do not return use case result. Sending the email is optional for proton to proton so we don't care if it failed
-            }
+            // If we updated the participation status on BE, we send the reply to the organizer. We consider sending the reply to be optional.
+            val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
+                userId,
+                eventCopy,
+                dbEvent?.iCalendar?.timezoneInfo,
+                userAttendee.copy(),
+                event.iCalEvent.organizer.email,
+                participationStatus,
+                sendPreferences,
+                Date.from(updateTime), // Use same updateTime as for Update part stat BE call
+                eventEntity,
+                true,
+                event.defaultTimeZone!!,
+                timeFormatIs24Hours
+            )
+            sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+            // Do not return use case result. Sending the email is optional for proton to proton so we don't care if it failed
         }
 
         handleChangeAnswerResult(

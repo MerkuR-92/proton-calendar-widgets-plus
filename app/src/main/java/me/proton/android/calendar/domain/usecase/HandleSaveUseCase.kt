@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.ICalendar
 import biweekly.util.ICalDate
 import biweekly.util.ICalDateFormat
 import biweekly.util.Recurrence
@@ -20,7 +19,6 @@ import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
@@ -39,7 +37,6 @@ class HandleSaveUseCase(
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
-    private val resourceProvider: ResourceProvider,
     private val sendEmailUseCase: SendEmailUseCase
 ) {
 
@@ -58,7 +55,7 @@ class HandleSaveUseCase(
         userSettings: UserSettingsEntity,
         eventTimeZoneId: String,
         userId: UserId,
-        recurrenceManuallyEdited: Boolean,
+        rruleManuallyEdited: Boolean,
         isCreate: Boolean
     ): UseCase.Result {
 
@@ -70,7 +67,8 @@ class HandleSaveUseCase(
 
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
 
-        val dbEvent = calendarsRepository.selectEventEntity(event.id)?.let { transformEventUseCase.execute(it) }
+        val eventEntity = calendarsRepository.selectEventEntity(event.id)
+        val dbEvent = eventEntity?.let { transformEventUseCase.execute(it) }
         val immutableOriginalDbEvent = originalDbEvent
         val dbEventStartDate = dbEvent?.getStart(event.defaultTimeZone!!)
         val originalDbEventStartDate = immutableOriginalDbEvent?.getStart(event.defaultTimeZone!!)
@@ -112,7 +110,7 @@ class HandleSaveUseCase(
                     dbEventStartDate,
                     originalDbEventStartDate,
                     occurrenceNumber,
-                    recurrenceManuallyEdited
+                    rruleManuallyEdited
                 )
             }
             else -> HandleSaveOptionResult.Success(event) // else no special changes for regular event, just overwrite everything
@@ -411,7 +409,7 @@ class HandleSaveUseCase(
         dbEventStartDate: ZonedDateTime?,
         originalDbEventStartDate: ZonedDateTime?,
         occurrenceNumber: Int,
-        recurrenceManuallyEdited: Boolean
+        rruleManuallyEdited: Boolean
     ): HandleSaveOptionResult {
 
         // All events expected behavior :
@@ -468,7 +466,7 @@ class HandleSaveUseCase(
                 dbEventWithOccurrenceStartDate
             })?.truncatedTo(ChronoUnit.DAYS) != event.getStart(event.defaultTimeZone!!).truncatedTo(ChronoUnit.DAYS)
 
-        return if (!hasDayChanged && !recurrenceManuallyEdited) {
+        return if (!hasDayChanged && !rruleManuallyEdited) {
 
             // update the original event's DTSTART only with new time (leave day the same)
 

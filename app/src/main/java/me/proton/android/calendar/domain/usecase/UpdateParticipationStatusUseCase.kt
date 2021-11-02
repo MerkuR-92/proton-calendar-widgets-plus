@@ -56,7 +56,7 @@ class UpdateParticipationStatusUseCase(
                 }
 
                 // If getEvent failed we still return success and will receive updated event in next server event loop
-                UseCase.Result.Success(updateParticipationStatusResponse.data.event.modifyTime)
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("api error updating participation status: ${updateParticipationStatusResponse.error}")

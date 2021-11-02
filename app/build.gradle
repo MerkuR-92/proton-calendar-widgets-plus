@@ -10,6 +10,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'jacoco'
 
 def sentryDsn = project.hasProperty("sentryDsn") ? sentryDsn : "https://abc@sentry.com/666"
 def storeFilePath = project.hasProperty('keyStoreFilePath') ? keyStoreFilePath : "protonkey.jks"
@@ -35,6 +36,63 @@ detekt {
             destination = file("build/reports/detekt.json")
         }
     }
+}
+
+jacoco {
+    toolVersion = '0.8.7'
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest','createDebugCoverageReport']) {
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*', 'ch.protonmail.android.utils.nativelib', '**/ch/protonmail/**']
+    def debugTree = fileTree(dir: "$project.buildDir/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom files([mainSrc])
+    classDirectories.setFrom files([debugTree])
+    executionData.setFrom fileTree(dir: "$buildDir", includes: [
+            "**/*.exec",
+            "**/*.ec"
+    ])
+}
+
+task coverageReport() {
+    dependsOn jacocoTestReport
+
+    def reportFile = project.file("build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+    inputs.file(reportFile)
+
+    doLast {
+        def slurper = new XmlSlurper()
+        slurper.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+        slurper.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+        def xml = slurper.parse(reportFile)
+        def counter = xml.counter.find {
+            node -> node.@type == 'INSTRUCTION'
+        }
+        def missed = counter.@missed.toDouble()
+        def covered = counter.@covered.toDouble()
+        def total = missed + covered
+        def percentage = covered / total * 100
+
+        printf "Missed %.0f branches%n", missed
+        printf "Covered %.0f branches%n", covered
+        printf "Total %.0f%%%n", percentage
+    }
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
 }
 
 android {
@@ -85,6 +143,7 @@ android {
         }
         debug {
             buildConfigField("String", "SENTRY_DSN", "\"null\"")
+            testCoverageEnabled true
         }
     }
     compileOptions {
@@ -102,6 +161,14 @@ android {
     }
     dataBinding {
         enabled = true
+    }
+    sourceSets {
+        androidTest {
+            java.srcDirs += "src/sharedTest/java"
+        }
+        test {
+            java.srcDirs += "src/sharedTest/java"
+        }
     }
 }
 
@@ -231,7 +298,7 @@ dependencies {
     detektPlugins 'pm.algirdas.detekt:codeanalysis:0.3.3'
     detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
 
-    androidTestImplementation "io.mockk:mockk-android:1.10.5"
+    androidTestImplementation "io.mockk:mockk-android:1.12.0"
     androidTestImplementation "androidx.test:core:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:runner:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.version.androidx_test}"
@@ -239,12 +306,16 @@ dependencies {
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     testImplementation 'com.willowtreeapps.assertk:assertk-jvm:0.21'
-    testImplementation "io.mockk:mockk:1.10.5"
+    testImplementation "io.mockk:mockk:1.12.0"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
 
     testImplementation "org.koin:koin-test:${rootProject.ext.version.koin}"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+
+    // Core library
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
 
 }
