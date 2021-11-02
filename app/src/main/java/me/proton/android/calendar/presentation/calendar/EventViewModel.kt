@@ -140,7 +140,7 @@ class EventViewModel(
     lateinit var userSettings: UserSettingsEntity
     lateinit var user: User
 
-    var recurrenceManuallyEdited: Boolean = false
+    var rruleManuallyEdited: Boolean = false
     private var singleEditsInfo: SingleEditsInfo? = null
 
     val eventDetailsState: MutableStateFlow<EventState> = MutableStateFlow(EventState.Idle)
@@ -216,7 +216,7 @@ class EventViewModel(
         eventCustomAllDayAlarmsSave = null
         dbEvent = null
         originalDbEvent = null
-        recurrenceManuallyEdited = false
+        rruleManuallyEdited = false
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
         hasEmailNotifications = false
@@ -793,7 +793,7 @@ class EventViewModel(
         customMonthly: Boolean = false
     ) {
         markEventAsEdited()
-        recurrenceManuallyEdited = true
+        rruleManuallyEdited = true
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -1535,7 +1535,7 @@ class EventViewModel(
                                 }
 
                             val message =
-                                if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && recurrenceManuallyEdited && hasRecurrenceRuleBeenEdited()) {
+                                if (eventEditDeleteOption == EventEditDeleteOption.THIS_EVENT && rruleManuallyEdited && hasRecurrenceRuleBeenEdited()) {
                                     // Display warning dialog for this event option if recurrence rule has been edited
                                     resourceProvider.provideString(R.string.event_recurring_update_this_description)
                                 } else if (eventEditDeleteOption == EventEditDeleteOption.ALL_EVENTS && (hasExDates() || hasSingleEdit)) {
@@ -1644,7 +1644,7 @@ class EventViewModel(
             userSettings,
             eventTimeZoneId,
             userId,
-            recurrenceManuallyEdited,
+            rruleManuallyEdited,
             isCreate
         )
 

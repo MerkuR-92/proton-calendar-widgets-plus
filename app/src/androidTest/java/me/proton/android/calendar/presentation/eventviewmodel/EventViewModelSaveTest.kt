@@ -15,10 +15,6 @@ import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.CalendarMocks.getCalendarEntity
-import me.proton.android.calendar.mocks.CalendarMocks.getMemberEntity
-import me.proton.android.calendar.mocks.EventMocks.getEvent
-import me.proton.android.calendar.mocks.EventMocks.getEventEntity
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
@@ -41,10 +37,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Mock hidden default calendar
-            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns getCalendarEntity(isHidden = true)
+            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity(isHidden = true)
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -90,10 +86,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 )
             }
@@ -123,12 +119,12 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
     fun editInviteErrorTest() { // TODO To remove once editing invite is allowed
         runBlocking {
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(isOrganizer = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isOrganizer = true)
 
             // Mock fetchEventById with event so that isApiEventAnInvitation returns true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity(hasAttendees = true)
+                    EventMocks.provideEventEntity(hasAttendees = true)
                 )
             )
 
@@ -173,12 +169,12 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event with hidden calendar
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isRecurring = true, hasHiddenCalendar = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true, hasHiddenCalendar = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity()
+                    EventMocks.provideEventEntity()
                 )
             )
 
@@ -187,7 +183,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -244,10 +240,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = false
                 )
             }
@@ -285,17 +281,17 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity()
+                    EventMocks.provideEventEntity()
                 )
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -359,10 +355,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = false
                 )
             }
@@ -402,17 +398,17 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isRecurring = true, hasExDate = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true, hasExDate = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity()
+                    EventMocks.provideEventEntity()
                 )
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -476,10 +472,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = false
                 )
             }
@@ -519,17 +515,17 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity()
+                    EventMocks.provideEventEntity()
                 )
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -571,7 +567,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Set RRule manually edited
-            eventViewModel.recurrenceManuallyEdited = true
+            eventViewModel.rruleManuallyEdited = true
 
             // Update recurrence rule count (from 10 to 20)
             eventViewModel.handleRecurrence(
@@ -603,10 +599,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = true,
+                    rruleManuallyEdited = true,
                     isCreate = false
                 )
             }
@@ -646,7 +642,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -659,13 +655,13 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                 Pair(
                     attendeeEmail,
                     ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     )
                 )
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(getMemberEntity())
+            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call
             coEvery {
@@ -710,13 +706,13 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     editOption = null,
                     occurrenceNumber = occurrenceNumber,
                     timeFormatIs24Hours = timeFormat.toBoolean(),
-                    sendPreferences = mapOf(Pair(attendeeEmail, UserMocks.getSendPreferences())),
+                    sendPreferences = mapOf(Pair(attendeeEmail, UserMocks.provideSendPreferences())),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 )
             }
@@ -748,17 +744,17 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isRecurring = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity()
+                    EventMocks.provideEventEntity()
                 )
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -774,13 +770,13 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                 Pair(
                     attendeeEmail,
                     ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     )
                 )
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(getMemberEntity())
+            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call
             coEvery {
@@ -826,13 +822,13 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     editOption = EventEditDeleteOption.ALL_EVENTS,
                     occurrenceNumber = occurrenceNumber,
                     timeFormatIs24Hours = timeFormat.toBoolean(),
-                    sendPreferences = mapOf(Pair(attendeeEmail, UserMocks.getSendPreferences())),
+                    sendPreferences = mapOf(Pair(attendeeEmail, UserMocks.provideSendPreferences())),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = false
                 )
             }
@@ -864,17 +860,17 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isRecurring = true, hasExDate = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true, hasExDate = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    getEventEntity()
+                    EventMocks.provideEventEntity()
                 )
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -891,7 +887,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(getMemberEntity())
+            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
@@ -959,10 +955,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = false
                 )
             }
@@ -1010,7 +1006,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -1024,7 +1020,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                 Pair(
                     organizerEmail,
                     ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     )
                 ),
                 Pair(
@@ -1034,7 +1030,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(getMemberEntity())
+            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call
             coEvery {
@@ -1099,13 +1095,13 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     editOption = null,
                     occurrenceNumber = occurrenceNumber,
                     timeFormatIs24Hours = timeFormat.toBoolean(),
-                    sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                    sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 )
             }
@@ -1158,7 +1154,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
@@ -1176,7 +1172,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(getMemberEntity())
+            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
@@ -1243,10 +1239,10 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     sendPreferences = mapOf(),
                     event = event!!,
                     originalDbEvent = null,
-                    userSettings = UserMocks.getUserSettingsEntity(),
+                    userSettings = UserMocks.provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 )
             }

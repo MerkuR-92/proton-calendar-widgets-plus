@@ -9,7 +9,7 @@ import me.proton.core.util.kotlin.toBoolean
 
 object CalendarMocks {
 
-    fun getCalendarEntity(id: String = calendarId, isDisabled: Boolean = false, isHidden: Boolean = false): CalendarEntity {
+    fun provideCalendarEntity(id: String = calendarId, isDisabled: Boolean = false, isHidden: Boolean = false): CalendarEntity {
         return CalendarEntity(
             id = id,
             name = calendarName,
@@ -22,7 +22,7 @@ object CalendarMocks {
         )
     }
 
-    fun getCalendarSettingsEntity(id: String = calendarId): CalendarSettingsEntity {
+    fun provideCalendarSettingsEntity(id: String = calendarId): CalendarSettingsEntity {
         return CalendarSettingsEntity(
             id = calendarSettingsId,
             calendarId = id,
@@ -32,7 +32,7 @@ object CalendarMocks {
         )
     }
 
-    fun getCalendarUserSettingsEntity(): CalendarUserSettingsEntity {
+    fun provideCalendarUserSettingsEntity(): CalendarUserSettingsEntity {
         return CalendarUserSettingsEntity(
             fkUserId = userId.id,
             weekLength = weekLength,
@@ -46,7 +46,7 @@ object CalendarMocks {
         )
     }
 
-    fun getCalendar(hasDisabledCalendar: Boolean = false, isHidden: Boolean = false): Calendar {
+    fun provideCalendar(hasDisabledCalendar: Boolean = false, isHidden: Boolean = false): Calendar {
         return Calendar(
             calendarId,
             calendarName,
@@ -57,7 +57,7 @@ object CalendarMocks {
         )
     }
 
-    fun getMemberEntity(memberEmail: String = userEmail): MemberEntity {
+    fun provideMemberEntity(memberEmail: String = userEmail): MemberEntity {
         return MemberEntity(
             id = memberId,
             permissions = MemberEntity.Permission.SUPEROWNER.value,

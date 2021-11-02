@@ -23,8 +23,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.EventMocks.getEvent
-import me.proton.android.calendar.mocks.EventMocks.getEventEntity
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
 import org.junit.Test
@@ -46,14 +44,14 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
                 hasDefaultAlarms = false
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -62,7 +60,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -83,7 +81,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity()
+                    event = EventMocks.provideEventEntity()
                 )
             )
 
@@ -119,7 +117,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.ACCEPTED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
                 eventEntity = null,
                 isProtonProtonInvite = false,
@@ -152,14 +150,14 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
                 hasDefaultAlarms = false
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -168,7 +166,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -184,7 +182,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity()
+                    event = EventMocks.provideEventEntity()
                 )
             )
 
@@ -223,7 +221,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.ACCEPTED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
                 eventEntity = null,
                 isProtonProtonInvite = false,
@@ -250,14 +248,14 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
                 hasDefaultAlarms = false
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -320,7 +318,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
                 isAttendee = true,
                 isProtonProtonInvite = true,
                 hasHiddenCalendar = true,
@@ -329,7 +327,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -338,7 +336,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -359,7 +357,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity()
+                    event = EventMocks.provideEventEntity()
                 )
             )
 
@@ -395,9 +393,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.ACCEPTED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = getEventEntity(),
+                eventEntity = EventMocks.provideEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -432,7 +430,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
                 isRecurring = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -442,7 +440,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -451,7 +449,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -472,7 +470,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity()
+                    event = EventMocks.provideEventEntity()
                 )
             )
 
@@ -517,9 +515,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.ACCEPTED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = getEventEntity(),
+                eventEntity = EventMocks.provideEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -560,7 +558,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns EventMocks.getEvent(
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
                 isRecurring = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -570,7 +568,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -579,7 +577,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -600,13 +598,13 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity()
+                    event = EventMocks.provideEventEntity()
                 )
             )
 
             // Mock single edits info (no single edits)
             coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf(
-                getEvent(isSingleEdit = true, isAttendee = true, participationStatus = ParticipationStatus.TENTATIVE, isProtonProtonInvite = true, hasHiddenCalendar = true)
+                EventMocks.provideEvent(isSingleEdit = true, isAttendee = true, participationStatus = ParticipationStatus.TENTATIVE, isProtonProtonInvite = true, hasHiddenCalendar = true)
             )
 
             // Confirmation dialog
@@ -647,9 +645,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.ACCEPTED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = getEventEntity(),
+                eventEntity = EventMocks.provideEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -690,8 +688,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock single edit event with user as attendee
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns getEventEntity(isSingleEdit = true)
-            coEvery { transformEventUseCaseMock.execute(getEventEntity(isSingleEdit = true)) } returns getEvent(
+            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventEntity(isSingleEdit = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true)) } returns EventMocks.provideEvent(
                 isSingleEdit = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -701,7 +699,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -710,7 +708,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -731,7 +729,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, singleEditEventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity(isSingleEdit = true)
+                    event = EventMocks.provideEventEntity(isSingleEdit = true)
                 )
             )
 
@@ -778,9 +776,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.DECLINED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = getEventEntity(isSingleEdit = true),
+                eventEntity = EventMocks.provideEventEntity(isSingleEdit = true),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -819,8 +817,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock single edit event with user as attendee
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns getEventEntity(isSingleEdit = true)
-            coEvery { transformEventUseCaseMock.execute(getEventEntity(isSingleEdit = true)) } returns getEvent(
+            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventEntity(isSingleEdit = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true)) } returns EventMocks.provideEvent(
                 isSingleEdit = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -830,7 +828,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             )
 
             // Get address for current user
-            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+            coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Get canonical and send preferences for organizer
             coEvery { getCanonicalEmailsUseCaseMock.invoke(userId, listOf(organizerEmail)) } returns mapOf(Pair(
@@ -839,7 +837,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             coEvery { obtainSendPreferencesUseCaseMock.execute(userId, mapOf(Pair(organizerEmail, organizerEmail))) } returns mapOf(
                 Pair(
                     organizerEmail, ObtainSendPreferencesUseCase.Result.Success(
-                        sendPreferences = UserMocks.getSendPreferences()
+                        sendPreferences = UserMocks.provideSendPreferences()
                     ))
             )
 
@@ -860,7 +858,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, singleEditEventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    event = getEventEntity(isSingleEdit = true)
+                    event = EventMocks.provideEventEntity(isSingleEdit = true)
                 )
             )
 
@@ -899,9 +897,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 userAttendee = userAttendee,
                 organizerEmail = organizerEmail,
                 participationStatus = ParticipationStatus.DECLINED,
-                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.getSendPreferences())),
+                sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = getEventEntity(isSingleEdit = true),
+                eventEntity = EventMocks.provideEventEntity(isSingleEdit = true),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()

@@ -6,9 +6,9 @@ import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.TestsLogger
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.EventMocks.getEvent
-import me.proton.android.calendar.mocks.EventMocks.getEventEntity
-import me.proton.android.calendar.mocks.UserMocks.getUserSettingsEntity
+import me.proton.android.calendar.mocks.EventMocks.provideEvent
+import me.proton.android.calendar.mocks.EventMocks.provideEventEntity
+import me.proton.android.calendar.mocks.UserMocks.provideUserSettingsEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -49,8 +49,8 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create single event test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = false)
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
+            val event = provideEvent(isRecurring = false)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -62,10 +62,10 @@ internal class HandleSaveUseCaseTest {
                     sendPreferences = mapOf(),
                     event = event,
                     originalDbEvent = null,
-                    userSettings = getUserSettingsEntity(),
+                    userSettings = provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 ) is UseCase.Result.Success<*>
             )
@@ -80,8 +80,8 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create recurring event test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = true)
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
+            val event = provideEvent(isRecurring = true)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -93,10 +93,10 @@ internal class HandleSaveUseCaseTest {
                     sendPreferences = mapOf(),
                     event = event,
                     originalDbEvent = null,
-                    userSettings = getUserSettingsEntity(),
+                    userSettings = provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 ) is UseCase.Result.Success<*>
             )
@@ -111,8 +111,8 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create single event with attendees test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = false, isOrganizer = true)
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
+            val event = provideEvent(isRecurring = false, isOrganizer = true)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -124,10 +124,10 @@ internal class HandleSaveUseCaseTest {
                     sendPreferences = mapOf(),
                     event = event,
                     originalDbEvent = null,
-                    userSettings = getUserSettingsEntity(),
+                    userSettings = provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 ) is UseCase.Result.Success<*>
             )
@@ -146,8 +146,8 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create recurring event with attendees test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity()
-            val event = getEvent(isRecurring = true, isOrganizer = true)
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
+            val event = provideEvent(isRecurring = true, isOrganizer = true)
             coEvery { transformEventUseCaseMock.execute(any()) } returns event
 
             /* Create single event */
@@ -159,10 +159,10 @@ internal class HandleSaveUseCaseTest {
                     sendPreferences = mapOf(), // TODO Mock send prefs
                     event = event,
                     originalDbEvent = null,
-                    userSettings = getUserSettingsEntity(),
+                    userSettings = provideUserSettingsEntity(),
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
-                    recurrenceManuallyEdited = false,
+                    rruleManuallyEdited = false,
                     isCreate = true
                 ) is UseCase.Result.Success<*>
             )

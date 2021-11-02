@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import biweekly.ICalendar
 import biweekly.util.ICalDate
 import biweekly.util.ICalDateFormat
 import biweekly.util.Recurrence
@@ -20,7 +19,6 @@ import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
@@ -57,7 +55,7 @@ class HandleSaveUseCase(
         userSettings: UserSettingsEntity,
         eventTimeZoneId: String,
         userId: UserId,
-        recurrenceManuallyEdited: Boolean,
+        rruleManuallyEdited: Boolean,
         isCreate: Boolean
     ): UseCase.Result {
 
@@ -112,7 +110,7 @@ class HandleSaveUseCase(
                     dbEventStartDate,
                     originalDbEventStartDate,
                     occurrenceNumber,
-                    recurrenceManuallyEdited
+                    rruleManuallyEdited
                 )
             }
             else -> HandleSaveOptionResult.Success(event) // else no special changes for regular event, just overwrite everything
@@ -411,7 +409,7 @@ class HandleSaveUseCase(
         dbEventStartDate: ZonedDateTime?,
         originalDbEventStartDate: ZonedDateTime?,
         occurrenceNumber: Int,
-        recurrenceManuallyEdited: Boolean
+        rruleManuallyEdited: Boolean
     ): HandleSaveOptionResult {
 
         // All events expected behavior :
@@ -468,7 +466,7 @@ class HandleSaveUseCase(
                 dbEventWithOccurrenceStartDate
             })?.truncatedTo(ChronoUnit.DAYS) != event.getStart(event.defaultTimeZone!!).truncatedTo(ChronoUnit.DAYS)
 
-        return if (!hasDayChanged && !recurrenceManuallyEdited) {
+        return if (!hasDayChanged && !rruleManuallyEdited) {
 
             // update the original event's DTSTART only with new time (leave day the same)
 

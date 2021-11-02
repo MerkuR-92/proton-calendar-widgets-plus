@@ -12,14 +12,12 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.CalendarMocks.getCalendarUserSettingsEntity
-import me.proton.android.calendar.mocks.EventMocks.getEvent
-import me.proton.android.calendar.mocks.EventMocks.getEventEntity
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.mocks.CalendarMocks.provideCalendarUserSettingsEntity
+import me.proton.android.calendar.mocks.EventMocks.provideEvent
+import me.proton.android.calendar.mocks.EventMocks.provideEventEntity
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 
 
 internal class HandleDeleteUseCaseTest {
@@ -58,7 +56,7 @@ internal class HandleDeleteUseCaseTest {
         coEvery { calendarsApiMock.getEventsByUid(userId, any(), any(), any()) } returns ApiResponse.Success(
             EventsByUidApiResponse(
                 listOf(
-                    getEventEntity()
+                    provideEventEntity()
                 )
             )
         )
@@ -72,13 +70,13 @@ internal class HandleDeleteUseCaseTest {
             )
         )
 
-        coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns getEventEntity() // We do not care about this EventEntity since it is just used as a parameter for transformEventUseCase and that is mocked above to return event
-        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns getCalendarUserSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectRootEventEntity(any()) } returns getEventEntity()
+        coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity() // We do not care about this EventEntity since it is just used as a parameter for transformEventUseCase and that is mocked above to return event
+        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns provideCalendarUserSettingsEntity()
+        coEvery { calendarsRepositoryMock.selectRootEventEntity(any()) } returns provideEventEntity()
         coEvery { calendarsRepositoryMock.deleteEventsById(any()) } just Runs
         coEvery { calendarsRepositoryMock.fetchEventById(userId, any(), any()) } returns ApiResponse.Success(
             EventApiResponse(
-                event = getEventEntity()
+                event = provideEventEntity()
             )
         )
 
@@ -118,7 +116,7 @@ internal class HandleDeleteUseCaseTest {
                     index = 0,
                     response = SyncResponse(
                         code = ApiResponseCode.EVENT_DOES_NOT_EXIST,
-                        event = getEventEntity()
+                        event = provideEventEntity()
                     )
                 )
             )
@@ -127,7 +125,7 @@ internal class HandleDeleteUseCaseTest {
                     index = 0,
                     response = SyncResponse(
                         code = 0,
-                        event = getEventEntity()
+                        event = provideEventEntity()
                     )
                 )
             )
@@ -143,7 +141,7 @@ internal class HandleDeleteUseCaseTest {
 
         // TODO Handle Single edits by preparing second set of EventEntity & Event and mocking transformEventUseCaseMock parameter to match either
 
-        val event = getEvent(isRecurring = isRecurring)
+        val event = provideEvent(isRecurring = isRecurring)
 
         coEvery { transformEventUseCaseMock.execute(any()) } returns event
 

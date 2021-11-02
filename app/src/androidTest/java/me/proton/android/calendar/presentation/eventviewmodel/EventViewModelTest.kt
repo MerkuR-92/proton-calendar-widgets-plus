@@ -7,10 +7,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.CalendarMocks.getCalendarEntity
-import me.proton.android.calendar.mocks.CalendarMocks.getCalendarSettingsEntity
-import me.proton.android.calendar.mocks.EventMocks.getEvent
-import me.proton.android.calendar.mocks.EventMocks.getEventEntity
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent
@@ -77,9 +73,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
             val startTime = LocalTime.of(12, 15)
             val endTime = LocalTime.of(12, 45)
 
-            assert(eventViewModel.eventLiveData.value?.getStart(TimeZone.getDefault().id)?.toLocalDate() == startDate)
-            assert(eventViewModel.eventLiveData.value?.getStart(TimeZone.getDefault().id)?.toLocalTime() == startTime)
-            assert(eventViewModel.eventLiveData.value?.getEnd(TimeZone.getDefault().id)?.toLocalTime() == endTime)
+            assert(eventViewModel.eventLiveData.value?.getStart(defaultTimezone)?.toLocalDate() == startDate)
+            assert(eventViewModel.eventLiveData.value?.getStart(defaultTimezone)?.toLocalTime() == startTime)
+            assert(eventViewModel.eventLiveData.value?.getEnd(defaultTimezone)?.toLocalTime() == endTime)
 
             assert(eventViewModel.eventLiveData.value?.isAllDay() == false)
 
@@ -94,7 +90,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = false,
@@ -114,7 +110,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
@@ -134,17 +130,17 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
 
             // No default calendar
             coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns null
 
-            // Alternative calendar
-            val alternativeCalendarId = "alternativeCalendarId"
-            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(getCalendarEntity(id = alternativeCalendarId))
+            // Fallback calendar
+            val fallbackCalendarId = "fallbackCalendarId"
+            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
 
-            // Alternative calendar settings
-            coEvery { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) } returns getCalendarSettingsEntity(id = alternativeCalendarId)
+            // Fallback calendar settings
+            coEvery { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) } returns CalendarMocks.provideCalendarSettingsEntity(id = fallbackCalendarId)
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
@@ -156,9 +152,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
 
-            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) }
 
-            assert(eventViewModel.calendarSettings.calendarId == alternativeCalendarId)
+            assert(eventViewModel.calendarSettings.calendarId == fallbackCalendarId)
         }
     }
 
@@ -170,18 +166,18 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent()
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
 
             // No default calendar
-            val calendarEntity = getCalendarEntity(isDisabled = true)
+            val calendarEntity = CalendarMocks.provideCalendarEntity(isDisabled = true)
             coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns calendarEntity
 
-            // Alternative calendar
-            val alternativeCalendarId = "alternativeCalendarId"
-            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(getCalendarEntity(id = alternativeCalendarId))
+            // Fallback calendar
+            val fallbackCalendarId = "fallbackCalendarId"
+            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
 
-            // Alternative calendar settings
-            coEvery { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) } returns getCalendarSettingsEntity(id = alternativeCalendarId)
+            // Fallback calendar settings
+            coEvery { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) } returns CalendarMocks.provideCalendarSettingsEntity(id = fallbackCalendarId)
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
@@ -193,9 +189,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
 
-            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(alternativeCalendarId) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) }
 
-            assert(eventViewModel.calendarSettings.calendarId == alternativeCalendarId)
+            assert(eventViewModel.calendarSettings.calendarId == fallbackCalendarId)
         }
     }
 
@@ -207,14 +203,14 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock single edit event
-            val singleEditEventEntity = getEventEntity(isSingleEdit = true)
-            val singleEditEvent =  getEvent(isSingleEdit = true)
+            val singleEditEventEntity = EventMocks.provideEventEntity(isSingleEdit = true)
+            val singleEditEvent = EventMocks.provideEvent(isSingleEdit = true)
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns singleEditEventEntity
             coEvery { transformEventUseCaseMock.execute(singleEditEventEntity) } returns singleEditEvent
 
             // Mock root event
-            val rootEventEntity = getEventEntity()
-            val rootEvent = getEvent(isRecurring = true)
+            val rootEventEntity = EventMocks.provideEventEntity()
+            val rootEvent = EventMocks.provideEvent(isRecurring = true)
             coEvery { calendarsRepositoryMock.selectRootEventEntity(eventUid) } returns rootEventEntity
             coEvery { transformEventUseCaseMock.execute(rootEventEntity) } returns rootEvent
 
@@ -247,11 +243,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event with attendee (user as organizer)
-            coEvery { transformEventUseCaseMock.execute(getEventEntity()) } returns getEvent(isRecurring = true, isOrganizer = true)
+            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true, isOrganizer = true)
 
             // Mock single edit with attendee (user as organizer)
             coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf(
-                getEvent(isOrganizer = true, isSingleEdit = true)
+                EventMocks.provideEvent(isOrganizer = true, isSingleEdit = true)
             )
 
             val eventViewModel = getInitialisedEventViewModel(

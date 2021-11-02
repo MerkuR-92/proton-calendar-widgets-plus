@@ -12,7 +12,7 @@ import me.proton.core.user.domain.entity.UserAddress
 
 object UserMocks {
 
-    fun getUserSettingsEntity(): UserSettingsEntity {
+    fun provideUserSettingsEntity(): UserSettingsEntity {
         return UserSettingsEntity(
             fkUserId = userId.id,
             weekStart = weekStart, // 0: Locale default, 1: Monday, 6: Saturday 7: Sunday
@@ -21,7 +21,7 @@ object UserMocks {
         )
     }
 
-    fun getUser(): User {
+    fun provideUser(): User {
         return User(
             userId = userId,
             email = userEmail,
@@ -41,7 +41,7 @@ object UserMocks {
         )
     }
 
-    fun getUserAddress(canSendParam: Boolean? = null, canReceiveParam: Boolean? = null, enabledParam: Boolean? = null): UserAddress {
+    fun provideUserAddress(canSendParam: Boolean? = null, canReceiveParam: Boolean? = null, enabledParam: Boolean? = null): UserAddress {
         return UserAddress(
             userId = userId,
             addressId = addressId,
@@ -58,7 +58,7 @@ object UserMocks {
         )
     }
 
-    fun getSendPreferences(): SendPreferences {
+    fun provideSendPreferences(): SendPreferences {
         return SendPreferences(
             encrypt = encrypt,
             sign = sign,

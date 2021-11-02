@@ -57,16 +57,16 @@ open class EventViewModelTestCommon: KoinComponent {
         protonCalendarApplication = application
 
         coEvery { calendarsRepositoryMock.getDefaultCalendarId(userId.id) } returns calendarId
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.getCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
         // TODO Test fallback to first active user calendar when default calendar is null
-        coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.getCalendarEntity())
-        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns CalendarMocks.getCalendarUserSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.getCalendarSettingsEntity()
-        coEvery { userSettingsRepositoryMock.selectUserSettings(userId.id) } returns UserMocks.getUserSettingsEntity()
-        coEvery { userManagerMock.getUser(userId) } returns UserMocks.getUser()
-        coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.getUserAddress())
+        coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity())
+        coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns CalendarMocks.provideCalendarUserSettingsEntity()
+        coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
+        coEvery { userSettingsRepositoryMock.selectUserSettings(userId.id) } returns UserMocks.provideUserSettingsEntity()
+        coEvery { userManagerMock.getUser(userId) } returns UserMocks.provideUser()
+        coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
-        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.getEventEntity()
+        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventEntity()
 
         coEvery { calendarWidgetRefresherMock.refresh() } just Runs
     }

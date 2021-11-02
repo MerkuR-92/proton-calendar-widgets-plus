@@ -16,7 +16,7 @@ import me.proton.android.calendar.common.ICalUtilsImpl
 import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.mocks.CalendarMocks.getCalendar
+import me.proton.android.calendar.mocks.CalendarMocks.provideCalendar
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -25,7 +25,7 @@ import java.util.*
 
 object EventMocks {
 
-    fun getEvent(
+    fun provideEvent(
         isRecurring: Boolean = false,
         isOrganizer: Boolean = false,
         isAttendee: Boolean = false,
@@ -100,7 +100,7 @@ object EventMocks {
 
         return Event.from(
             if (isSingleEdit) singleEditEventId else eventId,
-            getCalendar(hasDisabledCalendar, hasHiddenCalendar),
+            provideCalendar(hasDisabledCalendar, hasHiddenCalendar),
             iCalendar,
             null, // TODO
             isProtonProtonInvite = isProtonProtonInvite,
@@ -108,7 +108,7 @@ object EventMocks {
         )!!
     }
 
-    fun getEventEntity(
+    fun provideEventEntity(
         isSingleEdit: Boolean = false,
         isProtonProtonInvite: Boolean = false,
         hasAttendees: Boolean = false
