@@ -37,9 +37,6 @@ class CreateCalendarUseCase(
         return when (val createCalendarApiResponse = calendarsApi.createCalendar(userId, createCalendarApiRequest)) {
             is ApiResponse.Success -> {
 
-                // Save calendar in DB
-                calendarsRepository.persistCalendar(userId.id, createCalendarApiResponse.data.calendar)
-
                 val calendarId = createCalendarApiResponse.data.calendar.id
 
                 // Get member created for address
@@ -62,6 +59,10 @@ class CreateCalendarUseCase(
                         }
 
                         if (keySetupResult is UseCase.Result.Success<*>) {
+
+                            // Save calendar in DB
+                            calendarsRepository.persistCalendar(userId.id, createCalendarApiResponse.data.calendar)
+
                             return UseCase.Result.Success(calendarId)
                         } else keySetupResult
                     }
