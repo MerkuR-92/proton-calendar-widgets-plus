@@ -18,11 +18,10 @@ class CreateCalendarUseCase(
     private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
-    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String = "") : UseCase.Result {
+    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String? = null) : UseCase.Result {
 
-        val address = userManager.getAddresses(userId, refresh = true).firstOrNull {
-            if (email.isNotEmpty()) it.email == email
-            else it.canSend && it.canReceive
+        val address = userManager.getAddresses(userId, refresh = true).firstOrNull { address ->
+            email?.let { address.email == it } ?: address.canSend && address.canReceive
         } ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found")
 
         val createCalendarApiRequest =
@@ -47,16 +46,14 @@ class CreateCalendarUseCase(
                 return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
                     is ApiResponse.Success -> {
 
-                        memberListApiResponse.data.members.firstOrNull()?.let { memberEntity ->
-                            calendarsRepository.persistMember(memberEntity)
-                        }
-                        val memberId = memberListApiResponse.data.members.firstOrNull()?.id ?: return UseCase.Result.Error("CreateCalendarUseCase: memberId was null")
+                        val memberEntity = memberListApiResponse.data.members.firstOrNull() ?: return UseCase.Result.Error("CreateCalendarUseCase: member was null")
+                        calendarsRepository.persistMember(memberEntity)
 
                         val keySetupResult = keySetupUseCase.execute(
                             userId,
                             address.addressId.id,
                             calendarId,
-                            memberId
+                            memberEntity.id
                         )
 
                         when (keySetupResult) {

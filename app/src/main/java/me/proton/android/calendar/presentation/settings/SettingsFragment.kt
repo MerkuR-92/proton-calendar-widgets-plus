@@ -102,7 +102,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
             userCalendars ?: return@observe
 
-            refreshUserCalendarList(userCalendars)
+            refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
         }
 
         val settingsSubscribedCalendarListView = settings_subscribed_calendars_list
@@ -159,7 +159,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
             if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
-                calendarViewModel.userCalendars.value?.let { refreshUserCalendarList(it) }
+                calendarViewModel.userCalendars.value?.let { userCalendars ->
+                    refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+                }
             }
         }
 
@@ -252,7 +254,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendarEntity.id)
                 if (updateDefaultCalendarId) {
-                    calendarViewModel.userCalendars.value?.let { refreshUserCalendarList(it) }
+                    calendarViewModel.userCalendars.value?.let { userCalendars ->
+                        refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+                    }
                     view?.displaySnackBar(requireContext().getString(R.string.snack_update_default_calendar))
                 } else {
                     view?.displaySnackBar(requireContext().getString(R.string.snack_update_default_calendar_error))

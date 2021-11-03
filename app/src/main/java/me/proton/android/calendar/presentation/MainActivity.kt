@@ -842,14 +842,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.selectCalendars()
             calendarViewModel.userCalendars.observe(this@MainActivity) { userCalendars ->
                 userCalendars ?: return@observe
-                nav_view_calendars_list_add_layout.visibleOrGone(userCalendars.isEmpty())
-                nav_view_calendars_create.visibleOrGone(!userCalendars.isEmpty())
-                val defaultCalendarId = calendarViewModel.defaultCalendarId.value
+                // We only keep active and disabled calendars for the navigation drawer calendar list
+                val filteredUserCalendars = userCalendars.filter { it.isActive || it.isDisabled }
+                nav_view_calendars_list_add_layout.visibleOrGone(filteredUserCalendars.isEmpty())
+                nav_view_calendars_create.visibleOrGone(filteredUserCalendars.isNotEmpty())
                 userCalendarListAdapter.submitList(
-                    userCalendars.sortedBy {
+                    filteredUserCalendars.sortedBy {
                         it.isDisabled // Disabled will appear last
-                    }.sortedByDescending {
-                        it.id == defaultCalendarId // Default will appear first
                     }
                 )
             }

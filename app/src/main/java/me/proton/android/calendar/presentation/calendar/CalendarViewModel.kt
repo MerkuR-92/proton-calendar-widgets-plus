@@ -78,6 +78,7 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
+    // userCalendars contains all non-subscribed calendars regardless of their flags
     var userCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var activeUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
@@ -805,11 +806,11 @@ class CalendarViewModel(
     }
 
     suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
-        val userCalendarsNumber = userCalendars.value?.size ?: return UserCalendarLimit.ERROR
+        val userCalendarsCount = userCalendars.value?.size ?: return UserCalendarLimit.ERROR
         val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
 
-        if (isFreeUser && userCalendarsNumber >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
-        if (!isFreeUser && userCalendarsNumber >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
+        if (isFreeUser && userCalendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
+        if (!isFreeUser && userCalendarsCount >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
         return UserCalendarLimit.NOT_REACHED
     }
 }

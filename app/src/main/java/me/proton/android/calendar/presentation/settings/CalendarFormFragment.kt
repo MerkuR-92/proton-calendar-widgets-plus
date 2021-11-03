@@ -109,7 +109,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 else R.string.calendar_form_create
             )
             setOnSingleClickListener {
-                if (calendar_form_name_value.text.toString().isEmpty()) {
+                if (calendar_form_name_value.text.toString().isBlank()) {
                     view?.displaySnackBar(getString(R.string.snack_create_calendar_empty_name_error))
                     return@setOnSingleClickListener
                 }

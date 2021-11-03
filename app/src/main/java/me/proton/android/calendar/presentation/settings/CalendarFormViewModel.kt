@@ -18,6 +18,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.tryCast
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_ALARM
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -195,10 +197,10 @@ class CalendarFormViewModel(
         handleDefaultEventDuration(EVENT_DEFAULT_DURATION.first().toInt())
 
         // Set default part day event notification (15 minutes before)
-        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START), null), false)
+        handleAlarmChange(DEFAULT_PART_DAY_ALARM, false)
 
         // Set default all day event notification (1 day before at 9am)
-        handleAlarmChange(VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null), true)
+        handleAlarmChange(DEFAULT_ALL_DAY_ALARM, true)
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in CalendarFormViewModel initCreateCalendarForm")
@@ -210,7 +212,7 @@ class CalendarFormViewModel(
         _userId.value = userId
 
         // Save user emails for calendar email picker dialog
-        userEmails = userManager.getAddresses(userId).filter { it.enabled }.map { it.email }
+        userEmails = userManager.getAddresses(userId).filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email // TODO Can be null, what do we take next ?
         defaultUserEmail?.let { handleCalendarEmail(defaultUserEmail) }

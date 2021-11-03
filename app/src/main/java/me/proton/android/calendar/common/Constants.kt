@@ -1,5 +1,8 @@
 package me.proton.android.calendar.common
 
+import biweekly.component.VAlarm
+import biweekly.parameter.Related
+import biweekly.property.Trigger
 import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
@@ -211,6 +214,9 @@ object CalendarForm {
     const val DEFAULT_NOTIFICATIONS_COUNT_MAX = 5
 
     val EVENT_DEFAULT_DURATION = arrayListOf("30", "60", "90", "120")
+
+    val DEFAULT_PART_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).minutes(15).build(), Related.START), null)
+    val DEFAULT_ALL_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(15).build(), Related.START), null)
 }
 
 object FragmentArguments {

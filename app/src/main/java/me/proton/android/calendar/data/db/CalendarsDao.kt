@@ -26,7 +26,7 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("SELECT * FROM calendars WHERE flags & (2 + 4 + 8 + 16) >= 2  AND type == 0 AND fkUserId = :userId")
     abstract fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
-    @Query("SELECT * FROM calendars WHERE (flags == 1 OR flags & (32 + 64) >= 32)  AND type == 0 AND fkUserId = :userId")
+    @Query("SELECT * FROM calendars WHERE type == 0 AND fkUserId = :userId")
     abstract fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     @Query("SELECT * FROM calendars WHERE type == 1 AND fkUserId = :userId")
