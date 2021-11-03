@@ -1109,7 +1109,7 @@ class EventViewModel(
         return user.hasSubscription() || !isShortDomainAddress(email)
     }
 
-    private suspend fun updateCalendarDisplay(calendar: Calendar, display: Int) {
+    private suspend fun updateCalendarDisplay(calendar: Calendar, display: Boolean) {
         // 1. Update in DB
         calendarsRepository.updateCalendarDisplay(calendar.id, display)
         // 2. Update on Server
@@ -1693,7 +1693,7 @@ class EventViewModel(
                     widgetRefresher.refresh()
 
                     // Display the event's calendar if it was hidden
-                    if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+                    if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
 
                     // Reset event form state
                     eventFormState.value = EventState.Idle
@@ -1739,7 +1739,7 @@ class EventViewModel(
                 widgetRefresher.refresh()
 
                 // Display the event's calendar if it was hidden
-                if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+                if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
 
                 // Reset event form state
                 eventFormState.value = EventState.Idle
@@ -2849,7 +2849,7 @@ class EventViewModel(
         // Update the event participation status to reflect changes in view
         event.updateParticipationStatus(userEmails, participationStatus)
 
-        if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+        if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
 
         _event.postValue(event)
 
@@ -2909,7 +2909,7 @@ class EventViewModel(
         }
         val event = transformEventUseCase.execute(eventEntity) ?: return EventLinkResult.Error
         if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
-        if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+        if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
         return if (event.isRecurring()) {
             val calendarUserSettings =
                 calendarsRepository.selectCalendarUserSettings(userId.id) ?: return EventLinkResult.Error

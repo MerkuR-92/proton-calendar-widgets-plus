@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_general_settings.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
-import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -165,7 +164,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        calendarFormViewModel.calendarSettingsSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { calendarSettingsSnackState ->
+        calendarFormViewModel.calendarSettingsSnackState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { calendarSettingsSnackState ->
             calendarSettingsSnackState?.let {
                 when (it) {
                     is CalendarFormViewModel.CalendarFormSnackState.DisplaySnackNavigateUp -> {
@@ -244,8 +243,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         val deletePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_delete_press)
 
         editPress?.setOnSingleClickListener {
-            val bundle = Bundle()
-            bundle.putString(CALENDAR_ID_ARG, calendarEntity.id)
+            val bundle = Bundle().apply {
+                putString(CALENDAR_ID_ARG, calendarEntity.id)
+            }
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form, bundle)
             bottomSheetDialog.dismiss()
         }

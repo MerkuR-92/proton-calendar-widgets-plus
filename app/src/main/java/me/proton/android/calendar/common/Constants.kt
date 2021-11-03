@@ -213,19 +213,27 @@ object CalendarForm {
     const val CALENDAR_NAME_CHARACTER_LIMIT = 100
     const val DEFAULT_NOTIFICATIONS_COUNT_MAX = 5
 
-    val EVENT_DEFAULT_DURATION = arrayListOf("30", "60", "90", "120")
+    val EVENT_DEFAULT_DURATION_MINUTES = listOf(30, 60, 90, 120)
 
     val DEFAULT_PART_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).minutes(15).build(), Related.START), null)
     val DEFAULT_ALL_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(15).build(), Related.START), null)
 }
 
 object FragmentArguments {
+    // Fragment position in the adapter
     const val POSITION_ARG = "POSITION_ARG"
+    // Adapter starting position
     const val STARTING_POSITION_ARG = "STARTING_POSITION_ARG"
+    // Date value for adapter item
     const val DATE_ARG = "DATE_ARG"
 
+    /* Arguments defined in graph_main */
+
+    // Calendar ID for calendar form
     const val CALENDAR_ID_ARG = "calendarId"
+    // All day value for alarm form (show different views when part or all day)
     const val IS_ALL_DAY_ARG = "isAllDay"
+    // Boolean to know whether we open the alarm form to create calendar or event alarms
     const val IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG = "isCalendarDefaultEventNotification"
 }
 

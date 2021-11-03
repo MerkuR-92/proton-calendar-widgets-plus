@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_calendar_form.*
 import kotlinx.android.synthetic.main.fragment_event_form.*
-import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
@@ -41,14 +40,12 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
-import kotlin.random.Random
 
 class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
@@ -177,7 +174,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, it?.length, CALENDAR_NAME_CHARACTER_LIMIT)
         }
 
-        observeCalendarFormSnackState(coroutineContext)
+        observeCalendarFormSnackState(lifecycleScope.coroutineContext)
         observeCalendarFormValues()
     }
 
@@ -225,7 +222,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
 
-        calendarFormViewModel.calendarFormState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
+        calendarFormViewModel.calendarFormState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { eventState ->
             val processingEvent = eventState is CalendarFormViewModel.CalendarFormState.Processing
 
             // Update action bar buttons visibility
@@ -298,9 +295,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         // Add notification listener
         itemViewPress.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            val bundle = Bundle()
-            bundle.putBoolean(FragmentArguments.IS_ALL_DAY_ARG, allDay)
-            bundle.putBoolean(FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG, true)
+            val bundle = Bundle().apply {
+                putBoolean(FragmentArguments.IS_ALL_DAY_ARG, allDay)
+                putBoolean(FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG, true)
+            }
             findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }
     }
@@ -360,10 +358,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             var dialog: AlertDialog? = null
             val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
             dialog = builder.setSingleChoiceItems(
-                CalendarForm.EVENT_DEFAULT_DURATION.toTypedArray(),
-                calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION.indexOf(it.toString()) } ?: 0
+                CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map { it.toString() }.toTypedArray(),
+                calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.indexOf(it) } ?: 0
             ) { _, item ->
-                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION[item].toInt())
+                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION_MINUTES[item])
                 dialog?.dismiss()
             }
                 .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }

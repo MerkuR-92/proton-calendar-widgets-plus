@@ -410,7 +410,7 @@ class CalendarViewModel(
         }.await()
     }
 
-    suspend fun updateCalendarVisibility(calendarId: String, display: Int) {
+    suspend fun updateCalendarVisibility(calendarId: String, display: Boolean) {
         withContext(Dispatchers.IO) {
             calendarsRepository.updateCalendarDisplay(calendarId, display)
         }

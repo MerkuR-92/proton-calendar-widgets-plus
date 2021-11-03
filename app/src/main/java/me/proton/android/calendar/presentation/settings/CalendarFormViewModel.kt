@@ -1,14 +1,10 @@
 package me.proton.android.calendar.presentation.settings
 
 import android.app.Application
-import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import biweekly.component.VAlarm
-import biweekly.parameter.Related
-import biweekly.property.Trigger
-import biweekly.util.Duration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,7 +16,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
-import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION
+import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -33,12 +29,10 @@ import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 
 class CalendarFormViewModel(
     application: Application,
-    private val networkManager: NetworkManager,
     private val json: Json,
     private val resourceProvider: ResourceProvider,
     private val logger: Logger,
@@ -49,10 +43,6 @@ class CalendarFormViewModel(
     private val accountManager: AccountManager,
     private val createCalendarUseCase: CreateCalendarUseCase
 ) : AndroidViewModel(application) {
-
-    private val intents = mutableMapOf<String, Intent>()
-
-    val isConnectedToNetwork get() = networkManager.isConnectedToNetwork()
 
     sealed class CalendarFormSnackState {
 
@@ -118,7 +108,7 @@ class CalendarFormViewModel(
         _calendarName.value = ""
         _calendarColor.value = ""
         _calendarEmail.value = ""
-        _defaultEventDuration.value = EVENT_DEFAULT_DURATION.first().toInt()
+        _defaultEventDuration.value = EVENT_DEFAULT_DURATION_MINUTES.first()
         _defaultPartDayAlarms.value = arrayListOf()
         _defaultAllDayAlarms.value = arrayListOf()
         _calendarId = null
@@ -194,7 +184,7 @@ class CalendarFormViewModel(
         handleCalendarColor(calendarColor)
 
         // Set default event duration
-        handleDefaultEventDuration(EVENT_DEFAULT_DURATION.first().toInt())
+        handleDefaultEventDuration(EVENT_DEFAULT_DURATION_MINUTES.first())
 
         // Set default part day event notification (15 minutes before)
         handleAlarmChange(DEFAULT_PART_DAY_ALARM, false)

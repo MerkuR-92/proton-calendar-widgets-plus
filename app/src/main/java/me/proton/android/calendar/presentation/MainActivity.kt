@@ -73,6 +73,7 @@ import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
 import me.proton.core.util.kotlin.nullIfBlank
+import me.proton.core.util.kotlin.toBoolean
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
@@ -795,7 +796,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         userCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendarEntity ->
             //On Calendar click event
             lifecycleScope.launch {
-                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display)
+                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display.toBoolean())
                 updateCalendarsDelayed()
             }
         }
@@ -808,7 +809,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         subscribedCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendarEntity ->
             //On Calendar click event
             lifecycleScope.launch {
-                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display)
+                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display.toBoolean())
                 updateCalendarsDelayed()
             }
         }

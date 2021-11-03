@@ -28,9 +28,7 @@ class CalendarColorListAdapter(
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val inflater = parent?.context?.
-        getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = inflater.inflate(R.layout.item_calendar_color_picker, null)
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_calendar_color_picker, null)
 
         val colorItemFilled: ImageView = view.findViewById(R.id.item_calendar_color_picker_filled)
         val colorItemMain: ImageView = view.findViewById(R.id.item_calendar_color_picker_main)
