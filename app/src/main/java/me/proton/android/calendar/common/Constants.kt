@@ -650,9 +650,13 @@ val aliasesTimezonesMap: Map<String, String> = mapOf(
     "America/St_Thomas" to "America/Port_of_Spain",
     "America/St_Vincent" to "America/Port_of_Spain",
     "America/Tortola" to "America/Port_of_Spain",
+    "America/Indiana/Indianapolis" to "America/New_York",
+    "America/Nuuk" to "Atlantic/Stanley",
     "Asia/Phnom_Penh" to "Asia/Bangkok",
     "Asia/Vientiane" to "Asia/Bangkok",
     "Asia/Muscat" to "Asia/Dubai",
+    "Asia/Singapore" to "Asia/Shanghai",
+    "Asia/Yangon" to "Indian/Cocos",
     "Europe/Nicosia" to "Asia/Nicosia",
     "Asia/Bahrain" to "Asia/Qatar",
     "Asia/Aden" to "Asia/Riyadh",
@@ -680,7 +684,10 @@ val aliasesTimezonesMap: Map<String, String> = mapOf(
     "UTC" to "UTC",
     "Antarctica/McMurdo" to "Pacific/Auckland",
     "Pacific/Saipan" to "Pacific/Guam",
-    "Pacific/Midway" to "Pacific/Pago_Pago"
+    "Pacific/Midway" to "Pacific/Pago_Pago",
+    "Pacific/Funafuti" to "Asia/Kamchatka",
+    "Pacific/Wake" to "Asia/Kamchatka",
+    "Pacific/Wallis" to "Asia/Kamchatka"
 )
 
 val windowsTimeZoneMap: Map<String, String> = mapOf(

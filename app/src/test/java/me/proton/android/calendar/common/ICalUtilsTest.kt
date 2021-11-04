@@ -223,6 +223,8 @@ internal class ICalUtilsTest {
 
         assertThat(fallbackTimeZone("W Europe Standard Time")).isEqualTo("Europe/Berlin")
 
+        assertThat(fallbackTimeZone("W. Europe Standard Time")).isEqualTo("Europe/Berlin")
+
         /* Aliases Time Zones */
 
         assertThat(fallbackTimeZone("Europe/Bratislava")).isEqualTo("Europe/Prague")
