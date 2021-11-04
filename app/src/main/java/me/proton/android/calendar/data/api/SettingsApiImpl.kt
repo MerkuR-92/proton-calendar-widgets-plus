@@ -25,6 +25,9 @@ interface SettingsApiService : BaseRetrofitApi {
     @PUT("settings/calendar")
     suspend fun updateCalendarUserDisplayWeekNumber(@Body body: UpdateCalendarUserDisplayWeekNumberApiRequest): CalendarUserSettingsApiResponse
 
+    @PUT("settings/calendar")
+    suspend fun updateCalendarUserDefaultCalendarId(@Body body: UpdateCalendarUserDefaultCalendarIdApiRequest): CalendarUserSettingsApiResponse
+
     @GET("settings")
     suspend fun getUserSettings(): UserSettingsApiResponse
 
@@ -66,6 +69,13 @@ class SettingsApiImpl(private val apiProvider: ApiProvider) : SettingsApi {
         apiProvider.get<SettingsApiService>(userId).invoke {
             updateCalendarUserDisplayWeekNumber(
                 UpdateCalendarUserDisplayWeekNumberApiRequest(displayWeekNumber)
+            )
+        }.toApiResponse()
+
+    override suspend fun updateCalendarUserDefaultCalendarId(userId: UserId, defaultCalendarId: String): ApiResponse<CalendarUserSettingsApiResponse> =
+        apiProvider.get<SettingsApiService>(userId).invoke {
+            updateCalendarUserDefaultCalendarId(
+                UpdateCalendarUserDefaultCalendarIdApiRequest(defaultCalendarId)
             )
         }.toApiResponse()
 
@@ -112,6 +122,12 @@ data class UpdateCalendarUserAutoDetectTimezoneApiRequest(
 data class UpdateCalendarUserDisplayWeekNumberApiRequest(
     @SerialName("DisplayWeekNumber")
     val displayWeekNumber: Int
+)
+
+@Serializable
+data class UpdateCalendarUserDefaultCalendarIdApiRequest(
+    @SerialName("DefaultCalendarID")
+    val defaultCalendarId: String
 )
 
 @Serializable

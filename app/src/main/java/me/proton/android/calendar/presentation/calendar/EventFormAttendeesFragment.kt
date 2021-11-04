@@ -125,8 +125,9 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 searchAttendeeListAdapter.setQuery(query.toString())
 
                 if (contactsAccessGranted) {
-                    val args = Bundle()
-                    args.putString(CONTACTS_SEARCH_QUERY, query.toString())
+                    val args = Bundle().apply {
+                        putString(CONTACTS_SEARCH_QUERY, query.toString())
+                    }
                     LoaderManager.getInstance(this).restartLoader(0, args, this)
                 } else {
                     val searchResult =

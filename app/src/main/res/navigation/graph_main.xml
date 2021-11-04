@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_nav_calendar_to_nav_settings"
             app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_calendar_form"
+            app:destination="@id/nav_calendar_form" />
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />
@@ -41,8 +44,36 @@
         android:label=""
         tools:layout="@layout/fragment_settings">
         <action
-            android:id="@+id/action_nav_settings_to_nav_event_form"
-            app:destination="@id/nav_event_form" />
+            android:id="@+id/action_nav_settings_to_nav_general_settings"
+            app:destination="@id/nav_general_settings" />
+        <action
+            android:id="@+id/action_nav_settings_to_nav_calendar_form"
+            app:destination="@id/nav_calendar_form" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_general_settings"
+        android:name="me.proton.android.calendar.presentation.settings.GeneralSettingsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_general_settings">
+        <action
+            android:id="@+id/action_nav_general_settings_to_nav_settings"
+            app:destination="@id/nav_settings" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_calendar_form"
+        android:name="me.proton.android.calendar.presentation.settings.CalendarFormFragment"
+        android:label=""
+        tools:layout="@layout/fragment_calendar_form">
+        <argument
+            android:name="calendarId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_nav_calendar_form_to_nav_settings"
+            app:destination="@id/nav_settings" />
     </dialog>
 
     <dialog
@@ -124,7 +155,16 @@
     <dialog
         android:id="@+id/nav_event_form_alarm"
         android:name="me.proton.android.calendar.presentation.calendar.EventFormAlarmFragment"
-        android:label="EventFormAlarmFragment" />
+        android:label="EventFormAlarmFragment">
+        <argument
+            android:name="isAllDay"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="isCalendarDefaultEventNotification"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </dialog>
     <dialog
         android:id="@+id/nav_event_form_recurrence"
         android:name="me.proton.android.calendar.presentation.calendar.EventFormRecurrenceFragment"

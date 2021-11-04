@@ -196,8 +196,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/nav_view_calendars"
-                android:visibility="gone"
-                tools:visibility="visible"
+                android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -222,6 +221,22 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
+                <ImageView
+                    android:id="@+id/nav_view_calendars_create"
+                    android:layout_width="40dp"
+                    android:layout_height="0dp"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_plus"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    style="@style/Icon"
+                    app:tint="@color/sidebar_icon_weak"
+                    android:layout_marginEnd="@dimen/spacing_element_small"
+                    android:background="@drawable/ripple_nav_items"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_divider_top"
+                    app:layout_constraintBottom_toTopOf="@+id/nav_view_calendars_separator"/>
+
                 <View
                     android:id="@+id/nav_view_calendars_separator"
                     style="@style/Separator"
@@ -244,6 +259,61 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_separator"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_calendars_list_add_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_list"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <View
+                        android:id="@+id/nav_view_calendars_list_add_layout_press"
+                        android:background="@drawable/ripple_nav_items"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_calendars_list_add_layout_separator"/>
+
+                    <ImageView
+                        android:id="@+id/nav_view_calendars_list_add_layout_icon"
+                        style="@style/Icon"
+                        app:tint="@color/sidebar_icon_weak"
+                        android:src="@drawable/ic_plus"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_calendars_list_add_layout_title"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_calendars_list_add_layout_title"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/nav_view_calendars_list_add_layout_title"
+                        style="@style/Text.DefaultSmall"
+                        android:textColor="@color/sidebar_text_norm"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        android:text="@string/add_calendar_text"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_calendars_list_add_layout_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_calendars_list_add_layout_separator"
+                        style="@style/Separator"
+                        android:background="@color/sidebar_separator"
+                        android:visibility="invisible"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_calendars_list_add_layout_title"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

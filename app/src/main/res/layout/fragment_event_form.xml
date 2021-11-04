@@ -429,8 +429,9 @@
 
             <ImageView
                 android:id="@+id/event_form_calendar_icon"
-                style="@style/Icon.Form"
+                style="@style/ColoredDot"
                 android:src="@drawable/ic_dot"
+                android:layout_marginStart="@dimen/default_inner_padding_start"
                 app:layout_constraintBottom_toBottomOf="@+id/event_form_calendar"
                 app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
                 app:layout_constraintStart_toStartOf="parent" />

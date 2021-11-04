@@ -62,7 +62,7 @@ interface CalendarsRepository {
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
-    suspend fun updateCalendarDisplay(calendarId: String, display: Int)
+    suspend fun updateCalendarDisplay(calendarId: String, display: Boolean)
 
     // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
 
@@ -167,6 +167,8 @@ interface CalendarsRepository {
 
     suspend fun persistCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
 
+    suspend fun updateCalendarSettings(calendarSettings: CalendarSettingsEntity) // calendarId is already there
+
     suspend fun deleteCalendarSettingsById(id: String)
 
     // calendar subscription
@@ -190,6 +192,10 @@ interface CalendarsRepository {
     suspend fun updateCalendarUserSettingsDisplayWeekNumber(userId: String, displayWeekNumber: Int)
 
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>
+
+    suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String)
+
+    fun flowCalendarUserDefaultCalendarId(userId: String): Flow<String?>
 
     suspend fun selectCalendarUserSettingsPrimaryTimezone(userId: String): String?
 

@@ -31,6 +31,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_AUTO_DETECT
             const val UPDATE_DISPLAY_WEEK_NUMBER = UpdateCalendarUserSettingsUseCase.WORKER_ID_WEEK_NUMBER
+            const val UPDATE_DEFAULT_CALENDAR_ID = UpdateCalendarUserSettingsUseCase.WORKER_ID_DEFAULT_CALENDAR_ID
             const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
@@ -83,6 +84,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_PRIMARY_TIMEZONE = "UPDATE_PRIMARY_TIMEZONE"
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = "UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE"
             const val UPDATE_DISPLAY_WEEK_NUMBER = "UPDATE_DISPLAY_WEEK_NUMBER"
+            const val UPDATE_DEFAULT_CALENDAR_ID = "UPDATE_DEFAULT_CALENDAR_ID"
             const val UPDATE_TIME_FORMAT = "UPDATE_TIME_FORMAT"
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
@@ -114,7 +116,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             }
             UseCaseId.UPDATE_CALENDAR -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
-                updateCalendarUseCase.executeUpdate(
+                updateCalendarUseCase.executeUpdateFromDb(
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure())
             }
@@ -158,6 +160,13 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_DISPLAY_WEEK_NUMBER))
                         inputData.getBoolean(INPUT_DISPLAY_WEEK_NUMBER, true)
                     else return Result.failure()
+                )
+            }
+            UseCaseId.UPDATE_DEFAULT_CALENDAR_ID -> {
+                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
+                updateCalendarUserSettingsUseCase.executeDefaultCalendarId(
+                    userId,
+                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
                 )
             }
             UseCaseId.UPDATE_TIME_FORMAT -> {

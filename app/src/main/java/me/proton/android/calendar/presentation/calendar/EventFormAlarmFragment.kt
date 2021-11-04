@@ -11,14 +11,13 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
-import biweekly.property.Action
+import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
-import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.doAfterFilteredIntValueChanged
 import me.proton.android.calendar.common.AndroidUtils.getCheckedRadioButtonIndex
 import me.proton.android.calendar.common.AndroidUtils.setCustomOnCheckedChangeListener
@@ -27,13 +26,15 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.settings.CalendarFormViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import timber.log.Timber
 import java.time.LocalTime
 
 
 class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
+
+    private val navigationArguments: EventFormAlarmFragmentArgs by navArgs()
 
     override val TAG = "EventFormAlarmFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_alarm
@@ -41,8 +42,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     private lateinit var toolbarTitle: TextView
 
     private val eventViewModel: EventViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
 
-    private val isAllDay by lazy { eventViewModel.eventLiveData.value!!.isAllDay() }
+    private var isAllDay: Boolean = false
+    private var isCalendarDefaultEventNotification: Boolean = false
 
     private var lastSelectedRadioButtonId: Int = -1
 
@@ -79,8 +83,6 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun onDoneClick() {
-        Timber.d("notification create/edit done")
-
         val alarmTypeOption = getCheckedRadioButtonIndex(event_form_alarm_radio_group)
 
         val option =
@@ -91,13 +93,19 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
         val countTypeOption = getCheckedRadioButtonIndex(custom_alarm_radio_group)
         // countTypeOption with value at 4 is used for "on the day" option
-        if (!eventViewModel.handleAlarm(alarmTypeOption,
+        eventViewModel.handleAlarm(
+            alarmTypeOption = alarmTypeOption,
             count = custom_alarm_field.text.toString().toIntOrNull() ?:
             if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT
             else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT,
-            countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption)) {
-            this.view?.displaySnackBar(requireContext().getString(R.string.snack_event_maximum_alarm_reached_error))
-        } else findNavController().navigateUp()
+            countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption,
+            isAllDay = isAllDay
+        )?.let { alarm ->
+            if (isCalendarDefaultEventNotification) calendarFormViewModel.handleAlarmChange(alarm, isAllDay)
+            else eventViewModel.saveAlarm(alarm)
+        }
+
+        findNavController().navigateUp()
 
         // TODO
         // copy all values edited here to VM, before this they should be ephemeral, but we should keep in memory edited-not-saved
@@ -122,7 +130,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun resetAlarmText(selectedIndex: Int) {
 
-        val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+        val is24Hour =
+            if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
+            else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
 
         if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
             event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).formatTime(is24Hour))
@@ -148,7 +158,12 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         toolbarTitle.text = getString(R.string.event_alarms_title)
         toolbar.setNavigationIcon(R.drawable.ic_close)
 
-        event_form_alarm_send_by_layout.visibleOrGone(eventViewModel.hasEmailNotifications || ADD_EMAIL_NOTIFICATIONS)
+        isAllDay = navigationArguments.isAllDay
+        isCalendarDefaultEventNotification = navigationArguments.isCalendarDefaultEventNotification
+
+        event_form_alarm_send_by_layout.visibleOrGone(
+            (!isCalendarDefaultEventNotification && eventViewModel.hasEmailNotifications) || ADD_EMAIL_NOTIFICATIONS
+        )
 
         event_form_alarm_5.visibleOrGone(!isAllDay)
         resetAlarmText(-1)
@@ -236,7 +251,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             else button.jumpDrawablesToCurrentState()
         }
 
-        val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+        val is24Hour =
+            if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
+            else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
 
         // init
         custom_alarm_1.visibleOrGone(!isAllDay)
@@ -263,7 +280,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
-                eventViewModel.handleAlarmTime(it)
+                eventViewModel.handleAlarmTime(it) // TODO Handle isCalendarDefaultEventNotification
                 custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.formatTime(is24Hour))
             }
         }

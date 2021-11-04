@@ -46,7 +46,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()
 
             // Display calendar if it was hidden
-            coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, 1) } just Runs
+            coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
             coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Handle save use case call
@@ -95,7 +95,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             }
 
             // Update calendar display
-            coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, 1) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
             coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
 
             // Success snack
@@ -179,7 +179,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Display calendar if it was hidden
-            coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, 1) } just Runs
+            coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
             coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Get address for current user
@@ -249,7 +249,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             }
 
             // Update calendar display
-            coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, 1) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
             coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
 
             // Edit option picker dialog

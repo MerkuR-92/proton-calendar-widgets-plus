@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.protonApi.GenericResponse
@@ -119,4 +120,9 @@ interface CalendarsApi {
      * For an attendee to update event's personal part
      */
     suspend fun updateEventPersonalPart(userId: UserId, calendarId: String, eventId: String, body: UpdateEventPersonalPartApiRequest): ApiResponse<EventApiResponse>
+
+    /**
+     * Update calendar settings
+     */
+    suspend fun updateCalendarSettings(userId: UserId, calendarId: String, body: UpdateCalendarSettingsApiRequest): ApiResponse<UpdateCalendarSettingsApiResponse>
 }

@@ -19,6 +19,7 @@
 
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_close">Close</string>
 
     <!-- Delete as an organizer -->
 
@@ -51,6 +52,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_today">Today</string>
     <string name="action_create_event">Create event</string>
+    <string name="action_mark_default">Mark as default</string>
 
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">No events</string>
@@ -250,14 +252,15 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
-    <string name="nav_view_disabled_calendars">%s (disabled)</string>
-    <string name="nav_view_not_synced_calendars">%s (not synced)</string>
+    <string name="nav_view_disabled_calendars">%s (Disabled)</string>
+    <string name="nav_view_not_synced_calendars">%s (Not synced)</string>
     <string name="nav_view_more">More</string>
     <string name="nav_view_switcher">View</string>
     <string name="nav_view_switcher_day">Day</string>
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_timezone">Time zone</string>
     <string name="nav_view_more_settings">Settings</string>
+    <string name="nav_view_more_general_settings">General</string>
     <string name="nav_view_more_bug">Report bug</string>
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
@@ -297,6 +300,16 @@
     <string name="snack_network_error">Network error, please try again later</string>
     <string name="snack_import_event_signed_out">You need to sign in to import events</string>
     <string name="snack_app_link_signed_out">You need to sign in to see your event</string>
+    <string name="snack_update_default_calendar">Default calendar updated</string>
+    <string name="snack_update_default_calendar_error">Error updating default calendar, please try again later</string>
+    <string name="snack_calendar_init_error">Error loading calendar information</string>
+    <string name="snack_update_calendar_error">Error updating calendar information, please try again later</string>
+    <string name="snack_update_calendar_settings_error">Error updating some calendar information, please try again later</string>
+    <string name="snack_update_calendar_success">Calendar updated</string>
+    <string name="snack_create_calendar_success">Calendar created</string>
+    <string name="snack_calendar_saving">Saving calendar</string>
+    <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
+    <string name="snack_create_calendar_empty_name_error">Name required</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>
@@ -325,6 +338,8 @@
 
     <string name="snack_app_link_invalid">Invalid link to the event</string>
     <string name="snack_app_link_error">Error opening event</string>
+
+    <string name="snack_notification_already_added">The notification has already been added</string>
 
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
@@ -373,6 +388,40 @@
     <string name="settings_time_format_title">Time format</string>
     <string name="settings_week_numbers_title">Show week numbers</string>
     <string name="settings_value_placeholder">Tap to select</string>
+
+    <string name="settings_general_title">General</string>
+    <string name="settings_general_info">Theme, timezone, calendar layout etc.</string>
+    <string name="settings_calendars">My calendars</string>
+    <string name="settings_subscribed_calendars">Subscribed calendars</string>
+    <string name="settings_calendar_default">Default</string>
+    <string name="settings_calendar_disabled">Disabled</string>
+    <string name="settings_calendar_not_synced">Not synced</string>
+
+    <!-- Calendar form -->
+    <string name="calendar_form_create_title">Create calendar</string>
+    <string name="calendar_form_update_title">Update calendar</string>
+    <string name="calendar_form_create">Create</string>
+    <string name="calendar_form_update">Update</string>
+    <string name="calendar_form_name">Name</string>
+    <string name="calendar_form_name_placeholder">Add a calendar name</string>
+    <string name="calendar_form_name_character_limit">%d/%d characters</string>
+    <string name="calendar_form_color">Calendar color</string>
+    <string name="calendar_form_default_event_duration">Default event duration</string>
+    <string name="calendar_form_default_event_duration_value">%s minutes</string>
+    <string name="calendar_form_default_event_notifications">Default event notifications</string>
+    <string name="calendar_form_default_all_day_event_notifications">Default full-day event notifications</string>
+    <string name="calendar_form_add_notification">Add notification</string>
+    <string name="calendar_form_default_email">Default email</string>
+    <string name="calendar_form_default_email_value_error">Failed to load default email</string>
+    <string name="calendar_form_name_hint">Add a calendar name</string>
+
+    <string name="add_calendar_text">Add calendar</string>
+
+    <string name="create_calendar_limit_reached_free">You have reached the maximum number of calendars.</string>
+    <string name="create_calendar_limit_reached_paid_title">20-calendar maximum reached</string>
+    <string name="create_calendar_limit_reached_paid_message">Delete unused calendars to create new calendars.</string>
+    <string name="create_calendar_limit_reached_paid_manage">Manage calendars</string>
+    <string name="create_calendar_limit_reached_close">Close</string>
 
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>

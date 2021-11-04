@@ -15,6 +15,7 @@ import me.proton.core.domain.entity.UserId
 class UpdateCalendarUseCase(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
+    private val calendarsRepository: CalendarsRepository,
     private val database: AppDatabase,
 ): UseCase {
 
@@ -26,16 +27,33 @@ class UpdateCalendarUseCase(
     //TODO Handle other Calendar parameters
 
     //Update Single Calendar on Server
-    suspend fun executeUpdate(userId: UserId, calendarId: String) : UseCase.Result {
+    suspend fun executeUpdateFromDb(userId: UserId, calendarId: String) : UseCase.Result {
         val dbCalendar = database.calendarsDao().selectById(calendarId) ?: return UseCase.Result.Error("UpdateCalendarUseCase: DB Calendar was null")
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
             name = dbCalendar.name,
             description = dbCalendar.description,
             color = dbCalendar.color,
-            display = dbCalendar.display)
+            display = dbCalendar.display
+        )
 
         return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
+                UseCase.Result.Success<Unit>()
+            }
+            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
+        }
+    }
+    suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
+        val updateCalendarApiRequest = UpdateCalendarApiRequest(
+            name = name,
+            description = description,
+            color = color,
+            display = display
+        )
+        return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
+            is ApiResponse.Success -> {
+                calendarsRepository.updateCalendar(userId.id, updateCalendarResponse.data.calendar)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.error}")

@@ -36,6 +36,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
 import java.time.ZoneId
@@ -54,7 +55,9 @@ class CalendarViewModel(
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
-    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase) : AndroidViewModel(application) {
+    private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
+    private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase
+    ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -75,6 +78,7 @@ class CalendarViewModel(
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
+    // userCalendars contains all non-subscribed calendars regardless of their flags
     var userCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var activeUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
     var disabledUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
@@ -84,6 +88,7 @@ class CalendarViewModel(
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
     var timeFormat: LiveData<Int> = MutableLiveData()
+    var defaultCalendarId: LiveData<String?> = MutableLiveData()
     var autoDetectPrimaryTimezone: LiveData<Boolean> = MutableLiveData()
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
@@ -188,6 +193,10 @@ class CalendarViewModel(
 
             displayWeekNumber = calendarsRepository.flowCalendarUserSettingsDisplayWeekNumber(userId.id).map {
                 it?.toBoolean() ?: true // Show week numbers by default
+            }.asLiveData(Dispatchers.Default)
+
+            defaultCalendarId = calendarsRepository.flowCalendarUserDefaultCalendarId(userId.id).map {
+                it
             }.asLiveData(Dispatchers.Default)
 
             timeFormat = userSettingsRepository.flowTimeFormat(userId.id).map {
@@ -401,7 +410,7 @@ class CalendarViewModel(
         }.await()
     }
 
-    suspend fun updateCalendarVisibility(calendarId: String, display: Int) {
+    suspend fun updateCalendarVisibility(calendarId: String, display: Boolean) {
         withContext(Dispatchers.IO) {
             calendarsRepository.updateCalendarDisplay(calendarId, display)
         }
@@ -473,6 +482,20 @@ class CalendarViewModel(
             .build()
 
         return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    suspend fun updateDefaultCalendarId(defaultCalendarId: String): Boolean {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel updateDefaultCalendarId")
+            return false
+        }
+        val updateCalendarUserSettingsUseCaseResult = updateCalendarUserSettingsUseCase.executeDefaultCalendarId(
+            userId,
+            defaultCalendarId
+        )
+
+        return updateCalendarUserSettingsUseCaseResult is UseCase.Result.Success<*>
     }
 
     fun updateTimeFormat(timeFormat: Int) : LiveData<Operation.State> {
@@ -720,6 +743,24 @@ class CalendarViewModel(
         return calendarsRepository.selectCalendarSettings(defaultCalendarId)
     }
 
+    suspend fun getCalendarSettings(calendarId: String): CalendarSettingsEntity? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
+            return null
+        }
+        return calendarsRepository.selectCalendarSettings(calendarId)
+    }
+
+    suspend fun getDefaultCalendarId(): String? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
+            return null
+        }
+        return calendarsRepository.getDefaultCalendarId(userId.id)
+    }
+
     suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
         val userId = userId.value
         if (userId == null) {
@@ -745,5 +786,31 @@ class CalendarViewModel(
             if (currentLoadingProcesses > 0) currentLoadingProcesses--
         }
         if (currentLoadingProcesses == 0) this.loading.value = false
+    }
+
+    suspend fun isFreeUser(): Boolean? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel isFreeUser")
+            return null
+        }
+        val user = userManager.getUserOrNull(userId, logger)
+        return user?.hasSubscription() == false
+    }
+
+    enum class UserCalendarLimit {
+        ERROR,
+        NOT_REACHED,
+        FREE_REACHED,
+        PAID_REACHED
+    }
+
+    suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
+        val userCalendarsCount = userCalendars.value?.size ?: return UserCalendarLimit.ERROR
+        val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
+
+        if (isFreeUser && userCalendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
+        if (!isFreeUser && userCalendarsCount >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
+        return UserCalendarLimit.NOT_REACHED
     }
 }

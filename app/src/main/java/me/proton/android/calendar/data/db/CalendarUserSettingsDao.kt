@@ -39,4 +39,10 @@ abstract class CalendarUserSettingsDao : BaseDao<CalendarUserSettingsEntity> {
     @Query("UPDATE calendar_user_settings SET displayWeekNumber = :displayWeekNumber WHERE fkUserId = :userId")
     abstract suspend fun updateDisplayWeekNumber(userId: String, displayWeekNumber: Int)
 
+    @Query("SELECT defaultCalendarId FROM calendar_user_settings WHERE fkUserId = :userId")
+    abstract fun flowCalendarUserDefaultCalendarId(userId: String): Flow<String>
+
+    @Query("UPDATE calendar_user_settings SET defaultCalendarId = :defaultCalendarId WHERE fkUserId = :userId")
+    abstract suspend fun updateDefaultCalendarId(userId: String, defaultCalendarId: String)
+
 }

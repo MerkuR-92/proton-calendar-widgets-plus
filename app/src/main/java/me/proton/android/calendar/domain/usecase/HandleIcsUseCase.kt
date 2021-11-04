@@ -377,9 +377,9 @@ class HandleIcsUseCase(
 
                     if (!existingEvent.calendar.display) {
                         // 1. Update in DB
-                        calendarsRepository.updateCalendarDisplay(calendarId, 1)
+                        calendarsRepository.updateCalendarDisplay(calendarId, true)
                         // 2. Update on Server
-                        updateCalendarUseCase.executeUpdate(userId, calendarId)
+                        updateCalendarUseCase.executeUpdateFromDb(userId, calendarId)
                     }
 
                     return IcsSurgeryUtils.HandleIcsResult.Success(
@@ -424,9 +424,9 @@ class HandleIcsUseCase(
     private suspend fun makeCalendarVisible(event: Event, userId: UserId) {
         if (!event.calendar.display) {
             // 1. Update in DB
-            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
+            calendarsRepository.updateCalendarDisplay(event.calendar.id, true)
             // 2. Update on Server
-            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
+            updateCalendarUseCase.executeUpdateFromDb(userId, event.calendar.id)
         }
     }
 }

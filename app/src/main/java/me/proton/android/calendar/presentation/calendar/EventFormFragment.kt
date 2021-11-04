@@ -50,6 +50,8 @@ import me.proton.android.calendar.common.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
+import me.proton.android.calendar.common.FragmentArguments.IS_ALL_DAY_ARG
+import me.proton.android.calendar.common.FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -746,7 +748,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_alarm_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForAlarm()
-            findNavController().navigate(R.id.nav_event_form_alarm)
+            val bundle = Bundle().apply {
+                putBoolean(IS_ALL_DAY_ARG, eventViewModel.eventLiveData.value!!.isAllDay())
+                putBoolean(IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG, false)
+            }
+            findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }
         event_form_alarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
     }

@@ -649,9 +649,7 @@ class EventViewModel(
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
             if (event.iCalEvent.organizer != null) {
-                val organizerEmail = calendarsRepository.selectMembers(calendar.id).firstOrNull {
-                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-                }?.email
+                val organizerEmail = getCalendarEmail(calendar.id)
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
             event = Event.from(
@@ -929,9 +927,8 @@ class EventViewModel(
         this.tempAlarmTime = time
     }
 
-    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null): Boolean {
-        if (isAlarmLimitReached()) return false
-        val duration = if (event.isAllDay()) {
+    fun handleAlarm(alarmTypeOption: Int, count: Int? = null, countTypeOption: Int? = null, isAllDay: Boolean): VAlarm? {
+        val duration = if (isAllDay) {
             when (alarmTypeOption) {
                 0 -> Duration.builder().prior(false).hours(9).build() // on the day at 9:00
                 1 -> Duration.builder().prior(true).hours(6).build() // day before at 18:00
@@ -1026,12 +1023,23 @@ class EventViewModel(
                 SendByOption.EMAIL -> VAlarm.email(Trigger(duration, Related.START), null, null, emptyList())
             }
 
-            event.iCalEvent.addAlarm(alarm)
-            saveUserEditedAlarms()
-            _event.postValue(event)
+            return alarm
         }
 
-        return true
+        return null
+    }
+
+    fun saveAlarm(alarm: VAlarm) {
+        val currentAlarms = event.iCalEvent.alarms
+        if (currentAlarms?.contains(alarm) == true) {
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_notification_already_added)
+            )
+            return
+        }
+        event.iCalEvent.addAlarm(alarm)
+        saveUserEditedAlarms()
+        _event.postValue(event)
     }
 
     fun handleAlarmDelete(index: Int) {
@@ -1093,9 +1101,7 @@ class EventViewModel(
                 logger.i("EventViewModel: User was null in allowSend")
                 return false
             }
-        val email = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
+        val email = getCalendarEmail(event.calendar.id)
         if (email == null) {
             logger.i("EventViewModel: Email from selectMembers was null in allowSend")
             return false
@@ -1103,11 +1109,11 @@ class EventViewModel(
         return user.hasSubscription() || !isShortDomainAddress(email)
     }
 
-    private suspend fun updateCalendarDisplay(calendar: Calendar, display: Int) {
+    private suspend fun updateCalendarDisplay(calendar: Calendar, display: Boolean) {
         // 1. Update in DB
         calendarsRepository.updateCalendarDisplay(calendar.id, display)
         // 2. Update on Server
-        updateCalendarUseCase.executeUpdate(userId, calendar.id)
+        updateCalendarUseCase.executeUpdateFromDb(userId, calendar.id)
     }
 
     suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
@@ -1123,9 +1129,7 @@ class EventViewModel(
                 attendee
             )
             if (event.iCalEvent.organizer == null) {
-                val organizerEmail = calendarsRepository.selectMembers(event.calendar.id).firstOrNull {
-                    it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-                }?.email
+                val organizerEmail = getCalendarEmail(event.calendar.id)
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
         } else {
@@ -1689,7 +1693,7 @@ class EventViewModel(
                     widgetRefresher.refresh()
 
                     // Display the event's calendar if it was hidden
-                    if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+                    if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
 
                     // Reset event form state
                     eventFormState.value = EventState.Idle
@@ -1735,7 +1739,7 @@ class EventViewModel(
                 widgetRefresher.refresh()
 
                 // Display the event's calendar if it was hidden
-                if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+                if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
 
                 // Reset event form state
                 eventFormState.value = EventState.Idle
@@ -2845,12 +2849,7 @@ class EventViewModel(
         // Update the event participation status to reflect changes in view
         event.updateParticipationStatus(userEmails, participationStatus)
 
-        if (!event.calendar.display) {
-            // 1. Update in DB
-            calendarsRepository.updateCalendarDisplay(event.calendar.id, 1)
-            // 2. Update on Server
-            updateCalendarUseCase.executeUpdate(userId, event.calendar.id)
-        }
+        if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
 
         _event.postValue(event)
 
@@ -2910,7 +2909,7 @@ class EventViewModel(
         }
         val event = transformEventUseCase.execute(eventEntity) ?: return EventLinkResult.Error
         if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
-        if (!event.calendar.display) updateCalendarDisplay(event.calendar, 1)
+        if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
         return if (event.isRecurring()) {
             val calendarUserSettings =
                 calendarsRepository.selectCalendarUserSettings(userId.id) ?: return EventLinkResult.Error
@@ -2924,5 +2923,11 @@ class EventViewModel(
             if (occurrences.isNullOrEmpty()) EventLinkResult.OccurrenceDoesNotExist
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
+    }
+
+    suspend fun getCalendarEmail(calendarId: String): String? {
+        return calendarsRepository.selectMembers(calendarId).firstOrNull {
+            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+        }?.email
     }
 }

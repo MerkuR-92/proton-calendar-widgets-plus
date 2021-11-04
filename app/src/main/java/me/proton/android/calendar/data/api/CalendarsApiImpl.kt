@@ -2,6 +2,7 @@ package me.proton.android.calendar.data.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.api.*
@@ -92,6 +93,12 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun updateEventPersonalPart(@Path("calendarId") calendarId: String,
                                         @Path("eventId") eventId: String,
                                         @Body body: UpdateEventPersonalPartApiRequest) : EventApiResponse
+
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/settings")
+    suspend fun updateCalendarSettings(
+        @Path("calendarId") calendarId: String,
+        @Body body: UpdateCalendarSettingsApiRequest
+    ) : UpdateCalendarSettingsApiResponse
 }
 
 class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -240,6 +247,14 @@ class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
     ): ApiResponse<EventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         updateEventPersonalPart(calendarId, eventId, body)
     }.toApiResponse()
+
+    override suspend fun updateCalendarSettings(
+        userId: UserId,
+        calendarId: String,
+        body: UpdateCalendarSettingsApiRequest
+    ): ApiResponse<UpdateCalendarSettingsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        updateCalendarSettings(calendarId, body)
+    }.toApiResponse()
 }
 
 @Serializable
@@ -273,13 +288,13 @@ data class SyncEventsUpdateApiRequest(
 @Serializable
 data class UpdateCalendarApiRequest(
     @SerialName("Name")
-    val name: String,
+    val name: String? = null,
     @SerialName("Description")
-    val description: String,
+    val description: String? = null,
     @SerialName("Color")
-    val color: String,
+    val color: String? = null,
     @SerialName("Display")
-    val display: Int
+    val display: Int? = null
 )
 
 @Serializable
@@ -540,4 +555,20 @@ data class PersonalEventContentApiRequest(
     val data: String,
     @SerialName("Signature")
     val signature: String
+)
+
+@Serializable
+data class UpdateCalendarSettingsApiRequest(
+    @SerialName("DefaultEventDuration")
+    val defaultEventDuration: Int? = null,
+    @SerialName("DefaultPartDayNotifications")
+    val defaultPartDayNotifications: List<CalendarSettingsEntity.AlarmEntity>? = null,
+    @SerialName("DefaultFullDayNotifications")
+    val defaultFullDayNotifications: List<CalendarSettingsEntity.AlarmEntity>? = null
+)
+
+@Serializable
+data class UpdateCalendarSettingsApiResponse(
+    @SerialName("CalendarSettings")
+    val calendarSettings: CalendarSettingsEntity
 )

@@ -34,6 +34,7 @@ import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toBoolean
+import me.proton.core.util.kotlin.toInt
 import java.time.*
 import java.time.temporal.TemporalAdjusters
 import java.util.*
@@ -490,8 +491,8 @@ class CalendarsRepositoryImpl(
         return if (calendar != null) calendar.display == newDisplay else false
     }
 
-    override suspend fun updateCalendarDisplay(calendarId: String, display: Int) {
-        database.calendarsDao().updateCalendarDisplay(calendarId, display)
+    override suspend fun updateCalendarDisplay(calendarId: String, display: Boolean) {
+        database.calendarsDao().updateCalendarDisplay(calendarId, display.toInt())
         widgetRefresher.refresh()
     }
 
@@ -1091,6 +1092,10 @@ class CalendarsRepositoryImpl(
         database.calendarSettingsDao().insert(calendarSettings)
     }
 
+    override suspend fun updateCalendarSettings(calendarSettings: CalendarSettingsEntity) {
+        database.calendarSettingsDao().updateOrInsert(calendarSettings)
+    }
+
     override suspend fun deleteCalendarSettingsById(id: String) {
         database.calendarSettingsDao().deleteById(id)
     }
@@ -1133,6 +1138,14 @@ class CalendarsRepositoryImpl(
 
     override fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?> {
         return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
+    }
+
+    override suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String) {
+        return database.calendarUserSettingsDao().updateDefaultCalendarId(userId, defaultCalendarId)
+    }
+
+    override fun flowCalendarUserDefaultCalendarId(userId: String): Flow<String?> {
+        return database.calendarUserSettingsDao().flowCalendarUserDefaultCalendarId(userId).distinctUntilChanged()
     }
 
     override suspend fun selectCalendarUserSettingsPrimaryTimezone(userId: String): String? {
