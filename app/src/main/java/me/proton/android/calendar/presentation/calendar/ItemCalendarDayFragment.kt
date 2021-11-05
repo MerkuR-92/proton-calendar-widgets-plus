@@ -52,6 +52,7 @@ import org.koin.core.inject
 import java.text.SimpleDateFormat
 import java.time.*
 import java.util.*
+import kotlin.math.min
 
 class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
@@ -238,14 +239,20 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             }
             eventViews.add(eventView)
 
+            // events shorter than 30 minutes should still be shown as lasting 30 minutes
+            val minimumSpanningMinutes = 30
+
             // The day view needs the event time ranges in the start minute/end minute format,
             // so calculate those here
             val dtStart = event.getStart(timeZoneId)
             val dtEnd = event.getEnd(timeZoneId)
             val startMinute: Int = 60 * dtStart.hour + dtStart.minute
             val eventDuration = Duration.between(dtStart, dtEnd).toMinutes().toInt()
-            val endMinute: Int = startMinute + if (eventDuration < 30) 30 else eventDuration
-            eventTimeRanges.add(DayView.EventTimeRange(startMinute, endMinute))
+            // if event lasts past Midnight, start drawing it aligned to the bottom of the view
+            val alignedStartMinute = min(startMinute, Duration.ofDays(1).toMinutes().toInt() - minimumSpanningMinutes)
+            val endMinute: Int = alignedStartMinute + if (eventDuration < minimumSpanningMinutes) minimumSpanningMinutes else eventDuration
+
+            eventTimeRanges.add(DayView.EventTimeRange(alignedStartMinute, endMinute))
         }
 
         // Update the day view with the new events

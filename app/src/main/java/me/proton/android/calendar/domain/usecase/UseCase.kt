@@ -13,6 +13,7 @@ interface UseCase {
         /* BootstrapCalendarsUseCase */
         NO_CALENDAR,
         NO_ACTIVE_CALENDAR,
+        SOME_CALENDARS_FAILED_BOOTSTRAP,
         RESET_NEEDED,
         UPDATE_PASSPHRASE,
 

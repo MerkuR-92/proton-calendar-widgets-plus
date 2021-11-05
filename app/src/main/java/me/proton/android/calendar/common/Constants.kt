@@ -43,6 +43,7 @@ const val DEFAULT_CALENDAR_COLOR = "#657EE4"
 
 const val INVITE_ICS_FILE_NAME = "invite.ics"
 const val INVITE_ICS_MIME_TYPE = "text/calendar"
+const val INVITE_ICS_MIME_TYPE_TEMPLATE = "text/calendar; method=%s"
 const val INVITE_EMAIL_MIME_TYPE = "text/plain"
 const val INVITE_PROTON_INTENT_ACTION = "me.proton.android.calendar.intent.action.CTA_OPEN_ICS"
 const val INVITE_PROTON_EXTRA_SENDER_EMAIL = "me.proton.android.calendar.intent.extra.ICS_SENDER_EMAIL"
@@ -649,9 +650,13 @@ val aliasesTimezonesMap: Map<String, String> = mapOf(
     "America/St_Thomas" to "America/Port_of_Spain",
     "America/St_Vincent" to "America/Port_of_Spain",
     "America/Tortola" to "America/Port_of_Spain",
+    "America/Indiana/Indianapolis" to "America/New_York",
+    "America/Nuuk" to "Atlantic/Stanley",
     "Asia/Phnom_Penh" to "Asia/Bangkok",
     "Asia/Vientiane" to "Asia/Bangkok",
     "Asia/Muscat" to "Asia/Dubai",
+    "Asia/Singapore" to "Asia/Shanghai",
+    "Asia/Yangon" to "Indian/Cocos",
     "Europe/Nicosia" to "Asia/Nicosia",
     "Asia/Bahrain" to "Asia/Qatar",
     "Asia/Aden" to "Asia/Riyadh",
@@ -679,7 +684,10 @@ val aliasesTimezonesMap: Map<String, String> = mapOf(
     "UTC" to "UTC",
     "Antarctica/McMurdo" to "Pacific/Auckland",
     "Pacific/Saipan" to "Pacific/Guam",
-    "Pacific/Midway" to "Pacific/Pago_Pago"
+    "Pacific/Midway" to "Pacific/Pago_Pago",
+    "Pacific/Funafuti" to "Asia/Kamchatka",
+    "Pacific/Wake" to "Asia/Kamchatka",
+    "Pacific/Wallis" to "Asia/Kamchatka"
 )
 
 val windowsTimeZoneMap: Map<String, String> = mapOf(

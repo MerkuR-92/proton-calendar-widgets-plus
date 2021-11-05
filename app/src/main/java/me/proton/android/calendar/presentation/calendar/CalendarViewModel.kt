@@ -23,8 +23,8 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -39,10 +39,10 @@ import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.collections.HashMap
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -312,6 +312,7 @@ class CalendarViewModel(
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
+            val partTimeEndsOnMidnight = (!event.isAllDay() && event.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
             var start = event.getOccurrenceStart(timeZoneId).toLocalDate()
             val end = event.getOccurrenceEnd(timeZoneId).toLocalDate()
 
@@ -323,7 +324,7 @@ class CalendarViewModel(
                 start = start.plusDays(1)
 
                 // All day events end on next day 00:00 so we need to break loop to exclude end day
-                if (event.isAllDay() && start == end) break
+                if (start == end && (event.isAllDay() || partTimeEndsOnMidnight)) break
             }
         }
 
