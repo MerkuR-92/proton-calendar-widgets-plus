@@ -36,6 +36,7 @@ interface DateTimeUtils {
     fun Date.toZonedDateTime(timezone: String, isAllDay: Boolean): ZonedDateTime
 
     fun formatTimeZoneId(timeZoneId: String, forInstant: Instant, displayId: Boolean = true): String
+    fun getTimezoneOffsetDifferenceSeconds(instantA: Instant, instantB: Instant, timeZoneId: String): Int
 
     fun areTimeZoneOffsetsDifferent(timeZoneIdA: String, timeZoneIdB: String, forInstant: Instant? = null): Boolean?
 

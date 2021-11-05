@@ -156,6 +156,16 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return "${if (displayId) "$timeZoneId " else ""}(GMT${if (rawOffset < 0) "-" else "+"}${offset})"
     }
 
+    override fun getTimezoneOffsetDifferenceSeconds(instantA: Instant, instantB: Instant, timeZoneId: String): Int {
+        val rawOffsetA = TimeZone.getTimeZone(timeZoneId).getOffset(Date.from(instantA).time).toLong()
+        val rawOffsetB = TimeZone.getTimeZone(timeZoneId).getOffset(Date.from(instantB).time).toLong()
+
+        val offsetLocalTimeA = LocalTime.MIDNIGHT.plus(if (rawOffsetA < 0) -rawOffsetA else rawOffsetA, ChronoUnit.MILLIS)
+        val offsetLocalTimeB = LocalTime.MIDNIGHT.plus(if (rawOffsetB < 0) -rawOffsetB else rawOffsetB, ChronoUnit.MILLIS)
+        val diff = offsetLocalTimeB.toSecondOfDay() - offsetLocalTimeA.toSecondOfDay()
+        return if (rawOffsetA < 0) -diff else diff
+    }
+
     override fun areTimeZoneOffsetsDifferent(timeZoneIdA: String, timeZoneIdB: String, forInstant: Instant?): Boolean? {
 
         if (!TimeZone.getAvailableIDs().contains(timeZoneIdA) || !TimeZone.getAvailableIDs().contains(timeZoneIdB)) {

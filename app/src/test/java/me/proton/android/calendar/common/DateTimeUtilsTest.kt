@@ -7,10 +7,14 @@ import assertk.assertions.isNull
 import me.proton.android.calendar.common.DateTimeUtilsImpl.calculateWeekNumberBetween
 import me.proton.android.calendar.common.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.DateTimeUtilsImpl.getLastWeekOfMonthOffset
+import me.proton.android.calendar.common.DateTimeUtilsImpl.getTimezoneOffsetDifferenceSeconds
+import me.proton.android.calendar.common.IcsSurgeryUtils.applyBiweeklyDstParsingFix
+import me.proton.android.calendar.common.IcsSurgeryUtils.getBiweeklyDstParsingFix
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
-import java.time.DayOfWeek
-import java.time.LocalDate
+import java.time.*
 
 internal class DateTimeUtilsTest {
 
@@ -110,4 +114,161 @@ internal class DateTimeUtilsTest {
             LocalDate.of(2021, 7, 31)
         )).isEqualTo(1)
     }
+
+    @Test
+    fun `Check timezone offset difference between two Instants`() {
+        var timezone = "Europe/Berlin"
+        assertThat(
+            getTimezoneOffsetDifferenceSeconds(
+                ZonedDateTime.of(
+                    2021, 10, 28, 0, 0, 0, 0, ZoneId.of(timezone)
+                ).toInstant(), // GMT+2
+                ZonedDateTime.of(
+                    2021, 11, 2, 0, 0, 0, 0, ZoneId.of(timezone)
+                ).toInstant(), // GMT+1
+                timezone
+            )
+        ).isEqualTo(-3600)
+
+        timezone = "Pacific/Auckland"
+        assertThat(
+            getTimezoneOffsetDifferenceSeconds(
+                ZonedDateTime.of(
+                    2021, 9, 25, 0, 0, 0, 0, ZoneId.of(timezone)
+                ).toInstant(), // GMT+12
+                ZonedDateTime.of(
+                    2021, 9, 27, 0, 0, 0, 0, ZoneId.of(timezone)
+                ).toInstant(), // GMT+13
+                timezone
+            )
+        ).isEqualTo(3600)
+    }
+
+    @Test
+    fun `Fix dateStart and dateEnd parsing of Event starting during CET`() {
+
+        val iCalString = """
+            BEGIN:VCALENDAR
+            METHOD:REQUEST
+            PRODID:Microsoft Exchange Server 2010
+            VERSION:2.0
+            BEGIN:VTIMEZONE
+            TZID:Europe/Berlin
+            BEGIN:STANDARD
+            DTSTART:16010101T030000
+            TZOFFSETFROM:+0200
+            TZOFFSETTO:+0100
+            RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10
+            END:STANDARD
+            BEGIN:DAYLIGHT
+            DTSTART:16010101T020000
+            TZOFFSETFROM:+0100
+            TZOFFSETTO:+0200
+            RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3
+            END:DAYLIGHT
+            END:VTIMEZONE
+            BEGIN:VEVENT
+            UID:040000008
+            SUMMARY;LANGUAGE=en-US:test
+            DTSTART;TZID=Europe/Berlin:20211102T130000
+            DTEND;TZID=Europe/Berlin:20211102T140000
+            DTSTAMP:20211029T072337Z
+            END:VEVENT
+            END:VCALENDAR
+            """.trimIndent()
+
+        val timeZoneId = "Europe/Berlin"
+        val event = Event.from(
+            "id",
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            ICalUtilsImpl.parseICalString(iCalString)!!
+        )!!
+
+        // the actual dateTimes should always be the same, no matter when Biweekly parsed the ICS (during standard
+        //  or daylight saving time)
+
+        event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {
+            event.iCalEvent.dateStart.value = it
+        }
+        event.iCalEvent.dateEnd.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone.id)?.let {
+            event.iCalEvent.dateEnd.value = it
+        }
+
+        assertThat(event.getStart(timeZoneId)).isEqualTo(ZonedDateTime.of(
+            LocalDate.of(2021, 11, 2),
+            LocalTime.of(13, 0, 0),
+            ZoneId.of(timeZoneId)
+        ))
+
+        assertThat(event.getEnd(timeZoneId)).isEqualTo(ZonedDateTime.of(
+            LocalDate.of(2021, 11, 2),
+            LocalTime.of(14, 0, 0),
+            ZoneId.of(timeZoneId)
+        ))
+
+    }
+
+    @Test
+    fun `Fix dateStart and dateEnd parsing of Event starting during CEST`() {
+
+        val iCalString = """
+            BEGIN:VCALENDAR
+            METHOD:REQUEST
+            PRODID:Microsoft Exchange Server 2010
+            VERSION:2.0
+            BEGIN:VTIMEZONE
+            TZID:Europe/Berlin
+            BEGIN:STANDARD
+            DTSTART:16010101T030000
+            TZOFFSETFROM:+0200
+            TZOFFSETTO:+0100
+            RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10
+            END:STANDARD
+            BEGIN:DAYLIGHT
+            DTSTART:16010101T020000
+            TZOFFSETFROM:+0100
+            TZOFFSETTO:+0200
+            RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3
+            END:DAYLIGHT
+            END:VTIMEZONE
+            BEGIN:VEVENT
+            UID:040000008
+            SUMMARY;LANGUAGE=en-US:test
+            DTSTART;TZID=Europe/Berlin:20220402T130000
+            DTEND;TZID=Europe/Berlin:20220402T140000
+            DTSTAMP:20211029T072337Z
+            END:VEVENT
+            END:VCALENDAR
+            """.trimIndent()
+
+        val timeZoneId = "Europe/Berlin"
+        val event = Event.from(
+            "id",
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            ICalUtilsImpl.parseICalString(iCalString)!!
+        )!!
+
+        event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {
+            event.iCalEvent.dateStart.value = it
+        }
+        event.iCalEvent.dateEnd.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone.id)?.let {
+            event.iCalEvent.dateEnd.value = it
+        }
+
+        // the actual dateTimes should always be the same, no matter when Biweekly parsed the ICS (during standard
+        //  or daylight saving time)
+
+        assertThat(event.getStart(timeZoneId)).isEqualTo(ZonedDateTime.of(
+            LocalDate.of(2022, 4, 2),
+            LocalTime.of(13, 0, 0),
+            ZoneId.of(timeZoneId)
+        ))
+
+        assertThat(event.getEnd(timeZoneId)).isEqualTo(ZonedDateTime.of(
+            LocalDate.of(2022, 4, 2),
+            LocalTime.of(14, 0, 0),
+            ZoneId.of(timeZoneId)
+        ))
+    }
+
 }
