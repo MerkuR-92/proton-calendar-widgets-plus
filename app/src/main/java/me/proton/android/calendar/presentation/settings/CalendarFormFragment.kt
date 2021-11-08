@@ -358,7 +358,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             var dialog: AlertDialog? = null
             val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
             dialog = builder.setSingleChoiceItems(
-                CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map { it.toString() }.toTypedArray(),
+                CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map {
+                    getString(R.string.calendar_form_default_event_duration_value, it.toString())
+                }.toTypedArray(),
                 calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.indexOf(it) } ?: 0
             ) { _, item ->
                 calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION_MINUTES[item])
