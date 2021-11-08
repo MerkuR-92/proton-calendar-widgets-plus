@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
@@ -121,11 +122,11 @@ class SyncServerEventsUseCase(
 
                 }
                 is ApiResponse.Error -> {
-                    logger.e("error in SyncServerEvents: ${eventsReponse}")
+                    eventsReponse.logErrorIfNeeded("error in SyncServerEvents", logger)
                     return UseCase.Result.Error("api error getting server events: $eventsReponse")
                 }
                 is ApiResponse.Exception -> {
-                    logger.e("Exception in SyncServerEvents: ${eventsReponse}")
+                    eventsReponse.logErrorIfNeeded("Exception in SyncServerEvents", logger)
                     return UseCase.Result.Error("exception getting server events: $eventsReponse")
                 }
             }

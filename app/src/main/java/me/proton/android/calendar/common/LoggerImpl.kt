@@ -16,6 +16,7 @@ object LoggerImpl : Logger {
     private const val PROTON_ERROR_INVALID_REFRESH_TOKEN = 10013
     private const val PROTON_ERROR_INCORRECT_LOGIN_CREDENTIALS = 8002
     private const val PROTON_ERROR_PUBLIC_KEYS_ADDRESS_DOESNT_EXIST = 33102
+    private const val PROTON_ERROR_FORCE_UPDATE = 5003
 
     private fun isLogNeeded(error: Throwable): Boolean {
         return when (error) {
@@ -23,9 +24,10 @@ object LoggerImpl : Logger {
                 HTTP_ERROR_UNAUTHORIZED -> false
                 HTTP_ERROR_NOT_FOUND -> false
                 HTTP_ERROR_UNPROCESSABLE_ENTITY -> when (error.protonData.code) {
-                    PROTON_ERROR_INVALID_REFRESH_TOKEN -> true // TODO Set to false once random logout issue is fixed
+                    PROTON_ERROR_INVALID_REFRESH_TOKEN -> false
                     PROTON_ERROR_INCORRECT_LOGIN_CREDENTIALS -> false
                     PROTON_ERROR_PUBLIC_KEYS_ADDRESS_DOESNT_EXIST -> false
+                    PROTON_ERROR_FORCE_UPDATE -> false
                     else -> true
                 }
                 else -> true
