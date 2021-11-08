@@ -38,8 +38,12 @@ import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
-import me.proton.android.calendar.common.IcsSurgeryUtils.localizeZuluTimeDate
+import me.proton.android.calendar.common.IcsSurgeryUtils.applyBiweeklyDstParsingFix
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -159,6 +163,9 @@ object IcsSurgeryUtils {
 
         // TODO Once we handle multiple events, allow them to fail separately
         iCalendar.events.forEach { event ->
+
+            event.applyBiweeklyDstParsingFix(iCalendar)
+
             if (event.dateTimeStamp?.value == null) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
 
             if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
@@ -190,6 +197,66 @@ object IcsSurgeryUtils {
         }
 
         return HandleIcsResult.ParsingSuccessful(iCalendar)
+    }
+
+    /**
+     * Apply the fixed ICalDate values for [dateStart], [dateEnd] and [recurrenceId] if Biweekly made it incorrect due to DST
+     * [exceptionDates] are not fixed in this method, but are fixed later in [cleanExDates].
+     */
+    fun VEvent.applyBiweeklyDstParsingFix(iCalendar: ICalendar) {
+
+        // Fix dateStart
+        iCalendar.timezoneInfo?.getTimezone(this.dateStart)?.timeZone?.id?.let { timeZone ->
+            this.dateStart?.value?.getBiweeklyDstParsingFix(timeZone)?.let {
+                this.dateStart.value = it
+            }
+        }
+
+        // Fix dateEnd
+        iCalendar.timezoneInfo?.getTimezone(this.dateEnd)?.timeZone?.id?.let { timeZone ->
+            this.dateEnd?.value?.getBiweeklyDstParsingFix(timeZone)?.let {
+                this.dateEnd.value = it
+            }
+        }
+
+        // Fix recurrenceId
+        iCalendar.timezoneInfo?.getTimezone(this.recurrenceId)?.timeZone?.id?.let { timeZone ->
+            this.recurrenceId?.value?.getBiweeklyDstParsingFix(timeZone)?.let {
+                this.recurrenceId.value = it
+            }
+        }
+
+        // Fix ExDates in cleanExDates
+
+    }
+
+    /**
+     * Fixes the ICalDate value if Biweekly made it incorrect due to DST
+     * @return ICalDate if fix is needed. null if nothing needs to be fixed.
+     */
+    fun ICalDate.getBiweeklyDstParsingFix(timezone: String): ICalDate? {
+        // Ex: Device is in GMT+1 (No DST), ICalDate is in GMT+2 (DST): will return ICalDate minus 1 hour
+        // Ex: Device is in GMT+2 (DST), ICalDate is in GMT+1 (No DST): will return ICalDate plus 1 hour
+        // Ex: Device is in UTC-8 (No DST), ICalDate is in UTC-7 (DST): will return ICalDate minus 1 hour
+        // Ex: Device is in UTC-7 (DST), ICalDate is in UTC-8 (No DST): will return ICalDate plus 1 hour
+        if (!this.hasTime()) return null
+
+        val raw = this.rawComponents
+        val parsed = this.toZonedDateTime(
+            timezone
+        )
+        val rawLocalTime = LocalDateTime.of(
+            LocalDate.of(raw.year, raw.month, raw.date),
+            LocalTime.of(raw.hour, raw.minute)
+        )
+        val parsedLocalTime = LocalDateTime.of(
+            LocalDate.of(parsed.year, parsed.month, parsed.dayOfMonth),
+            LocalTime.of(parsed.hour, parsed.minute)
+        )
+        val diff = ChronoUnit.MILLIS.between(parsedLocalTime, rawLocalTime)
+        val date = this.clone() as ICalDate
+        date.time += diff
+        return date
     }
 
     fun String.cleanRawIcs(): HandleIcsResult {
@@ -470,6 +537,15 @@ object IcsSurgeryUtils {
                 if (exceptionDateValue.hasTime() && !this.dateStart.value.hasTime()) {
                     exceptionDates.values[exceptionDates.values.indexOf(exceptionDateValue)] =
                         ICalDate(exceptionDateValue, false)
+                }
+
+                // Fix Biweekly DST parsing on ExDates values
+                if (exceptionDateValue.hasTime() && this.dateStart.value.hasTime()) {
+                    iCalendar.timezoneInfo?.getTimezone(exceptionDates)?.timeZone?.id?.let { timeZone ->
+                        exceptionDateValue.getBiweeklyDstParsingFix(timeZone)?.let {
+                            exceptionDates.values[exceptionDates.values.indexOf(exceptionDateValue)] = it
+                        }
+                    }
                 }
             }
         }
