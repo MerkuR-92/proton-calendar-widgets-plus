@@ -648,7 +648,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
         val sortedAttendeeList =
-            attendeeList.sortedWith(compareBy { getParticipationStatusPriorityValue(it.participationStatus) })
+            attendeeList.sortedWith(compareBy { attendee ->
+                attendee.participationStatus?.let { participationStatus ->
+                    getParticipationStatusPriorityValue(participationStatus)
+                }
+            })
         attendeeListAdapter.submitList(sortedAttendeeList)
 
         // Reset LayoutParams
