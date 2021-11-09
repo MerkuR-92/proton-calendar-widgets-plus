@@ -169,4 +169,12 @@ object AppDatabaseMigrations {
             OrganizationDatabase.MIGRATION_0.migrate(database)
         }
     }
+
+    val MIGRATION_31_32 = object : Migration(31, 32) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Two new migrations in core.
+            AddressDatabase.MIGRATION_2.migrate(database)
+            PublicAddressDatabase.MIGRATION_1.migrate(database)
+        }
+    }
 }

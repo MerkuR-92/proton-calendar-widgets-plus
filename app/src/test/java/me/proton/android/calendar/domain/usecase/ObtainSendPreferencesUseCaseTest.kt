@@ -307,14 +307,16 @@ internal class ObtainSendPreferencesUseCaseTest {
         listOf(
             PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = false, true, true, true)),
             PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = true, true, true, true))
-        )
+        ),
+        null
     )
 
     private val unknownExternalRecipientNoKeysPublicAddress = PublicAddress(
         "unknown_external_no_keys@email.com",
         recipientType = Recipient.External.value,
         "text/html",
-        emptyList()
+        emptyList(),
+        null
     )
 
     private val unknownInternalRecipientWithKeysPublicAddress = PublicAddress(
@@ -324,14 +326,16 @@ internal class ObtainSendPreferencesUseCaseTest {
         listOf(
             PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = false, true, true, true)),
             PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = true, true, true, true))
-        )
+        ),
+        null
     )
 
     private val unknownInternalRecipientNoKeysPublicAddress = PublicAddress(
         "unknown_internal_no_keys@pm.me",
         recipientType = Recipient.Internal.value,
         "text/html",
-        emptyList()
+        emptyList(),
+        null
     )
 
     private val contactExternalPinnedKeyPublicAddress = PublicAddress(
@@ -346,7 +350,8 @@ internal class ObtainSendPreferencesUseCaseTest {
                     true, true, true
                 )
             ),
-        )
+        ),
+        null
     )
 
     private val externalContactWithPinnedKeyBrokenSignature: Contact =

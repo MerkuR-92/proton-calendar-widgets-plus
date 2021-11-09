@@ -24,7 +24,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.plan.data.repository.PlansRepositoryImpl
-import me.proton.core.plan.domain.SupportedPaidPlanIds
+import me.proton.core.plan.domain.SupportedPaidPlans
 import me.proton.core.plan.domain.repository.PlansRepository
 import javax.inject.Singleton
 
@@ -33,8 +33,8 @@ import javax.inject.Singleton
 object PlanModule {
 
     @Provides
-    @SupportedPaidPlanIds
-    fun provideClientSupportedPaidPlanIds(): List<String> =
+    @SupportedPaidPlans
+    fun provideClientSupportedPaidPlanNames(): List<String> =
         emptyList()
 
     @Provides

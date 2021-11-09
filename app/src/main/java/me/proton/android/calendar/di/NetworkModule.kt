@@ -15,10 +15,12 @@ import me.proton.android.calendar.data.api.CalendarApiClient
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.network.data.*
 import me.proton.core.network.data.client.ClientIdProviderImpl
+import me.proton.core.network.data.client.ExtraHeaderProviderImpl
 import me.proton.core.network.domain.ApiClient
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.network.domain.NetworkPrefs
 import me.proton.core.network.domain.client.ClientIdProvider
+import me.proton.core.network.domain.client.ExtraHeaderProvider
 import me.proton.core.network.domain.humanverification.HumanVerificationListener
 import me.proton.core.network.domain.humanverification.HumanVerificationProvider
 import me.proton.core.network.domain.server.ServerTimeListener
@@ -92,6 +94,11 @@ object NetworkModule {
             context.pgpCrypto.updateTime(epochSeconds)
         }
     }
+
+    @Provides
+    @Singleton
+    fun provideExtraHeaderProvider(): ExtraHeaderProvider =
+        ExtraHeaderProviderImpl()
 }
 
 @Module

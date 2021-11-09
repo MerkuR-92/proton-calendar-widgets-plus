@@ -131,7 +131,8 @@ internal class TransformEventUseCaseTest {
                     enabled = true,
                     type = AddressType.Original,
                     order = 1,
-                    keys = mockk()
+                    keys = mockk(),
+                    signedKeyList = null
                 )
             )
 

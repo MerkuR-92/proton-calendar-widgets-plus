@@ -110,11 +110,6 @@
             android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="me.proton.core.humanverification.presentation.ui.HumanVerificationActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name="me.proton.core.presentation.ui.alert.ForceUpdateActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
