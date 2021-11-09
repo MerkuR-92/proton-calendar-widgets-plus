@@ -27,6 +27,7 @@ import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
 import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
+import me.proton.core.contact.data.local.db.ContactDatabase
 import me.proton.core.data.room.db.extension.*
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.humanverification.data.entity.HumanVerificationEntity
@@ -175,6 +176,13 @@ object AppDatabaseMigrations {
             // Two new migrations in core.
             AddressDatabase.MIGRATION_2.migrate(database)
             PublicAddressDatabase.MIGRATION_1.migrate(database)
+        }
+    }
+
+    val MIGRATION_32_33 = object : Migration(32, 33) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // One new migration in core.
+            ContactDatabase.MIGRATION_0.migrate(database)
         }
     }
 }
