@@ -323,6 +323,8 @@ class CalendarFormViewModel(
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_update_calendar_error)
                     )
+                    // Clear loading state
+                    calendarFormState.value = CalendarFormState.Idle
                     return
                 }
             }

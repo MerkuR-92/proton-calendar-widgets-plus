@@ -231,7 +231,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
-        if (!isTaskRoot && intent.action != INVITE_PROTON_INTENT_ACTION && intent.action != Intent.ACTION_VIEW && intent.type != INVITE_ICS_MIME_TYPE && intent.action != MainViewModel.INTENT_ACTION_NEW_EVENT && intent.action != MainViewModel.INTENT_ACTION_SHOW_DAY && intent.action != MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS) {
+        if (!isTaskRoot &&
+            intent.action != INVITE_PROTON_INTENT_ACTION &&
+            intent.action != Intent.ACTION_VIEW &&
+            intent.type != INVITE_ICS_MIME_TYPE &&
+            intent.action != MainViewModel.INTENT_ACTION_NEW_EVENT &&
+            intent.action != MainViewModel.INTENT_ACTION_SHOW_DAY &&
+            intent.action != MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
+        ) {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
             //  at the top of the stack (ie: the last state of this task)
