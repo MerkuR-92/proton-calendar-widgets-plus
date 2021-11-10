@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation.settings
 
 import android.app.Application
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -93,7 +94,8 @@ class CalendarFormViewModel(
     private val _defaultAllDayAlarms = MutableLiveData(arrayListOf<VAlarm>())
     val defaultAllDayAlarms: LiveData<ArrayList<VAlarm>> = _defaultAllDayAlarms
 
-    private var _calendarId: String? = null
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var _calendarId: String? = null
 
     private var calendarEdited = false
     private var calendarSettingsEdited = false
@@ -346,6 +348,9 @@ class CalendarFormViewModel(
                             else R.string.snack_update_calendar_error
                         )
                     )
+                    // Clear loading state
+                    calendarFormState.value = CalendarFormState.Idle
+                    return
                 }
             }
 
@@ -363,33 +368,40 @@ class CalendarFormViewModel(
             calendarFormState.value = CalendarFormState.Processing.Saving
 
             // Create calendar
-            val createDefaultCalendarResult = createCalendarUseCase.execute(
+            val createCalendarResult = createCalendarUseCase.execute(
                 userId = userId,
                 name = _calendarName.value!!,
                 color = _calendarColor.value!!,
                 email = _calendarEmail.value!!
             )
-            if (createDefaultCalendarResult !is UseCase.Result.Success<*>) {
+            if (createCalendarResult !is UseCase.Result.Success<*>) {
                 calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_create_calendar_error)
                 )
+                // Clear loading state
+                calendarFormState.value = CalendarFormState.Idle
+                return
             }
 
-            if (createDefaultCalendarResult is UseCase.Result.Success<*>) {
-                createDefaultCalendarResult.returnValue.tryCast<String> {
-                    // Update newly created calendar settings
-                    val updateCalendarSettingsUseCaseResult = updateCalendarSettingsUseCase.updateCalendarSettings(
-                        userId,
-                        this,
-                        _defaultEventDuration.value,
-                        _defaultPartDayAlarms.value,
-                        _defaultAllDayAlarms.value
+            createCalendarResult.returnValue.tryCast<String> {
+                // Set the newly created calendar id in case we fail to update calendar settings
+                _calendarId = this
+
+                // Update newly created calendar settings
+                val updateCalendarSettingsUseCaseResult = updateCalendarSettingsUseCase.updateCalendarSettings(
+                    userId,
+                    this,
+                    _defaultEventDuration.value,
+                    _defaultPartDayAlarms.value,
+                    _defaultAllDayAlarms.value
+                )
+                if (updateCalendarSettingsUseCaseResult !is UseCase.Result.Success<*>) {
+                    calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
+                        resourceProvider.provideString(R.string.snack_create_calendar_settings_error)
                     )
-                    if (updateCalendarSettingsUseCaseResult !is UseCase.Result.Success<*>) {
-                        calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
-                            resourceProvider.provideString(R.string.snack_create_calendar_error)
-                        )
-                    }
+                    // Clear loading state
+                    calendarFormState.value = CalendarFormState.Idle
+                    return
                 }
             }
 

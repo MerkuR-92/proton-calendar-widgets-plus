@@ -1,0 +1,81 @@
+package me.proton.android.calendar.presentation.calendarformviewmodel
+
+import android.app.Application
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.platform.app.InstrumentationRegistry
+import io.mockk.*
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.serialization.json.Json
+import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.UserSettingsRepository
+import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.calendar.EventViewModel
+import me.proton.android.calendar.presentation.settings.CalendarFormViewModel
+import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.user.domain.UserManager
+import org.junit.Before
+import org.junit.Rule
+import org.koin.core.KoinComponent
+
+open class CalendarFormViewModelTestCommon: KoinComponent {
+
+    @get:Rule
+    var rule = InstantTaskExecutorRule()
+
+    lateinit var appDatabaseMock: AppDatabase
+    lateinit var protonCalendarApplication: Application
+
+    val calendarsRepositoryMock: CalendarsRepository = mockk()
+    val userSettingsRepositoryMock: UserSettingsRepository = mockk()
+
+    val userManagerMock: UserManager = mockk()
+
+    val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
+    val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
+    val updateCalendarSettingsUseCaseMock: UpdateCalendarSettingsUseCase = mockk()
+    val createCalendarsUseCaseMock: CreateCalendarUseCase = mockk()
+    val accountManagerMock: AccountManager = mockk()
+
+
+    private val testsLogger = TestsLogger
+    private val json = Json { this.ignoreUnknownKeys = true }
+
+    val resourceProviderMock: ResourceProvider = mockk()
+
+    @Before
+    fun beforeEach() {
+        clearAllMocks()
+        appDatabaseMock = mockk()
+        val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        protonCalendarApplication = application
+
+        coEvery { userManagerMock.getUser(userId) } returns UserMocks.provideUser()
+        coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
+        coEvery { accountManagerMock.getPrimaryUserId() } returns flowOf(userId)
+    }
+
+    /**
+     * Utils private methods
+     */
+    fun getCalendarFormViewModel(): CalendarFormViewModel {
+        return CalendarFormViewModel(
+            application = protonCalendarApplication,
+            calendarsRepository = calendarsRepositoryMock,
+            userManager = userManagerMock,
+            logger = testsLogger,
+            json = json,
+            updateCalendarUseCase = updateCalendarUseCaseMock,
+            resourceProvider = resourceProviderMock,
+            accountManager = accountManagerMock,
+            createCalendarUseCase = createCalendarsUseCaseMock,
+            updateCalendarSettingsUseCase = updateCalendarSettingsUseCaseMock
+        )
+    }
+
+}
