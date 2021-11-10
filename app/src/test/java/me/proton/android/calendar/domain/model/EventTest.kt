@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.model
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import biweekly.component.VEvent
@@ -8,6 +9,7 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrenceNew
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
@@ -15,6 +17,9 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.sql.Date
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 internal class EventTest {
 
@@ -177,6 +182,66 @@ internal class EventTest {
         // Europe/Samara makes event start and end on next day
         displayTimeZoneId = "Europe/Samara"
         assertTrue(event.spansSingleDay(timeZoneId = displayTimeZoneId))
+    }
+
+    /**
+     * Event happens weekly, starting in September at 18:00 in Zurich timezone.
+     * We want to display it in Pacific/Auckland, but over the course of following weeks,
+     * Auckland will switch to DST, and then Zurich will follow.
+     *
+     * This means that local time in Auckland will change twice, for those two DST switches.
+     *
+     * The local time in Zurich always stays the same.
+     */
+    @Test
+    fun `local time for part-time recurring event in another timezone, when both original and display TZ changes due to DST`() {
+        val event = Event.from("id", Calendar("id", "name", "color", 1, true, 0), calendarRecurringForCheckingDST!!)!!
+
+        val displayTimeZone = ZoneId.of("Pacific/Auckland")
+
+        // before both DST changes
+        with (event.generateOccurrenceNew(1, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2021, 9, 2),
+                    LocalTime.of(4, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
+        with (event.generateOccurrenceNew(2, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2021, 9, 16),
+                    LocalTime.of(4, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
+        // after Auckland DST change
+        with (event.generateOccurrenceNew(3, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2021, 9, 30),
+                    LocalTime.of(5, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
+        // after Zurich DST change
+        with (event.generateOccurrenceNew(6, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2021, 11, 11),
+                    LocalTime.of(6, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
     }
 
     val calendarStartEndTimeDifferentDays = ICalUtilsImpl.parseICalString("""
@@ -355,6 +420,27 @@ internal class EventTest {
     UID:DF6OBi2q7A7KV5qbO70j7uKRd0KJ@proton.me
     DTSTAMP:20201110T092019Z
     STATUS:CONFIRMED
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+    val calendarRecurringForCheckingDST = ICalUtilsImpl.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.28.0//EN
+    BEGIN:VEVENT
+    DTSTAMP:20211109T082541Z
+    SEQUENCE:0
+    SUMMARY:DST
+    LOCATION:
+    STATUS:CONFIRMED
+    TRANSP:OPAQUE
+    UID:30cp82qrfm0ukl22p6mj9p1cfv@google.com
+    CREATED:20211109T082523Z
+    LAST-MODIFIED:20211109T082540Z
+    DTSTART;TZID=Europe/Zurich:20210901T183000
+    DTEND;TZID=Europe/Zurich:20210901T193000
+    RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=WE;WKST=MO
     END:VEVENT
     END:VCALENDAR
     """.trimIndent())
