@@ -41,6 +41,8 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import me.proton.core.presentation.utils.errorSnack
+import me.proton.core.presentation.utils.onTextChange
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -110,7 +112,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
             setOnSingleClickListener {
                 if (calendar_form_name_value.text.toString().isBlank()) {
-                    view?.displaySnackBar(getString(R.string.snack_create_calendar_empty_name_error))
+                    calendar_form_name_value.setInputError(getString(R.string.calendar_form_name_required_error))
                     return@setOnSingleClickListener
                 }
 
@@ -162,7 +164,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 calendarFormViewModel.initUpdateCalendarForm(it)
             } ?: run {
                 // Init character limit text
-                calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
+                calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
 
                 calendar_form_name_value.requestFocus()
                 requireContext().showKeyboard()
@@ -176,8 +178,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         initOnClickListeners(calendarId == null)
 
-        calendar_form_name_value.doAfterTextChanged {
-            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, it?.length, CALENDAR_NAME_CHARACTER_LIMIT)
+        calendar_form_name_value.onTextChange {
+            if (it.isNotEmpty()) calendar_form_name_value.clearInputError()
+            calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, it.length, CALENDAR_NAME_CHARACTER_LIMIT)
         }
 
         observeCalendarFormSnackState(lifecycleScope.coroutineContext)
@@ -187,8 +190,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun observeCalendarFormValues() {
 
         calendarFormViewModel.calendarName.observe(viewLifecycleOwner) { calendarName ->
-            calendar_form_name_value.setText(calendarName)
-            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, calendarName.length,
+            calendar_form_name_value.text = calendarName
+            calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, calendarName.length,
                 CALENDAR_NAME_CHARACTER_LIMIT
             )
         }
