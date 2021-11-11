@@ -57,7 +57,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private var subscribedCalendars: List<CalendarEntity>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
-    private var defaultCalendarId: String = ""
+    private var defaultCalendarId: String? = null
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -154,7 +154,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         calendarViewModel.defaultCalendarId.observe(viewLifecycleOwner) { defaultCalendarId ->
-            defaultCalendarId ?: return@observe
 
             if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
@@ -195,10 +194,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
             val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
             var dataSetChanged = false
-            defaultCalendarId?.let {
-                this@SettingsFragment.defaultCalendarId = defaultCalendarId
-                dataSetChanged = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-            }
+            this@SettingsFragment.defaultCalendarId = defaultCalendarId
+            dataSetChanged = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
             settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
             settingsUserCalendarListAdapter.submitList(
                 userCalendars.sortedBy {

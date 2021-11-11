@@ -1164,8 +1164,12 @@ class CalendarsRepositoryImpl(
         database.calendarUserSettingsDao().deleteByUserId(userId)
     }
 
-    override suspend fun getDefaultCalendarId(userId: String): String? {
+    override suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String? {
         return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveUserCalendars(userId).firstOrNull()?.id
+    }
+
+    override suspend fun getDefaultCalendarId(userId: String): String? {
+        return selectCalendarUserSettings(userId)?.defaultCalendarId
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

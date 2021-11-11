@@ -127,7 +127,7 @@ class HandleIcsUseCase(
         if (!isOrganizerMode && userAttendee == null) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
         // Use the default calendar to create the event
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+        val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
             ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         if (defaultCalendar == null || !defaultCalendar.isActive) {

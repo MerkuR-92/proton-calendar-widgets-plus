@@ -736,7 +736,7 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
             return null
         }
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+        val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
         if (defaultCalendarId == null) {
             logger.e("defaultCalendarId was null in CalendarViewModel getDefaultCalendarSettings")
             return null

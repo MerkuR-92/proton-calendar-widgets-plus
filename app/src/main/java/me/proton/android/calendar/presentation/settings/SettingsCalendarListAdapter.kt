@@ -64,7 +64,7 @@ class SettingsCalendarListAdapter(
         return dataSetChanged
     }
 
-    fun setDefaultCalendarId(defaultCalendarId: String): Boolean {
+    fun setDefaultCalendarId(defaultCalendarId: String?): Boolean {
         val dataSetChanged = this.defaultCalendarId != defaultCalendarId
         this.defaultCalendarId = defaultCalendarId
         return dataSetChanged

@@ -301,7 +301,7 @@ class EventViewModel(
      */
     private suspend fun initializeDefaultCalendar(): InitResult {
         // Try to get default calendar id if it exists
-        var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+        var defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
             ?: return InitResult.Error("EventViewModel: could not get default calendar ID")
 
         // Try to get default calendar if it exists

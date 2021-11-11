@@ -205,6 +205,8 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarUserSettingsByUserId(userId: String)
 
+    suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String?
+
     suspend fun getDefaultCalendarId(userId: String): String?
 
     // event alarms
