@@ -32,6 +32,7 @@ import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -49,6 +50,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
 
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
     private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter
@@ -248,6 +250,12 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         markDefaultPress?.setOnSingleClickListener {
+            if (!mainViewModel.isConnectedToNetwork) {
+                bottomSheetDialog.dismiss()
+                view?.displaySnackBar(requireContext().getString(R.string.snack_network_error))
+                return@setOnSingleClickListener
+            }
+
             lifecycleScope.launch {
                 val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendarEntity.id)
                 if (updateDefaultCalendarId) {
