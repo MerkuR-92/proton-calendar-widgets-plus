@@ -806,8 +806,8 @@ class CalendarViewModel(
         PAID_REACHED
     }
 
-    suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
-        val userCalendarsCount = userCalendars.value?.size ?: return UserCalendarLimit.ERROR
+    suspend fun isUserCalendarLimitReached(calendars: List<CalendarEntity>? = null): UserCalendarLimit {
+        val userCalendarsCount = calendars?.size ?: userCalendars.value?.size ?: return UserCalendarLimit.ERROR
         val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
 
         if (isFreeUser && userCalendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED

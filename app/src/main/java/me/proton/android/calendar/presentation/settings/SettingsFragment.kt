@@ -82,11 +82,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_calendars_list_add_layout_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
         }
-        lifecycleScope.launch {
-            settings_calendars_list_add_layout.visibleOrGone(
-                calendarViewModel.isUserCalendarLimitReached() == CalendarViewModel.UserCalendarLimit.NOT_REACHED
-            )
-        }
 
         val settingsCalendarListView = settings_calendars_list
         val settingsCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -101,6 +96,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
             userCalendars ?: return@observe
 
+            lifecycleScope.launch {
+                settings_calendars_list_add_layout.visibleOrGone(
+                    calendarViewModel.isUserCalendarLimitReached(userCalendars) == CalendarViewModel.UserCalendarLimit.NOT_REACHED
+                )
+            }
             refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
         }
 
