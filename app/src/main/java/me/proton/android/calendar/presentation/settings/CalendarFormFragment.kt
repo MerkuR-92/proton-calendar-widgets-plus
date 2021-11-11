@@ -39,6 +39,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.core.presentation.utils.errorSnack
@@ -63,7 +64,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val accountViewModel: AccountViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
 
     private val logger: Logger by inject()
 
@@ -116,8 +117,15 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     return@setOnSingleClickListener
                 }
 
+                requireActivity().clearFocusAndHideKeyboard(view)
+
                 // Save calendar name in VM
                 calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
+
+                if (!mainViewModel.isConnectedToNetwork) {
+                    view?.displaySnackBar(getString(R.string.snack_network_error))
+                    return@setOnSingleClickListener
+                }
 
                 lifecycleScope.launch {
                     if (calendarFormViewModel.hasFormBeenEdited()) {
