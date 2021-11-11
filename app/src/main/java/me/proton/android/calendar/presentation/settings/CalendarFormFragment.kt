@@ -29,6 +29,7 @@ import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.CalendarForm.CALENDAR_NAME_CHARACTER_LIMIT
@@ -70,6 +71,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private var calendarId: String? = null
 
     override fun onBackPressedCustom() {
+        requireActivity().clearFocusAndHideKeyboard(view)
+
         // Display snack and return if we're saving the calendar changes
         val processingCalendar = calendarFormViewModel.calendarFormState.value is CalendarFormViewModel.CalendarFormState.Processing
         if (processingCalendar) {
@@ -160,6 +163,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             } ?: run {
                 // Init character limit text
                 calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
+
+                calendar_form_name_value.requestFocus()
+                requireContext().showKeyboard()
 
                 // Use random color from array as calendar color
                 val calendarColors = resources.getStringArray(R.array.calendar_colors)
