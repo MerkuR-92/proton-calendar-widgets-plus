@@ -758,7 +758,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                     drawer_layout.close()
                 }
-                CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                CalendarViewModel.UserCalendarLimit.FREE_REACHED,
+                CalendarViewModel.UserCalendarLimit.PAID_REACHED-> {
                     // Display limit reached for free user dialog
                     MaterialAlertDialogBuilder(this@MainActivity)
                         .setMessage(R.string.create_calendar_limit_reached_free)
@@ -766,20 +767,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         }
                         .show()
                 }
-                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
-                    // Display limit reached for paid user dialog
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
-                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
-                            // Open calendar settings view
-                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                            drawer_layout.close()
-                        }
-                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-                        }
-                        .show()
-                }
+                // TODO Use this dialog once we enable delete calendars
+//                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+//                    // Display limit reached for paid user dialog
+//                    MaterialAlertDialogBuilder(this@MainActivity)
+//                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
+//                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
+//                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
+//                            // Open calendar settings view
+//                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+//                            drawer_layout.close()
+//                        }
+//                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+//                        }
+//                        .show()
+//                }
             }
         }
     }
