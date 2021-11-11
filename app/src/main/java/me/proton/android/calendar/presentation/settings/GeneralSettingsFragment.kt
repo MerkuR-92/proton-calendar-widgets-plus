@@ -146,7 +146,9 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            settings_timezone_value.text = zoneId.id ?: getString(R.string.settings_value_placeholder)
+            settings_timezone_value.text = zoneId.id?.let {
+                DateTimeUtilsImpl.formatTimeZoneId(it, Instant.now())
+            } ?: getString(R.string.settings_value_placeholder)
         }
 
         calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
