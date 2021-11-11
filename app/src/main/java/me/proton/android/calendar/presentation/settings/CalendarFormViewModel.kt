@@ -159,16 +159,16 @@ class CalendarFormViewModel(
         }?.email
 
         // Calendar name
-        handleCalendarName(calendarEntity.name, initDefault = true)
+        _calendarName.value = calendarEntity.name
 
         // Calendar default email (can't be updated for existing calendar)
         _calendarEmail.value = calendarEmail ?: ""
 
         // Calendar color
-        handleCalendarColor(calendarEntity.color, initDefault = true)
+        _calendarColor.value = calendarEntity.color
 
         // Default event duration
-        handleDefaultEventDuration(calendarSettings.defaultEventDuration, initDefault = true)
+        _defaultEventDuration.value = calendarSettings.defaultEventDuration
 
         // Default part day event notifications
         setDefaultAlarms(calendarSettings.defaultPartDayNotifications, isAllDay = false)
@@ -180,18 +180,20 @@ class CalendarFormViewModel(
     suspend fun initCreateCalendarForm(calendarColor: String) {
 
         // Set default calendar color (picked randomly from the colors array)
-        handleCalendarColor(calendarColor, initDefault = true)
+        _calendarColor.value = calendarColor
 
         // Set default event duration
-        handleDefaultEventDuration(EVENT_DEFAULT_DURATION_MINUTES.first(), initDefault = true)
+        _defaultEventDuration.value = EVENT_DEFAULT_DURATION_MINUTES.first()
 
         // Set default part day event notifications (15 minutes before)
-        handleAlarmChange(DEFAULT_PART_DAY_ALARM, false, initDefault = true)
-        if (ADD_EMAIL_NOTIFICATIONS) handleAlarmChange(DEFAULT_PART_DAY_EMAIL_ALARM, false, initDefault = true)
+        val defaultPartDayAlarms = arrayListOf(DEFAULT_PART_DAY_ALARM)
+        if (ADD_EMAIL_NOTIFICATIONS) defaultPartDayAlarms.add(DEFAULT_PART_DAY_EMAIL_ALARM)
+        _defaultPartDayAlarms.value = defaultPartDayAlarms
 
         // Set default all day event notifications (1 day before at 9am)
-        handleAlarmChange(DEFAULT_ALL_DAY_ALARM, true, initDefault = true)
-        if (ADD_EMAIL_NOTIFICATIONS) handleAlarmChange(DEFAULT_ALL_DAY_EMAIL_ALARM, true, initDefault = true)
+        val defaultAllDayAlarms = arrayListOf(DEFAULT_ALL_DAY_ALARM)
+        if (ADD_EMAIL_NOTIFICATIONS) defaultAllDayAlarms.add(DEFAULT_ALL_DAY_EMAIL_ALARM)
+        _defaultAllDayAlarms.value = defaultAllDayAlarms
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in CalendarFormViewModel initCreateCalendarForm")
@@ -206,7 +208,9 @@ class CalendarFormViewModel(
         userEmails = userManager.getAddresses(userId).filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email // TODO Can be null, what do we take next ?
-        defaultUserEmail?.let { handleCalendarEmail(defaultUserEmail, initDefault = true) }
+        defaultUserEmail?.let {
+            _calendarEmail.value = it
+        }
     }
 
     fun hasFormBeenEdited(): Boolean {
@@ -232,8 +236,8 @@ class CalendarFormViewModel(
         else _defaultPartDayAlarms.value = alarms
     }
 
-    fun handleAlarmChange(alarm: VAlarm, isAllDay: Boolean, isDelete: Boolean = false, initDefault: Boolean = false) {
-        if (!initDefault) calendarSettingsEdited = true
+    fun handleAlarmChange(alarm: VAlarm, isAllDay: Boolean, isDelete: Boolean = false) {
+        calendarSettingsEdited = true
         if (isAllDay) {
             val tmpDefaultAllDayAlarms = _defaultAllDayAlarms.value
 
@@ -272,27 +276,27 @@ class CalendarFormViewModel(
         }
     }
 
-    fun handleCalendarName(calendarName: String, initDefault: Boolean = false) {
+    fun handleCalendarName(calendarName: String) {
         if (_calendarName.value == calendarName) return
-        if (!initDefault) calendarEdited = true
+        calendarEdited = true
         _calendarName.value = calendarName
     }
 
-    fun handleCalendarColor(calendarColor: String, initDefault: Boolean = false) {
+    fun handleCalendarColor(calendarColor: String) {
         if (_calendarColor.value == calendarColor) return
-        if (!initDefault) calendarEdited = true
+        calendarEdited = true
         _calendarColor.value = calendarColor
     }
 
-    fun handleDefaultEventDuration(defaultEventDuration: Int, initDefault: Boolean = false) {
+    fun handleDefaultEventDuration(defaultEventDuration: Int) {
         if (_defaultEventDuration.value == defaultEventDuration) return
-        if (!initDefault) calendarSettingsEdited = true
+        calendarSettingsEdited = true
         _defaultEventDuration.value = defaultEventDuration
     }
 
-    fun handleCalendarEmail(calendarEmail: String, initDefault: Boolean = false) {
+    fun handleCalendarEmail(calendarEmail: String) {
         if (_calendarEmail.value == calendarEmail) return
-        if (!initDefault) calendarEdited = true
+        calendarEdited = true
         _calendarEmail.value = calendarEmail
     }
 
