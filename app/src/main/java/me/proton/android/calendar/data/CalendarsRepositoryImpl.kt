@@ -1165,7 +1165,7 @@ class CalendarsRepositoryImpl(
     }
 
     override suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String? {
-        return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveUserCalendars(userId).firstOrNull()?.id
+        return getDefaultCalendarId(userId) ?: getActiveUserCalendars(userId).firstOrNull()?.id
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {

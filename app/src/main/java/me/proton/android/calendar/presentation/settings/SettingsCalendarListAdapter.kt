@@ -114,7 +114,7 @@ class SettingsCalendarListAdapter(
                         ),
                         R.color.notification_warning
                     )
-                    var helperMessage = when (calendarSubscription.status) {
+                    val helperMessage = when (calendarSubscription.status) {
                         CalendarSubscriptionStatus.INVALID_ICS.value -> {
                             itemView.context.getString(R.string.settings_calendar_subscribed_wrong_link)
                         }
@@ -134,11 +134,11 @@ class SettingsCalendarListAdapter(
                         else -> {
                             if (calendarSubscription.isLastSyncOld)
                                 itemView.context.getString(R.string.settings_calendar_subscribed_last_sync_old)
-                            else ""
+                            else null
                         }
                     }
 
-                    calendarEntityItemHelper.visibleOrGone(helperMessage.isNotEmpty())
+                    calendarEntityItemHelper.visibleOrGone(!helperMessage.isNullOrEmpty())
                     calendarEntityItemHelper.text = helperMessage
                 }
             }

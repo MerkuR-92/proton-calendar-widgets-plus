@@ -60,7 +60,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             settings_week_numbers_switch.performClick()
         }
         settings_week_numbers_switch.setOnClickListener {
-            if (!handleNetworkError()) {
+            if (!mainViewModel.isConnectedToNetwork) {
+                displayNetworkError()
                 settings_week_numbers_switch.isChecked = !settings_week_numbers_switch.isChecked
                 return@setOnClickListener
             }
@@ -73,7 +74,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             settings_update_timezone_switch.performClick()
         }
         settings_update_timezone_switch.setOnClickListener {
-            if (!handleNetworkError()) {
+            if (!mainViewModel.isConnectedToNetwork) {
+                displayNetworkError()
                 settings_update_timezone_switch.isChecked = !settings_update_timezone_switch.isChecked
                 return@setOnClickListener
             }
@@ -94,7 +96,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 else formattedTimeZoneIds.indexOf(DateTimeUtilsImpl.formatTimeZoneId(defaultTimeZone, forInstant))
 
             AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
-                if (!handleNetworkError()) return@displaySingleChoicePicker
+                if (!mainViewModel.isConnectedToNetwork) {
+                    displayNetworkError()
+                    return@displaySingleChoicePicker
+                }
                 lifecycleScope.launch {
                     calendarViewModel.updatePrimaryTimezone(formattedTimeZoneIds[it].formattedTimeZoneToId())
                 }
@@ -128,7 +133,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 timeFormats,
                 timeFormats.indexOf(settings_time_format_value.text)
             ) { index ->
-                if (!handleNetworkError()) return@displaySingleChoicePicker
+                if (!mainViewModel.isConnectedToNetwork) {
+                    displayNetworkError()
+                    return@displaySingleChoicePicker
+                }
                 settings_time_format_value.text = timeFormats[index]
                 calendarViewModel.updateTimeFormat(index)
             }
@@ -141,7 +149,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 null,
                 weekStartValues,
                 weekStartValues.indexOf(settings_week_start_value.text)) { index ->
-                if (!handleNetworkError()) return@displaySingleChoicePicker
+                if (!mainViewModel.isConnectedToNetwork) {
+                    displayNetworkError()
+                    return@displaySingleChoicePicker
+                }
                 lifecycleScope.launch {
                     val weekStart = when (index) {
                         2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
@@ -187,12 +198,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun handleNetworkError(): Boolean {
-        if (!mainViewModel.isConnectedToNetwork) {
-            view?.displaySnackBar(getString(R.string.snack_network_error))
-            return false
-        }
-        return true
+    private fun displayNetworkError() {
+        view?.displaySnackBar(getString(R.string.snack_network_error))
     }
 }
 
