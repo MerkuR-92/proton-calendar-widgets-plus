@@ -173,6 +173,54 @@ object AndroidUtils {
         builder.create().show()
     }
 
+    fun displayPickerDialog(
+        context: Context,
+        title: String?,
+        items: Array<String>,
+        initiallySelectedIndex: Int,
+        callback: (selectedIndex: Int) -> Unit
+    ) {
+
+        val adapter = object : ArrayAdapter<String>(context, R.layout.item_picker_dialog) {
+
+            lateinit var dialog: DialogInterface
+            var selectedIndex = initiallySelectedIndex
+
+            override fun getCount(): Int = items.size
+
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                var view = convertView
+                if (view == null) {
+                    view = LayoutInflater.from(context)
+                        .inflate(R.layout.item_picker_dialog, parent, false)
+                }
+
+                view!!.findViewById<AppCompatCheckedTextView>(R.id.ctv_item_name).apply {
+                    text = items[position]
+                    tag = position
+                    isChecked = position == selectedIndex
+                    setOnSingleClickListener() {
+                        selectedIndex = it.tag as Int
+                        notifyDataSetChanged()
+                        callback(selectedIndex)
+                        dialog.dismiss()
+                    }
+                }
+
+                return view
+            }
+
+        }
+
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        title?.apply { builder.setTitle(this) }
+        builder.setAdapter(adapter, null)
+        builder.setNegativeButton(R.string.dialog_button_close, null)
+        val dialog = builder.create()
+        adapter.dialog = dialog
+        dialog.show()
+    }
+
     fun displayCalendarPicker(
         context: Context,
         title: String?,

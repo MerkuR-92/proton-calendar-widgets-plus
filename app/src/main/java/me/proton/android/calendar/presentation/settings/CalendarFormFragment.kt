@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -40,9 +39,7 @@ import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainViewModel
-import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
-import me.proton.core.presentation.utils.errorSnack
 import me.proton.core.presentation.utils.onTextChange
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -354,37 +351,31 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         calendar_form_default_email_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            var dialog: AlertDialog? = null
-            val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
             val userEmails = calendarFormViewModel.userEmails ?: return@setOnSingleClickListener
-            dialog = builder.setSingleChoiceItems(
+            AndroidUtils.displayPickerDialog(
+                requireContext(),
+                null,
                 userEmails.toTypedArray(),
                 calendarFormViewModel.calendarEmail.value?.let { userEmails.indexOf(it) } ?: 0
-            ) { _, item ->
-                calendarFormViewModel.handleCalendarEmail(userEmails[item])
-                dialog?.dismiss()
+            ) {
+                calendarFormViewModel.handleCalendarEmail(userEmails[it])
             }
-                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
-                .show()
         }
 
         // Default event duration
         calendar_form_default_event_duration_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            var dialog: AlertDialog? = null
-            val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
-            dialog = builder.setSingleChoiceItems(
+            AndroidUtils.displayPickerDialog(
+                requireContext(),
+                null,
                 CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map {
                     getString(R.string.calendar_form_default_event_duration_value, it.toString())
                 }.toTypedArray(),
                 calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.indexOf(it) } ?: 0
-            ) { _, item ->
-                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION_MINUTES[item])
-                dialog?.dismiss()
+            ) {
+                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION_MINUTES[it])
             }
-                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
-                .show()
         }
     }
 
