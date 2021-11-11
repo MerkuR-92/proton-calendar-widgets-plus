@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.fragment_general_settings.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils
+import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.formattedTimeZoneToId
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.AndroidUtils.sortFormattedTimeZoneIds
@@ -20,6 +21,7 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.presentation.BaseDialogFragment
 import me.proton.android.calendar.presentation.MainActivity
+import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -36,6 +38,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
     override val navigateUp = true
 
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -57,6 +60,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             settings_week_numbers_switch.performClick()
         }
         settings_week_numbers_switch.setOnClickListener {
+            if (!handleNetworkError()) {
+                settings_week_numbers_switch.isChecked = !settings_week_numbers_switch.isChecked
+                return@setOnClickListener
+            }
             lifecycleScope.launch {
                 calendarViewModel.updateDisplayWeekNumber(settings_week_numbers_switch.isChecked)
             }
@@ -66,6 +73,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             settings_update_timezone_switch.performClick()
         }
         settings_update_timezone_switch.setOnClickListener {
+            if (!handleNetworkError()) {
+                settings_update_timezone_switch.isChecked = !settings_update_timezone_switch.isChecked
+                return@setOnClickListener
+            }
             lifecycleScope.launch {
                 calendarViewModel.updateAutoDetectPrimaryTimezone(settings_update_timezone_switch.isChecked)
             }
@@ -83,6 +94,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 else formattedTimeZoneIds.indexOf(DateTimeUtilsImpl.formatTimeZoneId(defaultTimeZone, forInstant))
 
             AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
+                if (!handleNetworkError()) return@displaySingleChoicePicker
                 lifecycleScope.launch {
                     calendarViewModel.updatePrimaryTimezone(formattedTimeZoneIds[it].formattedTimeZoneToId())
                 }
@@ -116,6 +128,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 timeFormats,
                 timeFormats.indexOf(settings_time_format_value.text)
             ) { index ->
+                if (!handleNetworkError()) return@displaySingleChoicePicker
                 settings_time_format_value.text = timeFormats[index]
                 calendarViewModel.updateTimeFormat(index)
             }
@@ -128,6 +141,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 null,
                 weekStartValues,
                 weekStartValues.indexOf(settings_week_start_value.text)) { index ->
+                if (!handleNetworkError()) return@displaySingleChoicePicker
                 lifecycleScope.launch {
                     val weekStart = when (index) {
                         2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
@@ -171,6 +185,14 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
         }
+    }
+
+    private fun handleNetworkError(): Boolean {
+        if (!mainViewModel.isConnectedToNetwork) {
+            view?.displaySnackBar(getString(R.string.snack_network_error))
+            return false
+        }
+        return true
     }
 }
 
