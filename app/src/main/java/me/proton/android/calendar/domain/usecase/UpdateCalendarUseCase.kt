@@ -44,6 +44,7 @@ class UpdateCalendarUseCase(
             is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
         }
     }
+
     suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
             name = name,
@@ -53,7 +54,11 @@ class UpdateCalendarUseCase(
         )
         return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
-                calendarsRepository.updateCalendar(userId.id, updateCalendarResponse.data.calendar)
+                // Copy existing calendar flags as API does not send it back in the response
+                val calendar = calendarsRepository.selectCalendar(calendarId)?.let {
+                    updateCalendarResponse.data.calendar.copy(flags = it.flags)
+                } ?: updateCalendarResponse.data.calendar
+                calendarsRepository.updateCalendar(userId.id, calendar)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: error in update calendar: ${updateCalendarResponse.error}")
