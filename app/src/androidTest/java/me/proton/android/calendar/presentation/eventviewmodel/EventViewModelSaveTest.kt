@@ -892,7 +892,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
                 handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-            } returns UseCase.Result.Error("Failed to send mail", UseCase.Error.EDIT_ERROR_SEND_MAIL)
+            } returns UseCase.Result.Error("Failed to send mail", UseCase.Error.HandleSave.EditSendEmail)
 
             // Send invitation dialog
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_title) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_title)
@@ -1177,7 +1177,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
                 handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
-            } returns UseCase.Result.Error("Failed to send mail", UseCase.Error.CREATE_ERROR_SEND_MAIL)
+            } returns UseCase.Result.Error("Failed to send mail", UseCase.Error.HandleSave.CreateSendEmail)
 
             // Send invitation dialog
             coEvery { resourceProviderMock.provideString(R.string.event_send_invite_dialog_title) } returns protonCalendarApplication.getString(R.string.event_send_invite_dialog_title)

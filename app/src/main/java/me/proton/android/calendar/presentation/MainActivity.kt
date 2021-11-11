@@ -23,7 +23,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
@@ -282,25 +281,25 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 var dialogMessage: Int? = null
                 var dialogPositiveButton = R.string.bootstrap_error_default_confirm
                 when (errorReport) {
-                    UseCase.Error.NO_CALENDAR -> {
+                    UseCase.Error.Bootstrap.NoCalendar -> {
                         dialogTitle = R.string.bootstrap_error_no_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_calendar_message
                     }
-                    UseCase.Error.NO_ACTIVE_CALENDAR -> {
+                    UseCase.Error.Bootstrap.NoActiveCalendar -> {
                         dialogTitle = R.string.bootstrap_error_no_active_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_active_calendar_message
                     }
-                    UseCase.Error.RESET_NEEDED -> {
+                    UseCase.Error.Bootstrap.ResetNeeded -> {
                         dialogTitle = R.string.bootstrap_error_reset_needed_title
                         dialogMessage = R.string.bootstrap_error_reset_needed_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
-                    UseCase.Error.UPDATE_PASSPHRASE -> {
+                    UseCase.Error.Bootstrap.UpdatePassphrase -> {
                         dialogTitle = R.string.bootstrap_error_update_passphrase_title
                         dialogMessage = R.string.bootstrap_error_update_passphrase_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
-                    UseCase.Error.SOME_CALENDARS_FAILED_BOOTSTRAP -> {
+                    is UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap -> {
                         dialogTitle = R.string.bootstrap_error_some_calendars_failed_title
                         dialogMessage = R.string.bootstrap_error_some_calendars_failed_message
                     }
@@ -313,7 +312,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     return@Observer
                 }
 
-                if (errorReport == UseCase.Error.RESET_NEEDED || errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
+                if (errorReport == UseCase.Error.Bootstrap.ResetNeeded || errorReport == UseCase.Error.Bootstrap.UpdatePassphrase) {
                     // Display dialog with list of calendars to fix
                     lifecycleScope.launch {
                         // If we fail to fetch calendars, we still display dialog without the calendar list
@@ -323,16 +322,32 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             dialogTitle,
                             dialogMessage,
                             false,
-                            if (errorReport == UseCase.Error.RESET_NEEDED) calendars.filter { it.isResetNeeded }
+                            if (errorReport == UseCase.Error.Bootstrap.ResetNeeded) calendars.filter { it.isResetNeeded }
                             else calendars.filter { it.hasUpdatePassphrase }
                         ) { _, _ ->
-                            if (errorReport == UseCase.Error.RESET_NEEDED) {
+                            if (errorReport == UseCase.Error.Bootstrap.ResetNeeded) {
                                 clearError()
                                 userId?.let { accountViewModel.resetCalendarsKey(it) }
-                            } else if (errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
+                            } else if (errorReport == UseCase.Error.Bootstrap.UpdatePassphrase) {
                                 clearError()
                                 userId?.let { accountViewModel.updatePassphrase(it) }
                             }
+                        }
+                    }
+                } else if (errorReport is UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap) {
+                    // Display dialog with list of calendars to fix
+                    lifecycleScope.launch {
+                        // If we fail to fetch calendars, we still display dialog without the calendar list
+                        val userId = accountViewModel.getPrimaryUserId()
+                        val calendars = if (userId != null) calendarViewModel.fetchCalendars(userId) ?: arrayListOf() else arrayListOf()
+                        this@MainActivity.displayCalendarListMaterialDialog(
+                            dialogTitle,
+                            dialogMessage,
+                            false,
+                            calendars.filter { errorReport.failedCalendarIds.contains(it.id) }
+                        ) { _, _ ->
+                            clearError()
+                            handleAccountState(accountViewModel, state.value!!)
                         }
                     }
                 } else {

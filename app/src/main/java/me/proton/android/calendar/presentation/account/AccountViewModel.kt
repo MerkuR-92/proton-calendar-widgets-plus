@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation.account
 
-import android.app.Application
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.*
@@ -10,7 +9,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.UseCaseWorker
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.account.domain.entity.*
@@ -24,7 +22,6 @@ import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
-import java.util.concurrent.TimeUnit
 
 class AccountViewModel(
     private val accountManager: AccountManager,
@@ -83,8 +80,8 @@ class AccountViewModel(
         if (bootstrapResult !is UseCase.Result.Success<*>) {
             if (bootstrapResult is UseCase.Result.Error) {
                 _errorReport.postValue(bootstrapResult.error)
-                if (bootstrapResult.error == UseCase.Error.RESET_NEEDED ||
-                    bootstrapResult.error == UseCase.Error.UPDATE_PASSPHRASE
+                if (bootstrapResult.error == UseCase.Error.Bootstrap.ResetNeeded ||
+                    bootstrapResult.error == UseCase.Error.Bootstrap.UpdatePassphrase
                 ) return
             }
             removeUser(userId)

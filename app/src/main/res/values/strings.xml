@@ -435,7 +435,7 @@
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparing calendars</string>
-    <string name="bootstrap_error_some_calendars_failed_message">Some calendars could not be set up.</string>
+    <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
     <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>

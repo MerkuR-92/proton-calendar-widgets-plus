@@ -5,7 +5,6 @@ import biweekly.property.Attendee
 import me.proton.android.calendar.common.AndroidUtils.toInt
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventUtilsImpl.addExceptionDate
-import me.proton.android.calendar.common.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
@@ -18,10 +17,8 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
-import me.proton.android.calendar.presentation.calendar.EventViewModel
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
-import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
 import java.time.ZoneId
@@ -253,18 +250,12 @@ class HandleDeleteUseCase( // TODO TESTS
             sendCancellationResult.ifSuccessAndLogErrors(logger) { }
 
             if (sendCancellationResult is UseCase.Result.Error) {
-                return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                    UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsOrganizer error in send email (cancel as organizer): ${sendCancellationResult.message}",
-                        UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
-                    )
-                } else {
-                    UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsOrganizer error in send email (cancel as organizer): ${sendCancellationResult.message}"
-                    )
-                }
-            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
                 return UseCase.Result.Error(
+                    "HandleDeleteUseCase: handleDeleteAsOrganizer error in send email (cancel as organizer): ${sendCancellationResult.message}",
+                    sendCancellationResult.error
+                )
+            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.InvalidParams(
                     "HandleDeleteUseCase: handleDeleteAsOrganizer invalid params in send email: ${sendCancellationResult.message}"
                 )
             }
@@ -335,18 +326,12 @@ class HandleDeleteUseCase( // TODO TESTS
             sendCancellationResult.ifSuccessAndLogErrors(logger) { }
 
             if (sendCancellationResult is UseCase.Result.Error) {
-                return if (sendCancellationResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                    UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}",
-                        UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
-                    )
-                } else {
-                    UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}"
-                    )
-                }
-            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
                 return UseCase.Result.Error(
+                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}",
+                        sendCancellationResult.error
+                    )
+            } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+                return UseCase.Result.InvalidParams(
                     "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in send email: ${sendCancellationResult.message}"
                 )
             }
@@ -373,7 +358,7 @@ class HandleDeleteUseCase( // TODO TESTS
                     "HandleDeleteUseCase: handleDeleteAsAttendee error in update part stat: ${updateParticipationStatusUseCaseResult.message}"
                 )
             } else if (updateParticipationStatusUseCaseResult is UseCase.Result.InvalidParams) {
-                return UseCase.Result.Error(
+                return UseCase.Result.InvalidParams(
                     "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in update part stat: ${updateParticipationStatusUseCaseResult.message}"
                 )
             }
