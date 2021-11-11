@@ -28,7 +28,7 @@
     <string-array name="time_formats">
         <item>System default</item>
         <item>13:00</item>
-        <item>1pm</item>
+        <item>1:00pm</item>
     </string-array>
 
     <string-array name="week_start">
