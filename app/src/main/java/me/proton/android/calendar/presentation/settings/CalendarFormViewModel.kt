@@ -15,8 +15,11 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_ALARM
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
+import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -182,11 +185,13 @@ class CalendarFormViewModel(
         // Set default event duration
         handleDefaultEventDuration(EVENT_DEFAULT_DURATION_MINUTES.first(), initDefault = true)
 
-        // Set default part day event notification (15 minutes before)
+        // Set default part day event notifications (15 minutes before)
         handleAlarmChange(DEFAULT_PART_DAY_ALARM, false, initDefault = true)
+        if (ADD_EMAIL_NOTIFICATIONS) handleAlarmChange(DEFAULT_PART_DAY_EMAIL_ALARM, false, initDefault = true)
 
-        // Set default all day event notification (1 day before at 9am)
+        // Set default all day event notifications (1 day before at 9am)
         handleAlarmChange(DEFAULT_ALL_DAY_ALARM, true, initDefault = true)
+        if (ADD_EMAIL_NOTIFICATIONS) handleAlarmChange(DEFAULT_ALL_DAY_EMAIL_ALARM, true, initDefault = true)
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in CalendarFormViewModel initCreateCalendarForm")

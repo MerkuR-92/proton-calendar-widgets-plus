@@ -217,7 +217,9 @@ object CalendarForm {
     val EVENT_DEFAULT_DURATION_MINUTES = listOf(30, 60, 90, 120)
 
     val DEFAULT_PART_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).minutes(15).build(), Related.START), null)
+    val DEFAULT_PART_DAY_EMAIL_ALARM: VAlarm = VAlarm.email(Trigger(biweekly.util.Duration.builder().prior(true).minutes(15).build(), Related.START), null, null)
     val DEFAULT_ALL_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(15).build(), Related.START), null)
+    val DEFAULT_ALL_DAY_EMAIL_ALARM: VAlarm = VAlarm.email(Trigger(biweekly.util.Duration.builder().prior(true).hours(15).build(), Related.START), null, null)
 }
 
 object FragmentArguments {
