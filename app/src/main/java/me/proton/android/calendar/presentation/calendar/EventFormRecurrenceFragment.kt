@@ -300,9 +300,18 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        custom_recurrence_end_1.setOnCheckedChangeListener { button, isChecked -> if (!isChecked) button.jumpDrawablesToCurrentState() }
-        custom_recurrence_end_2.setOnCheckedChangeListener { button, isChecked -> if (!isChecked) button.jumpDrawablesToCurrentState() }
-        custom_recurrence_end_3.setOnCheckedChangeListener { button, isChecked -> if (!isChecked) button.jumpDrawablesToCurrentState() }
+        custom_recurrence_end_1.setOnCheckedChangeListener { button, isChecked ->
+            if (!isChecked) button.jumpDrawablesToCurrentState()
+            else requireActivity().clearFocusAndHideKeyboard(view)
+        }
+        custom_recurrence_end_2.setOnCheckedChangeListener { button, isChecked ->
+            if (!isChecked) button.jumpDrawablesToCurrentState()
+            else requireActivity().clearFocusAndHideKeyboard(view)
+        }
+        custom_recurrence_end_3.setOnCheckedChangeListener { button, isChecked ->
+            if (!isChecked) button.jumpDrawablesToCurrentState()
+            else requireActivity().clearFocusAndHideKeyboard(view)
+        }
     }
 
     private fun setupCustomRecurrenceSpinnerComponent() {
