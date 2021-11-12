@@ -124,12 +124,17 @@ class SettingsCalendarListAdapter(
                         CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_BAD_REQUEST.value,
                         CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_UNAUTHORIZED.value,
                         CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_FORBIDDEN.value,
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_NOT_FOUND.value -> {
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_NOT_FOUND.value,
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_TEST.value -> {
                             itemView.context.getString(R.string.settings_calendar_subscribed_not_accessible)
                         }
                         CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_GENERIC_ERROR.value,
                         CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_INTERNAL_SERVER_ERROR.value -> {
                             itemView.context.getString(R.string.settings_calendar_subscribed_tmp_not_accessible)
+                        }
+                        CalendarSubscriptionStatus.P2P_LINK_NOT_FOUND.value,
+                        CalendarSubscriptionStatus.UNABLE_TO_DECRYPT.value -> {
+                            itemView.context.getString(R.string.settings_calendar_subscribed_not_decrypted)
                         }
                         else -> {
                             if (calendarSubscription.isLastSyncOld)
