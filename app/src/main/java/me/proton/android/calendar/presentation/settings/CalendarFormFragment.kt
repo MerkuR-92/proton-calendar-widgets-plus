@@ -276,9 +276,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         alarmsListView.removeAllViews()
         notificationIcon.visibleOrGone(true)
 
-        alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
+        lifecycleScope.launch {
+            alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
-            lifecycleScope.launch {
                 val alarmView = layoutInflater.inflate(
                     R.layout.item_alarm_text_button,
                     alarmsListView,

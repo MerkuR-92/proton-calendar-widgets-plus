@@ -99,49 +99,51 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
-                if (navigationArguments.eventId == null) {
-                    jumpToMonthView()
-                } else {
-                    // Reinitialise event view model data when user chooses to discard modifications
-                    lifecycleScope.launch {
-                        val userId = accountViewModel.getPrimaryUserId()
-                        val viewModeInitStatus =
-                            if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
-                            else eventViewModel.initialise(
-                                userId,
-                                editMode = false,
-                                navigationArguments.eventId,
-                                if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                                null,
-                                null
-                            )
-                        if (viewModeInitStatus == EventViewModel.InitResult.Success) {
-                            findNavController().navigateUp()
-                        } else {
-                            when (viewModeInitStatus) {
-                                EventViewModel.InitResult.OccurrenceDoesNotExist -> {
-                                    AndroidUtils.displaySimpleOkAlert(
-                                        requireContext(),
-                                        getString(R.string.error_occurrence_does_not_exist)
-                                    )
-                                }
-                                EventViewModel.InitResult.EventDoesNotExist -> {
-                                    AndroidUtils.displaySimpleOkAlert(
-                                        requireContext(),
-                                        getString(R.string.error_event_does_not_exist)
-                                    )
-                                }
-                                is EventViewModel.InitResult.Error -> {
-                                    logger.e(viewModeInitStatus.message)
-                                    requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
-                                }
-                            }
-                            jumpToMonthView()
-                        }
+                if (navigationArguments.eventId == null) jumpToMonthView()
+                else navigateBackToDetails()
+            }
+        } else if (navigationArguments.eventId == null) jumpToMonthView()
+        else navigateBackToDetails()
+    }
+
+    private fun navigateBackToDetails() {
+        // Reinitialise event view model data
+        lifecycleScope.launch {
+            val userId = accountViewModel.getPrimaryUserId()
+            val viewModeInitStatus =
+                if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
+                else eventViewModel.initialise(
+                    userId,
+                    editMode = false,
+                    navigationArguments.eventId,
+                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                    null,
+                    null
+                )
+            if (viewModeInitStatus == EventViewModel.InitResult.Success) {
+                findNavController().navigateUp()
+            } else {
+                when (viewModeInitStatus) {
+                    EventViewModel.InitResult.OccurrenceDoesNotExist -> {
+                        AndroidUtils.displaySimpleOkAlert(
+                            requireContext(),
+                            getString(R.string.error_occurrence_does_not_exist)
+                        )
+                    }
+                    EventViewModel.InitResult.EventDoesNotExist -> {
+                        AndroidUtils.displaySimpleOkAlert(
+                            requireContext(),
+                            getString(R.string.error_event_does_not_exist)
+                        )
+                    }
+                    is EventViewModel.InitResult.Error -> {
+                        logger.e(viewModeInitStatus.message)
+                        requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                     }
                 }
+                jumpToMonthView()
             }
-        } else jumpToMonthView()
+        }
     }
 
     override fun onNavigationIconClicked(): Boolean {
@@ -488,7 +490,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
                             // Call default method for selection if pagers have been initialised
                             if (calendarViewModel.pagersInitialised){
-                                lifecycleScope.launch { calendarViewModel.handleDaySelected(it.newSelectedDate) }
+                                calendarViewModel.handleDaySelected(it.newSelectedDate)
                             }
                             // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
                             else calendarViewModel.updateSelectedLocalDate = it.newSelectedDate
