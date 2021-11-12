@@ -309,7 +309,6 @@
     <string name="snack_create_calendar_success">Calendar created</string>
     <string name="snack_calendar_saving">Saving calendar</string>
     <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
-    <string name="snack_create_calendar_empty_name_error">Name required</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>
@@ -396,6 +395,13 @@
     <string name="settings_calendar_default">Default</string>
     <string name="settings_calendar_disabled">Disabled</string>
     <string name="settings_calendar_not_synced">Not synced</string>
+    <string name="settings_calendar_syncing">Syncing</string>
+
+    <string name="settings_calendar_subscribed_wrong_link">Calendar link is wrong</string>
+    <string name="settings_calendar_subscribed_too_big">Calendar is too big</string>
+    <string name="settings_calendar_subscribed_not_accessible">Calendar link is not accessible</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">Calendar link is temporarily unaccessible</string>
+    <string name="settings_calendar_subscribed_last_sync_old">More than 12 hours passed since last update</string>
 
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Create calendar</string>
@@ -414,6 +420,7 @@
     <string name="calendar_form_default_email">Default email</string>
     <string name="calendar_form_default_email_value_error">Failed to load default email</string>
     <string name="calendar_form_name_hint">Add a calendar name</string>
+    <string name="calendar_form_name_required_error">Name required</string>
 
     <string name="add_calendar_text">Add calendar</string>
 
@@ -428,7 +435,7 @@
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparing calendars</string>
-    <string name="bootstrap_error_some_calendars_failed_message">Some calendars could not be set up.</string>
+    <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
     <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>

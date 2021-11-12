@@ -23,7 +23,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
@@ -147,15 +146,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             initDrawerCalendarsListContent()
 
                             withContext(Dispatchers.Main) {
-                                // if we're navigating from outside of the app to create new Event, check if there's active Calendar
-                                if (uri.isDeeplinkToEventCreate()) {
-                                    if (calendarViewModel.getActiveCalendars().isEmpty()) {
-                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toMonth())
-                                        displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
-                                    } else safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
-                                } else {
-                                    safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
-                                }
+                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
                             }
                         }
                     }
@@ -231,7 +222,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
-        if (!isTaskRoot && intent.action != INVITE_PROTON_INTENT_ACTION && intent.action != Intent.ACTION_VIEW && intent.type != INVITE_ICS_MIME_TYPE && intent.action != MainViewModel.INTENT_ACTION_NEW_EVENT && intent.action != MainViewModel.INTENT_ACTION_SHOW_DAY && intent.action != MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS) {
+        if (!isTaskRoot &&
+            intent.action != INVITE_PROTON_INTENT_ACTION &&
+            intent.action != Intent.ACTION_VIEW &&
+            intent.type != INVITE_ICS_MIME_TYPE &&
+            intent.action != MainViewModel.INTENT_ACTION_NEW_EVENT &&
+            intent.action != MainViewModel.INTENT_ACTION_SHOW_DAY &&
+            intent.action != MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
+        ) {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
             //  at the top of the stack (ie: the last state of this task)
@@ -275,25 +273,25 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 var dialogMessage: Int? = null
                 var dialogPositiveButton = R.string.bootstrap_error_default_confirm
                 when (errorReport) {
-                    UseCase.Error.NO_CALENDAR -> {
+                    UseCase.Error.Bootstrap.NoCalendar -> {
                         dialogTitle = R.string.bootstrap_error_no_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_calendar_message
                     }
-                    UseCase.Error.NO_ACTIVE_CALENDAR -> {
+                    UseCase.Error.Bootstrap.NoActiveCalendar -> {
                         dialogTitle = R.string.bootstrap_error_no_active_calendar_title
                         dialogMessage = R.string.bootstrap_error_no_active_calendar_message
                     }
-                    UseCase.Error.RESET_NEEDED -> {
+                    UseCase.Error.Bootstrap.ResetNeeded -> {
                         dialogTitle = R.string.bootstrap_error_reset_needed_title
                         dialogMessage = R.string.bootstrap_error_reset_needed_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
-                    UseCase.Error.UPDATE_PASSPHRASE -> {
+                    UseCase.Error.Bootstrap.UpdatePassphrase -> {
                         dialogTitle = R.string.bootstrap_error_update_passphrase_title
                         dialogMessage = R.string.bootstrap_error_update_passphrase_message
                         dialogPositiveButton = R.string.bootstrap_error_continue_button
                     }
-                    UseCase.Error.SOME_CALENDARS_FAILED_BOOTSTRAP -> {
+                    is UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap -> {
                         dialogTitle = R.string.bootstrap_error_some_calendars_failed_title
                         dialogMessage = R.string.bootstrap_error_some_calendars_failed_message
                     }
@@ -306,7 +304,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     return@Observer
                 }
 
-                if (errorReport == UseCase.Error.RESET_NEEDED || errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
+                if (errorReport == UseCase.Error.Bootstrap.ResetNeeded || errorReport == UseCase.Error.Bootstrap.UpdatePassphrase) {
                     // Display dialog with list of calendars to fix
                     lifecycleScope.launch {
                         // If we fail to fetch calendars, we still display dialog without the calendar list
@@ -316,16 +314,32 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             dialogTitle,
                             dialogMessage,
                             false,
-                            if (errorReport == UseCase.Error.RESET_NEEDED) calendars.filter { it.isResetNeeded }
+                            if (errorReport == UseCase.Error.Bootstrap.ResetNeeded) calendars.filter { it.isResetNeeded }
                             else calendars.filter { it.hasUpdatePassphrase }
                         ) { _, _ ->
-                            if (errorReport == UseCase.Error.RESET_NEEDED) {
+                            if (errorReport == UseCase.Error.Bootstrap.ResetNeeded) {
                                 clearError()
                                 userId?.let { accountViewModel.resetCalendarsKey(it) }
-                            } else if (errorReport == UseCase.Error.UPDATE_PASSPHRASE) {
+                            } else if (errorReport == UseCase.Error.Bootstrap.UpdatePassphrase) {
                                 clearError()
                                 userId?.let { accountViewModel.updatePassphrase(it) }
                             }
+                        }
+                    }
+                } else if (errorReport is UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap) {
+                    // Display dialog with list of calendars to fix
+                    lifecycleScope.launch {
+                        // If we fail to fetch calendars, we still display dialog without the calendar list
+                        val userId = accountViewModel.getPrimaryUserId()
+                        val calendars = if (userId != null) calendarViewModel.fetchCalendars(userId) ?: arrayListOf() else arrayListOf()
+                        this@MainActivity.displayCalendarListMaterialDialog(
+                            dialogTitle,
+                            dialogMessage,
+                            false,
+                            calendars.filter { errorReport.failedCalendarIds.contains(it.id) }
+                        ) { _, _ ->
+                            clearError()
+                            handleAccountState(accountViewModel, state.value!!)
                         }
                     }
                 } else {
@@ -751,7 +765,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                     drawer_layout.close()
                 }
-                CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                CalendarViewModel.UserCalendarLimit.FREE_REACHED,
+                CalendarViewModel.UserCalendarLimit.PAID_REACHED-> {
                     // Display limit reached for free user dialog
                     MaterialAlertDialogBuilder(this@MainActivity)
                         .setMessage(R.string.create_calendar_limit_reached_free)
@@ -759,20 +774,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         }
                         .show()
                 }
-                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
-                    // Display limit reached for paid user dialog
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
-                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
-                            // Open calendar settings view
-                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                            drawer_layout.close()
-                        }
-                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-                        }
-                        .show()
-                }
+                // TODO Use this dialog once we enable delete calendars
+//                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+//                    // Display limit reached for paid user dialog
+//                    MaterialAlertDialogBuilder(this@MainActivity)
+//                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
+//                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
+//                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
+//                            // Open calendar settings view
+//                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+//                            drawer_layout.close()
+//                        }
+//                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+//                        }
+//                        .show()
+//                }
             }
         }
     }
@@ -900,7 +916,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         inactiveCalendarsJob = lifecycleScope.launch {
             delay(UPDATE_PASSPHRASE_CALENDARS_DELAY.toMillis())
-            val calendarsToUpdate = calendarViewModel.inactiveUserCalendars.value?.filter { it.hasUpdatePassphrase } ?: return@launch
+            val calendarsToUpdate = calendarViewModel.getInactiveUserCalendars()?.filter { it.hasUpdatePassphrase } ?: return@launch
             calendarViewModel.updatingCalendarPassphrase = true
             this@MainActivity.displayCalendarListMaterialDialog(
                 R.string.bootstrap_error_update_passphrase_title,

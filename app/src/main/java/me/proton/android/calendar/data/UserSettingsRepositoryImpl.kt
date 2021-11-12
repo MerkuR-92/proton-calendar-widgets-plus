@@ -26,6 +26,10 @@ class UserSettingsRepositoryImpl(
         return database.deprecatedUserSettingsDao().flowTimeFormat(userId).distinctUntilChanged()
     }
 
+    override suspend fun selectWeekStart(userId: String): Int? {
+        return database.deprecatedUserSettingsDao().selectWeekStart(userId)
+    }
+
     override fun flowWeekStart(userId: String): Flow<Int?> {
         return database.deprecatedUserSettingsDao().flowWeekStart(userId).distinctUntilChanged()
     }

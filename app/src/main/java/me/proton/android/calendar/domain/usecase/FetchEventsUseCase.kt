@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.Crypto
@@ -91,11 +92,11 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
                                         }
 
                                     } else {
-                                        logger.e("api error fetching events for calendar: $eventsResponse")
+                                        eventsResponse.logErrorIfNeeded("api error fetching events for calendar", logger)
                                         UseCase.Result.Error("api error in FetchEventsUseCase: ${eventsResponse}")
                                     }
                                 } else {
-                                    logger.e("error fetching events for calendar: $eventsResponse")
+                                    eventsResponse.logErrorIfNeeded("error fetching events for calendar", logger)
                                     UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
                                 }
 

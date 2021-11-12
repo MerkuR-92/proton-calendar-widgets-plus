@@ -65,7 +65,8 @@ internal class GetCanonicalEmailsUseCaseTest {
             coEvery { addressesApi.getCanonicalEmails(userId, emails) } returns ApiResponse.Error(
                 500,
                 0,
-                "internal server error"
+                "internal server error",
+                true
             )
 
             val sut = GetCanonicalEmailsUseCase(addressesApi, logger)

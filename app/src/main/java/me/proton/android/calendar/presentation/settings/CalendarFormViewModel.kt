@@ -15,8 +15,11 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_ALARM
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
+import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -156,41 +159,41 @@ class CalendarFormViewModel(
         }?.email
 
         // Calendar name
-        handleCalendarName(calendarEntity.name)
+        _calendarName.value = calendarEntity.name
 
         // Calendar default email (can't be updated for existing calendar)
         _calendarEmail.value = calendarEmail ?: ""
 
         // Calendar color
-        handleCalendarColor(calendarEntity.color)
+        _calendarColor.value = calendarEntity.color
 
         // Default event duration
-        handleDefaultEventDuration(calendarSettings.defaultEventDuration)
+        _defaultEventDuration.value = calendarSettings.defaultEventDuration
 
         // Default part day event notifications
         setDefaultAlarms(calendarSettings.defaultPartDayNotifications, isAllDay = false)
 
         // Default all day event notifications
         setDefaultAlarms(calendarSettings.defaultFullDayNotifications, isAllDay = true)
-
-        // Make sure to set those values to false after having initialized the form with existing values
-        calendarEdited = false
-        calendarSettingsEdited = false
     }
 
     suspend fun initCreateCalendarForm(calendarColor: String) {
 
         // Set default calendar color (picked randomly from the colors array)
-        handleCalendarColor(calendarColor)
+        _calendarColor.value = calendarColor
 
         // Set default event duration
-        handleDefaultEventDuration(EVENT_DEFAULT_DURATION_MINUTES.first())
+        _defaultEventDuration.value = EVENT_DEFAULT_DURATION_MINUTES.first()
 
-        // Set default part day event notification (15 minutes before)
-        handleAlarmChange(DEFAULT_PART_DAY_ALARM, false)
+        // Set default part day event notifications (15 minutes before)
+        val defaultPartDayAlarms = arrayListOf(DEFAULT_PART_DAY_ALARM)
+        if (ADD_EMAIL_NOTIFICATIONS) defaultPartDayAlarms.add(DEFAULT_PART_DAY_EMAIL_ALARM)
+        _defaultPartDayAlarms.value = defaultPartDayAlarms
 
-        // Set default all day event notification (1 day before at 9am)
-        handleAlarmChange(DEFAULT_ALL_DAY_ALARM, true)
+        // Set default all day event notifications (1 day before at 9am)
+        val defaultAllDayAlarms = arrayListOf(DEFAULT_ALL_DAY_ALARM)
+        if (ADD_EMAIL_NOTIFICATIONS) defaultAllDayAlarms.add(DEFAULT_ALL_DAY_EMAIL_ALARM)
+        _defaultAllDayAlarms.value = defaultAllDayAlarms
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in CalendarFormViewModel initCreateCalendarForm")
@@ -205,11 +208,9 @@ class CalendarFormViewModel(
         userEmails = userManager.getAddresses(userId).filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email // TODO Can be null, what do we take next ?
-        defaultUserEmail?.let { handleCalendarEmail(defaultUserEmail) }
-
-        // Make sure to set those values to false after having initialized the form with default values
-        calendarEdited = false
-        calendarSettingsEdited = false
+        defaultUserEmail?.let {
+            _calendarEmail.value = it
+        }
     }
 
     fun hasFormBeenEdited(): Boolean {
@@ -323,6 +324,8 @@ class CalendarFormViewModel(
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_update_calendar_error)
                     )
+                    // Clear loading state
+                    calendarFormState.value = CalendarFormState.Idle
                     return
                 }
             }

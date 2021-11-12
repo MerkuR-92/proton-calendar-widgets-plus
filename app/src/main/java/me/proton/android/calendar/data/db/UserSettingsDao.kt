@@ -25,5 +25,8 @@ abstract class UserSettingsDao : BaseDao<UserSettingsEntity> {
     abstract fun flowTimeFormat(userId: String): Flow<Int?>
 
     @Query("SELECT weekStart FROM user_settings WHERE fkUserId = :userId")
+    abstract suspend fun selectWeekStart(userId: String): Int?
+
+    @Query("SELECT weekStart FROM user_settings WHERE fkUserId = :userId")
     abstract fun flowWeekStart(userId: String): Flow<Int?>
 }

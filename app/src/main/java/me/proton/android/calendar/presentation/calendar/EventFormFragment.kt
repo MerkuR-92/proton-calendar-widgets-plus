@@ -300,7 +300,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         )
                     }
                 }
-                findNavController().navigateUp()
+                if (navigationArguments.eventId == null) jumpToMonthView()
+                else onBackPressedCustom()
             }
 
             eventViewModel.eventFormState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
@@ -486,7 +487,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                         if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
                             // Call default method for selection if pagers have been initialised
-                            if (calendarViewModel.pagersInitialised) calendarViewModel.handleDaySelected(it.newSelectedDate)
+                            if (calendarViewModel.pagersInitialised){
+                                lifecycleScope.launch { calendarViewModel.handleDaySelected(it.newSelectedDate) }
+                            }
                             // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
                             else calendarViewModel.updateSelectedLocalDate = it.newSelectedDate
                         }
@@ -614,7 +617,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
-                val calendars = calendarViewModel.userCalendars.value?.filter { it.isActive }
+                val calendars = calendarViewModel.getUserCalendars()?.filter { it.isActive }
 
                 // TODO Save active calendars in calendar VM to avoid triggering click effect when not needed
                 if (calendars == null || calendars.size <= 1) return@launch

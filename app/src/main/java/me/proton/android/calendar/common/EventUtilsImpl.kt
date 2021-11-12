@@ -518,6 +518,28 @@ object EventUtilsImpl : EventUtils {
         return generateOccurrences(timeZoneId, null, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
     }
 
+    override fun Event.generateOccurrenceNew(occurrenceNumber: Int, timeZoneId: String): Event.Occurrence? {
+
+        val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart).timeZone)
+
+        var count = 0
+        var iteratorDateStart: Date? = null
+        while (iterator.hasNext() && count < occurrenceNumber) {
+            iteratorDateStart  = iterator.next()
+            count++
+        }
+
+        return if (count == occurrenceNumber && iteratorDateStart != null) {
+            val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
+
+            // TODO HANDLE ALL-DAY, WE CAN'T ADD MILLIS, BUT DAYS
+            val occurrenceStart = iteratorDateStart.toInstant().atZone(ZoneId.of(timeZoneId))
+            val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+
+            Event.Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber)
+        } else null
+    }
+
     // TODO remove nullability from dateTimeStart/End and use function from ICalUtils
     override fun Event.overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {
 

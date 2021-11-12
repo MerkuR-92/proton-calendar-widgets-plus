@@ -91,7 +91,7 @@ class SendEmailUseCase(
         }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address for sender") // TODO better error
 
         if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
-            return UseCase.Result.Error("couldn't get UserAddress valid for encryption to organizer", UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION)
+            return UseCase.Result.Error("couldn't get UserAddress valid for encryption to organizer", UseCase.Error.Crypto.UserAddressInvalidForEncryption)
         }
 
         val attachmentBytes = ics.toByteArray()
@@ -277,7 +277,7 @@ class SendEmailUseCase(
         }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
 
         if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
-            return UseCase.Result.Error("couldn't get UserAddress valid for encryption to attendees", UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION)
+            return UseCase.Result.Error("couldn't get UserAddress valid for encryption to attendees", UseCase.Error.Crypto.UserAddressInvalidForEncryption)
         }
 
         return UseCase.Result.Success(senderAddress)

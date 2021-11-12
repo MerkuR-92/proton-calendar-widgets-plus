@@ -9,19 +9,24 @@ interface UseCase {
         class Error(val message: String, val error: UseCase.Error? = null) : Result()
     }
 
-    enum class Error {
-        /* BootstrapCalendarsUseCase */
-        NO_CALENDAR,
-        NO_ACTIVE_CALENDAR,
-        SOME_CALENDARS_FAILED_BOOTSTRAP,
-        RESET_NEEDED,
-        UPDATE_PASSPHRASE,
+    sealed class Error {
+        sealed class Bootstrap: Error() {
+            object NoCalendar : Bootstrap()
+            object NoActiveCalendar : Bootstrap()
+            class SomeCalendarsFailedBootstrap(val failedCalendarIds: List<String>): Bootstrap()
+            object ResetNeeded : Bootstrap()
+            object UpdatePassphrase : Bootstrap()
+        }
 
-        /* HandleSaveUseCase */
-        EDIT_ERROR_SEND_MAIL,
-        CREATE_ERROR_SEND_MAIL,
+        sealed class HandleSave: Error() {
+            object EditSendEmail : HandleSave()
+            object CreateSendEmail : HandleSave()
+        }
 
-        USER_ADDRESS_INVALID_FOR_ENCRYPTION
+        sealed class Crypto: Error() {
+            object UserAddressInvalidForEncryption : Crypto()
+        }
+
     }
 }
 

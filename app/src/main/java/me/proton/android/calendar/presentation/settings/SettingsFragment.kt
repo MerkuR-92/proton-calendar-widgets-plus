@@ -32,6 +32,7 @@ import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.BaseDialogFragment
+import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.EventViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -49,6 +50,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val eventViewModel: EventViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
 
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
     private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter
@@ -57,7 +59,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private var subscribedCalendars: List<CalendarEntity>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
-    private var defaultCalendarId: String = ""
+    private var defaultCalendarId: String? = null
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -82,11 +84,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_calendars_list_add_layout_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
         }
-        lifecycleScope.launch {
-            settings_calendars_list_add_layout.visibleOrGone(
-                calendarViewModel.isUserCalendarLimitReached() == CalendarViewModel.UserCalendarLimit.NOT_REACHED
-            )
-        }
 
         val settingsCalendarListView = settings_calendars_list
         val settingsCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -101,6 +98,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
             userCalendars ?: return@observe
 
+            lifecycleScope.launch {
+                settings_calendars_list_add_layout.visibleOrGone(
+                    calendarViewModel.isUserCalendarLimitReached(userCalendars) == CalendarViewModel.UserCalendarLimit.NOT_REACHED
+                )
+            }
             refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
         }
 
@@ -154,12 +156,13 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         calendarViewModel.defaultCalendarId.observe(viewLifecycleOwner) { defaultCalendarId ->
-            defaultCalendarId ?: return@observe
 
             if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
-                calendarViewModel.userCalendars.value?.let { userCalendars ->
-                    refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+                lifecycleScope.launch {
+                    calendarViewModel.getUserCalendars()?.let { userCalendars ->
+                        refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+                    }
                 }
             }
         }
@@ -195,10 +198,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
             val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
             var dataSetChanged = false
-            defaultCalendarId?.let {
-                this@SettingsFragment.defaultCalendarId = defaultCalendarId
-                dataSetChanged = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-            }
+            this@SettingsFragment.defaultCalendarId = defaultCalendarId
+            dataSetChanged = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
             settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
             settingsUserCalendarListAdapter.submitList(
                 userCalendars.sortedBy {
@@ -251,10 +252,16 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         markDefaultPress?.setOnSingleClickListener {
+            if (!mainViewModel.isConnectedToNetwork) {
+                bottomSheetDialog.dismiss()
+                view?.displaySnackBar(requireContext().getString(R.string.snack_network_error))
+                return@setOnSingleClickListener
+            }
+
             lifecycleScope.launch {
                 val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendarEntity.id)
                 if (updateDefaultCalendarId) {
-                    calendarViewModel.userCalendars.value?.let { userCalendars ->
+                    calendarViewModel.getUserCalendars()?.let { userCalendars ->
                         refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
                     }
                     view?.displaySnackBar(requireContext().getString(R.string.snack_update_default_calendar))

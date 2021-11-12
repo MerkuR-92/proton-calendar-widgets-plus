@@ -13,6 +13,9 @@ abstract class CalendarSubscriptionDao : BaseDao<CalendarSubscriptionEntity> {
     abstract suspend fun select(calendarId: String): CalendarSubscriptionEntity?
 
     @Query("SELECT * FROM calendar_subscriptions")
+    abstract suspend fun selectCalendarSubscriptions(): List<CalendarSubscriptionEntity>
+
+    @Query("SELECT * FROM calendar_subscriptions")
     abstract fun flowCalendarSubscriptions(): Flow<List<CalendarSubscriptionEntity>>
 
     @Query("DELETE FROM calendar_subscriptions WHERE calendarId = :calendarId")

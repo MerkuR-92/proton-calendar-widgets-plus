@@ -15,6 +15,7 @@
     android:paddingEnd="?attr/dialogPreferredPadding"
     android:paddingRight="?attr/dialogPreferredPadding"
     android:textAlignment="viewStart"
+    android:breakStrategy="simple"
     app:drawableLeftCompat="?android:attr/listChoiceIndicatorSingle"
     app:drawableStartCompat="?android:attr/listChoiceIndicatorSingle"
     tools:text="Test"

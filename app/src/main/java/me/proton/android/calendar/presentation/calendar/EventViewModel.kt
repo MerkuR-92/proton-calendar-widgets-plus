@@ -301,7 +301,7 @@ class EventViewModel(
      */
     private suspend fun initializeDefaultCalendar(): InitResult {
         // Try to get default calendar id if it exists
-        var defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
+        var defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
             ?: return InitResult.Error("EventViewModel: could not get default calendar ID")
 
         // Try to get default calendar if it exists
@@ -309,7 +309,7 @@ class EventViewModel(
 
         if (defaultCalendar == null || !defaultCalendar.isActive) {
             // Fallback to first active user calendar
-            defaultCalendar = calendarsRepository.getActiveUserCalendars(userId.id).firstOrNull()
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull()
                 ?: return InitResult.Error("EventViewModel: no active calendars for user")
             defaultCalendarId = defaultCalendar.id
         }
@@ -1661,9 +1661,9 @@ class EventViewModel(
             when (handleSaveResult) {
                 is UseCase.Result.Error -> {
                     when (handleSaveResult.error) {
-                        UseCase.Error.EDIT_ERROR_SEND_MAIL -> SaveResult.EDIT_ERROR_SEND_MAIL
-                        UseCase.Error.CREATE_ERROR_SEND_MAIL -> SaveResult.CREATE_ERROR_SEND_MAIL
-                        UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION -> SaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                        UseCase.Error.HandleSave.EditSendEmail -> SaveResult.EDIT_ERROR_SEND_MAIL
+                        UseCase.Error.HandleSave.CreateSendEmail -> SaveResult.CREATE_ERROR_SEND_MAIL
+                        UseCase.Error.Crypto.UserAddressInvalidForEncryption -> SaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION
                         else -> SaveResult.ERROR
                     }
                 }
@@ -2718,7 +2718,7 @@ class EventViewModel(
         } else UseCase.Result.Success<Unit>()
         sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
 
-        if (sendEmailUseCaseResult is UseCase.Result.Error && sendEmailUseCaseResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+        if (sendEmailUseCaseResult is UseCase.Result.Error && sendEmailUseCaseResult.error == UseCase.Error.Crypto.UserAddressInvalidForEncryption) {
             // We don't need to display snack and update attendee answer state because this state will force logout the user anyway
             eventDetailsState.value = EventState.UserAddressInvalidForEncryption
             return

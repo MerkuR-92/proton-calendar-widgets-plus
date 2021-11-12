@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionStatus
 
 class SettingsCalendarListAdapter(
     val listener: (CalendarEntity) -> Unit
@@ -64,7 +65,7 @@ class SettingsCalendarListAdapter(
         return dataSetChanged
     }
 
-    fun setDefaultCalendarId(defaultCalendarId: String): Boolean {
+    fun setDefaultCalendarId(defaultCalendarId: String?): Boolean {
         val dataSetChanged = this.defaultCalendarId != defaultCalendarId
         this.defaultCalendarId = defaultCalendarId
         return dataSetChanged
@@ -74,6 +75,7 @@ class SettingsCalendarListAdapter(
         private val calendarEntityItemPress: View = view.item_settings_calendar_press
         private val calendarEntityItemTitle: TextView = view.item_settings_calendar_title
         private val calendarEntityItemSubtitle: TextView = view.item_settings_calendar_subtitle
+        private val calendarEntityItemHelper: TextView = view.item_settings_calendar_helper
         private val calendarEntityItemMenuIcon: ImageView = view.item_settings_calendar_menu_icon
         private val calendarEntityItemIcon: ImageView = view.item_settings_calendar_icon
         private val calendarEntityItemBadgeLayout: LinearLayout = view.item_settings_calendar_badge_layout
@@ -99,14 +101,46 @@ class SettingsCalendarListAdapter(
             // Display disabled badge
             if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.notification_warning)
 
+            calendarEntityItemHelper.visibleOrGone(false)
             if (calendarEntity.isSubscribed) {
                 val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
 
                 // Display not synced badge
-                if (calendarSubscription?.isSynced == false) addBadge(
-                    itemView.context.getString(R.string.settings_calendar_not_synced),
-                    R.color.notification_warning
-                )
+                if (calendarSubscription?.isSynced == false) {
+                    addBadge(
+                        itemView.context.getString(
+                            if (calendarSubscription.isSyncing) R.string.settings_calendar_syncing
+                            else R.string.settings_calendar_not_synced
+                        ),
+                        R.color.notification_warning
+                    )
+                    val helperMessage = when (calendarSubscription.status) {
+                        CalendarSubscriptionStatus.INVALID_ICS.value -> {
+                            itemView.context.getString(R.string.settings_calendar_subscribed_wrong_link)
+                        }
+                        CalendarSubscriptionStatus.SIZE_EXCEED_LIMIT.value -> {
+                            itemView.context.getString(R.string.settings_calendar_subscribed_too_big)
+                        }
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_BAD_REQUEST.value,
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_UNAUTHORIZED.value,
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_FORBIDDEN.value,
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_NOT_FOUND.value -> {
+                            itemView.context.getString(R.string.settings_calendar_subscribed_not_accessible)
+                        }
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_GENERIC_ERROR.value,
+                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_INTERNAL_SERVER_ERROR.value -> {
+                            itemView.context.getString(R.string.settings_calendar_subscribed_tmp_not_accessible)
+                        }
+                        else -> {
+                            if (calendarSubscription.isLastSyncOld)
+                                itemView.context.getString(R.string.settings_calendar_subscribed_last_sync_old)
+                            else null
+                        }
+                    }
+
+                    calendarEntityItemHelper.visibleOrGone(!helperMessage.isNullOrEmpty())
+                    calendarEntityItemHelper.text = helperMessage
+                }
             }
 
             // Only show menu icon when calendar can be edited

@@ -38,7 +38,7 @@ class HandleAlarmsUseCase(
             Duration.ofSeconds(nowInstant.epochSecond - alarmEpochSeconds).toMinutes()
         } else 0
 
-        if (broadcastReceivedLateMinutes > 0) {
+        if (broadcastReceivedLateMinutes >= 5) {
             logger.i("HandleAlarmsUseCase executed ${broadcastReceivedLateMinutes} minutes later than scheduled")
         }
 
@@ -62,7 +62,7 @@ class HandleAlarmsUseCase(
         val minAlarmOccurrenceSeconds =
             alarmsToDisplayNow.minByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
         val minutesLate = ((nowInstant.epochSecond - minAlarmOccurrenceSeconds) / 60.0).roundToInt()
-        if (alarmsToDisplayNow.isNotEmpty() && minutesLate >= 0) {
+        if (alarmsToDisplayNow.isNotEmpty() && minutesLate >= 5) {
             logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${minutesLate} minutes")
         }
 

@@ -421,6 +421,22 @@ class CalendarsRepositoryImpl(
         return database.calendarsDao().selectUserCalendars(userId)
     }
 
+    override suspend fun selectActiveUserCalendars(userId: String): List<CalendarEntity> {
+        return database.calendarsDao().selectActiveUserCalendars(userId)
+    }
+
+    override suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity> {
+        return database.calendarsDao().selectDisabledUserCalendars(userId)
+    }
+
+    override suspend fun selectInactiveUserCalendars(userId: String): List<CalendarEntity> {
+        return database.calendarsDao().selectInactiveUserCalendars(userId)
+    }
+
+    override suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity> {
+        return database.calendarsDao().selectSubscribedCalendars(userId)
+    }
+
     override fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>> {
         return database.calendarsDao().flowActiveUserCalendars(userId).distinctUntilChanged()
     }
@@ -476,14 +492,6 @@ class CalendarsRepositoryImpl(
         } else {
             calendarsResponse.data.calendars
         }
-    }
-
-    override suspend fun getActiveUserCalendars(userId: String): List<CalendarEntity> {
-        return selectUserCalendars(userId).filter { it.isActive }
-    }
-
-    override suspend fun getDisabledUserCalendars(userId: String): List<CalendarEntity> {
-        return selectUserCalendars(userId).filter { it.isDisabled }
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
@@ -1104,6 +1112,10 @@ class CalendarsRepositoryImpl(
         return database.calendarSubscriptionDao().select(calendarId)
     }
 
+    override suspend fun selectCalendarSubscriptions(calendarId: String): List<CalendarSubscriptionEntity> {
+        return database.calendarSubscriptionDao().selectCalendarSubscriptions()
+    }
+
     override fun flowCalendarSubscriptions(): Flow<List<CalendarSubscriptionEntity>> {
         return database.calendarSubscriptionDao().flowCalendarSubscriptions().distinctUntilChanged()
     }
@@ -1136,6 +1148,10 @@ class CalendarsRepositoryImpl(
         return database.calendarUserSettingsDao().updateDisplayWeekNumber(userId, displayWeekNumber)
     }
 
+    override suspend fun selectCalendarUserSettingsDisplayWeekNumber(userId: String): Int? {
+        return database.calendarUserSettingsDao().selectCalendarUserSettingsDisplayWeekNumber(userId)
+    }
+
     override fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?> {
         return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
     }
@@ -1164,8 +1180,12 @@ class CalendarsRepositoryImpl(
         database.calendarUserSettingsDao().deleteByUserId(userId)
     }
 
+    override suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String? {
+        return getDefaultCalendarId(userId) ?: selectActiveUserCalendars(userId).firstOrNull()?.id
+    }
+
     override suspend fun getDefaultCalendarId(userId: String): String? {
-        return selectCalendarUserSettings(userId)?.defaultCalendarId ?: getActiveUserCalendars(userId).firstOrNull()?.id
+        return database.calendarUserSettingsDao().selectCalendarUserDefaultCalendarId(userId)
     }
 
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {

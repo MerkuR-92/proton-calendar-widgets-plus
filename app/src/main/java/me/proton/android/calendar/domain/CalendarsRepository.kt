@@ -36,6 +36,14 @@ interface CalendarsRepository {
 
     suspend fun selectUserCalendars(userId: String): List<CalendarEntity>
 
+    suspend fun selectActiveUserCalendars(userId: String): List<CalendarEntity>
+
+    suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity>
+
+    suspend fun selectInactiveUserCalendars(userId: String): List<CalendarEntity>
+
+    suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity>
+
     fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
@@ -55,10 +63,6 @@ interface CalendarsRepository {
     suspend fun refreshCalendars(userId: UserId): Boolean
 
     suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
-
-    suspend fun getActiveUserCalendars(userId: String): List<CalendarEntity>
-
-    suspend fun getDisabledUserCalendars(userId: String): List<CalendarEntity>
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
@@ -174,6 +178,8 @@ interface CalendarsRepository {
     // calendar subscription
     suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity?
 
+    suspend fun selectCalendarSubscriptions(calendarId: String): List<CalendarSubscriptionEntity>
+
     fun flowCalendarSubscriptions(): Flow<List<CalendarSubscriptionEntity>>
 
     suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) // calendarId is already there
@@ -191,6 +197,8 @@ interface CalendarsRepository {
 
     suspend fun updateCalendarUserSettingsDisplayWeekNumber(userId: String, displayWeekNumber: Int)
 
+    suspend fun selectCalendarUserSettingsDisplayWeekNumber(userId: String): Int?
+
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>
 
     suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String)
@@ -204,6 +212,8 @@ interface CalendarsRepository {
     suspend fun persistCalendarUserSettings(userId: String, calendarUserSettings: CalendarUserSettingsEntity)
 
     suspend fun deleteCalendarUserSettingsByUserId(userId: String)
+
+    suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String?
 
     suspend fun getDefaultCalendarId(userId: String): String?
 

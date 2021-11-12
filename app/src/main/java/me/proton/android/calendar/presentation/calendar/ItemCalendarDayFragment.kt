@@ -156,18 +156,20 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     }
 
     private fun setHourLabelViews() {
-        val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
-        // Inflate a label view for each hour the day view will display
-        val hourLabelViews: MutableList<View> = ArrayList()
-        for (i in dayView.startHour..dayView.endHour) {
-            val tmpDay =
-                if (i == 24) LocalTime.MIDNIGHT
-                else day.withHour(i)
-            val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
-            hourLabelView.text = tmpDay.formatTime(timeFormatIs24Hour, short = true)
-            hourLabelViews.add(hourLabelView)
+        lifecycleScope.launch {
+            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
+            // Inflate a label view for each hour the day view will display
+            val hourLabelViews: MutableList<View> = ArrayList()
+            for (i in dayView.startHour..dayView.endHour) {
+                val tmpDay =
+                    if (i == 24) LocalTime.MIDNIGHT
+                    else day.withHour(i)
+                val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
+                hourLabelView.text = tmpDay.formatTime(timeFormatIs24Hour, short = true)
+                hourLabelViews.add(hourLabelView)
+            }
+            dayView.setHourLabelViews(hourLabelViews)
         }
-        dayView.setHourLabelViews(hourLabelViews)
     }
 
     private lateinit var updateCurrentTimeIndicatorJob: Job
@@ -441,7 +443,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             }
         }
         agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
-            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(requireContext()) }
+            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
@@ -727,21 +729,23 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     }
 
     private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalTime? = null) {
-        val hasActiveCalendars = !calendarViewModel.activeUserCalendars.value.isNullOrEmpty()
-        if (hasActiveCalendars) {
-            val immutableDate = date ?: return
-            val truncatedStartTime =
-                if (!isAllDay && startTime != null) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
-                else null
-            requireActivity().findNavController(R.id.nav_host_fragment_container_view)
-                .navigate(
-                    Navigation.Deeplink.toEventCreate(
-                        immutableDate,
-                        truncatedStartTime
+        lifecycleScope.launch {
+            val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
+            if (hasActiveCalendars) {
+                val immutableDate = date ?: return@launch
+                val truncatedStartTime =
+                    if (!isAllDay && startTime != null) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
+                    else null
+                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                    .navigate(
+                        Navigation.Deeplink.toEventCreate(
+                            immutableDate,
+                            truncatedStartTime
+                        )
                     )
-                )
-        } else {
-            requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+            } else {
+                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+            }
         }
     }
 }

@@ -128,20 +128,22 @@ class MonthFragment : BaseFragment() {
 
     private fun setToolbarListeners(timeZoneId: ZoneId) {
         buttonCreate.setOnSingleClickListener {
-            val hasActiveCalendars = !calendarViewModel.activeUserCalendars.value.isNullOrEmpty()
-            if (hasActiveCalendars) {
-                // Each item in the adapter is one day
-                val currentDate =
-                    calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
-                    .navigate(
-                        Navigation.Deeplink.toEventCreate(
-                            currentDate,
-                            ICalUtilsImpl.generateEventStartTime(timeZoneId)
+            lifecycleScope.launch {
+                val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
+                if (hasActiveCalendars) {
+                    // Each item in the adapter is one day
+                    val currentDate =
+                        calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
+                    requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                        .navigate(
+                            Navigation.Deeplink.toEventCreate(
+                                currentDate,
+                                ICalUtilsImpl.generateEventStartTime(timeZoneId)
+                            )
                         )
-                    )
-            } else {
-                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                } else {
+                    requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                }
             }
         }
 
@@ -153,9 +155,11 @@ class MonthFragment : BaseFragment() {
         }
         buttonToday.setOnSingleClickListener {
             val todayDate = LocalDate.now(timeZoneId)
-            calendarViewModel.handleDaySelected(todayDate)
-            // Align day view to current time
-            calendarViewModel.jumpToCurrentTime.value = true
+            lifecycleScope.launch {
+                calendarViewModel.handleDaySelected(todayDate)
+                // Align day view to current time
+                calendarViewModel.jumpToCurrentTime.value = true
+            }
         }
     }
 
@@ -170,13 +174,15 @@ class MonthFragment : BaseFragment() {
                 val monthStartingDate = miniCalendarPagerAdapter.firstDayOfMonth
                 val firstDay = monthStartingDate.plusMonths((position - monthStartingPosition).toLong())
 
-                calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
+                lifecycleScope.launch {
+                    calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
 
-                setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
+                    setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
 
-                adjustMiniCalendarView(firstDay.withDayOfMonth(1), startWeekOn)
+                    adjustMiniCalendarView(firstDay.withDayOfMonth(1), startWeekOn)
 
-                timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+                    timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+                }
             }
         }
     }
@@ -236,7 +242,7 @@ class MonthFragment : BaseFragment() {
         override fun onPageSelected(position: Int) {
             val currentDate =
                 calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-            calendarViewModel.handleDaySelected(currentDate)
+            lifecycleScope.launch { calendarViewModel.handleDaySelected(currentDate) }
         }
     }
 
@@ -247,7 +253,9 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.initialAutoDetectPrimaryTimezoneValue = null
         calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
             autoDetectPrimaryTimezone ?: return@observe
-            calendarViewModel.handleAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone, requireContext())
+            lifecycleScope.launch {
+                calendarViewModel.handleAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone, requireContext())
+            }
         }
     }
 
@@ -346,17 +354,19 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->
             setToolbarMonthYearTitle(selectedDate, miniCalendarPager.currentItem)
 
-            val firstDayOfMonth = selectedDate.withDayOfMonth(1)
-            val weekStart = calendarViewModel.weekStart.value ?: return@observe
-            val startWeekOn = getWeekStartDayOfWeek(weekStart)
-            if (calendarViewModel.currentPosDesiredMonthHeight != calculateAdapterHeight(
-                    requireContext(),
-                    firstDayOfMonth,
-                    startWeekOn,
-                    true
-                )
-            ) {
-                adjustMiniCalendarView(firstDayOfMonth, startWeekOn)
+            lifecycleScope.launch {
+                val firstDayOfMonth = selectedDate.withDayOfMonth(1)
+                val weekStart = calendarViewModel.getWeekStart() ?: return@launch
+                val startWeekOn = getWeekStartDayOfWeek(weekStart)
+                if (calendarViewModel.currentPosDesiredMonthHeight != calculateAdapterHeight(
+                        requireContext(),
+                        firstDayOfMonth,
+                        startWeekOn,
+                        true
+                    )
+                ) {
+                    adjustMiniCalendarView(firstDayOfMonth, startWeekOn)
+                }
             }
         }
 
@@ -589,35 +599,37 @@ class MonthFragment : BaseFragment() {
         currentViewMode = viewMode
 
         fragmentMonthLayout.allowScrolling = viewMode == ViewMode.AGENDA
-        val immutableWeekStart = calendarViewModel.weekStart.value
-        if (viewMode == ViewMode.AGENDA) {
-            if (immutableWeekStart != null) {
-                calendarViewModel.monthView.value = true
-                simulateExpandWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
+        lifecycleScope.launch {
+            val immutableWeekStart = calendarViewModel.getWeekStart()
+            if (viewMode == ViewMode.AGENDA) {
+                if (immutableWeekStart != null) {
+                    calendarViewModel.monthView.value = true
+                    simulateExpandWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
+                }
+                agendaPager.apply {
+                    val currentItem = this.currentItem // Save currently selected item position
+                    adapter = agendaPagerAdapter
+                    setCurrentItem(if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition, false)
+                    offscreenPageLimit = 1
+                }
+                calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
+            } else {
+                if (immutableWeekStart != null) {
+                    calendarViewModel.monthView.value = false
+                    simulateCollapseWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
+                }
+                calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
+                agendaPager.apply {
+                    val currentItem = this.currentItem // Save currently selected item position
+                    adapter = dayPagerAdapter
+                    setCurrentItem(if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition, false)
+                    offscreenPageLimit = 1
+                }
+                calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             }
-            agendaPager.apply {
-                val currentItem = this.currentItem // Save currently selected item position
-                adapter = agendaPagerAdapter
-                setCurrentItem(if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition, false)
-                offscreenPageLimit = 1
-            }
-            calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
-        } else {
-            if (immutableWeekStart != null) {
-                calendarViewModel.monthView.value = false
-                simulateCollapseWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
-            }
-            calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
-            agendaPager.apply {
-                val currentItem = this.currentItem // Save currently selected item position
-                adapter = dayPagerAdapter
-                setCurrentItem(if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition, false)
-                offscreenPageLimit = 1
-            }
-            calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
+            (agendaPager.getChildAt(0) as RecyclerView).layoutManager?.isItemPrefetchEnabled = false
+            (agendaPager.getChildAt(0) as RecyclerView).setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
         }
-        (agendaPager.getChildAt(0) as RecyclerView).layoutManager?.isItemPrefetchEnabled = false
-        (agendaPager.getChildAt(0) as RecyclerView).setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
     }
 
     private fun setHeaderDaysContent(startWeekOn: DayOfWeek, timeZoneId: String) {

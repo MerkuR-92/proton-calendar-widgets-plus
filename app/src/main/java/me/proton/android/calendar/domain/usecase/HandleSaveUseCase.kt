@@ -612,21 +612,21 @@ class HandleSaveUseCase(
         sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
         if (sendEmailResult is UseCase.Result.Error) {
-            return if (sendEmailResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+            return if (sendEmailResult.error == UseCase.Error.Crypto.UserAddressInvalidForEncryption) {
                 UseCase.Result.Error(
                     "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
-                    UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                    UseCase.Error.Crypto.UserAddressInvalidForEncryption
                 )
             } else {
                 UseCase.Result.Error(
                     "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
-                    UseCase.Error.EDIT_ERROR_SEND_MAIL
+                    UseCase.Error.HandleSave.EditSendEmail
                 )
             }
         } else if (sendEmailResult is UseCase.Result.InvalidParams) {
             return UseCase.Result.Error(
                 "HandleSaveUseCase: invalid params in send email: ${sendEmailResult.message}",
-                UseCase.Error.EDIT_ERROR_SEND_MAIL
+                UseCase.Error.HandleSave.EditSendEmail
             )
         }
 
@@ -648,7 +648,7 @@ class HandleSaveUseCase(
                 if (this.isNullOrEmpty()) {
                     return UseCase.Result.Error(
                         "HandleSaveUseCase: error in send mail: createEventResult returned null or empty new event ID",
-                        UseCase.Error.CREATE_ERROR_SEND_MAIL
+                        UseCase.Error.HandleSave.CreateSendEmail
                     )
                 }
 
@@ -663,21 +663,21 @@ class HandleSaveUseCase(
                 )
 
                 if (sendEmailResult is UseCase.Result.Error) {
-                    return if (sendEmailResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
+                    return if (sendEmailResult.error == UseCase.Error.Crypto.UserAddressInvalidForEncryption) {
                         UseCase.Result.Error(
                             "HandleSaveUseCase: error in send mail (create with attendees): ${sendEmailResult.message}",
-                            UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                            UseCase.Error.Crypto.UserAddressInvalidForEncryption
                         )
                     } else {
                         UseCase.Result.Error(
                             "HandleSaveUseCase: error in send mail (create with attendees): ${sendEmailResult.message}",
-                            UseCase.Error.CREATE_ERROR_SEND_MAIL
+                            UseCase.Error.HandleSave.CreateSendEmail
                         )
                     }
                 } else if (sendEmailResult is UseCase.Result.InvalidParams) {
                     return UseCase.Result.Error(
                         "HandleSaveUseCase: invalid params in send mail: ${sendEmailResult.message}",
-                        UseCase.Error.CREATE_ERROR_SEND_MAIL
+                        UseCase.Error.HandleSave.CreateSendEmail
                     )
                 }
             }
@@ -692,14 +692,7 @@ class HandleSaveUseCase(
         val createEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
 
         if (createEventResult is UseCase.Result.Error) {
-            return if (createEventResult.error == UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
-                UseCase.Result.Error(
-                    "HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}",
-                    UseCase.Error.USER_ADDRESS_INVALID_FOR_ENCRYPTION
-                )
-            } else {
-                UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}")
-            }
+            return UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}", createEventResult.error)
         } else if (createEventResult is UseCase.Result.InvalidParams) {
             return UseCase.Result.InvalidParams("HandleSaveUseCase:invalid params in create event: ${createEventResult.message}")
         }

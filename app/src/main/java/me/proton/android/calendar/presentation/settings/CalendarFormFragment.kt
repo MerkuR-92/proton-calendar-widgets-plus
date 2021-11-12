@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,6 +28,7 @@ import me.proton.android.calendar.common.AndroidUtils
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.CalendarForm.CALENDAR_NAME_CHARACTER_LIMIT
@@ -38,8 +38,9 @@ import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.BaseDialogFragment
-import me.proton.android.calendar.presentation.account.AccountViewModel
+import me.proton.android.calendar.presentation.MainViewModel
 import me.proton.android.calendar.presentation.calendar.CalendarViewModel
+import me.proton.core.presentation.utils.onTextChange
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
@@ -60,7 +61,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val accountViewModel: AccountViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
 
     private val logger: Logger by inject()
 
@@ -70,6 +71,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private var calendarId: String? = null
 
     override fun onBackPressedCustom() {
+        requireActivity().clearFocusAndHideKeyboard(view)
+
         // Display snack and return if we're saving the calendar changes
         val processingCalendar = calendarFormViewModel.calendarFormState.value is CalendarFormViewModel.CalendarFormState.Processing
         if (processingCalendar) {
@@ -107,12 +110,19 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
             setOnSingleClickListener {
                 if (calendar_form_name_value.text.toString().isBlank()) {
-                    view?.displaySnackBar(getString(R.string.snack_create_calendar_empty_name_error))
+                    calendar_form_name_value.setInputError(getString(R.string.calendar_form_name_required_error))
                     return@setOnSingleClickListener
                 }
 
+                requireActivity().clearFocusAndHideKeyboard(view)
+
                 // Save calendar name in VM
                 calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
+
+                if (!mainViewModel.isConnectedToNetwork) {
+                    view?.displaySnackBar(getString(R.string.snack_network_error))
+                    return@setOnSingleClickListener
+                }
 
                 lifecycleScope.launch {
                     if (calendarFormViewModel.hasFormBeenEdited()) {
@@ -159,7 +169,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 calendarFormViewModel.initUpdateCalendarForm(it)
             } ?: run {
                 // Init character limit text
-                calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
+                calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
+
+                calendar_form_name_value.requestFocus()
+                requireContext().showKeyboard()
 
                 // Use random color from array as calendar color
                 val calendarColors = resources.getStringArray(R.array.calendar_colors)
@@ -170,8 +183,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         initOnClickListeners(calendarId == null)
 
-        calendar_form_name_value.doAfterTextChanged {
-            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, it?.length, CALENDAR_NAME_CHARACTER_LIMIT)
+        calendar_form_name_value.onTextChange {
+            if (it.isNotEmpty()) calendar_form_name_value.clearInputError()
+            calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, it.length, CALENDAR_NAME_CHARACTER_LIMIT)
         }
 
         observeCalendarFormSnackState(lifecycleScope.coroutineContext)
@@ -181,8 +195,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun observeCalendarFormValues() {
 
         calendarFormViewModel.calendarName.observe(viewLifecycleOwner) { calendarName ->
-            calendar_form_name_value.setText(calendarName)
-            calendar_form_name_character_limit.text = getString(R.string.calendar_form_name_character_limit, calendarName.length,
+            calendar_form_name_value.text = calendarName
+            calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, calendarName.length,
                 CALENDAR_NAME_CHARACTER_LIMIT
             )
         }
@@ -265,31 +279,33 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
-            val alarmView = layoutInflater.inflate(
-                R.layout.item_alarm_text_button,
-                alarmsListView,
-                false
-            )
-            alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
-                text = AndroidUtils.formatAlarm(
-                    resources,
-                    allDay,
-                    calendarViewModel.timeFormatIs24Hour(requireContext()),
-                    LocalDate.now().toDate(ZoneId.systemDefault().id).toZonedDateTime(ZoneId.systemDefault().id, false), // TODO Simplify this
-                    alarm
+            lifecycleScope.launch {
+                val alarmView = layoutInflater.inflate(
+                    R.layout.item_alarm_text_button,
+                    alarmsListView,
+                    false
                 )
-                isClickable = false
-            }
-            alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
-                // Remove notification listener
-                setOnSingleClickListener {
-                    requireActivity().clearFocusAndHideKeyboard(view)
-                    calendarFormViewModel.handleAlarmChange(alarm, allDay, isDelete = true)
+                alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
+                    text = AndroidUtils.formatAlarm(
+                        resources,
+                        allDay,
+                        calendarViewModel.timeFormatIs24Hour(requireContext()),
+                        LocalDate.now().toDate(ZoneId.systemDefault().id).toZonedDateTime(ZoneId.systemDefault().id, false), // TODO Simplify this
+                        alarm
+                    )
+                    isClickable = false
                 }
-                isClickable = true
+                alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
+                    // Remove notification listener
+                    setOnSingleClickListener {
+                        requireActivity().clearFocusAndHideKeyboard(view)
+                        calendarFormViewModel.handleAlarmChange(alarm, allDay, isDelete = true)
+                    }
+                    isClickable = true
+                }
+                if (index == 0) notificationIcon.visibleOrGone(false)
+                alarmsListView.addView(alarmView)
             }
-            if (index == 0) notificationIcon.visibleOrGone(false)
-            alarmsListView.addView(alarmView)
         }
 
         // Add notification listener
@@ -337,35 +353,31 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         calendar_form_default_email_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            var dialog: AlertDialog? = null
-            val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
             val userEmails = calendarFormViewModel.userEmails ?: return@setOnSingleClickListener
-            dialog = builder.setSingleChoiceItems(
+            AndroidUtils.displayPickerDialog(
+                requireContext(),
+                null,
                 userEmails.toTypedArray(),
                 calendarFormViewModel.calendarEmail.value?.let { userEmails.indexOf(it) } ?: 0
-            ) { _, item ->
-                calendarFormViewModel.handleCalendarEmail(userEmails[item])
-                dialog?.dismiss()
+            ) {
+                calendarFormViewModel.handleCalendarEmail(userEmails[it])
             }
-                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
-                .show()
         }
 
         // Default event duration
         calendar_form_default_event_duration_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            var dialog: AlertDialog? = null
-            val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
-            dialog = builder.setSingleChoiceItems(
-                CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map { it.toString() }.toTypedArray(),
+            AndroidUtils.displayPickerDialog(
+                requireContext(),
+                null,
+                CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map {
+                    getString(R.string.calendar_form_default_event_duration_value, it.toString())
+                }.toTypedArray(),
                 calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.indexOf(it) } ?: 0
-            ) { _, item ->
-                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION_MINUTES[item])
-                dialog?.dismiss()
+            ) {
+                calendarFormViewModel.handleDefaultEventDuration(CalendarForm.EVENT_DEFAULT_DURATION_MINUTES[it])
             }
-                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
-                .show()
         }
     }
 

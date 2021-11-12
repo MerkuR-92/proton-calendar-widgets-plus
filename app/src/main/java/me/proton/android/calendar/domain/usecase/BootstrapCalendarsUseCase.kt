@@ -49,10 +49,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
         var userCalendars = calendarsResponse.data.calendars.filterNot { it.isSubscribed }
         if (calendarsResponse.data.calendars.isNotEmpty() && calendarsResponse.data.calendars.firstOrNull { it.isResetNeeded } != null) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
-            return UseCase.Result.Error("BootstrapCalendarsUseCase: error reset needed for calendar", UseCase.Error.RESET_NEEDED)
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error reset needed for calendar", UseCase.Error.Bootstrap.ResetNeeded)
         } else if (userCalendars.isNotEmpty() &&
             userCalendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null) {
-            return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.Bootstrap.NoActiveCalendar)
         }
 
         var redoGetCalendars = false
@@ -96,7 +96,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                 // Handle flag UPDATE_PASSPHRASE
 
                 // Skip confirmation dialog if we just handled flag RESET_NEEDED
-                if (showConfirmationDialog) return UseCase.Result.Error("BootstrapCalendarsUseCase: error update passphrase for calendar", UseCase.Error.UPDATE_PASSPHRASE)
+                if (showConfirmationDialog) return UseCase.Result.Error("BootstrapCalendarsUseCase: error update passphrase for calendar", UseCase.Error.Bootstrap.UpdatePassphrase)
 
                 val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id)
 
@@ -118,10 +118,10 @@ class BootstrapCalendarsUseCase( // TODO TEST
             userCalendars = calendarsResponse.data.calendars.filterNot { it.isSubscribed }
             if (userCalendars.isNullOrEmpty()) {
                 logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
-                return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no calendar", UseCase.Error.NO_CALENDAR)
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no calendar", UseCase.Error.Bootstrap.NoCalendar)
             } else if (userCalendars.firstOrNull { it.isActive || it.isDisabled } == null) {
                 logger.e("BootstrapCalendarsUseCase: still no active calendar after creating default calendar")
-                return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.NO_ACTIVE_CALENDAR)
+                return UseCase.Result.Error("BootstrapCalendarsUseCase: error user has no active calendar", UseCase.Error.Bootstrap.NoActiveCalendar)
             }
         }
 
@@ -149,6 +149,14 @@ class BootstrapCalendarsUseCase( // TODO TEST
             executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
             if (executeBootstrapResult !is UseCase.Result.Success<*>) {
                 failedCalendarIds.add(calendarEntity.id)
+
+                val failReason = if (executeBootstrapResult is UseCase.Result.Error) {
+                    "${executeBootstrapResult.message} + ${executeBootstrapResult.error}"
+                } else if (executeBootstrapResult is UseCase.Result.InvalidParams) {
+                    executeBootstrapResult.message
+                } else null
+
+                logger.e("calendar ${calendarEntity.id} failed bootstrap: ${failReason}")
             }
         }
 
@@ -164,7 +172,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
         }
 
         return if (failedCalendarIds.isNotEmpty()) {
-            UseCase.Result.Error("calendar bootstrap failed for: ${failedCalendarIds.joinToString(separator = ", ")}", UseCase.Error.SOME_CALENDARS_FAILED_BOOTSTRAP)
+            UseCase.Result.Error("calendar bootstrap failed for: ${failedCalendarIds.joinToString(separator = ", ")}", UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap(failedCalendarIds))
         } else {
 
             // sync alarms right after downloading calendars and events

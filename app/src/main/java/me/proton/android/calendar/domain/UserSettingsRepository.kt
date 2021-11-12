@@ -14,5 +14,7 @@ interface UserSettingsRepository {
 
     fun flowTimeFormat(userId: String): Flow<Int?>
 
+    suspend fun selectWeekStart(userId: String): Int?
+
     fun flowWeekStart(userId: String): Flow<Int?>
 }
