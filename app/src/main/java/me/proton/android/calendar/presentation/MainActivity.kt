@@ -146,15 +146,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             initDrawerCalendarsListContent()
 
                             withContext(Dispatchers.Main) {
-                                // if we're navigating from outside of the app to create new Event, check if there's active Calendar
-                                if (uri.isDeeplinkToEventCreate()) {
-                                    if (calendarViewModel.getActiveCalendars().isEmpty()) {
-                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toMonth())
-                                        displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
-                                    } else safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
-                                } else {
-                                    safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
-                                }
+                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
                             }
                         }
                     }
@@ -924,7 +916,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         inactiveCalendarsJob = lifecycleScope.launch {
             delay(UPDATE_PASSPHRASE_CALENDARS_DELAY.toMillis())
-            val calendarsToUpdate = calendarViewModel.inactiveUserCalendars.value?.filter { it.hasUpdatePassphrase } ?: return@launch
+            val calendarsToUpdate = calendarViewModel.getInactiveUserCalendars()?.filter { it.hasUpdatePassphrase } ?: return@launch
             calendarViewModel.updatingCalendarPassphrase = true
             this@MainActivity.displayCalendarListMaterialDialog(
                 R.string.bootstrap_error_update_passphrase_title,

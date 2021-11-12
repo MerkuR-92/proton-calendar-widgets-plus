@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
@@ -342,7 +343,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             }
 
             miniCalendarItemView.setOnClickListener {
-                calendarViewModel.handleDaySelected(item.date)
+                lifecycleScope.launch { calendarViewModel.handleDaySelected(item.date) }
             }
 
             this.addView(miniCalendarItemView)

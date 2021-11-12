@@ -10,11 +10,13 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AndroidUtils.clearFocusAndHideKeyboard
@@ -129,25 +131,26 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun resetAlarmText(selectedIndex: Int) {
+        lifecycleScope.launch {
+            val is24Hour =
+                if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
+                else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
 
-        val is24Hour =
-            if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
-            else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
-
-        if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
-            event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).formatTime(is24Hour))
-            event_form_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).formatTime(is24Hour))
-            event_form_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).formatTime(is24Hour))
-            event_form_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).formatTime(is24Hour))
-        } else {
-            event_form_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
-            event_form_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
-            event_form_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
-            event_form_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
-            event_form_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
-            if (selectedIndex != -1 && selectedIndex != R.id.event_form_alarm_1) {
-                val radioButton = event_form_alarm_radio_group.findViewById<RadioButton>(selectedIndex)
-                radioButton.text = getString(R.string.event_alarm_label_before, radioButton.text)
+            if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
+                event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).formatTime(is24Hour))
+                event_form_alarm_2.text = getString(R.string.event_alarm_all_day_2, LocalTime.of(18, 0).formatTime(is24Hour))
+                event_form_alarm_3.text = getString(R.string.event_alarm_all_day_3, LocalTime.of(9, 0).formatTime(is24Hour))
+                event_form_alarm_4.text = getString(R.string.event_alarm_all_day_4, LocalTime.of(9, 0).formatTime(is24Hour))
+            } else {
+                event_form_alarm_1.text = getString(R.string.event_alarm_partial_day_1)
+                event_form_alarm_2.text = getString(R.string.event_alarm_partial_day_2)
+                event_form_alarm_3.text = getString(R.string.event_alarm_partial_day_3)
+                event_form_alarm_4.text = getString(R.string.event_alarm_partial_day_4)
+                event_form_alarm_5.text = getString(R.string.event_alarm_partial_day_5)
+                if (selectedIndex != -1 && selectedIndex != R.id.event_form_alarm_1) {
+                    val radioButton = event_form_alarm_radio_group.findViewById<RadioButton>(selectedIndex)
+                    radioButton.text = getString(R.string.event_alarm_label_before, radioButton.text)
+                }
             }
         }
     }
@@ -251,37 +254,41 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             else button.jumpDrawablesToCurrentState()
         }
 
-        val is24Hour =
-            if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
-            else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+        lifecycleScope.launch {
+            val is24Hour =
+                if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
+                else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
 
-        // init
-        custom_alarm_1.visibleOrGone(!isAllDay)
-        custom_alarm_2.visibleOrGone(!isAllDay)
-        custom_alarm_time_layout.visibleOrGone(isAllDay)
-        custom_alarm_same_day_layout.visibleOrGone(isAllDay)
-        if (isAllDay) {
-            custom_alarm_field.setText("1")
-            custom_alarm_radio_group.check(custom_alarm_3.id)
-            resetAlarmCustomText(1)
-            custom_alarm_time.text = getString(R.string.event_alarm_at_time, eventViewModel.tempAlarmTime.formatTime(is24Hour))
-        } else {
-            custom_alarm_field.setText("15")
-            custom_alarm_radio_group.check(custom_alarm_1.id)
-            resetAlarmCustomText(15)
-        }
-        custom_alarm_field_layout.setEndIconOnClickListener {
-            custom_alarm_field.setText(
-                if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT.toString()
-                else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT.toString())
-        }
+            // init
+            custom_alarm_1.visibleOrGone(!isAllDay)
+            custom_alarm_2.visibleOrGone(!isAllDay)
+            custom_alarm_time_layout.visibleOrGone(isAllDay)
+            custom_alarm_same_day_layout.visibleOrGone(isAllDay)
+            if (isAllDay) {
+                custom_alarm_field.setText("1")
+                custom_alarm_radio_group.check(custom_alarm_3.id)
+                resetAlarmCustomText(1)
+                custom_alarm_time.text =
+                    getString(R.string.event_alarm_at_time, eventViewModel.tempAlarmTime.formatTime(is24Hour))
+            } else {
+                custom_alarm_field.setText("15")
+                custom_alarm_radio_group.check(custom_alarm_1.id)
+                resetAlarmCustomText(15)
+            }
+            custom_alarm_field_layout.setEndIconOnClickListener {
+                custom_alarm_field.setText(
+                    if (isAllDay) FormValidation.ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT.toString()
+                    else FormValidation.ALARM_PERIOD_COUNT_PARTIAL_DAY_DEFAULT.toString()
+                )
+            }
 
-        custom_alarm_time_press.setOnSingleClickListener {
-            requireActivity().clearFocusAndHideKeyboard(view)
+            custom_alarm_time_press.setOnSingleClickListener {
+                requireActivity().clearFocusAndHideKeyboard(view)
 
-            AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
-                eventViewModel.handleAlarmTime(it) // TODO Handle isCalendarDefaultEventNotification
-                custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.formatTime(is24Hour))
+                AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
+                    eventViewModel.handleAlarmTime(it) // TODO Handle isCalendarDefaultEventNotification
+                    custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.formatTime(is24Hour))
+                }
             }
         }
     }

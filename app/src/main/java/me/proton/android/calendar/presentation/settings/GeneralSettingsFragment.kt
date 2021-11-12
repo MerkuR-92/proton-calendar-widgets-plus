@@ -90,17 +90,17 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 DateTimeUtilsImpl.formatTimeZoneId(it, forInstant)
             }.toTypedArray()
             formattedTimeZoneIds.sortFormattedTimeZoneIds()
-            val defaultTimeZone = calendarViewModel.timeZoneId.value?.id
-            val selectedIndex =
-                if (defaultTimeZone == null) -1
-                else formattedTimeZoneIds.indexOf(DateTimeUtilsImpl.formatTimeZoneId(defaultTimeZone, forInstant))
+            lifecycleScope.launch {
+                val defaultTimeZone = calendarViewModel.getTimeZoneId()?.id
+                val selectedIndex =
+                    if (defaultTimeZone == null) -1
+                    else formattedTimeZoneIds.indexOf(DateTimeUtilsImpl.formatTimeZoneId(defaultTimeZone, forInstant))
 
-            AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
-                if (!mainViewModel.isConnectedToNetwork) {
-                    displayNetworkError()
-                    return@displaySingleChoicePicker
-                }
-                lifecycleScope.launch {
+                AndroidUtils.displaySingleChoicePicker(requireContext(), getString(R.string.settings_timezone_title), formattedTimeZoneIds, selectedIndex) {
+                    if (!mainViewModel.isConnectedToNetwork) {
+                        displayNetworkError()
+                        return@displaySingleChoicePicker
+                    }
                     calendarViewModel.updatePrimaryTimezone(formattedTimeZoneIds[it].formattedTimeZoneToId())
                 }
             }

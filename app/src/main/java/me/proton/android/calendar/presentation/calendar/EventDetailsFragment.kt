@@ -253,6 +253,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
                 calendarViewModel.userAddresses.distinctUntilChanged().observe(viewLifecycleOwner) { userAddresses ->
+                    userAddresses ?: return@observe
                     handleAttendeeAnswerViewVisibility(userAddresses)
                 }
                 observeEventLiveData(coroutineContext)
@@ -295,7 +296,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
                         if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
                             // Call default method for selection if pagers have been initialised
-                            if (calendarViewModel.pagersInitialised) calendarViewModel.handleDaySelected(it.newSelectedDate)
+                            if (calendarViewModel.pagersInitialised) {
+                                lifecycleScope.launch { calendarViewModel.handleDaySelected(it.newSelectedDate) }
+                            }
                             // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
                             else calendarViewModel.updateSelectedLocalDate = it.newSelectedDate
                         }
@@ -493,13 +496,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val alarmLabels = event.iCalEvent.alarms.filter { it.action == Action.display() || it.action == Action.email() }
                 .sortedBy { it.trigger.duration.toMillis() }
                 .mapNotNull { alarm ->
-                    AndroidUtils.formatAlarm(
-                        resources,
-                        event.isAllDay(),
-                        calendarViewModel.timeFormatIs24Hour(requireContext()),
-                        event.getStart(eventViewModel.displayTimeZoneId),
-                        alarm
-                    )
+                    lifecycleScope.launch {
+                        AndroidUtils.formatAlarm(
+                            resources,
+                            event.isAllDay(),
+                            calendarViewModel.timeFormatIs24Hour(requireContext()),
+                            event.getStart(eventViewModel.displayTimeZoneId),
+                            alarm
+                        )
+                    }
                 }
 
             section_alarms.visibleOrGone(alarmLabels.isNotEmpty())
@@ -615,24 +620,26 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
-        val userEmails = calendarViewModel.getUserEmails()
-        event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
-        val organizerEmail = organizer.extractEmail()
-        if (organizerEmail != null && userEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
-            event_attendee_organizer_layout.item_attendee_title.text =
-                resources.getString(R.string.event_attendee_is_organizer)
-            event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
-        } else {
-            event_attendee_organizer_layout.item_attendee_title.text = organizer.extractEmail()
-            event_attendee_organizer_layout.item_attendee_description.text =
-                resources.getString(R.string.event_attendee_organizer)
-        }
-        event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.extractEmail() ?: "")
+        lifecycleScope.launch {
+            val userEmails = calendarViewModel.getUserEmails()
+            event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
+            val organizerEmail = organizer.extractEmail()
+            if (organizerEmail != null && userEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
+                event_attendee_organizer_layout.item_attendee_title.text =
+                    resources.getString(R.string.event_attendee_is_organizer)
+                event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
+            } else {
+                event_attendee_organizer_layout.item_attendee_title.text = organizer.extractEmail()
+                event_attendee_organizer_layout.item_attendee_description.text =
+                    resources.getString(R.string.event_attendee_organizer)
+            }
+            event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.extractEmail() ?: "")
 
-        val organizerStatus = event_attendee_organizer_layout.item_attendee_status
-        if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
-            initAttendeeStatus(organizerStatus, organizerAttendee.participationStatus, requireContext())
-        } else organizerStatus.visibleOrGone(false)
+            val organizerStatus = event_attendee_organizer_layout.item_attendee_status
+            if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
+                initAttendeeStatus(organizerStatus, organizerAttendee.participationStatus, requireContext())
+            } else organizerStatus.visibleOrGone(false)
+        }
     }
 
     private var attendeesListHeight: Int? = null

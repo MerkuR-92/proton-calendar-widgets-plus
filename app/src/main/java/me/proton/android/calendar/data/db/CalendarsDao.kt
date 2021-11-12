@@ -12,37 +12,63 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class CalendarsDao : BaseDao<CalendarEntity> {
 
-//    lateinit var userId: String
-
-    @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
-    abstract fun flowCalendars(userId: String): Flow<List<CalendarEntity>>
-
-    @Query("SELECT * FROM calendars WHERE flags == 1 AND type == 0 AND fkUserId = :userId")
-    abstract fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
-
-    @Query("SELECT * FROM calendars WHERE flags & (32 + 64) >= 32  AND type == 0 AND fkUserId = :userId")
-    abstract fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
-
-    @Query("SELECT * FROM calendars WHERE flags & (2 + 4 + 8 + 16) >= 2  AND type == 0 AND fkUserId = :userId")
-    abstract fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
-
-    @Query("SELECT * FROM calendars WHERE type == 0 AND fkUserId = :userId")
-    abstract fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
-
-    @Query("SELECT * FROM calendars WHERE type == 1 AND fkUserId = :userId")
-    abstract fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>>
-
-    @Query("SELECT * FROM calendars")
-    abstract fun flowCalendars(): Flow<List<CalendarEntity>>
+    /** All calendars */
 
     @Query("SELECT * FROM calendars")
     abstract fun selectCalendars(): List<CalendarEntity>
 
+    @Query("SELECT * FROM calendars")
+    abstract fun flowCalendars(): Flow<List<CalendarEntity>>
+
+    /** All calendars for userId */
+
     @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
     abstract suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
-    @Query("SELECT * FROM calendars WHERE fkUserId = :userId AND type == 0")
+    @Query("SELECT * FROM calendars WHERE fkUserId = :userId")
+    abstract fun flowCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    /** User calendars */
+
+    @Query("SELECT * FROM calendars WHERE type == 0 AND fkUserId = :userId")
     abstract suspend fun selectUserCalendars(userId: String): List<CalendarEntity>
+
+    @Query("SELECT * FROM calendars WHERE type == 0 AND fkUserId = :userId")
+    abstract fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    /** Active user calendars */
+
+    @Query("SELECT * FROM calendars WHERE flags == 1 AND type == 0 AND fkUserId = :userId")
+    abstract suspend fun selectActiveUserCalendars(userId: String): List<CalendarEntity>
+
+    @Query("SELECT * FROM calendars WHERE flags == 1 AND type == 0 AND fkUserId = :userId")
+    abstract fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    /** Disabled user calendars */
+
+    @Query("SELECT * FROM calendars WHERE flags & (32 + 64) >= 32  AND type == 0 AND fkUserId = :userId")
+    abstract suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity>
+
+    @Query("SELECT * FROM calendars WHERE flags & (32 + 64) >= 32  AND type == 0 AND fkUserId = :userId")
+    abstract fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    /** Inactive user calendars */
+
+    @Query("SELECT * FROM calendars WHERE flags & (2 + 4 + 8 + 16) >= 2  AND type == 0 AND fkUserId = :userId")
+    abstract suspend fun selectInactiveUserCalendars(userId: String): List<CalendarEntity>
+
+    @Query("SELECT * FROM calendars WHERE flags & (2 + 4 + 8 + 16) >= 2  AND type == 0 AND fkUserId = :userId")
+    abstract fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    /** Subscribed calendars */
+
+    @Query("SELECT * FROM calendars WHERE type == 1 AND fkUserId = :userId")
+    abstract suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity>
+
+    @Query("SELECT * FROM calendars WHERE type == 1 AND fkUserId = :userId")
+    abstract fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>>
+
+    /** By id */
 
     @Query("SELECT fkUserId FROM calendars WHERE id = :calendarId")
     abstract suspend fun selectCalendarUserId(calendarId: String): String?
@@ -65,79 +91,4 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("UPDATE calendars SET display = :display WHERE id = :calendarId")
     abstract suspend fun updateCalendarDisplay(calendarId: String, display: Int)
 
-// @Query("SELECT * from plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")
-//fun getPlantsWithGrowZoneNumberFlow(growZoneNumber: Int): Flow<List<Plant>>
-
-
-//    @Query("SELECT * FROM ${TABLE_CALENDARS}")
-//    suspend fun selectCalendars(): List<CalendarApiEntity>
-
-//    @Query("SELECT * FROM ${TABLE_CALENDARS}")
-//    fun selectCalendarsLiveData(): LiveData<List<CalendarEntity>>
-//
-//
-//
-//    @Query("SELECT * FROM ${TABLE_CALENDARS}")
-//    fun selectCalendarsFlowSingleItem(): Flow<CalendarEntity>
-//
-
-
-
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Query type: Observable read: Flow<T> or LiveData<T>
-    // one-shot read and write: suspend fun
-
-
-
-
-//
-    //@Query("SELECT * FROM user WHERE age > :minAge")
-    //    fun loadAllUsersOlderThan(minAge: Int): Array<User>
-
-    // @Query("SELECT * FROM user WHERE age BETWEEN :minAge AND :maxAge")
-    //    fun loadAllUsersBetweenAges(minAge: Int, maxAge: Int): Array<User>
-
-    //@Query("SELECT first_name, last_name FROM user WHERE region IN (:regions)")
-    //    fun loadUsersFromRegions(regions: List<String>): List<NameTuple>
-
-//    @Query("UPDATE users SET age = age + 1 WHERE userId = :userId")
-//    suspend fun incrementUserAge(userId: String)
-//
-//    @Insert
-//    suspend fun insertUser(user: User)
-//
-//    @Update
-//    suspend fun updateUser(user: User) or vararg or list
-//
-//    @Delete
-//    suspend fun deleteUser(user: User)
-
-    // transaction methods can be suspending as well
-//    @Transaction
-//    open suspend fun setLoggedInUser(loggedInUser: User) {
-//        deleteUser(loggedInUser)
-//        insertUser(loggedInUser)
-//    }
-//
-//    @Query("DELETE FROM users")
-//    abstract suspend fun deleteUser(user: User)
-//
-//    @Insert
-//    abstract suspend fun insertUser(user: User)
-
-
-    // calling different suspend functions:
-    /**
-
-    class Repository(val database: MyDatabase) {
-
-    suspend fun clearData(){
-    database.withTransaction {
-    database.userDao().deleteLoggedInUser() // suspend function
-    database.commentsDao().deleteComments() // suspend function
-    }
-    }
-    }
-
-     */
 }

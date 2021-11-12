@@ -93,7 +93,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             }
         }
         agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
-            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(requireContext()) }
+            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)

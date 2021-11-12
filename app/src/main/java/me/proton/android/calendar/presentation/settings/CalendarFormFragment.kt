@@ -279,31 +279,33 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
-            val alarmView = layoutInflater.inflate(
-                R.layout.item_alarm_text_button,
-                alarmsListView,
-                false
-            )
-            alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
-                text = AndroidUtils.formatAlarm(
-                    resources,
-                    allDay,
-                    calendarViewModel.timeFormatIs24Hour(requireContext()),
-                    LocalDate.now().toDate(ZoneId.systemDefault().id).toZonedDateTime(ZoneId.systemDefault().id, false), // TODO Simplify this
-                    alarm
+            lifecycleScope.launch {
+                val alarmView = layoutInflater.inflate(
+                    R.layout.item_alarm_text_button,
+                    alarmsListView,
+                    false
                 )
-                isClickable = false
-            }
-            alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
-                // Remove notification listener
-                setOnSingleClickListener {
-                    requireActivity().clearFocusAndHideKeyboard(view)
-                    calendarFormViewModel.handleAlarmChange(alarm, allDay, isDelete = true)
+                alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
+                    text = AndroidUtils.formatAlarm(
+                        resources,
+                        allDay,
+                        calendarViewModel.timeFormatIs24Hour(requireContext()),
+                        LocalDate.now().toDate(ZoneId.systemDefault().id).toZonedDateTime(ZoneId.systemDefault().id, false), // TODO Simplify this
+                        alarm
+                    )
+                    isClickable = false
                 }
-                isClickable = true
+                alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
+                    // Remove notification listener
+                    setOnSingleClickListener {
+                        requireActivity().clearFocusAndHideKeyboard(view)
+                        calendarFormViewModel.handleAlarmChange(alarm, allDay, isDelete = true)
+                    }
+                    isClickable = true
+                }
+                if (index == 0) notificationIcon.visibleOrGone(false)
+                alarmsListView.addView(alarmView)
             }
-            if (index == 0) notificationIcon.visibleOrGone(false)
-            alarmsListView.addView(alarmView)
         }
 
         // Add notification listener

@@ -309,7 +309,7 @@ class EventViewModel(
 
         if (defaultCalendar == null || !defaultCalendar.isActive) {
             // Fallback to first active user calendar
-            defaultCalendar = calendarsRepository.getActiveUserCalendars(userId.id).firstOrNull()
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull()
                 ?: return InitResult.Error("EventViewModel: no active calendars for user")
             defaultCalendarId = defaultCalendar.id
         }
