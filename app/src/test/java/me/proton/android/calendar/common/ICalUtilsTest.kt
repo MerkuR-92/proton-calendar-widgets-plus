@@ -2701,7 +2701,7 @@ internal class ICalUtilsTest {
     }
 
     @Test
-    fun `clone Event`() {
+    fun `clone Event and modify the original afterwards`() {
 
         val eventTimeZoneId = "Europe/Zurich"
 
@@ -2726,6 +2726,55 @@ internal class ICalUtilsTest {
         assertThat(eventCopy.getStart("Europe/Zurich").toInstant()).isEqualTo(ZonedDateTime.of(2021, 5, 18, 18, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant())
         assertThat(eventCopy.getEnd("Europe/Zurich").toInstant()).isEqualTo(ZonedDateTime.of(2021, 5, 18, 19, 0, 0, 0, ZoneId.of("Europe/Zurich")).toInstant())
         assertThat(eventCopy.defaultTimeZone).isEqualTo("Europe/Zurich")
+    }
+
+    @Test
+    fun `clone Event and check if timezone assignments were copied`() {
+
+        val eventTimeZoneId = "Europe/Zurich"
+
+        // RecurrenceID added for testing
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Zurich:20200803T120000
+    DTEND;TZID=Europe/Zurich:20200803T123000
+    RRULE:FREQ=DAILY
+    EXDATE;TZID=Europe/Vilnius:20200807T120000
+    EXDATE;TZID=Europe/Vilnius:20200808T120000
+    SEQUENCE:0
+    RECURRENCE-ID;TZID=Europe/Berlin:20200809T120000
+    UID:ahaBeeTYIPTisogZGV7ASf1htS0T@proton.me
+    DTSTAMP:20200803T150732Z
+    END:VEVENT
+    END:VCALENDAR
+        """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        val eventCopy = Event.from(event)
+
+        assertThat(eventCopy.getStart(eventTimeZoneId).toInstant()).isEqualTo(ZonedDateTime.of(2020, 8, 3, 12, 0, 0, 0, ZoneId.of(eventTimeZoneId)).toInstant())
+        assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.dateStart)?.timeZone?.id).isEqualTo(eventTimeZoneId)
+
+        assertThat(eventCopy.getEnd(eventTimeZoneId).toInstant()).isEqualTo(ZonedDateTime.of(2020, 8, 3, 12, 30, 0, 0, ZoneId.of(eventTimeZoneId)).toInstant())
+        assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.dateEnd)?.timeZone?.id).isEqualTo(eventTimeZoneId)
+
+        assertThat(eventCopy.defaultTimeZone).isNull()
+
+        assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.exceptionDates[0])?.timeZone?.id).isEqualTo("Europe/Vilnius")
+        assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.exceptionDates[1])?.timeZone?.id).isEqualTo("Europe/Vilnius")
+
+        assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.recurrenceId)?.timeZone?.id).isEqualTo("Europe/Berlin")
     }
 
     @Test
