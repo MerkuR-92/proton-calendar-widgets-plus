@@ -19,14 +19,14 @@ import org.junit.runner.RunWith
 import org.koin.core.KoinComponent
 
 /**
- * EventViewModel save flow tests
+ * CalendarFormViewModel create flow tests
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormViewModelTestCommon() {
 
     @Test
-    fun initViewModelTest() = runBlocking {
+    fun initViewModelCreateTest() = runBlocking {
 
         val calendarFormViewModel = getCalendarFormViewModel()
 
@@ -64,7 +64,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
     }
 
     @Test
-    fun initViewModelFailedToGetUserIdTest() = runBlocking {
+    fun initViewModelCreateFailedToGetUserIdTest() = runBlocking {
 
         coEvery { accountManagerMock.getPrimaryUserId() } returns flowOf(null)
         coEvery { resourceProviderMock.provideString(R.string.snack_calendar_init_error) } returns
@@ -110,6 +110,9 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
         val successSnackText = protonCalendarApplication.getString(
             R.string.snack_create_calendar_success)
         coEvery { resourceProviderMock.provideString(R.string.snack_create_calendar_success) } returns successSnackText
+        val existingAlarmSnackText = protonCalendarApplication.getString(
+            R.string.snack_notification_already_added)
+        coEvery { resourceProviderMock.provideString(R.string.snack_notification_already_added) } returns existingAlarmSnackText
 
         coEvery { createCalendarsUseCaseMock.execute(userId, customCalendarName, "", customCalendarColor, 1, customCalendarEmail) } returns UseCase.Result.Success(calendarId)
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm)) } returns UseCase.Result.Success<Unit>()
@@ -132,6 +135,15 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
         // add custom alarms
         calendarFormViewModel.handleAlarmChange(customAllDayAlarm, true)
         calendarFormViewModel.handleAlarmChange(customPartDayAlarm, false)
+
+        // Test add already existing alarms
+        calendarFormViewModel.handleAlarmChange(customAllDayAlarm, true)
+        calendarFormViewModel.handleAlarmChange(customPartDayAlarm, false)
+
+        assert(calendarFormViewModel.calendarFormSnackState.value == CalendarFormViewModel.CalendarFormSnackState.DisplaySnack(existingAlarmSnackText))
+
+        // Reset calendarFormSnackState
+        calendarFormViewModel.calendarFormSnackState.value = null
 
         assert(calendarFormViewModel.hasFormBeenEdited())
         assert(calendarFormViewModel.calendarFormState.value == CalendarFormViewModel.CalendarFormState.Idle)
