@@ -169,6 +169,25 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         handleAppTheme()
     }
 
+    fun isAlternativeRoutingEnabled(): Boolean {
+        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
+    }
+
+    fun isAlternativeRoutingEnabled(enabled: Boolean) {
+
+        val isAlternativeRoutingEnabled = isAlternativeRoutingEnabled()
+        if (isAlternativeRoutingEnabled != enabled) {
+
+            // TODO Apply actual change here, if successful then update sharedprefs
+
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+            val editor = sharedPreferences.edit()
+            editor.putBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, enabled)
+            editor.apply()
+        }
+    }
+
     fun changeViewMode(viewMode: ViewMode) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 

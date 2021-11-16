@@ -386,6 +386,8 @@
     <string name="settings_week_start_title">Week start</string>
     <string name="settings_time_format_title">Time format</string>
     <string name="settings_week_numbers_title">Show week numbers</string>
+    <string name="settings_alternative_routing_title">Allow alternative routing</string>
+    <string name="settings_alternative_routing_subtitle">In case Proton sites are blocked, this setting allows the app to try alternative network routing to reach Proton, which can be useful for bypassing firewalls or network issues. We recommend keeping this setting on for greater reliability.</string>
     <string name="settings_value_placeholder">Tap to select</string>
 
     <string name="settings_general_title">General</string>
