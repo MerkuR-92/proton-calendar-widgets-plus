@@ -969,40 +969,6 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
-    fun `cleanRRule do not generate any occurrence test`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:-//Proton Technologies//AndroidCalendar 0.18.8//EN
-    BEGIN:VEVENT
-    DTSTART;TZID=Europe/Paris:20210306T160000
-    DTEND;TZID=Europe/Paris:20210306T163000
-    RRULE:FREQ=WEEKLY;UNTIL=20210305T225959Z;BYDAY=SA
-    SEQUENCE:0
-    EXDATE;TZID=Europe/Paris:20210313T160000
-    EXDATE;TZID=Europe/Paris:20210320T160000
-    SUMMARY:Recurring with exdates
-    STATUS:CONFIRMED
-    DTSTAMP:20210311T145808Z
-    UID:35fdx2qMv8RPjvIFecqY1qTMIooJ@proton.me
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanRRule(iCalendar)).isFalse()
-        }
-    }
-
-    @Test
     fun `cleanRRule recurring with ex date on only occurrence test`() {
 
         val iCalString = """
@@ -1307,6 +1273,87 @@ internal class IcsSurgeryUtilsTest {
                             "Europe/Paris"
                         )
                     ).toInstant()
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `cleanRRule UNTIL is before DTSTART for part day event test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.10//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Paris:20210329T120000
+    DTEND;TZID=Europe/Paris:20210329T123000
+    RRULE:FREQ=DAILY;UNTIL=20210328T215959Z
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    DTSTAMP:20210329T094841Z
+    UID:B6CCcxfX8f3TfV0WVYTEcdSNz2aa@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
+            assertThat(event.recurrenceRule.value.until.hasTime()).isTrue()
+            assertThat(event.recurrenceRule.value.until).isEqualTo(
+                ICalDate.from(
+                    ZonedDateTime.of(
+                        2021, 3, 29, 12, 0, 0, 0, ZoneId.of(
+                            "Europe/Paris"
+                        )
+                    ).toInstant()
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `cleanRRule UNTIL is before DTSTART for all day event test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.18.10//EN
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210329
+    DTEND;VALUE=DATE:20210329
+    RRULE:FREQ=DAILY;UNTIL=20210328
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    DTSTAMP:20210329T094841Z
+    UID:B6CCcxfX8f3TfV0WVYTEcdSNz2aa@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanRRule(iCalendar)).isTrue()
+            assertThat(event.recurrenceRule.value.until).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2021, 3, 29, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
                 )
             )
         }
