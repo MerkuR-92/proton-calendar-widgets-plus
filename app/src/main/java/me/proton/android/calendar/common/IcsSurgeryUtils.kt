@@ -594,7 +594,12 @@ object IcsSurgeryUtils {
 
         val attendeesEmail = mutableListOf<String>()
         this.attendees?.forEach { attendee ->
-            val email = attendee.extractEmail() ?: return false
+            // We allow any values for attendee email during the surgery, but we check the email validity in HandleIcsUseCase
+            //  if we are in organizerMode, as there we require the attendee email to be canonizable to generate the token
+            val email = attendee.extractEmail() ?:
+            attendee.email ?:
+            attendee.uri?.substringAfter("mailto:") ?:
+            attendee.commonName
 
             // Remove URI parameter if it's clearly not an email
             if (attendee.uri?.contains("@") == false) {
@@ -636,7 +641,7 @@ object IcsSurgeryUtils {
 
             // In case some attendee emails are repeated, we reject (as unsupported) the invite
             if (attendeesEmail.contains(email)) return false
-            attendeesEmail.add(email)
+            email?.let { attendeesEmail.add(email) }
         }
 
         return true
