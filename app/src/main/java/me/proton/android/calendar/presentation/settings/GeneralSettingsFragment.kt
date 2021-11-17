@@ -164,6 +164,15 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        val isAlternativeRoutingEnabled = mainViewModel.isAlternativeRoutingEnabled()
+        settings_alternative_routing_switch.isChecked = isAlternativeRoutingEnabled
+        settings_alternative_routing_press.setOnClickListener {
+            settings_alternative_routing_switch.performClick()
+        }
+        settings_alternative_routing_switch.setOnClickListener {
+            mainViewModel.setAlternativeRoutingEnabled(settings_alternative_routing_switch.isChecked)
+        }
+
         // Observers
 
         calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
