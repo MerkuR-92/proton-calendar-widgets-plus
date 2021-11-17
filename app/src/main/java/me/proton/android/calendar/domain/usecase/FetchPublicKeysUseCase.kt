@@ -9,6 +9,7 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
+import me.proton.core.key.domain.repository.Source
 
 /**
  * Forces fetching and caching Public Keys for Authors of Calendar Parts.
@@ -21,7 +22,7 @@ class FetchPublicKeysUseCase(
     private suspend fun fetchPublicKeys(userId: UserId, email: String): UseCase.Result {
 
         val publicAddress = kotlin.runCatching {
-            publicAddressRepository.getPublicAddress(userId, email, refresh = true)
+            publicAddressRepository.getPublicAddress(userId, email, source = Source.RemoteNoCache)
         }.getOrNull()
 
         return if (publicAddress != null) {

@@ -54,7 +54,8 @@ object UserMocks {
             enabled = enabledParam ?: enabled,
             type = addressType,
             order = order,
-            keys = emptyList() // TODO
+            keys = emptyList(), // TODO
+            signedKeyList = null // TODO
         )
     }
 

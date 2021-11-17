@@ -20,6 +20,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
+import me.proton.core.key.domain.repository.Source
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
@@ -236,8 +237,8 @@ class TransformEventUseCase(
 
                 if (eventPart.signature != null) {
 
-                    // refresh = false, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
-                    val publicAddressKeys = kotlin.runCatching { publicAddressRepository.getPublicAddress(userId, eventPart.author, refresh = false).keys }.getOrNull()
+                    // Source.LocalIfAvailable, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
+                    val publicAddressKeys = kotlin.runCatching { publicAddressRepository.getPublicAddress(userId, eventPart.author, source = Source.LocalIfAvailable).keys }.getOrNull()
 
                     if (publicAddressKeys == null || publicAddressKeys.isEmpty()) {
                         signatureVerification = Event.SignatureVerification.SIGNED_BUT_NO_KEYS

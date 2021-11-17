@@ -1,7 +1,7 @@
 package me.proton.android.calendar.presentation.account
 
 import android.content.Context
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
 import androidx.work.WorkManager
 import kotlinx.coroutines.CancellationException
@@ -107,7 +107,7 @@ class AccountViewModel(
     val errorReport: LiveData<UseCase.Error?> = _errorReport
     val hasPrimary: LiveData<Boolean> = _hasPrimary
 
-    fun init(context: ComponentActivity) {
+    fun init(context: FragmentActivity) {
         // Make sure we clear error on init
         clearError()
 
