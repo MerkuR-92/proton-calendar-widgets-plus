@@ -5,10 +5,8 @@ import android.content.*
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.work.*
 import kotlinx.coroutines.Job
-import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -23,7 +21,8 @@ class MainViewModel(
     application: Application,
     private val accountViewModel: AccountViewModel,
     private val handleIcsUseCase: HandleIcsUseCase,
-    private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -57,6 +56,30 @@ class MainViewModel(
         } catch (e: Exception) {
             false
         }
+    }
+
+    fun isAlternativeRoutingEnabled(): Boolean {
+        return defaultSharedPreferencesProvider.sharedPreferences.getBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
+    }
+
+    fun setAlternativeRoutingEnabled(enabled: Boolean) {
+        val isAlternativeRoutingEnabled = isAlternativeRoutingEnabled()
+        if (isAlternativeRoutingEnabled != enabled) {
+            val editor = defaultSharedPreferencesProvider.sharedPreferences.edit()
+            editor.putBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, enabled)
+            editor.apply()
+        }
+    }
+
+    fun setViewMode(viewMode: ViewMode) {
+        val editor = defaultSharedPreferencesProvider.sharedPreferences.edit()
+        editor.putInt(SharedPreferencesKeys.VIEW_MODE, viewMode.value)
+        editor.apply()
+    }
+
+    fun getLastViewMode(): ViewMode {
+        // By default we display the agenda view
+        return ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.AGENDA.value)]
     }
 
     // TODO sync all "active" accounts

@@ -78,6 +78,7 @@ val viewModelModule = module {
             get(),
             get(),
             get(),
+            get(),
             get()
         )
     }
@@ -135,7 +136,8 @@ fun coreModule(
     cryptoContext: CryptoContext,
     sendEmailDirect: SendEmailDirect,
     publicAddressRepository: PublicAddressRepository,
-    networkManager: NetworkManager
+    networkManager: NetworkManager,
+    defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -155,4 +157,5 @@ fun coreModule(
     factory<SendEmailDirect> { sendEmailDirect /*SendEmailDirect(get(), get(), get(), get())*/ }
     single<PublicAddressRepository> { publicAddressRepository }
     single<NetworkManager> { networkManager }
+    single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
 }

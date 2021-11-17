@@ -94,6 +94,9 @@ class ProtonCalendarApplication : Application() {
     lateinit var networkManager: NetworkManager
 
     @Inject
+    lateinit var defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
+
+    @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
     private val logger: Logger by inject()
@@ -125,7 +128,8 @@ class ProtonCalendarApplication : Application() {
                     cryptoContext,
                     sendEmailDirect,
                     publicAddressRepository,
-                    networkManager
+                    networkManager,
+                    defaultSharedPreferencesProvider
                 )
             )
         }

@@ -169,38 +169,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         handleAppTheme()
     }
 
-    fun isAlternativeRoutingEnabled(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
-    }
-
-    fun isAlternativeRoutingEnabled(enabled: Boolean) {
-
-        val isAlternativeRoutingEnabled = isAlternativeRoutingEnabled()
-        if (isAlternativeRoutingEnabled != enabled) {
-
-            // TODO Apply actual change here, if successful then update sharedprefs
-
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-            val editor = sharedPreferences.edit()
-            editor.putBoolean(SharedPreferencesKeys.ALTERNATIVE_ROUTING, enabled)
-            editor.apply()
-        }
-    }
-
-    fun changeViewMode(viewMode: ViewMode) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val editor = sharedPreferences.edit()
-        editor.putInt(SharedPreferencesKeys.VIEW_MODE, viewMode.value)
-        editor.apply()
-    }
-
-    fun getLastViewMode(): ViewMode {
-        // By default we display the agenda view
-        return ViewMode.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.AGENDA.value)]
-    }
-
     private fun handleAppTheme() {
         when (getAppTheme()) {
             AppTheme.LIGHT -> {
@@ -376,7 +344,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             })
         }
-        calendarViewModel.viewMode.value = getLastViewMode()
+        calendarViewModel.viewMode.value = mainViewModel.getLastViewMode()
 
         nav_view_main_content.nav_view_version.text = getString(
             R.string.nav_view_version_name,
@@ -735,13 +703,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
-            changeViewMode(ViewMode.DAY)
+            mainViewModel.setViewMode(ViewMode.DAY)
             drawer_layout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
-            changeViewMode(ViewMode.AGENDA)
+            mainViewModel.setViewMode(ViewMode.AGENDA)
             drawer_layout.close()
         }
 
