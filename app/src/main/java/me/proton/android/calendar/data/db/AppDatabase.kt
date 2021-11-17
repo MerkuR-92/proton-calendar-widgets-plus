@@ -15,6 +15,12 @@ import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
 import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
+import me.proton.core.contact.data.local.db.ContactConverters
+import me.proton.core.contact.data.local.db.ContactDatabase
+import me.proton.core.contact.data.local.db.entity.ContactCardEntity
+import me.proton.core.contact.data.local.db.entity.ContactEmailEntity
+import me.proton.core.contact.data.local.db.entity.ContactEmailLabelEntity
+import me.proton.core.contact.data.local.db.entity.ContactEntity
 import me.proton.core.crypto.android.keystore.CryptoConverters
 import me.proton.core.data.room.db.BaseDatabase
 import me.proton.core.data.room.db.CommonConverters
@@ -60,6 +66,10 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         me.proton.core.usersettings.data.entity.UserSettingsEntity::class,
         OrganizationEntity::class,
         OrganizationKeysEntity::class,
+        ContactCardEntity::class,
+        ContactEmailEntity::class,
+        ContactEmailLabelEntity::class,
+        ContactEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -83,6 +93,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
     CryptoConverters::class,
     HumanVerificationConverters::class,
     UserSettingsConverters::class,
+    ContactConverters::class,
     // Calendar
     DatabaseTypeConverters::class
 )
@@ -96,7 +107,8 @@ abstract class AppDatabase :
     PublicAddressDatabase,
     MailSettingsDatabase,
     UserSettingsDatabase,
-    OrganizationDatabase {
+    OrganizationDatabase,
+    ContactDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -127,7 +139,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 32
+        const val version = 33
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -142,6 +154,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_29_30,
             AppDatabaseMigrations.MIGRATION_30_31,
             AppDatabaseMigrations.MIGRATION_31_32,
+            AppDatabaseMigrations.MIGRATION_32_33,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

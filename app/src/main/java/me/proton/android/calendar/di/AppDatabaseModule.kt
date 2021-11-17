@@ -27,6 +27,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.core.account.data.db.AccountDatabase
+import me.proton.core.contact.data.local.db.ContactDatabase
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.key.data.db.KeySaltDatabase
 import me.proton.core.key.data.db.PublicAddressDatabase
@@ -77,4 +78,7 @@ abstract class AppDatabaseBindsModule {
 
     @Binds
     abstract fun provideOrganizationDatabase(appDatabase: AppDatabase): OrganizationDatabase
+
+    @Binds
+    abstract fun provideContactDatabase(appDatabase: AppDatabase): ContactDatabase
 }

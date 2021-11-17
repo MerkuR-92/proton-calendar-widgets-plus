@@ -65,7 +65,7 @@ class ObtainSendPreferencesUseCase(
 
         // 2. get all User's contacts
         val contactEmails =
-            kotlin.runCatching { contactEmailsRepository.getContactEmails(userId, refresh = true) }.getOrNull()
+            kotlin.runCatching { contactEmailsRepository.getAllContactEmails(userId, refresh = true) }.getOrNull()
 
         if (mailSettings == null || contactEmails == null || user == null) {
             return canonicalEmails.mapValues { Result.Error.NetworkError }
@@ -86,7 +86,7 @@ class ObtainSendPreferencesUseCase(
 
         // 5. fetch full Contact info for those contacts
         val fullContactsWithCustomPreferences = contactEmailsWithCustomPreferences.mapValues { entry ->
-            kotlin.runCatching { contactEmailsRepository.getContact(userId, entry.value.contactId, refresh = true) }
+            kotlin.runCatching { contactEmailsRepository.getContactWithCards(userId, entry.value.contactId, refresh = true) }
                 .getOrNull()
         }
         fullContactsWithCustomPreferences.forEach {

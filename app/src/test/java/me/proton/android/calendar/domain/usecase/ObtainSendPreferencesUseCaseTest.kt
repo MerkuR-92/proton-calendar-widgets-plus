@@ -19,6 +19,9 @@ import me.proton.android.calendar.domain.model.PackageType
 import me.proton.core.contact.domain.entity.Contact
 import me.proton.core.contact.domain.entity.ContactCard
 import me.proton.core.contact.domain.entity.ContactEmail
+import me.proton.core.contact.domain.entity.ContactEmailId
+import me.proton.core.contact.domain.entity.ContactId
+import me.proton.core.contact.domain.entity.ContactWithCards
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -69,19 +72,21 @@ internal class ObtainSendPreferencesUseCaseTest {
 
         coEvery { mailSettingsApiMock.getMailSettings(userId) } returns mailSettingsSignTrue
 
-        coEvery { contactEmailsRepositoryMock.getContactEmails(userId, refresh = true) } returns listOf(
+        coEvery { contactEmailsRepositoryMock.getAllContactEmails(userId, refresh = true) } returns listOf(
             ContactEmail(
-                "1",
+                userId,
+                ContactEmailId("1"),
                 "External Contact with pinned key",
                 "contact_external_pinned_key+alias@email.com",
                 defaults = 0,
                 1,
-                contactId = "contact_1",
-                "contact_external_pinned_key@email.com"
+                contactId = ContactId("contact_1"),
+                "contact_external_pinned_key@email.com",
+                labelIds = emptyList()
             )
         )
 
-        coEvery { contactEmailsRepositoryMock.getContact(userId, "contact_1", refresh = true) } returns externalContactWithPinnedKeyBrokenSignature
+        coEvery { contactEmailsRepositoryMock.getContactWithCards(userId, ContactId("contact_1"), refresh = true) } returns externalContactWithPinnedKeyBrokenSignature
 
         coEvery { getRecipientPublicAddressesMock.invoke(userId, any()) } returns mapOf(
             "disabled_address@pm.me" to null, // address is disabled
@@ -231,7 +236,7 @@ internal class ObtainSendPreferencesUseCaseTest {
 
             sut.execute(userId, canonicalEmails)
 
-            coVerify(exactly = 1) { contactEmailsRepositoryMock.getContact(userId, "contact_1", refresh = true) }
+            coVerify(exactly = 1) { contactEmailsRepositoryMock.getContactWithCards(userId, ContactId("contact_1"), refresh = true) }
             coVerify(exactly = 1) { externalContactWithPinnedKeyBrokenSignature.extractSignedVCard(
                 userMock,
                 cryptoContextMock,
@@ -251,7 +256,7 @@ internal class ObtainSendPreferencesUseCaseTest {
 
             val result = sut.execute(userId, canonicalEmails)
 
-            coVerify(exactly = 1) { contactEmailsRepositoryMock.getContact(userId, "contact_1", refresh = true) }
+            coVerify(exactly = 1) { contactEmailsRepositoryMock.getContactWithCards(userId, ContactId("contact_1"), refresh = true) }
             coVerify(exactly = 1) { externalContactWithPinnedKeyBrokenSignature.extractSignedVCard(userMock, cryptoContextMock, logger) }
 
             assertThat(result["contact_external_pinned_key+alias@email.com"]).isEqualTo(ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys)
@@ -354,24 +359,29 @@ internal class ObtainSendPreferencesUseCaseTest {
         null
     )
 
-    private val externalContactWithPinnedKeyBrokenSignature: Contact =
-        Contact(
-            "1", "External Contact with pinned key",
-            contactEmails = listOf(
-                ContactEmail(
-                    "1",
-                    "External Contact with pinned key",
-                    "contact_external_pinned_key+alias@email.com",
-                    0,
-                    1,
-                    "contact_1",
-                    null
-                ) /* this is deliberately null here, API doesn't return it */
+    private val externalContactWithPinnedKeyBrokenSignature: ContactWithCards =
+        ContactWithCards(
+            contact = Contact(
+                userId,
+                id = ContactId("1"),
+                name = "External Contact with pinned key",
+                contactEmails = listOf(
+                    ContactEmail(
+                        userId,
+                        ContactEmailId("1"),
+                        name = "External Contact with pinned key",
+                        email = "contact_external_pinned_key+alias@email.com",
+                        defaults = 0,
+                        order = 1,
+                        contactId = ContactId("contact_1"),
+                        canonicalEmail = null,
+                        labelIds = emptyList()
+                    ) /* this is deliberately null here, API doesn't return it */
+                )
             ),
-            cards = listOf(
-                ContactCard(3, "encrypted and signed data", "signature"),
-                ContactCard(
-                    2,
+            contactCards = listOf(
+                ContactCard.Encrypted("encrypted and signed data", "signature"),
+                ContactCard.Signed(
                     "BEGIN:VCARD\r\nVERSION:4.0\r\nFN;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.EMAIL;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.KEY;PREF=1:data:application/pgp-keys;base64,xjMEYIE/zBYJKwYBBAHaRw8BA\r\n QdAU0kzBdPct+/iReob+92uE1hEJPzoXnrrTqx5p8EoOa7NLWNhbGVuZGFyQHByb3Rvbi5ibGFj\r\n ayA8Y2FsZW5kYXJAcHJvdG9uLmJsYWNrPsKPBBAWCgAgBQJggT/MBgsJBwgDAgQVCAoCBBYCAQA\r\n CGQECGwMCHgEAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP09xeAQD3ioSt4E6SyV\r\n xOeS8xBQvhuEXkqBKKZCkMO10fd0P2LgD/WvtGpRv8JAll0feMgG2y1lufZtJImTeLr0ciYb7AE\r\n gnOOARggT/MEgorBgEEAZdVAQUBAQdAJYTJ0NuH3zSCNxk+gsFNTVHuPDLQQLRsyNermAbrEXID\r\n AQgHwngEGBYIAAkFAmCBP8wCGwwAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP0/e\r\n ZAQC9vSk4lPi9v1dMHsbKCChrYPR2WCMSUXykpNcDuP2TBgEA0jjgSKW351PQTmHU15UcSFY71O\r\n pD+j04Cs4EcONklw0=\r\nUID:proton-web-4e57f941-d1b4-7909-c879-73a2df5513f1\r\nITEM1.X-PM-ENCRYPT:true\r\nITEM1.X-PM-SIGN:true\r\nEND:VCARD",
                     "correct signature"
                 )

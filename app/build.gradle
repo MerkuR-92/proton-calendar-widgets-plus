@@ -200,6 +200,7 @@ dependencies {
     implementation "me.proton.core:account-manager-dagger:${rootProject.ext.version.proton_core_account_manager}"
     implementation "me.proton.core:auth:${rootProject.ext.version.proton_core_auth}"
     implementation "me.proton.core:contact:${rootProject.ext.version.proton_core_contact}"
+    implementation "me.proton.core:contact-hilt:${rootProject.ext.version.proton_core_contact}"
     implementation "me.proton.core:country:${rootProject.ext.version.proton_core_country}"
     implementation "me.proton.core:crypto:${rootProject.ext.version.proton_core_crypto}"
     implementation "me.proton.core:data:${rootProject.ext.version.proton_core_data}"

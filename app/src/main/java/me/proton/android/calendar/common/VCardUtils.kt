@@ -5,7 +5,8 @@ import ezvcard.Ezvcard
 import ezvcard.VCard
 import ezvcard.property.RawProperty
 import me.proton.android.calendar.domain.Logger
-import me.proton.core.contact.domain.entity.Contact
+import me.proton.core.contact.domain.entity.ContactCard
+import me.proton.core.contact.domain.entity.ContactWithCards
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
@@ -36,10 +37,10 @@ fun VCard.getKeysForGroup(group: String): List<String> =
         Armor.armorKey(it.data)
     } // TODO test
 
-fun Contact.extractSignedVCard(user: User, cryptoContext: CryptoContext, logger: Logger): VCard? {
+fun ContactWithCards.extractSignedVCard(user: User, cryptoContext: CryptoContext, logger: Logger): VCard? {
 
-    val signedContactCard = this.cards.firstOrNull { it.type == 2 /* signed */ } ?: return null
-    val signature = signedContactCard.signature ?: return null
+    val signedContactCard = this.contactCards.filterIsInstance(ContactCard.Signed::class.java).firstOrNull() ?: return null
+    val signature = signedContactCard.signature
 
     return try {
 
