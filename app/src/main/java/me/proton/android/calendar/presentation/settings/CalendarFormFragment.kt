@@ -105,8 +105,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(
-                if (navigationArguments.calendarId != null) R.string.calendar_form_update
-                else R.string.calendar_form_create
+                R.string.calendar_form_save
             )
             setOnSingleClickListener {
                 if (calendar_form_name_value.text.toString().isBlank()) {
