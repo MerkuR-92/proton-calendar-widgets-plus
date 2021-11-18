@@ -89,8 +89,6 @@ interface EventUtils {
      */
     fun Event.generateOccurrence(occurrenceNumber: Int, timeZoneId: String): Event.Occurrence?
 
-    fun Event.generateOccurrenceNew(occurrenceNumber: Int, timeZoneId: String): Event.Occurrence?
-
     // TODO remove nullability from dateTimeStart/End and use function from ICalUtils
     fun Event.overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean
 

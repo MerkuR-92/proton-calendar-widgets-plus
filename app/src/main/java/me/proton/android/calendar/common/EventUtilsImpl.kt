@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common
 
 import android.content.res.Resources
+import android.os.TestLooperManager
 import biweekly.component.VTimezone
 import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationStatus
@@ -23,7 +24,6 @@ import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.common.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.utils.EventUtils
 import me.proton.core.user.domain.entity.UserAddress
@@ -36,7 +36,6 @@ import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 object EventUtilsImpl : EventUtils {
 
@@ -230,108 +229,104 @@ object EventUtilsImpl : EventUtils {
      */
     override fun Event.generateOccurrences(timeZoneId: String, toDate: LocalDate?, firstOccurrenceFromDateTime: ZonedDateTime?, occurrenceCount: Int?): List<Event.Occurrence>? {
 
+        // localize Date created by iterator in display TimeZone, handling the BySetPos
+        fun localizeIteratorDate(iteratorDate: Date, iteratorZoneId: ZoneId, iteratorZonedDateTimeStart: ZonedDateTime, formatZoneId: ZoneId, hasBySetPos: Boolean): ZonedDateTime {
+            return if (isAllDay()) {
+                iteratorDate.toInstant().atZone(iteratorZoneId).withZoneSameLocal(formatZoneId)
+            } else {
+                if (hasBySetPos) {
+                    iteratorDate.toInstant().atZone(iteratorZoneId)
+                        .withHour(iteratorZonedDateTimeStart.hour) // fix hour
+                        .withMinute(iteratorZonedDateTimeStart.minute) // fix minute
+                        .withZoneSameInstant(formatZoneId) // localize in display TZ
+                } else {
+                    iteratorDate.toInstant().atZone(formatZoneId) // localize in display TZ
+                }
+            }
+        }
+
         if (!isRecurring()) return null
 
         if (toDate == null && occurrenceCount == null && firstOccurrenceFromDateTime == null) return null
 
-        val occurrences = mutableListOf<Event.Occurrence>()
-
-        val toDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
-
-        val iCalTimeZoneStart = iCalendar.iCalTimeZone(iCalEvent.dateStart)
-
-        // TODO Investigate issue with by set pos
-        // this is a workaround for bugs in generating occurrences for RRULE with BYSETPOS
-        //  when Event start date contains time different than 00:00, then:
-        //  1. first occurrence is skipped
-        //  2. all the occurrences are returned as happening at 00:00 anyway, so we lose time of day
-        //
-        //  we generate occurrences ignoring time of day & timezone and set it later manually,
-        //   this will most likely only work for FREQUENCY at least DAILY
-
-        val hasTime = !isAllDay() && iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty() && iCalEvent.recurrenceRule.value.byDay.isNullOrEmpty()
-
-        val startZonedDateTime = iCalEvent.dateStart.value.toZonedDateTime(timeZoneId)
-        val startZonedDateTimeAllDayNormalised = ZonedDateTime.of(startZonedDateTime.toLocalDate(), LocalTime.MIDNIGHT, ZoneId.of(timeZoneId))
-
-        val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(iCalEvent.dateStart) else TimeZone.getDefault()
-
-        // Special case is for events that have date iterator skip the first occurrence
-        //  (either by having bysetpos, or by having a display tz that makes it jump to the next / previous day)
-        var specialCase = false
-        val startICalDate = if (!isAllDay() && (!iCalEvent.recurrenceRule.value.bySetPos.isNullOrEmpty() || iCalEvent.dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).toLocalDate().dayOfYear)) {
-            specialCase = true
-            ICalDate(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
-        } else ICalDate(iCalEvent.dateStart.value, hasTime)
-
-        val recurrenceRule = if (this.isAllDay() && this.iCalEvent.recurrenceRule?.value?.until != null) {
-            RecurrenceRule(this.iCalEvent.recurrenceRule.value.clone(until = ICalDate(this.iCalEvent.recurrenceRule.value.until, true)))
-        } else {
-            this.iCalEvent.recurrenceRule
-        }
-
-        val startIterator = recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
-
-        val untilZonedDateTime = if (iCalEvent.recurrenceRule.value.until != null) {
-            iCalEvent.recurrenceRule.value.until.toZonedDateTime(timeZoneId)
-        } else null
+        val iteratorZoneId = ZoneId.of(if (isAllDay()) /*TODO fallback to UTC?*/ TimeZone.getDefault().id else this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart)?.timeZone?.id)
+        val iteratorZonedDateTimeStart = this.iCalEvent.dateStart.value.toZonedDateTime(iteratorZoneId.id) // TODO add isAllDay?
+        val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, TimeZone.getTimeZone(iteratorZoneId.id))
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
 
-        var occurrenceNumber = 0
-        while (startIterator.hasNext()) {
+        val formatZoneId = ZoneId.of(timeZoneId)
+        val formatToZonedDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
 
-            occurrenceNumber++
+        // hack: if Event contains BySetPos
+        //  1. first occurrence is skipped
+        //  2. all the occurrences are returned as happening at 00:00, so we lose time of day
+        val hasBySetPos = iCalEvent.recurrenceRule.value?.bySetPos?.isNullOrEmpty() == false
 
-            val startIteratorNext = startIterator.next()
-            val occurrenceStart =
-                if (specialCase) {
-                    ZonedDateTime.ofInstant(startIteratorNext.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id, true).withHour(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).hour).withMinute(iCalEvent.dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(iCalEvent.dateStart).id).minute).toInstant(), ZoneId.of(timeZoneId))
-                } else if (!hasTime && !isAllDay()) {
-                    // Handle BySetPos edge case
-                    startIteratorNext.toZonedDateTime(timeZoneId, !isAllDay()).withHour(startZonedDateTime.hour).withMinute(startZonedDateTime.minute)
-                } else {
-                    startIteratorNext.toZonedDateTime(timeZoneId, this.isAllDay())
-                }
+        var count = 0
+        val occurrences = mutableListOf<Event.Occurrence>()
 
-            val occurrenceEnd =
-                if (isAllDay()) occurrenceStart.plusDays(TimeUnit.MILLISECONDS.toDays(eventDurationInMillis))
-                else occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+        while (iterator.hasNext()) {
 
-            // occurrence start date-time is generated by us so we need to check the UNTIL manually
-            if (untilZonedDateTime != null && occurrenceStart.isAfter(untilZonedDateTime)) {
-                break
-            }
+            count++
 
-            // ignore occurrences happening before they should be actually displayed
-            if ((this.isAllDay() && occurrenceStart.isBefore(startZonedDateTimeAllDayNormalised)) || !this.isAllDay() && occurrenceStart.isBefore(startZonedDateTime)) {
-                occurrenceNumber--
-                continue
-            }
+            val iteratorDateStart = iterator.next()
 
-            // ignore occurrences before the [fromDate]
+            val occurrenceStart = localizeIteratorDate(iteratorDateStart, iteratorZoneId, iteratorZonedDateTimeStart, formatZoneId, hasBySetPos)
+            val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+
+            // we generated enough occurrences already
+            if (occurrenceCount != null && (count > occurrenceCount)) break
+
+            // occurrence starts after the [toDate]
+            if (toDate != null && occurrenceStart.isAfter(formatToZonedDateTime)) break
+
+            // ignore occurrences before the [firstOccurrenceFromDateTime]
             if (firstOccurrenceFromDateTime != null && firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
                 continue
             }
 
-            if ((toDateTime != null && occurrenceStart.isAfter(toDateTime)) || (occurrenceCount != null && occurrenceNumber > occurrenceCount)) {
-                break
-            }
+            occurrences.add(Event.Occurrence(occurrenceStart, occurrenceEnd, count))
 
-            occurrences.add(Event.Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber))
-
-            // ignore occurrences before the [fromDate]
+            // if there was [firstOccurrenceFromDateTime], take the first matching occurrence and break
             if (firstOccurrenceFromDateTime != null) {
-                if (firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
-                    continue
-                } else {
+                if (!firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
                     break
                 }
             }
-
         }
 
-        return occurrences
+        return if (hasBySetPos) { // apply BySetPos hack
+
+            val potentiallySkippedOccurrence = Event.Occurrence(
+                iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId),
+                iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
+                    .plus(eventDurationInMillis, ChronoUnit.MILLIS),
+                1
+            )
+
+            val shiftedOccurrences = occurrences.map { it.copy(occurrenceNumber = it.occurrenceNumber + 1) }.toMutableList()
+
+            // potentiallySkippedOccurrence starts after the [toDate]
+            if (toDate != null && potentiallySkippedOccurrence.startDateTime.isAfter(formatToZonedDateTime)) return occurrences
+
+            // ignore potentiallySkippedOccurrence before the [firstOccurrenceFromDateTime]
+            if (firstOccurrenceFromDateTime != null) {
+                if (firstOccurrenceFromDateTime.isAfter(potentiallySkippedOccurrence.startDateTime)) {
+                    return shiftedOccurrences // because the generated ones are 1 behind
+                } else {
+                    // potentiallySkippedOccurrence is the first occurrence
+                    return listOf(potentiallySkippedOccurrence)
+                }
+            }
+
+            // add missing one
+            shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
+
+            // take requested `occurrence count` into consideration
+            shiftedOccurrences.take(occurrenceCount ?: shiftedOccurrences.size)
+
+        } else occurrences
 
     }
 
@@ -516,28 +511,6 @@ object EventUtilsImpl : EventUtils {
      */
     override fun Event.generateOccurrence(occurrenceNumber: Int, timeZoneId: String): Event.Occurrence? {
         return generateOccurrences(timeZoneId, null, null, occurrenceNumber)?.getOrNull(occurrenceNumber - 1)
-    }
-
-    override fun Event.generateOccurrenceNew(occurrenceNumber: Int, timeZoneId: String): Event.Occurrence? {
-
-        val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart).timeZone)
-
-        var count = 0
-        var iteratorDateStart: Date? = null
-        while (iterator.hasNext() && count < occurrenceNumber) {
-            iteratorDateStart  = iterator.next()
-            count++
-        }
-
-        return if (count == occurrenceNumber && iteratorDateStart != null) {
-            val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
-
-            // TODO HANDLE ALL-DAY, WE CAN'T ADD MILLIS, BUT DAYS
-            val occurrenceStart = iteratorDateStart.toInstant().atZone(ZoneId.of(timeZoneId))
-            val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
-
-            Event.Occurrence(occurrenceStart, occurrenceEnd, occurrenceNumber)
-        } else null
     }
 
     // TODO remove nullability from dateTimeStart/End and use function from ICalUtils
