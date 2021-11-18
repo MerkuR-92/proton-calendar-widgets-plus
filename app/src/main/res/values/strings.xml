@@ -309,6 +309,7 @@
     <string name="snack_create_calendar_success">Calendar created</string>
     <string name="snack_calendar_saving">Saving calendar</string>
     <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
+    <string name="snack_create_calendar_settings_error">The calendar was created but some information were not updated, please try again later</string>
 
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>

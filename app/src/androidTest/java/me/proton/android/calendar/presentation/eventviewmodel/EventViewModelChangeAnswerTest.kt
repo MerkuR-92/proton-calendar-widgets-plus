@@ -76,7 +76,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
@@ -177,7 +177,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
@@ -352,7 +352,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
@@ -414,7 +414,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
 
             assert(eventViewModel.eventLiveData.value?.getParticipationStatus(listOf(userEmail)) == ParticipationStatus.ACCEPTED)
             assert(eventViewModel.eventLiveData.value?.iCalEvent?.alarms?.size != 0) // Check that alarms were added
@@ -465,7 +465,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
@@ -536,7 +536,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
 
             // Confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_change_answer_recurring_title) }
@@ -593,7 +593,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
@@ -666,7 +666,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
 
             // Confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_change_answer_recurring_title) }
@@ -724,7 +724,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, singleEditEventId) } returns ApiResponse.Success(
@@ -795,7 +795,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
 
             // Confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_change_answer_recurring_title) }
@@ -853,7 +853,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Fetch event by id if event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, singleEditEventId) } returns ApiResponse.Success(
@@ -916,7 +916,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdate(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
 
             // Make sure we skip confirmation dialog
             verify(exactly = 0) { resourceProviderMock.provideString(R.string.event_change_answer_recurring_title) }

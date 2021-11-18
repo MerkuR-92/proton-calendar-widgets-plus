@@ -59,7 +59,7 @@ open class EventViewModelTestCommon: KoinComponent {
         coEvery { calendarsRepositoryMock.getDefaultCalendarIdOrFirstActiveId(userId.id) } returns calendarId
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
         // TODO Test fallback to first active user calendar when default calendar is null
-        coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity())
+        coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity())
         coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns CalendarMocks.provideCalendarUserSettingsEntity()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
         coEvery { userSettingsRepositoryMock.selectUserSettings(userId.id) } returns UserMocks.provideUserSettingsEntity()

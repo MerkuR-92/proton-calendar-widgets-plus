@@ -137,7 +137,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Fallback calendar
             val fallbackCalendarId = "fallbackCalendarId"
-            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
+            coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
 
             // Fallback calendar settings
             coEvery { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) } returns CalendarMocks.provideCalendarSettingsEntity(id = fallbackCalendarId)
@@ -150,7 +150,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
                 initStartTime = null
             )
 
-            coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.selectActiveUserCalendars(any()) }
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) }
 
@@ -174,7 +174,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Fallback calendar
             val fallbackCalendarId = "fallbackCalendarId"
-            coEvery { calendarsRepositoryMock.getActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
+            coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
 
             // Fallback calendar settings
             coEvery { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) } returns CalendarMocks.provideCalendarSettingsEntity(id = fallbackCalendarId)
@@ -187,7 +187,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
                 initStartTime = null
             )
 
-            coVerify(exactly = 1) { calendarsRepositoryMock.getActiveUserCalendars(any()) }
+            coVerify(exactly = 1) { calendarsRepositoryMock.selectActiveUserCalendars(any()) }
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) }
 
