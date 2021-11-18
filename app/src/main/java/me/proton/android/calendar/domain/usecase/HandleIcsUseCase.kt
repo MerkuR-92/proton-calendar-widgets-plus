@@ -122,7 +122,7 @@ class HandleIcsUseCase(
         iCalendar.events.first().attendees.forEach {
             if (it.participationStatus == null) it.participationStatus = ParticipationStatus.NEEDS_ACTION
 
-            // When in organizer mode, we do not accept invalid emails, as there we require the attendee email to be canonizable to generate the token
+            // When in organizer mode, we do not accept invalid emails, as there we require the attendee email to be canonicalizable to generate the token
             if (isOrganizerMode && it.extractEmail() == null) IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
         }
 

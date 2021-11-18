@@ -102,8 +102,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
-    private var defaultCalendarId: String? = null
-
     private var subscribedCalendars: List<CalendarEntity>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
     private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
@@ -845,17 +843,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         calendarViewModel.selectCalendars()
         calendarViewModel.userCalendars.observe(this@MainActivity, Observer { userCalendars ->
             userCalendars ?: return@Observer
-            setUserCalendarsList(userCalendars, defaultCalendarId)
+            setUserCalendarsList(userCalendars)
         })
 
         calendarViewModel.defaultCalendarId.observe(this@MainActivity, Observer { defaultCalendarId ->
 
-            if (this@MainActivity.defaultCalendarId != defaultCalendarId) {
-                this@MainActivity.defaultCalendarId = defaultCalendarId
-                lifecycleScope.launch {
-                    calendarViewModel.getUserCalendars()?.let { userCalendars ->
-                        setUserCalendarsList(userCalendars, defaultCalendarId)
-                    }
+            lifecycleScope.launch {
+                calendarViewModel.getUserCalendars()?.let { userCalendars ->
+                    setUserCalendarsList(userCalendars, defaultCalendarId)
                 }
             }
         })

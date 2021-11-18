@@ -2262,7 +2262,7 @@ END:VCALENDAR
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
             // We allow any values for attendee email during the surgery, but we check the email validity in HandleIcsUseCase
-            //  if we are in organizerMode, as there we require the attendee email to be canonizable to generate the token
+            //  if we are in organizerMode, as there we require the attendee email to be canonicalizable to generate the token
             assertThat(event.cleanAttendees(iCalendar.method)).isTrue()
         }
     }

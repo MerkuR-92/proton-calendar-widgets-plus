@@ -40,6 +40,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import me.proton.android.calendar.common.IcsSurgeryUtils.applyBiweeklyDstParsingFix
 import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtEnd
+import me.proton.core.util.kotlin.takeIfNotBlank
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -412,7 +413,7 @@ object IcsSurgeryUtils {
 
         // UNTIL: we should use UTC dates if and only if the event is not all-day.
         if (!this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == true) {
-            val timeZone = iCalendar.timezoneInfo.timezones.map { it.timeZone }.firstOrNull()
+            val timeZone = iCalendar.timezoneInfo.timezones.firstOrNull()?.timeZone
             val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: "UTC" else "UTC"
             val untilDate = this.recurrenceRule.value.until
             this.recurrenceRule.value = this.recurrenceRule.value.clone(until = partDayICalDateToDate(untilDate, supportedTimeZone))
@@ -420,9 +421,10 @@ object IcsSurgeryUtils {
 
         // UNTIL: we should transform a DATE into the UTC DATETIME that corresponds to the end of the day in the DTSTART timezone
         if (this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == false) {
-            val timezone = iCalendar.timezoneInfo.getTimezone(this.dateStart).timeZone.id
-            val newUntil = allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
-            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
+            iCalendar.timezoneInfo.getTimezone(this.dateStart)?.timeZone?.id?.let { timezone -> // We make sure we have a timezone for part day dateStart earlier in the process
+                val newUntil = allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
+                this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
+            }
         }
 
         // UNTIL: if an UNTIL < DTSTART is received, it means to actually have one occurrence. We should therefore set UNTIL = DTSTART (equality in the timestamp sense, the UNTIL format should always be UTC DATETIME).
@@ -595,11 +597,11 @@ object IcsSurgeryUtils {
         val attendeesEmail = mutableListOf<String>()
         this.attendees?.forEach { attendee ->
             // We allow any values for attendee email during the surgery, but we check the email validity in HandleIcsUseCase
-            //  if we are in organizerMode, as there we require the attendee email to be canonizable to generate the token
+            //  if we are in organizerMode, as there we require the attendee email to be canonicalizable to generate the token
             val email = attendee.extractEmail() ?:
-            attendee.email ?:
-            attendee.uri?.substringAfter("mailto:") ?:
-            attendee.commonName
+            attendee.email.takeIfNotBlank() ?:
+            attendee.uri?.substringAfter("mailto:")?.takeIfNotBlank() ?:
+            attendee.commonName.takeIfNotBlank() ?: return false
 
             // Remove URI parameter if it's clearly not an email
             if (attendee.uri?.contains("@") == false) {
