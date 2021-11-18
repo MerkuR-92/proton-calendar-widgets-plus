@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.model
 
 import biweekly.ICalendar
 import biweekly.component.VEvent
+import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import kotlinx.serialization.SerialName
@@ -68,13 +69,37 @@ data class Event private constructor(
         /**
          * Makes sure we have deep copy of [ICalendar] object inside [Event].
          * Copy event with specified id / calendar / iCalendar values
+         * and Timezone Assignments
          */
         fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
+            val startTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
+            val endTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
             return event.copy(
                 id = id ?: event.id,
                 calendar = calendar ?: event.calendar,
                 iCalendar = (iCalendar ?: ICalendar(event.iCalendar)).apply {
+
+                    // manually copy timezone assignments
+                    val originalCalendar = event.iCalendar
+                    val newICalendar = this
+
+                    originalCalendar.timezoneInfo.getTimezone(originalCalendar.events.first().recurrenceId)?.let {
+                        newICalendar.timezoneInfo.setTimezone(newICalendar.events.first().recurrenceId, it)
+                    }
+
+                    originalCalendar.events.first().exceptionDates.forEachIndexed { index, exceptionDate ->
+                        newICalendar.events.first().addExceptionDates(exceptionDate)
+
+                        // copy timezone assignments for EXDATEs
+                        val timezoneAssignment = originalCalendar.timezoneInfo.getTimezone(exceptionDate)
+                        if (timezoneAssignment != null) {
+                            newICalendar.timezoneInfo.setTimezone(newICalendar.events.first().exceptionDates[index], timezoneAssignment)
+                        }
+                    }
+
+                    setStartTimeZone(startTimezoneId)
+                    setEndTimeZone(endTimezoneId)
                     setDefaultTimeZone(defaultTimezoneId)
                 })
         }

@@ -1,6 +1,6 @@
 plugins {
 //    id 'org.jetbrains.kotlin.multiplatform' version '1.4.10'
-    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.10"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.5.31"
 }
 
 apply plugin: 'com.android.application'
@@ -104,8 +104,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 100
-        versionName "0.28.1"
+        versionCode 101
+        versionName "0.28.2"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

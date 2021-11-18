@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -123,7 +124,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         setHourLabelViews()
 
         calendarViewModel.timeFormat.observe(viewLifecycleOwner) {
-            setHourLabelViews()
+            setHourLabelViews(calendarViewModel.timeFormatIs24Hour(it, requireContext()))
         }
 
         onScrollChangeListener = View.OnScrollChangeListener { _, _, scrollY, _, _ ->
@@ -155,21 +156,23 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         return rootView
     }
 
-    private fun setHourLabelViews() {
-        lifecycleScope.launch {
-            val timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(requireContext())
-            // Inflate a label view for each hour the day view will display
-            val hourLabelViews: MutableList<View> = ArrayList()
-            for (i in dayView.startHour..dayView.endHour) {
-                val tmpDay =
-                    if (i == 24) LocalTime.MIDNIGHT
-                    else day.withHour(i)
-                val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
-                hourLabelView.text = tmpDay.formatTime(timeFormatIs24Hour, short = true)
-                hourLabelViews.add(hourLabelView)
-            }
-            dayView.setHourLabelViews(hourLabelViews)
+    private fun setHourLabelViews(timeFormatIs24Hour: Boolean? = null) {
+        val is24Hour = timeFormatIs24Hour ?: run {
+            calendarViewModel.timeFormat.value?.let {
+                calendarViewModel.timeFormatIs24Hour(it, requireContext())
+            } ?: DateFormat.is24HourFormat(context)
         }
+        // Inflate a label view for each hour the day view will display
+        val hourLabelViews: MutableList<View> = ArrayList()
+        for (i in dayView.startHour..dayView.endHour) {
+            val tmpDay =
+                if (i == 24) LocalTime.MIDNIGHT
+                else day.withHour(i)
+            val hourLabelView = layoutInflater.inflate(R.layout.item_hour_label, dayView, false) as TextView
+            hourLabelView.text = tmpDay.formatTime(is24Hour, short = true)
+            hourLabelViews.add(hourLabelView)
+        }
+        dayView.setHourLabelViews(hourLabelViews)
     }
 
     private lateinit var updateCurrentTimeIndicatorJob: Job

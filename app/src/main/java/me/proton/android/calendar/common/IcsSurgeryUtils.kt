@@ -39,6 +39,8 @@ import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import me.proton.android.calendar.common.IcsSurgeryUtils.applyBiweeklyDstParsingFix
+import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtEnd
+import me.proton.core.util.kotlin.takeIfNotBlank
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -409,6 +411,28 @@ object IcsSurgeryUtils {
         // UNTIL: The maximum value is currently 01/01/2038 @ 00:00:00 UTC (soon to become 01/01/2200 @ 12:00am (UTC)
         if (recurrenceRule.value.until != null && recurrenceRule.value.until.toInstant().isAfter(MAX_DATE.toInstant())) return false
 
+        // UNTIL: we should use UTC dates if and only if the event is not all-day.
+        if (!this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == true) {
+            val timeZone = iCalendar.timezoneInfo.timezones.firstOrNull()?.timeZone
+            val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: "UTC" else "UTC"
+            val untilDate = this.recurrenceRule.value.until
+            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = partDayICalDateToDate(untilDate, supportedTimeZone))
+        }
+
+        // UNTIL: we should transform a DATE into the UTC DATETIME that corresponds to the end of the day in the DTSTART timezone
+        if (this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == false) {
+            iCalendar.timezoneInfo.getTimezone(this.dateStart)?.timeZone?.id?.let { timezone -> // We make sure we have a timezone for part day dateStart earlier in the process
+                val newUntil = allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
+                this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
+            }
+        }
+
+        // UNTIL: if an UNTIL < DTSTART is received, it means to actually have one occurrence. We should therefore set UNTIL = DTSTART (equality in the timestamp sense, the UNTIL format should always be UTC DATETIME).
+        if (this.recurrenceRule.value.until != null && this.recurrenceRule.value.until < this.dateStart.value) {
+            val newUntil = this.dateStart.value
+            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
+        }
+
         // We reject as invalid RRULEs that:
         val hasTime = dateStart.value.hasTime() && recurrenceRule.value.bySetPos.isNullOrEmpty() && recurrenceRule.value.byDay.isNullOrEmpty()
         val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()
@@ -458,21 +482,6 @@ object IcsSurgeryUtils {
         }
 
         if (!generatesOccurrences) return false
-
-        // UNTIL: we should use UTC dates if and only if the event is not all-day.
-        if (!this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == true) {
-            val timeZone = iCalendar.timezoneInfo.timezones.map { it.timeZone }.firstOrNull()
-            val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: "UTC" else "UTC"
-            val untilDate = this.recurrenceRule.value.until
-            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = partDayICalDateToDate(untilDate, supportedTimeZone))
-        }
-
-        // UNTIL: we should transform a DATE into the UTC DATETIME that corresponds to the end of the day in the DTSTART timezone
-        if (this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == false) {
-            val timezone = iCalendar.timezoneInfo.getTimezone(this.dateStart).timeZone.id
-            val newUntil = allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
-            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
-        }
 
         // Special case: YEARLY with BYMONTHDAY but no BYMONTH
         if (recurrenceRule.value.frequency == Frequency.YEARLY && !recurrenceRule.value.byMonthDay.isNullOrEmpty() && recurrenceRule.value.byMonth.isNullOrEmpty()) return false
@@ -587,7 +596,12 @@ object IcsSurgeryUtils {
 
         val attendeesEmail = mutableListOf<String>()
         this.attendees?.forEach { attendee ->
-            val email = attendee.extractEmail() ?: return false
+            // We allow any values for attendee email during the surgery, but we check the email validity in HandleIcsUseCase
+            //  if we are in organizerMode, as there we require the attendee email to be canonicalizable to generate the token
+            val email = attendee.extractEmail() ?:
+            attendee.email.takeIfNotBlank() ?:
+            attendee.uri?.substringAfter("mailto:")?.takeIfNotBlank() ?:
+            attendee.commonName.takeIfNotBlank() ?: return false
 
             // Remove URI parameter if it's clearly not an email
             if (attendee.uri?.contains("@") == false) {
@@ -629,7 +643,7 @@ object IcsSurgeryUtils {
 
             // In case some attendee emails are repeated, we reject (as unsupported) the invite
             if (attendeesEmail.contains(email)) return false
-            attendeesEmail.add(email)
+            email?.let { attendeesEmail.add(email) }
         }
 
         return true

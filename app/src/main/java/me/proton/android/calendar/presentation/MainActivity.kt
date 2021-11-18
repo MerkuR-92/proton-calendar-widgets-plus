@@ -139,13 +139,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             logger.v("regular init, got finished")
                             withContext(Dispatchers.Main) {
                                 displaySplashScreen(false)
-                            }
 
-                            // Refresh drawer content now that we are logged in.
-                            initDrawerHeader()
-                            initDrawerCalendarsListContent()
+                                // Refresh drawer content now that we are logged in.
+                                initDrawerHeader()
+                                initDrawerCalendarsListContent()
 
-                            withContext(Dispatchers.Main) {
                                 safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
                             }
                         }
@@ -688,10 +686,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             navController.navigate(R.id.action_nav_calendar_to_nav_settings)
             drawer_layout.close()
         }
-        accountViewModel.hasPrimary.observe(this@MainActivity) { hasPrimary ->
+        accountViewModel.hasPrimary.observe(this@MainActivity, Observer { hasPrimary ->
             nav_view_main_content.nav_view_more_logout_layout.isVisible = hasPrimary
             nav_view_main_content.nav_view_more_login_layout.isGone = hasPrimary
-        }
+        })
         nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
             accountViewModel.logoutPrimary()
             drawer_layout.close()
@@ -721,7 +719,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             onClickCreateCalendar()
         }
 
-        calendarViewModel.viewMode.observe(this@MainActivity) { viewMode ->
+        calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
             if (viewMode == ViewMode.AGENDA) {
                 // Set selected background
                 nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
@@ -739,7 +737,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                 nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
             }
-        }
+        })
     }
 
     private fun onClickCreateCalendar() {
@@ -782,9 +780,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerHeader() {
         lifecycleScope.launch {
-            val user = withContext(Dispatchers.Default) {
-                calendarViewModel.selectUser()
-            }
+            val user = calendarViewModel.selectUser()
             if (user != null) {
                 nav_view_main_content.nav_view_user_name.text = user.displayName?.nullIfBlank() ?: resources.getString(R.string.default_user_display_name)
                 nav_view_main_content.nav_view_user_mail.text = user.email?.nullIfBlank() ?: resources.getString(R.string.default_user_email)
@@ -837,62 +833,77 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Uncomment this to display current timezone in drawer
         // lifecycleScope.launch(Dispatchers.Main) {
-        //     calendarViewModel.timeZoneId.observe(this@MainActivity) { zoneId ->
+        //     calendarViewModel.timeZoneId.observe(this@MainActivity, Observer { zoneId ->
         //         nav_view_timezone.visibleOrGone(true)
         //         nav_view_timezone_login_title.text =
         //             formatTimeZoneId(zoneId.id, ZonedDateTime.now(zoneId).toInstant())
-        //     }
+        //     })
         // }
 
+        calendarViewModel.selectCalendars()
+        calendarViewModel.userCalendars.observe(this@MainActivity, Observer { userCalendars ->
+            userCalendars ?: return@Observer
+            setUserCalendarsList(userCalendars)
+        })
+
+        calendarViewModel.defaultCalendarId.observe(this@MainActivity, Observer { defaultCalendarId ->
+
+            lifecycleScope.launch {
+                calendarViewModel.getUserCalendars()?.let { userCalendars ->
+                    setUserCalendarsList(userCalendars, defaultCalendarId)
+                }
+            }
+        })
+
+        calendarViewModel.inactiveUserCalendars.observe(this@MainActivity, Observer { inactiveCalendars ->
+            inactiveCalendars ?: return@Observer
+
+            // TODO Uncomment once calendar key reactivation has been fixed
+            // if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
+            //     handleUpdatePassphrase()
+            // }
+        })
+
+        subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
+            subscribedCalendars = value
+
+            if (subscribedCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            }
+        }
+        subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
+            calendarSubscriptions = value
+
+            if (subscribedCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            }
+        }
+        subscribedCalendarsMediator.observe(this@MainActivity, Observer {
+            it?.let {
+                val subscribedCalendars = it.first
+                val calendarSubscriptions = it.second
+                val dataSetChanged = subscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
+                subscribedCalendarListAdapter.submitList(subscribedCalendars)
+                if (dataSetChanged) subscribedCalendarListAdapter.notifyDataSetChanged()
+                nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
+            }
+        })
+    }
+
+    private fun setUserCalendarsList(userCalendars: List<CalendarEntity>, defaultCalendarId: String? = null) {
+        // We only keep active and disabled calendars for the navigation drawer calendar list
+        val filteredUserCalendars = userCalendars.filter { it.isActive || it.isDisabled }
+        nav_view_calendars_list_add_layout.visibleOrGone(filteredUserCalendars.isEmpty())
+        nav_view_calendars_create.visibleOrGone(filteredUserCalendars.isNotEmpty())
         lifecycleScope.launch {
-            calendarViewModel.selectCalendars()
-            calendarViewModel.userCalendars.observe(this@MainActivity) { userCalendars ->
-                userCalendars ?: return@observe
-                // We only keep active and disabled calendars for the navigation drawer calendar list
-                val filteredUserCalendars = userCalendars.filter { it.isActive || it.isDisabled }
-                nav_view_calendars_list_add_layout.visibleOrGone(filteredUserCalendars.isEmpty())
-                nav_view_calendars_create.visibleOrGone(filteredUserCalendars.isNotEmpty())
-                userCalendarListAdapter.submitList(
-                    filteredUserCalendars.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }
-                )
-            }
-
-
-            subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
-                subscribedCalendars = value
-
-                if (subscribedCalendars != null && calendarSubscriptions != null) {
-                    subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            val tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
+            userCalendarListAdapter.submitList(
+                filteredUserCalendars.sortedBy {
+                    it.isDisabled // Disabled will appear last
+                }.sortedByDescending {
+                    it.id == tmpDefaultCalendarId // Default will appear first
                 }
-            }
-            subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
-                calendarSubscriptions = value
-
-                if (subscribedCalendars != null && calendarSubscriptions != null) {
-                    subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
-                }
-            }
-            subscribedCalendarsMediator.observe(this@MainActivity) {
-                it?.let {
-                    val subscribedCalendars = it.first
-                    val calendarSubscriptions = it.second
-                    val dataSetChanged = subscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
-                    subscribedCalendarListAdapter.submitList(subscribedCalendars)
-                    if (dataSetChanged) subscribedCalendarListAdapter.notifyDataSetChanged()
-                    nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
-                }
-            }
-
-            calendarViewModel.inactiveUserCalendars.observe(this@MainActivity) { inactiveCalendars ->
-                inactiveCalendars ?: return@observe
-
-                // TODO Uncomment once calendar key reactivation has been fixed
-//                if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
-//                    handleUpdatePassphrase()
-//                }
-            }
+            )
         }
     }
 
@@ -915,12 +926,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.main, menu)
-        return true
     }
 
     override fun onSupportNavigateUp(): Boolean {

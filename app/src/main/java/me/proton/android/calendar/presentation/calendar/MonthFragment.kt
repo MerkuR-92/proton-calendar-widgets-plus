@@ -155,11 +155,9 @@ class MonthFragment : BaseFragment() {
         }
         buttonToday.setOnSingleClickListener {
             val todayDate = LocalDate.now(timeZoneId)
-            lifecycleScope.launch {
-                calendarViewModel.handleDaySelected(todayDate)
-                // Align day view to current time
-                calendarViewModel.jumpToCurrentTime.value = true
-            }
+            calendarViewModel.handleDaySelected(todayDate)
+            // Align day view to current time
+            calendarViewModel.jumpToCurrentTime.value = true
         }
     }
 
@@ -174,15 +172,13 @@ class MonthFragment : BaseFragment() {
                 val monthStartingDate = miniCalendarPagerAdapter.firstDayOfMonth
                 val firstDay = monthStartingDate.plusMonths((position - monthStartingPosition).toLong())
 
-                lifecycleScope.launch {
-                    calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
+                calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
 
-                    setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
+                setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
 
-                    adjustMiniCalendarView(firstDay.withDayOfMonth(1), startWeekOn)
+                adjustMiniCalendarView(firstDay.withDayOfMonth(1), startWeekOn)
 
-                    timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-                }
+                timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
             }
         }
     }
@@ -193,7 +189,7 @@ class MonthFragment : BaseFragment() {
         animateChange: Boolean
     ) {
 
-        val firstDayOfMonth = calendarViewModel.selectedDate.value!!.withDayOfMonth(1)
+        val firstDayOfMonth = calendarViewModel.selectedDate.value?.withDayOfMonth(1) ?: return // We will retry this once calendarViewModel.selectedDate has been set
 
         // Calculate current month's desired height for both mini calendar mode (month / week)
         val desiredHeight = calculateAdapterHeight(
@@ -242,7 +238,7 @@ class MonthFragment : BaseFragment() {
         override fun onPageSelected(position: Int) {
             val currentDate =
                 calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-            lifecycleScope.launch { calendarViewModel.handleDaySelected(currentDate) }
+            calendarViewModel.handleDaySelected(currentDate)
         }
     }
 
@@ -449,13 +445,14 @@ class MonthFragment : BaseFragment() {
             }
 
             // Calculate current month's desired height for both mini calendar mode (month / week)
-            val firstDayOfMonth = calendarViewModel.selectedDate.value!!.withDayOfMonth(1)
-            calendarViewModel.currentPosDesiredMonthHeight = calculateAdapterHeight(
-                requireContext(),
-                firstDayOfMonth,
-                startWeekOn,
-                true
-            )
+            calendarViewModel.selectedDate.value?.withDayOfMonth(1)?.let { firstDayOfMonth ->
+                calendarViewModel.currentPosDesiredMonthHeight = calculateAdapterHeight(
+                    requireContext(),
+                    firstDayOfMonth,
+                    startWeekOn,
+                    true
+                )
+            }
 
             // Set custom listener for mini calendar gestures
             val onTouchListener = MonthLayoutGestureListener(

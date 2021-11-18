@@ -234,21 +234,19 @@ class CalendarViewModel(
         // Select specific date if it has been provided instead of default init value.
         // Lets us handle selected date when navigating back from event details / form if it was opened from a notification
         val immutableUpdateSelectedLocalDate = updateSelectedLocalDate
-        lifeCycleScope.launch {
-            if (immutableUpdateSelectedLocalDate != null) {
-                handleDaySelected(immutableUpdateSelectedLocalDate)
-                updateSelectedLocalDate = null
-            } else handleDaySelected(date)
-        }
+        if (immutableUpdateSelectedLocalDate != null) {
+            handleDaySelected(immutableUpdateSelectedLocalDate)
+            updateSelectedLocalDate = null
+        } else handleDaySelected(date)
     }
 
-    suspend fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
+    fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
         // prevent mini-calendar scroll from overriding selected date
         _selectedDate.value?.let {
             if (fromMonthPagerCallback && it.month == date.month && it.year == date.year) {
                 return
             }
-            getWeekStart()?.let { weekStart ->
+            weekStart.value?.let { weekStart ->
                 val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart)
                 if (fromMonthPagerCallback && monthView.value == false && it.weekNumber(startWeekOn) == date.weekNumber(startWeekOn) && it.year == date.year) {
                     // TODO is this early return logic really needed for week view here ?

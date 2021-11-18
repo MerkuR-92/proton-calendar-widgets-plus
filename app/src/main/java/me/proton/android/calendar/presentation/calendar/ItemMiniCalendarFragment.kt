@@ -343,7 +343,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             }
 
             miniCalendarItemView.setOnClickListener {
-                lifecycleScope.launch { calendarViewModel.handleDaySelected(item.date) }
+                calendarViewModel.handleDaySelected(item.date)
             }
 
             this.addView(miniCalendarItemView)

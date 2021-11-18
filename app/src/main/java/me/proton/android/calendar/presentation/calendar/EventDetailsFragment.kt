@@ -297,7 +297,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
                             // Call default method for selection if pagers have been initialised
                             if (calendarViewModel.pagersInitialised) {
-                                lifecycleScope.launch { calendarViewModel.handleDaySelected(it.newSelectedDate) }
+                                calendarViewModel.handleDaySelected(it.newSelectedDate)
                             }
                             // Set updateSelectedLocalDate for month view to initialise with event start date as selected day
                             else calendarViewModel.updateSelectedLocalDate = it.newSelectedDate
@@ -496,15 +496,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val alarmLabels = event.iCalEvent.alarms.filter { it.action == Action.display() || it.action == Action.email() }
                 .sortedBy { it.trigger.duration.toMillis() }
                 .mapNotNull { alarm ->
-                    lifecycleScope.launch {
-                        AndroidUtils.formatAlarm(
-                            resources,
-                            event.isAllDay(),
-                            calendarViewModel.timeFormatIs24Hour(requireContext()),
-                            event.getStart(eventViewModel.displayTimeZoneId),
-                            alarm
-                        )
-                    }
+                    AndroidUtils.formatAlarm(
+                        resources,
+                        event.isAllDay(),
+                        eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())),
+                        event.getStart(eventViewModel.displayTimeZoneId),
+                        alarm
+                    )
                 }
 
             section_alarms.visibleOrGone(alarmLabels.isNotEmpty())

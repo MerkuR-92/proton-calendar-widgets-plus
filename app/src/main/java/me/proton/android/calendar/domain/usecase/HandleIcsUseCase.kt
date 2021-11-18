@@ -121,6 +121,9 @@ class HandleIcsUseCase(
         // Make sure all attendees have a part stat (default is NEEDS-ACTION)
         iCalendar.events.first().attendees.forEach {
             if (it.participationStatus == null) it.participationStatus = ParticipationStatus.NEEDS_ACTION
+
+            // When in organizer mode, we do not accept invalid emails, as there we require the attendee email to be canonicalizable to generate the token
+            if (isOrganizerMode && it.extractEmail() == null) IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
         }
 
         // If current user is not in the attendee list and is not the organizer then it is a party crasher
@@ -226,7 +229,7 @@ class HandleIcsUseCase(
 
         if (isNewNonCancelled || isNewSingleEditCancelled || isReInvitation) {
             // Create brand new event
-            if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
+            if (!newEvent.iCalendar.setAttendeesXPmToken(userId, isOrganizerMode)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
             if (isNewSingleEditCancelled) {
                 newEvent.iCalendar.method = Method.request()
                 newEvent.iCalEvent.status = Status.cancelled() // In case of un-invite, the status needs to be set to cancelled
@@ -244,7 +247,7 @@ class HandleIcsUseCase(
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
-                if (!newEvent.iCalendar.setAttendeesXPmToken(userId)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
+                if (!newEvent.iCalendar.setAttendeesXPmToken(userId, isOrganizerMode)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
                 return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
                 if (newEvent.hasProtonProtonProperties || newEvent.isProtonProtonReply) {
@@ -263,7 +266,7 @@ class HandleIcsUseCase(
         return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
     }
 
-    private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId): Boolean {
+    private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId, isOrganizerMode: Boolean): Boolean {
         val missingToken = this.events.first().attendees.firstOrNull { attendee ->
             attendee.getParameter(X_PM_TOKEN) == null
         } != null
@@ -272,7 +275,10 @@ class HandleIcsUseCase(
             val canonicalEmails = canonicalEmailsUseCase.invoke(userId, this.events.first().attendees.mapNotNull { it.extractEmail() })
             if (canonicalEmails.values.any { it.isNullOrEmpty() }) return false
             this.events.first().attendees.forEach { attendee ->
-                val attendeeCanonicalEmail = canonicalEmails[attendee.extractEmail()]
+                val attendeeCanonicalEmail =
+                    if (attendee.extractEmail() != null) canonicalEmails[attendee.extractEmail()]
+                    else if (isOrganizerMode) return false
+                    else attendee.email ?: return false // We still need to generate tokens for invalid emails when in attendee mode
                 if (attendee.getParameter(X_PM_TOKEN) == null && attendeeCanonicalEmail != null) {
                     val token = ICalUtilsImpl.generateXPmToken(attendeeCanonicalEmail, eventUid)
                     attendee.addParameter(X_PM_TOKEN, token)
