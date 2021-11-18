@@ -354,6 +354,9 @@ class CalendarFormViewModel(
                 }
             }
 
+            // Reset calendar id
+            _calendarId = null
+
             // Clear loading state
             calendarFormState.value = CalendarFormState.Idle
 
@@ -384,8 +387,6 @@ class CalendarFormViewModel(
             }
 
             createCalendarResult.returnValue.tryCast<String> {
-                // Set the newly created calendar id in case we fail to update calendar settings
-                _calendarId = this
 
                 // Update newly created calendar settings
                 val updateCalendarSettingsUseCaseResult = updateCalendarSettingsUseCase.updateCalendarSettings(
@@ -396,6 +397,9 @@ class CalendarFormViewModel(
                     _defaultAllDayAlarms.value
                 )
                 if (updateCalendarSettingsUseCaseResult !is UseCase.Result.Success<*>) {
+                    // Set the newly created calendar id in case we fail to update calendar settings
+                    _calendarId = this
+
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_create_calendar_settings_error)
                     )
@@ -404,6 +408,12 @@ class CalendarFormViewModel(
                     return
                 }
             }
+
+            // Reset calendar id
+            _calendarId = null
+
+            // Clear loading state
+            calendarFormState.value = CalendarFormState.Idle
 
             if (returnToSettings) {
                 // Use settings snack state here to display snack in calendar settings view
@@ -416,9 +426,6 @@ class CalendarFormViewModel(
                     resourceProvider.provideString(R.string.snack_create_calendar_success)
                 )
             }
-
-            // Clear loading state
-            calendarFormState.value = CalendarFormState.Idle
         }
     }
 
