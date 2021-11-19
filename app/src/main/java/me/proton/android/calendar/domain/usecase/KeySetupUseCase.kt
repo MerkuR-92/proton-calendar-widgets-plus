@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.encryptText
+import me.proton.core.key.domain.entity.keyholder.KeyHolderPrivateKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
@@ -22,10 +23,7 @@ class KeySetupUseCase(
     private val userManager: UserManager
 ): UseCase {
 
-    suspend fun execute(userId: UserId, addressId: String, calendarId: String, memberId: String) : UseCase.Result {
-
-        val memberAddressKey = userManager.getAddresses(userId, refresh = true).find { it.addressId.id == addressId }?.keys?.primary() ?: return UseCase.Result.Error("KeySetupUseCase: No valid Primary Address Key found for Member")
-
+    suspend fun execute(userId: UserId, addressId: String, memberAddressKey: KeyHolderPrivateKey, calendarId: String, memberId: String) : UseCase.Result {
         // Generate a random 32 bytes passphrase
         val calendarPassphrase = Base64.encode(Random.randBytes(32))
 
@@ -69,7 +67,6 @@ class KeySetupUseCase(
     }
 
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
-
         val address = userManager.getAddresses(userId, refresh = true).firstOrNull {
             it.canSend && it.canReceive
         } ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
@@ -84,6 +81,7 @@ class KeySetupUseCase(
                 val keySetupResult = execute(
                     userId,
                     address.addressId.id,
+                    address.keys.primary() ?: return UseCase.Result.Error("KeySetupUseCase: No valid Primary Address Key found for Address"),
                     calendarId,
                     memberId)
 

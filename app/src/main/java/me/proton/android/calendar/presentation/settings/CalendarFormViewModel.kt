@@ -367,6 +367,13 @@ class CalendarFormViewModel(
         } ?: run {
             // Create new calendar
 
+            if (_calendarEmail.value.isNullOrEmpty()) {
+                calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
+                    resourceProvider.provideString(R.string.snack_create_calendar_error)
+                )
+                return
+            }
+
             // Set loading state
             calendarFormState.value = CalendarFormState.Processing.Saving
 

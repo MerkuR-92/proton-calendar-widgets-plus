@@ -120,6 +120,8 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
+    suspend fun refreshCalendarsFlags(userId: UserId)
+
     suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String)
 
     /**
