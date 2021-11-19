@@ -96,7 +96,7 @@ class SettingsCalendarListAdapter(
             calendarEntityItemBadgeLayout.removeAllViews()
 
             // Display default badge
-            if (calendarEntity.id == defaultCalendarId) addBadge(itemView.context.getString(R.string.settings_calendar_default), R.color.brand_norm)
+            if (calendarEntity.id == defaultCalendarId && calendarEntity.isDisabled.not()) addBadge(itemView.context.getString(R.string.settings_calendar_default), R.color.brand_norm)
 
             // Display disabled badge
             if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.notification_warning)
