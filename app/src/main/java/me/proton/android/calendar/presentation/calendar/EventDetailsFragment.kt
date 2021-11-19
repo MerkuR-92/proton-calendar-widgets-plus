@@ -436,7 +436,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 if (event.status != null) {
                     if ((event.status as Status).isCancelled) {
                         this.text_status.visibleOrGone(true)
-                        this.text_status.text = getString(R.string.event_status_cancelled)
+                        this.text_status.text = getString(R.string.event_status_canceled)
                     }
                 }
 
