@@ -940,7 +940,7 @@ class CalendarsRepositoryImpl(
                     json.decodeFromJsonElement<Event.EventPart.Shared>(it)
                 }
                 val iCal = ICalUtilsImpl.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
-                iCal?.events?.first()?.recurrenceId == null
+                iCal?.events?.firstOrNull()?.recurrenceId == null
             }
         } else null
     }

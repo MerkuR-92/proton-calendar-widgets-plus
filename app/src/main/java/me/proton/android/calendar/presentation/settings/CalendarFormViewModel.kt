@@ -214,7 +214,7 @@ class CalendarFormViewModel(
         if (defaultUserEmail != null && userAddresses.find { it.email == defaultUserEmail }?.enabled == true) {
             _calendarEmail.value = defaultUserEmail
         } else {
-            _calendarEmail.value = userEmails?.first() ?: run {
+            _calendarEmail.value = userEmails?.firstOrNull() ?: run {
                 logger.e("userEmails was null in CalendarFormViewModel initCreateCalendarForm")
                 calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
                     resourceProvider.provideString(R.string.snack_calendar_init_error)

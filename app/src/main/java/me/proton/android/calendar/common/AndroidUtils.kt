@@ -247,7 +247,7 @@ object AndroidUtils {
                     text = items[position].name
                     tag = position
                     isChecked = position == selectedIndex
-//                        compoundDrawablesRelative?.first().setTint(Color.parseColor(items[position].color))
+//                        compoundDrawablesRelative?.firstOrNull().setTint(Color.parseColor(items[position].color))
                     setOnSingleClickListener() {
                         selectedIndex = it.tag as Int
                         notifyDataSetChanged()
