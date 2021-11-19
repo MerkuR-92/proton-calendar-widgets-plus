@@ -249,8 +249,8 @@ object EventUtilsImpl : EventUtils {
 
         if (toDate == null && occurrenceCount == null && firstOccurrenceFromDateTime == null) return null
 
-        val iteratorZoneId = ZoneId.of(if (isAllDay()) /*TODO fallback to UTC?*/ TimeZone.getDefault().id else this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart)?.timeZone?.id)
-        val iteratorZonedDateTimeStart = this.iCalEvent.dateStart.value.toZonedDateTime(iteratorZoneId.id) // TODO add isAllDay?
+        val iteratorZoneId = ZoneId.of(if (isAllDay()) TimeZone.getDefault().id else this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart)?.timeZone?.id ?: TimeZone.getTimeZone("UTC").id)
+        val iteratorZonedDateTimeStart = this.iCalEvent.dateStart.value.toZonedDateTime(iteratorZoneId.id)
         val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, TimeZone.getTimeZone(iteratorZoneId.id))
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
