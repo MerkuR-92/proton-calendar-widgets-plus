@@ -91,6 +91,7 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } just Runs
         coEvery { fetchPublicKeysUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success<Unit>()
         coEvery { bootstrapCalendarsUseCaseMock.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+        coEvery { calendarsRepositoryMock.refreshCalendarsFlags(userId) } just Runs
 
         every { valueStoreProviderMock.provideValueStore(userId.id) } returns valueStoreMock
         every { valueStoreMock.putString(any(), any()) } just Runs
