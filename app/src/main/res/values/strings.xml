@@ -254,6 +254,7 @@
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
     <string name="nav_view_disabled_calendars">%s (Disabled)</string>
     <string name="nav_view_not_synced_calendars">%s (Not synced)</string>
+    <string name="nav_view_syncing_calendars">%s (Syncing)</string>
     <string name="nav_view_more">More</string>
     <string name="nav_view_switcher">View</string>
     <string name="nav_view_switcher_day">Day</string>
