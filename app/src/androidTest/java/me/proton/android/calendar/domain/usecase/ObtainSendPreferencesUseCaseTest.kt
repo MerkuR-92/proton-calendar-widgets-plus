@@ -13,9 +13,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.MailSettingsApiResponse
 import me.proton.android.calendar.domain.api.MailSettingsApi
 import me.proton.android.calendar.domain.model.PackageType
-import me.proton.core.contact.domain.entity.Contact
 import me.proton.core.contact.domain.entity.ContactCard
-import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.pgp.PGPCrypto
@@ -64,7 +62,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     fun handle_createCustomSendPreferences_for_contact_with_pinned_key() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
-        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptTrue.cards.first {it.type == 2}.data).first()!!
+        val vCard = Ezvcard.parse((externalContactWithPinnedKeyEncryptTrueCards.first { it is ContactCard.Signed } as ContactCard.Signed).data).first()!!
 
         coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
 
@@ -85,7 +83,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_do_not_encrypt() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
-        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+        val vCard = Ezvcard.parse((externalContactWithPinnedKeyEncryptFalseCards.first { it is ContactCard.Signed } as ContactCard.Signed).data).first()!!
 
         coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
 
@@ -102,7 +100,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     fun handle_createCustomSendPreferences_for_contact_with_pinned_key_and_no_key_in_public_repo() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
-        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+        val vCard = Ezvcard.parse((externalContactWithPinnedKeyEncryptFalseCards.first { it is ContactCard.Signed } as ContactCard.Signed).data).first()!!
 
         coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
 
@@ -116,7 +114,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_key_is_obsolete() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
-        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+        val vCard = Ezvcard.parse((externalContactWithPinnedKeyEncryptFalseCards.first { it is ContactCard.Signed } as ContactCard.Signed).data).first()!!
 
         coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
 
@@ -130,7 +128,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
     fun handle_createCustomSendPreferences_for_contact_with_pinned_key_but_key_is_compromised() {
 
         val vCardEmail = "contact_external_pinned_key+alias@email.com"
-        val vCard = Ezvcard.parse(externalContactWithPinnedKeyEncryptFalse.cards.first {it.type == 2}.data).first()!!
+        val vCard = Ezvcard.parse((externalContactWithPinnedKeyEncryptFalseCards.first { it is ContactCard.Signed } as ContactCard.Signed).data).first()!!
 
         coEvery { pgpCryptoMock.getFingerprint(any()) } returns "key fingerprint"
 
@@ -162,7 +160,8 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         "contact_external_pinned_key@pm.me",
         recipientType = Recipient.External.value,
         "text/html",
-        emptyList()
+        emptyList(),
+        null
     )
 
     private val contactExternalPinnedKeyPublicAddress = PublicAddress(
@@ -170,8 +169,19 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         recipientType = Recipient.External.value,
         "text/html",
         listOf(
-            PublicAddressKey("contact_external_pinned_key@pm.me", 3, PublicKey("armored key from public repository", isPrimary = true, true, true, true)),
-        )
+            PublicAddressKey(
+                "contact_external_pinned_key@pm.me",
+                3,
+                PublicKey(
+                    "armored key from public repository",
+                    isPrimary = true,
+                    true,
+                    true,
+                    true
+                )
+            ),
+        ),
+        null // TODO
     )
 
     private val contactExternalPinnedKeyPublicAddressCompromised = PublicAddress(
@@ -179,8 +189,18 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         recipientType = Recipient.External.value,
         "text/html",
         listOf(
-            PublicAddressKey("contact_external_pinned_key@pm.me", 0, PublicKey("armored key from public repository", isPrimary = true, true, true, true)),
-        )
+            PublicAddressKey(
+                "contact_external_pinned_key@pm.me",
+                0,
+                PublicKey("armored key from public repository",
+                    isPrimary = true,
+                    true,
+                    true,
+                    true
+                )
+            ),
+        ),
+        null // TODO
     )
 
     private val contactExternalPinnedKeyPublicAddressObsolete = PublicAddress(
@@ -188,26 +208,42 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         recipientType = Recipient.External.value,
         "text/html",
         listOf(
-            PublicAddressKey("contact_external_pinned_key@pm.me", 1, PublicKey("armored key from public repository", isPrimary = true, true, true, true)),
-        )
+            PublicAddressKey(
+                "contact_external_pinned_key@pm.me",
+                1,
+                PublicKey(
+                    "armored key from public repository",
+                    isPrimary = true,
+                    true,
+                    true,
+                    true
+                )
+            ),
+        ),
+        null // TODO
     )
 
-    private val externalContactWithPinnedKeyEncryptTrue: Contact =
-        Contact(
-            "1", "External Contact with pinned key",
-            contactEmails = listOf(ContactEmail("1", "External Contact with pinned key", "contact_external_pinned_key+alias@email.com", 0, 1, "contact_1", null) /* this is deliberately null here, API doesn't return it */),
-            cards = listOf(
-                ContactCard(3, "encrypted and signed data", "signature"),
-                ContactCard(2, "BEGIN:VCARD\r\nVERSION:4.0\r\nFN;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.EMAIL;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.KEY;PREF=1:data:application/pgp-keys;base64,xjMEYIE/zBYJKwYBBAHaRw8BA\r\n QdAU0kzBdPct+/iReob+92uE1hEJPzoXnrrTqx5p8EoOa7NLWNhbGVuZGFyQHByb3Rvbi5ibGFj\r\n ayA8Y2FsZW5kYXJAcHJvdG9uLmJsYWNrPsKPBBAWCgAgBQJggT/MBgsJBwgDAgQVCAoCBBYCAQA\r\n CGQECGwMCHgEAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP09xeAQD3ioSt4E6SyV\r\n xOeS8xBQvhuEXkqBKKZCkMO10fd0P2LgD/WvtGpRv8JAll0feMgG2y1lufZtJImTeLr0ciYb7AE\r\n gnOOARggT/MEgorBgEEAZdVAQUBAQdAJYTJ0NuH3zSCNxk+gsFNTVHuPDLQQLRsyNermAbrEXID\r\n AQgHwngEGBYIAAkFAmCBP8wCGwwAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP0/e\r\n ZAQC9vSk4lPi9v1dMHsbKCChrYPR2WCMSUXykpNcDuP2TBgEA0jjgSKW351PQTmHU15UcSFY71O\r\n pD+j04Cs4EcONklw0=\r\nUID:proton-web-4e57f941-d1b4-7909-c879-73a2df5513f1\r\nITEM1.X-PM-ENCRYPT:true\r\nITEM1.X-PM-SIGN:true\r\nEND:VCARD", "correct signature")
-            ))
+    private val externalContactWithPinnedKeyEncryptTrueCards =
+        listOf(
+            ContactCard.Encrypted(
+                "encrypted and signed data",
+                "signature"
+            ),
+            ContactCard.Signed(
+                "BEGIN:VCARD\r\nVERSION:4.0\r\nFN;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.EMAIL;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.KEY;PREF=1:data:application/pgp-keys;base64,xjMEYIE/zBYJKwYBBAHaRw8BA\r\n QdAU0kzBdPct+/iReob+92uE1hEJPzoXnrrTqx5p8EoOa7NLWNhbGVuZGFyQHByb3Rvbi5ibGFj\r\n ayA8Y2FsZW5kYXJAcHJvdG9uLmJsYWNrPsKPBBAWCgAgBQJggT/MBgsJBwgDAgQVCAoCBBYCAQA\r\n CGQECGwMCHgEAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP09xeAQD3ioSt4E6SyV\r\n xOeS8xBQvhuEXkqBKKZCkMO10fd0P2LgD/WvtGpRv8JAll0feMgG2y1lufZtJImTeLr0ciYb7AE\r\n gnOOARggT/MEgorBgEEAZdVAQUBAQdAJYTJ0NuH3zSCNxk+gsFNTVHuPDLQQLRsyNermAbrEXID\r\n AQgHwngEGBYIAAkFAmCBP8wCGwwAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP0/e\r\n ZAQC9vSk4lPi9v1dMHsbKCChrYPR2WCMSUXykpNcDuP2TBgEA0jjgSKW351PQTmHU15UcSFY71O\r\n pD+j04Cs4EcONklw0=\r\nUID:proton-web-4e57f941-d1b4-7909-c879-73a2df5513f1\r\nITEM1.X-PM-ENCRYPT:true\r\nITEM1.X-PM-SIGN:true\r\nEND:VCARD",
+                "correct signature"
+            )
+        )
 
-    private val externalContactWithPinnedKeyEncryptFalse: Contact =
-        Contact(
-            "1", "External Contact with pinned key",
-            contactEmails = listOf(ContactEmail("1", "External Contact with pinned key", "contact_external_pinned_key+alias@email.com", 0, 1, "contact_1", null) /* this is deliberately null here, API doesn't return it */),
-            cards = listOf(
-                ContactCard(3, "encrypted and signed data", "signature"),
-                ContactCard(2, "BEGIN:VCARD\r\nVERSION:4.0\r\nFN;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.EMAIL;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.KEY;PREF=1:data:application/pgp-keys;base64,xjMEYIE/zBYJKwYBBAHaRw8BA\r\n QdAU0kzBdPct+/iReob+92uE1hEJPzoXnrrTqx5p8EoOa7NLWNhbGVuZGFyQHByb3Rvbi5ibGFj\r\n ayA8Y2FsZW5kYXJAcHJvdG9uLmJsYWNrPsKPBBAWCgAgBQJggT/MBgsJBwgDAgQVCAoCBBYCAQA\r\n CGQECGwMCHgEAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP09xeAQD3ioSt4E6SyV\r\n xOeS8xBQvhuEXkqBKKZCkMO10fd0P2LgD/WvtGpRv8JAll0feMgG2y1lufZtJImTeLr0ciYb7AE\r\n gnOOARggT/MEgorBgEEAZdVAQUBAQdAJYTJ0NuH3zSCNxk+gsFNTVHuPDLQQLRsyNermAbrEXID\r\n AQgHwngEGBYIAAkFAmCBP8wCGwwAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP0/e\r\n ZAQC9vSk4lPi9v1dMHsbKCChrYPR2WCMSUXykpNcDuP2TBgEA0jjgSKW351PQTmHU15UcSFY71O\r\n pD+j04Cs4EcONklw0=\r\nUID:proton-web-4e57f941-d1b4-7909-c879-73a2df5513f1\r\nITEM1.X-PM-ENCRYPT:false\r\nITEM1.X-PM-SIGN:true\r\nEND:VCARD", "correct signature")
-            ))
-
+    private val externalContactWithPinnedKeyEncryptFalseCards =
+        listOf(
+            ContactCard.Encrypted(
+                "encrypted and signed data",
+                "signature"
+            ),
+            ContactCard.Signed(
+                "BEGIN:VCARD\r\nVERSION:4.0\r\nFN;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.EMAIL;PREF=1:contact_external_pinned_key+alias@email.com\r\nITEM1.KEY;PREF=1:data:application/pgp-keys;base64,xjMEYIE/zBYJKwYBBAHaRw8BA\r\n QdAU0kzBdPct+/iReob+92uE1hEJPzoXnrrTqx5p8EoOa7NLWNhbGVuZGFyQHByb3Rvbi5ibGFj\r\n ayA8Y2FsZW5kYXJAcHJvdG9uLmJsYWNrPsKPBBAWCgAgBQJggT/MBgsJBwgDAgQVCAoCBBYCAQA\r\n CGQECGwMCHgEAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP09xeAQD3ioSt4E6SyV\r\n xOeS8xBQvhuEXkqBKKZCkMO10fd0P2LgD/WvtGpRv8JAll0feMgG2y1lufZtJImTeLr0ciYb7AE\r\n gnOOARggT/MEgorBgEEAZdVAQUBAQdAJYTJ0NuH3zSCNxk+gsFNTVHuPDLQQLRsyNermAbrEXID\r\n AQgHwngEGBYIAAkFAmCBP8wCGwwAIQkQ9LTBFWUbz9MWIQQL9ztQ8o2jSXASlPX0tMEVZRvP0/e\r\n ZAQC9vSk4lPi9v1dMHsbKCChrYPR2WCMSUXykpNcDuP2TBgEA0jjgSKW351PQTmHU15UcSFY71O\r\n pD+j04Cs4EcONklw0=\r\nUID:proton-web-4e57f941-d1b4-7909-c879-73a2df5513f1\r\nITEM1.X-PM-ENCRYPT:false\r\nITEM1.X-PM-SIGN:true\r\nEND:VCARD",
+                "correct signature"
+            )
+        )
 }
