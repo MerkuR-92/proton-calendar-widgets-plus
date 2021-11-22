@@ -4,7 +4,8 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import me.proton.android.calendar.common.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test

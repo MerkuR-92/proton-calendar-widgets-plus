@@ -2,27 +2,26 @@ package me.proton.android.calendar.domain.model
 
 import biweekly.ICalendar
 import biweekly.component.VEvent
-import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.ICalUtilsImpl.sanitise
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import java.time.*
 import java.time.temporal.ChronoUnit
-import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
-import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
-import me.proton.android.calendar.common.ICalUtilsImpl.clone
-import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
-import me.proton.android.calendar.common.ICalUtilsImpl.getEnd
-import me.proton.android.calendar.common.ICalUtilsImpl.getStart
-import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
-import me.proton.android.calendar.common.ICalUtilsImpl.setEnd
-import me.proton.android.calendar.common.ICalUtilsImpl.setEndTimeZone
-import me.proton.android.calendar.common.ICalUtilsImpl.setStart
-import me.proton.android.calendar.common.ICalUtilsImpl.setStartTimeZone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 
 // TODO remove nullability from signature verification and decryption statuses
 data class Event private constructor(

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_norm"
-    tools:context=".presentation.calendar.MonthFragment">
+    tools:context=".presentation.calendar.fragment.MonthFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_agenda"

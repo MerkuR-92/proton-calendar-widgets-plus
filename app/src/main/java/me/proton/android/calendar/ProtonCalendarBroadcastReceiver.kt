@@ -9,8 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.common.SyncWorker
-import me.proton.android.calendar.common.UseCaseWorker
+import me.proton.android.calendar.common.worker.SyncWorker
+import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId

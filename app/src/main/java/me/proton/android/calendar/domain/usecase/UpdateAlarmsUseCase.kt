@@ -1,8 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.content.Context
-import me.proton.android.calendar.common.ICalUtilsImpl
-import me.proton.android.calendar.common.ICalUtilsImpl.formatUidForICal
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId

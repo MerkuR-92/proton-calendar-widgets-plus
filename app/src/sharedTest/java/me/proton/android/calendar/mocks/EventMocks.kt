@@ -12,8 +12,8 @@ import biweekly.util.ICalDate
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.ICalUtilsImpl
-import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.mocks.CalendarMocks.provideCalendar

@@ -4,7 +4,9 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import me.proton.android.calendar.BaseTest
-import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
 import java.time.*

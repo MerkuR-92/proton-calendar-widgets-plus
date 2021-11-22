@@ -1,8 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.content.Context
 import android.util.Log
-import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import io.mockk.*

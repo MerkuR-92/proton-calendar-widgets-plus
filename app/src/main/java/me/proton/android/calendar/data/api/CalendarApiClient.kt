@@ -3,10 +3,10 @@ package me.proton.android.calendar.data.api
 import android.os.Build
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.API_APPLICATION_NAME
-import me.proton.android.calendar.common.DefaultSharedPreferencesProvider
+import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.USER_AGENT_NAME
-import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
+import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.network.domain.ApiClient
 import javax.inject.Inject
 

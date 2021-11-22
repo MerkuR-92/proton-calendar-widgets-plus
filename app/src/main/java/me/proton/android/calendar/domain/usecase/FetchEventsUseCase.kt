@@ -3,7 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import me.proton.android.calendar.common.isTimeout
+import me.proton.android.calendar.common.utils.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase

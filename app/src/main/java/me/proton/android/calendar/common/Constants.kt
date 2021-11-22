@@ -127,6 +127,12 @@ enum class ViewMode(val value: Int) {
     DAY(1)
 }
 
+enum class EventEditDeleteOption {
+    THIS_EVENT,
+    THIS_EVENT_AND_FUTURE,
+    ALL_EVENTS
+}
+
 object IcsParsingValidation {
     const val UID_MAX_LENGTH = 191
     const val CONTACT_NAME_MAX_LENGTH = 190

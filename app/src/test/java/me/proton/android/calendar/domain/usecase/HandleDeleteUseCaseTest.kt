@@ -4,7 +4,8 @@ import android.util.Log
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.ApiResponseCode
-import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -15,7 +16,6 @@ import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.mocks.CalendarMocks.provideCalendarUserSettingsEntity
 import me.proton.android.calendar.mocks.EventMocks.provideEvent
 import me.proton.android.calendar.mocks.EventMocks.provideEventEntity
-import me.proton.android.calendar.presentation.calendar.EventEditDeleteOption
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

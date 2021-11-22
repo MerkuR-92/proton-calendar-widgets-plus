@@ -4,6 +4,10 @@ import androidx.annotation.VisibleForTesting
 import com.proton.gopenpgp.crypto.Crypto
 import ezvcard.VCard
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.extractSignedVCard
+import me.proton.android.calendar.common.utils.getGroupForEmail
+import me.proton.android.calendar.common.utils.getKeysForGroup
+import me.proton.android.calendar.common.utils.getProperty
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.MailSettingsApi

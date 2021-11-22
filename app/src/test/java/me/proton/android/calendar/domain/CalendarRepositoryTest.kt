@@ -17,8 +17,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.CalendarWidgetRefresher
-import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
-import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse

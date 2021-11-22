@@ -1,6 +1,6 @@
 package me.proton.android.calendar
 
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.domain.model.Event
 
 internal abstract class BaseTest {
