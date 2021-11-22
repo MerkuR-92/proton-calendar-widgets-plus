@@ -105,6 +105,25 @@ data class Event private constructor(
         }
 
         /**
+         * Wraps the [iCalendar] in [Event] using dummy values for everything else.
+         */
+        fun dummyFrom(
+            iCalendar: ICalendar
+        ): Event? {
+
+            val vEvent = iCalendar.events.firstOrNull()
+
+            return if (vEvent?.sanitise() == true) {
+                Event(
+                    "",
+                    Calendar("", "", "", 1, true, 0),
+                    iCalendar
+                )
+            } else null
+
+        }
+
+        /**
          * Returns copy of an [Event] with overwritten start & end datetime with [Occurrence] values in a given [timeZoneId].
          */
         fun withOccurrence(event: Event, occurrenceNumber: Int, timeZoneId: String): Event? {
