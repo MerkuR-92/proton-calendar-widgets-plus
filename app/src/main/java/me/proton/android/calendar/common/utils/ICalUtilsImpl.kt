@@ -522,10 +522,20 @@ object ICalUtilsImpl : ICalUtils {
      */
     override fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event> {
 
-        val occurrences = this.mapNotNull { it.occurrence }
-        val exDatedOccurrences = occurrences.filterOutEventOccurrencesByExdates(originalEvent, timeZoneId)
+        val exZonedDateTimes =
+            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+                exDates.values.map { exDate ->
+                    exDate.toZonedDateTime(timeZoneId)
+                }
+            }
 
-        return this.filter { exDatedOccurrences.contains(it.occurrence) }
+        return if (exZonedDateTimes.isNullOrEmpty()) {
+            this
+        } else {
+            this.filterNot {
+                it.occurrence!!.startDateTime in exZonedDateTimes
+            }
+        }
     }
 
     override fun List<Event.Occurrence>.filterOutEventOccurrencesByExdates(
