@@ -10,6 +10,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CanonicalEmailsApiResponse
 import me.proton.android.calendar.domain.api.AddressesApi
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.Test
 
 internal class GetCanonicalEmailsUseCaseTest {
 
-    private val logger = me.proton.android.calendar.common.TestsLogger
+    private val logger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
     private val userId = UserId("test-user-id")
 

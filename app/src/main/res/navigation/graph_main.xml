@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_calendar"
-        android:name="me.proton.android.calendar.presentation.calendar.MonthFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.MonthFragment"
         android:label=""
         tools:layout="@layout/fragment_month">
         <action
@@ -40,7 +40,7 @@
 
     <dialog
         android:id="@+id/nav_settings"
-        android:name="me.proton.android.calendar.presentation.settings.SettingsFragment"
+        android:name="me.proton.android.calendar.presentation.settings.fragment.SettingsFragment"
         android:label=""
         tools:layout="@layout/fragment_settings">
         <action
@@ -53,7 +53,7 @@
 
     <dialog
         android:id="@+id/nav_general_settings"
-        android:name="me.proton.android.calendar.presentation.settings.GeneralSettingsFragment"
+        android:name="me.proton.android.calendar.presentation.settings.fragment.GeneralSettingsFragment"
         android:label=""
         tools:layout="@layout/fragment_general_settings">
         <action
@@ -63,7 +63,7 @@
 
     <dialog
         android:id="@+id/nav_calendar_form"
-        android:name="me.proton.android.calendar.presentation.settings.CalendarFormFragment"
+        android:name="me.proton.android.calendar.presentation.settings.fragment.CalendarFormFragment"
         android:label=""
         tools:layout="@layout/fragment_calendar_form">
         <argument
@@ -78,7 +78,7 @@
 
     <dialog
         android:id="@+id/nav_bug_report"
-        android:name="me.proton.android.calendar.presentation.bug_report.BugReportFragment"
+        android:name="me.proton.android.calendar.presentation.bugReport.BugReportFragment"
         android:label=""
         tools:layout="@layout/fragment_bug_report">
         <action
@@ -88,7 +88,7 @@
 
     <dialog
         android:id="@+id/nav_event_details"
-        android:name="me.proton.android.calendar.presentation.calendar.EventDetailsFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.EventDetailsFragment"
         android:label=""
         tools:layout="@layout/fragment_event_details">
         <action
@@ -109,7 +109,7 @@
 
     <dialog
         android:id="@+id/nav_event_form"
-        android:name="me.proton.android.calendar.presentation.calendar.EventFormFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormFragment"
         android:label="EventFormFragment">
         <deepLink
             android:id="@+id/deepLink2"
@@ -150,11 +150,11 @@
     </dialog>
     <dialog
         android:id="@+id/nav_event_form_attendees"
-        android:name="me.proton.android.calendar.presentation.calendar.EventFormAttendeesFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormAttendeesFragment"
         android:label="EventFormAttendeesFragment" />
     <dialog
         android:id="@+id/nav_event_form_alarm"
-        android:name="me.proton.android.calendar.presentation.calendar.EventFormAlarmFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment"
         android:label="EventFormAlarmFragment">
         <argument
             android:name="isAllDay"
@@ -167,11 +167,11 @@
     </dialog>
     <dialog
         android:id="@+id/nav_event_form_recurrence"
-        android:name="me.proton.android.calendar.presentation.calendar.EventFormRecurrenceFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormRecurrenceFragment"
         android:label="EventFormEditRecurrenceFragment" />
     <fragment
         android:id="@+id/rootFragment"
-        android:name="me.proton.android.calendar.presentation.calendar.RootFragment"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.RootFragment"
         android:label="RootFragment" >
         <deepLink
             android:id="@+id/deepLink5"

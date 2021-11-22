@@ -1,7 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.*

@@ -9,9 +9,9 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.common.TestsLogger
-import me.proton.android.calendar.common.extractSignedVCard
+import me.proton.android.calendar.common.utils.extractSignedVCard
 import me.proton.android.calendar.common.getUserOrNull
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.MailSettingsApiResponse
 import me.proton.android.calendar.domain.api.MailSettingsApi
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test
 
 internal class ObtainSendPreferencesUseCaseTest {
 
-    private val logger = me.proton.android.calendar.common.TestsLogger
+    private val logger = TestsLogger
     private val contactEmailsRepositoryMock: ContactRepository = mockk()
     private val userManagerMock: UserManager = mockk()
     private val mailSettingsApiMock: MailSettingsApi = mockk()

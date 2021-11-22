@@ -14,7 +14,7 @@ import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.CalendarSplit
+import me.proton.android.calendar.common.utils.CalendarSplit
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import java.time.LocalDate

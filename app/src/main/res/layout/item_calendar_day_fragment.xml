@@ -155,7 +155,7 @@
         android:scrollbars="none"
         android:layout_weight="1">
 
-        <me.proton.android.calendar.common.DayView
+        <me.proton.android.calendar.presentation.calendar.customView.DayView
             android:id="@+id/day_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

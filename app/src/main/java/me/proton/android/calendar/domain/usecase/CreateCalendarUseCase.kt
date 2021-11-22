@@ -1,7 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
-import me.proton.android.calendar.common.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
 import me.proton.android.calendar.domain.CalendarsRepository

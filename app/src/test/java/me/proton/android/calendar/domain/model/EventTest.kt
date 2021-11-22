@@ -8,11 +8,12 @@ import biweekly.component.VEvent
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
-import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
-import me.proton.android.calendar.common.ICalUtilsImpl.setStart
-import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
+import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.sql.Date

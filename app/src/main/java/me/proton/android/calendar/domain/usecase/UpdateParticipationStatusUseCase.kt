@@ -1,9 +1,9 @@
 package me.proton.android.calendar.domain.usecase
 
 import biweekly.parameter.ParticipationStatus
-import me.proton.android.calendar.common.AndroidUtils.toInt
-import me.proton.android.calendar.common.AndroidUtils.toParticipationStatus
-import me.proton.android.calendar.common.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.utils.AndroidUtils.toInt
+import me.proton.android.calendar.common.utils.AndroidUtils.toParticipationStatus
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger

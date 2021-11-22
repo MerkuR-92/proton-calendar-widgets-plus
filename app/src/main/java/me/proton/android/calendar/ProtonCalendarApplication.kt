@@ -6,12 +6,16 @@ import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.logger.LoggerImpl
+import me.proton.android.calendar.common.logger.SentryTree
+import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
+import me.proton.android.calendar.common.worker.SyncWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
-import me.proton.android.calendar.presentation.forceupdate.ForceUpdateViewModel
+import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository

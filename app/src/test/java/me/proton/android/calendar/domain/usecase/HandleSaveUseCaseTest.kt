@@ -3,7 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import android.util.Log
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import me.proton.android.calendar.common.TestsLogger
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.mocks.EventMocks.provideEvent

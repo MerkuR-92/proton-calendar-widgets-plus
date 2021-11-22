@@ -5,7 +5,9 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import org.junit.jupiter.api.Test
 import java.time.*
 

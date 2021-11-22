@@ -5,11 +5,13 @@ import biweekly.parameter.ParticipationStatus
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.AndroidUtils.toInt
+import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
-import me.proton.android.calendar.common.ICalUtilsImpl.printToString
-import me.proton.android.calendar.common.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.isValidForEncryption
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
