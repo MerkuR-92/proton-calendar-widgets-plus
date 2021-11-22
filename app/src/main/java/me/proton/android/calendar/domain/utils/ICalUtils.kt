@@ -130,6 +130,7 @@ interface ICalUtils {
      * Given original Event, filter out all occurrences that are excluded by EXDATE
      */
     fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event>
+    fun List<Event.Occurrence>.filterOutEventOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event.Occurrence>
     fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity>
 
     /**

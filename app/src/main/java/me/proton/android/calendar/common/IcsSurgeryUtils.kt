@@ -16,10 +16,14 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.DateTimeUtilsImpl.allDayICalDateToDateTime
 import me.proton.android.calendar.common.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.DateTimeUtilsImpl.partDayICalDateToDate
-import me.proton.android.calendar.common.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.EventUtilsImpl.generateFirstOccurrenceSince
+import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurrenceSince
+import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutEventOccurrencesByExdates
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.IcsParsingValidation.CONTACT_NAME_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
@@ -38,8 +42,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
-import me.proton.android.calendar.common.IcsSurgeryUtils.applyBiweeklyDstParsingFix
-import me.proton.android.calendar.common.IcsSurgeryUtils.cleanDtEnd
+import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -434,54 +437,15 @@ object IcsSurgeryUtils {
         }
 
         // We reject as invalid RRULEs that:
-        val hasTime = dateStart.value.hasTime() && recurrenceRule.value.bySetPos.isNullOrEmpty() && recurrenceRule.value.byDay.isNullOrEmpty()
-        val iteratorTimezone = if (hasTime) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()
+        val eventTimezone = (if (dateStart.value.hasTime()) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()) ?: return false
+        val dummyEventForOccurrences = Event.dummyFrom(iCalendar) ?: return false
 
-        // Special case is for events that have date iterator skip the first occurrence
-        //  (either by having bysetpos, or by having a display tz that makes it jump to the next / previous day)
-        var specialCase = false
-        val startICalDate = if (dateStart.value.hasTime() && (
-                    !recurrenceRule.value.bySetPos.isNullOrEmpty() ||
-                            (!recurrenceRule.value.byDay.isNullOrEmpty() && recurrenceRule.value.frequency == Frequency.MONTHLY) ||
-                            dateStart.value.toZonedDateTime(TimeZone.getDefault().id).toLocalDate().dayOfYear > dateStart.value.toZonedDateTime(iteratorTimezone.id).toLocalDate().dayOfYear)) {
-            specialCase = true
-            ICalDate(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).withZoneSameLocal(ZoneId.of(TimeZone.getDefault().id)).toLocalDate().toDate(TimeZone.getDefault().id), false)
-        } else dateStart.value
-        val startIterator = recurrenceRule.getDateIterator(startICalDate, iteratorTimezone)
-
-        var checkDtStart = true
-        var generatesOccurrences = false
         // Do not generate any occurrence.
-        if (!startIterator.hasNext()) return false
-        while (startIterator.hasNext()) {
-            if (specialCase) {
-                val nextDate = startIterator.next().toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id, true).withHour(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).hour).withMinute(dateStart.value.toZonedDateTime(iCalendar.iCalTimeZone(dateStart).id).minute)
+        val firstOccurrence = dummyEventForOccurrences.generateOccurrence(1, eventTimezone.id) ?: return false
+        val firstExDatedOccurrence = (listOf(firstOccurrence)).filterOutEventOccurrencesByExdates(dummyEventForOccurrences, eventTimezone.id).firstOrNull() ?: return false
 
-                // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
-                if (checkDtStart && nextDate.toInstant() != dateStart.value.toInstant()) return false
-                checkDtStart = false
-
-                // Do not generate any occurrence.
-                if (exceptionDates.firstOrNull { exDates -> exDates.values.any { exDateValue -> exDateValue == ICalDate.from(nextDate.toInstant()) } } == null) {
-                    generatesOccurrences = true
-                    break
-                }
-            } else {
-                val nextDate = startIterator.next()
-
-                // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
-                if (checkDtStart && nextDate != dateStart.value) return false
-                checkDtStart = false
-
-                // Do not generate any occurrence.
-                if (exceptionDates.firstOrNull { exDates -> exDates.values.any { exDateValue -> exDateValue == nextDate } } == null) {
-                    generatesOccurrences = true
-                    break
-                }
-            }
-        }
-
-        if (!generatesOccurrences) return false
+        // Do not generate DTSTART as occurrence (which is mandatory as per RFC).
+        if (firstExDatedOccurrence.startDateTime != dummyEventForOccurrences.getStart(eventTimezone.id) || firstExDatedOccurrence.endDateTime != dummyEventForOccurrences.getEnd(eventTimezone.id)) return false
 
         // Special case: YEARLY with BYMONTHDAY but no BYMONTH
         if (recurrenceRule.value.frequency == Frequency.YEARLY && !recurrenceRule.value.byMonthDay.isNullOrEmpty() && recurrenceRule.value.byMonth.isNullOrEmpty()) return false

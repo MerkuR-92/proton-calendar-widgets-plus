@@ -204,6 +204,9 @@ class HandleServerEventsUseCase(
                             logger.i("action CREATE/UPDATE for calendarKey in just deleted calendar")
                         } else {
                             calendarsRepository.persistCalendarKey(it.key!!)
+                            // TODO If new key, fetch all calendars to get flags (flags are not yet returned in fetch by id)
+                            //  Replace this with select calendar by id once BE implements updated flags there
+                            calendarsRepository.refreshCalendarsFlags(userId)
                         }
                     }
                 )

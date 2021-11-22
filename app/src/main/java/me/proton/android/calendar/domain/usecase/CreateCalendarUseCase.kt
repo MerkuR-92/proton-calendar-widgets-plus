@@ -8,6 +8,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.extension.primary
 import me.proton.core.user.domain.UserManager
 
 class CreateCalendarUseCase(
@@ -37,21 +38,23 @@ class CreateCalendarUseCase(
         return when (val createCalendarApiResponse = calendarsApi.createCalendar(userId, createCalendarApiRequest)) {
             is ApiResponse.Success -> {
 
-                // Save calendar in DB
-                calendarsRepository.persistCalendar(userId.id, createCalendarApiResponse.data.calendar)
-
                 val calendarId = createCalendarApiResponse.data.calendar.id
 
                 // Get member created for address
                 return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
                     is ApiResponse.Success -> {
 
+                        // Save calendar in DB
+                        calendarsRepository.persistCalendar(userId.id, createCalendarApiResponse.data.calendar)
+
+                        // Save member in DB
                         val memberEntity = memberListApiResponse.data.members.firstOrNull() ?: return UseCase.Result.Error("CreateCalendarUseCase: member was null")
                         calendarsRepository.persistMember(memberEntity)
 
                         val keySetupResult = keySetupUseCase.execute(
                             userId,
                             address.addressId.id,
+                            address.keys.primary() ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Primary Address Key found for Address"),
                             calendarId,
                             memberEntity.id
                         )

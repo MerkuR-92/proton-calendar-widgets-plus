@@ -36,6 +36,7 @@ import me.proton.android.calendar.common.EventUtilsImpl.generateFirstRealOccurre
 import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.MessageDigestHashType.SHA1
@@ -524,6 +525,17 @@ object ICalUtilsImpl : ICalUtils {
      */
     override fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event> {
 
+        val occurrences = this.mapNotNull { it.occurrence }
+        val exDatedOccurrences = occurrences.filterOutEventOccurrencesByExdates(originalEvent, timeZoneId)
+
+        return this.filter { exDatedOccurrences.contains(it.occurrence) }
+    }
+
+    override fun List<Event.Occurrence>.filterOutEventOccurrencesByExdates(
+        originalEvent: Event,
+        timeZoneId: String
+    ): List<Event.Occurrence> {
+
         val exZonedDateTimes =
             originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
                 exDates.values.map { exDate ->
@@ -535,9 +547,10 @@ object ICalUtilsImpl : ICalUtils {
             this
         } else {
             this.filterNot {
-                it.occurrence!!.startDateTime in exZonedDateTimes
+                it.startDateTime in exZonedDateTimes
             }
         }
+
     }
 
     override fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {

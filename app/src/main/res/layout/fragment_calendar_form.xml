@@ -16,6 +16,7 @@
         android:layout_marginEnd="@dimen/spacing_page"
         android:hint="@string/calendar_form_name_hint"
         android:theme="@style/ProtonTheme.Calendar"
+        android:maxLength="100"
         app:actionMode="clear_text"
         app:help="@string/calendar_form_name_character_limit"
         app:label="@string/calendar_form_name"

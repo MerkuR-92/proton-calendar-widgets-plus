@@ -9,7 +9,7 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrenceNew
+import me.proton.android.calendar.common.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.ICalUtilsImpl.wrapInICalendar
@@ -200,7 +200,7 @@ internal class EventTest {
         val displayTimeZone = ZoneId.of("Pacific/Auckland")
 
         // before both DST changes
-        with (event.generateOccurrenceNew(1, displayTimeZone.id)!!) {
+        with (event.generateOccurrence(1, displayTimeZone.id)!!) {
             assertThat(startDateTime).isEqualTo(
                 ZonedDateTime.of(
                     LocalDate.of(2021, 9, 2),
@@ -210,7 +210,7 @@ internal class EventTest {
             )
         }
 
-        with (event.generateOccurrenceNew(2, displayTimeZone.id)!!) {
+        with (event.generateOccurrence(2, displayTimeZone.id)!!) {
             assertThat(startDateTime).isEqualTo(
                 ZonedDateTime.of(
                     LocalDate.of(2021, 9, 16),
@@ -221,7 +221,7 @@ internal class EventTest {
         }
 
         // after Auckland DST change
-        with (event.generateOccurrenceNew(3, displayTimeZone.id)!!) {
+        with (event.generateOccurrence(3, displayTimeZone.id)!!) {
             assertThat(startDateTime).isEqualTo(
                 ZonedDateTime.of(
                     LocalDate.of(2021, 9, 30),
@@ -232,11 +232,44 @@ internal class EventTest {
         }
 
         // after Zurich DST change
-        with (event.generateOccurrenceNew(6, displayTimeZone.id)!!) {
+        with (event.generateOccurrence(6, displayTimeZone.id)!!) {
             assertThat(startDateTime).isEqualTo(
                 ZonedDateTime.of(
                     LocalDate.of(2021, 11, 11),
                     LocalTime.of(6, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
+        // now Zurich and Auckland are in DST
+        with (event.generateOccurrence(15, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2022, 3, 17),
+                    LocalTime.of(6, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
+        // after Zurich goes back to Standard
+        with (event.generateOccurrence(16, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2022, 3, 31),
+                    LocalTime.of(5, 30),
+                    displayTimeZone
+                )
+            )
+        }
+
+        // after Auckland goes back to Standard
+        with (event.generateOccurrence(17, displayTimeZone.id)!!) {
+            assertThat(startDateTime).isEqualTo(
+                ZonedDateTime.of(
+                    LocalDate.of(2022, 4, 14),
+                    LocalTime.of(4, 30),
                     displayTimeZone
                 )
             )

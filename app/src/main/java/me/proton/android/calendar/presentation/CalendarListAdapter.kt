@@ -71,7 +71,8 @@ class CalendarListAdapter(
                     calendarEntityItemTitle.text = calendarEntity.name
                     calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 } else {
-                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
+                    if (calendarSubscription?.isSyncing == true) itemView.context.getString(R.string.nav_view_syncing_calendars, calendarEntity.name)
+                    else calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
                     calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 }
             } else {

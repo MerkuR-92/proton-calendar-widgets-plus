@@ -96,7 +96,7 @@ class SettingsCalendarListAdapter(
             calendarEntityItemBadgeLayout.removeAllViews()
 
             // Display default badge
-            if (calendarEntity.id == defaultCalendarId) addBadge(itemView.context.getString(R.string.settings_calendar_default), R.color.brand_norm)
+            if (calendarEntity.id == defaultCalendarId && calendarEntity.isDisabled.not()) addBadge(itemView.context.getString(R.string.settings_calendar_default), R.color.brand_norm)
 
             // Display disabled badge
             if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.notification_warning)
@@ -107,41 +107,53 @@ class SettingsCalendarListAdapter(
 
                 // Display not synced badge
                 if (calendarSubscription?.isSynced == false) {
+                    /*
+                    Priority as followed:
+                    - LastUpdateTime == 0 -> Syncing
+                    - isLastSyncOld -> Not synced + helper message
+                    - Status == 7 -> Syncing
+                    - Status > 0 -> Not synced + helper message if existing
+                     */
                     addBadge(
                         itemView.context.getString(
-                            if (calendarSubscription.isSyncing) R.string.settings_calendar_syncing
+                            if (calendarSubscription.lastUpdateTime == 0 ||
+                                (calendarSubscription.status == CalendarSubscriptionStatus.SYNCING.value && calendarSubscription.isLastSyncOld.not()))
+                                    R.string.settings_calendar_syncing
                             else R.string.settings_calendar_not_synced
                         ),
                         R.color.notification_warning
                     )
-                    val helperMessage = when (calendarSubscription.status) {
-                        CalendarSubscriptionStatus.INVALID_ICS.value -> {
-                            itemView.context.getString(R.string.settings_calendar_subscribed_wrong_link)
+                    val helperMessage =
+                        if (calendarSubscription.isLastSyncOld)
+                            itemView.context.getString(R.string.settings_calendar_subscribed_last_sync_old)
+                        else {
+                            when (calendarSubscription.status) {
+                                CalendarSubscriptionStatus.INVALID_ICS.value -> {
+                                    itemView.context.getString(R.string.settings_calendar_subscribed_wrong_link)
+                                }
+                                CalendarSubscriptionStatus.SIZE_EXCEED_LIMIT.value -> {
+                                    itemView.context.getString(R.string.settings_calendar_subscribed_too_big)
+                                }
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_BAD_REQUEST.value,
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_UNAUTHORIZED.value,
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_FORBIDDEN.value,
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_NOT_FOUND.value,
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_TEST.value -> {
+                                    itemView.context.getString(R.string.settings_calendar_subscribed_not_accessible)
+                                }
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_GENERIC_ERROR.value,
+                                CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_INTERNAL_SERVER_ERROR.value -> {
+                                    itemView.context.getString(R.string.settings_calendar_subscribed_tmp_not_accessible)
+                                }
+                                CalendarSubscriptionStatus.P2P_LINK_NOT_FOUND.value,
+                                CalendarSubscriptionStatus.UNABLE_TO_DECRYPT.value -> {
+                                    itemView.context.getString(R.string.settings_calendar_subscribed_not_decrypted)
+                                }
+                                else -> {
+                                    null
+                                }
+                            }
                         }
-                        CalendarSubscriptionStatus.SIZE_EXCEED_LIMIT.value -> {
-                            itemView.context.getString(R.string.settings_calendar_subscribed_too_big)
-                        }
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_BAD_REQUEST.value,
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_UNAUTHORIZED.value,
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_FORBIDDEN.value,
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_NOT_FOUND.value,
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_TEST.value -> {
-                            itemView.context.getString(R.string.settings_calendar_subscribed_not_accessible)
-                        }
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_GENERIC_ERROR.value,
-                        CalendarSubscriptionStatus.HTTP_REQUEST_FAILED_INTERNAL_SERVER_ERROR.value -> {
-                            itemView.context.getString(R.string.settings_calendar_subscribed_tmp_not_accessible)
-                        }
-                        CalendarSubscriptionStatus.P2P_LINK_NOT_FOUND.value,
-                        CalendarSubscriptionStatus.UNABLE_TO_DECRYPT.value -> {
-                            itemView.context.getString(R.string.settings_calendar_subscribed_not_decrypted)
-                        }
-                        else -> {
-                            if (calendarSubscription.isLastSyncOld)
-                                itemView.context.getString(R.string.settings_calendar_subscribed_last_sync_old)
-                            else null
-                        }
-                    }
 
                     calendarEntityItemHelper.visibleOrGone(!helperMessage.isNullOrEmpty())
                     calendarEntityItemHelper.text = helperMessage

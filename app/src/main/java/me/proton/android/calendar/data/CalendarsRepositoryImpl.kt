@@ -130,6 +130,18 @@ class CalendarsRepositoryImpl(
         }
     }
 
+    override suspend fun refreshCalendarsFlags(userId: UserId) {
+        val dbCalendars = selectCalendars(userId.id)
+        val remoteCalendars = fetchCalendars(userId)
+        remoteCalendars?.forEach { remoteCalendar ->
+            dbCalendars.find { it.id == remoteCalendar.id }?.let { dbCalendar ->
+                if (dbCalendar.flags != remoteCalendar.flags) {
+                    database.calendarsDao().updateCalendarFlags(dbCalendar.id, remoteCalendar.flags)
+                }
+            }
+        }
+    }
+
     override suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String) {
         // Members objects are used to link an Address and the Calendars that are part of it
         val members = database.membersDao().selectByAddress(address)
@@ -928,7 +940,7 @@ class CalendarsRepositoryImpl(
                     json.decodeFromJsonElement<Event.EventPart.Shared>(it)
                 }
                 val iCal = ICalUtilsImpl.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
-                iCal?.events?.first()?.recurrenceId == null
+                iCal?.events?.firstOrNull()?.recurrenceId == null
             }
         } else null
     }

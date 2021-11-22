@@ -207,11 +207,20 @@ class CalendarFormViewModel(
         _userId.value = userId
 
         // Save user emails for calendar email picker dialog
-        userEmails = userManager.getAddresses(userId).filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
+        val userAddresses = userManager.getAddresses(userId)
+        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
 
-        val defaultUserEmail = userManager.getUser(userId).email // TODO Can be null, what do we take next ?
-        defaultUserEmail?.let {
-            _calendarEmail.value = it
+        val defaultUserEmail = userManager.getUser(userId).email
+        if (defaultUserEmail != null && userAddresses.find { it.email == defaultUserEmail }?.enabled == true) {
+            _calendarEmail.value = defaultUserEmail
+        } else {
+            _calendarEmail.value = userEmails?.firstOrNull() ?: run {
+                logger.e("userEmails was null in CalendarFormViewModel initCreateCalendarForm")
+                calendarFormSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
+                    resourceProvider.provideString(R.string.snack_calendar_init_error)
+                )
+                return
+            }
         }
     }
 
@@ -366,6 +375,13 @@ class CalendarFormViewModel(
             )
         } ?: run {
             // Create new calendar
+
+            if (_calendarEmail.value.isNullOrEmpty()) {
+                calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
+                    resourceProvider.provideString(R.string.snack_create_calendar_error)
+                )
+                return
+            }
 
             // Set loading state
             calendarFormState.value = CalendarFormState.Processing.Saving
