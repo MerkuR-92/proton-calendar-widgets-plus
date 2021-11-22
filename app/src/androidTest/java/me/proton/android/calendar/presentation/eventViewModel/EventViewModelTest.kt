@@ -45,9 +45,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
                 ZoneId.of(defaultTimezone)
             )
 
-            assert(eventViewModel.eventLiveData.value?.getStart(TimeZone.getDefault().id) == startDate)
-            assert(eventViewModel.eventLiveData.value?.getStart(TimeZone.getDefault().id) == startDate)
-            assert(eventViewModel.eventLiveData.value?.getEnd(TimeZone.getDefault().id) == startDate)
+            assert(eventViewModel.eventLiveData.value?.getStart(defaultTimezone) == startDate)
+            assert(eventViewModel.eventLiveData.value?.getStart(defaultTimezone) == startDate)
+            assert(eventViewModel.eventLiveData.value?.getEnd(defaultTimezone) == startDate)
 
             assert(eventViewModel.eventLiveData.value?.isAllDay() == true)
 
