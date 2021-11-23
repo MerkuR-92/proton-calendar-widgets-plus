@@ -212,7 +212,7 @@ class CalendarFormViewModel(
 
         val defaultUserEmail = userManager.getUser(userId).email
         if (defaultUserEmail != null && userAddresses.find { it.email == defaultUserEmail }?.enabled == true) {
-            _calendarEmail.value = defaultUserEmail
+            _calendarEmail.value = defaultUserEmail!!
         } else {
             _calendarEmail.value = userEmails?.firstOrNull() ?: run {
                 logger.e("userEmails was null in CalendarFormViewModel initCreateCalendarForm")
