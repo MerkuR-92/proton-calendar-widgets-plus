@@ -87,6 +87,7 @@ data class Event private constructor(
                         newICalendar.timezoneInfo.setTimezone(newICalendar.events.first().recurrenceId, it)
                     }
 
+                    newICalendar.events.first().exceptionDates?.clear()
                     originalCalendar.events.first().exceptionDates.forEachIndexed { index, exceptionDate ->
                         newICalendar.events.first().addExceptionDates(exceptionDate)
 

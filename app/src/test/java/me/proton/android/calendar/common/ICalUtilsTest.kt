@@ -2923,6 +2923,16 @@ internal class ICalUtilsTest {
 
         assertThat(eventCopy.defaultTimeZone).isNull()
 
+        assertThat(eventCopy.iCalEvent.exceptionDates.size).isEqualTo(2)
+
+        val exceptionICalDates = eventCopy.iCalEvent.exceptionDates.flatMap { it.values }
+        assertThat(exceptionICalDates.find {
+            it.toInstant() == ZonedDateTime.of(LocalDate.of(2020, 8, 7), LocalTime.of(12, 0, 0), ZoneId.of("Europe/Vilnius")).toInstant()
+        }).isNotNull()
+        assertThat(exceptionICalDates.find {
+            it.toInstant() == ZonedDateTime.of(LocalDate.of(2020, 8, 8), LocalTime.of(12, 0, 0), ZoneId.of("Europe/Vilnius")).toInstant()
+        }).isNotNull()
+
         assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.exceptionDates[0])?.timeZone?.id).isEqualTo("Europe/Vilnius")
         assertThat(eventCopy.iCalendar.timezoneInfo.getTimezone(eventCopy.iCalEvent.exceptionDates[1])?.timeZone?.id).isEqualTo("Europe/Vilnius")
 
