@@ -67,7 +67,8 @@ object NetworkModule {
         humanVerificationProvider,
         humanVerificationListener,
         protonCookieStore,
-        CoroutineScope(Job() + Dispatchers.Default)
+        CoroutineScope(Job() + Dispatchers.Default),
+        apiConnectionListener = null
     )
 
     @Provides
