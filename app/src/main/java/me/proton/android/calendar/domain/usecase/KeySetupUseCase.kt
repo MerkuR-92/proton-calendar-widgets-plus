@@ -20,7 +20,7 @@ class KeySetupUseCase(
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,
     private val cryptoContext: CryptoContext,
-    private val userManager: UserManager
+    private val userManager: UserManager,
 ): UseCase {
 
     suspend fun execute(userId: UserId, addressId: String, memberAddressKey: KeyHolderPrivateKey, calendarId: String, memberId: String) : UseCase.Result {
@@ -53,7 +53,7 @@ class KeySetupUseCase(
         )
         return when (val setupKeyApiResponse = calendarsApi.setupKey(userId, calendarId, setupKeyApiRequest)) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success<Unit>()
+                UseCase.Result.Success(setupKeyApiResponse.data.calendarKey)
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("KeySetupUseCase: error in setup key: ${setupKeyApiResponse.error}")
