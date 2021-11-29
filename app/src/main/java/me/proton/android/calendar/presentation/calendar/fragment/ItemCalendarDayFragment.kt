@@ -71,7 +71,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
     private var userAddresses: List<UserAddress>? = null
-    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
+    private val dayMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -426,7 +426,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         all_day_layout.visibleOrGone(true)
         all_day_header_date.visibleOrGone(true)
 
-        agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
+        dayMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
             value?.let {
@@ -447,25 +447,26 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 onEventsChange(timeZoneId!!, userAddresses!!)
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
         }
-        agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
+        dayMediator.addSource(calendarViewModel.timeFormat) { value ->
             timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
         }
-        agendaMediator.addSource(calendarViewModel.userAddresses) { value ->
+        dayMediator.addSource(calendarViewModel.userAddresses) { value ->
             userAddresses = value
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
         }
-        agendaMediator.observe(viewLifecycleOwner) {
+        dayMediator.observe(viewLifecycleOwner) {
             it?.let {
+                logger.e("Test test Day agendaMediator observe update")
                 setupItemMiniCalendarContent(it.first, it.second, it.third)
             }
         }
@@ -592,6 +593,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_no_events.text = resources.getString(R.string.agenda_loading_events)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
+
                         allEvents = it.events
                         onEventsChange(timeZoneId, userAddresses)
 
@@ -726,6 +728,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        logger.e("Test test Day onDestroyView")
         calendarViewModel.setLoading(false, position)
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove observers in on destroy for $date")

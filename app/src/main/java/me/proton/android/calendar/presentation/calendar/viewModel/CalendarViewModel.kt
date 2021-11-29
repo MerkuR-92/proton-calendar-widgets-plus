@@ -37,6 +37,7 @@ import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.DayPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
+import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
@@ -227,12 +228,19 @@ class CalendarViewModel(
 
     private lateinit var miniCalendarPager: ViewPager2
     private lateinit var agendaPager: ViewPager2
+    private lateinit var agendaViewMode: ViewMode
     var pagersInitialised = false
     var updateSelectedLocalDate: LocalDate? = null
 
-    fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2) {
+    fun setAgendaViewMode(agendaViewMode: ViewMode) {
+        this.agendaViewMode = agendaViewMode
+    }
+
+    fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2, agendaViewMode: ViewMode?) {
         this.miniCalendarPager = miniCalendarPager
         this.agendaPager = agendaPager
+        logger.e("Test test setCalendarPagers agendaViewMode $agendaViewMode")
+        agendaViewMode?.let { this.agendaViewMode = agendaViewMode }
         pagersInitialised = true
     }
 
@@ -262,12 +270,16 @@ class CalendarViewModel(
         }
 
         _selectedDate.value = date
+        logger.e("Test test handleSaySelected _selectedDate $date")
 
         // adjust Mini Calendar
         val monthStartingDate = initialToday.withDayOfMonth(1)
         val offset = ChronoUnit.MONTHS.between(monthStartingDate, date.withDayOfMonth(1)).toInt()
-        val monthStartingPosition = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
+        val monthStartingPosition =
+            if (viewMode.value == ViewMode.MONTH) (miniCalendarPager.adapter as MonthPagerAdapter).startingPosition
+            else (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
         val miniCalendarIndex = monthStartingPosition + offset
+        logger.e("Test test handleSaySelected miniCalendarPager.currentItem ${miniCalendarPager.currentItem} miniCalendarIndex $miniCalendarIndex")
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
             miniCalendarPager.post {
@@ -276,23 +288,49 @@ class CalendarViewModel(
         }
 
         // adjust Agenda
-        val agendaAdapter = if (viewMode.value == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter else agendaPager.adapter as? DayPagerAdapter
+        if (this::agendaViewMode.isInitialized) logger.e("Test test handleSaySelected before agendaAdapter agendaViewMode $agendaViewMode agendaPager.adapter ${agendaPager.adapter}")
+        else logger.e("Test test handleSaySelected before agendaAdapter agendaViewMode not initialized agendaPager.adapter ${agendaPager.adapter}")
+        val agendaAdapter =
+            when (val viewMode = viewMode.value) {
+                ViewMode.AGENDA -> {
+                    // Agenda view
+                    if (this::agendaViewMode.isInitialized.not()) agendaViewMode = viewMode
+                    agendaPager.adapter as? AgendaPagerAdapter
+                }
+                ViewMode.DAY -> {
+                    // Day view
+                    if (this::agendaViewMode.isInitialized.not()) agendaViewMode = viewMode
+                    agendaPager.adapter as? DayPagerAdapter
+                }
+                else -> {
+                    logger.e("Test test handleSaySelected when else branch agendaViewMode isInitialized ${this::agendaViewMode.isInitialized}")
+                    if (this::agendaViewMode.isInitialized) {
+                        if (agendaViewMode == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter
+                        else agendaPager.adapter as? DayPagerAdapter
+                    } else null
+                }
+            }
+        if (this::agendaViewMode.isInitialized) logger.e("Test test handleSaySelected after agendaAdapter agendaViewMode $agendaViewMode")
+        else logger.e("Test test handleSaySelected after agendaAdapter agendaViewMode not initialized")
         if (agendaAdapter != null) {
             val startingDate =
-                if (viewMode.value == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
+                if (agendaViewMode == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
                 else (agendaPager.adapter as DayPagerAdapter).startingDate
             val startingPosition =
-                if (viewMode.value == ViewMode.AGENDA) (agendaPager.adapter as AgendaPagerAdapter).startingPosition
+                if (agendaViewMode == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingPosition
                 else (agendaPager.adapter as DayPagerAdapter).startingPosition
 
             val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, date).toInt()
             val agendaIndex = startingPosition + selectedDayOffset
 
+            logger.e("Test test handleSaySelected agendaPager.currentItem ${agendaPager.currentItem} agendaIndex $agendaIndex")
             if (agendaPager.currentItem != agendaIndex) {
                 agendaPager.post {
                     agendaPager.setCurrentItem(agendaIndex, false)
                 }
             }
+        } else {
+            logger.e("Test test handleSaySelected agendaAdapter was null")
         }
 
     }

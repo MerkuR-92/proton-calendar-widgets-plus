@@ -767,6 +767,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_switcher_month_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.MONTH)
+            mainViewModel.setViewMode(ViewMode.MONTH)
+            drawer_layout.close()
+        }
+
         nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
             onClickCreateCalendar()
         }
@@ -776,22 +782,41 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
-            if (viewMode == ViewMode.AGENDA) {
-                // Set selected background
-                nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
-                nav_view_main_content.nav_view_switcher_day_layout.background = null
+            viewMode ?: return@Observer
+            when (viewMode) {
+                ViewMode.AGENDA -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_month_layout.background = null
 
-                // Set icon tint
-                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
-                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-            } else {
-                // Set selected background
-                nav_view_main_content.nav_view_switcher_agenda_layout.background = null
-                nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                }
+                ViewMode.DAY -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                    nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_month_layout.background = null
 
-                // Set icon tint
-                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                }
+                ViewMode.MONTH -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                    nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_month_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                }
             }
         })
     }

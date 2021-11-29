@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import me.proton.android.calendar.common.ViewMode
 
 class InterceptTouchConstraintLayout @JvmOverloads constructor(
     context: Context,
@@ -14,6 +15,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     var allowScrolling: Boolean = false
+    var viewMode: ViewMode = ViewMode.DAY
     var agendaPager: View? = null
     var sliderView: View? = null
 
@@ -26,6 +28,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
         return when (ev.actionMasked) {
             // Always handle the case of the touch gesture being complete.
             MotionEvent.ACTION_DOWN -> {
+                if (viewMode == ViewMode.MONTH) return false
                 val delegateArea = Rect()
                 agendaPager?.getHitRect(delegateArea)
 
@@ -42,6 +45,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
                 false
             }
             MotionEvent.ACTION_MOVE -> {
+                if (viewMode == ViewMode.MONTH) return false
                 val delegateArea = Rect()
                 agendaPager?.getHitRect(delegateArea)
 
