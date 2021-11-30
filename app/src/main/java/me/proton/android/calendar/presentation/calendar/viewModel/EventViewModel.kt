@@ -210,6 +210,8 @@ class EventViewModel(
             eventDetailsSnackState.value = null
         }
 
+        attendeeAnswerState.value = null
+
         // reset backup values
         timeStartBackup = null
         timeEndBackup = null
