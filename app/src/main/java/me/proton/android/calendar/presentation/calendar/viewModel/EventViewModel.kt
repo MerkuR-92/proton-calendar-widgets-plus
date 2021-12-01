@@ -1091,8 +1091,10 @@ class EventViewModel(
     }
 
     private suspend fun isApiEventAnInvitation(): Boolean? {
-        return if (event.isSyncedWithApi()) {
-            val eventEntity = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event ?: return null
+        // take the DB Event CalendarID, in case the calendar has just been edited
+        val dbEventCalendarId = dbEvent?.calendar?.id
+        return if (event.isSyncedWithApi() && dbEventCalendarId != null) {
+            val eventEntity = calendarsRepository.fetchEventById(userId, dbEventCalendarId, event.id).valueOrNullAndLogErrors(logger)?.event ?: return null
             return eventEntity.attendees.isNotEmpty()
         } else {
             null
