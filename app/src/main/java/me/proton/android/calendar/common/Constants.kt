@@ -82,6 +82,7 @@ object FeatureFlag {
     const val APP_LINKS = true
     const val ADD_EMAIL_NOTIFICATIONS = false
     const val DELETE_CALENDAR = false
+    const val CHANGE_CALENDAR_SIMPLE_EVENT = true
 }
 
 object ApiResponseCode {

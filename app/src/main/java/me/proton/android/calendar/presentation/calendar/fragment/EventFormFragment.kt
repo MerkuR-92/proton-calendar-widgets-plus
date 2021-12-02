@@ -615,8 +615,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_form_calendar_press.setOnSingleClickListener {
-            // TODO Remove once change calendar has been implemented
-            if (navigationArguments.eventId != null) {
+            if (!eventViewModel.isCalendarChangeAllowed()) {
                 view?.displaySnackBar(getString(R.string.snack_feature_coming_soon))
                 return@setOnSingleClickListener
             }

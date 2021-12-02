@@ -406,7 +406,7 @@ class HandleIcsUseCase(
     private suspend fun editCreateEventFromIcs(action: IcsSurgeryUtils.HandleIcsAction, userId: UserId, newEvent: Event): IcsSurgeryUtils.HandleIcsResult {
         val createLinkedEventAsAttendee =
             action == IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT && newEvent.hasProtonProtonProperties
-        when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent, createLinkedEventAsAttendee)) {
+        when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent, newEvent.calendar.id, createLinkedEventAsAttendee)) {
             is UseCase.Result.Success<*> -> {
                 var eventId: String? = null
                 editCreateEventResult.returnValue.tryCast<List<String>> {

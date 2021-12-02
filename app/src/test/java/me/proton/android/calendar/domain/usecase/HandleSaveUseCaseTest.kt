@@ -30,7 +30,7 @@ internal class HandleSaveUseCaseTest {
         coEvery { Log.isLoggable(any(), any()) } returns true
 
         coEvery { handleDeleteUseCaseMock.handleDeleteSingleEdits(userId, any(), any()) } returns UseCase.Result.Success<Unit>()
-        coEvery { editCreateEventUseCaseMock.execute(userId, any(), any()) } returns UseCase.Result.Success(listOf(userId.id))
+        coEvery { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) } returns UseCase.Result.Success(listOf(userId.id))
         coEvery { sendEmailUseCaseMock.sendInviteToAttendees(userId, any(), any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
     }
 

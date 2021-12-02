@@ -146,7 +146,7 @@ class HandleSaveUseCase(
                 timeFormatIs24Hours
             )
         } else {
-            editCreateEvent(userId, newEvent)
+            editCreateEvent(userId, newEvent, dbEvent?.calendar?.id)
         }
     }
 
@@ -344,7 +344,7 @@ class HandleSaveUseCase(
         }
 
         val editOriginalEventResult =
-            editCreateEventUseCase.execute(userId, dbEventToUpdate.calendar.id, dbEventToUpdate)
+            editCreateEventUseCase.execute(userId, dbEventToUpdate, dbEventToUpdate.calendar.id)
         if (editOriginalEventResult is UseCase.Result.Error) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}"))
         } else if (editOriginalEventResult is UseCase.Result.InvalidParams) {
@@ -688,8 +688,12 @@ class HandleSaveUseCase(
         }
     }
 
-    private suspend fun editCreateEvent(userId: UserId, newEvent: Event): UseCase.Result {
-        val createEventResult = editCreateEventUseCase.execute(userId, newEvent.calendar.id, newEvent)
+    /**
+     * @param [oldCalendarId] provide if the calendar has just been changed
+     */
+    private suspend fun editCreateEvent(userId: UserId, newEvent: Event, oldCalendarId: String? = null): UseCase.Result {
+
+        val createEventResult = editCreateEventUseCase.execute(userId, newEvent, oldCalendarId)
 
         if (createEventResult is UseCase.Result.Error) {
             return UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}", createEventResult.error)
@@ -730,7 +734,7 @@ class HandleSaveUseCase(
         // Update the sequence of parent if it didn't have a value before
         if (dbEvent.iCalEvent.sequence?.value == null) {
             dbEvent.iCalEvent.setSequence(0)
-            return editCreateEventUseCase.execute(userId, dbEvent.calendar.id, dbEvent)
+            return editCreateEventUseCase.execute(userId, dbEvent, dbEvent.calendar.id)
         }
         return UseCase.Result.Success<Unit>()
     }

@@ -639,6 +639,9 @@ class EventViewModel(
 
     fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
+    fun isCalendarChangeAllowed() = this.event.isSyncedWithApi().not() // is newly created
+            || (!this.event.isPartOfChain() && !this.event.isAnInvitation && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+
     /**
      * Resets temporary values for Alarm.
      */

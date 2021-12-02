@@ -428,7 +428,9 @@ data class SyncEvent(
     @SerialName("SharedEventID")
     val sharedEventId: String? = null,
     @SerialName("UID")
-    val uid: String? = null
+    val uid: String? = null,
+    @SerialName("SourceCalendarID") // original Calendar ID when creating new Event for "change calendar"
+    val sourceCalendarId: String? = null,
 )
 
 @Serializable
