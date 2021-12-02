@@ -695,13 +695,19 @@ class HandleSaveUseCase(
 
         val createEventResult = editCreateEventUseCase.execute(userId, newEvent, oldCalendarId)
 
-        if (createEventResult is UseCase.Result.Error) {
-            return UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}", createEventResult.error)
-        } else if (createEventResult is UseCase.Result.InvalidParams) {
-            return UseCase.Result.InvalidParams("HandleSaveUseCase:invalid params in create event: ${createEventResult.message}")
+        return when (createEventResult) {
+            is UseCase.Result.Error -> UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}", createEventResult.error)
+            is UseCase.Result.InvalidParams -> UseCase.Result.InvalidParams("HandleSaveUseCase:invalid params in create event: ${createEventResult.message}")
+            is UseCase.Result.Success<*> -> {
+                val isCalendarBeingChanged = oldCalendarId != null && oldCalendarId != newEvent.calendar.id
+                if (isCalendarBeingChanged) {
+                    val deleteOldEventResult = handleDeleteUseCase.handleDelete(userId, newEvent.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber = null)
+                    if (deleteOldEventResult is UseCase.Result.Success<*>) createEventResult else deleteOldEventResult
+                } else {
+                    createEventResult
+                }
+            }
         }
-
-        return createEventResult
     }
 
     private fun Event.handleSequence(dbEvent: Event?, dbEventWithOccurrence: Event? = null, eventTimeZoneId: String) {
