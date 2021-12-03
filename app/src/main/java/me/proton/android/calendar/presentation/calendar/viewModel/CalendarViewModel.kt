@@ -365,13 +365,13 @@ class CalendarViewModel(
         }
     }
 
-    private fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+    fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
         return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId).asLiveData()
     }
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
 
-        return skeletonEventsForIndicatorsLiveData(fromDate, toDate, timeZoneId).map { skeletonResult ->
+        return getSkeletonEvents(fromDate, toDate, timeZoneId).map { skeletonResult ->
             when (skeletonResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     emptyMap()

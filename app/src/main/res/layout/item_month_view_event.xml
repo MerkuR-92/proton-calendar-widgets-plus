@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="16dp"
+    android:layout_marginEnd="2dp"
+    android:layout_marginBottom="1dp">
+
+    <View
+        android:id="@+id/view_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_item_month_view_event"/>
+
+    <TextView
+        android:id="@+id/text_title"
+        style="@style/Text.Overline.Strong"
+        android:textColor="@color/text_on_calendar_color"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="2dp"
+        android:maxLines="1"
+        android:gravity="center_vertical"
+        tools:text="Klosterstraße 44, 10179 Berlin, Germany"
+        />
+
+</RelativeLayout>

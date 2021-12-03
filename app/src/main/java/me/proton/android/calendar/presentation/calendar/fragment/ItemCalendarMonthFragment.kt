@@ -1,5 +1,8 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,25 +11,39 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_calendar_month_fragment.*
+import kotlinx.android.synthetic.main.item_month_view_event.view.*
 import kotlinx.android.synthetic.main.item_month_view_grid.view.*
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
+import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
+import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
@@ -36,6 +53,15 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     private var position: Int? = null
     private var startingPosition: Int? = null
     private var date: LocalDate? = null
+
+    private var timeZoneId: String? = null
+    private var weekStart: DayOfWeek? = null
+    private val monthViewMediator = MediatorLiveData<Pair<String, DayOfWeek>>()
+
+    private lateinit var monthView: MonthView
+
+    private lateinit var skeletonEventsLiveData: LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>>
+    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 
     companion object {
         fun newInstance(position: Int, startingPosition: Int, date: LocalDate): ItemCalendarMonthFragment {
@@ -66,6 +92,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     ): View? {
         val rootView = inflater.inflate(R.layout.item_calendar_month_fragment, container, false)
 
+        monthView = rootView.findViewById(R.id.month_fragment_month_view)
 
         return rootView
     }
@@ -77,6 +104,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         val immutablePosition = position ?: return
         val immutableStartingPosition = startingPosition ?: return
         val firstDayMonthView = immutableDate.plusMonths((immutablePosition - immutableStartingPosition).toLong())
+
+        month_fragment_loader.visibleOrGone(true)
 
         view.findViewById<TextView>(R.id.monthFragmentWeekDay1).text = "M"
         view.findViewById<TextView>(R.id.monthFragmentWeekDay2).text = "T"
@@ -91,14 +120,29 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             monthFragmentWeekNumberLayout.visibleOrGone(displayWeekNumber)
         }
 
-        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
-            weekStart ?: return@observe
+        monthViewMediator.addSource(calendarViewModel.timeZoneId) { value ->
+            timeZoneId = value?.id
 
-            setupMonthViewGrid(firstDayMonthView, AndroidUtils.getWeekStartDayOfWeek(weekStart))
+            if (timeZoneId != null && weekStart != null) {
+                monthViewMediator.value = Pair(timeZoneId!!, weekStart!!)
+            }
+        }
+        monthViewMediator.addSource(calendarViewModel.weekStart) { value ->
+            weekStart = value?.let { AndroidUtils.getWeekStartDayOfWeek(it) }
+
+            if (timeZoneId != null && weekStart != null) {
+                monthViewMediator.value = Pair(timeZoneId!!, weekStart!!)
+            }
+        }
+
+        monthViewMediator.observe(viewLifecycleOwner) {
+            it?.let {
+                setupMonthViewGrid(firstDayMonthView, it.first, it.second)
+            }
         }
     }
 
-    private fun setupMonthViewGrid(forDate: LocalDate, startWeekOn: DayOfWeek) {
+    private fun setupMonthViewGrid(forDate: LocalDate, timeZoneId: String, startWeekOn: DayOfWeek) {
         val firstDayOfTheMonth = forDate.withDayOfMonth(1)
         val firstDayOfTheWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
         val firstDayOfTheWeekOffset =
@@ -133,6 +177,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Submit month skeleton with only days and weekday names
         val skeletonList = AndroidUtils.concatenate(previousMonthDayItems, dayItems, upcomingMonthDayItems)
 
+        // Set the grid
         view?.findViewById<GridLayout>(R.id.month_fragment_grid_layout)?.run {
             this.removeAllViews()
             var skeletonListIndex = 0
@@ -173,6 +218,127 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                 }
             }
         }
+
+        calendarViewModel.lifeCycleScope.launch {
+
+            // Get and display skeleton events
+            skeletonEventsLiveData = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
+            skeletonEventsLiveData.observe(viewLifecycleOwner) { skeletonEventsResult ->
+                when (skeletonEventsResult) {
+                    CalendarsRepository.GetEventsResult.InProgress -> {
+                        // TODO Loader for fetch state
+                    }
+                    is CalendarsRepository.GetEventsResult.Success -> {
+
+                        displayMonthViewEvents(skeletonEventsResult.events, fromDate, timeZoneId, true)
+
+                        month_fragment_loader.visibleOrGone(false)
+
+                        getEvents(fromDate, toDate, timeZoneId)
+                    }
+                    is CalendarsRepository.GetEventsResult.Exception -> {
+                        logger.e("ItemCalendarMonthFragment getSkeletonEvents exception getting skeletonEventsLiveData", skeletonEventsResult.throwable)
+                        // TODO Error somewhere
+                        month_fragment_loader.visibleOrGone(false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
+        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+            logger.v("events flow: remove already existing observer for $fromDate to toDate")
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+        eventsLiveData = calendarViewModel.getEvents(fromDate, toDate, timeZoneId, this.lifecycle)
+        eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
+
+            eventsResult?.let {
+                when (it) {
+                    CalendarsRepository.GetEventsResult.InProgress -> {
+                        // TODO
+                    }
+                    is CalendarsRepository.GetEventsResult.Success -> {
+
+                        displayMonthViewEvents(it.events, fromDate, timeZoneId, false)
+                    }
+                    is CalendarsRepository.GetEventsResult.Exception -> {
+                        // TODO
+                    }
+                }
+            }
+        }
+    }
+
+    private fun displayMonthViewEvents(events: List<Event>, fromDate:LocalDate, timeZoneId: String, isSkeletonEvent: Boolean) {
+        val monthGridMap = mutableMapOf<Int, ArrayList<Event>>()
+        events.forEach { skeletonEvent ->
+            val partTimeEndsOnMidnight = (!skeletonEvent.isAllDay() && skeletonEvent.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
+            var start = skeletonEvent.getOccurrenceStart(timeZoneId).toLocalDate()
+            val end = skeletonEvent.getOccurrenceEnd(timeZoneId).toLocalDate()
+
+            // Use !start.isAfter(end) to iterate inclusive
+            while (!start.isAfter(end)) {
+                val dayIndex = ChronoUnit.DAYS.between(fromDate, start).toInt()
+                val current = monthGridMap[dayIndex]
+                current?.add(skeletonEvent)
+                monthGridMap[dayIndex] = current ?: arrayListOf(skeletonEvent)
+                start = start.plusDays(1)
+
+                // All day events end on next day 00:00 so we need to break loop to exclude end day
+                if (start == end && (skeletonEvent.isAllDay() || partTimeEndsOnMidnight)) break
+            }
+        }
+        logger.e("Test test monthGridMap ${monthGridMap.size}")
+
+
+        // Reclaim all of the existing event views so we can reuse them if needed, this process
+        // can be useful if your day view is hosted in a recycler view for example
+        val recycled: List<View> = monthView.removeMonthViewEvents()
+        var remaining = recycled.size
+
+        val monthViewEventsMap = hashMapOf<Int, List<MonthView.MonthViewEvent>>()
+        monthGridMap.forEach {
+            // Sort the list and take first 3 events
+            val sortedList = it.value.sortForAgendaView(timeZoneId).take(3)
+            val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
+            sortedList.forEach { event ->
+                val dayItemView =
+                    if (remaining > 0) recycled[--remaining]
+                    else LayoutInflater.from(requireContext()).inflate(
+                        R.layout.item_month_view_event,
+                        monthView,
+                        false
+                    )
+
+                // TODO Apply style
+                if (!isSkeletonEvent) {
+                    val viewBackground: LayerDrawable = dayItemView.findViewById<View>(R.id.view_background).background as LayerDrawable
+                    val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
+                    val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
+                    viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                    viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
+
+                    dayItemView.text_title.text = event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
+                }
+
+                val daySpanCount = event.calculateFullDayCounter(
+                    event.getOccurrenceStart(timeZoneId).toLocalDate(),
+                    timeZoneId
+                ).second
+
+                monthViewEvents.add(
+                    MonthView.MonthViewEvent(
+                        dayItemView,
+                        daySpanCount
+                    )
+                )
+            }
+            monthViewEventsMap[it.key] = monthViewEvents
+        }
+
+        monthView.setMonthViewEvents(monthViewEventsMap)
     }
 
     private fun setupWeekNumbers(firstDay: LocalDate, startWeekOn: DayOfWeek) {
@@ -184,5 +350,19 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                 weekNumberTextView.text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        logger.e("Test test Month onDestroyView")
+        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
+            logger.e("Test test Month onDestroyView skeletonEventsLiveData removeObservers")
+            skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
+            logger.e("Test test Month onDestroyView eventsLiveData removeObservers")
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+        monthView.removeMonthViewEvents()
     }
 }
