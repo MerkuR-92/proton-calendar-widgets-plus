@@ -511,7 +511,7 @@ class CalendarsRepositoryImpl(
 
     override suspend fun updateCalendarDisplay(calendarId: String, display: Boolean) {
         database.calendarsDao().updateCalendarDisplay(calendarId, display.toInt())
-        widgetRefresher.refresh()
+        widgetRefresher.refreshEventList()
     }
 
     override fun eventsFlow(

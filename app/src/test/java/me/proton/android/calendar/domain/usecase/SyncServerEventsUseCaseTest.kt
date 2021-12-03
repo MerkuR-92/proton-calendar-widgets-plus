@@ -96,7 +96,7 @@ internal class SyncServerEventsUseCaseTest {
         every { valueStoreMock.putString(any(), any()) } just Runs
         every { valueStoreMock.putStringInSet(any(), any(), any()) } just Runs
 
-        every { calendarWidgetRefresherMock.refresh() } just runs
+        every { calendarWidgetRefresherMock.refreshEventList() } just runs
     }
 
     @Test
@@ -306,7 +306,7 @@ internal class SyncServerEventsUseCaseTest {
             }
 
             coVerify(exactly = 1) {
-                calendarWidgetRefresherMock.refresh()
+                calendarWidgetRefresherMock.refreshEventList()
             }
 
             coVerify(exactly = 1) {

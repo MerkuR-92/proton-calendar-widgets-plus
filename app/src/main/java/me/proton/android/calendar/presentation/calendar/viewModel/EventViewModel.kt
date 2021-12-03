@@ -1706,7 +1706,7 @@ class EventViewModel(
                 SaveResult.SUCCESS -> {
 
                     // Refresh the widget on success
-                    widgetRefresher.refresh()
+                    widgetRefresher.refreshEventList()
 
                     // Display the event's calendar if it was hidden
                     if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
@@ -1756,7 +1756,7 @@ class EventViewModel(
             if (saveResult == SaveResult.SUCCESS || saveResult == SaveResult.CREATE_ERROR_SEND_MAIL) {
 
                 // Refresh the widget on success
-                widgetRefresher.refresh()
+                widgetRefresher.refreshEventList()
 
                 // Display the event's calendar if it was hidden
                 if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
@@ -2411,7 +2411,7 @@ class EventViewModel(
         eventDetailsState.value = EventState.Idle
 
         if (deleteResult is UseCase.Result.Success<*>) {
-            widgetRefresher.refresh()
+            widgetRefresher.refreshEventList()
             eventDetailsSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                 if (deleteType == DeleteType.AS_AN_ORGANIZER && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
                 else if (deleteType == DeleteType.AS_AN_ATTENDEE && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
@@ -2901,7 +2901,7 @@ class EventViewModel(
         attendeeAnswerState.value = Pair(participationStatus, false)
 
         // Force the Widget to refresh, because we just changed the Event answer
-        widgetRefresher.refresh()
+        widgetRefresher.refreshEventList()
     }
 
     private fun clearSingleEditsParticipationStatus(

@@ -68,7 +68,7 @@ open class EventViewModelTestCommon: KoinComponent {
 
         coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventEntity()
 
-        coEvery { calendarWidgetRefresherMock.refresh() } just Runs
+        coEvery { calendarWidgetRefresherMock.refreshEventList() } just Runs
     }
 
     /**

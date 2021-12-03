@@ -225,7 +225,7 @@ class BootstrapCalendarsUseCase( // TODO TEST
                                     logger.v("persisting events in bootstrap: ${it.size}")
                                     calendarsRepository.persistEvents(*it.toTypedArray())
                                     updateAlarmsUseCase.execute(userId.id, it.map { it.id })
-                                    widgetRefresher.refresh()
+                                    widgetRefresher.refreshEventList()
                                 }
                             }
                         }

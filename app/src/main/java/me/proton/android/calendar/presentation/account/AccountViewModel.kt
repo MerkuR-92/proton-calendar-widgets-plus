@@ -99,7 +99,7 @@ class AccountViewModel(
     private suspend fun cleanUser(context: Context) {
         WorkManager.getInstance(context).cancelAllWork()
         calendarsRepository.shutdown()
-        widgetRefresher.refresh()
+        widgetRefresher.refreshEventList()
     }
 
     // TODO: Merge State & Error in the same StateFlow.
