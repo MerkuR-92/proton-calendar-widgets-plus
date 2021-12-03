@@ -1,9 +1,11 @@
 package me.proton.android.calendar.common.utils
 
+import biweekly.util.DateTimeComponents
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.aliasesTimezonesMap
 import me.proton.android.calendar.common.allowedTimezoneIds
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
@@ -181,31 +183,64 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return offsetA != offsetB
     }
 
-    override fun allDayICalDateToDateTime(zonedDateTime: ZonedDateTime, timeZoneId: String): ICalDate {
-        return ICalDate(
-            Date.from(
-                ZonedDateTime.of(
-                    zonedDateTime.toLocalDate(),
-                    LocalTime.of(23, 59, 59),
-                    ZoneId.of(timeZoneId)
-                ).withZoneSameInstant(
-                    ZoneId.of(timeZoneId)
-                ).toInstant()
-            ),
-            true
+    override fun dateToDateTime(zonedDateTime: ZonedDateTime, timeZoneId: String, setRawComponents: Boolean): ICalDate {
+        val date = Date.from(
+            ZonedDateTime.of(
+                zonedDateTime.toLocalDate(),
+                LocalTime.of(23, 59, 59),
+                ZoneId.of(timeZoneId)
+            ).withZoneSameInstant(
+                ZoneId.of(timeZoneId)
+            ).toInstant()
         )
+        return if (setRawComponents) {
+            ICalDate(
+                date,
+                DateTimeComponents(date),
+                true
+            )
+        } else {
+            ICalDate(
+                date,
+                true
+            )
+        }
     }
 
-    override fun partDayICalDateToDate(iCalDate: ICalDate, timeZoneId: String): ICalDate {
-        return ICalDate(
-            Date.from(
-                ZonedDateTime.of(
-                    iCalDate.toInstant().atZone(ZoneId.of(timeZoneId)).toLocalDate(),
-                    LocalTime.MIDNIGHT,
-                    ZoneId.systemDefault()
-                ).toInstant()
-            ), false
+    override fun dateTimeToDate(iCalDate: ICalDate, timeZoneId: String, setRawComponents: Boolean): ICalDate {
+        val date = Date.from(
+            ZonedDateTime.of(
+                iCalDate.toInstant().atZone(ZoneId.of(timeZoneId)).toLocalDate(),
+                LocalTime.MIDNIGHT,
+                ZoneId.systemDefault()
+            ).toInstant()
         )
+        val rawComponents =
+            if (setRawComponents) {
+                try {
+                    DateTimeComponents.parse(
+                        // Use parse to remove time from DateTimeComponents
+                        DateTimeComponents(date).toString(false, false)
+                    )
+                } catch (e: IllegalArgumentException) {
+                    TimberLogger.e("dateTimeToDate failed to parse DateTimeComponents")
+                    null
+                }
+            } else {
+                null
+            }
+        return if (setRawComponents && rawComponents != null) {
+            ICalDate(
+                date,
+                rawComponents,
+                false
+            )
+        } else {
+            ICalDate(
+                date,
+                false
+            )
+        }
     }
 
     override fun startEndOverlapsWithFullDayRange(startDateTime: ZonedDateTime, endDateTime: ZonedDateTime, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean {

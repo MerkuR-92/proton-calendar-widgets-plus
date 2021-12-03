@@ -24,7 +24,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.allDayICalDateToDateTime
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.startEndOverlapsWithFullDayRange
@@ -182,7 +182,7 @@ object ICalUtilsImpl : ICalUtils {
             val newUntilDate = if (startDate.isAfter(untilDate)) startDate else untilDate
 
             val until : ICalDate = if (iCalEvent.dateStart.value.hasTime()) {
-                allDayICalDateToDateTime(newUntilDate, startTimeZone.id)
+                dateToDateTime(newUntilDate, startTimeZone.id)
             } else {
                 ICalDate(newUntilDate.toLocalDate().toDate(ZoneId.systemDefault().id), false)
             }

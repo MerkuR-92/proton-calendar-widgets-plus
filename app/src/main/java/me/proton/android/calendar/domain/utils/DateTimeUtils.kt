@@ -40,8 +40,8 @@ interface DateTimeUtils {
 
     fun areTimeZoneOffsetsDifferent(timeZoneIdA: String, timeZoneIdB: String, forInstant: Instant? = null): Boolean?
 
-    fun allDayICalDateToDateTime(zonedDateTime: ZonedDateTime, timeZoneId: String): ICalDate
-    fun partDayICalDateToDate(iCalDate: ICalDate, timeZoneId: String): ICalDate
+    fun dateToDateTime(zonedDateTime: ZonedDateTime, timeZoneId: String, rawComponents: Boolean = false): ICalDate
+    fun dateTimeToDate(iCalDate: ICalDate, timeZoneId: String, rawComponents: Boolean = false): ICalDate
 
     fun startEndOverlapsWithFullDayRange(startDateTime: ZonedDateTime, endDateTime: ZonedDateTime, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean
 
