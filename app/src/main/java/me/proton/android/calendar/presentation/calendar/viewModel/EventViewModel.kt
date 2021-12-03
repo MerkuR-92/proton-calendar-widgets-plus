@@ -651,6 +651,8 @@ class EventViewModel(
     }
 
     suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
+        val isCalendarBeingChanged = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != calendar.id
+
         // If user choice has been saved then we don't set calendar's default alarms
         val alarmsEdited = (event.isAllDay() && eventCustomAllDayAlarmsSave != null) ||
                 (!event.isAllDay() && eventCustomPartialDayAlarmsSave != null)
@@ -671,7 +673,11 @@ class EventViewModel(
                     calendar.type
                 )
             )
-            if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)
+
+            // when changing calendar, don't apply its default alarms
+            if (!alarmsEdited && !isCalendarBeingChanged) {
+                setDefaultAlarms(event, calendarSettings)
+            }
             _event.postValue(event)
             true
         } else {
@@ -765,9 +771,12 @@ class EventViewModel(
             )
         }
 
+        val isCalendarBeingChanged = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
+
         // If user choice has been saved then we don't set calendar's default alarms
-        if ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
-            (!isAllDay && eventCustomPartialDayAlarmsSave == null)
+        // if calendar has been changed during this editing, set its default alarms
+        if (isCalendarBeingChanged && ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
+            (!isAllDay && eventCustomPartialDayAlarmsSave == null))
         ) {
             setDefaultAlarms(event, calendarSettings)
         } else {
