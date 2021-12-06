@@ -10,12 +10,13 @@ import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.ICalProperty
 import biweekly.property.Method
+import biweekly.util.DateTimeComponents
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.allDayICalDateToDateTime
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.partDayICalDateToDate
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateTimeToDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
@@ -248,7 +249,10 @@ object IcsSurgeryUtils {
         // Ex: Device is in UTC-7 (DST), ICalDate is in UTC-8 (No DST): will return ICalDate plus 1 hour
         if (!this.hasTime()) return null
 
-        val raw = this.rawComponents
+        val raw = this.rawComponents ?: run {
+            TimberLogger.e("IcsSurgeryUtils: getBiweeklyDstParsingFix rawComponents was null")
+            return null
+        }
         val parsed = this.toZonedDateTime(
             timezone
         )
@@ -421,13 +425,13 @@ object IcsSurgeryUtils {
             val timeZone = iCalendar.timezoneInfo.timezones.firstOrNull()?.timeZone
             val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: "UTC" else "UTC"
             val untilDate = this.recurrenceRule.value.until
-            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = partDayICalDateToDate(untilDate, supportedTimeZone))
+            this.recurrenceRule.value = this.recurrenceRule.value.clone(until = dateTimeToDate(untilDate, supportedTimeZone, setRawComponents = true))
         }
 
         // UNTIL: we should transform a DATE into the UTC DATETIME that corresponds to the end of the day in the DTSTART timezone
         if (this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == false) {
             iCalendar.timezoneInfo.getTimezone(this.dateStart)?.timeZone?.id?.let { timezone -> // We make sure we have a timezone for part day dateStart earlier in the process
-                val newUntil = allDayICalDateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone)
+                val newUntil = dateToDateTime(this.recurrenceRule.value.until.toZonedDateTime(timezone), timezone, setRawComponents = true)
                 this.recurrenceRule.value = this.recurrenceRule.value.clone(until = newUntil)
             }
         }
@@ -468,7 +472,27 @@ object IcsSurgeryUtils {
 
         // If RECURRENCE-ID is of type DATE-TIME for a parent all-day event, convert to type DATE by keeping just the date part.
         if (event.recurrenceId.value.hasTime() && parentEvent.dateStart?.value?.hasTime() == false) {
-            event.recurrenceId.value = ICalDate(event.recurrenceId.value, false)
+            val rawComponents = try {
+                DateTimeComponents.parse(
+                    event.recurrenceId.value.rawComponents.toString(false, false)
+                )
+            } catch (e: IllegalArgumentException) {
+                TimberLogger.e("cleanRecurrenceId failed to parse DateTimeComponents")
+                null
+            }
+            event.recurrenceId.value =
+                if (rawComponents != null) {
+                    ICalDate(
+                        event.recurrenceId.value,
+                        rawComponents,
+                        false
+                    )
+                } else {
+                    ICalDate(
+                        event.recurrenceId.value,
+                        false
+                    )
+                }
         }
 
         // If RECURRENCE-ID is of type DATE for a parent part-day event then we cannot recover and reject (as invalid).
@@ -510,8 +534,27 @@ object IcsSurgeryUtils {
 
                 // If EXDATE is of type DATE-TIME for an all-day event, convert to type DATE by keeping just the date part.
                 if (exceptionDateValue.hasTime() && !this.dateStart.value.hasTime()) {
+                    val rawComponents = try {
+                        DateTimeComponents.parse(
+                            exceptionDateValue.rawComponents.toString(false, false)
+                        )
+                    } catch (e: IllegalArgumentException) {
+                        TimberLogger.e("cleanExDate failed to parse DateTimeComponents")
+                        null
+                    }
                     exceptionDates.values[exceptionDates.values.indexOf(exceptionDateValue)] =
-                        ICalDate(exceptionDateValue, false)
+                        if (rawComponents != null) {
+                            ICalDate(
+                                exceptionDateValue,
+                                rawComponents,
+                                false
+                            )
+                        } else {
+                            ICalDate(
+                                exceptionDateValue,
+                                false
+                            )
+                        }
                 }
 
                 // Fix Biweekly DST parsing on ExDates values
@@ -698,11 +741,14 @@ object IcsSurgeryUtils {
     }
 
     private fun DateOrDateTimeProperty.localizeDateToTimezone(timezone: String) {
+        val date = Date.from(
+            this.value.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
+                .toInstant()
+        )
         this.value = ICalDate(
-            Date.from(
-                this.value.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
-                    .toInstant()
-            ), true
+            date,
+            DateTimeComponents(date),
+            true
         )
         this.setParameter(TZID, timezone)
     }
