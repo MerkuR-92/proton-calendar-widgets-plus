@@ -98,82 +98,54 @@
             android:weightSum="7"
             android:orientation="horizontal">
 
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay1"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
-                <include
-                    android:id="@+id/monthFragmentWeekDay1"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay2"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
-                <include
-                    android:id="@+id/monthFragmentWeekDay2"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay3"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
-                <include
-                    android:id="@+id/monthFragmentWeekDay3"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay4"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
-                <include
-                    android:id="@+id/monthFragmentWeekDay4"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay5"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
-                <include
-                    android:id="@+id/monthFragmentWeekDay5"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay6"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
-                <include
-                    android:id="@+id/monthFragmentWeekDay6"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <include
+                android:id="@+id/monthFragmentWeekDay7"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <include
-                    android:id="@+id/monthFragmentWeekDay7"
-                    layout="@layout/item_mini_calendar_header" />
-
-            </LinearLayout>
+                android:layout_height="@dimen/calendar_item_header_height"
+                layout="@layout/item_mini_calendar_header" />
 
         </LinearLayout>
 

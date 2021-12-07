@@ -114,6 +114,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
     private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
 
+    private var currentViewMode: ViewMode? = null
+    private var returnToMonthView: Boolean = false
+
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
 
@@ -755,6 +758,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
+            returnToMonthView = currentViewMode == ViewMode.MONTH && viewMode == ViewMode.DAY
+            currentViewMode = viewMode
+        })
+
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setViewMode(ViewMode.DAY)
@@ -1020,6 +1028,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
+        } else if (returnToMonthView) {
+            calendarViewModel.viewMode.postValue(ViewMode.MONTH)
+            mainViewModel.setViewMode(ViewMode.MONTH)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
             moveTaskToBack(true)
         } else {

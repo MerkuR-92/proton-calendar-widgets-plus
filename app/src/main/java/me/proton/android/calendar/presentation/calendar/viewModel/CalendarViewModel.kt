@@ -109,6 +109,9 @@ class CalendarViewModel(
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    // Pair with position of the resumed fragment and loading status
+    val monthViewLoading = MutableLiveData<Pair<Int, Boolean>>()
+
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
 
