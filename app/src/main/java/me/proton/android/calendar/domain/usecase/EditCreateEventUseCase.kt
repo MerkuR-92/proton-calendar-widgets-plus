@@ -44,7 +44,9 @@ class EditCreateEventUseCase(
 
     suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String?, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
 
-        val oldEventId = if (newEvent.isSyncedWithApi()) newEvent.id else null
+        val oldEventEntity = if (newEvent.isSyncedWithApi()) {
+            database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")
+        } else null
 
         // 0. split Event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
@@ -60,8 +62,6 @@ class EditCreateEventUseCase(
                 first ?: return second!!
             }
         }
-
-        val oldEventEntity = if (oldEventId != null) database.eventsDao().selectById(newEvent.id) else null
 
         // 3. get old Session Keys if they were already present in old Event
         val oldSessionKeys = if (oldEventEntity != null && oldCalendarKey != null) {
