@@ -69,18 +69,18 @@ object UserManagerModule {
         db: AddressDatabase,
         provider: ApiProvider,
         userRepository: UserRepository,
-        userAddressKeySecretProvider: UserAddressKeySecretProvider
+        userAddressKeySecretProvider: UserAddressKeySecretProvider,
+        context: CryptoContext
     ): UserAddressRepository =
-        UserAddressRepositoryImpl(db, provider, userRepository, userAddressKeySecretProvider)
+        UserAddressRepositoryImpl(db, provider, userRepository, userAddressKeySecretProvider, context)
 
     @Provides
     @Singleton
     fun provideUserAddressKeyPassphraseProvider(
-        userRepository: UserRepository,
         passphraseRepository: PassphraseRepository,
         cryptoContext: CryptoContext
     ): UserAddressKeySecretProvider =
-        UserAddressKeySecretProvider(userRepository, passphraseRepository, cryptoContext)
+        UserAddressKeySecretProvider(passphraseRepository, cryptoContext)
 
     @Provides
     @Singleton

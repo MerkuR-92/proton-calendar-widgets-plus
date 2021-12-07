@@ -11,6 +11,7 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.data.repository.AuthRepositoryImpl
 import me.proton.core.auth.domain.ClientSecret
 import me.proton.core.auth.domain.repository.AuthRepository
+import me.proton.core.auth.domain.usecase.PostLoginAccountSetup
 import me.proton.core.auth.domain.usecase.SetupAccountCheck
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.DefaultUserCheck
@@ -53,5 +54,5 @@ object AuthModule {
         @ApplicationContext context: Context,
         accountManager: AccountManager,
         userManager: UserManager
-    ): SetupAccountCheck.UserCheck = CalendarUserCheck(context, accountManager, userManager)
+    ): PostLoginAccountSetup.UserCheck = CalendarUserCheck(context, accountManager, userManager)
 }

@@ -5,7 +5,8 @@ import me.proton.android.calendar.R
 import me.proton.core.account.domain.entity.Account
 import me.proton.core.account.domain.entity.AccountState
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.auth.domain.usecase.SetupAccountCheck
+import me.proton.core.auth.domain.usecase.PostLoginAccountSetup
+import me.proton.core.auth.domain.usecase.UserCheckAction
 import me.proton.core.auth.presentation.DefaultUserCheck
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.Delinquent
@@ -24,15 +25,15 @@ class CalendarUserCheck(
     userManager: UserManager
 ) : DefaultUserCheck(context, accountManager, userManager) {
 
-    private fun errorStoreQuota() = SetupAccountCheck.UserCheckResult.Error(
+    private fun errorStoreQuota() = PostLoginAccountSetup.UserCheckResult.Error(
         localizedMessage = context.getString(R.string.bootstrap_error_store_quota_reached_message),
-        action = SetupAccountCheck.Action.OpenUrl(
+        action = UserCheckAction.OpenUrl(
             name = context.getString(R.string.bootstrap_error_store_quota_reached_learn_more),
             url = "https://protonmail.com/support/knowledge-base/increase-my-storage-space"
         )
     )
 
-    override suspend fun invoke(user: User): SetupAccountCheck.UserCheckResult = when {
+    override suspend fun invoke(user: User): PostLoginAccountSetup.UserCheckResult = when {
         user.usedSpace >= user.maxSpace -> errorStoreQuota()
         else -> super.invoke(user)
     }
