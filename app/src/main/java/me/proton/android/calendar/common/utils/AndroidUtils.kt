@@ -1226,6 +1226,10 @@ object AndroidUtils {
         if (this is T) block()
     }
 
+    inline fun <reified T> Any?.tryCastOrNull(): T? {
+        return if (this is T) this else null
+    }
+
     fun Int.toParticipationStatus(): ParticipationStatus {
         return when (this) {
             1 -> ParticipationStatus.TENTATIVE

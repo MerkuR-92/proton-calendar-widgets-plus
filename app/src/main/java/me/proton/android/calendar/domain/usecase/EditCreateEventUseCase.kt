@@ -8,6 +8,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.SESSION_KEY_ALGO
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
@@ -52,27 +53,35 @@ class EditCreateEventUseCase(
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
 
         // 1. get Member's AddressKey for signing
-        val newMemberKey = getMemberKey(userId.id, newEvent.calendar.id).run {
-            first ?: return second!!
+        val newMemberKey = when (val result = getMemberKey(userId.id, newEvent.calendar.id)) {
+            is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<MemberKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newMemberKey")
+            else -> return result
         }
 
         // 2. get old CalendarKey for decrypting
         val oldCalendarKey = oldCalendarId?.let {
-            getCalendarKey(userId.id, oldCalendarId).run {
-                first ?: return second!!
+            when (val result = getCalendarKey(userId.id, oldCalendarId)) {
+                is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<CalendarKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting oldCalendarKey")
+                else -> return result
             }
         }
 
         // 3. get old Session Keys if they were already present in old Event
         val oldSessionKeys = if (oldEventEntity != null && oldCalendarKey != null) {
-             extractSessionKeys(oldEventEntity, oldCalendarKey).run {
-                 first ?: return second!!
+             when (val result = extractSessionKeys(oldEventEntity, oldCalendarKey)) {
+                 is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<SessionKeys>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting oldSessionKeys")
+                 else -> return result
              }
         } else SessionKeys(null, null)
 
         // 4. get new CalendarKey for encrypting
-        val newCalendarKey = getCalendarKey(userId.id, newEvent.calendar.id).run {
-            first ?: return second!!
+        val newCalendarKey = if (oldCalendarKey != null && oldCalendarId == newEvent.calendar.id) {
+            oldCalendarKey
+        } else {
+            when (val result = getCalendarKey(userId.id, newEvent.calendar.id)) {
+                is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<CalendarKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newCalendarKey")
+                else -> return result
+            }
         }
 
         val isCalendarBeingChanged = oldCalendarId != null && oldCalendarId != newEvent.calendar.id
@@ -403,7 +412,7 @@ class EditCreateEventUseCase(
         val key: PrivateKey
     )
 
-    private fun extractSessionKeys(eventEntity: EventEntity, calendarKey: CalendarKey): Pair<SessionKeys?, UseCase.Result?> {
+    private fun extractSessionKeys(eventEntity: EventEntity, calendarKey: CalendarKey): UseCase.Result {
 
         val sharedSessionKey = crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarKey.privateKeys, calendarKey.passphrase)
 
@@ -412,45 +421,45 @@ class EditCreateEventUseCase(
         } else null
 
         if (sharedSessionKey == null && eventEntity.sharedKeyPacket.isNotBlank()) {
-            return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt shared session key"))
+            return UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt shared session key")
         }
 
         if (calendarSessionKey == null && !eventEntity.calendarKeyPacket.isNullOrBlank()) {
-            return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt old calendar session key"))
+            return UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt old calendar session key")
         }
 
-        return Pair(SessionKeys(sharedSessionKey, calendarSessionKey), null)
+        return UseCase.Result.Success(SessionKeys(sharedSessionKey, calendarSessionKey))
     }
 
-    private suspend fun getCalendarKey(userId: String, calendarId: String): Pair<CalendarKey?, UseCase.Result?> {
+    private suspend fun getCalendarKey(userId: String, calendarId: String): UseCase.Result {
 
-        val calendarPrimaryPrivateKey = database.calendarKeysDao().select(calendarId).firstOrNull { it.isActiveAndPrimary }?.privateKey ?: return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no active primary key for calendar"))
-        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no active keys for calendar"))
+        val calendarPrimaryPrivateKey = database.calendarKeysDao().select(calendarId).firstOrNull { it.isActiveAndPrimary }?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no active primary key for calendar")
+        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no active keys for calendar")
         val calendarPassphraseList = database.passphrasesDao().select(calendarId)
 
-        if (calendarPassphraseList.isNullOrEmpty()) return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar"))
+        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar")
 
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid cached Calendar Passphrase"))
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid cached Calendar Passphrase")
 
-        return Pair(CalendarKey(calendarPrimaryPrivateKey, calendarPrivateKeys, keyPassphrase.toByteArray()), null)
+        return UseCase.Result.Success(CalendarKey(calendarPrimaryPrivateKey, calendarPrivateKeys, keyPassphrase.toByteArray()))
     }
 
-    private suspend fun getMemberKey(userId: String, calendarId: String): Pair<MemberKey?, UseCase.Result?> {
+    private suspend fun getMemberKey(userId: String, calendarId: String): UseCase.Result {
 
-        val member = database.membersDao().select(calendarId).firstOrNull() ?: return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member"))
+        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member")
         val userAddresses = userManager.getAddresses(UserId(userId), refresh = false).filter { it.email.equalsNoCase(member.email) }
         val memberAddress = userAddresses.find {
             it.email.equalsNoCase(member.email)
-        } ?: return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address"))
+        } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
 
         if (!memberAddress.isValidForEncryption(cryptoContext, logger)) {
-            return Pair(null, UseCase.Result.Error("couldn't get MemberAddress valid for encryption in EditCreateEventUseCase", UseCase.Error.Crypto.UserAddressInvalidForEncryption))
+            return UseCase.Result.Error("couldn't get MemberAddress valid for encryption in EditCreateEventUseCase", UseCase.Error.Crypto.UserAddressInvalidForEncryption)
         }
 
-        val memberAddressKey = memberAddress.keys.primary()?.privateKey ?: return Pair(null, UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Primary Address Key for Member"))
+        val memberAddressKey = memberAddress.keys.primary()?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Primary Address Key for Member")
 
-        return Pair(MemberKey(member.id, memberAddressKey), null)
+        return UseCase.Result.Success(MemberKey(member.id, memberAddressKey))
     }
 
 }
