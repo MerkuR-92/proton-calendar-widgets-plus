@@ -26,6 +26,7 @@ import me.proton.core.key.domain.entity.key.PrivateKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
@@ -49,11 +50,13 @@ class EditCreateEventUseCase(
             database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")
         } else null
 
+        val userAddresses = userManager.getAddresses(userId, refresh = false).ifEmpty { return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty") }
+
         // 0. split Event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
 
         // 1. get Member's AddressKey for signing
-        val newMemberKey = when (val result = getMemberKey(userId.id, newEvent.calendar.id)) {
+        val newMemberKey = when (val result = getMemberKey(userAddresses, newEvent.calendar.id)) {
             is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<MemberKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newMemberKey")
             else -> return result
         }
@@ -232,13 +235,11 @@ class EditCreateEventUseCase(
                 if (createLinkedEventAsAttendee) {
                     // The array must only contain one Attendee (the user itself) with his own token and answered participation status
                     val member = database.membersDao().select(newEvent.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member in createLinkedEventAsAttendee")
-                    val memberUserAddresses = userManager.getAddresses(userId, refresh = false).filter { it.email.equalsNoCase(member.email) }
-                    // TODO remove duplication in processing the addresses twice here
-                    val userEmails = memberUserAddresses.map { address ->
+                    val canonicalMemberEmails = userAddresses.filter { it.email.equalsNoCase(member.email) }.map { address ->
                         canonicalizeProtonEmail(address.email, forceCanonicalization = true)
                     }
                     val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
-                        userEmails.firstOrNull { userEmail ->
+                        canonicalMemberEmails.firstOrNull { userEmail ->
                             val attendeeEmail = attendee.extractEmail()
                             attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(userEmail, ignoreCase = true)
                         } != null
@@ -261,7 +262,7 @@ class EditCreateEventUseCase(
         val organizerEmail = newEvent.iCalEvent.organizer?.extractEmail()
         val isOrganizer =
             if (organizerEmail != null) {
-                val canonicalUserEmails = userManager.getAddresses(userId).map { canonicalizeProtonEmail(it.email) }
+                val canonicalUserEmails = userAddresses.map { canonicalizeProtonEmail(it.email) }
                 val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
                 canonicalUserEmails.any { canonicalOrganizerEmail == it }.toInt()
             } else if (newEvent.iCalEvent.attendees.isNullOrEmpty()) 1
@@ -445,11 +446,10 @@ class EditCreateEventUseCase(
         return UseCase.Result.Success(CalendarKey(calendarPrimaryPrivateKey, calendarPrivateKeys, keyPassphrase.toByteArray()))
     }
 
-    private suspend fun getMemberKey(userId: String, calendarId: String): UseCase.Result {
+    private suspend fun getMemberKey(userAddresses: List<UserAddress>, calendarId: String): UseCase.Result {
 
         val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member")
-        val userAddresses = userManager.getAddresses(UserId(userId), refresh = false).filter { it.email.equalsNoCase(member.email) }
-        val memberAddress = userAddresses.find {
+        val memberAddress = userAddresses.filter { it.email.equalsNoCase(member.email) }.find {
             it.email.equalsNoCase(member.email)
         } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
 
