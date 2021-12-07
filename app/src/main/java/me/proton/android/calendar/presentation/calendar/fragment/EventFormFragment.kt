@@ -475,8 +475,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event_form_participant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
             event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 
-            // TODO Replace this with !event.isAnInvitation once we check if event is an invite by checking organizer field
-            event_form_calendar_press.visibleOrGone(event.iCalEvent.organizer == null || navigationArguments.eventId.isNullOrEmpty())
+            event_form_calendar_press.visibleOrGone(eventViewModel.isCalendarChangeAllowed())
         })
     }
 
@@ -665,6 +664,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun navigateToAttendees() {
         requireActivity().clearFocusAndHideKeyboard(view)
+
+        if (!eventViewModel.isChangingAttendeesAllowed()) {
+            view?.displaySnackBar(getString(R.string.snack_event_edit_calendar_with_attendees_error))
+            return
+        }
 
         when {
             ContextCompat.checkSelfPermission(

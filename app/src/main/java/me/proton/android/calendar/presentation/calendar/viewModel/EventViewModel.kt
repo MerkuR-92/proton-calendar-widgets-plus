@@ -640,7 +640,11 @@ class EventViewModel(
     fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
     fun isCalendarChangeAllowed() = this.event.isSyncedWithApi().not() // is newly created
-            || (!this.event.isPartOfChain() && !this.event.isAnInvitation && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+            || (!this.event.isPartOfChain() && !this.event.isAnInvitation && this.event.iCalEvent.organizer == null && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+
+    fun hasCalendarBeenChanged() = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
+
+    fun isChangingAttendeesAllowed() = !hasCalendarBeenChanged()
 
     /**
      * Resets temporary values for Alarm.
@@ -771,11 +775,9 @@ class EventViewModel(
             )
         }
 
-        val isCalendarBeingChanged = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
-
         // If user choice has been saved then we don't set calendar's default alarms
         // if calendar has been changed during this editing, set its default alarms
-        if (isCalendarBeingChanged && ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
+        if (hasCalendarBeenChanged() && ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
             (!isAllDay && eventCustomPartialDayAlarmsSave == null))
         ) {
             setDefaultAlarms(event, calendarSettings)
