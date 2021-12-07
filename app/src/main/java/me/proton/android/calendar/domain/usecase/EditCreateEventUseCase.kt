@@ -44,7 +44,7 @@ class EditCreateEventUseCase(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String?, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
+    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String? = null, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
 
         val oldEventEntity = if (newEvent.isSyncedWithApi()) {
             database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")

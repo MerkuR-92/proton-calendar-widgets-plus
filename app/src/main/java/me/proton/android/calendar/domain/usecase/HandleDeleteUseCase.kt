@@ -66,7 +66,7 @@ class HandleDeleteUseCase( // TODO TESTS
                 if (event.isRecurring()) {
                     // add EXDATE to it
                     event.addExceptionDate(occurrenceNumber!!, timezone) // TODO
-                    editCreateEventUseCase.execute(userId, event, event.calendar.id)
+                    editCreateEventUseCase.execute(userId, event)
                 } else if (event.isSingleEdit()) {
 
                     if (!isOrphanSingleEdit) {
@@ -89,7 +89,7 @@ class HandleDeleteUseCase( // TODO TESTS
                             // delete single edit and root event
                             deleteEvents(userId, listOf(event.id, rootEvent.id), rootEvent.calendar.id, member.id)
                         } else {
-                            val editResult = editCreateEventUseCase.execute(userId, rootEvent, rootEvent.calendar.id)
+                            val editResult = editCreateEventUseCase.execute(userId, rootEvent)
                             editResult.ifSuccessAndLogErrors(logger) {}
 
                             // delete the single edit
@@ -118,7 +118,7 @@ class HandleDeleteUseCase( // TODO TESTS
                     ?: return UseCase.Result.Error("HandleDeleteUseCase: could not generate occurrence in >delete this and following< events")
 
                 rootEvent.handleDeleteThisAndFuture(occurrenceNumber)
-                val editResult = editCreateEventUseCase.execute(userId, rootEvent, rootEvent.calendar.id)
+                val editResult = editCreateEventUseCase.execute(userId, rootEvent)
                 editResult.ifSuccessAndLogErrors(logger) {}
 
                 // delete single edits happening after this occurrence

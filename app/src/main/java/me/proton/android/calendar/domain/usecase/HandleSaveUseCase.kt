@@ -344,7 +344,7 @@ class HandleSaveUseCase(
         }
 
         val editOriginalEventResult =
-            editCreateEventUseCase.execute(userId, dbEventToUpdate, dbEventToUpdate.calendar.id)
+            editCreateEventUseCase.execute(userId, dbEventToUpdate)
         if (editOriginalEventResult is UseCase.Result.Error) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}"))
         } else if (editOriginalEventResult is UseCase.Result.InvalidParams) {
@@ -740,7 +740,7 @@ class HandleSaveUseCase(
         // Update the sequence of parent if it didn't have a value before
         if (dbEvent.iCalEvent.sequence?.value == null) {
             dbEvent.iCalEvent.setSequence(0)
-            return editCreateEventUseCase.execute(userId, dbEvent, dbEvent.calendar.id)
+            return editCreateEventUseCase.execute(userId, dbEvent)
         }
         return UseCase.Result.Success<Unit>()
     }
