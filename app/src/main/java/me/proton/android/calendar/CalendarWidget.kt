@@ -10,6 +10,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
+import android.os.Binder
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
@@ -20,8 +21,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import me.proton.android.calendar.CalendarWidget.Companion.EXTRA_APP_WIDGET_ID
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
@@ -30,7 +33,6 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCo
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
-import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -52,12 +54,26 @@ interface WidgetRefresher {
     /**
      * Sends a broadcast to force-refresh all the app-widgets.
      */
-    fun refresh()
+    fun broadcastRefresh()
+
+    /**
+     * Refreshes all Event lists in all Widgets using AppWidgetManager (without broadcast).
+     */
+    fun refreshEventList()
 }
 
 class CalendarWidgetRefresher(private val context: Context) : WidgetRefresher {
-    override fun refresh() {
+
+    override fun broadcastRefresh() {
         CalendarWidget.sendRefreshBroadcast(context)
+    }
+
+    override fun refreshEventList() {
+        val widgetManager = AppWidgetManager.getInstance(context)
+        val widgetComponent = ComponentName(context, CalendarWidget::class.java)
+        val widgetIds = widgetManager.getAppWidgetIds(widgetComponent)
+
+        widgetManager.notifyAppWidgetViewDataChanged(widgetIds, R.id.lv_widget)
     }
 }
 
@@ -69,24 +85,33 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
     private val logger: Logger by inject()
 
     override fun onReceive(context: Context, intent: Intent?) {
-        super.onReceive(context, intent)
 
+        // manually refresh Widget when we get these special broadcasts
         intent?.let {
             if (it.action == Intent.ACTION_TIME_CHANGED || it.action == Intent.ACTION_TIMEZONE_CHANGED || it.action == Intent.ACTION_DATE_CHANGED) {
-                sendRefreshBroadcast(context)
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val appWidgetIds =
+                    appWidgetManager.getAppWidgetIds(ComponentName(context, AppWidgetProvider::class.java))
+                onUpdate(context, appWidgetManager, appWidgetIds)
             }
         }
+
+        // this will handle Intent action AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        super.onReceive(context, intent)
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+
+        // TODO consider goAsync(): https://developer.android.com/guide/topics/appwidgets/advanced#broadcastreceiver-duration
+
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
+
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
     private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-
-        logger.v("updating Calendar Widget id = $appWidgetId")
 
         val remoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.calendar_widget)
 
@@ -126,9 +151,9 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         // intent for RemoteViewService that creates the ListView with Events
         val remoteViewsServiceIntent = Intent(context, CalendarWidgetRemoteViewsService::class.java)
         // we need to pass the AppWidgetID to RemoteViewsService
-        remoteViewsServiceIntent.putExtra(EXTRA_APP_WIDGET_ID, appWidgetId)
+        remoteViewsServiceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         // without "data" property, extras are ignored when comparing intents
-        remoteViewsServiceIntent.data = Uri.parse("dummy://calendar.proton.me/widget/${appWidgetId}")
+        remoteViewsServiceIntent.data = Uri.parse(remoteViewsServiceIntent.toUri(Intent.URI_INTENT_SCHEME))
         remoteViews.setRemoteAdapter(
             R.id.lv_widget,
             remoteViewsServiceIntent
@@ -138,9 +163,6 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         // trigger Remote Views update
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-
-        // trigger Event ListView update
-        appWidgetManager.notifyAppWidgetViewDataChanged(intArrayOf(appWidgetId), R.id.lv_widget)
     }
 
     private fun createOpenAppIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
@@ -172,8 +194,6 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         const val WIDGET_DAYS_AHEAD = 14
 
-        const val EXTRA_APP_WIDGET_ID = "EXTRA_APP_WIDGET_ID"
-
         private fun createWidgetRefreshIntent(context: Context): Intent {
             val widgetManager = AppWidgetManager.getInstance(context)
             val widgetComponent = ComponentName(context, CalendarWidget::class.java)
@@ -189,6 +209,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
          * Widget is refreshed only when this special Intent gets broadcast.
          */
         fun sendRefreshBroadcast(context: Context) {
+            // TODO https://developer.android.com/guide/topics/appwidgets/advanced#broadcastreceiver-priority
             context.sendBroadcast(createWidgetRefreshIntent(context))
         }
 
@@ -203,16 +224,18 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
     private val accountManager: AccountManager by inject()
     private val userManager: UserManager by inject()
     private val userSettingsRepository: UserSettingsRepository by inject()
+    private val logger: Logger by inject()
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         return CalendarWidgetRemoteViewsFactory(
-            intent.getIntExtra(EXTRA_APP_WIDGET_ID, -1),
+            intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID),
             resourceProvider,
             calendarsRepository,
             accountManager,
             userManager,
             userSettingsRepository,
-            applicationContext
+            applicationContext,
+            logger
         )
     }
 }
@@ -241,7 +264,8 @@ internal class CalendarWidgetRemoteViewsFactory(
     private val accountManager: AccountManager,
     private val userManager: UserManager,
     private val userSettingsRepository: UserSettingsRepository,
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val logger: Logger
 ) : RemoteViewsService.RemoteViewsFactory {
 
     private var adapterData = emptyList<WidgetEvent>()
@@ -312,11 +336,16 @@ internal class CalendarWidgetRemoteViewsFactory(
         )
     }
 
-    override fun getViewAt(position: Int): RemoteViews {
+    override fun getViewAt(position: Int): RemoteViews? {
 
         val remoteView = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.item_widget)
 
-        val event = adapterData[position]
+        val event = adapterData.getOrNull(position)
+
+        if (event == null) {
+            logger.e("widget item position out of bounds")
+            return null
+        }
 
         // show or hide date column
         remoteView.setViewVisibility(
@@ -417,6 +446,8 @@ internal class CalendarWidgetRemoteViewsFactory(
 
     override fun onDataSetChanged() {
 
+        // val identityToken = Binder.clearCallingIdentity() // TODO use this as last resort
+
         // this method has to get the data synchronously
         runBlocking {
             withContext(Dispatchers.Default) {
@@ -515,6 +546,9 @@ internal class CalendarWidgetRemoteViewsFactory(
                 adapterData = widgetEvents
             }
         }
+
+        //Binder.restoreCallingIdentity(identityToken) // TODO use this as last resort
+
     }
 
     private fun displayMainInfoText(text: String?) {

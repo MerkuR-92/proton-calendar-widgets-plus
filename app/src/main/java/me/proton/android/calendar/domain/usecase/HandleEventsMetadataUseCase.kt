@@ -63,7 +63,7 @@ class HandleEventsMetadataUseCase(
 
                                 updateAlarmsUseCase.execute(userId.id, entities.map { it.id })
                                 fetchPublicKeysUseCase.execute(userId, entities)
-                                widgetRefresher.refresh()
+                                widgetRefresher.refreshEventList()
                             }
 
                             // EventEntities belonging to Calendars that don't exist locally, inserting
