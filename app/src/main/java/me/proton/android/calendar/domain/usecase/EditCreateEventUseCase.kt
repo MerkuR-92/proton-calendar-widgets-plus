@@ -44,7 +44,7 @@ class EditCreateEventUseCase(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String? = null, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
+    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String = newEvent.calendar.id, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
 
         val oldEventEntity = if (newEvent.isSyncedWithApi()) {
             database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")
@@ -62,32 +62,31 @@ class EditCreateEventUseCase(
         }
 
         // 2. get old CalendarKey for decrypting
-        val oldCalendarKey = oldCalendarId?.let {
+        val oldCalendarKey =
             when (val result = getCalendarKey(userId.id, oldCalendarId)) {
                 is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<CalendarKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting oldCalendarKey")
                 else -> return result
             }
-        }
 
         // 3. get old Session Keys if they were already present in old Event
-        val oldSessionKeys = if (oldEventEntity != null && oldCalendarKey != null) {
+        val oldSessionKeys = if (oldEventEntity != null) {
              when (val result = extractSessionKeys(oldEventEntity, oldCalendarKey)) {
                  is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<SessionKeys>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting oldSessionKeys")
                  else -> return result
              }
-        } else SessionKeys(null, null)
+        } else null
+
+        val isCalendarBeingChanged = oldCalendarId != newEvent.calendar.id
 
         // 4. get new CalendarKey for encrypting
-        val newCalendarKey = if (oldCalendarKey != null && oldCalendarId == newEvent.calendar.id) {
-            oldCalendarKey
-        } else {
+        val newCalendarKey = if (isCalendarBeingChanged) {
             when (val result = getCalendarKey(userId.id, newEvent.calendar.id)) {
                 is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<CalendarKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newCalendarKey")
                 else -> return result
             }
+        } else {
+            oldCalendarKey
         }
-
-        val isCalendarBeingChanged = oldCalendarId != null && oldCalendarId != newEvent.calendar.id
 
         // 5. sign and encrypt Shared Parts
         val sharedPartICalString = calendarSplit.sharedPart.printToString()
@@ -106,7 +105,7 @@ class EditCreateEventUseCase(
                     crypto.getArmoredPublicKey(newCalendarKey.primaryPrivateKey) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, calendar public key was null")
                 )
                 Ciphertext.from(sharedKeyPacket, "")
-            } else if (oldSessionKeys.shared != null) { // Shared Session Key was there already, encrypt it with new Calendar Key
+            } else if (oldSessionKeys?.shared != null) { // Shared Session Key was there already, encrypt it with new Calendar Key
                 val encryptedSharedPart = crypto.encryptText(sharedPartToEncryptICalString, oldSessionKeys.shared)
                 val sharedSessionKey = SessionKey(oldSessionKeys.shared.key, SESSION_KEY_ALGO)
                 val sharedKeyPacket = crypto.getKeyPacket(
@@ -130,7 +129,7 @@ class EditCreateEventUseCase(
 
         val calendarPartToEncryptICalString = calendarSplit.calendarPartToEncrypt?.printToString()
         val encryptedCalendarPartCiphertext = if (calendarPartToEncryptICalString != null) {
-            if (oldSessionKeys.calendar != null) {
+            if (oldSessionKeys?.calendar != null) {
                 val encryptedCalendarPart = crypto.encryptText(calendarPartToEncryptICalString, oldSessionKeys.calendar)
                 val calendarSessionKey = SessionKey(oldSessionKeys.calendar.key, SESSION_KEY_ALGO)
                 val calendarKeyPacket = crypto.getKeyPacket(
@@ -159,7 +158,7 @@ class EditCreateEventUseCase(
         val attendeesEventContent =
             if (createLinkedEventAsAttendee) null // We don't send the attendeesEventContent part when creating a linked event as an attendee
             else if (attendeesPartICalString != null) {
-                val encryptedAttendeesPartCiphertext = if (oldSessionKeys.shared != null) {
+                val encryptedAttendeesPartCiphertext = if (oldSessionKeys?.shared != null) {
                     val encryptedAttendeesPart = crypto.encryptText(attendeesPartICalString, oldSessionKeys.shared)
                     Ciphertext.from(null, encryptedAttendeesPart!!)
                 } else {
@@ -301,7 +300,7 @@ class EditCreateEventUseCase(
                                     isOrganizer = isOrganizer,
                                     sharedKeyPacket = null, // this is already present in existing event
                                     sharedEventContent = sharedEventContent,
-                                    calendarKeyPacket = if (oldSessionKeys.shared == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
+                                    calendarKeyPacket = if (oldSessionKeys?.calendar == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
                                     calendarEventContent = calendarEventContent,
                                     personalEventContent = personalEventContent,
                                     attendeesEventContent = attendeesEventContent,

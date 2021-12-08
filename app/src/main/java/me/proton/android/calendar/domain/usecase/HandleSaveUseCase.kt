@@ -693,7 +693,7 @@ class HandleSaveUseCase(
      */
     private suspend fun editCreateEvent(userId: UserId, newEvent: Event, oldCalendarId: String? = null): UseCase.Result {
 
-        val createEventResult = editCreateEventUseCase.execute(userId, newEvent, oldCalendarId)
+        val createEventResult = editCreateEventUseCase.execute(userId, newEvent, oldCalendarId = oldCalendarId ?: newEvent.calendar.id)
 
         return when (createEventResult) {
             is UseCase.Result.Error -> UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}", createEventResult.error)
