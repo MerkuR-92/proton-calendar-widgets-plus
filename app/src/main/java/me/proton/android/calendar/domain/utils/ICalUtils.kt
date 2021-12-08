@@ -206,6 +206,8 @@ interface ICalUtils {
      */
     fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event>
 
+    fun List<Event>.sortForMonthView(timeZoneId: String): List<Event>
+
     /**
      * Copies all multi-day events across each day in the range, so we can display them day by day.
      */

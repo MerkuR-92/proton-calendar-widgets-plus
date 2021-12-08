@@ -17,6 +17,7 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -1207,6 +1208,10 @@ object AndroidUtils {
 
     fun Context.pixelToDp(pixel: Int): Int {
         return (pixel / resources.displayMetrics.density).toInt()
+    }
+
+    fun Context.spToPixel(sp: Float): Float {
+        return sp * this.resources.displayMetrics.scaledDensity
     }
 
     fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {

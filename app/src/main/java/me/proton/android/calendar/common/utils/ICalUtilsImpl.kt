@@ -37,6 +37,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.utils.ICalUtils
@@ -805,6 +806,71 @@ object ICalUtilsImpl : ICalUtils {
                 ?: emptyList()
         )
         return result
+    }
+
+    private fun isAllDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
+        return a.isAllDay() &&
+                !b.isAllDay() &&
+                a.getOccurrenceStart(
+                    timeZoneId
+                ).toLocalDate().isEqual((b.getOccurrenceEnd(
+                    timeZoneId
+                )).toLocalDate()) && b.spansSingleDay(timeZoneId = timeZoneId)
+    }
+
+    private fun isMultiDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
+        return !a.isAllDay() &&
+                !b.isAllDay() &&
+                !a.spansSingleDay(timeZoneId = timeZoneId) &&
+                b.spansSingleDay(timeZoneId = timeZoneId)
+    }
+
+    override fun List<Event>.sortForMonthView(timeZoneId: String): List<Event> {
+        val comparator = Comparator<Event> { a, b ->
+            return@Comparator when {
+                isAllDayPrio(timeZoneId, a, b) -> {
+                    TestsLogger.e("Test test isAllDayPrio a ((${a.summary})) before b ((${b.summary}))")
+                    -1
+                }
+                isAllDayPrio(timeZoneId, b, a) -> {
+                    TestsLogger.e("Test test isAllDayPrio b ((${b.summary})) before a ((${a.summary}))")
+                    1
+                }
+                isMultiDayPrio(timeZoneId, a, b) -> {
+                    TestsLogger.e("Test test isMultiDayPrio a ((${a.summary})) before b ((${b.summary}))")
+                    -1
+                }
+                isMultiDayPrio(timeZoneId, b, a) -> {
+                    TestsLogger.e("Test test isMultiDayPrio b ((${b.summary})) before a ((${a.summary}))")
+                    1
+                }
+                else -> {
+                    val coeficcient1 = (a.getOccurrenceStart(timeZoneId)).toEpochSecond() - (b.getOccurrenceStart(timeZoneId)).toEpochSecond()
+                    val coeficcient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
+
+                    if (coeficcient1 > 0) {
+                        TestsLogger.e("Test test coeficcient1 > 0 b ((${b.summary})) before a ((${a.summary}))")
+                        1
+                    } else if (coeficcient1 < 0) {
+                        TestsLogger.e("Test test coeficcient1 < 0 a ((${a.summary})) before b ((${b.summary}))")
+                        -1
+                    }
+                    else {
+                        if (coeficcient2 > 0) {
+                            TestsLogger.e("Test test coeficcient2 > 0 b ((${b.summary})) before a ((${a.summary}))")
+                            1
+                        } else if (coeficcient2 < 0) {
+                            TestsLogger.e("Test test coeficcient2 < 0 a ((${a.summary})) before b ((${b.summary}))")
+                            -1
+                        } else {
+                            TestsLogger.e("Test test coeficcient == 0 a ((${a.summary})) keep original order with b ((${b.summary}))")
+                            0
+                        }
+                    }
+                }
+            }
+        }
+        return this.sortedWith(comparator)
     }
 
     override fun List<Event>.explodeDayByDay(

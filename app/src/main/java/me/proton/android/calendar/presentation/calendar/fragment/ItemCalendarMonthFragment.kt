@@ -1,8 +1,6 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +14,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_calendar_month_fragment.*
-import kotlinx.android.synthetic.main.item_month_view_event.view.*
 import kotlinx.android.synthetic.main.item_month_view_grid.view.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -27,16 +24,14 @@ import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
-import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -360,52 +355,98 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         }
         logger.e("Test test monthGridMap ${monthGridMap.size}")
 
-
-        // Reclaim all of the existing event views so we can reuse them if needed, this process
-        // can be useful if your day view is hosted in a recycler view for example
-        val recycled: List<View> = monthView.removeMonthViewEvents()
-        var remaining = recycled.size
-        logger.e("Test test opti recycled size ${recycled.size} isSkeletonEvent $isSkeletonEvent")
-        logger.e("Test test opti events to display size ${monthGridMap.values.flatMap { it.take(3) }.size} isSkeletonEvent $isSkeletonEvent")
+        logger.e("Test test opti events to display size ${monthGridMap.values.flatMap { it.take(4) }.size} isSkeletonEvent $isSkeletonEvent")
 
         val monthViewEventsMap = hashMapOf<Int, List<MonthView.MonthViewEvent>>()
+
         monthGridMap.forEach {
-            // Sort the list and take first 3 events
-            val sortedList = it.value.sortForAgendaView(timeZoneId).take(3)
-            val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
-            sortedList.forEach { event ->
-                val dayItemView =
-                    if (remaining > 0) recycled[--remaining]
-                    else LayoutInflater.from(requireContext()).inflate(
-                        R.layout.item_month_view_event,
-                        monthView,
-                        false
-                    )
 
-                // TODO Apply style
-                if (!isSkeletonEvent) {
-                    val viewBackground: LayerDrawable = dayItemView.findViewById<View>(R.id.view_background).background as LayerDrawable
-                    val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
-                    val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
-                    viewMainSurface.setTint(Color.parseColor(event.calendar.color))
-                    viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
+            // Sort the list
+            val filteredList = it.value.filterNot { event ->
+                !event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        event.calculateFullDayCounter(
+                            fromDate.plusDays(it.key.toLong()),
+                            timeZoneId
+                        ).first > 1
+            }
+            val sortedList: MutableList<Event> = filteredList.sortForMonthView(timeZoneId).toMutableList()
+            it.value.clear()
+            it.value.addAll(sortedList)
+        }
 
-                    dayItemView.text_title.text = event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
+        val rootMap: MutableMap<Int, Map<Int, Event>> = mutableMapOf()
+        val maxEventCount = monthView.getMaxEventCount()
+        for (key in 0 until 42) {
+            val events = monthGridMap[key]
+
+            val childMap = mutableMapOf<Int, Event>()
+            if (key > 0) {
+                val previousChildMap = rootMap[key - 1]
+                logger.e("${fromDate.plusDays(key.toLong())} key $key previousChildMap ${previousChildMap?.values?.map { it.summary }}")
+                previousChildMap?.forEach { index, event ->
+                    if (!event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        event.calculateFullDayCounter(
+                            fromDate.plusDays(key.toLong()),
+                            timeZoneId
+                        ).first > 1) {
+                        logger.e("${fromDate.plusDays(key.toLong())} key $key this: ${event.summary} to index $index counter ${event.calculateFullDayCounter(
+                            fromDate.plusDays(key.toLong()),
+                            timeZoneId
+                        )}")
+                        childMap[index] = event
+                    }
                 }
+            }
+            var nextAvailableMapIndex = 0
+            events?.forEachIndexed { index, event ->
+                // TODO Maybe store MonthEventViews here directly ?
+                while (childMap.containsKey(nextAvailableMapIndex)) nextAvailableMapIndex++
+                // TODO EXTRACT MAX
+                if (nextAvailableMapIndex >= maxEventCount + 3) return@forEachIndexed // TODO EXTRACT MAX
+                // TODO EXTRACT MAX
+                childMap[nextAvailableMapIndex] = event
+                nextAvailableMapIndex++
+            }
 
-                val daySpanCount = event.calculateFullDayCounter(
-                    event.getOccurrenceStart(timeZoneId).toLocalDate(),
+            logger.e("${fromDate.plusDays(key.toLong())} key $key childMap ${childMap.values.map { it.summary }}")
+            rootMap[key] = childMap
+        }
+
+        rootMap.forEach {
+            logger.e("${fromDate.plusDays(it.key.toLong())} key ${it.key} childMap ${it.value.values.map { it.summary }}")
+        }
+
+        rootMap.forEach { (dayIndex, childMap) ->
+
+            val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
+
+            // Take first 4 events
+            childMap.forEach { (indexInDay, event) ->
+
+                val fullDayCounter = event.calculateFullDayCounter(
+                    fromDate.plusDays(dayIndex.toLong()),
                     timeZoneId
-                ).second
+                )
 
                 monthViewEvents.add(
                     MonthView.MonthViewEvent(
-                        dayItemView,
-                        daySpanCount
+                        null,
+                        indexInDay,
+                        fullDayCounter.second,
+                        fullDayCounter.first,
+                        if (isSkeletonEvent) ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
+                        else Color.parseColor(event.calendar.color),
+                        event.isInThePast(timeZoneId),
+                        if (isSkeletonEvent) null
+                        else {
+                            // TODO Handle decryption status
+                            if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) "locked" // TODO Handle decryption status
+                            else event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
+                        }
                     )
                 )
             }
-            monthViewEventsMap[it.key] = monthViewEvents
+            monthViewEventsMap[dayIndex] = monthViewEvents
         }
 
         monthView.setMonthViewEvents(monthViewEventsMap)
@@ -433,7 +474,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             logger.e("Test test Month onDestroyView eventsLiveData removeObservers")
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
-        monthView.removeMonthViewEvents()
     }
 
     override fun onResume() {
