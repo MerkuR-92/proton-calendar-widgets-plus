@@ -44,7 +44,7 @@ internal class HandleDeleteUseCaseTest {
 
         appDatabaseMock = mockk()
 
-        coEvery { editCreateEventUseCaseMock.execute(userId, any(), any()) } returns UseCase.Result.Success(listOf(userId.id))
+        coEvery { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) } returns UseCase.Result.Success(listOf(userId.id))
 
         coEvery { sendEmailUseCaseMock.sendInviteToAttendees(userId, any(), any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
@@ -169,7 +169,7 @@ internal class HandleDeleteUseCaseTest {
             coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
             coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
-            coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any()) }
+            coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsById(listOf(event.id)) }
             coVerify(exactly = 1) { handleAlarmsUseCaseMock.execute(userId) }
         }
@@ -200,7 +200,7 @@ internal class HandleDeleteUseCaseTest {
             coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
             coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
-            coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any()) }
+            coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsById(listOf(event.id)) }
             coVerify(exactly = 1) { handleAlarmsUseCaseMock.execute(userId) }
         }
@@ -231,7 +231,7 @@ internal class HandleDeleteUseCaseTest {
             coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
             coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
-            coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any()) }
+            coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 0) { calendarsRepositoryMock.deleteEventsById(listOf(event.id)) }
             coVerify(exactly = 0) { handleAlarmsUseCaseMock.execute(userId) }
         }

@@ -639,6 +639,13 @@ class EventViewModel(
 
     fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
+    fun isCalendarChangeAllowed() = this.event.isSyncedWithApi().not() // is newly created
+            || (!this.event.isPartOfChain() && !this.event.isAnInvitation && this.event.iCalEvent.organizer == null && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+
+    fun hasCalendarBeenChanged() = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
+
+    fun isChangingAttendeesAllowed() = !hasCalendarBeenChanged()
+
     /**
      * Resets temporary values for Alarm.
      */
@@ -648,6 +655,8 @@ class EventViewModel(
     }
 
     suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
+        val isCalendarBeingChanged = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != calendar.id
+
         // If user choice has been saved then we don't set calendar's default alarms
         val alarmsEdited = (event.isAllDay() && eventCustomAllDayAlarmsSave != null) ||
                 (!event.isAllDay() && eventCustomPartialDayAlarmsSave != null)
@@ -668,7 +677,11 @@ class EventViewModel(
                     calendar.type
                 )
             )
-            if (!alarmsEdited) setDefaultAlarms(event, calendarSettings)
+
+            // when changing calendar, don't apply its default alarms
+            if (!alarmsEdited && (!isCalendarBeingChanged || dbEvent?.isAllDay() != event.isAllDay())) {
+                setDefaultAlarms(event, calendarSettings)
+            }
             _event.postValue(event)
             true
         } else {
@@ -763,9 +776,9 @@ class EventViewModel(
         }
 
         // If user choice has been saved then we don't set calendar's default alarms
-        if ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
-            (!isAllDay && eventCustomPartialDayAlarmsSave == null)
-        ) {
+        // if calendar has been changed during this editing, set its default alarms
+        if ((isAllDay && eventCustomAllDayAlarmsSave == null && (!hasCalendarBeenChanged() || isAllDay != dbEvent?.isAllDay())) ||
+            (!isAllDay && eventCustomPartialDayAlarmsSave == null && (!hasCalendarBeenChanged() || isAllDay != dbEvent?.isAllDay()))) {
             setDefaultAlarms(event, calendarSettings)
         } else {
             event.iCalEvent.alarms.clear()
@@ -1091,8 +1104,10 @@ class EventViewModel(
     }
 
     private suspend fun isApiEventAnInvitation(): Boolean? {
-        return if (event.isSyncedWithApi()) {
-            val eventEntity = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event ?: return null
+        // take the DB Event CalendarID, in case the calendar has just been edited
+        val dbEventCalendarId = dbEvent?.calendar?.id
+        return if (event.isSyncedWithApi() && dbEventCalendarId != null) {
+            val eventEntity = calendarsRepository.fetchEventById(userId, dbEventCalendarId, event.id).valueOrNullAndLogErrors(logger)?.event ?: return null
             return eventEntity.attendees.isNotEmpty()
         } else {
             null

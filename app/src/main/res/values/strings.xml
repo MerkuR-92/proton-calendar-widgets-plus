@@ -286,6 +286,7 @@
     <string name="snack_event_created_error">Error creating event</string>
     <string name="snack_event_opening_edit_error">Error opening event for edit</string>
     <string name="snack_event_edit_with_attendees_error">Editing events with attendees is not supported yet</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">Cannot add participants and change calendar simultaneously</string>
     <string name="snack_event_init_error">Error initialising new event</string>
     <string name="snack_event_calendar_error">Error switching calendar</string>
     <string name="snack_event_maximum_alarm_reached_error">The maximum number of notifications has been reached</string>

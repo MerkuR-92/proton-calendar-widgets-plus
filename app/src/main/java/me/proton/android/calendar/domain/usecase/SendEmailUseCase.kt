@@ -181,7 +181,7 @@ class SendEmailUseCase(
 
                 // Edit same event to add attendees if mail(s) have been sent
 
-                val editEventResult = editCreateEventUseCase.execute(userId, newEventEntity.calendarId, event)
+                val editEventResult = editCreateEventUseCase.execute(userId, event)
 
                 if (editEventResult is UseCase.Result.InvalidParams) {
                     logger.e("SendEmailUseCase sendInviteToAttendees invalid params in edit event: ${editEventResult.message}")
