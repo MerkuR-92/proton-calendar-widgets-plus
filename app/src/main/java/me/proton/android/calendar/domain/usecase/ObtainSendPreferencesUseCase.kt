@@ -187,6 +187,9 @@ class ObtainSendPreferencesUseCase(
 
             // pinned key is expired
             if (isKeyExpired(pinnedPublicKey) == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
+
+            // pinned key is revoked
+            if (isKeyRevoked(pinnedPublicKey) == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
         }
 
         if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return SendPreferencesOrError.Error.PublicKeysInvalid
@@ -303,6 +306,10 @@ class ObtainSendPreferencesUseCase(
 
     private fun isKeyExpired(armoredKey: Armored): Boolean? {
         return kotlin.runCatching { Crypto.newKeyFromArmored(armoredKey).isExpired }.getOrNull()
+    }
+
+    private fun isKeyRevoked(armoredKey: Armored): Boolean? {
+        return kotlin.runCatching { Crypto.newKeyFromArmored(armoredKey).isRevoked }.getOrNull()
     }
 
 }
