@@ -679,7 +679,7 @@ class EventViewModel(
             )
 
             // when changing calendar, don't apply its default alarms
-            if (!alarmsEdited && !isCalendarBeingChanged) {
+            if (!alarmsEdited && (!isCalendarBeingChanged || dbEvent?.isAllDay() != event.isAllDay())) {
                 setDefaultAlarms(event, calendarSettings)
             }
             _event.postValue(event)
@@ -777,9 +777,8 @@ class EventViewModel(
 
         // If user choice has been saved then we don't set calendar's default alarms
         // if calendar has been changed during this editing, set its default alarms
-        if (hasCalendarBeenChanged() && ((isAllDay && eventCustomAllDayAlarmsSave == null) ||
-            (!isAllDay && eventCustomPartialDayAlarmsSave == null))
-        ) {
+        if ((isAllDay && eventCustomAllDayAlarmsSave == null && (!hasCalendarBeenChanged() || isAllDay != dbEvent?.isAllDay())) ||
+            (!isAllDay && eventCustomPartialDayAlarmsSave == null && (!hasCalendarBeenChanged() || isAllDay != dbEvent?.isAllDay()))) {
             setDefaultAlarms(event, calendarSettings)
         } else {
             event.iCalEvent.alarms.clear()
