@@ -46,7 +46,7 @@ class UpdateAlarmsUseCase(
             val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
 
             if (transformedChain.isEmpty()) {
-                logger.e("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")
+                logger.v("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")
                 return@forEach
             }
 

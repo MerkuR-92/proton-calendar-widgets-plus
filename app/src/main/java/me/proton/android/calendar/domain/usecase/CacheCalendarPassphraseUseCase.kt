@@ -5,9 +5,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.decryptTextOrNull
-import me.proton.core.key.domain.useKeys
-import me.proton.core.key.domain.verifyText
+import me.proton.core.key.domain.*
 import me.proton.core.user.domain.UserManager
 
 /**
@@ -49,9 +47,19 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey
         val plaintextPassphrase = memberAddress.useKeys(cryptoContext) {
-            val decryptedPassphrase = decryptTextOrNull(memberPassphrase.passphrase)
+            this.privateKeyRing.keys.firstNotNullOfOrNull { privateKey ->
+                val decryptedPassphrase = privateKey.unlockOrNull(cryptoContext)?.decryptTextOrNull(cryptoContext, memberPassphrase.passphrase)
 
-            if (verifyText(decryptedPassphrase ?: "", memberPassphrase.signature)) decryptedPassphrase else null
+                if (decryptedPassphrase != null) {
+                    val isKeyCompromised = !privateKey.canVerify
+                    val isSignatureValid = cryptoContext.pgpCrypto.verifyText(decryptedPassphrase, memberPassphrase.signature, cryptoContext.pgpCrypto.getPublicKey(privateKey.key))
+
+                    // this is a special case, when AddressKey is compromised, we should allow for decrypting
+                    //  the CalendarPassphrase and ignore verification error (because verification will always fail),
+                    //  but trust the signature verification only when key is not compromised
+                    if ((isKeyCompromised) || (!isKeyCompromised && isSignatureValid)) decryptedPassphrase else null
+                } else null
+            }
         }
 
         if (plaintextPassphrase.isNullOrBlank()) {
