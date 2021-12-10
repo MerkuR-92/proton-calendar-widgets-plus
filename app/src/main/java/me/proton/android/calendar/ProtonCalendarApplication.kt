@@ -16,6 +16,7 @@ import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
+import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
@@ -51,6 +52,9 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var accountStateHandler: AccountStateHandler
 
     @Inject
     lateinit var userManager: UserManager
@@ -120,6 +124,7 @@ class ProtonCalendarApplication : Application() {
                     product,
                     apiProvider,
                     accountManager,
+                    accountStateHandler,
                     authOrchestrator,
                     humanVerificationManager,
                     humanVerificationOrchestrator,
@@ -149,6 +154,8 @@ class ProtonCalendarApplication : Application() {
         ShowNotificationUseCase.createNotificationChannels(this)
 
         SyncWorker.setup(this, logger)
+
+        accountStateHandler.start()
 
         forceUpdateViewModel.forceUpdate.observe(ProcessLifecycleOwner.get()) {
             if (it.forceUpdate) {

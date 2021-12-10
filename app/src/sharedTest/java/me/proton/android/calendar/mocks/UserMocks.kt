@@ -2,11 +2,6 @@ package me.proton.android.calendar.mocks
 
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.model.SendPreferences
-import me.proton.core.key.domain.extension.areAllLocked
-import me.proton.core.key.domain.useKeys
-import me.proton.core.user.domain.UserManager
-import me.proton.core.user.domain.entity.AddressId
-import me.proton.core.user.domain.entity.AddressType
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 

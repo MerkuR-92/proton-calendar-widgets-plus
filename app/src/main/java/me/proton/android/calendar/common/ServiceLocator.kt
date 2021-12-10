@@ -21,6 +21,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
+import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
@@ -130,6 +131,7 @@ fun coreModule(
     product: Product,
     apiProvider: ApiProvider,
     accountManager: AccountManager,
+    accountStateHandler: AccountStateHandler,
     authOrchestrator: AuthOrchestrator,
     humanVerificationManager: HumanVerificationManager,
     humanVerificationOrchestrator: HumanVerificationOrchestrator,
@@ -150,6 +152,7 @@ fun coreModule(
     single<ApiProvider> { apiProvider }
     // TODO: Remove when all *ViewModel/*UseCase will be provided by a Dagger module.
     single<AccountManager> { accountManager }
+    single<AccountStateHandler> { accountStateHandler }
     // TODO: Remove when AccountViewModel will be provided by a Dagger module.
     factory<AuthOrchestrator> { authOrchestrator }
     single<HumanVerificationManager> { humanVerificationManager }

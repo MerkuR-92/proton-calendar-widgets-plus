@@ -125,7 +125,6 @@ class AccountViewModel(
                 .onAccountCreateAddressFailed { removeUser(it.userId) }
                 .onAccountDisabled { removeUser(it.userId) }
                 .onAccountRemoved { cleanUser(context) }
-                .disableInitialNotReadyAccounts()
         }
 
         // HumanVerification State handling.
