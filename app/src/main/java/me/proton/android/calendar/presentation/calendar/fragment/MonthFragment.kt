@@ -217,27 +217,26 @@ class MonthFragment : BaseFragment() {
         }
 
         if (animateChange) {
-            viewPagerTopGuideline.animateGuidelineHeightChange(
+            viewPagerTopGuideline?.animateGuidelineHeightChange(
                 desiredHeight,
                 calendarViewModel.currentPosDesiredMonthHeight
             ) {
             }
-            viewPagerSliderGuideline.animateGuidelineHeightChange(
+            viewPagerSliderGuideline?.animateGuidelineHeightChange(
                 desiredHeight - requireContext().resources.getDimensionPixelSize(
                     R.dimen.calendar_slider_height
                 ), calendarViewModel.currentPosDesiredMonthHeight
             ) { }
         } else {
-            val layoutParams = (viewPagerTopGuideline.layoutParams as ConstraintLayout.LayoutParams).apply {
-                guideBegin = desiredHeight
+            (viewPagerTopGuideline?.layoutParams as? ConstraintLayout.LayoutParams)?.let { layoutParams ->
+                layoutParams.guideBegin = desiredHeight
+                viewPagerTopGuideline?.layoutParams = layoutParams
             }
-            viewPagerTopGuideline.layoutParams = layoutParams
 
-            val sliderLayoutParams = (viewPagerSliderGuideline.layoutParams as ConstraintLayout.LayoutParams).apply {
-                guideBegin =
-                    desiredHeight - requireContext().resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
+            (viewPagerSliderGuideline?.layoutParams as? ConstraintLayout.LayoutParams)?.let { sliderLayoutParams ->
+                sliderLayoutParams.guideBegin = desiredHeight - requireContext().resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
+                viewPagerSliderGuideline?.layoutParams = sliderLayoutParams
             }
-            viewPagerSliderGuideline.layoutParams = sliderLayoutParams
         }
     }
 
@@ -288,9 +287,9 @@ class MonthFragment : BaseFragment() {
             )
         }
 
-        viewPagerTopGuideline.animateGuidelineHeightChange(desiredHeight, null) {
+        viewPagerTopGuideline?.animateGuidelineHeightChange(desiredHeight, null) {
         }
-        viewPagerSliderGuideline.animateGuidelineHeightChange(
+        viewPagerSliderGuideline?.animateGuidelineHeightChange(
             desiredHeight - requireContext().resources.getDimensionPixelSize(
                 R.dimen.calendar_slider_height
             ), null
@@ -473,7 +472,7 @@ class MonthFragment : BaseFragment() {
                         if (calendarViewModel.monthView.value == false) {
                             // Apply the changes for expanded state
                             calendarViewModel.monthView.value = true
-                            AndroidUtils.rotateArrowUpward(mini_calendar_chevron)
+                            mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
                             updateMiniCalendarHeight(
                                 startWeekOn,
                                 isMonthView = true,
@@ -482,12 +481,12 @@ class MonthFragment : BaseFragment() {
                             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
                             // Animate mini calendar to go back to expanded state
-                            viewPagerTopGuideline.animateGuidelineHeightChange(
+                            viewPagerTopGuideline?.animateGuidelineHeightChange(
                                 calendarViewModel.currentPosDesiredMonthHeight,
                                 calendarViewModel.currentPosDesiredMonthHeight
                             ) {
                             }
-                            viewPagerSliderGuideline.animateGuidelineHeightChange(
+                            viewPagerSliderGuideline?.animateGuidelineHeightChange(
                                 calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(
                                     R.dimen.calendar_slider_height
                                 ), calendarViewModel.currentPosDesiredMonthHeight
@@ -500,7 +499,7 @@ class MonthFragment : BaseFragment() {
                         if (calendarViewModel.monthView.value == true) {
                             // Apply the changes for collapsed state
                             calendarViewModel.monthView.value = false
-                            AndroidUtils.rotateArrowDownward(mini_calendar_chevron)
+                            mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
                             updateMiniCalendarHeight(
                                 startWeekOn,
                                 isMonthView = false,
@@ -509,12 +508,12 @@ class MonthFragment : BaseFragment() {
                             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                         } else {
                             // Animate mini calendar to go back to collapsed state
-                            viewPagerTopGuideline.animateGuidelineHeightChange(
+                            viewPagerTopGuideline?.animateGuidelineHeightChange(
                                 resources.getDimensionPixelSize(R.dimen.calendar_slider_height),
                                 calendarViewModel.currentPosDesiredMonthHeight
                             ) {
                             }
-                            viewPagerSliderGuideline.animateGuidelineHeightChange(
+                            viewPagerSliderGuideline?.animateGuidelineHeightChange(
                                 resources.getDimensionPixelSize(R.dimen.calendar_slider_height) - requireContext().resources.getDimensionPixelSize(
                                     R.dimen.calendar_slider_height
                                 ), calendarViewModel.currentPosDesiredMonthHeight
@@ -602,7 +601,7 @@ class MonthFragment : BaseFragment() {
         if (viewMode == currentViewMode) return
         currentViewMode = viewMode
 
-        fragmentMonthLayout.allowScrolling = viewMode == ViewMode.AGENDA
+        fragmentMonthLayout?.allowScrolling = viewMode == ViewMode.AGENDA
         lifecycleScope.launch {
             val immutableWeekStart = calendarViewModel.getWeekStart()
             if (viewMode == ViewMode.AGENDA) {
@@ -610,29 +609,29 @@ class MonthFragment : BaseFragment() {
                     calendarViewModel.monthView.value = true
                     simulateExpandWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
                 }
-                agendaPager.apply {
+                agendaPager?.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = agendaPagerAdapter
                     setCurrentItem(if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition, false)
                     offscreenPageLimit = 1
                 }
-                calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
+                if (miniCalendarPager != null && agendaPager!= null) calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             } else {
                 if (immutableWeekStart != null) {
                     calendarViewModel.monthView.value = false
                     simulateCollapseWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
                 }
                 calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
-                agendaPager.apply {
+                agendaPager?.apply {
                     val currentItem = this.currentItem // Save currently selected item position
                     adapter = dayPagerAdapter
                     setCurrentItem(if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition, false)
                     offscreenPageLimit = 1
                 }
-                calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
+                if (miniCalendarPager != null && agendaPager!= null) calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager)
             }
-            (agendaPager.getChildAt(0) as RecyclerView).layoutManager?.isItemPrefetchEnabled = false
-            (agendaPager.getChildAt(0) as RecyclerView).setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+            (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+            (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
         }
     }
 
@@ -710,10 +709,10 @@ class MonthFragment : BaseFragment() {
                 animateChange = true
             )
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-            AndroidUtils.rotateArrowUpward(mini_calendar_chevron)
+            mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
 
             // Animate the guidelines to desired height
-            viewPagerTopGuideline.animateGuidelineHeightChange(
+            viewPagerTopGuideline?.animateGuidelineHeightChange(
                 desiredHeight,
                 object : AndroidUtils.AnimateGuidelineListener {
                     override fun onHeightChange(animatedValue: Int) {
@@ -725,7 +724,7 @@ class MonthFragment : BaseFragment() {
                                 calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(
                                     R.dimen.calendar_slider_height
                                 )
-                            viewPagerSliderGuideline.layoutParams = viewPagerSliderGuidelineLayoutParams
+                            viewPagerSliderGuideline?.layoutParams = viewPagerSliderGuidelineLayoutParams
                         }
                     }
 
@@ -739,10 +738,10 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.lifeCycleScope.launch {
             val desiredHeight = resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
 
-            AndroidUtils.rotateArrowDownward(mini_calendar_chevron)
+            mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
 
             // Animate mini calendar collapse
-            viewPagerTopGuideline.animateGuidelineHeightChange(
+            viewPagerTopGuideline?.animateGuidelineHeightChange(
                 desiredHeight,
                 object : AndroidUtils.AnimateGuidelineListener {
                     override fun onHeightChange(animatedValue: Int) {
