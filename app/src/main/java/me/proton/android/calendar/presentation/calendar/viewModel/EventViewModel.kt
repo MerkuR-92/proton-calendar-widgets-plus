@@ -649,8 +649,19 @@ class EventViewModel(
 
     fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
-    fun isCalendarChangeAllowed() = this.event.isSyncedWithApi().not() // is newly created
-            || (!this.event.isPartOfChain() && !this.event.isAnInvitation && this.event.iCalEvent.organizer == null && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+    fun isCalendarChangeAllowed(): Boolean {
+
+        val dbEventAllowed = dbEvent?.let {
+            it.isSyncedWithApi().not() // is newly created
+                    || (!it.isPartOfChain() && !it.isAnInvitation && it.iCalEvent.organizer == null && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+        } ?: true
+
+        val currentEventAllowed = this.event.isSyncedWithApi().not() // is newly created
+                || (!this.event.isPartOfChain() && !this.event.isAnInvitation && this.event.iCalEvent.organizer == null && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+
+        return dbEventAllowed && currentEventAllowed
+
+    }
 
     fun hasCalendarBeenChanged() = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
 
