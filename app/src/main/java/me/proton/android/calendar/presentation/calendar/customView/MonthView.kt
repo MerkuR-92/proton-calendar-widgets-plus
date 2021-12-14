@@ -8,12 +8,17 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.item_month_view_grid.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.MAX_MINI_EVENT_COUNT
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.spToPixel
+import java.time.LocalDate
+import java.time.Month
+import kotlin.math.PI
+import kotlin.math.cos
 
 class MonthView : ViewGroup {
 
@@ -22,37 +27,129 @@ class MonthView : ViewGroup {
 
         eventRadius = context.dpToPixel(4).toFloat()
 
-        titlePaint.style = Paint.Style.FILL
-        titlePaint.textSize = context.spToPixel(10F)
-        titlePaint.typeface = Typeface.createFromAsset(context.assets, "fonts/Roboto-Medium.ttf")
+        val robotoMediumTypeface = Typeface.createFromAsset(context.assets, "fonts/Roboto-Medium.ttf")
 
-        plusIconPaint.color = ContextCompat.getColor(context, R.color.interaction_strong_norm)
-        plusIconPaint.style = Paint.Style.FILL
+        basicTitlePaint = TextPaint().apply {
+            style = Paint.Style.FILL
+            textSize = context.spToPixel(10F)
+            typeface = robotoMediumTypeface
+            color = ContextCompat.getColor(context, R.color.text_on_calendar_color)
+            isAntiAlias = true
+        }
+
+        dayTitlePaint = TextPaint().apply {
+            style = Paint.Style.FILL
+            textSize = context.spToPixel(12F)
+            typeface = robotoMediumTypeface
+            color = ContextCompat.getColor(context, R.color.text_norm)
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+
+        highlightDayTitlePaint = TextPaint(dayTitlePaint).apply {
+            color = ContextCompat.getColor(context, R.color.brand_norm)
+        }
+
+        offsetDayTitlePaint = TextPaint(dayTitlePaint).apply {
+            color = ContextCompat.getColor(context, R.color.text_hint)
+        }
+
+        gridItemSeparatorPaint = Paint().apply {
+            style = Paint.Style.FILL
+            color = ContextCompat.getColor(context, R.color.separator_norm)
+            strokeWidth = context.dpToPixel(1).toFloat()
+            isAntiAlias = true
+        }
     }
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0) { }
 
     private var monthViewEventsMap: HashMap<Int, List<MonthViewEvent>> = hashMapOf()
 
-    private var gridItemWidth = 0
-    private var gridItemHeight = 0
-    private var parentWidth = 0
-    private var parentHeight = 0
+    private var gridItemWidth = 0F
+    private var gridItemHeight = 0F
+    private var parentWidth = 0F
+    private var parentHeight = 0F
 
     private var eventRadius: Float = 0F
 
-    private var titlePaint: TextPaint = TextPaint()
-    private var plusIconPaint: Paint = Paint()
+    private var basicTitlePaint: TextPaint
+
+    private var dayTitlePaint: TextPaint
+    private var offsetDayTitlePaint: TextPaint
+    private var highlightDayTitlePaint: TextPaint
+
+    private var gridItemSeparatorPaint: Paint
+
+    private var dayList: List<LocalDate>? = null
+    private var month: Month? = null
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        TimberLogger.e("Test test MonthView onDraw")
+        TimberLogger.e("Test test MonthView onDraw parentWidth $parentWidth parentHeight $parentHeight gridItemWidth $gridItemWidth gridItemHeight $gridItemHeight")
 
         // TODO Clear Canvas
 //        canvas?.drawColor(context.getColor(R.color.background_norm))
 
+        drawMonthGrid(canvas)
+
         // TODO Optimise to avoid redrawing everything
         drawEvents(canvas)
+    }
+
+    private fun drawMonthGrid(canvas: Canvas?) {
+
+        val dayList = this.dayList
+        val month = this.month
+        if (dayList == null || month == null) return
+
+        val topMargin = context.dpToPixel(19)
+        val gridItemSpacing = context.dpToPixel(1)
+
+        var listIndex = 0
+        for (rowIndex in 0 until 6) {
+            for (columnIndex in 0 until 7) {
+                val date = dayList[listIndex]
+                val text = date.dayOfMonth.toString()
+
+                val gridItemStart = (columnIndex * gridItemWidth)
+                val gridItemEnd = gridItemStart + gridItemWidth
+                val gridItemTop = (rowIndex * gridItemHeight) + topMargin + gridItemSpacing
+
+                canvas?.drawText(
+                    text,
+                    0,
+                    text.length,
+                    gridItemStart + (gridItemWidth / 2),
+                    gridItemTop,
+                    if (date == LocalDate.now()) highlightDayTitlePaint
+                    else if (date.month != month) offsetDayTitlePaint
+                    else dayTitlePaint
+                )
+
+                listIndex++
+            }
+        }
+
+        // Draw lines to split grid items
+        val gridSeparatorList = arrayListOf<Float>()
+        for (rowIndex in 0 until 6) {
+            gridSeparatorList.add(0F) // startX
+            gridSeparatorList.add(rowIndex * gridItemHeight) // startY
+            gridSeparatorList.add(parentWidth) // stopX
+            gridSeparatorList.add(rowIndex * gridItemHeight) // stopY
+        }
+        for (columnIndex in 0 until 7) {
+            gridSeparatorList.add(columnIndex * gridItemWidth) // startX
+            gridSeparatorList.add(0F) // startY
+            gridSeparatorList.add(columnIndex * gridItemWidth) // stopX
+            gridSeparatorList.add(parentHeight) // stopY
+        }
+        canvas?.drawLines(
+            // startX, startY, stopX, stopY
+            gridSeparatorList.toFloatArray(),
+            gridItemSeparatorPaint
+        )
     }
 
     private fun drawEvents(canvas: Canvas?) {
@@ -76,39 +173,44 @@ class MonthView : ViewGroup {
      * Draws the event rects with side strip
      */
     private fun drawEventRect(canvas: Canvas?, monthViewEvent: MonthViewEvent) {
-        // Draw side strip first to cover the right side of it with background
-        if (monthViewEvent.extendLeftSideStrip) {
-            canvas?.drawRect(
-                monthViewEvent.eventLeftSideStripRect,
-                monthViewEvent.eventLeftSideStripPaint
-            )
-        } else {
-            canvas?.drawRoundRect(
-                monthViewEvent.eventLeftSideStripRect,
-                eventRadius,
-                eventRadius,
-                monthViewEvent.eventLeftSideStripPaint
-            )
-        }
+
+        if (!monthViewEvent.drawRect) return
 
         // Draw main rect containing text
-        canvas?.drawRect(
+        canvas?.drawRoundRect(
             monthViewEvent.eventRect,
+            eventRadius,
+            eventRadius,
             monthViewEvent.eventRectPaint
         )
 
-        // Draw rect for right radius
-        if (monthViewEvent.extendRightSideStrip) {
-            canvas?.drawRect(
-                monthViewEvent.eventRightSideStripRect,
-                monthViewEvent.eventRectPaint
+        // Draw side strip after to cover the left side of original rect
+        canvas?.drawRoundRect(
+            monthViewEvent.eventLeftSideStripRect,
+            eventRadius,
+            eventRadius,
+            monthViewEvent.eventLeftSideStripPaint
+        )
+
+        // Draw line to cover right half of side strip rect
+        canvas?.drawLines(
+            monthViewEvent.eventStripSeparationLine,
+            monthViewEvent.eventStripSeparationPaint
+        )
+
+        if (monthViewEvent.isUnanswered) {
+            canvas?.drawLines(
+                monthViewEvent.unansweredStripes,
+                monthViewEvent.unansweredStripesPaint
             )
-        } else {
+        }
+
+        if (monthViewEvent.decryptionFailed && !monthViewEvent.isMiniEvent) { // TODO Do we also apply it to mini blobs ?
             canvas?.drawRoundRect(
-                monthViewEvent.eventRightSideStripRect,
+                monthViewEvent.decryptionFailedRect,
                 eventRadius,
                 eventRadius,
-                monthViewEvent.eventRectPaint
+                monthViewEvent.decryptionFailedPaint
             )
         }
     }
@@ -118,18 +220,14 @@ class MonthView : ViewGroup {
      */
     private fun drawEventTitle(canvas: Canvas?, monthViewEvent: MonthViewEvent, eventTitle: String) {
         // Draw text for event title
-        if (eventTitle.isNotBlank()) {
-            val paint = titlePaint
-            paint.color =
-                if (monthViewEvent.pastEvent) ContextCompat.getColor(context, R.color.text_weak)
-                else ContextCompat.getColor(context, R.color.text_on_calendar_color)
+        if (eventTitle.isNotBlank() && monthViewEvent.ellipsizedTitle.isNotBlank()) {
             canvas?.drawText(
                 eventTitle,
                 0,
                 monthViewEvent.ellipsizedTitle.length,
                 monthViewEvent.titleX,
                 monthViewEvent.titleY,
-                paint
+                monthViewEvent.titlePaint
             )
         }
     }
@@ -141,43 +239,44 @@ class MonthView : ViewGroup {
 
         canvas?.drawRect(
             monthViewEvent.plusIconVerticalRect,
-            plusIconPaint
+            monthViewEvent.plusIconPaint
         )
 
         canvas?.drawRect(
             monthViewEvent.plusIconHorizontalRect,
-            plusIconPaint
+            monthViewEvent.plusIconPaint
         )
 
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        TimberLogger.e("Test test MonthView onLayout changed $changed left $l top $t right $r bottom $b")
+        // Nothing to do here
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        TimberLogger.e("Test test MonthView onMeasure widthMeasureSpec $widthMeasureSpec heightMeasureSpec $heightMeasureSpec")
-
-        parentWidth = measuredWidth
-        parentHeight = measuredHeight
-
-        TimberLogger.e("Test test MonthView onMeasure parentWidth $parentWidth parentHeight $parentHeight")
+        parentWidth = measuredWidth.toFloat()
+        parentHeight = measuredHeight.toFloat()
 
         gridItemWidth = parentWidth / 7
         gridItemHeight = parentHeight / 6
 
-        TimberLogger.e("Test test MonthView onMeasure gridItemWidth $gridItemWidth gridItemHeight $gridItemHeight")
+
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
+    }
+
+    fun prepareMonthGrid(skeletonList: List<LocalDate>, forMonth: Month) {
+        dayList = skeletonList
+        month = forMonth
     }
 
     fun getMaxEventCount(): Int {
         val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
         val eventHeight = context.dpToPixel(16) + context.dpToPixel(1) // TODO EXTRACT DIMENS // 1 dp for event blob top margin
         val miniEventsHeight = context.dpToPixel(10)
-        return (gridItemHeight - headerHeight - miniEventsHeight - context.dpToPixel(2)) / eventHeight // 2 dp for top grid item top + bottom margin
+        return ((gridItemHeight - headerHeight - miniEventsHeight - context.dpToPixel(2)) / eventHeight).toInt() // 2 dp for top grid item top + bottom margin
     }
 
     fun setMonthViewEvents(monthViewEventsMap: Map<Int, List<MonthViewEvent>>) {
@@ -186,19 +285,15 @@ class MonthView : ViewGroup {
 
         this.monthViewEventsMap.putAll(monthViewEventsMap)
 
-        TimberLogger.e("Test test MonthView setMonthViewEvents monthViewEventsMap size ${this.monthViewEventsMap.size}")
-        TimberLogger.e("Test test MonthView setMonthViewEvents eventViews size ${this.monthViewEventsMap.values.map { it.size }}")
-
         val maxEventCount = getMaxEventCount()
-        TimberLogger.e("Test test maxEventCount $maxEventCount")
         this.monthViewEventsMap.forEach {
             val dayIndex = it.key
             // 7 is number of column
             val row = dayIndex / 7
             val column = dayIndex - (row * 7)
-            it.value.forEachIndexed { index, monthViewEvent ->
+            var miniEventIndex = 0 // Workaround for monthViewEvent.indexInDay skipping some indexes because of previous day multi day events
+            it.value.forEach { monthViewEvent ->
                 if (monthViewEvent.indexInDay >= maxEventCount) {
-                    val miniEventIndex = monthViewEvent.indexInDay - maxEventCount
                     val miniEventCount = it.value.size - maxEventCount
                     if (miniEventIndex > MAX_MINI_EVENT_COUNT - 1) { // Extract max number of mini events
                         monthViewEvent.preparePlusIcon(
@@ -221,10 +316,11 @@ class MonthView : ViewGroup {
                             miniEventIndex
                         )
                     }
+                    miniEventIndex++
                 } else {
                     monthViewEvent.prepareEventBlob(
                         context,
-                        titlePaint,
+                        basicTitlePaint,
                         gridItemWidth,
                         gridItemHeight,
                         column,
@@ -244,117 +340,120 @@ class MonthView : ViewGroup {
         val daySpanIndex: Int,
         val calendarColor: Int,
         val pastEvent: Boolean,
+        val isUnanswered: Boolean,
+        val strikeThroughTitle: Boolean,
+        val decryptionFailed: Boolean,
         val eventTitle: String?
     ) {
 
-        var eventRect: RectF = RectF()
-        var eventLeftSideStripRect: RectF = RectF()
-        var eventRightSideStripRect: RectF = RectF()
+        lateinit var eventRect: RectF
+        lateinit var eventRectPaint: Paint
 
-        var eventLeftSideStripPaint: Paint = Paint()
-        var eventRectPaint: Paint = Paint()
+        lateinit var eventStripSeparationPaint: Paint
+        lateinit var eventStripSeparationLine: FloatArray
+
+        lateinit var eventLeftSideStripRect: RectF
+        lateinit var eventLeftSideStripPaint: Paint
+
+        lateinit var titlePaint: TextPaint
 
         var ellipsizedTitle: CharSequence = ""
 
         var titleX: Float = 0F
         var titleY: Float = 0F
 
-        var extendLeftSideStrip = false
-        var extendRightSideStrip = false
+        lateinit var plusIconHorizontalRect: RectF
+        lateinit var plusIconVerticalRect: RectF
 
-        var isPlusIcon: Boolean = false
+        lateinit var plusIconPaint: Paint
 
-        var plusIconHorizontalRect: RectF = RectF()
-        var plusIconVerticalRect: RectF = RectF()
+        lateinit var decryptionFailedRect: RectF
+        lateinit var decryptionFailedPaint: Paint
 
-        fun prepareEventBlob(context: Context, titlePaint: TextPaint, gridItemWidth: Int, gridItemHeight: Int, column: Int, row: Int) {
-            val start = (column * gridItemWidth + context.dpToPixel(1)).toFloat()
+        lateinit var unansweredStripes: FloatArray
+
+        lateinit var unansweredStripesPaint: Paint
+
+        var drawRect = true
+        var isMiniEvent = false
+        var isPlusIcon = false
+
+        fun prepareEventBlob(context: Context, basicTitlePaint: TextPaint, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int) {
+
+            // For multi day events, we only draw one blob per row, skip the others
+            if (daySpanCount > 1 && daySpanIndex > 1 && column > 0) {
+                drawRect = false
+                return
+            }
+
+            val start = (column * gridItemWidth + context.dpToPixel(1))
             val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
             val eventHeight = context.dpToPixel(16)
-            val top = ((row * gridItemHeight) + headerHeight + (indexInDay * eventHeight) + (indexInDay * context.dpToPixel(1))).toFloat()
-            val end = ((column * gridItemWidth) + gridItemWidth - context.dpToPixel(2)).toFloat()
+            val top = ((row * gridItemHeight) + headerHeight + (indexInDay * eventHeight) + (indexInDay * context.dpToPixel(1)))
+            val gridItemExtensionCount =
+                if (daySpanIndex == 1 && column + daySpanCount > 6) 6 - column
+                else if (daySpanIndex > 1 && daySpanCount - daySpanIndex > 6) 6
+                else daySpanCount - daySpanIndex
+            val end = ((column * gridItemWidth) + (gridItemExtensionCount * gridItemWidth) + gridItemWidth - context.dpToPixel(2))
             val bottom = top + eventHeight
 
-            if (daySpanCount > 1) {
-                if (daySpanIndex == 1) {
-                    TimberLogger.e("Test test multiday daySpanCount $daySpanCount daySpanIndex $daySpanIndex extend right strip")
-                    extendRightSideStrip = column < 6
-                } else if (daySpanIndex == daySpanCount) {
-                    TimberLogger.e("Test test multiday daySpanCount $daySpanCount daySpanIndex $daySpanIndex display right side strip, extend left side")
-                    extendLeftSideStrip = column > 0
-                } else {
-                    TimberLogger.e("Test test multiday daySpanCount $daySpanCount daySpanIndex $daySpanIndex extend both sides")
-                    extendLeftSideStrip = column > 0
-                    extendRightSideStrip = column < 6
-                }
-            }
+            val sideStripWidth = context.dpToPixel(3).toFloat()
+            val textStart = start + sideStripWidth + context.dpToPixel(2)
+            val eventRectEndMargin = context.dpToPixel(1)
+            val textEndMargin = context.dpToPixel(2)
 
-            // Prepare the event blob rects
-
-            eventLeftSideStripPaint.style = Paint.Style.FILL
-            if (extendLeftSideStrip) {
-                eventLeftSideStripPaint.color =
-                    if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
-                    else calendarColor
-
-                eventLeftSideStripRect.set(
-                    start - context.dpToPixel(1),
-                    top,
-                    (start + context.dpToPixel(6)),
-                    bottom
-                )
-            } else {
-                eventLeftSideStripPaint.color = Color.parseColor(AndroidUtils.darkenCalendarColor(
+            // Prepare the event left strip with darkened color
+            eventLeftSideStripPaint = Paint().apply {
+                style = Paint.Style.FILL
+                color = Color.parseColor(AndroidUtils.darkenCalendarColor(
                     "#${Integer.toHexString(calendarColor and 0x00ffffff)}")
                 )
-
-                eventLeftSideStripRect.set(
-                    start,
-                    top,
-                    (start + context.dpToPixel(6)),
-                    bottom
-                )
+                isAntiAlias = true
             }
-
-            eventRectPaint.color =
-                if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
-                else calendarColor
-            eventRectPaint.style = Paint.Style.FILL
-
-            eventRect.set(
-                start + context.dpToPixel(3),
+            eventLeftSideStripRect = RectF(
+                start,
                 top,
-                end - context.dpToPixel(3),
+                start + (sideStripWidth * 2), // We double the width to have a proper rounded top & bottom
                 bottom
             )
 
-            if (extendRightSideStrip) {
-                eventRightSideStripRect.set(
-                    end - context.dpToPixel(6),
-                    top,
-                    end + context.dpToPixel(2),
-                    bottom
-                )
-            } else {
-                eventRightSideStripRect.set(
-                    end - context.dpToPixel(6),
-                    top,
-                    end,
-                    bottom
-                )
+            // Prepare the event main rect
+            eventRectPaint = Paint().apply {
+                style = Paint.Style.FILL
+                color =
+                    if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                    else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                    else calendarColor
+                isAntiAlias = true
             }
+            eventRect = RectF(
+                start,
+                top,
+                end - eventRectEndMargin,
+                bottom
+            )
 
-            TimberLogger.e("Test test multiday daySpanIndex $daySpanIndex")
-            if (eventTitle != null && (daySpanIndex == 1 || column == 0)) {
-                // Prepare the event blob title
+            eventStripSeparationPaint = Paint(eventRectPaint).apply {
+                strokeWidth = sideStripWidth
+            }
+            eventStripSeparationLine = floatArrayOf(
+                eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
+            )
 
-                titleX = eventRect.left + context.dpToPixel(2)
+            // Prepare the event title if needed
+            if (eventTitle != null && !decryptionFailed) {
+                titlePaint = TextPaint(basicTitlePaint).apply {
+                    color =
+                        if (isUnanswered) ContextCompat.getColor(context, R.color.text_norm)
+                        else if (pastEvent) ContextCompat.getColor(context, R.color.text_weak)
+                        else ContextCompat.getColor(context, R.color.text_on_calendar_color)
+                    isStrikeThruText = strikeThroughTitle
+                }
+
+                titleX = textStart
                 titleY = eventRect.centerY() - (titlePaint.descent() + titlePaint.ascent()) / 2
 
-                val availableColumns = 7 - column
-                val titleWidth = eventRect.width() * (
-                        if (availableColumns < daySpanCount) availableColumns
-                        else daySpanCount)
+                val titleWidth = eventRect.width() - textEndMargin - sideStripWidth
 
                 ellipsizedTitle = TextUtils.ellipsize(
                     eventTitle,
@@ -363,28 +462,98 @@ class MonthView : ViewGroup {
                     TextUtils.TruncateAt.END
                 )
             }
+
+            if (decryptionFailed) {
+                decryptionFailedPaint = Paint().apply {
+                    val colorToBrighten =
+                        if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                        else calendarColor
+                    color = Color.parseColor(AndroidUtils.brightenCalendarColor(
+                        "#${Integer.toHexString(colorToBrighten and 0x00ffffff)}", if (pastEvent) 0.04f else 0.18f)
+                    )
+                    isAntiAlias = true
+                }
+
+                decryptionFailedRect = RectF(
+                    start + context.dpToPixel(5),
+                    top + context.dpToPixel(5),
+                    end - context.dpToPixel(5),
+                    bottom - context.dpToPixel(5)
+                )
+            }
+
+            if (isUnanswered) {
+                prepareStripes(context, sideStripWidth)
+            }
         }
 
-        fun prepareMiniEventBlob(context: Context, gridItemWidth: Int, gridItemHeight: Int, column: Int, row: Int, maxEventCount: Int, miniEventCount: Int, miniEventIndex: Int) {
-            TimberLogger.e("Test test prepareMiniEventBlob gridItemWidth $gridItemWidth gridItemHeight $gridItemHeight column $column row $row maxEventCount $maxEventCount miniEventCount $miniEventCount miniEventIndex $miniEventIndex")
+        private fun prepareStripes(context: Context, sideStripWidth: Float) {
+            val lineWidth = context.dpToPixel(1) / 2F
+
+            unansweredStripesPaint = Paint().apply {
+                color = Color.parseColor(AndroidUtils.brightenCalendarColor(
+                    "#${Integer.toHexString(calendarColor and 0x00ffffff)}", 0.18f)
+                )
+                strokeWidth = lineWidth
+                isAntiAlias = true
+            }
+
+            val lineGap = context.dpToPixel(4)
+
+            val eventWidth = eventRect.width() - sideStripWidth
+            val totalDistance = eventWidth + eventRect.height()
+
+            val stripesArrayList = arrayListOf<Float>()
+            var distance = 0.0
+            val rectStartX = eventRect.left + sideStripWidth
+            while (distance < totalDistance) {
+
+                val startX =
+                    if (distance < eventWidth) rectStartX + distance.toFloat()
+                    else rectStartX + eventWidth
+                val startY =
+                    if (distance < eventWidth) eventRect.top
+                    else eventRect.top + (distance.toFloat() - eventWidth)
+                val stopX =
+                    if (distance < eventRect.height()) rectStartX
+                    else rectStartX + (distance.toFloat() - eventRect.height())
+                val stopY =
+                    if (distance < eventRect.height()) eventRect.top + distance.toFloat()
+                    else eventRect.top + eventRect.height()
+
+                stripesArrayList.add(startX)
+                stripesArrayList.add(startY)
+                stripesArrayList.add(stopX)
+                stripesArrayList.add(stopY)
+
+                distance += ((lineGap + lineWidth) / cos(PI / 4))
+
+            }
+            unansweredStripes = stripesArrayList.toFloatArray()
+        }
+
+        fun prepareMiniEventBlob(context: Context, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int, maxEventCount: Int, miniEventCount: Int, miniEventIndex: Int) {
+
+            isMiniEvent = true
 
             val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
             val eventHeight = context.dpToPixel(16)
             val miniEventHeight = context.dpToPixel(6)
+            val eventRectEndMargin = context.dpToPixel(1)
 
             // Prepare the mini event blob rects
 
             val start: Float
             val end: Float
 
-            val top = ((row * gridItemHeight) + headerHeight + (maxEventCount * eventHeight) + (maxEventCount * context.dpToPixel(1)) + context.dpToPixel(2)).toFloat()
+            val top = ((row * gridItemHeight) + headerHeight + (maxEventCount * eventHeight) + (maxEventCount * context.dpToPixel(1)) + context.dpToPixel(2))
             val bottom = top + miniEventHeight
 
-            val columnStart = (column * gridItemWidth + context.dpToPixel(1)).toFloat()
+            val columnStart = (column * gridItemWidth + context.dpToPixel(1))
             if (miniEventCount == 1) {
                 // Display only one mini blob
                 start = columnStart
-                end = ((column * gridItemWidth) + gridItemWidth - context.dpToPixel(2)).toFloat()
+                end = ((column * gridItemWidth) + gridItemWidth - context.dpToPixel(2))
             } else if (miniEventCount > MAX_MINI_EVENT_COUNT) {
                 // Display + icon
                 val plusIconWidth = context.dpToPixel(8)
@@ -403,51 +572,64 @@ class MonthView : ViewGroup {
                 end = start + miniEventWidth - endMargin
             }
 
-            eventLeftSideStripPaint.color = Color.parseColor(AndroidUtils.darkenCalendarColor(
-                "#${Integer.toHexString(calendarColor and 0x00ffffff)}")
-            )
+            val sideStripWidth = context.dpToPixel(3).toFloat()
 
-            eventLeftSideStripRect.set(
+            eventLeftSideStripPaint = Paint().apply {
+                color = Color.parseColor(AndroidUtils.darkenCalendarColor(
+                    "#${Integer.toHexString(calendarColor and 0x00ffffff)}")
+                )
+                isAntiAlias = true
+            }
+
+            eventLeftSideStripRect = RectF(
                 start,
                 top,
-                (start + context.dpToPixel(6)),
+                start + (sideStripWidth * 2), // We double the width to have a proper rounded top & bottom
                 bottom
             )
 
-            eventRectPaint.color =
-                if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
-                else calendarColor
-            eventRectPaint.style = Paint.Style.FILL
+            eventRectPaint = Paint().apply {
+                color =
+                    if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                    else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                    else calendarColor
+                style = Paint.Style.FILL
+                isAntiAlias = true
+            }
 
-            eventRect.set(
-                start + context.dpToPixel(3),
+            eventRect = RectF(
+                start,
                 top,
-                end - context.dpToPixel(3),
+                end - eventRectEndMargin,
                 bottom
             )
 
-            eventRightSideStripRect.set(
-                end - context.dpToPixel(6),
-                top,
-                end,
-                bottom
+            eventStripSeparationPaint = Paint(eventRectPaint).apply {
+                strokeWidth = sideStripWidth
+            }
+            eventStripSeparationLine = floatArrayOf(
+                eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
             )
+
+            if (isUnanswered) {
+                prepareStripes(context, sideStripWidth)
+            }
         }
 
-        fun preparePlusIcon(context: Context, gridItemWidth: Int, gridItemHeight: Int, column: Int, row: Int, maxEventCount: Int) {
+        fun preparePlusIcon(context: Context, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int, maxEventCount: Int) {
             isPlusIcon = true
 
             val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
             val eventHeight = context.dpToPixel(16)
             val miniEventHeight = context.dpToPixel(6)
 
-            val top = ((row * gridItemHeight) + headerHeight + (maxEventCount * eventHeight) + (maxEventCount * context.dpToPixel(1)) + context.dpToPixel(2)).toFloat()
-            val end = (column * gridItemWidth + context.dpToPixel(1) + gridItemWidth - context.dpToPixel(5)).toFloat()
+            val top = ((row * gridItemHeight) + headerHeight + (maxEventCount * eventHeight) + (maxEventCount * context.dpToPixel(1)) + context.dpToPixel(2))
+            val end = (column * gridItemWidth + context.dpToPixel(1) + gridItemWidth - context.dpToPixel(5))
             val start = end - context.dpToPixel(6)
             val bottom = top + miniEventHeight
 
             val horizontalHeight = (bottom - top) / 2 - context.dpToPixel(1)
-            plusIconHorizontalRect.set(
+            plusIconHorizontalRect = RectF(
                 start,
                 top + horizontalHeight,
                 end,
@@ -455,12 +637,24 @@ class MonthView : ViewGroup {
             )
 
             val verticalWidth = (end - start) / 2 - context.dpToPixel(1)
-            plusIconVerticalRect.set(
+            plusIconVerticalRect = RectF(
                 start + verticalWidth,
                 top,
                 end - verticalWidth,
                 bottom
             )
+
+            plusIconPaint = Paint().apply {
+                color =
+                    if (eventTitle == null) {
+                        val color = ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                        Color.parseColor(AndroidUtils.darkenCalendarColor(
+                            "#${Integer.toHexString(color and 0x00ffffff)}")
+                        )
+                    } else ContextCompat.getColor(context, R.color.icon_weak)
+                style = Paint.Style.FILL
+                isAntiAlias = true
+            }
         }
     }
 }

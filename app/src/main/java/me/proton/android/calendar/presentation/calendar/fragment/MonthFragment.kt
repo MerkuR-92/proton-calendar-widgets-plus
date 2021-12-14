@@ -184,7 +184,6 @@ class MonthFragment : BaseFragment() {
                 val monthStartingDate = miniCalendarPagerAdapter.firstDayOfMonth
                 val firstDay = monthStartingDate.plusMonths((position - monthStartingPosition).toLong())
 
-                TimberLogger.e("Test test MONTH onPageSelected firstDay $firstDay")
                 calendarViewModel.handleDaySelected(firstDay, fromMonthPagerCallback = true)
 
                 setToolbarMonthYearTitle(firstDay, miniCalendarPager.currentItem)
@@ -200,7 +199,6 @@ class MonthFragment : BaseFragment() {
         override fun onPageSelected(position: Int) {
             val currentDate =
                 calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-            TimberLogger.e("Test test AGENDA onPageSelected agendaPager.currentItem ${agendaPager.currentItem} currentDate $currentDate")
             calendarViewModel.handleDaySelected(currentDate)
         }
     }
@@ -269,6 +267,8 @@ class MonthFragment : BaseFragment() {
     }
 
     private fun adjustMiniCalendarView(firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek) {
+
+        if (currentViewMode == ViewMode.MONTH) return
 
         // ViewPager will adjust its height to the largest item it contains and display empty space for
         // smaller items, like months with fewer week lines. That's why we need to resize it every time we
@@ -647,8 +647,9 @@ class MonthFragment : BaseFragment() {
                     setCurrentItem(currentItem, false)
                 }
             }
-            (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
-            (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+            // TODO Try and see if this is needed
+            // (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+            // (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
 
             val immutableWeekStart = calendarViewModel.getWeekStart()
             if (viewMode == ViewMode.AGENDA) {
@@ -731,6 +732,9 @@ class MonthFragment : BaseFragment() {
     }
 
     private fun setHeaderDaysContent(startWeekOn: DayOfWeek, timeZoneId: String) {
+
+        if (currentViewMode == ViewMode.MONTH) return
+
         // Setup week days header
         miniCalendarDaysHeaderLayout?.run {
 

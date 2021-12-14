@@ -829,19 +829,15 @@ object ICalUtilsImpl : ICalUtils {
         val comparator = Comparator<Event> { a, b ->
             return@Comparator when {
                 isAllDayPrio(timeZoneId, a, b) -> {
-                    TestsLogger.e("Test test isAllDayPrio a ((${a.summary})) before b ((${b.summary}))")
                     -1
                 }
                 isAllDayPrio(timeZoneId, b, a) -> {
-                    TestsLogger.e("Test test isAllDayPrio b ((${b.summary})) before a ((${a.summary}))")
                     1
                 }
                 isMultiDayPrio(timeZoneId, a, b) -> {
-                    TestsLogger.e("Test test isMultiDayPrio a ((${a.summary})) before b ((${b.summary}))")
                     -1
                 }
                 isMultiDayPrio(timeZoneId, b, a) -> {
-                    TestsLogger.e("Test test isMultiDayPrio b ((${b.summary})) before a ((${a.summary}))")
                     1
                 }
                 else -> {
@@ -849,21 +845,16 @@ object ICalUtilsImpl : ICalUtils {
                     val coeficcient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
 
                     if (coeficcient1 > 0) {
-                        TestsLogger.e("Test test coeficcient1 > 0 b ((${b.summary})) before a ((${a.summary}))")
                         1
                     } else if (coeficcient1 < 0) {
-                        TestsLogger.e("Test test coeficcient1 < 0 a ((${a.summary})) before b ((${b.summary}))")
                         -1
                     }
                     else {
                         if (coeficcient2 > 0) {
-                            TestsLogger.e("Test test coeficcient2 > 0 b ((${b.summary})) before a ((${a.summary}))")
                             1
                         } else if (coeficcient2 < 0) {
-                            TestsLogger.e("Test test coeficcient2 < 0 a ((${a.summary})) before b ((${b.summary}))")
                             -1
                         } else {
-                            TestsLogger.e("Test test coeficcient == 0 a ((${a.summary})) keep original order with b ((${b.summary}))")
                             0
                         }
                     }

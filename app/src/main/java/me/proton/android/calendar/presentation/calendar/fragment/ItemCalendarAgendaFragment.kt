@@ -248,7 +248,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        logger.e("Test test Agenda onDestroyView")
         calendarViewModel.setLoading(false, position)
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
             logger.v("events flow: remove observers in on destroy for $date")

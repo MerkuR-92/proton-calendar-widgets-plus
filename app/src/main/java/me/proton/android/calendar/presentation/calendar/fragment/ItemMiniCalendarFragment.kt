@@ -245,7 +245,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                 timeZoneId
             ).observe(viewLifecycleOwner) { indicators ->
                 this@ItemMiniCalendarFragment.indicators = indicators
-                logger.e("Test test indicators $indicators")
                 applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
             }
 

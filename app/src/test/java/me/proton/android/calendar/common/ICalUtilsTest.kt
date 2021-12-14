@@ -4258,8 +4258,6 @@ internal class ICalUtilsTest {
 
         val sortedList = events.sortForMonthView(timeZoneId)
 
-        TestsLogger.e("Test test RESULT ${sortedList.map { it.summary }}")
-
         assertThat(sortedList[0].summary).isEqualTo("Multi day all day 3 - 5")
         assertThat(sortedList[1].summary).isEqualTo("Multi day all day 5 - 7")
         assertThat(sortedList[2].summary).isEqualTo("Multi day part day 5 - 6 11h - 13h")

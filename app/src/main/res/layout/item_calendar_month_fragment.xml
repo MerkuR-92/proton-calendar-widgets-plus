@@ -159,7 +159,6 @@
                 android:layout_height="match_parent"
                 android:rowCount="6"
                 android:columnCount="7"
-                android:background="@color/separator_norm"
                 tools:listitem="@layout/item_month_view_grid" />
 
             <me.proton.android.calendar.presentation.calendar.customView.MonthView

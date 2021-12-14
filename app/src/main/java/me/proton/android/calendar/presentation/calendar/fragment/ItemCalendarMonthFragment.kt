@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +13,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
+import biweekly.parameter.ParticipationStatus
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_calendar_month_fragment.*
 import kotlinx.android.synthetic.main.item_month_view_grid.view.*
@@ -27,6 +31,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -196,15 +201,14 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Submit month skeleton with only days and weekday names
         val skeletonList = AndroidUtils.concatenate(previousMonthDayItems, dayItems, upcomingMonthDayItems)
 
-        // Set the grid
+        monthView.prepareMonthGrid(skeletonList.map { it.date }, forDate.month)
+
+        // Set the clickable grid items
         view?.findViewById<GridLayout>(R.id.month_fragment_grid_layout)?.run {
             this.removeAllViews()
             var skeletonListIndex = 0
             for (rowIndex in 0 until 6) {
                 for (columnIndex in 0 until 7) {
-
-                    val row = GridLayout.spec(rowIndex, GridLayout.FILL, 1f)
-                    val column = GridLayout.spec(columnIndex, GridLayout.FILL, 1f)
 
                     val dayItemView = LayoutInflater.from(this.context).inflate(
                         R.layout.item_month_view_grid,
@@ -212,27 +216,16 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         false
                     )
 
+                    val row = GridLayout.spec(rowIndex, GridLayout.FILL, 1f)
+                    val column = GridLayout.spec(columnIndex, GridLayout.FILL, 1f)
+
                     val layoutParams = GridLayout.LayoutParams(row, column)
-                    layoutParams.topMargin = requireContext().dpToPixel(1)
-                    if (rowIndex != 5) layoutParams.bottomMargin = requireContext().dpToPixel(1)
-                    layoutParams.leftMargin = requireContext().dpToPixel(1)
-                    layoutParams.rightMargin = requireContext().dpToPixel(1)
                     dayItemView.layoutParams = layoutParams
 
                     if (skeletonListIndex <= skeletonList.lastIndex) {
                         // Make sure we don't go out of bound
                         val date = skeletonList[skeletonListIndex].date
-                        dayItemView.item_month_view_grid_date.text = date.dayOfMonth.toString()
-                        dayItemView.item_month_view_grid_date.setTextColor(
-                            ContextCompat.getColor(
-                                requireContext(),
-                                if (skeletonList[skeletonListIndex].date == LocalDate.now()) R.color.brand_norm
-                                else if (skeletonList[skeletonListIndex].date.month != forDate.month) R.color.text_hint
-                                else R.color.text_norm
-                            )
-                        )
                         dayItemView.setOnSingleClickListener {
-                            logger.e("Test test dayItemView onClick date $date")
                             calendarViewModel.handleDaySelected(date)
                             calendarViewModel.viewMode.postValue(ViewMode.DAY)
                             mainViewModel.setViewMode(ViewMode.DAY)
@@ -244,10 +237,10 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                     skeletonListIndex++
                 }
             }
+
         }
 
         if (this.isResumed) {
-            logger.e("Test test opti isResumed getSkeletonEvents for position $position")
             calendarViewModel.monthViewLoading.value = Pair(position, true)
             getSkeletonEvents(fromDate, toDate, timeZoneId, position)
         } else {
@@ -255,13 +248,11 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             calendarViewModel.monthViewLoading.observe(viewLifecycleOwner) { monthViewLoading ->
                 if ((this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) ||
                     (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers())) {
-                    logger.e("Test test opti monthViewLoading observe already has observers for position $position")
                     calendarViewModel.monthViewLoading.removeObservers(viewLifecycleOwner)
                     return@observe
                 }
                 if (!loading && (monthViewLoading.first == position || !monthViewLoading.second)) {
                     loading = true
-                    logger.e("Test test opti monthViewLoading observe getSkeletonEvents for monthViewLoading $monthViewLoading position $position")
                     calendarViewModel.monthViewLoading.value = Pair(position, true)
                     getSkeletonEvents(fromDate, toDate, timeZoneId, position)
                 }
@@ -289,7 +280,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         loading = false
-                        logger.e("Test test opti monthViewLoading getSkeletonEvents Exception $position")
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
                         logger.e(
                             "ItemCalendarMonthFragment getSkeletonEvents exception getting skeletonEventsLiveData",
@@ -320,12 +310,14 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
                         displayMonthViewEvents(it.events, fromDate, timeZoneId, false)
                         loading = false
-                        logger.e("Test test opti monthViewLoading getEvents Success $position")
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
+
+                        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
+                            skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
+                        }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         loading = false
-                        logger.e("Test test opti monthViewLoading getEvents Exception $position")
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
                         // TODO
                     }
@@ -353,9 +345,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                 if (start == end && (skeletonEvent.isAllDay() || partTimeEndsOnMidnight)) break
             }
         }
-        logger.e("Test test monthGridMap ${monthGridMap.size}")
-
-        logger.e("Test test opti events to display size ${monthGridMap.values.flatMap { it.take(4) }.size} isSkeletonEvent $isSkeletonEvent")
 
         val monthViewEventsMap = hashMapOf<Int, List<MonthView.MonthViewEvent>>()
 
@@ -382,17 +371,12 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             val childMap = mutableMapOf<Int, Event>()
             if (key > 0) {
                 val previousChildMap = rootMap[key - 1]
-                logger.e("${fromDate.plusDays(key.toLong())} key $key previousChildMap ${previousChildMap?.values?.map { it.summary }}")
                 previousChildMap?.forEach { index, event ->
                     if (!event.spansSingleDay(timeZoneId = timeZoneId) &&
                         event.calculateFullDayCounter(
                             fromDate.plusDays(key.toLong()),
                             timeZoneId
                         ).first > 1) {
-                        logger.e("${fromDate.plusDays(key.toLong())} key $key this: ${event.summary} to index $index counter ${event.calculateFullDayCounter(
-                            fromDate.plusDays(key.toLong()),
-                            timeZoneId
-                        )}")
                         childMap[index] = event
                     }
                 }
@@ -408,48 +392,46 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                 nextAvailableMapIndex++
             }
 
-            logger.e("${fromDate.plusDays(key.toLong())} key $key childMap ${childMap.values.map { it.summary }}")
             rootMap[key] = childMap
         }
 
-        rootMap.forEach {
-            logger.e("${fromDate.plusDays(it.key.toLong())} key ${it.key} childMap ${it.value.values.map { it.summary }}")
-        }
+        lifecycleScope.launch {
+            val userEmails = calendarViewModel.getUserEmails()
+            rootMap.forEach { (dayIndex, childMap) ->
 
-        rootMap.forEach { (dayIndex, childMap) ->
+                val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
 
-            val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
+                // Take first 4 events
+                childMap.forEach { (indexInDay, event) ->
 
-            // Take first 4 events
-            childMap.forEach { (indexInDay, event) ->
-
-                val fullDayCounter = event.calculateFullDayCounter(
-                    fromDate.plusDays(dayIndex.toLong()),
-                    timeZoneId
-                )
-
-                monthViewEvents.add(
-                    MonthView.MonthViewEvent(
-                        null,
-                        indexInDay,
-                        fullDayCounter.second,
-                        fullDayCounter.first,
-                        if (isSkeletonEvent) ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
-                        else Color.parseColor(event.calendar.color),
-                        event.isInThePast(timeZoneId),
-                        if (isSkeletonEvent) null
-                        else {
-                            // TODO Handle decryption status
-                            if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) "locked" // TODO Handle decryption status
-                            else event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
-                        }
+                    val fullDayCounter = event.calculateFullDayCounter(
+                        fromDate.plusDays(dayIndex.toLong()),
+                        timeZoneId
                     )
-                )
-            }
-            monthViewEventsMap[dayIndex] = monthViewEvents
-        }
 
-        monthView.setMonthViewEvents(monthViewEventsMap)
+                    val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
+                    monthViewEvents.add(
+                        MonthView.MonthViewEvent(
+                            null,
+                            indexInDay,
+                            fullDayCounter.second,
+                            fullDayCounter.first,
+                            if (isSkeletonEvent) ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
+                            else Color.parseColor(event.calendar.color),
+                            event.isInThePast(timeZoneId),
+                            !event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
+                            event.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
+                            event.decryptionStatus == Event.DecryptionStatus.FAILURE,
+                            if (isSkeletonEvent) null
+                            else event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
+                        )
+                    )
+                }
+                monthViewEventsMap[dayIndex] = monthViewEvents
+            }
+
+            monthView.setMonthViewEvents(monthViewEventsMap)
+        }
     }
 
     private fun setupWeekNumbers(firstDay: LocalDate, startWeekOn: DayOfWeek) {
@@ -465,13 +447,10 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        logger.e("Test test Month onDestroyView")
         if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
-            logger.e("Test test Month onDestroyView skeletonEventsLiveData removeObservers")
             skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
         }
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
-            logger.e("Test test Month onDestroyView eventsLiveData removeObservers")
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
     }
@@ -479,7 +458,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     override fun onResume() {
         super.onResume()
         position?.let {
-            logger.e("Test test opti onResume position $it loading $loading")
             calendarViewModel.monthViewLoading.value = Pair(it, loading)
         }
     }

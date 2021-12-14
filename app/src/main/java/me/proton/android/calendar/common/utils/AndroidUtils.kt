@@ -761,6 +761,13 @@ object AndroidUtils {
         return "#${color.toHexString()}"
     }
 
+    fun brightenCalendarColor(colorString: String, increaseBy: Float): String {
+        val outHSL = FloatArray(3)
+        ColorUtils.colorToHSL(Integer.valueOf(colorString.substringAfter("#"), 16), outHSL)
+
+        val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] + increaseBy, 1.0f))))
+        return "#${color.toHexString()}"
+    }
 
     fun Activity.clearFocusAndHideKeyboard(view: View?) {
         val windowToken = view?.rootView?.windowToken
@@ -1204,6 +1211,10 @@ object AndroidUtils {
 
     fun Context.dpToPixel(dp: Int): Int {
         return (dp * resources.displayMetrics.density).toInt()
+    }
+
+    fun Context.dpToPixel(dp: Float): Float {
+        return dp * resources.displayMetrics.density
     }
 
     fun Context.pixelToDp(pixel: Int): Int {

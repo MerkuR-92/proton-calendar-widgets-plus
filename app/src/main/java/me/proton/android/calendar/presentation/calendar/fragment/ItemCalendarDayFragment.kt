@@ -466,7 +466,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
         dayMediator.observe(viewLifecycleOwner) {
             it?.let {
-                logger.e("Test test Day agendaMediator observe update")
                 setupItemMiniCalendarContent(it.first, it.second, it.third)
             }
         }
@@ -728,7 +727,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        logger.e("Test test Day onDestroyView")
         calendarViewModel.setLoading(false, position)
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove observers in on destroy for $date")
