@@ -111,6 +111,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Delete events</string>
     <string name="event_decryption_error_dialog_close">Close</string>
 
+    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a></string>
+
     <string name="event_change_answer_recurring_title">Update recurring event</string>
     <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
     <string name="event_change_answer_recurring_overwrite_description">Would you like to change your answer for all the events in this series?\nSome of your answers to occurrences previously updated by the organizer will be lost.</string>
