@@ -542,12 +542,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         if (day_view == null) return
 
-        if (FeatureFlag.NEW_EVENT_DECRYPTION) {
-            // TODO remove UserID livedata
-            calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
-                userId?.let {
-                    getEvents(immutableDate, timeZoneId, timeFormatIs24Hour, userAddresses)
-                }
+        // TODO remove UserID livedata
+        calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
+            userId?.let {
+                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour, userAddresses)
             }
         }
 
