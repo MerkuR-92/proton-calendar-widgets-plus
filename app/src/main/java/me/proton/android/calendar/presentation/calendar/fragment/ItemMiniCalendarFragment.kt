@@ -28,6 +28,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.FragmentArguments.STARTING_POSITION_ARG
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel

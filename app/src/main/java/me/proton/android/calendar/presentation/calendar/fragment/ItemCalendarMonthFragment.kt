@@ -24,6 +24,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.ViewMode
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -73,6 +74,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     private lateinit var skeletonEventsLiveData: LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>>
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 
+    private var events: List<Event>? = null
+
     companion object {
         fun newInstance(position: Int, startingPosition: Int, date: LocalDate): ItemCalendarMonthFragment {
             return ItemCalendarMonthFragment().apply {
@@ -115,11 +118,11 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         val immutableStartingPosition = startingPosition ?: return
         val firstDayMonthView = immutableDate.plusMonths((immutablePosition - immutableStartingPosition).toLong())
 
-        month_fragment_loader.visibleOrGone(true)
-
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
 
             monthFragmentWeekNumberLayout.visibleOrGone(displayWeekNumber)
+
+            monthView.setShowWeekNumbers(displayWeekNumber)
         }
 
         monthViewMediator.addSource(calendarViewModel.timeZoneId) { value ->
@@ -226,6 +229,20 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         // Make sure we don't go out of bound
                         val date = skeletonList[skeletonListIndex].date
                         dayItemView.setOnSingleClickListener {
+                            val selectedDateEvents = events?.filter {
+                                it.getOccurrenceStart(timeZoneId).toLocalDate() == date && it.spansSingleDay(true, timeZoneId)
+                            }
+                            if (selectedDateEvents != null && selectedDateEvents.isNotEmpty()) {
+                                calendarViewModel.firstEventOfTheDayTime =
+                                    Collections.min(
+                                        selectedDateEvents.map {
+                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                        }
+                                    )
+                            }
+
+                            calendarViewModel.monthViewDate = calendarViewModel.selectedDate.value
+
                             calendarViewModel.handleDaySelected(date)
                             calendarViewModel.viewMode.postValue(ViewMode.DAY)
                             mainViewModel.setViewMode(ViewMode.DAY)
@@ -265,6 +282,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
             // Get and display skeleton events
             skeletonEventsLiveData = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
+            month_fragment_loader.visibleOrGone(true)
             skeletonEventsLiveData.observe(viewLifecycleOwner) { skeletonEventsResult ->
                 when (skeletonEventsResult) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
@@ -307,6 +325,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         // TODO
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
+
+                        events = it.events
 
                         displayMonthViewEvents(it.events, fromDate, timeZoneId, false)
                         loading = false
@@ -352,7 +372,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
             // Sort the list
             val filteredList = it.value.filterNot { event ->
-                !event.spansSingleDay(timeZoneId = timeZoneId) &&
+                it.key != 0 &&
+                        !event.spansSingleDay(timeZoneId = timeZoneId) &&
                         event.calculateFullDayCounter(
                             fromDate.plusDays(it.key.toLong()),
                             timeZoneId
@@ -430,7 +451,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                 monthViewEventsMap[dayIndex] = monthViewEvents
             }
 
-            monthView.setMonthViewEvents(monthViewEventsMap)
+            monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false)
         }
     }
 

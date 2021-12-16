@@ -74,6 +74,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class MonthFragment : BaseFragment() {
@@ -146,15 +147,21 @@ class MonthFragment : BaseFragment() {
                 val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
                 if (hasActiveCalendars) {
                     // Each item in the adapter is one day
-                    val currentDate =
-                        calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-                    requireActivity().findNavController(R.id.nav_host_fragment_container_view)
-                        .navigate(
-                            Navigation.Deeplink.toEventCreate(
-                                currentDate,
-                                ICalUtilsImpl.generateEventStartTime(timeZoneId)
+                    calendarViewModel.selectedDate.value?.let { currentDate ->
+
+                        val date = if (currentViewMode == ViewMode.MONTH) {
+                            if (currentDate.month == LocalDate.now().month && currentDate.year == LocalDate.now().year) LocalDate.now()
+                            else currentDate.withDayOfMonth(1)
+                        } else currentDate
+
+                        requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                            .navigate(
+                                Navigation.Deeplink.toEventCreate(
+                                    date,
+                                    ICalUtilsImpl.generateEventStartTime(timeZoneId)
+                                )
                             )
-                        )
+                    }
                 } else {
                     requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
                 }
@@ -197,9 +204,11 @@ class MonthFragment : BaseFragment() {
 
     private val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            val currentDate =
-                calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
-            calendarViewModel.handleDaySelected(currentDate)
+            if (currentViewMode != ViewMode.MONTH) {
+                val currentDate =
+                    calendarViewModel.initialToday.plusDays((agendaPager.currentItem - agendaPagerAdapter.startingPosition).toLong())
+                calendarViewModel.handleDaySelected(currentDate)
+            }
         }
     }
 
@@ -331,7 +340,6 @@ class MonthFragment : BaseFragment() {
         dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday)
 
         calendarViewModel.viewMode.value?.let { viewMode ->
-            calendarViewModel.setAgendaViewMode(viewMode)
             fragmentMonthLayout.viewMode = viewMode
             initAgendaPager(viewMode)
         }
@@ -342,7 +350,6 @@ class MonthFragment : BaseFragment() {
 
         // Switch between Agenda and Day views
         calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
-            calendarViewModel.setAgendaViewMode(viewMode)
             fragmentMonthLayout.viewMode = viewMode
             initAgendaPager(viewMode)
         }
@@ -634,20 +641,38 @@ class MonthFragment : BaseFragment() {
 
             if (viewMode == ViewMode.MONTH) {
                 miniCalendarPager?.apply {
-                    val currentItem = this.currentItem // Save currently selected item position
+                    val currentItem =
+                        calendarViewModel.selectedDate.value?.let { selectedDate ->
+                                val startingDate = monthPagerAdapter.firstDayOfMonth
+                                val startingPosition = monthPagerAdapter.startingPosition
+                                val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                                startingPosition + selectedDayOffset
+                            } ?: monthPagerAdapter.startingPosition
+
                     adapter = monthPagerAdapter
                     offscreenPageLimit = 1
-                    setCurrentItem(currentItem, false)
+
+                    val item = if (currentItem > 0) currentItem else monthPagerAdapter.startingPosition
+                    setCurrentItem(item, false)
                 }
             } else {
                 miniCalendarPager?.apply {
-                    val currentItem = this.currentItem // Save currently selected item position
+                    val currentItem =
+                            calendarViewModel.selectedDate.value?.let { selectedDate ->
+                                val startingDate = miniCalendarPagerAdapter.firstDayOfMonth
+                                val startingPosition = miniCalendarPagerAdapter.startingPosition
+                                val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                                startingPosition + selectedDayOffset
+                            } ?: miniCalendarPagerAdapter.startingPosition
+
                     adapter = miniCalendarPagerAdapter
                     offscreenPageLimit = 1
-                    setCurrentItem(currentItem, false)
+
+                    val item = if (currentItem > 0) currentItem else miniCalendarPagerAdapter.startingPosition
+                    setCurrentItem(item, false)
                 }
             }
-            // TODO Try and see if this is needed
+            // TODO Try and see if this is still needed
             // (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
             // (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
 
@@ -658,29 +683,47 @@ class MonthFragment : BaseFragment() {
                     simulateExpandWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
                 }
                 agendaPager?.apply {
-                    val currentItem = this.currentItem // Save currently selected item position
+                    val currentItem =
+                            calendarViewModel.selectedDate.value?.let { selectedDate ->
+                                val startingDate = agendaPagerAdapter.startingDate
+                                val startingPosition = agendaPagerAdapter.startingPosition
+                                val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                                startingPosition + selectedDayOffset
+                            } ?: agendaPagerAdapter.startingPosition
+
                     adapter = agendaPagerAdapter
                     val item = if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition
                     setCurrentItem(item, false)
                     offscreenPageLimit = 1
                 }
-                (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
-                (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
-            } else if (viewMode == ViewMode.DAY) {
+                // TODO Try and see if this is still needed
+                // (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+                // (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+            } else { // Init with Day adapter
                 if (immutableWeekStart != null) {
                     calendarViewModel.monthView.value = false
                     simulateCollapseWithScroll(getWeekStartDayOfWeek(immutableWeekStart))
                 }
-                calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
+                if (calendarViewModel.selectedDate.value == LocalDate.now()) {
+                    calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
+                }
                 agendaPager?.apply {
-                    val currentItem = this.currentItem // Save currently selected item position
+                    val currentItem =
+                            calendarViewModel.selectedDate.value?.let { selectedDate ->
+                                val startingDate = dayPagerAdapter.startingDate
+                                val startingPosition = dayPagerAdapter.startingPosition
+                                val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                                startingPosition + selectedDayOffset
+                            } ?: dayPagerAdapter.startingPosition
+
                     adapter = dayPagerAdapter
                     val item = if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition
                     setCurrentItem(item, false)
                     offscreenPageLimit = 1
                 }
-                (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
-                (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+                // TODO Try and see if this is still needed
+                // (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+                // (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
             }
             if (miniCalendarPager != null && agendaPager != null) {
                 calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager, if (viewMode != ViewMode.MONTH) viewMode else null)

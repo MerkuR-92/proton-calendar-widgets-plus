@@ -95,6 +95,8 @@
             android:id="@+id/monthFragmentWeekDaysLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="3dp"
             android:weightSum="7"
             android:orientation="horizontal">
 
@@ -164,7 +166,9 @@
             <me.proton.android.calendar.presentation.calendar.customView.MonthView
                 android:id="@+id/month_fragment_month_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="3dp" />
 
             <ProgressBar
                 android:id="@+id/month_fragment_loader"

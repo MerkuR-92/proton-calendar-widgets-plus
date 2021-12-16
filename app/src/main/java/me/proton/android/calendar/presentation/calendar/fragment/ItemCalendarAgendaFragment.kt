@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -36,6 +37,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDate
+import java.util.*
 
 
 class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
@@ -219,14 +221,28 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
 
-                        if (it.events.isEmpty()) {
+                        val sortedEvents = it.events.sortForAgendaView(timeZoneId)
+                        if (immutableDate == calendarViewModel.selectedDate.value) {
+                            val partDayEvents = it.events.filter {
+                                it.spansSingleDay(true, timeZoneId)
+                            }
+                            calendarViewModel.firstEventOfTheDayTime =
+                                if (partDayEvents.isNotEmpty()) {
+                                    Collections.min(
+                                        partDayEvents.map {
+                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                        }
+                                    )
+                                } else null
+                        }
+                        if (sortedEvents.isEmpty()) {
                             list_view_status.visibleOrInvisible(true)
                             list_view_status.text = resources.getString(R.string.agenda_no_events)
                         } else {
                             list_view_status.visibleOrInvisible(false)
                         }
                         (rv_agenda.adapter as? EventAdapter)?.submitList(
-                            listOf(fakeHeaderEvent).plus(it.events.sortForAgendaView(timeZoneId))
+                            listOf(fakeHeaderEvent).plus(sortedEvents)
                         )
                         calendarViewModel.setLoading(false, position)
 

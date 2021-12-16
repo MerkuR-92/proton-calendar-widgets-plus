@@ -1029,6 +1029,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else if (returnToMonthView) {
+            calendarViewModel.monthViewDate?.let {
+                calendarViewModel.handleDaySelected(it)
+            }
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setViewMode(ViewMode.MONTH)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {

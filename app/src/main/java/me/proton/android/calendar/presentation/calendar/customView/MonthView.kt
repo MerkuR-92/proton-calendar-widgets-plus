@@ -84,9 +84,10 @@ class MonthView : ViewGroup {
     private var dayList: List<LocalDate>? = null
     private var month: Month? = null
 
+    private var showWeekNumbers: Boolean = false
+
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        TimberLogger.e("Test test MonthView onDraw parentWidth $parentWidth parentHeight $parentHeight gridItemWidth $gridItemWidth gridItemHeight $gridItemHeight")
 
         // TODO Clear Canvas
 //        canvas?.drawColor(context.getColor(R.color.background_norm))
@@ -139,7 +140,9 @@ class MonthView : ViewGroup {
             gridSeparatorList.add(parentWidth) // stopX
             gridSeparatorList.add(rowIndex * gridItemHeight) // stopY
         }
-        for (columnIndex in 0 until 7) {
+        val columnStart = if (showWeekNumbers) 0 else 1
+        val columnEnd = if (showWeekNumbers) 8 else 7
+        for (columnIndex in columnStart until columnEnd) {
             gridSeparatorList.add(columnIndex * gridItemWidth) // startX
             gridSeparatorList.add(0F) // startY
             gridSeparatorList.add(columnIndex * gridItemWidth) // stopX
@@ -256,13 +259,16 @@ class MonthView : ViewGroup {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
+        val refreshView = (parentWidth != 0F && parentWidth != measuredWidth.toFloat()) &&
+                this.monthViewEventsMap.isNotEmpty()
+
         parentWidth = measuredWidth.toFloat()
         parentHeight = measuredHeight.toFloat()
 
         gridItemWidth = parentWidth / 7
         gridItemHeight = parentHeight / 6
 
-
+        if (refreshView) prepareAndDrawMonthViewEvents()
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
     }
@@ -279,12 +285,18 @@ class MonthView : ViewGroup {
         return ((gridItemHeight - headerHeight - miniEventsHeight - context.dpToPixel(2)) / eventHeight).toInt() // 2 dp for top grid item top + bottom margin
     }
 
-    fun setMonthViewEvents(monthViewEventsMap: Map<Int, List<MonthViewEvent>>) {
+    fun setMonthViewEvents(monthViewEventsMap: Map<Int, List<MonthViewEvent>>, showWeekNumbers: Boolean) {
+
+        this.showWeekNumbers = showWeekNumbers
 
         this.monthViewEventsMap.clear()
 
         this.monthViewEventsMap.putAll(monthViewEventsMap)
 
+        prepareAndDrawMonthViewEvents()
+    }
+
+    private fun prepareAndDrawMonthViewEvents() {
         val maxEventCount = getMaxEventCount()
         this.monthViewEventsMap.forEach {
             val dayIndex = it.key
@@ -331,6 +343,11 @@ class MonthView : ViewGroup {
         }
 
         invalidate()
+    }
+
+    fun setShowWeekNumbers(showWeekNumbers: Boolean) {
+
+        this.showWeekNumbers = showWeekNumbers
     }
 
     data class MonthViewEvent(
@@ -419,7 +436,9 @@ class MonthView : ViewGroup {
 
             // Prepare the event main rect
             eventRectPaint = Paint().apply {
-                style = Paint.Style.FILL
+                style =
+                    if (strikeThroughTitle) Paint.Style.STROKE
+                    else Paint.Style.FILL
                 color =
                     if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
                     else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
@@ -434,7 +453,9 @@ class MonthView : ViewGroup {
             )
 
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
-                strokeWidth = sideStripWidth
+                strokeWidth = sideStripWidth + eventRectEndMargin
+                style = Paint.Style.FILL
+                if (strikeThroughTitle) color = ContextCompat.getColor(context, R.color.background_norm)
             }
             eventStripSeparationLine = floatArrayOf(
                 eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
@@ -444,7 +465,7 @@ class MonthView : ViewGroup {
             if (eventTitle != null && !decryptionFailed) {
                 titlePaint = TextPaint(basicTitlePaint).apply {
                     color =
-                        if (isUnanswered) ContextCompat.getColor(context, R.color.text_norm)
+                        if (isUnanswered || (!pastEvent && strikeThroughTitle)) ContextCompat.getColor(context, R.color.text_norm)
                         else if (pastEvent) ContextCompat.getColor(context, R.color.text_weak)
                         else ContextCompat.getColor(context, R.color.text_on_calendar_color)
                     isStrikeThruText = strikeThroughTitle
@@ -491,9 +512,11 @@ class MonthView : ViewGroup {
             val lineWidth = context.dpToPixel(1) / 2F
 
             unansweredStripesPaint = Paint().apply {
-                color = Color.parseColor(AndroidUtils.brightenCalendarColor(
-                    "#${Integer.toHexString(calendarColor and 0x00ffffff)}", 0.18f)
-                )
+                color =
+                    if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                    else Color.parseColor(AndroidUtils.brightenCalendarColor(
+                        "#${Integer.toHexString(calendarColor and 0x00ffffff)}", 0.18f)
+                    )
                 strokeWidth = lineWidth
                 isAntiAlias = true
             }
@@ -605,7 +628,7 @@ class MonthView : ViewGroup {
             )
 
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
-                strokeWidth = sideStripWidth
+                strokeWidth = sideStripWidth + eventRectEndMargin
             }
             eventStripSeparationLine = floatArrayOf(
                 eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom

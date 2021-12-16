@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
@@ -44,6 +45,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -527,7 +529,17 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             }
         } else {
             // Use previous view scrolling position if it exists
-            scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+            val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
+            if (calendarViewModel.selectedDate.value == date && firstEventOfTheDayTime != null) {
+                val yPos = dayView.getHourTop(
+                    if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
+                    else firstEventOfTheDayTime.hour
+                )
+                scrollView.scrollY = yPos
+                calendarViewModel.dayViewScrollYPosition.value = yPos
+            } else {
+                scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+            }
         }
         scrollView.setOnScrollChangeListener(onScrollChangeListener)
         preDrawDone = true
@@ -592,6 +604,29 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_no_events.text = resources.getString(R.string.agenda_loading_events)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
+
+                        val partDayEvents = it.events.filter {
+                            it.spansSingleDay(true, timeZoneId)
+                        }
+                        if (immutableDate == calendarViewModel.selectedDate.value) {
+                            val firstEventOfTheDayTime =
+                                if (partDayEvents.isNotEmpty()) {
+                                    Collections.min(
+                                        partDayEvents.map {
+                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                        }
+                                    )
+                                } else null
+                            calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
+                            if (immutableDate != LocalDate.now() && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
+                                val yPos = dayView.getHourTop(
+                                    if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
+                                    else firstEventOfTheDayTime.hour
+                                )
+                                day_scroll_view.scrollY = yPos
+                                calendarViewModel.dayViewScrollYPosition.value = yPos
+                            }
+                        }
 
                         allEvents = it.events
                         onEventsChange(timeZoneId, userAddresses)
