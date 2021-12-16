@@ -898,7 +898,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_calendars_list_add_layout.visibleOrGone(filteredUserCalendars.isEmpty())
         nav_view_calendars_create.visibleOrGone(filteredUserCalendars.isNotEmpty())
         lifecycleScope.launch {
-            val tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
+            var tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
+            val defaultCalendar = userCalendars.firstOrNull { it.id == tmpDefaultCalendarId }
+            if (defaultCalendar?.isActive == false) tmpDefaultCalendarId = userCalendars.firstOrNull { it.isActive }?.id
             userCalendarListAdapter.submitList(
                 filteredUserCalendars.sortedBy {
                     it.isDisabled // Disabled will appear last
