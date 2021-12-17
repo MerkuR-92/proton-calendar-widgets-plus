@@ -378,7 +378,8 @@ object ICalUtilsImpl : ICalUtils {
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
                 else if (iCalProperty::class == DateTimeStamp::class) {
                     // Take latest DateTimeStamp
-                    if ((iCalProperty as DateTimeStamp).value.after(left.events.first().getProperty(DateTimeStamp::class.java).value))
+                    val leftDateTimeStamp = left.events.first().getProperty(DateTimeStamp::class.java)?.value
+                    if (leftDateTimeStamp == null || (iCalProperty as DateTimeStamp).value.after(leftDateTimeStamp))
                         left.events.first().setProperty(iCalProperty)
                 } else left.events.first().setProperty(iCalProperty)
                 left.timezoneInfo.setTimezone(iCalProperty, right.timezoneInfo.getTimezone(iCalProperty))
