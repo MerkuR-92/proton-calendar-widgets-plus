@@ -10,6 +10,7 @@ import me.proton.android.calendar.common.provider.SharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
+import me.proton.android.calendar.data.EventDecryptorImpl
 import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
@@ -72,8 +73,9 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get(), get(), get()) }
+    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     single<UserSettingsRepository> { UserSettingsRepositoryImpl(get()) }
+    single<EventDecryptor> { EventDecryptorImpl(get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
 }
@@ -89,7 +91,7 @@ val viewModelModule = module {
             get()
         )
     }
-    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
@@ -101,7 +103,7 @@ val useCaseModule = module {
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<HandleDeleteUseCase> { HandleDeleteUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<HandleDeleteUseCase> { HandleDeleteUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleServerEventsUseCase> { HandleServerEventsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get()) }
     factory<SyncServerEventsUseCase> { SyncServerEventsUseCase(get(), get(), get(), get(), get()) }
@@ -111,7 +113,7 @@ val useCaseModule = module {
     factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get(), get(), get()) }
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get()) }
-    factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get()) }
+    factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get(), get()) }
     factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<GetCanonicalEmailsUseCase> { GetCanonicalEmailsUseCase(get(), get()) }
@@ -121,9 +123,9 @@ val useCaseModule = module {
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
     factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get()) }
     factory<SendEmailUseCase> { SendEmailUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<HandleIcsUseCase> { HandleIcsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<HandleIcsUseCase> { HandleIcsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get(), get()) }
-    factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get()) }
 }
 

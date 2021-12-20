@@ -17,6 +17,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlap
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
@@ -26,6 +27,7 @@ import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
@@ -48,7 +50,8 @@ class CalendarsRepositoryImpl(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
     private val json: Json,
-    private val widgetRefresher: WidgetRefresher
+    private val widgetRefresher: WidgetRefresher,
+    private val eventDecryptor: EventDecryptor
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
@@ -499,7 +502,11 @@ class CalendarsRepositoryImpl(
 
                 val transformedEvents = eventEntities.map { eventEntity ->
                     async {
-                        val transformedEvent = transformEventUseCase.execute(eventEntity)
+                        val transformedEvent = if (USE_EVENT_DECRYPTOR) {
+                            eventDecryptor.decrypt(eventEntity)
+                        } else {
+                            transformEventUseCase.execute(eventEntity)
+                        }
 
                         val skeletons = eventSkeletons.filter { it.id == eventEntity.id }
 
@@ -758,7 +765,11 @@ class CalendarsRepositoryImpl(
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             eventsSharingUidResponse.data.events.forEach {
-                val event = transformEventUseCase.execute(it)
+                val event = if (USE_EVENT_DECRYPTOR) {
+                    eventDecryptor.decrypt(it)
+                } else {
+                    transformEventUseCase.execute(it)
+                }
                 if (event?.iCalEvent?.recurrenceId != null) return true
             }
             false
@@ -771,7 +782,11 @@ class CalendarsRepositoryImpl(
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             val events = arrayListOf<Event>()
             eventsSharingUidResponse.data.events.forEach {
-                val event = transformEventUseCase.execute(it)
+                val event = if (USE_EVENT_DECRYPTOR) {
+                    eventDecryptor.decrypt(it)
+                } else {
+                    transformEventUseCase.execute(it)
+                }
                 if (stopAfter != null && timeZoneId != null && event?.getStart(timeZoneId)?.isAfter(stopAfter) == true) {
                     events.add(event)
                     return events

@@ -47,6 +47,7 @@ internal class CalendarRepositoryTest {
     private val fetchEventsUseCaseMock: FetchEventsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
     private val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
+    private val eventDecryptorMock: EventDecryptor = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -263,7 +264,8 @@ internal class CalendarRepositoryTest {
             updateAlarmsUseCaseMock,
             calendarsApiMock,
             json,
-            calendarWidgetRefresherMock
+            calendarWidgetRefresherMock,
+            eventDecryptorMock
         )
     }
 
