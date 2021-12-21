@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -44,7 +45,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
                 hasDefaultAlarms = false
@@ -150,7 +155,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
                 hasDefaultAlarms = false
@@ -248,7 +257,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
                 hasDefaultAlarms = false
@@ -318,7 +331,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 isProtonProtonInvite = true,
                 hasHiddenCalendar = true,
@@ -430,7 +447,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(
                 isRecurring = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -558,7 +579,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(
                 isRecurring = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -689,7 +714,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock single edit event with user as attendee
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventEntity(isSingleEdit = true)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true)) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity(isSingleEdit = true))
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true))
+            } } returns EventMocks.provideEvent(
                 isSingleEdit = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -818,7 +847,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock single edit event with user as attendee
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventEntity(isSingleEdit = true)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true)) } returns EventMocks.provideEvent(
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity(isSingleEdit = true))
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true))
+            } } returns EventMocks.provideEvent(
                 isSingleEdit = true,
                 isAttendee = true,
                 isProtonProtonInvite = true,

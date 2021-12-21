@@ -5,11 +5,13 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.mocks.*
@@ -33,6 +35,7 @@ internal class HandleDeleteUseCaseTest {
     private val transformEventUseCaseMock: TransformEventUseCase = mockk()
     private val sendEmailUseCaseMock: SendEmailUseCase = mockk()
     private val updateParticipationStatusUseCaseMock: UpdateParticipationStatusUseCase = mockk()
+    private val eventDecryptorMock: EventDecryptor = mockk()
 
     private val testsLogger = TestsLogger
 
@@ -99,7 +102,8 @@ internal class HandleDeleteUseCaseTest {
             transformEventUseCaseMock,
             calendarsRepositoryMock,
             sendEmailUseCaseMock,
-            updateParticipationStatusUseCaseMock
+            updateParticipationStatusUseCaseMock,
+            eventDecryptorMock
         )
     }
 
@@ -143,7 +147,11 @@ internal class HandleDeleteUseCaseTest {
 
         val event = provideEvent(isRecurring = isRecurring)
 
-        coEvery { transformEventUseCaseMock.execute(any()) } returns event
+        coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            eventDecryptorMock.decrypt(any())
+        } else {
+            transformEventUseCaseMock.execute(any())
+        } } returns event
 
         return event
     }
@@ -166,7 +174,11 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
+            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(any())
+            } else {
+                transformEventUseCaseMock.execute(any())
+            } }
             coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
@@ -197,7 +209,11 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
+            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(any())
+            } else {
+                transformEventUseCaseMock.execute(any())
+            } }
             coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
@@ -228,7 +244,11 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
+            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(any())
+            } else {
+                transformEventUseCaseMock.execute(any())
+            } }
             coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }

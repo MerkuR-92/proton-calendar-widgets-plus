@@ -6,9 +6,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import io.mockk.*
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.usecase.*
@@ -30,6 +32,7 @@ open class EventViewModelTestCommon: KoinComponent {
 
     val calendarsRepositoryMock: CalendarsRepository = mockk()
     val userSettingsRepositoryMock: UserSettingsRepository = mockk()
+    val eventDecryptorMock: EventDecryptor = mockk()
 
     val userManagerMock: UserManager = mockk()
 
@@ -93,7 +96,8 @@ open class EventViewModelTestCommon: KoinComponent {
             updateCalendarUseCase = updateCalendarUseCaseMock,
             resourceProvider = resourceProviderMock,
             widgetRefresher = calendarWidgetRefresherMock,
-            handleAlarmsUseCase = handleAlarmsUseCaseMock
+            handleAlarmsUseCase = handleAlarmsUseCaseMock,
+            eventDecryptor = eventDecryptorMock
         )
     }
 
@@ -129,14 +133,26 @@ open class EventViewModelTestCommon: KoinComponent {
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
             if (editMode) {
                 coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any()) }
-                coVerify(exactly = 2) { transformEventUseCaseMock.execute(any()) }
+                coVerify(exactly = 2) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    eventDecryptorMock.decrypt(any())
+                } else {
+                    transformEventUseCaseMock.execute(any())
+                } }
             } else {
-                coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
+                coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    eventDecryptorMock.decrypt(any())
+                } else {
+                    transformEventUseCaseMock.execute(any())
+                } }
             }
         } else if (eventId != null) {
             // If we edit existing event
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { transformEventUseCaseMock.execute(any()) }
+            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(any())
+            } else {
+                transformEventUseCaseMock.execute(any())
+            } }
         }
 
         return eventViewModel

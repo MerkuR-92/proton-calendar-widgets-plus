@@ -331,32 +331,20 @@ class CalendarViewModel(
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
 
-        return if (FeatureFlag.NEW_EVENT_DECRYPTION) {
-
-            skeletonEventsForIndicatorsLiveData(fromDate, toDate, timeZoneId).map { skeletonResult ->
-                when (skeletonResult) {
-                    CalendarsRepository.GetEventsResult.InProgress -> {
-                        emptyMap()
-                    }
-                    is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
-                        skeletonResult.events,
-                        timeZoneId
-                    )
-                    is CalendarsRepository.GetEventsResult.Exception -> {
-                        logger.e("exception getting skeletonEventsLiveData", skeletonResult.throwable)
-                        emptyMap()
-                    }
+        return skeletonEventsForIndicatorsLiveData(fromDate, toDate, timeZoneId).map { skeletonResult ->
+            when (skeletonResult) {
+                CalendarsRepository.GetEventsResult.InProgress -> {
+                    emptyMap()
+                }
+                is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
+                    skeletonResult.events,
+                    timeZoneId
+                )
+                is CalendarsRepository.GetEventsResult.Exception -> {
+                    logger.e("exception getting skeletonEventsLiveData", skeletonResult.throwable)
+                    emptyMap()
                 }
             }
-
-        } else {
-
-            eventsLiveData(fromDate, toDate, timeZoneId).map {
-                it?.let {
-                    calculateCalendarIndicators(it, timeZoneId)
-                } ?: emptyMap()
-            }
-
         }
     }
 

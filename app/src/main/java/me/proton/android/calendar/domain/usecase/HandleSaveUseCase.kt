@@ -4,6 +4,7 @@ import biweekly.util.ICalDate
 import biweekly.util.ICalDateFormat
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
@@ -19,6 +20,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -37,7 +39,8 @@ class HandleSaveUseCase(
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
-    private val sendEmailUseCase: SendEmailUseCase
+    private val sendEmailUseCase: SendEmailUseCase,
+    private val eventDecryptor: EventDecryptor
 ) {
 
     sealed class HandleSaveOptionResult {
@@ -68,7 +71,11 @@ class HandleSaveUseCase(
         event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
 
         val eventEntity = calendarsRepository.selectEventEntity(event.id)
-        val dbEvent = eventEntity?.let { transformEventUseCase.execute(it) }
+        val dbEvent = eventEntity?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            eventDecryptor.decrypt(it)
+        } else {
+            transformEventUseCase.execute(it)
+        } }
         val immutableOriginalDbEvent = originalDbEvent
         val dbEventStartDate = dbEvent?.getStart(event.defaultTimeZone!!)
         val originalDbEventStartDate = immutableOriginalDbEvent?.getStart(event.defaultTimeZone!!)

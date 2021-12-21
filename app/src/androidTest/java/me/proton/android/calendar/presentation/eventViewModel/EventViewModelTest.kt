@@ -6,6 +6,7 @@ import biweekly.util.Frequency
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.mocks.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,7 +91,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = false,
@@ -110,7 +115,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
@@ -130,7 +139,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent()
 
             // No default calendar
             coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns null
@@ -166,7 +179,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent()
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent()
 
             // No default calendar
             val calendarEntity = CalendarMocks.provideCalendarEntity(isDisabled = true)
@@ -206,13 +223,21 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
             val singleEditEventEntity = EventMocks.provideEventEntity(isSingleEdit = true)
             val singleEditEvent = EventMocks.provideEvent(isSingleEdit = true)
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns singleEditEventEntity
-            coEvery { transformEventUseCaseMock.execute(singleEditEventEntity) } returns singleEditEvent
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(singleEditEventEntity)
+            } else {
+                transformEventUseCaseMock.execute(singleEditEventEntity)
+            } } returns singleEditEvent
 
             // Mock root event
             val rootEventEntity = EventMocks.provideEventEntity()
             val rootEvent = EventMocks.provideEvent(isRecurring = true)
             coEvery { calendarsRepositoryMock.selectRootEventEntity(eventUid) } returns rootEventEntity
-            coEvery { transformEventUseCaseMock.execute(rootEventEntity) } returns rootEvent
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(rootEventEntity)
+            } else {
+                transformEventUseCaseMock.execute(rootEventEntity)
+            } } returns rootEvent
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
@@ -243,7 +268,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock event with attendee (user as organizer)
-            coEvery { transformEventUseCaseMock.execute(EventMocks.provideEventEntity()) } returns EventMocks.provideEvent(isRecurring = true, isOrganizer = true)
+            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+            } else {
+                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+            } } returns EventMocks.provideEvent(isRecurring = true, isOrganizer = true)
 
             // Mock single edit with attendee (user as organizer)
             coEvery { calendarsRepositoryMock.getSingleEdits(userId, eventUid, null, null) } returns listOf(

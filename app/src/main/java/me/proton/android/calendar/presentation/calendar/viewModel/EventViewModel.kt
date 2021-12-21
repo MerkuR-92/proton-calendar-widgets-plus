@@ -27,6 +27,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.formatSendPreference
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
@@ -52,10 +53,8 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddr
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ResourceProvider
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -80,6 +79,7 @@ class EventViewModel(
     private val calendarsRepository: CalendarsRepository,
     private val userSettingsRepository: UserSettingsRepository,
     private val transformEventUseCase: TransformEventUseCase,
+    private val eventDecryptor: EventDecryptor,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val sendEmailUseCase: SendEmailUseCase,
     private val logger: Logger,
@@ -410,7 +410,13 @@ class EventViewModel(
     ): InitResult {
 
         val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
-        dbEvent = if (dbEventEntity != null) transformEventUseCase.execute(dbEventEntity)
+        dbEvent = if (dbEventEntity != null) {
+            if (USE_EVENT_DECRYPTOR) {
+                eventDecryptor.decrypt(dbEventEntity)
+            } else {
+                transformEventUseCase.execute(dbEventEntity)
+            }
+        }
         else null
 
         if (dbEvent == null) return InitResult.EventDoesNotExist
@@ -465,7 +471,11 @@ class EventViewModel(
                     if (dbEvent?.isSingleEdit() == true && eventUid != null) {
                         // We store reference to originalDbEvent for later use
                         originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
-                            ?.let { transformEventUseCase.execute(it) }
+                            ?.let { if (USE_EVENT_DECRYPTOR) {
+                                eventDecryptor.decrypt(it)
+                            } else {
+                                transformEventUseCase.execute(it)
+                            } }
                         this.iCalEvent.recurrenceRule = originalDbEvent?.iCalEvent?.recurrenceRule
                     }
                 }
@@ -2966,7 +2976,11 @@ class EventViewModel(
             eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
                 ?: return EventLinkResult.EventDoesNotExist
         }
-        val event = transformEventUseCase.execute(eventEntity) ?: return EventLinkResult.Error
+        val event = (if (USE_EVENT_DECRYPTOR) {
+            eventDecryptor.decrypt(eventEntity)
+        } else {
+            transformEventUseCase.execute(eventEntity)
+        }) ?: return EventLinkResult.Error
         if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
         if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
         return if (event.isRecurring()) {

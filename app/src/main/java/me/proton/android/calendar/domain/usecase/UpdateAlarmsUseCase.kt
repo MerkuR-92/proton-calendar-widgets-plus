@@ -1,9 +1,11 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.content.Context
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
@@ -12,7 +14,7 @@ import java.time.ZonedDateTime
 
 class UpdateAlarmsUseCase(
     private val logger: Logger,
-    private val context: Context,
+    private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val transformEventUseCase: TransformEventUseCase
@@ -29,7 +31,11 @@ class UpdateAlarmsUseCase(
         logger.v("executing UpdateAlarmsUseCase")
 
         val eventChains = eventIds.mapNotNull {
-            val originalEvent = database.eventsDao().selectById(it)?.let { transformEventUseCase.execute(it) }
+            val originalEvent = database.eventsDao().selectById(it)?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptor.decrypt(it)
+            } else {
+                transformEventUseCase.execute(it)
+            } }
 
             if (originalEvent == null) {
                 logger.e("could not transform event in UpdateAlarmsUseCase")
@@ -41,7 +47,11 @@ class UpdateAlarmsUseCase(
 
         eventChains.forEach {
 
-            val transformedChain = it.second.mapNotNull { transformEventUseCase.execute(it) }
+            val transformedChain = it.second.mapNotNull { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptor.decrypt(it)
+            } else {
+                transformEventUseCase.execute(it)
+            } }
 
             val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
 

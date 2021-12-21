@@ -165,37 +165,11 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
         }
 
-        if (FeatureFlag.NEW_EVENT_DECRYPTION) {
-
-            // TODO remove UserID livedata
-
-            calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
-
-                userId?.let {
-                    getEvents(immutableDate, timeZoneId)
-                }
-
+        // TODO remove UserID livedata
+        calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
+            userId?.let {
+                getEvents(immutableDate, timeZoneId)
             }
-
-        } else {
-
-            calendarViewModel.eventsLiveData(immutableDate, immutableDate, timeZoneId).observe(viewLifecycleOwner) {
-                logger.d("observed events arrived in LIVE DATA, item agenda fragment: $immutableDate -> ${it?.size}")
-
-                if (it == null) {
-                    list_view_status.visibleOrInvisible(true)
-                    list_view_status.text = resources.getString(R.string.agenda_loading_events)
-                } else if (it.isEmpty()) {
-                    list_view_status.visibleOrInvisible(true)
-                    list_view_status.text = resources.getString(R.string.agenda_no_events)
-                } else {
-                    list_view_status.visibleOrInvisible(false)
-                }
-                (rv_agenda.adapter as? EventAdapter)?.submitList(
-                    listOf(fakeHeaderEvent).plus(it ?: emptyList())
-                )
-            }
-
         }
 
         calendarViewModel.selectedDate.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDate ->

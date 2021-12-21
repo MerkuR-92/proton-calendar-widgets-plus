@@ -10,11 +10,13 @@ import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.Duration
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartForNotification
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Event
@@ -27,6 +29,7 @@ class ShowNotificationUseCase(
     private val logger: Logger,
     private val context: Context,
     private val transformEventUseCase: TransformEventUseCase,
+    private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,
     private val userSettingsRepository: UserSettingsRepository
 ) {
@@ -58,7 +61,11 @@ class ShowNotificationUseCase(
             if (eventEntity == null) {
                 logger.e("could not find EventEntity to show notification")
             } else {
-                val dbEvent = transformEventUseCase.execute(eventEntity)
+                val dbEvent = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    eventDecryptor.decrypt(eventEntity)
+                } else {
+                    transformEventUseCase.execute(eventEntity)
+                }
                 if (dbEvent == null) {
                     logger.e("could not transform EventEntity to show notification")
                 } else {

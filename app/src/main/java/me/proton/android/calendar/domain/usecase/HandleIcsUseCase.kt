@@ -25,6 +25,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -43,7 +44,8 @@ class HandleIcsUseCase(
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
-    private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase
+    private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase,
+    private val eventDecryptor: EventDecryptor
 ) {
 
     suspend fun execute(iCalString: String, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
@@ -156,7 +158,13 @@ class HandleIcsUseCase(
                 }
             }
         }
-        val parentEvent = if (parentEventEntity != null) transformEventUseCase.execute(parentEventEntity) else null
+        val parentEvent = if (parentEventEntity != null) {
+            if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                eventDecryptor.decrypt(parentEventEntity)
+            } else {
+                transformEventUseCase.execute(parentEventEntity)
+            }
+        } else null
 
         // IMPORTANT: Unlike the rest of the surgery, clean recurrence id is called outside of cleanIcs, but it is still mandatory
         if (!iCalendar.cleanRecurrenceId(iCalendar.method == Method.reply(), parentEvent?.iCalendar)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RecurrenceId
@@ -166,7 +174,11 @@ class HandleIcsUseCase(
         var existingEventEntity: EventEntity? = null
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
-                val event = transformEventUseCase.execute(eventEntity)
+                val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    eventDecryptor.decrypt(eventEntity)
+                } else {
+                    transformEventUseCase.execute(eventEntity)
+                }
                 if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
                     existingEventEntity = eventEntity

@@ -73,7 +73,6 @@ const val MAX_CALENDAR_PAID = 20
 const val MAX_CALENDAR_FREE = 1
 
 object FeatureFlag {
-    const val NEW_EVENT_DECRYPTION = true
     const val SETTINGS_DRAWER = true
     const val ADD_ATTENDEES = true
     const val CHANGE_ANSWER = true
@@ -83,6 +82,7 @@ object FeatureFlag {
     const val ADD_EMAIL_NOTIFICATIONS = false
     const val DELETE_CALENDAR = false
     const val CHANGE_CALENDAR_SIMPLE_EVENT = false
+    const val USE_EVENT_DECRYPTOR = true
 }
 
 object ApiResponseCode {
