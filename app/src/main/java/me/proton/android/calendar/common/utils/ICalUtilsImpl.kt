@@ -24,6 +24,8 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
+import me.proton.android.calendar.common.MessageDigestHashType.SHA1
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
@@ -35,8 +37,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
-import me.proton.android.calendar.common.MessageDigestHashType.SHA1
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.utils.ICalUtils
@@ -634,6 +634,23 @@ object ICalUtilsImpl : ICalUtils {
                 }
             }
         }.filter { it.occurrence >= now.toEpochSecond() }
+    }
+
+    override fun isCalendarChangeAllowed(fromEvent: Event, toEvent: Event): Boolean {
+
+        val isFromEventAnInvitation =
+            fromEvent.iCalEvent.attendees?.isNotEmpty() == true || fromEvent.iCalEvent.organizer != null
+
+        val isCurrentEventAnInvitation =
+            toEvent.iCalEvent.attendees?.isNotEmpty() == true || toEvent.iCalEvent.organizer != null
+
+        if (isFromEventAnInvitation) return false
+
+        if (isCurrentEventAnInvitation) return false
+
+        if (fromEvent.isPartOfChain() || !FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) return false
+
+        return true
     }
 
     /**
