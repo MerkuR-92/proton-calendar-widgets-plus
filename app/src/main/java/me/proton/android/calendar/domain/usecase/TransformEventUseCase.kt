@@ -184,6 +184,10 @@ class TransformEventUseCase(
                 verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_NO_KEYS } -> {
                     Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                 }
+                verificationStatuses.all { it == Event.SignatureVerification.NOT_SIGNED || it == Event.SignatureVerification.SUCCESS } -> {
+                    // if at least 1 part is NOT_SIGNED but the rest is NOT_SIGNED or SUCCESS, then we treat entire Event as NOT_SIGNED
+                    Event.SignatureVerification.NOT_SIGNED
+                }
                 else -> null
             },
             decryptionStatus = when {

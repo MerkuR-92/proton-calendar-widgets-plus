@@ -530,7 +530,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             with (section_verification_warning) {
-                visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS)
+                visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS && event.verificationStatus != Event.SignatureVerification.NOT_SIGNED)
                 movementMethod = LinkMovementMethod.getInstance()
             }
         })
