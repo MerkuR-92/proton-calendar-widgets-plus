@@ -424,7 +424,7 @@ object ICalUtilsImpl : ICalUtils {
     /**
      * Generates Proton Product Identifier.
      */
-    override fun generateProtonProdId() = "-//Proton Technologies//$API_APPLICATION_NAME ${BuildConfig.VERSION_NAME}//EN"
+    override fun generateProtonProdId() = "-//Proton AG//$API_APPLICATION_NAME ${BuildConfig.VERSION_NAME}//EN"
 
     /**
      * Generates offline CalendarID to use before it's successfully sent to server.
