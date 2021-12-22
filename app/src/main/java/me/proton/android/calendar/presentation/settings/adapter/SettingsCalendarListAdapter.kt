@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -93,7 +94,7 @@ class SettingsCalendarListAdapter(
             if (calendarEntity.id == defaultCalendarId && calendarEntity.isDisabled.not()) addBadge(itemView.context.getString(R.string.settings_calendar_default), R.color.brand_norm)
 
             // Display disabled badge
-            if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.notification_warning)
+            if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.background_secondary, R.color.text_norm)
 
             calendarEntityItemHelper.visibleOrGone(false)
             if (calendarEntity.isSubscribed) {
@@ -173,9 +174,12 @@ class SettingsCalendarListAdapter(
             }
         }
 
-        private fun addBadge(text: String, colorId: Int) {
+        private fun addBadge(text: String, colorId: Int, textColor: Int? = null) {
             val badgeView = LayoutInflater.from(itemView.context).inflate(R.layout.item_badge, calendarEntityItemBadgeLayout, false) as TextView
             badgeView.text = text
+            textColor?.let {
+                badgeView.setTextColor(ContextCompat.getColor(itemView.context, it))
+            }
             badgeView.backgroundTintList = ColorStateList.valueOf(itemView.context.getColor(colorId))
             calendarEntityItemBadgeLayout.addView(badgeView)
         }
