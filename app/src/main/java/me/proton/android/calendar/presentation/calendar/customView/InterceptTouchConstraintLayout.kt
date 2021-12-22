@@ -28,7 +28,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
         return when (ev.actionMasked) {
             // Always handle the case of the touch gesture being complete.
             MotionEvent.ACTION_DOWN -> {
-                if (viewMode == ViewMode.MONTH) return false
+                if (viewMode == ViewMode.MONTH) return false // This behavior does not apply to month view
                 val delegateArea = Rect()
                 agendaPager?.getHitRect(delegateArea)
 
@@ -45,7 +45,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
                 false
             }
             MotionEvent.ACTION_MOVE -> {
-                if (viewMode == ViewMode.MONTH) return false
+                if (viewMode == ViewMode.MONTH) return false // This behavior does not apply to month view
                 val delegateArea = Rect()
                 agendaPager?.getHitRect(delegateArea)
 

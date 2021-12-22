@@ -54,10 +54,10 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.defaultEventDuration.value == CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first())
 
-        assert(calendarFormViewModel.defaultAllDayAlarms.value?.size == 1)
+        assert(calendarFormViewModel.defaultAllDayAlarms.value?.size == 2)
         assert(calendarFormViewModel.defaultAllDayAlarms.value?.first() == CalendarForm.DEFAULT_ALL_DAY_ALARM)
 
-        assert(calendarFormViewModel.defaultPartDayAlarms.value?.size == 1)
+        assert(calendarFormViewModel.defaultPartDayAlarms.value?.size == 2)
         assert(calendarFormViewModel.defaultPartDayAlarms.value?.first() == CalendarForm.DEFAULT_PART_DAY_ALARM)
 
     }
@@ -114,8 +114,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
         coEvery { resourceProviderMock.provideString(R.string.snack_notification_already_added) } returns existingAlarmSnackText
 
         coEvery { createCalendarsUseCaseMock.execute(userId, customCalendarName, "", customCalendarColor, 1, customCalendarEmail) } returns UseCase.Result.Success(calendarId)
-        coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm)) } returns UseCase.Result.Success<Unit>()
-
+        coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM, customPartDayAlarm), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM, customAllDayAlarm)) } returns UseCase.Result.Success<Unit>()
         val calendarFormViewModel = getCalendarFormViewModel()
 
         calendarFormViewModel.initCreateCalendarForm(calendarColor)
@@ -157,7 +156,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
             createCalendarsUseCaseMock.execute(userId, name = customCalendarName, color = customCalendarColor, email = customCalendarEmail)
         }
         coVerify(exactly = 1) {
-            updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm))
+            updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM, customPartDayAlarm), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM, customAllDayAlarm))
         }
 
         // Test resetFormValues
@@ -182,7 +181,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
         coEvery { resourceProviderMock.provideString(R.string.snack_create_calendar_success) } returns successSnackText
 
         coEvery { createCalendarsUseCaseMock.execute(userId, calendarName, "", calendarColor, 1, userEmail) } returns UseCase.Result.Success(calendarId)
-        coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(), listOf()) } returns UseCase.Result.Success<Unit>()
+        coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM)) } returns UseCase.Result.Success<Unit>()
 
         val calendarFormViewModel = getCalendarFormViewModel()
 
@@ -211,7 +210,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
             createCalendarsUseCaseMock.execute(userId, name = calendarName, color = calendarColor, email = userEmail)
         }
         coVerify(exactly = 1) {
-            updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(), listOf())
+            updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM))
         }
     }
 
@@ -260,7 +259,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
                 protonCalendarApplication.getString(R.string.snack_create_calendar_settings_error)
 
         coEvery { createCalendarsUseCaseMock.execute(userId, calendarName, "", calendarColor, 1, userEmail) } returns UseCase.Result.Success(calendarId)
-        coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(), listOf()) } returns UseCase.Result.Error("Test")
+        coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM)) } returns UseCase.Result.Error("Test")
 
         val calendarFormViewModel = getCalendarFormViewModel()
 
@@ -292,7 +291,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
             createCalendarsUseCaseMock.execute(userId, name = calendarName, color = calendarColor, email = userEmail)
         }
         coVerify(exactly = 1) {
-            updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(), listOf())
+            updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM))
         }
     }
 

@@ -3,7 +3,6 @@ package me.proton.android.calendar.presentation.calendar.pagerAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.presentation.calendar.fragment.ItemCalendarMonthFragment
 import java.time.LocalDate
 

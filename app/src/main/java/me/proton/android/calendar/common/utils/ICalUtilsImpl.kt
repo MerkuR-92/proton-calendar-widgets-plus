@@ -37,7 +37,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
-import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.utils.ICalUtils
@@ -808,6 +807,9 @@ object ICalUtilsImpl : ICalUtils {
         return result
     }
 
+    /**
+     * @returns true if event a is all day and event b is partial single day
+     */
     private fun isAllDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
         return a.isAllDay() &&
                 !b.isAllDay() &&
@@ -818,6 +820,9 @@ object ICalUtilsImpl : ICalUtils {
                 )).toLocalDate()) && b.spansSingleDay(timeZoneId = timeZoneId)
     }
 
+    /**
+     * @returns true if event a is single day and event b is spanning multiple days
+     */
     private fun isMultiDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
         return !a.isAllDay() &&
                 !b.isAllDay() &&
@@ -825,38 +830,30 @@ object ICalUtilsImpl : ICalUtils {
                 b.spansSingleDay(timeZoneId = timeZoneId)
     }
 
+    /**
+     * Sorts events with following order:
+     * 1- All day spanning multiple days
+     * 2- All day
+     * 3- Partial day spanning multiple days
+     * 4- Partial day
+     */
     override fun List<Event>.sortForMonthView(timeZoneId: String): List<Event> {
         val comparator = Comparator<Event> { a, b ->
             return@Comparator when {
-                isAllDayPrio(timeZoneId, a, b) -> {
-                    -1
-                }
-                isAllDayPrio(timeZoneId, b, a) -> {
-                    1
-                }
-                isMultiDayPrio(timeZoneId, a, b) -> {
-                    -1
-                }
-                isMultiDayPrio(timeZoneId, b, a) -> {
-                    1
-                }
+                isAllDayPrio(timeZoneId, a, b) ->  -1
+                isAllDayPrio(timeZoneId, b, a) -> 1
+                isMultiDayPrio(timeZoneId, a, b) -> -1
+                isMultiDayPrio(timeZoneId, b, a) -> 1
                 else -> {
-                    val coeficcient1 = (a.getOccurrenceStart(timeZoneId)).toEpochSecond() - (b.getOccurrenceStart(timeZoneId)).toEpochSecond()
-                    val coeficcient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
+                    val coefficient1 = (a.getOccurrenceStart(timeZoneId)).toEpochSecond() - (b.getOccurrenceStart(timeZoneId)).toEpochSecond()
+                    val coefficient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
 
-                    if (coeficcient1 > 0) {
-                        1
-                    } else if (coeficcient1 < 0) {
-                        -1
-                    }
+                    if (coefficient1 > 0) 1
+                    else if (coefficient1 < 0) -1
                     else {
-                        if (coeficcient2 > 0) {
-                            1
-                        } else if (coeficcient2 < 0) {
-                            -1
-                        } else {
-                            0
-                        }
+                        if (coefficient2 > 0) 1
+                        else if (coefficient2 < 0) -1
+                        else 0
                     }
                 }
             }

@@ -23,7 +23,6 @@ import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -221,11 +220,14 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
 
+                        // Sort the events
                         val sortedEvents = it.events.sortForAgendaView(timeZoneId)
+
                         if (immutableDate == calendarViewModel.selectedDate.value) {
                             val partDayEvents = it.events.filter {
                                 it.spansSingleDay(true, timeZoneId)
                             }
+                            // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
                             calendarViewModel.firstEventOfTheDayTime =
                                 if (partDayEvents.isNotEmpty()) {
                                     Collections.min(
@@ -235,6 +237,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                                     )
                                 } else null
                         }
+
                         if (sortedEvents.isEmpty()) {
                             list_view_status.visibleOrInvisible(true)
                             list_view_status.text = resources.getString(R.string.agenda_no_events)

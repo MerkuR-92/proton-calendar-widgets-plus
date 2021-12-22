@@ -17,7 +17,6 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

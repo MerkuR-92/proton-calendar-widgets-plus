@@ -1,20 +1,19 @@
 package me.proton.android.calendar.presentation.calendar.customView
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.*
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.item_month_view_grid.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.MAX_MINI_EVENT_COUNT
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
-import me.proton.android.calendar.common.utils.AndroidUtils.spToPixel
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.COLUMNS_MAX
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MINI_EVENTS_MAX
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MONTH_VIEW_FONT_PATH
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.ROWS_MAX
 import java.time.LocalDate
 import java.time.Month
 import kotlin.math.PI
@@ -22,48 +21,16 @@ import kotlin.math.cos
 
 class MonthView : ViewGroup {
 
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
-        setWillNotDraw(false)
+    object MonthViewSettings {
+        const val ROWS_MAX = 6
+        const val COLUMNS_MAX = 7
+        const val MINI_EVENTS_MAX = 2
+        const val MONTH_GRID_ITEMS_MAX = 42
 
-        eventRadius = context.dpToPixel(4).toFloat()
-
-        val robotoMediumTypeface = Typeface.createFromAsset(context.assets, "fonts/Roboto-Medium.ttf")
-
-        basicTitlePaint = TextPaint().apply {
-            style = Paint.Style.FILL
-            textSize = context.spToPixel(10F)
-            typeface = robotoMediumTypeface
-            color = ContextCompat.getColor(context, R.color.text_on_calendar_color)
-            isAntiAlias = true
-        }
-
-        dayTitlePaint = TextPaint().apply {
-            style = Paint.Style.FILL
-            textSize = context.spToPixel(12F)
-            typeface = robotoMediumTypeface
-            color = ContextCompat.getColor(context, R.color.text_norm)
-            textAlign = Paint.Align.CENTER
-            isAntiAlias = true
-        }
-
-        highlightDayTitlePaint = TextPaint(dayTitlePaint).apply {
-            color = ContextCompat.getColor(context, R.color.brand_norm)
-        }
-
-        offsetDayTitlePaint = TextPaint(dayTitlePaint).apply {
-            color = ContextCompat.getColor(context, R.color.text_hint)
-        }
-
-        gridItemSeparatorPaint = Paint().apply {
-            style = Paint.Style.FILL
-            color = ContextCompat.getColor(context, R.color.separator_norm)
-            strokeWidth = context.dpToPixel(1).toFloat()
-            isAntiAlias = true
-        }
+        const val MONTH_VIEW_FONT_PATH = "fonts/Roboto-Medium.ttf"
     }
 
-    constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0) { }
-
+    // Map of grid index and list of events for each index
     private var monthViewEventsMap: HashMap<Int, List<MonthViewEvent>> = hashMapOf()
 
     private var gridItemWidth = 0F
@@ -86,15 +53,61 @@ class MonthView : ViewGroup {
 
     private var showWeekNumbers: Boolean = false
 
+    private val res = context.resources
+
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
+        setWillNotDraw(false)
+
+        val res = context.resources
+
+        eventRadius = res.getDimension(R.dimen.month_view_event_corner_radius)
+
+        val robotoMediumTypeface = Typeface.createFromAsset(context.assets, MONTH_VIEW_FONT_PATH)
+
+        basicTitlePaint = TextPaint().apply {
+            style = Paint.Style.FILL
+            textSize = res.getDimension(R.dimen.month_view_event_title_text_size)
+            typeface = robotoMediumTypeface
+            color = ContextCompat.getColor(context, R.color.text_on_calendar_color)
+            isAntiAlias = true
+        }
+
+        dayTitlePaint = TextPaint().apply {
+            style = Paint.Style.FILL
+            textSize = res.getDimension(R.dimen.month_view_day_number_text_size)
+            typeface = robotoMediumTypeface
+            color = ContextCompat.getColor(context, R.color.text_norm)
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+        }
+
+        highlightDayTitlePaint = TextPaint(dayTitlePaint).apply {
+            color = ContextCompat.getColor(context, R.color.brand_norm)
+        }
+
+        offsetDayTitlePaint = TextPaint(dayTitlePaint).apply {
+            color = ContextCompat.getColor(context, R.color.text_hint)
+        }
+
+        gridItemSeparatorPaint = Paint().apply {
+            style = Paint.Style.FILL
+            color = ContextCompat.getColor(context, R.color.separator_norm)
+            strokeWidth = res.getDimension(R.dimen.month_view_grid_separator_width)
+
+            isAntiAlias = true
+        }
+    }
+
+    constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0) { }
+
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        // TODO Clear Canvas
-//        canvas?.drawColor(context.getColor(R.color.background_norm))
+        // TODO Clear Canvas ?
+        // canvas?.drawColor(context.getColor(R.color.background_norm))
 
         drawMonthGrid(canvas)
 
-        // TODO Optimise to avoid redrawing everything
         drawEvents(canvas)
     }
 
@@ -104,18 +117,16 @@ class MonthView : ViewGroup {
         val month = this.month
         if (dayList == null || month == null) return
 
-        val topMargin = context.dpToPixel(19)
-        val gridItemSpacing = context.dpToPixel(1)
+        val topMargin = res.getDimension(R.dimen.month_view_day_number_text_baseline_margin_top)
 
         var listIndex = 0
-        for (rowIndex in 0 until 6) {
-            for (columnIndex in 0 until 7) {
+        for (rowIndex in 0 until ROWS_MAX) {
+            for (columnIndex in 0 until COLUMNS_MAX) {
                 val date = dayList[listIndex]
                 val text = date.dayOfMonth.toString()
 
                 val gridItemStart = (columnIndex * gridItemWidth)
-                val gridItemEnd = gridItemStart + gridItemWidth
-                val gridItemTop = (rowIndex * gridItemHeight) + topMargin + gridItemSpacing
+                val gridItemTop = (rowIndex * gridItemHeight) + topMargin
 
                 canvas?.drawText(
                     text,
@@ -134,14 +145,18 @@ class MonthView : ViewGroup {
 
         // Draw lines to split grid items
         val gridSeparatorList = arrayListOf<Float>()
-        for (rowIndex in 0 until 6) {
+        for (rowIndex in 0 until ROWS_MAX) {
             gridSeparatorList.add(0F) // startX
             gridSeparatorList.add(rowIndex * gridItemHeight) // startY
             gridSeparatorList.add(parentWidth) // stopX
             gridSeparatorList.add(rowIndex * gridItemHeight) // stopY
         }
+
+        // 0 will draw an outer divider to the left of the grid
         val columnStart = if (showWeekNumbers) 0 else 1
-        val columnEnd = if (showWeekNumbers) 8 else 7
+        // MAX + 1 will draw an outer divider to the right of the grid
+        val columnEnd = if (showWeekNumbers) COLUMNS_MAX + 1 else COLUMNS_MAX
+
         for (columnIndex in columnStart until columnEnd) {
             gridSeparatorList.add(columnIndex * gridItemWidth) // startX
             gridSeparatorList.add(0F) // startY
@@ -177,7 +192,7 @@ class MonthView : ViewGroup {
      */
     private fun drawEventRect(canvas: Canvas?, monthViewEvent: MonthViewEvent) {
 
-        if (!monthViewEvent.drawRect) return
+        if (!monthViewEvent.drawRect) return // For multi day events, we only draw one blob per row, skip the others
 
         // Draw main rect containing text
         canvas?.drawRoundRect(
@@ -202,13 +217,15 @@ class MonthView : ViewGroup {
         )
 
         if (monthViewEvent.isUnanswered) {
+            // Draw unanswered style stripped lines
             canvas?.drawLines(
                 monthViewEvent.unansweredStripes,
                 monthViewEvent.unansweredStripesPaint
             )
         }
 
-        if (monthViewEvent.decryptionFailed && !monthViewEvent.isMiniEvent) { // TODO Do we also apply it to mini blobs ?
+        if (monthViewEvent.decryptionFailed && !monthViewEvent.isMiniEvent) {
+            // Draw round square that replaces the title for event that failed to be decrypted
             canvas?.drawRoundRect(
                 monthViewEvent.decryptionFailedRect,
                 eventRadius,
@@ -240,11 +257,13 @@ class MonthView : ViewGroup {
      */
     private fun drawPlusIcon(canvas: Canvas?, monthViewEvent: MonthViewEvent) {
 
+        // Draw the '+' vertical line
         canvas?.drawRect(
             monthViewEvent.plusIconVerticalRect,
             monthViewEvent.plusIconPaint
         )
 
+        // Draw the '+' horizontal line
         canvas?.drawRect(
             monthViewEvent.plusIconHorizontalRect,
             monthViewEvent.plusIconPaint
@@ -259,32 +278,49 @@ class MonthView : ViewGroup {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
+        // Width will change when showing / hiding week numbers. Check if view needs to be refreshed so that event blobs have the correct width.
         val refreshView = (parentWidth != 0F && parentWidth != measuredWidth.toFloat()) &&
                 this.monthViewEventsMap.isNotEmpty()
 
+        // Save the view's width and height
         parentWidth = measuredWidth.toFloat()
         parentHeight = measuredHeight.toFloat()
 
-        gridItemWidth = parentWidth / 7
-        gridItemHeight = parentHeight / 6
-
-        if (refreshView) prepareAndDrawMonthViewEvents()
+        // Calculate the grid items width and height
+        gridItemWidth = parentWidth / COLUMNS_MAX
+        gridItemHeight = parentHeight / ROWS_MAX
 
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
+
+        // Calculate the event blobs width, height, positions and trigger view's onDraw
+        if (refreshView) prepareAndDrawMonthViewEvents()
     }
 
+    /**
+     * Store the list of dates to display, as well as the month value for the month we display.
+     */
     fun prepareMonthGrid(skeletonList: List<LocalDate>, forMonth: Month) {
         dayList = skeletonList
         month = forMonth
     }
 
+    /**
+     * Calculate how many events can fit in a grid item.
+     */
     fun getMaxEventCount(): Int {
-        val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
-        val eventHeight = context.dpToPixel(16) + context.dpToPixel(1) // TODO EXTRACT DIMENS // 1 dp for event blob top margin
-        val miniEventsHeight = context.dpToPixel(10)
-        return ((gridItemHeight - headerHeight - miniEventsHeight - context.dpToPixel(2)) / eventHeight).toInt() // 2 dp for top grid item top + bottom margin
+        val headerHeight = res.getDimension(R.dimen.month_view_day_header_height)
+        val eventHeight = res.getDimension(R.dimen.month_view_event_height) +
+                res.getDimension(R.dimen.month_view_event_top_margin)
+        val miniEventsHeight = res.getDimension(R.dimen.month_view_mini_event_height)
+        return ((gridItemHeight - headerHeight - miniEventsHeight -
+                (res.getDimension(R.dimen.month_view_grid_item_top_margin) +
+                        res.getDimension(R.dimen.month_view_grid_item_bottom_margin))
+                ) / eventHeight).toInt()
     }
 
+    /**
+     * Store the events to display.
+     */
     fun setMonthViewEvents(monthViewEventsMap: Map<Int, List<MonthViewEvent>>, showWeekNumbers: Boolean) {
 
         this.showWeekNumbers = showWeekNumbers
@@ -296,20 +332,34 @@ class MonthView : ViewGroup {
         prepareAndDrawMonthViewEvents()
     }
 
+    /**
+     * Set whether we display week numbers or not.
+     */
+    fun setShowWeekNumbers(showWeekNumbers: Boolean) {
+
+        this.showWeekNumbers = showWeekNumbers
+    }
+
+    /**
+     * Iterate through the event list and prepare the elements to draw onto the view.
+     */
     private fun prepareAndDrawMonthViewEvents() {
         val maxEventCount = getMaxEventCount()
         this.monthViewEventsMap.forEach {
+
             val dayIndex = it.key
-            // 7 is number of column
-            val row = dayIndex / 7
-            val column = dayIndex - (row * 7)
+            val row = dayIndex / COLUMNS_MAX
+            val column = dayIndex - (row * COLUMNS_MAX)
+
             var miniEventIndex = 0 // Workaround for monthViewEvent.indexInDay skipping some indexes because of previous day multi day events
+
             it.value.forEach { monthViewEvent ->
                 if (monthViewEvent.indexInDay >= maxEventCount) {
                     val miniEventCount = it.value.size - maxEventCount
-                    if (miniEventIndex > MAX_MINI_EVENT_COUNT - 1) { // Extract max number of mini events
+                    if (miniEventIndex > MINI_EVENTS_MAX - 1) { // Extract max number of mini events
                         monthViewEvent.preparePlusIcon(
                             context,
+                            context.resources,
                             gridItemWidth,
                             gridItemHeight,
                             column,
@@ -319,6 +369,7 @@ class MonthView : ViewGroup {
                     } else {
                         monthViewEvent.prepareMiniEventBlob(
                             context,
+                            context.resources,
                             gridItemWidth,
                             gridItemHeight,
                             column,
@@ -332,6 +383,7 @@ class MonthView : ViewGroup {
                 } else {
                     monthViewEvent.prepareEventBlob(
                         context,
+                        context.resources,
                         basicTitlePaint,
                         gridItemWidth,
                         gridItemHeight,
@@ -345,13 +397,10 @@ class MonthView : ViewGroup {
         invalidate()
     }
 
-    fun setShowWeekNumbers(showWeekNumbers: Boolean) {
-
-        this.showWeekNumbers = showWeekNumbers
-    }
-
+    /**
+     * MonthViewEvent contains all the data needed to draw the event onto the view.
+     */
     data class MonthViewEvent(
-        val eventView: View?,
         val indexInDay: Int,
         val daySpanCount: Int,
         val daySpanIndex: Int,
@@ -395,7 +444,7 @@ class MonthView : ViewGroup {
         var isMiniEvent = false
         var isPlusIcon = false
 
-        fun prepareEventBlob(context: Context, basicTitlePaint: TextPaint, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int) {
+        fun prepareEventBlob(context: Context, res: Resources, basicTitlePaint: TextPaint, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int) {
 
             // For multi day events, we only draw one blob per row, skip the others
             if (daySpanCount > 1 && daySpanIndex > 1 && column > 0) {
@@ -403,27 +452,44 @@ class MonthView : ViewGroup {
                 return
             }
 
-            val start = (column * gridItemWidth + context.dpToPixel(1))
-            val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
-            val eventHeight = context.dpToPixel(16)
-            val top = ((row * gridItemHeight) + headerHeight + (indexInDay * eventHeight) + (indexInDay * context.dpToPixel(1)))
+            // Event rect start
+            val start = (column * gridItemWidth + res.getDimension(R.dimen.month_view_event_start_margin))
+
+            val headerHeight = res.getDimension(R.dimen.month_view_day_header_height)
+            val eventHeight = res.getDimension(R.dimen.month_view_event_height)
+
+            // Event rect top
+            val top = ((row * gridItemHeight) +
+                    headerHeight +
+                    (indexInDay * eventHeight) +
+                    (indexInDay * res.getDimension(R.dimen.month_view_event_top_margin)))
+
+            val columnLastIndex = COLUMNS_MAX - 1
             val gridItemExtensionCount =
-                if (daySpanIndex == 1 && column + daySpanCount > 6) 6 - column
-                else if (daySpanIndex > 1 && daySpanCount - daySpanIndex > 6) 6
+                if (daySpanIndex == 1 && column + daySpanCount > columnLastIndex) columnLastIndex - column
+                else if (daySpanIndex > 1 && daySpanCount - daySpanIndex > columnLastIndex) columnLastIndex
                 else daySpanCount - daySpanIndex
-            val end = ((column * gridItemWidth) + (gridItemExtensionCount * gridItemWidth) + gridItemWidth - context.dpToPixel(2))
+
+            // Event rect end
+            val end = ((column * gridItemWidth) +
+                    (gridItemExtensionCount * gridItemWidth) + gridItemWidth -
+                    res.getDimension(R.dimen.month_view_event_end_margin))
+
+            // Event rect bottom
             val bottom = top + eventHeight
 
-            val sideStripWidth = context.dpToPixel(3).toFloat()
-            val textStart = start + sideStripWidth + context.dpToPixel(2)
-            val eventRectEndMargin = context.dpToPixel(1)
-            val textEndMargin = context.dpToPixel(2)
+            val sideStripWidth = res.getDimension(R.dimen.month_view_event_side_strip_width)
+            val textStart = start + sideStripWidth + res.getDimension(R.dimen.month_view_event_title_start_margin)
+            val eventRectAdjustmentEndMargin = res.getDimension(R.dimen.month_view_event_adjustment_end_margin)
+            val textEndMargin = res.getDimension(R.dimen.month_view_event_title_end_margin)
 
             // Prepare the event left strip with darkened color
             eventLeftSideStripPaint = Paint().apply {
                 style = Paint.Style.FILL
-                color = Color.parseColor(AndroidUtils.darkenCalendarColor(
-                    "#${Integer.toHexString(calendarColor and 0x00ffffff)}")
+                color = Color.parseColor(
+                    AndroidUtils.darkenCalendarColor(
+                        "#${Integer.toHexString(calendarColor and 0x00ffffff)}"
+                    )
                 )
                 isAntiAlias = true
             }
@@ -448,12 +514,13 @@ class MonthView : ViewGroup {
             eventRect = RectF(
                 start,
                 top,
-                end - eventRectEndMargin,
+                end - eventRectAdjustmentEndMargin,
                 bottom
             )
 
+            // The event strip separation is used to cover the right half of the event strip round rectangle
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
-                strokeWidth = sideStripWidth + eventRectEndMargin
+                strokeWidth = sideStripWidth + eventRectAdjustmentEndMargin
                 style = Paint.Style.FILL
                 if (strikeThroughTitle) color = ContextCompat.getColor(context, R.color.background_norm)
             }
@@ -465,8 +532,8 @@ class MonthView : ViewGroup {
             if (eventTitle != null && !decryptionFailed) {
                 titlePaint = TextPaint(basicTitlePaint).apply {
                     color =
-                        if (isUnanswered || (!pastEvent && strikeThroughTitle)) ContextCompat.getColor(context, R.color.text_norm)
-                        else if (pastEvent) ContextCompat.getColor(context, R.color.text_weak)
+                        if (pastEvent) ContextCompat.getColor(context, R.color.text_weak)
+                        else if (isUnanswered || strikeThroughTitle) ContextCompat.getColor(context, R.color.text_norm)
                         else ContextCompat.getColor(context, R.color.text_on_calendar_color)
                     isStrikeThruText = strikeThroughTitle
                 }
@@ -476,6 +543,7 @@ class MonthView : ViewGroup {
 
                 val titleWidth = eventRect.width() - textEndMargin - sideStripWidth
 
+                // Use ellipsize to calculate the max length we can draw
                 ellipsizedTitle = TextUtils.ellipsize(
                     eventTitle,
                     titlePaint,
@@ -484,6 +552,7 @@ class MonthView : ViewGroup {
                 )
             }
 
+            // Prepare failed to decrypt style
             if (decryptionFailed) {
                 decryptionFailedPaint = Paint().apply {
                     val colorToBrighten =
@@ -496,21 +565,122 @@ class MonthView : ViewGroup {
                 }
 
                 decryptionFailedRect = RectF(
-                    start + context.dpToPixel(5),
-                    top + context.dpToPixel(5),
-                    end - context.dpToPixel(5),
-                    bottom - context.dpToPixel(5)
+                    start + res.getDimension(R.dimen.month_view_event_decryption_failed_margin),
+                    top + res.getDimension(R.dimen.month_view_event_decryption_failed_margin),
+                    end - res.getDimension(R.dimen.month_view_event_decryption_failed_margin),
+                    bottom - res.getDimension(R.dimen.month_view_event_decryption_failed_margin)
                 )
             }
 
+            // Prepare unanswered stripped lines
             if (isUnanswered) {
-                prepareStripes(context, sideStripWidth)
+                prepareStripes(context, res, sideStripWidth)
             }
         }
 
-        private fun prepareStripes(context: Context, sideStripWidth: Float) {
-            val lineWidth = context.dpToPixel(1) / 2F
+        fun prepareMiniEventBlob(context: Context, res: Resources, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int, maxEventCount: Int, miniEventCount: Int, miniEventIndex: Int) {
 
+            isMiniEvent = true
+
+            val headerHeight = res.getDimension(R.dimen.month_view_day_header_height)
+            val eventHeight = res.getDimension(R.dimen.month_view_event_height)
+            val miniEventHeight = res.getDimension(R.dimen.month_view_mini_event_height)
+            val eventRectAdjustmentEndMargin = res.getDimension(R.dimen.month_view_event_adjustment_end_margin)
+
+            // Prepare the mini event blob rects
+
+            val start: Float
+            val end: Float
+
+            // Mini event rect top
+            val top = ((row * gridItemHeight) +
+                    headerHeight +
+                    (maxEventCount * eventHeight) +
+                    (maxEventCount * res.getDimension(R.dimen.month_view_event_top_margin)) +
+                    res.getDimension(R.dimen.month_view_mini_event_top_margin))
+
+            // Mini event rect bottom
+            val bottom = top + miniEventHeight
+
+            val columnStart = (column * gridItemWidth) + res.getDimension(R.dimen.month_view_grid_separator_width)
+            // Calculate mini event rect start and end
+            if (miniEventCount == 1) {
+                // Display only one mini blob
+                start = columnStart
+                end = ((column * gridItemWidth) + gridItemWidth - res.getDimension(R.dimen.month_view_mini_event_end_margin))
+            } else if (miniEventCount > MINI_EVENTS_MAX) {
+                // Display '+' icon
+                val plusIconWidth = res.getDimension(R.dimen.month_view_plus_icon_width) + res.getDimension(R.dimen.month_view_mini_event_end_margin)
+                val miniEventWidth = (gridItemWidth -
+                        plusIconWidth -
+                        (MINI_EVENTS_MAX * res.getDimension(R.dimen.month_view_mini_event_end_margin))) /
+                        MINI_EVENTS_MAX
+
+                start = columnStart + (miniEventWidth * miniEventIndex)
+                end = start + miniEventWidth - res.getDimension(R.dimen.month_view_mini_event_end_margin)
+            } else {
+                // Split width to display MINI_EVENTS_MAX number of mini event
+                val endMargin =
+                    if (miniEventCount - 1 == miniEventIndex) 0F
+                    else res.getDimension(R.dimen.month_view_mini_event_end_margin)
+                val miniEventWidth = (gridItemWidth -
+                        (res.getDimension(R.dimen.month_view_mini_event_end_margin) + res.getDimension(R.dimen.month_view_grid_separator_width)) -
+                        ((MINI_EVENTS_MAX - 1) * endMargin)) /
+                        MINI_EVENTS_MAX
+
+                start = columnStart + (miniEventWidth * miniEventIndex)
+                end = start + miniEventWidth - endMargin
+            }
+
+            // Prepare the mini event left strip with darkened color
+            eventLeftSideStripPaint = Paint().apply {
+                color = Color.parseColor(AndroidUtils.darkenCalendarColor(
+                    "#${Integer.toHexString(calendarColor and 0x00ffffff)}")
+                )
+                isAntiAlias = true
+            }
+            val sideStripWidth = res.getDimension(R.dimen.month_view_event_side_strip_width)
+            eventLeftSideStripRect = RectF(
+                start,
+                top,
+                start + (sideStripWidth * 2), // We double the width to have a proper rounded top & bottom
+                bottom
+            )
+
+            // Prepare the mini event main rect
+            eventRectPaint = Paint().apply {
+                color =
+                    if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                    else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                    else calendarColor
+                style = Paint.Style.FILL
+                isAntiAlias = true
+            }
+            eventRect = RectF(
+                start,
+                top,
+                end - eventRectAdjustmentEndMargin,
+                bottom
+            )
+
+            // The event strip separation is used to cover the right half of the event strip round rectangle
+            eventStripSeparationPaint = Paint(eventRectPaint).apply {
+                strokeWidth = sideStripWidth + eventRectAdjustmentEndMargin
+            }
+            eventStripSeparationLine = floatArrayOf(
+                eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
+            )
+
+            // Prepare unanswered stripped lines
+            if (isUnanswered) {
+                prepareStripes(context, res, sideStripWidth)
+            }
+        }
+
+        private fun prepareStripes(context: Context, res: Resources, sideStripWidth: Float) {
+            val lineWidth = res.getDimension(R.dimen.month_view_event_unanswered_stripes_width)
+
+            // Set the paint for the stripes
             unansweredStripesPaint = Paint().apply {
                 color =
                     if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
@@ -521,11 +691,13 @@ class MonthView : ViewGroup {
                 isAntiAlias = true
             }
 
-            val lineGap = context.dpToPixel(4)
+            // Define the gap between each stripe
+            val lineGap = res.getDimension(R.dimen.month_view_event_unanswered_stripes_gap)
 
             val eventWidth = eventRect.width() - sideStripWidth
             val totalDistance = eventWidth + eventRect.height()
 
+            // Array list containing sets of 4 floats that represents the x and y coordinates for the start and stop points of the line
             val stripesArrayList = arrayListOf<Float>()
             var distance = 0.0
             val rectStartX = eventRect.left + sideStripWidth
@@ -544,10 +716,10 @@ class MonthView : ViewGroup {
                     if (distance < eventRect.height()) eventRect.top + distance.toFloat()
                     else eventRect.top + eventRect.height()
 
-                stripesArrayList.add(startX)
-                stripesArrayList.add(startY)
-                stripesArrayList.add(stopX)
-                stripesArrayList.add(stopY)
+                stripesArrayList.add(startX) // The x-coordinate of the start point of the line
+                stripesArrayList.add(startY) // The y-coordinate of the start point of the line
+                stripesArrayList.add(stopX) // The x-coordinate of the end point of the line
+                stripesArrayList.add(stopY) // The y-coordinate of the end point of the line
 
                 distance += ((lineGap + lineWidth) / cos(PI / 4))
 
@@ -555,103 +727,34 @@ class MonthView : ViewGroup {
             unansweredStripes = stripesArrayList.toFloatArray()
         }
 
-        fun prepareMiniEventBlob(context: Context, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int, maxEventCount: Int, miniEventCount: Int, miniEventIndex: Int) {
-
-            isMiniEvent = true
-
-            val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
-            val eventHeight = context.dpToPixel(16)
-            val miniEventHeight = context.dpToPixel(6)
-            val eventRectEndMargin = context.dpToPixel(1)
-
-            // Prepare the mini event blob rects
-
-            val start: Float
-            val end: Float
-
-            val top = ((row * gridItemHeight) + headerHeight + (maxEventCount * eventHeight) + (maxEventCount * context.dpToPixel(1)) + context.dpToPixel(2))
-            val bottom = top + miniEventHeight
-
-            val columnStart = (column * gridItemWidth + context.dpToPixel(1))
-            if (miniEventCount == 1) {
-                // Display only one mini blob
-                start = columnStart
-                end = ((column * gridItemWidth) + gridItemWidth - context.dpToPixel(2))
-            } else if (miniEventCount > MAX_MINI_EVENT_COUNT) {
-                // Display + icon
-                val plusIconWidth = context.dpToPixel(8)
-                val miniEventWidth = (gridItemWidth - plusIconWidth - (MAX_MINI_EVENT_COUNT * context.dpToPixel(2))) / MAX_MINI_EVENT_COUNT
-
-                start = columnStart + (miniEventWidth * miniEventIndex)
-                end = start + miniEventWidth - context.dpToPixel(2)
-            } else {
-                // Split width to display x number of mini event (x being constant for max number of mini event)
-                val endMargin =
-                    if (miniEventCount - 1 == miniEventIndex) 0
-                    else context.dpToPixel(2)
-                val miniEventWidth = (gridItemWidth - context.dpToPixel(3) - ((MAX_MINI_EVENT_COUNT - 1) * endMargin)) / MAX_MINI_EVENT_COUNT
-
-                start = columnStart + (miniEventWidth * miniEventIndex)
-                end = start + miniEventWidth - endMargin
-            }
-
-            val sideStripWidth = context.dpToPixel(3).toFloat()
-
-            eventLeftSideStripPaint = Paint().apply {
-                color = Color.parseColor(AndroidUtils.darkenCalendarColor(
-                    "#${Integer.toHexString(calendarColor and 0x00ffffff)}")
-                )
-                isAntiAlias = true
-            }
-
-            eventLeftSideStripRect = RectF(
-                start,
-                top,
-                start + (sideStripWidth * 2), // We double the width to have a proper rounded top & bottom
-                bottom
-            )
-
-            eventRectPaint = Paint().apply {
-                color =
-                    if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
-                    else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
-                    else calendarColor
-                style = Paint.Style.FILL
-                isAntiAlias = true
-            }
-
-            eventRect = RectF(
-                start,
-                top,
-                end - eventRectEndMargin,
-                bottom
-            )
-
-            eventStripSeparationPaint = Paint(eventRectPaint).apply {
-                strokeWidth = sideStripWidth + eventRectEndMargin
-            }
-            eventStripSeparationLine = floatArrayOf(
-                eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
-            )
-
-            if (isUnanswered) {
-                prepareStripes(context, sideStripWidth)
-            }
-        }
-
-        fun preparePlusIcon(context: Context, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int, maxEventCount: Int) {
+        fun preparePlusIcon(context: Context, res: Resources, gridItemWidth: Float, gridItemHeight: Float, column: Int, row: Int, maxEventCount: Int) {
             isPlusIcon = true
 
-            val headerHeight = context.dpToPixel(26) // TODO EXTRACT DIMENS
-            val eventHeight = context.dpToPixel(16)
-            val miniEventHeight = context.dpToPixel(6)
+            val headerHeight = res.getDimension(R.dimen.month_view_day_header_height)
+            val eventHeight = res.getDimension(R.dimen.month_view_event_height)
+            val miniEventHeight = res.getDimension(R.dimen.month_view_mini_event_height)
 
-            val top = ((row * gridItemHeight) + headerHeight + (maxEventCount * eventHeight) + (maxEventCount * context.dpToPixel(1)) + context.dpToPixel(2))
-            val end = (column * gridItemWidth + context.dpToPixel(1) + gridItemWidth - context.dpToPixel(5))
-            val start = end - context.dpToPixel(6)
+            // Plus icon top
+            val top = ((row * gridItemHeight) +
+                    headerHeight +
+                    (maxEventCount * eventHeight) +
+                    (maxEventCount * res.getDimension(R.dimen.month_view_event_top_margin)) +
+                    res.getDimension(R.dimen.month_view_mini_event_top_margin))
+
+            // Plus icon end
+            val end = (column * gridItemWidth) +
+                    res.getDimension(R.dimen.month_view_grid_separator_width) +
+                    gridItemWidth -
+                    res.getDimension(R.dimen.month_view_plus_icon_end_margin)
+
+            // Plus icon start
+            val start = end - res.getDimension(R.dimen.month_view_plus_icon_width)
+
+            // Plus icon bottom
             val bottom = top + miniEventHeight
 
-            val horizontalHeight = (bottom - top) / 2 - context.dpToPixel(1)
+            val horizontalHeight = ((bottom - top) / 2) - res.getDimension(R.dimen.month_view_plus_icon_line_width)
+            // Prepare the plus icon horizontal line
             plusIconHorizontalRect = RectF(
                 start,
                 top + horizontalHeight,
@@ -659,7 +762,8 @@ class MonthView : ViewGroup {
                 bottom - horizontalHeight
             )
 
-            val verticalWidth = (end - start) / 2 - context.dpToPixel(1)
+            val verticalWidth = ((end - start) / 2) - res.getDimension(R.dimen.month_view_plus_icon_line_width)
+            // Prepare the plus icon vertical line
             plusIconVerticalRect = RectF(
                 start + verticalWidth,
                 top,
@@ -667,6 +771,7 @@ class MonthView : ViewGroup {
                 bottom
             )
 
+            // Prepare the plus icon paint
             plusIconPaint = Paint().apply {
                 color =
                     if (eventTitle == null) {

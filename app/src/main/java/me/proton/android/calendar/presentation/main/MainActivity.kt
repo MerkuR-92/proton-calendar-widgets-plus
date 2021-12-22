@@ -114,7 +114,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
     private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
 
+    // Save the current view mode so that we know if we are navigating to day view from the month view
     private var currentViewMode: ViewMode? = null
+    // Lets us know whether we need to navigate back to month when triggering back action
     private var returnToMonthView: Boolean = false
 
     private fun navigateTo(uri: Uri) {
@@ -1029,6 +1031,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else if (returnToMonthView) {
+            // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
                 calendarViewModel.handleDaySelected(it)
             }

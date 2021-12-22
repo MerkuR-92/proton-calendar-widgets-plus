@@ -18,7 +18,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
@@ -83,6 +82,13 @@ class CalendarViewModel(
         viewModelJob.cancel()
     }
 
+    private lateinit var miniCalendarPager: ViewPager2
+    private lateinit var agendaPager: ViewPager2
+    private lateinit var agendaViewMode: ViewMode
+
+    var pagersInitialised = false
+    var updateSelectedLocalDate: LocalDate? = null
+
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
@@ -110,8 +116,13 @@ class CalendarViewModel(
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    // Pair with position of the resumed fragment and loading status
+    // Pair with position of the resumed fragment and loading status for the view
+    //  so that we know when to load and display the events for a fragment without having multiple process running
     val monthViewLoading = MutableLiveData<Pair<Int, Boolean>>()
+    val dayViewLoading = MutableLiveData<Pair<Int, Boolean>>()
+
+    // Position of the currently resumed month view fragment. We use to start loading the next view only after the swipe is finished.
+    val resumedMonthViewPosition = MutableLiveData<Int>()
 
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
@@ -131,7 +142,9 @@ class CalendarViewModel(
     var showAutoDetectPrimaryTimezone = true
     var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
 
+    // Used to save the month view currently displayed month
     var monthViewDate: LocalDate? = null
+    // Time of the first event of the day, used to adjust the day view scroll position
     var firstEventOfTheDayTime: LocalTime? = null
 
     // TODO Rename
@@ -232,12 +245,6 @@ class CalendarViewModel(
         initialised = false
         calendarsRepository.shutdown()
     }
-
-    private lateinit var miniCalendarPager: ViewPager2
-    private lateinit var agendaPager: ViewPager2
-    private lateinit var agendaViewMode: ViewMode
-    var pagersInitialised = false
-    var updateSelectedLocalDate: LocalDate? = null
 
     fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2, agendaViewMode: ViewMode?) {
         this.miniCalendarPager = miniCalendarPager

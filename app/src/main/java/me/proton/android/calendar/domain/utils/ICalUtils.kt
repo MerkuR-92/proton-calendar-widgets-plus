@@ -206,6 +206,13 @@ interface ICalUtils {
      */
     fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event>
 
+    /**
+     * Sorts events with following order:
+     * 1- All day spanning multiple days
+     * 2- All day
+     * 3- Partial day spanning multiple days
+     * 4- Partial day
+     */
     fun List<Event>.sortForMonthView(timeZoneId: String): List<Event>
 
     /**
