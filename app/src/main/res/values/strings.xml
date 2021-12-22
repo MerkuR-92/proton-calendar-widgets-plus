@@ -111,6 +111,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Delete events</string>
     <string name="event_decryption_error_dialog_close">Close</string>
 
+    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a></string>
+
     <string name="event_change_answer_recurring_title">Update recurring event</string>
     <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
     <string name="event_change_answer_recurring_overwrite_description">Would you like to change your answer for all the events in this series?\nSome of your answers to occurrences previously updated by the organizer will be lost.</string>
@@ -402,10 +404,10 @@
     <string name="settings_calendar_not_synced">Not synced</string>
     <string name="settings_calendar_syncing">Syncing</string>
 
-    <string name="settings_calendar_subscribed_wrong_link">Calendar link is wrong</string>
+    <string name="settings_calendar_subscribed_invalid_ics">Unsupported calendar format</string>
     <string name="settings_calendar_subscribed_too_big">Calendar is too big</string>
     <string name="settings_calendar_subscribed_not_accessible">Calendar link is not accessible</string>
-    <string name="settings_calendar_subscribed_tmp_not_accessible">Calendar link is temporarily unaccessible</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">Calendar link is temporarily inaccessible</string>
     <string name="settings_calendar_subscribed_last_sync_old">More than 12 hours passed since last update</string>
     <string name="settings_calendar_subscribed_not_decrypted">Calendar could not be decrypted</string>
 

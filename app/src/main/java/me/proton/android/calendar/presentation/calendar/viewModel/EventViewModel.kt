@@ -41,6 +41,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustRRuleToStartD
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
@@ -649,8 +650,11 @@ class EventViewModel(
 
     fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
-    fun isCalendarChangeAllowed() = this.event.isSyncedWithApi().not() // is newly created
-            || (!this.event.isPartOfChain() && !this.event.isAnInvitation && this.event.iCalEvent.organizer == null && FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) // OR is a simple event
+    fun isCalendarChangeAllowed(): Boolean {
+        return dbEvent?.let {
+            isCalendarChangeAllowed(it, this.event)
+        } ?: true
+    }
 
     fun hasCalendarBeenChanged() = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
 

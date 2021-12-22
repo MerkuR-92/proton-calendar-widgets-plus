@@ -19,10 +19,14 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.entity.key.PublicKey
+import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.key.domain.repository.Source
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 
 class TransformEventUseCase(
@@ -56,6 +60,11 @@ class TransformEventUseCase(
             logger.e("TransformEventUseCase, keyPassphrase is null")
             return null
         }
+        val userAddresses = kotlin.runCatching { userManager.getAddresses(UserId(userId)) }.getOrNull()
+        if (userAddresses == null) {
+            logger.e("TransformEventUseCase, userAddresses is null")
+            return null
+        }
 
         val calendarParts = mutableListOf<String>()
         val verificationStatuses: MutableList<Event.SignatureVerification> = mutableListOf()
@@ -73,7 +82,7 @@ class TransformEventUseCase(
                         calendarPrivateKeys,
                         keyPassphrase,
                         sharedEvent,
-                        UserId(userId)
+                        getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
                     )
                 }
             }
@@ -88,7 +97,7 @@ class TransformEventUseCase(
                         calendarPrivateKeys,
                         keyPassphrase,
                         calendarEvent,
-                        UserId(userId)
+                        getPublicKeysForAuthor(UserId(userId), calendarEvent, userAddresses)
                     )
                 }
             }
@@ -103,7 +112,7 @@ class TransformEventUseCase(
                         calendarPrivateKeys,
                         keyPassphrase,
                         personalEvent,
-                        UserId(userId)
+                        getPublicKeysForAuthor(UserId(userId), personalEvent, userAddresses)
                     )
                 }
             }
@@ -118,7 +127,7 @@ class TransformEventUseCase(
                         calendarPrivateKeys,
                         keyPassphrase,
                         attendeeEvent,
-                        UserId(userId)
+                        getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
                     )
                 }
             }
@@ -141,7 +150,7 @@ class TransformEventUseCase(
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
-            val canonicalUserEmails = userManager.getAddresses(UserId(userId)).map { canonicalizeProtonEmail(it.email, forceCanonicalization = true) }
+            val canonicalUserEmails = userAddresses.map { canonicalizeProtonEmail(it.email, forceCanonicalization = true) }
             val attendees = eventEntity.attendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
@@ -184,6 +193,10 @@ class TransformEventUseCase(
                 verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_NO_KEYS } -> {
                     Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                 }
+                verificationStatuses.all { it == Event.SignatureVerification.NOT_SIGNED || it == Event.SignatureVerification.SUCCESS } -> {
+                    // if at least 1 part is NOT_SIGNED but the rest is NOT_SIGNED or SUCCESS, then we treat entire Event as NOT_SIGNED
+                    Event.SignatureVerification.NOT_SIGNED
+                }
                 else -> null
             },
             decryptionStatus = when {
@@ -208,14 +221,29 @@ class TransformEventUseCase(
         val signatureVerification: Event.SignatureVerification
     )
 
+    private suspend fun getPublicKeysForAuthor(userId: UserId, eventPart: Event.EventPart, userAddresses: List<UserAddress>): List<PublicKey> {
+        return kotlin.runCatching {
+            userAddresses.firstOrNull {
+                canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(
+                    canonicalizeProtonEmail(eventPart.author, forceCanonicalization = false)
+                )
+            }?.let {
+                // current User is the Author of this EventPart
+                it.publicKeyRing(cryptoContext).keys
+
+                // Source.LocalIfAvailable, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
+            } ?: publicAddressRepository.getPublicAddress(userId, eventPart.author, source = Source.LocalIfAvailable).keys.map { it.publicKey }
+        }.getOrNull() ?: emptyList()
+    }
+
     /**
      * Get plaintext payload or decrypt & check signature if necessary.
      */
-    private suspend fun getPlainText(keyPacket: String?,
-                                     privateKeys: List<String>,
-                                     keyPassphrase: String,
-                                     eventPart: Event.EventPart,
-                                     userId: UserId
+    private fun getPlainText(keyPacket: String?,
+                             privateKeys: List<String>,
+                             keyPassphrase: String,
+                             eventPart: Event.EventPart,
+                             authorsPublicKeys: List<PublicKey>
     ): ProcessResult {
 
         // decrypt if necessary
@@ -237,16 +265,13 @@ class TransformEventUseCase(
 
                 if (eventPart.signature != null) {
 
-                    // Source.LocalIfAvailable, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
-                    val publicAddressKeys = kotlin.runCatching { publicAddressRepository.getPublicAddress(userId, eventPart.author, source = Source.LocalIfAvailable).keys }.getOrNull()
-
-                    if (publicAddressKeys == null || publicAddressKeys.isEmpty()) {
+                    if (authorsPublicKeys.isEmpty()) {
                         signatureVerification = Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                     } else {
 
                         val signatureOk = eventPart.signature?.let { signature ->
-                            publicAddressKeys.any {
-                                it.publicKey.verifyText(cryptoContext, plainText, signature)
+                            authorsPublicKeys.any {
+                                it.verifyText(cryptoContext, plainText, signature)
                             }
                         } ?: false
 

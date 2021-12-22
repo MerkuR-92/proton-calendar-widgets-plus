@@ -5,11 +5,15 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
+import biweekly.property.DateTimeStamp
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import org.junit.jupiter.api.Test
+import java.text.SimpleDateFormat
 import java.time.*
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 internal class ICalTest {
 
@@ -124,10 +128,42 @@ internal class ICalTest {
         val mergedCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts) ?: fail("calendar merging failed")
         val mergedEvent = mergedCalendar?.events?.first() ?: fail("calendar merging failed")
 
-        TestsLogger.d("${mergedCalendar.printToString()}")
-
         assertThat(mergedCalendar.timezoneInfo.getTimezone(mergedEvent.dateStart).timeZone.id).isEqualTo("Europe/Budapest")
         assertThat(mergedCalendar.timezoneInfo.getTimezone(mergedEvent.dateEnd).timeZone.id).isEqualTo("Europe/Budapest")
+
+    }
+
+    @Test
+    fun `merge calendars with empty DTSTAMP`() {
+
+        val calendarParts = listOf(
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    UID:proton-calendar-5a1e31ee-0ba7-7094-93d8-26dd58ca8b37
+    SUMMARY:Start on 31st March 10:00\, end on 1st April 18:00
+    END:VEVENT
+    END:VCALENDAR""".trimIndent(),
+            """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    UID:proton-calendar-5a1e31ee-0ba7-7094-93d8-26dd58ca8b37
+    DTSTAMP:20200330T155311Z
+    DTSTART;TZID=Europe/Budapest:20200331T100000
+    DTEND;TZID=Europe/Budapest:20200401T180000
+    END:VEVENT
+    END:VCALENDAR""".trimIndent()
+        )
+
+        val mergedCalendar = iCal.mergeCalendarPartsIntoICalendar(calendarParts) ?: fail("calendar merging failed")
+        val mergedEvent = mergedCalendar?.events?.first() ?: fail("calendar merging failed")
+
+        val dateFormat = SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+
+        assertThat(mergedEvent.dateTimeStamp.value).isEqualTo(dateFormat.parse("20200330T155311Z"))
 
     }
 

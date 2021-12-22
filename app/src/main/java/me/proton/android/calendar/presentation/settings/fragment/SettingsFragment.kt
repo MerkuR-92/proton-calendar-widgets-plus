@@ -160,7 +160,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.defaultCalendarId.observe(viewLifecycleOwner) { defaultCalendarId ->
 
             if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
-                this@SettingsFragment.defaultCalendarId = defaultCalendarId
                 lifecycleScope.launch {
                     calendarViewModel.getUserCalendars()?.let { userCalendars ->
                         refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
@@ -198,10 +197,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     calendarEmails[userCalendar.id] = it
                 }
             }
-            val defaultCalendarId = calendarViewModel.getDefaultCalendarId()
-            var dataSetChanged = false
+            var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
+            val defaultCalendar = userCalendars.firstOrNull { it.id == defaultCalendarId }
+            if (defaultCalendar?.isActive == false) defaultCalendarId = userCalendars.firstOrNull { it.isActive }?.id
             this@SettingsFragment.defaultCalendarId = defaultCalendarId
-            dataSetChanged = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
+            val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
             settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
             settingsUserCalendarListAdapter.submitList(
                 userCalendars.sortedBy {

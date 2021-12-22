@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.TypedValue
 import android.view.View
@@ -70,6 +71,7 @@ import me.proton.android.calendar.presentation.calendar.adapter.AttendeeListAdap
 import me.proton.android.calendar.presentation.calendar.adapter.initAttendeeStatus
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.core.crypto.common.pgp.VerificationStatus
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.nullIfBlank
@@ -525,6 +527,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     image_icon.setImageResource(R.drawable.ic_text_align_left)
                     visibleOrGone(true)
                 }
+            }
+
+            with (section_verification_warning) {
+                visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS && event.verificationStatus != Event.SignatureVerification.NOT_SIGNED)
+                movementMethod = LinkMovementMethod.getInstance()
             }
         })
     }

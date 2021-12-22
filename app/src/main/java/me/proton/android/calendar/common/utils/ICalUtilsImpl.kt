@@ -24,6 +24,8 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
+import me.proton.android.calendar.common.MessageDigestHashType.SHA1
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
@@ -35,8 +37,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
-import me.proton.android.calendar.common.MessageDigestHashType.SHA1
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.utils.ICalUtils
@@ -378,7 +378,8 @@ object ICalUtilsImpl : ICalUtils {
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
                 else if (iCalProperty::class == DateTimeStamp::class) {
                     // Take latest DateTimeStamp
-                    if ((iCalProperty as DateTimeStamp).value.after(left.events.first().getProperty(DateTimeStamp::class.java).value))
+                    val leftDateTimeStamp = left.events.first().getProperty(DateTimeStamp::class.java)?.value
+                    if (leftDateTimeStamp == null || (iCalProperty as DateTimeStamp).value.after(leftDateTimeStamp))
                         left.events.first().setProperty(iCalProperty)
                 } else left.events.first().setProperty(iCalProperty)
                 left.timezoneInfo.setTimezone(iCalProperty, right.timezoneInfo.getTimezone(iCalProperty))
@@ -423,7 +424,7 @@ object ICalUtilsImpl : ICalUtils {
     /**
      * Generates Proton Product Identifier.
      */
-    override fun generateProtonProdId() = "-//Proton Technologies//$API_APPLICATION_NAME ${BuildConfig.VERSION_NAME}//EN"
+    override fun generateProtonProdId() = "-//Proton AG//$API_APPLICATION_NAME ${BuildConfig.VERSION_NAME}//EN"
 
     /**
      * Generates offline CalendarID to use before it's successfully sent to server.
@@ -633,6 +634,23 @@ object ICalUtilsImpl : ICalUtils {
                 }
             }
         }.filter { it.occurrence >= now.toEpochSecond() }
+    }
+
+    override fun isCalendarChangeAllowed(fromEvent: Event, toEvent: Event): Boolean {
+
+        val isFromEventAnInvitation =
+            fromEvent.iCalEvent.attendees?.isNotEmpty() == true || fromEvent.iCalEvent.organizer != null
+
+        val isCurrentEventAnInvitation =
+            toEvent.iCalEvent.attendees?.isNotEmpty() == true || toEvent.iCalEvent.organizer != null
+
+        if (isFromEventAnInvitation) return false
+
+        if (isCurrentEventAnInvitation) return false
+
+        if (fromEvent.isPartOfChain() || !FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) return false
+
+        return true
     }
 
     /**

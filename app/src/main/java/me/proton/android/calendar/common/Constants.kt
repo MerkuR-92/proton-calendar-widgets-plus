@@ -79,9 +79,9 @@ object FeatureFlag {
     const val OPEN_ICS = true
     const val OPEN_ICS_FILES = false
     const val APP_LINKS = true
-    const val ADD_EMAIL_NOTIFICATIONS = false
+    const val ADD_EMAIL_NOTIFICATIONS = true
     const val DELETE_CALENDAR = false
-    const val CHANGE_CALENDAR_SIMPLE_EVENT = false
+    const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
 }
 

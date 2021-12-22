@@ -54,9 +54,13 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.filterFromTheEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.utils.ICalUtils
+import me.proton.android.calendar.mocks.EventMocks
+import me.proton.android.calendar.mocks.calendarId
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.*
@@ -3952,6 +3956,49 @@ internal class ICalUtilsTest {
         )
 
         assertThat(alarmEntities.filterOutDuplicates().size).isEqualTo(3)
+
+    }
+
+    @Test
+    fun `is Calendar change allowed for simple Event`() {
+
+        val simpleEvent = EventMocks.provideEvent()
+        val simpleInvitation = EventMocks.provideEvent(isAttendee = true, isOrganizer = true)
+
+        val recurringEvent = EventMocks.provideEvent(isRecurring = true)
+        val recurringInvitation = EventMocks.provideEvent(isRecurring = true, isAttendee = true, isOrganizer = true)
+
+        assertThat(isCalendarChangeAllowed(simpleEvent, simpleEvent)).isEqualTo(FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT)
+        assertThat(isCalendarChangeAllowed(simpleEvent, simpleInvitation)).isEqualTo(false)
+
+        assertThat(isCalendarChangeAllowed(simpleEvent, recurringEvent)).isEqualTo(FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT)
+        assertThat(isCalendarChangeAllowed(simpleEvent, recurringInvitation)).isEqualTo(false)
+
+    }
+
+    @Test
+    fun `is Calendar change allowed for recurring Event`() {
+
+        val simpleEvent = EventMocks.provideEvent()
+        val recurringEvent = EventMocks.provideEvent(isRecurring = true)
+        val singleEditEvent = EventMocks.provideEvent(isSingleEdit = true)
+
+        assertThat(isCalendarChangeAllowed(recurringEvent, simpleEvent)).isFalse()
+        assertThat(isCalendarChangeAllowed(recurringEvent, singleEditEvent)).isFalse()
+        assertThat(isCalendarChangeAllowed(recurringEvent, recurringEvent)).isFalse()
+
+    }
+
+    @Test
+    fun `is Calendar change allowed for single-edit Event`() {
+
+        val simpleEvent = EventMocks.provideEvent()
+        val recurringEvent = EventMocks.provideEvent(isRecurring = true)
+        val singleEditEvent = EventMocks.provideEvent(isSingleEdit = true)
+
+        assertThat(isCalendarChangeAllowed(singleEditEvent, simpleEvent)).isFalse()
+        assertThat(isCalendarChangeAllowed(singleEditEvent, recurringEvent)).isFalse()
+        assertThat(isCalendarChangeAllowed(singleEditEvent, singleEditEvent)).isFalse()
 
     }
 

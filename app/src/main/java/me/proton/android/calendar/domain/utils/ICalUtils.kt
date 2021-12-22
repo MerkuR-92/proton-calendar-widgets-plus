@@ -157,6 +157,8 @@ interface ICalUtils {
     fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
     ): List<EventAlarmEntity>
 
+    fun isCalendarChangeAllowed(from: Event, to: Event): Boolean
+
     /**
      * Creates new ICalendar object and sets this VEvent as only event.
      */
