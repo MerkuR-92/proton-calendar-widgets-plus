@@ -124,7 +124,7 @@ class SettingsCalendarListAdapter(
                         else {
                             when (calendarSubscription.status) {
                                 CalendarSubscriptionStatus.INVALID_ICS.value -> {
-                                    itemView.context.getString(R.string.settings_calendar_subscribed_wrong_link)
+                                    itemView.context.getString(R.string.settings_calendar_subscribed_invalid_ics)
                                 }
                                 CalendarSubscriptionStatus.SIZE_EXCEED_LIMIT.value -> {
                                     itemView.context.getString(R.string.settings_calendar_subscribed_too_big)

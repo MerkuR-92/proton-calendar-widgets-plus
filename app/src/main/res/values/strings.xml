@@ -404,7 +404,7 @@
     <string name="settings_calendar_not_synced">Not synced</string>
     <string name="settings_calendar_syncing">Syncing</string>
 
-    <string name="settings_calendar_subscribed_wrong_link">Calendar link is wrong</string>
+    <string name="settings_calendar_subscribed_invalid_ics">Unsupported calendar format</string>
     <string name="settings_calendar_subscribed_too_big">Calendar is too big</string>
     <string name="settings_calendar_subscribed_not_accessible">Calendar link is not accessible</string>
     <string name="settings_calendar_subscribed_tmp_not_accessible">Calendar link is temporarily inaccessible</string>
