@@ -211,7 +211,8 @@ class CalendarFormViewModel(
         userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.sortedBy { it.order }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email
-        if (defaultUserEmail != null && userAddresses.find { it.email == defaultUserEmail }?.enabled == true) {
+        val defaultUserAddress = userAddresses.find { it.email == defaultUserEmail }
+        if (defaultUserEmail != null && defaultUserAddress?.enabled == true && defaultUserAddress.canReceive && defaultUserAddress.canSend) {
             _calendarEmail.value = defaultUserEmail!!
         } else {
             _calendarEmail.value = userEmails?.firstOrNull() ?: run {
