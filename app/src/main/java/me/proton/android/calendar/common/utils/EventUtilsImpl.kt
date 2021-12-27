@@ -319,8 +319,10 @@ object EventUtilsImpl : EventUtils {
                 }
             }
 
-            // add missing one
-            shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
+            if (potentiallySkippedOccurrence != occurrences.firstOrNull()) {
+                // add missing one
+                shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
+            }
 
             // take requested `occurrence count` into consideration
             shiftedOccurrences.take(occurrenceCount ?: shiftedOccurrences.size)
