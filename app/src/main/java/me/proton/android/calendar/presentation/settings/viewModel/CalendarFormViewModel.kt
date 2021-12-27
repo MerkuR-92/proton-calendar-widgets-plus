@@ -208,7 +208,7 @@ class CalendarFormViewModel(
 
         // Save user emails for calendar email picker dialog
         val userAddresses = userManager.getAddresses(userId)
-        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
+        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.sortedBy { it.order }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email
         if (defaultUserEmail != null && userAddresses.find { it.email == defaultUserEmail }?.enabled == true) {
