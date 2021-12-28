@@ -430,137 +430,36 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            setToolbarListeners(zoneId)
+        if (headerDaysMediator.hasObservers()) {
+            headerDaysMediator.removeObservers(viewLifecycleOwner)
         }
-
-        calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
-            if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.unregisterOnPageChangeCallback(
-                miniCalendarPageChangeCallback
-            )
-
-            val startWeekOn = getWeekStartDayOfWeek(weekStart)
-            setMiniCalendarPageChangeCallback(startWeekOn)
-
-            fragment_toolbar_title_layout.setOnSingleClickListener {
-                if (calendarViewModel.monthView.value == false) {
-                    simulateExpandWithScroll(startWeekOn)
-                } else {
-                    simulateCollapseWithScroll(startWeekOn)
-                }
-            }
-
-            // Calculate current month's desired height for both mini calendar mode (month / week)
-            calendarViewModel.selectedDate.value?.withDayOfMonth(1)?.let { firstDayOfMonth ->
-                calendarViewModel.currentPosDesiredMonthHeight = calculateAdapterHeight(
-                    requireContext(),
-                    firstDayOfMonth,
-                    startWeekOn,
-                    true
-                )
-            }
-
-            // Set custom listener for mini calendar gestures
-            val onTouchListener = MonthLayoutGestureListener(
-                requireContext(),
-                calendarViewModel,
-                viewPagerTopGuideline,
-                viewPagerSliderGuideline,
-                agendaPager,
-                object : MonthLayoutGestureListener.MonthLayoutOnFinishMoveListener {
-                    override fun fullyExpand(animationEndListener: () -> Unit) {
-                        if (calendarViewModel.monthView.value == false) {
-                            // Apply the changes for expanded state
-                            calendarViewModel.monthView.value = true
-                            mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
-                            updateMiniCalendarHeight(
-                                startWeekOn,
-                                isMonthView = true,
-                                animateChange = true
-                            )
-                            timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-                        } else {
-                            // Animate mini calendar to go back to expanded state
-                            viewPagerTopGuideline?.animateGuidelineHeightChange(
-                                calendarViewModel.currentPosDesiredMonthHeight,
-                                calendarViewModel.currentPosDesiredMonthHeight
-                            ) {
-                            }
-                            viewPagerSliderGuideline?.animateGuidelineHeightChange(
-                                calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(
-                                    R.dimen.calendar_slider_height
-                                ), calendarViewModel.currentPosDesiredMonthHeight
-                            ) {
-                            }
-                        }
-                    }
-
-                    override fun fullyCollapse(animationEndListener: () -> Unit) {
-                        if (calendarViewModel.monthView.value == true) {
-                            // Apply the changes for collapsed state
-                            calendarViewModel.monthView.value = false
-                            mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
-                            updateMiniCalendarHeight(
-                                startWeekOn,
-                                isMonthView = false,
-                                animateChange = true
-                            )
-                            timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-                        } else {
-                            // Animate mini calendar to go back to collapsed state
-                            viewPagerTopGuideline?.animateGuidelineHeightChange(
-                                resources.getDimensionPixelSize(R.dimen.calendar_slider_height),
-                                calendarViewModel.currentPosDesiredMonthHeight
-                            ) {
-                            }
-                            viewPagerSliderGuideline?.animateGuidelineHeightChange(
-                                resources.getDimensionPixelSize(R.dimen.calendar_slider_height) - requireContext().resources.getDimensionPixelSize(
-                                    R.dimen.calendar_slider_height
-                                ), calendarViewModel.currentPosDesiredMonthHeight
-                            ) {
-                            }
-                        }
-                    }
-
-                    override fun simulateCollapse(animationEndListener: () -> Unit) {
-                        simulateCollapseWithScroll(startWeekOn)
-                    }
-
-                    override fun simulateExpand(animationEndListener: () -> Unit) {
-                        simulateExpandWithScroll(startWeekOn)
-                    }
-
-                }
-            )
-
-            fragmentMonthLayout.setOnTouchListener(onTouchListener)
-            fragmentMonthLayout.agendaPager = agendaPager
-            fragmentMonthLayout.sliderView = mini_calendar_slider
-
-            miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
-        }
-
         // Setup header with week's days
-        headerDaysMediator.addSource(calendarViewModel.timeZoneId) { value ->
-            timeZoneId = value?.id
+        headerDaysMediator.addSource(calendarViewModel.timeZoneId) { zoneId ->
+            timeZoneId = zoneId?.id
+
+            setToolbarListeners(zoneId)
 
             if (timeZoneId != null && startWeekOn != null) {
                 headerDaysMediator.value = Pair(startWeekOn!!, timeZoneId!!)
             }
         }
-        headerDaysMediator.addSource(calendarViewModel.weekStart) { value ->
+        headerDaysMediator.addSource(calendarViewModel.weekStart) { weekStart ->
 
-            if (startWeekOn == null && value != null) {
+            weekStart?.let {
+                setupMonthLayoutGestures(weekStart)
+            }
+
+            if (startWeekOn == null && weekStart != null) {
                 if (calendarViewModel.viewMode.value == ViewMode.AGENDA) {
                     calendarViewModel.monthView.value = true
-                    simulateExpandWithScroll(getWeekStartDayOfWeek(value))
+                    simulateExpandWithScroll(getWeekStartDayOfWeek(weekStart))
                 } else {
                     calendarViewModel.monthView.value = false
-                    simulateCollapseWithScroll(getWeekStartDayOfWeek(value))
+                    simulateCollapseWithScroll(getWeekStartDayOfWeek(weekStart))
                 }
             }
 
-            startWeekOn = value?.let { getWeekStartDayOfWeek(it) }
+            startWeekOn = weekStart?.let { getWeekStartDayOfWeek(it) }
 
             if (timeZoneId != null && startWeekOn != null) {
                 headerDaysMediator.value = Pair(startWeekOn!!, timeZoneId!!)
@@ -594,6 +493,112 @@ class MonthFragment : BaseFragment() {
                 buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_button_disabled_oval)
             }
         }
+    }
+
+    private fun setupMonthLayoutGestures(weekStart: Int) {
+        if (this::miniCalendarPageChangeCallback.isInitialized) miniCalendarPager.unregisterOnPageChangeCallback(
+            miniCalendarPageChangeCallback
+        )
+
+        val startWeekOn = getWeekStartDayOfWeek(weekStart)
+        setMiniCalendarPageChangeCallback(startWeekOn)
+
+        fragment_toolbar_title_layout.setOnSingleClickListener {
+            if (calendarViewModel.monthView.value == false) {
+                simulateExpandWithScroll(startWeekOn)
+            } else {
+                simulateCollapseWithScroll(startWeekOn)
+            }
+        }
+
+        // Calculate current month's desired height for both mini calendar mode (month / week)
+        calendarViewModel.selectedDate.value?.withDayOfMonth(1)?.let { firstDayOfMonth ->
+            calendarViewModel.currentPosDesiredMonthHeight = calculateAdapterHeight(
+                requireContext(),
+                firstDayOfMonth,
+                startWeekOn,
+                true
+            )
+        }
+
+        // Set custom listener for mini calendar gestures
+        val onTouchListener = MonthLayoutGestureListener(
+            requireContext(),
+            calendarViewModel,
+            viewPagerTopGuideline,
+            viewPagerSliderGuideline,
+            agendaPager,
+            object : MonthLayoutGestureListener.MonthLayoutOnFinishMoveListener {
+                override fun fullyExpand(animationEndListener: () -> Unit) {
+                    if (calendarViewModel.monthView.value == false) {
+                        // Apply the changes for expanded state
+                        calendarViewModel.monthView.value = true
+                        mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
+                        updateMiniCalendarHeight(
+                            startWeekOn,
+                            isMonthView = true,
+                            animateChange = true
+                        )
+                        timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+                    } else {
+                        // Animate mini calendar to go back to expanded state
+                        viewPagerTopGuideline?.animateGuidelineHeightChange(
+                            calendarViewModel.currentPosDesiredMonthHeight,
+                            calendarViewModel.currentPosDesiredMonthHeight
+                        ) {
+                        }
+                        viewPagerSliderGuideline?.animateGuidelineHeightChange(
+                            calendarViewModel.currentPosDesiredMonthHeight - requireContext().resources.getDimensionPixelSize(
+                                R.dimen.calendar_slider_height
+                            ), calendarViewModel.currentPosDesiredMonthHeight
+                        ) {
+                        }
+                    }
+                }
+
+                override fun fullyCollapse(animationEndListener: () -> Unit) {
+                    if (calendarViewModel.monthView.value == true) {
+                        // Apply the changes for collapsed state
+                        calendarViewModel.monthView.value = false
+                        mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
+                        updateMiniCalendarHeight(
+                            startWeekOn,
+                            isMonthView = false,
+                            animateChange = true
+                        )
+                        timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+                    } else {
+                        // Animate mini calendar to go back to collapsed state
+                        viewPagerTopGuideline?.animateGuidelineHeightChange(
+                            resources.getDimensionPixelSize(R.dimen.calendar_slider_height),
+                            calendarViewModel.currentPosDesiredMonthHeight
+                        ) {
+                        }
+                        viewPagerSliderGuideline?.animateGuidelineHeightChange(
+                            resources.getDimensionPixelSize(R.dimen.calendar_slider_height) - requireContext().resources.getDimensionPixelSize(
+                                R.dimen.calendar_slider_height
+                            ), calendarViewModel.currentPosDesiredMonthHeight
+                        ) {
+                        }
+                    }
+                }
+
+                override fun simulateCollapse(animationEndListener: () -> Unit) {
+                    simulateCollapseWithScroll(startWeekOn)
+                }
+
+                override fun simulateExpand(animationEndListener: () -> Unit) {
+                    simulateExpandWithScroll(startWeekOn)
+                }
+
+            }
+        )
+
+        fragmentMonthLayout.setOnTouchListener(onTouchListener)
+        fragmentMonthLayout.agendaPager = agendaPager
+        fragmentMonthLayout.sliderView = mini_calendar_slider
+
+        miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
     }
 
     private fun initAgendaPager(viewMode: ViewMode) {
