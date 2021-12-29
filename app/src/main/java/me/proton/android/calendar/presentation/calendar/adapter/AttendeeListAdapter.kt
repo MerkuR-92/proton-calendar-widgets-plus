@@ -89,7 +89,7 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
                 attendeeItemOptional.visibleOrGone(false)
             }
 
-            initAttendeeStatus(attendeeItemStatus, attendee.participationStatus, view.context)
+            initAttendeeStatus(attendeeItemStatus, attendee.participationStatus ?: ParticipationStatus.NEEDS_ACTION, view.context)
         }
     }
 }
