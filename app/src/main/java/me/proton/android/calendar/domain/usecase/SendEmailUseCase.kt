@@ -81,9 +81,9 @@ class SendEmailUseCase(
             )
         } else getResponseIcs(event.iCalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
-        val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail, forceCanonicalization = true)
+        val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail)
         val senderAddressId = userManager.getAddresses(userId).find {
-            canonicalizeProtonEmail(it.email, forceCanonicalization = true) == userAttendeeCanonicalEmail
+            canonicalizeProtonEmail(it.email) == userAttendeeCanonicalEmail
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address ID for sender") // TODO better error
 
         val senderAddress = kotlin.runCatching {
