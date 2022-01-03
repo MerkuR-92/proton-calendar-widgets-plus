@@ -21,8 +21,9 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 
-class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
+class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
 
     class AttendeeDiffCallback : DiffUtil.ItemCallback<Attendee>() {
         override fun areItemsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
@@ -63,9 +64,16 @@ class AttendeeListAdapter() : ListAdapter<Attendee, AttendeeListAdapter.ViewHold
                     attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
                 else attendee.extractEmail() ?: ""
 
-            attendeeItemTitle.text = title
-            attendeeItemDescription.visibleOrGone(description.isNotEmpty())
-            if (description.isNotEmpty()) attendeeItemDescription.text = description
+            val attendeeIsCurrentUser = canonicalUserEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(title)) == true
+            attendeeItemTitle.text =
+                if (attendeeIsCurrentUser) view.context.getString(R.string.event_attendee_is_current_user)
+                else title
+            attendeeItemDescription.visibleOrGone(description.isNotEmpty() || attendeeIsCurrentUser)
+            if (description.isNotEmpty() || attendeeIsCurrentUser) {
+                attendeeItemDescription.text =
+                    if (attendeeIsCurrentUser) title
+                    else description
+            }
 
             attendeeItemInitials.text = getInitials(title)
 
