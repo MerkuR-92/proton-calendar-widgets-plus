@@ -320,7 +320,7 @@ object EventUtilsImpl : EventUtils {
             }
 
             if (potentiallySkippedOccurrence != occurrences.firstOrNull()) {
-                // add missing one
+                // add missing one if it was indeed skipped
                 shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
             }
 
