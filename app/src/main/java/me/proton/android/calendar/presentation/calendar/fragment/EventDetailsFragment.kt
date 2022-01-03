@@ -529,10 +529,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            with (section_verification_warning) {
+            // TODO hide the warning until we verify Event signatures with pinned keys
+            /*with (section_verification_warning) {
                 visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS && event.verificationStatus != Event.SignatureVerification.NOT_SIGNED)
                 movementMethod = LinkMovementMethod.getInstance()
-            }
+            }*/
         })
     }
 
