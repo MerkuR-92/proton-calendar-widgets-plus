@@ -631,7 +631,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
         lifecycleScope.launch {
-            val userEmails = calendarViewModel.getUserEmails()
+            val userEmails = calendarViewModel.getCanonicalUserEmails()
             event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
             val organizerEmail = organizer.extractEmail()
             if (organizerEmail != null && userEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
