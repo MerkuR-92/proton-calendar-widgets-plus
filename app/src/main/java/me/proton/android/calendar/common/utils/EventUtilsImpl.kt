@@ -79,8 +79,7 @@ object EventUtilsImpl : EventUtils {
     /**
      * For given LocalDate and TimeZoneId, returns
      * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
-     * Pair<-1, x> if event doesn't span the give date
-     *
+     * Pair<-1, x> if event doesn't span the given date
      */
     override fun Event.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> {
 

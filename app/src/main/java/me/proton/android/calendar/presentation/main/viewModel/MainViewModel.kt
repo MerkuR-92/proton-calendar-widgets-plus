@@ -85,7 +85,7 @@ class MainViewModel(
 
     fun getLastViewMode(): ViewMode {
         // By default we display the agenda view
-        return ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.AGENDA.value)]
+        return ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.MONTH.value)]
     }
 
     // TODO sync all "active" accounts

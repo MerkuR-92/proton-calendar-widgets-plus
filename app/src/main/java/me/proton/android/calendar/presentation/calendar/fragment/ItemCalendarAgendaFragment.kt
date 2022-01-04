@@ -19,10 +19,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
+import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -225,7 +225,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
                         if (immutableDate == calendarViewModel.selectedDate.value) {
                             val partDayEvents = it.events.filter {
-                                it.spansSingleDay(true, timeZoneId)
+                                !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
                             }
                             // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
                             calendarViewModel.firstEventOfTheDayTime =
@@ -268,9 +268,5 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onDestroyView() {
         super.onDestroyView()
         calendarViewModel.setLoading(false, position)
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
-            logger.v("events flow: remove observers in on destroy for $date")
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
     }
 }

@@ -6,6 +6,8 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.SpannableString
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -563,7 +565,7 @@ class MonthFragment : BaseFragment() {
                     if (calendarViewModel.monthView.value == false) {
                         // Apply the changes for expanded state
                         calendarViewModel.monthView.value = true
-                        mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
+                        if (currentViewMode != ViewMode.MONTH) mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
                         updateMiniCalendarHeight(
                             startWeekOn,
                             isMonthView = true,
@@ -590,7 +592,7 @@ class MonthFragment : BaseFragment() {
                     if (calendarViewModel.monthView.value == true) {
                         // Apply the changes for collapsed state
                         calendarViewModel.monthView.value = false
-                        mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
+                        if (currentViewMode != ViewMode.MONTH) mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
                         updateMiniCalendarHeight(
                             startWeekOn,
                             isMonthView = false,
@@ -644,11 +646,11 @@ class MonthFragment : BaseFragment() {
                 miniCalendarPager?.apply {
                     val currentItem =
                         calendarViewModel.selectedDate.value?.let { selectedDate ->
-                                val startingDate = monthPagerAdapter.firstDayOfMonth
-                                val startingPosition = monthPagerAdapter.startingPosition
-                                val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
-                                startingPosition + selectedDayOffset
-                            } ?: monthPagerAdapter.startingPosition
+                            val startingDate = monthPagerAdapter.firstDayOfMonth
+                            val startingPosition = monthPagerAdapter.startingPosition
+                            val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                            startingPosition + selectedDayOffset
+                        } ?: monthPagerAdapter.startingPosition
 
                     adapter = monthPagerAdapter
                     offscreenPageLimit = 2
@@ -663,12 +665,12 @@ class MonthFragment : BaseFragment() {
                 // Update the pager to use mini calendar adapter
                 miniCalendarPager?.apply {
                     val currentItem =
-                            calendarViewModel.selectedDate.value?.let { selectedDate ->
-                                val startingDate = miniCalendarPagerAdapter.firstDayOfMonth
-                                val startingPosition = miniCalendarPagerAdapter.startingPosition
-                                val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
-                                startingPosition + selectedDayOffset
-                            } ?: miniCalendarPagerAdapter.startingPosition
+                        calendarViewModel.selectedDate.value?.let { selectedDate ->
+                            val startingDate = miniCalendarPagerAdapter.firstDayOfMonth
+                            val startingPosition = miniCalendarPagerAdapter.startingPosition
+                            val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                            startingPosition + selectedDayOffset
+                        } ?: miniCalendarPagerAdapter.startingPosition
 
                     adapter = miniCalendarPagerAdapter
                     offscreenPageLimit = 1
@@ -690,12 +692,12 @@ class MonthFragment : BaseFragment() {
                 }
                 agendaPager?.apply {
                     val currentItem =
-                            calendarViewModel.selectedDate.value?.let { selectedDate ->
-                                val startingDate = agendaPagerAdapter.startingDate
-                                val startingPosition = agendaPagerAdapter.startingPosition
-                                val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
-                                startingPosition + selectedDayOffset
-                            } ?: agendaPagerAdapter.startingPosition
+                        calendarViewModel.selectedDate.value?.let { selectedDate ->
+                            val startingDate = agendaPagerAdapter.startingDate
+                            val startingPosition = agendaPagerAdapter.startingPosition
+                            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                            startingPosition + selectedDayOffset
+                        } ?: agendaPagerAdapter.startingPosition
 
                     adapter = agendaPagerAdapter
                     val item = if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition
@@ -716,12 +718,12 @@ class MonthFragment : BaseFragment() {
                 }
                 agendaPager?.apply {
                     val currentItem =
-                            calendarViewModel.selectedDate.value?.let { selectedDate ->
-                                val startingDate = dayPagerAdapter.startingDate
-                                val startingPosition = dayPagerAdapter.startingPosition
-                                val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
-                                startingPosition + selectedDayOffset
-                            } ?: dayPagerAdapter.startingPosition
+                        calendarViewModel.selectedDate.value?.let { selectedDate ->
+                            val startingDate = dayPagerAdapter.startingDate
+                            val startingPosition = dayPagerAdapter.startingPosition
+                            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                            startingPosition + selectedDayOffset
+                        } ?: dayPagerAdapter.startingPosition
 
                     adapter = dayPagerAdapter
                     val item = if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition
@@ -743,6 +745,7 @@ class MonthFragment : BaseFragment() {
             agendaPager?.visibleOrGone(false)
             miniCalendarDaysHeaderLayout?.visibleOrGone(false)
             mini_calendar_slider?.visibleOrGone(false)
+            mini_calendar_chevron.clearAnimation()
             mini_calendar_chevron.visibleOrGone(false)
 
             // Update constraints so that month view can occupy entire space
@@ -764,6 +767,7 @@ class MonthFragment : BaseFragment() {
             agendaPager?.visibleOrGone(true)
             miniCalendarDaysHeaderLayout?.visibleOrGone(true)
             mini_calendar_slider?.visibleOrGone(true)
+            mini_calendar_chevron.clearAnimation()
             mini_calendar_chevron.visibleOrGone(true)
 
             // Update constraints so that the view is split between mini calendar and agenda / day views
@@ -859,7 +863,7 @@ class MonthFragment : BaseFragment() {
                 animateChange = true
             )
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-            mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
+            if (currentViewMode != ViewMode.MONTH) mini_calendar_chevron?.let { AndroidUtils.rotateArrowUpward(it) }
 
             // Animate the guidelines to desired height
             viewPagerTopGuideline?.animateGuidelineHeightChange(
@@ -888,7 +892,7 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.lifeCycleScope.launch {
             val desiredHeight = resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
 
-            mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
+            if (currentViewMode != ViewMode.MONTH) mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
 
             // Animate mini calendar collapse
             viewPagerTopGuideline?.animateGuidelineHeightChange(

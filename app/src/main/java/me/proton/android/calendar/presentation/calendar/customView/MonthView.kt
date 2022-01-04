@@ -11,6 +11,9 @@ import androidx.core.content.ContextCompat
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.COLUMNS_MAX
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.DECRYPTION_FAILED_BRIGHTEN_COLOR_BY
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.DECRYPTION_FAILED_PAST_EVENT_BRIGHTEN_COLOR_BY
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.UNANSWERED_STRIPES_BRIGHTEN_COLOR_BY
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MINI_EVENTS_MAX
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MONTH_VIEW_FONT_PATH
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.ROWS_MAX
@@ -25,9 +28,14 @@ class MonthView : ViewGroup {
         const val ROWS_MAX = 6
         const val COLUMNS_MAX = 7
         const val MINI_EVENTS_MAX = 2
-        const val MONTH_GRID_ITEMS_MAX = 42
+        const val MONTH_GRID_ITEMS_MAX = ROWS_MAX * COLUMNS_MAX
 
         const val MONTH_VIEW_FONT_PATH = "fonts/Roboto-Medium.ttf"
+
+        const val DECRYPTION_FAILED_PAST_EVENT_BRIGHTEN_COLOR_BY = 0.04f
+        const val DECRYPTION_FAILED_BRIGHTEN_COLOR_BY = 0.18f
+
+        const val UNANSWERED_STRIPES_BRIGHTEN_COLOR_BY = 0.18f
     }
 
     // Map of grid index and list of events for each index
@@ -102,9 +110,6 @@ class MonthView : ViewGroup {
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-
-        // TODO Clear Canvas ?
-        // canvas?.drawColor(context.getColor(R.color.background_norm))
 
         drawMonthGrid(canvas)
 
@@ -558,8 +563,12 @@ class MonthView : ViewGroup {
                     val colorToBrighten =
                         if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
                         else calendarColor
-                    color = Color.parseColor(AndroidUtils.brightenCalendarColor(
-                        "#${Integer.toHexString(colorToBrighten and 0x00ffffff)}", if (pastEvent) 0.04f else 0.18f)
+                    color = Color.parseColor(
+                        AndroidUtils.brightenCalendarColor(
+                            "#${Integer.toHexString(colorToBrighten and 0x00ffffff)}",
+                            if (pastEvent) DECRYPTION_FAILED_PAST_EVENT_BRIGHTEN_COLOR_BY
+                            else DECRYPTION_FAILED_BRIGHTEN_COLOR_BY
+                        )
                     )
                     isAntiAlias = true
                 }
@@ -684,8 +693,11 @@ class MonthView : ViewGroup {
             unansweredStripesPaint = Paint().apply {
                 color =
                     if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
-                    else Color.parseColor(AndroidUtils.brightenCalendarColor(
-                        "#${Integer.toHexString(calendarColor and 0x00ffffff)}", 0.18f)
+                    else Color.parseColor(
+                        AndroidUtils.brightenCalendarColor(
+                            "#${Integer.toHexString(calendarColor and 0x00ffffff)}",
+                            UNANSWERED_STRIPES_BRIGHTEN_COLOR_BY
+                        )
                     )
                 strokeWidth = lineWidth
                 isAntiAlias = true

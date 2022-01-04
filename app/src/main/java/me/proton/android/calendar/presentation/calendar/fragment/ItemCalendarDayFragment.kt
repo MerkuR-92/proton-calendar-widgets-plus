@@ -35,15 +35,15 @@ import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
-import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -635,7 +635,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                     is CalendarsRepository.GetEventsResult.Success -> {
 
                         val partDayEvents = it.events.filter {
-                            it.spansSingleDay(true, timeZoneId)
+                            !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
                         }
 
                         // If fragment is currently selected day, check time of the first event of the day so that we can adjust the view's scroll position
@@ -801,10 +801,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     override fun onDestroyView() {
         super.onDestroyView()
         calendarViewModel.setLoading(false, position)
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
-            logger.v("ItemCalendarDayFragment: events flow: remove observers in on destroy for $date")
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
         dayView.removeEventViews()
         if (loading) {
             // Clear dayViewLoading value
