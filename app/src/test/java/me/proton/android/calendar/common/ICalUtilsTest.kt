@@ -1224,6 +1224,55 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate occurrences of yearly all-day event with BYSETPOS`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar 0.30.1//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Berlin
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTAMP:20211227T131037Z
+    RRULE:FREQ=MONTHLY;INTERVAL=12;BYDAY=FR;BYSETPOS=3
+    SEQUENCE:0
+    SUMMARY:Test Duplicated
+    UID:ZrsZ8COhD5FpNFbptwnRsOumvMrE@proton.me
+    STATUS:CONFIRMED
+    DTSTART;VALUE=DATE:20211217
+    DTEND;VALUE=DATE:20211217
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = ZoneId.systemDefault().id
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 3)!!
+
+        assertThat(occurrences.size).isEqualTo(3)
+
+        assertThat(occurrences[0].startDateTime).isEqualTo(ZonedDateTime.of(2021, 12, 17, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[0].endDateTime).isEqualTo(ZonedDateTime.of(2021, 12,  17, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences[1].startDateTime).isEqualTo(ZonedDateTime.of(2022, 12, 16, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[1].endDateTime).isEqualTo(ZonedDateTime.of(2022, 12,  16, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences[2].startDateTime).isEqualTo(ZonedDateTime.of(2023, 12, 15, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[2].endDateTime).isEqualTo(ZonedDateTime.of(2023, 12,  15, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
     fun `generate occurrences of part-day event with BYSETPOS within full-day range, different than system timezone`() {
 
         val iCalString = """

@@ -529,10 +529,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            with (section_verification_warning) {
+            // TODO hide the warning until we verify Event signatures with pinned keys
+            /*with (section_verification_warning) {
                 visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS && event.verificationStatus != Event.SignatureVerification.NOT_SIGNED)
                 movementMethod = LinkMovementMethod.getInstance()
-            }
+            }*/
         })
     }
 
@@ -631,10 +632,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
         lifecycleScope.launch {
-            val userEmails = calendarViewModel.getUserEmails()
+            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails()
             event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
             val organizerEmail = organizer.extractEmail()
-            if (organizerEmail != null && userEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
+            if (organizerEmail != null && canonicalUserEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
                 event_attendee_organizer_layout.item_attendee_title.text =
                     resources.getString(R.string.event_attendee_is_organizer)
                 event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
@@ -654,55 +655,58 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private var attendeesListHeight: Int? = null
     private fun initAttendeeList(attendeeList: MutableList<Attendee>, organizerAttendee: Attendee?) {
-        val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        event_attendee_list.layoutManager = attendeesLayoutManager
-        attendeeListAdapter = AttendeeListAdapter()
-        (event_attendee_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        event_attendee_list.adapter = attendeeListAdapter
+        lifecycleScope.launch {
+            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails()
+            val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+            event_attendee_list.layoutManager = attendeesLayoutManager
+            attendeeListAdapter = AttendeeListAdapter(canonicalUserEmails)
+            (event_attendee_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            event_attendee_list.adapter = attendeeListAdapter
 
-        // Remove organizer attendee from the list if it exists to avoid duplicates
-        if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
+            // Remove organizer attendee from the list if it exists to avoid duplicates
+            if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
 
-        // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
-        val sortedAttendeeList =
-            attendeeList.sortedWith(compareBy { attendee ->
-                attendee.participationStatus?.let { participationStatus ->
-                    getParticipationStatusPriorityValue(participationStatus)
+            // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
+            val sortedAttendeeList =
+                attendeeList.sortedWith(compareBy { attendee ->
+                    attendee.participationStatus?.let { participationStatus ->
+                        getParticipationStatusPriorityValue(participationStatus)
+                    }
+                })
+            attendeeListAdapter.submitList(sortedAttendeeList)
+
+            // Reset LayoutParams
+            event_attendee_list.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
+            event_attendee_list.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
+
+            if (attendeesListHeight == null) {
+                if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
+                    event_attendee_list.visibleOrGone(true)
+                    rotateArrowUpward(event_attendees_button, 0)
+                } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
+                    event_attendee_list.visibleOrGone(false)
+                    event_attendees_button.visibleOrGone(false)
+                    event_attendees_press.visibleOrGone(false)
+                    return@launch
                 }
-            })
-        attendeeListAdapter.submitList(sortedAttendeeList)
-
-        // Reset LayoutParams
-        event_attendee_list.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
-        event_attendee_list.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
-
-        if (attendeesListHeight == null) {
-            if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
-                event_attendee_list.visibleOrGone(true)
-                rotateArrowUpward(event_attendees_button, 0)
-            } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
-                event_attendee_list.visibleOrGone(false)
-                event_attendees_button.visibleOrGone(false)
-                event_attendees_press.visibleOrGone(false)
-                return
             }
-        }
 
-        // Reset view height
-        attendeesListHeight = null
+            // Reset view height
+            attendeesListHeight = null
 
-        event_attendees_press.setOnClickListener {
-            if (event_attendee_list.isVisible) {
-                // Save expanded view height only once
-                val height = collapse(event_attendee_list).first
-                if (attendeesListHeight == null) attendeesListHeight = height
-                rotateArrowDownward(event_attendees_button)
-            } else {
-                // TODO: Workaround for special case where desired height is not properly calculated.
-                //  Passing 0 skips the animation.
-                //  It means that List with more than 5 items will not have expand animation on first expand.
-                expand(event_attendee_list, height = attendeesListHeight ?: 0)
-                rotateArrowUpward(event_attendees_button)
+            event_attendees_press.setOnClickListener {
+                if (event_attendee_list.isVisible) {
+                    // Save expanded view height only once
+                    val height = collapse(event_attendee_list).first
+                    if (attendeesListHeight == null) attendeesListHeight = height
+                    rotateArrowDownward(event_attendees_button)
+                } else {
+                    // TODO: Workaround for special case where desired height is not properly calculated.
+                    //  Passing 0 skips the animation.
+                    //  It means that List with more than 5 items will not have expand animation on first expand.
+                    expand(event_attendee_list, height = attendeesListHeight ?: 0)
+                    rotateArrowUpward(event_attendees_button)
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffs
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -702,6 +703,10 @@ class CalendarViewModel(
 
     suspend fun getUserEmails(): List<String>? {
         return getUserAddresses()?.map { it.email }
+    }
+
+    suspend fun getCanonicalUserEmails(): List<String>? {
+        return getUserAddresses()?.map { ProtonUtilsImpl.canonicalizeProtonEmail(it.email) }
     }
 
     suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {

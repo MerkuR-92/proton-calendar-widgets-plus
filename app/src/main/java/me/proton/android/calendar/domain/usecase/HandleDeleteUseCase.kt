@@ -330,7 +330,7 @@ class HandleDeleteUseCase( // TODO TESTS
 
             val userAttendee = event.iCalEvent.attendees.find { attendee ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
                     .equals(userEmail, ignoreCase = true)
             } ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee userAttendee was null")
 

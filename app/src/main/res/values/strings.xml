@@ -99,6 +99,7 @@
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
+    <string name="event_attendee_is_current_user">You</string>
 
     <string name="event_answer_attending">Attending?</string>
     <string name="event_answer_yes">Yes</string>

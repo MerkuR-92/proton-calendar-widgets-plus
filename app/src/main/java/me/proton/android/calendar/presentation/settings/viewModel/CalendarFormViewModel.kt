@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
 import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -208,10 +209,13 @@ class CalendarFormViewModel(
 
         // Save user emails for calendar email picker dialog
         val userAddresses = userManager.getAddresses(userId)
-        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.map { it.email }
+        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.sortedBy { it.order }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email
-        if (defaultUserEmail != null && userAddresses.find { it.email == defaultUserEmail }?.enabled == true) {
+        val defaultUserAddress =
+            if (defaultUserEmail != null) userAddresses.find { canonicalizeProtonEmail(it.email) == canonicalizeProtonEmail(defaultUserEmail)  }
+            else null
+        if (defaultUserEmail != null && defaultUserAddress != null && defaultUserAddress.enabled && defaultUserAddress.canReceive && defaultUserAddress.canSend) {
             _calendarEmail.value = defaultUserEmail!!
         } else {
             _calendarEmail.value = userEmails?.firstOrNull() ?: run {
