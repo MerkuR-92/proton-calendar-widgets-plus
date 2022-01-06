@@ -705,8 +705,8 @@ class CalendarViewModel(
         return getUserAddresses()?.map { it.email }
     }
 
-    suspend fun getCanonicalUserEmails(): List<String>? {
-        return getUserAddresses()?.map { ProtonUtilsImpl.canonicalizeProtonEmail(it.email) }
+    suspend fun getCanonicalUserEmails(forceCanonicalization: Boolean = false): List<String>? {
+        return getUserAddresses()?.map { ProtonUtilsImpl.canonicalizeProtonEmail(it.email, forceCanonicalization) }
     }
 
     suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {

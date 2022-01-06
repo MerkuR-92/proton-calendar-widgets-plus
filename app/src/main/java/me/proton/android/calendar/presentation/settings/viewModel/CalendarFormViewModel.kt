@@ -213,8 +213,14 @@ class CalendarFormViewModel(
 
         val defaultUserEmail = userManager.getUser(userId).email
         val defaultUserAddress =
-            if (defaultUserEmail != null) userAddresses.find { canonicalizeProtonEmail(it.email) == canonicalizeProtonEmail(defaultUserEmail)  }
-            else null
+            if (defaultUserEmail != null) {
+                userAddresses.find {
+                    canonicalizeProtonEmail(it.email, forceCanonicalization = true) == canonicalizeProtonEmail(
+                        defaultUserEmail,
+                        forceCanonicalization = true
+                    )
+                }
+            } else null
         if (defaultUserEmail != null && defaultUserAddress != null && defaultUserAddress.enabled && defaultUserAddress.canReceive && defaultUserAddress.canSend) {
             _calendarEmail.value = defaultUserEmail!!
         } else {

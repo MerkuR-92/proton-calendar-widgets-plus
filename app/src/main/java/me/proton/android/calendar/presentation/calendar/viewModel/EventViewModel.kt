@@ -1838,11 +1838,11 @@ class EventViewModel(
         eventDetailsState.value = EventState.Processing.Deleting
 
         val userAddresses = userManager.getAddresses(userId)
-        val userEmails = userAddresses.map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+        val canonicalUserEmails = userAddresses.map { address ->
+            ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
-        val deleteAsAnOrganizer = event.isUserOrganizer(userEmails)
-        val deleteAsAnAttendee = event.isUserAttendee(userEmails)
+        val deleteAsAnOrganizer = event.isUserOrganizer(canonicalUserEmails)
+        val deleteAsAnAttendee = event.isUserAttendee(canonicalUserEmails)
 
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
@@ -2106,7 +2106,7 @@ class EventViewModel(
                 return
             }
 
-            val userEmail = ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email)
+            val userEmail = userAddress.email
 
             val isOrphanSingleEdit = if (event.isSingleEdit()) calendarsRepository.isOrphanSingleEdit(
                 userId,
@@ -2482,7 +2482,7 @@ class EventViewModel(
         if (eventDetailsState.value is EventState.Processing || attendeeAnswerState.value?.second == true) return
 
         val userEmails = userManager.getAddresses(userId).map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+            address.email
         }
 
         val currentParticipationStatus = event.getParticipationStatus(userEmails) ?: ParticipationStatus.NEEDS_ACTION
@@ -2663,7 +2663,7 @@ class EventViewModel(
         val status = participationStatus.toInt()
 
         val userEmails = userManager.getAddresses(userId).map { address ->
-            ProtonUtilsImpl.canonicalizeProtonEmail(address.email)
+            address.email
         }
 
         val userAttendee = event.iCalEvent.attendees.find { attendee ->

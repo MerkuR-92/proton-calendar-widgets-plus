@@ -7,8 +7,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import kotlinx.coroutines.Job
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
+import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.usecase.*
@@ -178,6 +180,7 @@ class MainViewModel(
     suspend fun handleIcsFile(bufferedReader: BufferedReader, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
         val userId = accountViewModel.getPrimaryUserId() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
         val iCalString = bufferedReader.use { it.readText() }
+        if (isConnectedToNetwork.not()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
     }
 }
