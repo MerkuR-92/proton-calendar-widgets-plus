@@ -150,19 +150,19 @@ class TransformEventUseCase(
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
-            val canonicalUserEmails = userAddresses.map { canonicalizeProtonEmail(it.email) }
+            val canonicalUserEmails = userAddresses.map { canonicalizeProtonEmail(it.email, forceCanonicalization = true) }
             val attendees = eventEntity.attendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter(X_PM_TOKEN) ?: generateXPmToken(
-                    canonicalizeProtonEmail(attendee.extractEmail() ?: ""),
+                    canonicalizeProtonEmail(attendee.extractEmail() ?: ""), // Do not force canonicalization here
                     iCalendar.events.first().uid.value
                 )
                 val attendeeStatusEvent = attendees.find { it.token == attendeeToken }
                 if (attendeeStatusEvent != null) {
                     val status = attendeeStatusEvent.participationStatus
-                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.extractEmail() ?: "") }) currentUserAttendeeId =
+                    if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.extractEmail() ?: "", forceCanonicalization = true) }) currentUserAttendeeId =
                         attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }
@@ -224,8 +224,8 @@ class TransformEventUseCase(
     private suspend fun getPublicKeysForAuthor(userId: UserId, eventPart: Event.EventPart, userAddresses: List<UserAddress>): List<PublicKey> {
         return kotlin.runCatching {
             userAddresses.firstOrNull {
-                canonicalizeProtonEmail(it.email).equalsNoCase(
-                    canonicalizeProtonEmail(eventPart.author)
+                canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(
+                    canonicalizeProtonEmail(eventPart.author, forceCanonicalization = true)
                 )
             }?.let {
                 // current User is the Author of this EventPart
