@@ -316,15 +316,14 @@ data class Event private constructor(
 
     }
 
-    fun isUserOrganizer(userEmails: List<String>?): Boolean {
+    fun isUserOrganizer(canonicalUserEmails: List<String>?): Boolean {
         return if (this.isAnInvitation) {
             val organizerEmail = this.iCalEvent.organizer?.extractEmail()
-            organizerEmail != null && userEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(organizerEmail)) == true
+            organizerEmail != null && canonicalUserEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)) == true
         } else false
     }
 
-    fun isUserAttendee(userEmails: List<String>?): Boolean {
-        val canonicalUserEmails = userEmails?.map { ProtonUtilsImpl.canonicalizeProtonEmail(it, forceCanonicalization = true) }
+    fun isUserAttendee(canonicalUserEmails: List<String>?): Boolean {
         return if (this.isAnInvitation) {
             val attendeeEmails = this.iCalEvent.attendees?.mapNotNull { it.extractEmail() }
             attendeeEmails != null && attendeeEmails.find { canonicalUserEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(it, forceCanonicalization = true)) == true } != null

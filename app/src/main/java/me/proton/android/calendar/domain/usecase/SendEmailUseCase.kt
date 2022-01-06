@@ -266,9 +266,9 @@ class SendEmailUseCase(
 
     private suspend fun getSenderAddress(userId: UserId, eventEntity: EventEntity): UseCase.Result {
         val member = database.membersDao().select(eventEntity.calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: there is no valid first Member when creating Event")
-        val senderCanonicalEmail = canonicalizeProtonEmail(member.email)
+        val senderCanonicalEmail = canonicalizeProtonEmail(member.email, forceCanonicalization = true)
         val senderAddressId = userManager.getAddresses(userId).find {
-            canonicalizeProtonEmail(it.email) == senderCanonicalEmail
+            canonicalizeProtonEmail(it.email, forceCanonicalization = true) == senderCanonicalEmail
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
 
         // TODO Check with core if refresh true can be removed
