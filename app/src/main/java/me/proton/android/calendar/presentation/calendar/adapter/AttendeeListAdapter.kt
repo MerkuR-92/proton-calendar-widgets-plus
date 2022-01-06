@@ -64,7 +64,7 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
                     attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
                 else attendee.extractEmail() ?: ""
 
-            val attendeeIsCurrentUser = canonicalUserEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(title)) == true
+            val attendeeIsCurrentUser = canonicalUserEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(title, forceCanonicalization = true)) == true
             attendeeItemTitle.text =
                 if (attendeeIsCurrentUser) view.context.getString(R.string.event_attendee_is_current_user)
                 else title

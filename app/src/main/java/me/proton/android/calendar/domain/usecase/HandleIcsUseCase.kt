@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmails
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -60,30 +61,28 @@ class HandleIcsUseCase(
 
         if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
 
-        val userEmails = userManager.getAddresses(userId).map { address ->
-            canonicalizeProtonEmail(address.email)
+        val canonicalUserEmails = userManager.getAddresses(userId).map { address ->
+            canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
         val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
 
         // Find out if we are in organizer mode or attendee mode
-        val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail)
-        val isOrganizerMode = userEmails.firstOrNull { canonicalOrganizerEmail == it } != null
+        val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)
+        val isOrganizerMode = canonicalUserEmails.firstOrNull { canonicalOrganizerEmail == it } != null
 
         var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
         if (!OPEN_ICS_FILES || (senderEmail != null && recipientEmail != null)) {
-            val canonicalExtrasEmails = canonicalEmailsUseCase.invoke(userId, listOf(senderEmail!!, recipientEmail!!))
-            if (canonicalExtrasEmails.isEmpty()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError // TODO Properly handle network errors in general
-            val canonicalSenderEmail = canonicalExtrasEmails[senderEmail]
-            val canonicalRecipientEmail = canonicalExtrasEmails[recipientEmail]
+            val canonicalSenderEmail = canonicalizeProtonEmail(senderEmail ?: "", forceCanonicalization = true)
+            val canonicalRecipientEmail = canonicalizeProtonEmail(recipientEmail ?: "", forceCanonicalization = true)
 
-            isCurrentUserSender = userEmails.contains(canonicalSenderEmail) == true
-            val isCurrentUserRecipient = userEmails.contains(canonicalRecipientEmail)
+            isCurrentUserSender = canonicalUserEmails.contains(canonicalSenderEmail) == true
+            val isCurrentUserRecipient = canonicalUserEmails.contains(canonicalRecipientEmail)
 
             if (!isCurrentUserSender && !isCurrentUserRecipient) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
-            val canonicalAttendeeEmails = canonicalEmailsUseCase.invoke(
-                userId,
-                iCalendar.events.first().attendees.mapNotNull { it.extractEmail() })
+            val attendeeEmails = iCalendar.events.first().attendees.mapNotNull { it.extractEmail() }
+            val canonicalAttendeeEmails = canonicalizeProtonEmails(attendeeEmails, forceCanonicalization = true)
+
             if (isOrganizerMode && isCurrentUserRecipient && !canonicalAttendeeEmails.values.contains(canonicalSenderEmail)) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
         }
 
@@ -115,9 +114,9 @@ class HandleIcsUseCase(
 
         // Try to extract the current user from the attendee list if it exists
         val userAttendee = iCalendar.events.first().attendees.find { attendee ->
-            userEmails.firstOrNull { userEmail ->
+            canonicalUserEmails.firstOrNull { canonicalUserEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(canonicalUserEmail, ignoreCase = true)
             } != null
         }
 
@@ -261,7 +260,7 @@ class HandleIcsUseCase(
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
                 if (!newEvent.iCalendar.setAttendeesXPmToken(userId, isOrganizerMode)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
-                return updateEventAsAnAttendee(newEvent, immutableExistingEvent, userEmails, userAttendee, userId)
+                return updateEventAsAnAttendee(newEvent, immutableExistingEvent, canonicalUserEmails, userAttendee, userId)
             } else if (isOrganizerMode && immutableExistingEvent != null && immutableExistingEventEntity != null && !iCalendar.events.first().attendees.isNullOrEmpty()) {
                 if (newEvent.hasProtonProtonProperties || newEvent.isProtonProtonReply) {
                     // Attendee added the event as a Proton to Proton invite
@@ -301,7 +300,7 @@ class HandleIcsUseCase(
         return true
     }
 
-    private suspend fun updateEventAsAnAttendee(newEvent: Event, existingEvent: Event, userEmails: List<String>?, userAttendee: Attendee?, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
+    private suspend fun updateEventAsAnAttendee(newEvent: Event, existingEvent: Event, canonicalUserEmails: List<String>?, userAttendee: Attendee?, userId: UserId): IcsSurgeryUtils.HandleIcsResult {
         // Update existing event as an attendee
 
         val newICalendar = newEvent.iCalendar.clone()
@@ -316,8 +315,8 @@ class HandleIcsUseCase(
             existingEvent.iCalEvent.dateTimeStamp = newICalendar.events.first().dateTimeStamp
             existingEvent
         } else {
-            userEmails?.let {
-                val currentParticipationStatus = existingEvent.getParticipationStatus(userEmails)
+            canonicalUserEmails?.let {
+                val currentParticipationStatus = existingEvent.getParticipationStatus(canonicalUserEmails)
 
                 val currentSequence = existingEvent.iCalEvent.sequence?.value
                 if (currentSequence != null && currentSequence < newEvent.iCalEvent.sequence.value) {

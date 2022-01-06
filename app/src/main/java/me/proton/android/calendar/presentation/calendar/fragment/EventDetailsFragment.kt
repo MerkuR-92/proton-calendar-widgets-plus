@@ -632,10 +632,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
         lifecycleScope.launch {
-            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails()
+            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
             event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
             val organizerEmail = organizer.extractEmail()
-            if (organizerEmail != null && canonicalUserEmails?.contains(canonicalizeProtonEmail(organizerEmail)) == true) {
+            if (organizerEmail != null && canonicalUserEmails?.contains(canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)) == true) {
                 event_attendee_organizer_layout.item_attendee_title.text =
                     resources.getString(R.string.event_attendee_is_organizer)
                 event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
@@ -656,7 +656,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private var attendeesListHeight: Int? = null
     private fun initAttendeeList(attendeeList: MutableList<Attendee>, organizerAttendee: Attendee?) {
         lifecycleScope.launch {
-            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails()
+            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
             val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             event_attendee_list.layoutManager = attendeesLayoutManager
             attendeeListAdapter = AttendeeListAdapter(canonicalUserEmails)
