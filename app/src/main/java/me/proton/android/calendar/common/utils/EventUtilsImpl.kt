@@ -43,8 +43,8 @@ object EventUtilsImpl : EventUtils {
         return iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(
-                    canonicalizeProtonEmail(userEmail), ignoreCase = true
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(
+                    canonicalizeProtonEmail(userEmail, forceCanonicalization = true), ignoreCase = true
                 )
             } != null
         }?.participationStatus
@@ -54,8 +54,8 @@ object EventUtilsImpl : EventUtils {
         iCalEvent.attendees.forEach { attendee ->
             val userAddress = userAddresses.firstOrNull { userAddress ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(
-                    canonicalizeProtonEmail(userAddress.email), ignoreCase = true
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(
+                    canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true), ignoreCase = true
                 )
             }
             userAddress?.let {
@@ -69,8 +69,8 @@ object EventUtilsImpl : EventUtils {
         iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(
-                    canonicalizeProtonEmail(userEmail), ignoreCase = true
+                attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(
+                    canonicalizeProtonEmail(userEmail, forceCanonicalization = true), ignoreCase = true
                 )
             } != null
         }?.participationStatus = status

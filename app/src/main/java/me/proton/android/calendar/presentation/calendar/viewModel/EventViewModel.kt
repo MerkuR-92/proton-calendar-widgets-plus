@@ -2092,8 +2092,8 @@ class EventViewModel(
             val attendeeEmails = event.iCalEvent.attendees.mapNotNull { it.extractEmail() }
             val userAddress = userAddresses.find { userAddress ->
                 attendeeEmails.find { attendeeEmail ->
-                    ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email) ==
-                            ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
+                    ProtonUtilsImpl.canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true) ==
+                            ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
                 } != null
             }
 
@@ -2669,8 +2669,8 @@ class EventViewModel(
         val userAttendee = event.iCalEvent.attendees.find { attendee ->
             userEmails.firstOrNull { userEmail ->
                 val attendeeEmail = attendee.extractEmail()
-                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail)
-                    .equals(userEmail, ignoreCase = true)
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
+                    .equals(ProtonUtilsImpl.canonicalizeProtonEmail(userEmail, forceCanonicalization = true), ignoreCase = true)
             } != null
         }
         if (userAttendee == null) {

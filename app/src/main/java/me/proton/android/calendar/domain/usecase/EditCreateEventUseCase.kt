@@ -235,12 +235,12 @@ class EditCreateEventUseCase(
                     // The array must only contain one Attendee (the user itself) with his own token and answered participation status
                     val member = database.membersDao().select(newEvent.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member in createLinkedEventAsAttendee")
                     val canonicalMemberEmails = userAddresses.filter { it.email.equalsNoCase(member.email) }.map { address ->
-                        canonicalizeProtonEmail(address.email)
+                        canonicalizeProtonEmail(address.email, forceCanonicalization = true)
                     }
                     val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
                         canonicalMemberEmails.firstOrNull { userEmail ->
                             val attendeeEmail = attendee.extractEmail()
-                            attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail).equals(userEmail, ignoreCase = true)
+                            attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(userEmail, ignoreCase = true)
                         } != null
                     } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from newEvent")
                     listOf(userAttendee)
