@@ -2978,6 +2978,7 @@ class EventViewModel(
     }
 
     suspend fun handleEventLink(userId: UserId, eventId: String, calendarId: String, recurrenceIdTimestamp: String): EventLinkResult {
+        this.userId = userId
         var eventEntity = calendarsRepository.selectEventEntity(eventId)
         if (eventEntity == null) {
             eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
