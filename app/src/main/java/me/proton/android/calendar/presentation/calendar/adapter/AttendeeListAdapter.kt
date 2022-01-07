@@ -56,22 +56,30 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
 
         fun bind(attendee : Attendee, position : Int) {
             // If has common name use it, else use email and hide description field
+            val attendeeEmail = attendee.extractEmail()
             val title =
-                if (attendee.commonName.isNullOrEmpty()) attendee.extractEmail() ?: ""
+                if (attendee.commonName.isNullOrEmpty()) attendeeEmail ?: ""
                 else attendee.commonName
             val description =
                 if (attendee.commonName.isNullOrEmpty() ||
-                    attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true)) ""
-                else attendee.extractEmail() ?: ""
+                    attendee.commonName.equals(attendeeEmail, ignoreCase = true)) ""
+                else attendeeEmail ?: ""
 
-            val attendeeIsCurrentUser = canonicalUserEmails?.contains(ProtonUtilsImpl.canonicalizeProtonEmail(title, forceCanonicalization = true)) == true
+            val attendeeIsCurrentUser = attendeeEmail?.let {
+                canonicalUserEmails?.contains(
+                    ProtonUtilsImpl.canonicalizeProtonEmail(
+                        attendeeEmail,
+                        forceCanonicalization = true
+                    )
+                ) == true
+            } ?: false
             attendeeItemTitle.text =
                 if (attendeeIsCurrentUser) view.context.getString(R.string.event_attendee_is_current_user)
                 else title
             attendeeItemDescription.visibleOrGone(description.isNotEmpty() || attendeeIsCurrentUser)
             if (description.isNotEmpty() || attendeeIsCurrentUser) {
                 attendeeItemDescription.text =
-                    if (attendeeIsCurrentUser) title
+                    if (attendeeIsCurrentUser) attendeeEmail
                     else description
             }
 
