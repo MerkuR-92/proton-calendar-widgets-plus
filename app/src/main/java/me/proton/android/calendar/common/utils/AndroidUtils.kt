@@ -345,7 +345,7 @@ object AndroidUtils {
 
                             val dayOfWeekAsWord = byDay.day.toDayOfWeek().format()
 
-                            val dayNumber: Int? = if (recurrence.bySetPos.isNotEmpty()) {
+                            val dayNumber: Int? = if (recurrence.bySetPos.isNotEmpty() && index <= recurrence.bySetPos.lastIndex) {
                                 recurrence.bySetPos[index]
                             } else byDay.num
 
