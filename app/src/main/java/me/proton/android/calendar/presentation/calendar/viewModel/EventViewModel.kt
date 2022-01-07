@@ -822,8 +822,6 @@ class EventViewModel(
         daysOfWeek: List<DayOfWeek>? = null,
         customMonthly: Boolean = false
     ) {
-        markEventAsEdited()
-        rruleManuallyEdited = true
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -874,7 +872,12 @@ class EventViewModel(
             }
         }
 
-        event.iCalEvent.setRecurrenceRule(if (frequency != null) builder.build() else null)
+        val recurrence = if (frequency != null) builder.build() else null
+        if (event.iCalEvent.recurrenceRule.value == recurrence) return
+
+        markEventAsEdited()
+        rruleManuallyEdited = true
+        event.iCalEvent.setRecurrenceRule(recurrence)
         _event.postValue(event)
     }
 
