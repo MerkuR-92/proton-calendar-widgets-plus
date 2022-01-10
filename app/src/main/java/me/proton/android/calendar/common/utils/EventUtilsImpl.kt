@@ -297,10 +297,13 @@ object EventUtilsImpl : EventUtils {
 
         return if (hasBySetPos) { // apply BySetPos hack
 
+            val potentiallySkippedStart =
+                if (this.isAllDay()) iteratorZonedDateTimeStart.withZoneSameLocal(formatZoneId)
+                else iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
+
             val potentiallySkippedOccurrence = Event.Occurrence(
-                iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId),
-                iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
-                    .plus(eventDurationInMillis, ChronoUnit.MILLIS),
+                potentiallySkippedStart,
+                potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS),
                 1
             )
 
