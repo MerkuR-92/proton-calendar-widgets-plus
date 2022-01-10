@@ -69,6 +69,11 @@ class EventDecryptorImpl(
         }
     }
 
+    @Synchronized
+    override suspend fun clearCache() {
+        cache.clear()
+    }
+
     private fun EventEntity.isTheSameAs(other: EventEntity): Boolean {
 
         // TODO extract SEQUENCE if this is not enough

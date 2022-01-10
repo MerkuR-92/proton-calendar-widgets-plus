@@ -989,6 +989,12 @@ object ICalUtilsImpl : ICalUtils {
         return cancelICalendar.printToString()
     }
 
+    override fun VAlarm.isTheSameAs(
+        alarm: VAlarm
+    ): Boolean {
+        return this.action == alarm.action && this.trigger?.duration?.toMillis() == alarm.trigger?.duration?.toMillis()
+    }
+
 }
 
 data class CalendarSplit(

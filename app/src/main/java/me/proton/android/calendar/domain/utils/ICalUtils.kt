@@ -238,4 +238,8 @@ interface ICalUtils {
         event: Event,
         sharedEventId: String
     ): String
+
+    fun VAlarm.isTheSameAs(
+        alarm: VAlarm
+    ): Boolean
 }

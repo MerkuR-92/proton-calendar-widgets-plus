@@ -42,6 +42,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
@@ -822,8 +823,6 @@ class EventViewModel(
         daysOfWeek: List<DayOfWeek>? = null,
         customMonthly: Boolean = false
     ) {
-        markEventAsEdited()
-        rruleManuallyEdited = true
         val builder = Recurrence.Builder(frequency)
 
         if (frequency != null) {
@@ -874,7 +873,12 @@ class EventViewModel(
             }
         }
 
-        event.iCalEvent.setRecurrenceRule(if (frequency != null) builder.build() else null)
+        val recurrence = if (frequency != null) builder.build() else null
+        if (event.iCalEvent.recurrenceRule?.value == recurrence) return
+
+        markEventAsEdited()
+        rruleManuallyEdited = true
+        event.iCalEvent.setRecurrenceRule(recurrence)
         _event.postValue(event)
     }
 
@@ -1063,7 +1067,7 @@ class EventViewModel(
 
     fun saveAlarm(alarm: VAlarm) {
         val currentAlarms = event.iCalEvent.alarms
-        if (currentAlarms?.contains(alarm) == true) {
+        if (currentAlarms?.contains(alarm) == true || currentAlarms.any { it.isTheSameAs(alarm) }) {
             eventFormSnackState.value = EventSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.snack_notification_already_added)
             )
@@ -2975,6 +2979,7 @@ class EventViewModel(
     }
 
     suspend fun handleEventLink(userId: UserId, eventId: String, calendarId: String, recurrenceIdTimestamp: String): EventLinkResult {
+        this.userId = userId
         var eventEntity = calendarsRepository.selectEventEntity(eventId)
         if (eventEntity == null) {
             eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event

@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
 import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -265,7 +266,7 @@ class CalendarFormViewModel(
             if (isDelete) tmpDefaultAllDayAlarms?.remove(alarm) // Remove the alarm from the list
             else {
                 // Check if alarm already exist in the list
-                if (tmpDefaultAllDayAlarms?.contains(alarm) == true) {
+                if (tmpDefaultAllDayAlarms?.contains(alarm) == true || tmpDefaultAllDayAlarms?.any { it.isTheSameAs(alarm) } == true) {
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_notification_already_added)
                     )
@@ -283,7 +284,7 @@ class CalendarFormViewModel(
             if (isDelete) tmpDefaultPartDayAlarms?.remove(alarm) // Remove the alarm from the list
             else {
                 // Check if alarm already exist in the list
-                if (tmpDefaultPartDayAlarms?.contains(alarm) == true) {
+                if (tmpDefaultPartDayAlarms?.contains(alarm) == true || tmpDefaultPartDayAlarms?.any { it.isTheSameAs(alarm) } == true) {
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_notification_already_added)
                     )

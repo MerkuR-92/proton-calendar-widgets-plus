@@ -35,6 +35,8 @@ class ResetCalendarsKeyUseCase(
 
         val setupKeyApiRequestMap = hashMapOf<String, SetupKeyApiRequest>()
 
+        val addresses = userManager.getAddresses(userId, refresh = true)
+
         // Reset key for each calendar
         resetInfoResponse.data.calendars.forEach {
             val calendarId = it.id
@@ -49,7 +51,7 @@ class ResetCalendarsKeyUseCase(
                         memberEntity.hasPermission(MemberEntity.Permission.ADMIN)
                     } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: no admin member")
 
-                    val address = userManager.getAddresses(userId, refresh = true).find {
+                    val address = addresses.find {
                         it.email.equalsNoCase(adminMember.email)
                     } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: No address found")
 

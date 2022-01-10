@@ -340,8 +340,11 @@ object IcsSurgeryUtils {
 
     fun VEvent.cleanDtEnd(): Boolean {
         // DTEND: If not present, we don't add it either. If present, the standard DATETIME/DATE sanitization operations must be performed.
-        if (this.dateEnd?.value != null && this.dateEnd.value.before(this.dateStart.value)) {
-            // If DTEND happens before DTSTART we drop it
+        if (this.dateEnd?.value != null && (
+                    this.dateEnd.value.before(this.dateStart.value) ||
+                            (!this.dateEnd.value.hasTime() && this.dateEnd.value.equals(this.dateStart.value))
+                    )) {
+            // If DTEND happens before DTSTART, or if event is all day and DTSTART is equal to DTEND we drop it
             this.dateEnd.value = null
         }
         if (this.dateEnd?.value == null) {

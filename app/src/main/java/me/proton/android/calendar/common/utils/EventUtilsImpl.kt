@@ -297,17 +297,23 @@ object EventUtilsImpl : EventUtils {
 
         return if (hasBySetPos) { // apply BySetPos hack
 
+            val potentiallySkippedStart =
+                if (this.isAllDay()) iteratorZonedDateTimeStart.withZoneSameLocal(formatZoneId)
+                else iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
+
             val potentiallySkippedOccurrence = Event.Occurrence(
-                iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId),
-                iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
-                    .plus(eventDurationInMillis, ChronoUnit.MILLIS),
+                potentiallySkippedStart,
+                potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS),
                 1
             )
 
-            val shiftedOccurrences = occurrences.map { it.copy(occurrenceNumber = it.occurrenceNumber + 1) }.toMutableList()
+            // potentiallySkippedOccurrence was not skipped after all
+            if (potentiallySkippedOccurrence == occurrences.firstOrNull()) return occurrences
 
             // potentiallySkippedOccurrence starts after the [toDate]
             if (toDate != null && potentiallySkippedOccurrence.startDateTime.isAfter(formatToZonedDateTime)) return occurrences
+
+            val shiftedOccurrences = occurrences.map { it.copy(occurrenceNumber = it.occurrenceNumber + 1) }.toMutableList()
 
             // ignore potentiallySkippedOccurrence before the [firstOccurrenceFromDateTime]
             if (firstOccurrenceFromDateTime != null) {
@@ -319,10 +325,8 @@ object EventUtilsImpl : EventUtils {
                 }
             }
 
-            if (potentiallySkippedOccurrence != occurrences.firstOrNull()) {
-                // add missing one if it was indeed skipped
-                shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
-            }
+            // add missing one if it was indeed skipped
+            shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
 
             // take requested `occurrence count` into consideration
             shiftedOccurrences.take(occurrenceCount ?: shiftedOccurrences.size)
@@ -455,27 +459,27 @@ object EventUtilsImpl : EventUtils {
             if (recurrenceRule.count != null && recurrenceRule.count >= occurrenceNumber) {
                 this.iCalEvent.setRecurrenceRule(
                     Recurrence.Builder(this.iCalEvent.recurrenceRule.value).count(
-                    if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
-                ).build())
+                        if (occurrenceNumber == 1) 0 else occurrenceNumber - 1
+                    ).build())
             } else { // otherwise, set or update UNTIL
                 // Use default timezone for part day only
                 generateOccurrence(occurrenceNumber, if (this.isAllDay()) ZoneId.systemDefault().id else iCalendar.iCalTimeZone(this.iCalEvent.dateStart).id)?.let {
                     if (this.isAllDay()) {
                         this.iCalEvent.setRecurrenceRule(
                             Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
-                            it.startDateTime
-                                .minusDays(1)
-                                .with(ChronoField.HOUR_OF_DAY, 0)
-                                .toLocalDate()
-                                .toDate(it.startDateTime.zone.id),
-                            false
-                        ).build())
+                                it.startDateTime
+                                    .minusDays(1)
+                                    .with(ChronoField.HOUR_OF_DAY, 0)
+                                    .toLocalDate()
+                                    .toDate(it.startDateTime.zone.id),
+                                false
+                            ).build())
                     } else {
                         this.iCalEvent.setRecurrenceRule(
                             Recurrence.Builder(this.iCalEvent.recurrenceRule.value).until(
-                            Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()),
-                            true
-                        ).build())
+                                Date.from(it.startDateTime.with(ChronoField.HOUR_OF_DAY, 0).minusSeconds(1).toInstant()),
+                                true
+                            ).build())
                     }
                 }
             }

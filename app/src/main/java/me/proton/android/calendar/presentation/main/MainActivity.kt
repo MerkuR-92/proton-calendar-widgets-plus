@@ -239,7 +239,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             ), drawer_layout
         )
 
-        intent?.let { mainViewModel.handleIntent(intent) }
+        intent?.let { if (savedInstanceState == null) mainViewModel.handleIntent(intent) }
 
         with(accountViewModel) {
             init(this@MainActivity)
@@ -669,7 +669,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        intent?.let { mainViewModel.handleIntent(intent) }
+        intent?.let {
+            logger.i("MainActivity onNewIntent received non null Intent")
+            mainViewModel.handleIntent(intent)
+        }
     }
 
     private fun initDrawerListeners() {
