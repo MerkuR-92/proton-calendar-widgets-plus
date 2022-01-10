@@ -35,7 +35,8 @@ class AccountViewModel(
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val logger: Logger,
     private val product: Product,
-    private val widgetRefresher: WidgetRefresher
+    private val widgetRefresher: WidgetRefresher,
+    private val eventDecryptor: EventDecryptor
 ) : ViewModel() {
 
     sealed class State {
@@ -99,6 +100,7 @@ class AccountViewModel(
     private suspend fun cleanUser(context: Context) {
         WorkManager.getInstance(context).cancelAllWork()
         calendarsRepository.shutdown()
+        eventDecryptor.clearCache()
         widgetRefresher.refreshEventList()
     }
 

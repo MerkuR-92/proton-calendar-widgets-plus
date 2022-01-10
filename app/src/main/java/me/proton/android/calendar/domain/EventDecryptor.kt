@@ -7,4 +7,6 @@ interface EventDecryptor {
 
     suspend fun decrypt(eventEntity: EventEntity): Event?
 
+    suspend fun clearCache()
+
 }
