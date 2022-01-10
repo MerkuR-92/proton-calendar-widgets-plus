@@ -874,7 +874,7 @@ class EventViewModel(
         }
 
         val recurrence = if (frequency != null) builder.build() else null
-        if (event.iCalEvent.recurrenceRule.value == recurrence) return
+        if (event.iCalEvent.recurrenceRule?.value == recurrence) return
 
         markEventAsEdited()
         rruleManuallyEdited = true
