@@ -239,8 +239,7 @@ interface ICalUtils {
         sharedEventId: String
     ): String
 
-    fun isAlarmDuplicated(
-        alarms: List<VAlarm>?,
+    fun VAlarm.isTheSameAs(
         alarm: VAlarm
     ): Boolean
 }

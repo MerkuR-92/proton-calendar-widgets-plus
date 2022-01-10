@@ -989,13 +989,10 @@ object ICalUtilsImpl : ICalUtils {
         return cancelICalendar.printToString()
     }
 
-    override fun isAlarmDuplicated(
-        alarms: List<VAlarm>?,
+    override fun VAlarm.isTheSameAs(
         alarm: VAlarm
     ): Boolean {
-        return alarms?.find {
-            it.action == alarm.action && it.trigger.duration.toMillis() == alarm.trigger.duration.toMillis()
-        } != null
+        return this.action == alarm.action && this.trigger?.duration?.toMillis() == alarm.trigger?.duration?.toMillis()
     }
 
 }

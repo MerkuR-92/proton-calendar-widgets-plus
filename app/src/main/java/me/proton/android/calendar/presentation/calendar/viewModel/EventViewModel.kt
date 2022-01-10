@@ -41,8 +41,8 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustRRuleToStartD
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.isAlarmDuplicated
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
@@ -1067,7 +1067,7 @@ class EventViewModel(
 
     fun saveAlarm(alarm: VAlarm) {
         val currentAlarms = event.iCalEvent.alarms
-        if (currentAlarms?.contains(alarm) == true || isAlarmDuplicated(currentAlarms, alarm)) {
+        if (currentAlarms?.contains(alarm) == true || currentAlarms.any { it.isTheSameAs(alarm) }) {
             eventFormSnackState.value = EventSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.snack_notification_already_added)
             )
