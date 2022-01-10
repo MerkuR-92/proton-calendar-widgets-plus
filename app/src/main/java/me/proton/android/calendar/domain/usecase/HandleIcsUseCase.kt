@@ -71,9 +71,9 @@ class HandleIcsUseCase(
         val isOrganizerMode = canonicalUserEmails.firstOrNull { canonicalOrganizerEmail == it } != null
 
         var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
-        if (!OPEN_ICS_FILES || (senderEmail != null && recipientEmail != null)) {
-            val canonicalSenderEmail = canonicalizeProtonEmail(senderEmail ?: "", forceCanonicalization = true)
-            val canonicalRecipientEmail = canonicalizeProtonEmail(recipientEmail ?: "", forceCanonicalization = true)
+        val canonicalSenderEmail = canonicalizeProtonEmail(senderEmail ?: "", forceCanonicalization = true)
+        val canonicalRecipientEmail = canonicalizeProtonEmail(recipientEmail ?: "", forceCanonicalization = true)
+        if (!OPEN_ICS_FILES || (canonicalSenderEmail.isNotBlank() && canonicalRecipientEmail.isNotBlank())) {
 
             isCurrentUserSender = canonicalUserEmails.contains(canonicalSenderEmail) == true
             val isCurrentUserRecipient = canonicalUserEmails.contains(canonicalRecipientEmail)
@@ -188,6 +188,13 @@ class HandleIcsUseCase(
 
         val immutableExistingEvent = existingEvent
         val immutableExistingEventEntity = existingEventEntity
+
+        val attendees = immutableExistingEvent?.iCalEvent?.attendees
+        // Check using the original event that the reply sender is indeed an attendee
+        if (iCalendar.method.isReply && isOrganizerMode && canonicalSenderEmail.isNotBlank() && attendees != null &&
+            attendees.find {
+                canonicalizeProtonEmail(it.extractEmail() ?: "", forceCanonicalization = true).equals(canonicalSenderEmail)
+            } == null) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(immutableExistingEvent.id)
 
         if (iCalendar.method.isReply && !isOrganizerMode) {
             return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
