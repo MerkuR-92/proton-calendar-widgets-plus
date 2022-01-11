@@ -378,7 +378,6 @@ class HandleSaveUseCase(
                             )
                         )
                     )
-                    exceptionDates.clear()
                     val nullDate: Date? = null
                     setRecurrenceId(nullDate)
                     event.iCalEvent.recurrenceRule?.value?.let {
@@ -401,6 +400,7 @@ class HandleSaveUseCase(
                 }
             }
         )
+        eventToCreate.iCalEvent.exceptionDates.clear()
         if (dbEvent.isSingleEdit()) eventToCreate.iCalEvent.recurrenceId = null
 
         return HandleSaveOptionResult.Success(eventToCreate)
