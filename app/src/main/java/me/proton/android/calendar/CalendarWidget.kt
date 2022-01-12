@@ -10,21 +10,16 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
-import android.os.Binder
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import biweekly.parameter.ParticipationStatus
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.logger.TestsLogger
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
@@ -85,25 +80,28 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
     private val logger: Logger by inject()
 
     override fun onReceive(context: Context, intent: Intent?) {
-
-        // manually refresh Widget when we get these special broadcasts
         intent?.let {
-            if (it.action == Intent.ACTION_TIME_CHANGED || it.action == Intent.ACTION_TIMEZONE_CHANGED || it.action == Intent.ACTION_DATE_CHANGED) {
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                val appWidgetIds =
-                    appWidgetManager.getAppWidgetIds(ComponentName(context, AppWidgetProvider::class.java))
-                onUpdate(context, appWidgetManager, appWidgetIds)
+            // manually refresh Widget when we get the refresh broadcast
+            if (it.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE ||
+                // and these special ones
+                it.action == Intent.ACTION_TIME_CHANGED ||
+                it.action == Intent.ACTION_TIMEZONE_CHANGED ||
+                it.action == Intent.ACTION_DATE_CHANGED ||
+                it.action == Intent.ACTION_LOCALE_CHANGED) {
+
+                val widgetManager = AppWidgetManager.getInstance(context)
+                val widgetComponent = ComponentName(context, CalendarWidget::class.java)
+                val appWidgetIds = widgetManager.getAppWidgetIds(widgetComponent)
+
+                onUpdate(context, widgetManager, appWidgetIds)
+            } else {
+                // delegate to super for other actions like adding or removing the Widget
+                super.onReceive(context, intent)
             }
         }
-
-        // this will handle Intent action AppWidgetManager.ACTION_APPWIDGET_UPDATE
-        super.onReceive(context, intent)
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-
-        // TODO consider goAsync(): https://developer.android.com/guide/topics/appwidgets/advanced#broadcastreceiver-duration
-
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -161,6 +159,9 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         // used for handling clicks on ListView elements
         remoteViews.setPendingIntentTemplate(R.id.lv_widget, createPendingIntentTemplate(context))
 
+        // force ListView to refresh
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.lv_widget)
+
         // trigger Remote Views update
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
     }
@@ -199,7 +200,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
             val widgetComponent = ComponentName(context, CalendarWidget::class.java)
             val widgetIds = widgetManager.getAppWidgetIds(widgetComponent)
 
-            return Intent().apply {
+            return Intent(context, CalendarWidget::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
                 action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             }
@@ -226,9 +227,22 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
     private val userSettingsRepository: UserSettingsRepository by inject()
     private val logger: Logger by inject()
 
-    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
+    override fun onGetViewFactory(intent: Intent?): RemoteViewsFactory {
+
+        val widgetId = intent?.let { intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID) }
+
+        if (widgetId == null) {
+            logger.e("widgetId == null in onGetViewFactory")
+        }
+        if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            logger.e("widgetId == INVALID_APPWIDGET_ID in onGetViewFactory")
+        }
+        if (intent == null) {
+            logger.e("intent == null in onGetViewFactory")
+        }
+
         return CalendarWidgetRemoteViewsFactory(
-            intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID),
+            widgetId ?: AppWidgetManager.INVALID_APPWIDGET_ID,
             resourceProvider,
             calendarsRepository,
             accountManager,
@@ -450,7 +464,8 @@ internal class CalendarWidgetRemoteViewsFactory(
 
         // this method has to get the data synchronously
         runBlocking {
-            withContext(Dispatchers.Default) {
+
+            val widgetEvents = withTimeoutOrNull(java.time.Duration.ofSeconds(30).toMillis()) {
 
                 val userId = accountManager.getPrimaryAccount().firstOrNull()?.userId
 
@@ -462,6 +477,8 @@ internal class CalendarWidgetRemoteViewsFactory(
                 if (userEmails.isEmpty()) { // user is logged out
                     displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_please_log_in))
                     displayCreateNewEventButton(display = false)
+                    // there is no need to query the Events
+                    return@withTimeoutOrNull emptyList<WidgetEvent>()
                 } else {
                     displayMainInfoText(if (adapterData.isEmpty()) resourceProvider.provideString(R.string.calendar_widget_loading_events) else null)
                     displayCreateNewEventButton(display = true)
@@ -543,6 +560,13 @@ internal class CalendarWidgetRemoteViewsFactory(
                     widgetEvents.add(it.copy(showBottomSpacing = false))
                 }
 
+                widgetEvents
+            }
+
+            if (widgetEvents == null) {
+                logger.e("widgetEvents == null in onDataSetChanged")
+                displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_loading_events_error))
+            } else {
                 adapterData = widgetEvents
             }
         }
@@ -590,6 +614,6 @@ internal class CalendarWidgetRemoteViewsFactory(
 
     override fun getItemId(position: Int): Long = position.toLong()
 
-    override fun hasStableIds() = true
+    override fun hasStableIds() = false
 
 }
