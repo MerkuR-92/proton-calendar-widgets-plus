@@ -17,6 +17,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AppTheme
+import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -121,6 +122,37 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 ) { index ->
                     settings_theme_value.text = appThemes[index]
                     (activity as MainActivity).changeAppTheme(AppTheme.values()[index])
+                }
+            }
+        }
+
+        val appLanguagesLabels = resources.getStringArray(R.array.custom_language_labels)
+        val appLanguagesValues = resources.getStringArray(R.array.custom_language_values)
+        val selectedLanguageValue = (activity as MainActivity).getAppLanguage()
+        val selectedLanguageIndex = appLanguagesValues.indexOfFirst { it == selectedLanguageValue }
+        val systemDefaultLabel = resources.getString(R.string.settings_language_default)
+        settings_language_value.text = if (selectedLanguageIndex == -1) systemDefaultLabel else appLanguagesLabels[selectedLanguageIndex]
+
+        val appLanguageDialogLabels = appLanguagesLabels.toMutableList()
+        appLanguageDialogLabels.add(0, systemDefaultLabel)
+
+        settings_language.visibleOrGone(CHANGE_LANGUAGE)
+        settings_language_press.setOnSingleClickListener {
+            AndroidUtils.displaySingleChoicePicker(
+                requireContext(),
+                getString(R.string.settings_language_title),
+                appLanguageDialogLabels.toTypedArray(),
+                run {
+                    val selectedLanguageDialogIndex = appLanguagesValues.indexOfFirst { it == (activity as MainActivity).getAppLanguage() }
+                    if (selectedLanguageDialogIndex == -1) 0 else selectedLanguageDialogIndex + 1
+                }
+            ) { index ->
+                if (index == 0) {
+                    settings_language_value.text = systemDefaultLabel
+                    (activity as MainActivity).changeAppLanguage("") // Use empty string for System default
+                } else {
+                    settings_language_value.text = appLanguagesLabels[index - 1]
+                    (activity as MainActivity).changeAppLanguage(appLanguagesValues[index - 1])
                 }
             }
         }

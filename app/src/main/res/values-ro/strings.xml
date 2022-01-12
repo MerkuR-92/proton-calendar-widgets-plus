@@ -340,6 +340,8 @@
   <string name="settings_theme_title">Tema</string>
   <string name="settings_theme_info">Această setare afectează doar aspectul aplicației Proton Calendar pe acest dispozitiv. Aplicația va reporni după schimbarea temei.</string>
   <string name="settings_timezone_title">Fus orar</string>
+  <string name="settings_language_title">Limbă aplicație</string>
+  <string name="settings_language_default">System default</string>
   <string name="settings_update_timezone_title">Setare solicitare actualizare fus orar</string>
   <string name="settings_update_timezone_subtitle">Dacă fusul orar al sistemului nu se potrivește cu cel din setări, vi se va solicita să-l actualizați.</string>
   <string name="settings_update_timezone_checkbox">Nu mă mai întreba</string>

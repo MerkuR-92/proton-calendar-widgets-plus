@@ -340,6 +340,8 @@
   <string name="settings_theme_title">Thème</string>
   <string name="settings_theme_info">Ce paramètre n\'affecte que l\'apparence de l\'application Proton Calendar sur cet appareil. L\'application redémarrera après avoir changé de thème.</string>
   <string name="settings_timezone_title">Fuseau horaire</string>
+  <string name="settings_language_title">Langue de l\'application</string>
+  <string name="settings_language_default">Identique au système</string>
   <string name="settings_update_timezone_title">Demander à mettre à jour le réglage du fuseau horaire</string>
   <string name="settings_update_timezone_subtitle">Si le fuseau horaire du système ne correspond pas à la configuration actuelle du fuseau horaire, il vous sera demandé de le mettre à jour.</string>
   <string name="settings_update_timezone_checkbox">Ne plus me demander</string>

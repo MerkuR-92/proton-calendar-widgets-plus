@@ -34,6 +34,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.customView.NoLayoutRadioGroup
@@ -162,7 +163,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                         // weekdays for occurrence
                         val daysOfWeek = (chip_group_day_of_week_layout as ViewGroup).children.mapIndexedNotNull() { index, chip ->
                             if ((chip as Chip).isChecked) {
-                                val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(Locale.getDefault()).firstDayOfWeek.value else eventViewModel.userSettings.weekStart
+                                val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(
+                                    getLocaleForFormatting()
+                                ).firstDayOfWeek.value else eventViewModel.userSettings.weekStart
                                 biweekly.util.DayOfWeek.values()[(index + weekStart) % 7]
                             } else null
                         }.toList()
@@ -397,7 +400,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // TODO cleanup below after removing hardcoded string-array with date names
         // We do minus 1 to match java.time DayOfWeek ordinals
-        val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(Locale.getDefault()).firstDayOfWeek.value - 1 else eventViewModel.userSettings.weekStart - 1
+        val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(getLocaleForFormatting()).firstDayOfWeek.value - 1 else eventViewModel.userSettings.weekStart - 1
         val weekEnd = 7
         var stringArrayIndex = weekStart
         // Iterate from weekStart first

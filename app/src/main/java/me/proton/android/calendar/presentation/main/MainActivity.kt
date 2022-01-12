@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.main
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -58,6 +59,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -153,6 +155,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
         }
+    }
+
+    fun getAppLanguage(): String {
+        return PreferenceManager.getDefaultSharedPreferences(this).getString(SharedPreferencesKeys.APP_LANGUAGE, null) ?: ""
+    }
+
+    fun changeAppLanguage(language: String) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val editor = sharedPreferences.edit()
+        editor.putString(SharedPreferencesKeys.APP_LANGUAGE, language)
+        editor.apply()
+
+        recreate()
     }
 
     fun getAppTheme(): AppTheme {
@@ -949,5 +965,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(CustomLocale.apply(newBase))
     }
 }

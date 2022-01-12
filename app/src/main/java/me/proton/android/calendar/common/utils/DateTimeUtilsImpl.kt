@@ -3,6 +3,7 @@ package me.proton.android.calendar.common.utils
 import biweekly.util.DateTimeComponents
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
+import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.aliasesTimezonesMap
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.logger.TimberLogger
@@ -18,7 +19,7 @@ import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.time.temporal.IsoFields
 import java.util.*
-import java.util.Locale.getDefault
+import java.util.Locale.*
 import kotlin.math.abs
 
 object DateTimeUtilsImpl : DateTimeUtils {
@@ -337,8 +338,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
         val dateFormat = SimpleDateFormat("LLLL", getLocaleForFormatting())
         val formattedMonth = dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
         if (capitalize)
-            return formattedMonth.substring(0, 1).toUpperCase(Locale.getDefault()) +
-                    formattedMonth.substring(1).toLowerCase(Locale.getDefault())
+            return formattedMonth.substring(0, 1).toUpperCase(getLocaleForFormatting()) +
+                    formattedMonth.substring(1).toLowerCase(getLocaleForFormatting())
         return formattedMonth
     }
 
@@ -356,9 +357,29 @@ object DateTimeUtilsImpl : DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     override fun getLocaleForFormatting(): Locale {
-        return when (Locale.getDefault()) {
-            // add mapping for other supported Locales
-            else -> Locale.US
+        val defaultLocale = getDefault()
+        if (!CHANGE_LANGUAGE) return US
+        return when (defaultLocale.toLanguageTag()) {
+            // Check for supported country specific language tags first
+            "fr-CA",
+            "es-ES",
+            "es-MX",
+            "pt-PT" -> defaultLocale
+            else -> {
+                when (defaultLocale.language) {
+                    // Check for supported languages
+                    "fr",
+                    "es",
+                    "ca",
+                    "pl",
+                    "ro",
+                    "pt" -> defaultLocale
+                    else -> {
+                        // Force Locale to English (US)
+                        US
+                    }
+                }
+            }
         }
     }
 

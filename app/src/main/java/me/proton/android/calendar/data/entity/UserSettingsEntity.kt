@@ -7,6 +7,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.core.user.data.entity.UserEntity
 import java.time.DayOfWeek
@@ -47,7 +49,7 @@ data class UserSettingsEntity(
         1 -> DayOfWeek.MONDAY
         6 -> DayOfWeek.SATURDAY
         7 -> DayOfWeek.SUNDAY
-        else -> WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        else -> WeekFields.of(getLocaleForFormatting()).firstDayOfWeek
     }
 
     fun timeFormatIs24Hour(default: Boolean): Boolean = when (timeFormat) {

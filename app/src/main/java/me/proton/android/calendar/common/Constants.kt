@@ -83,6 +83,7 @@ object FeatureFlag {
     const val DELETE_CALENDAR = false
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
+    const val CHANGE_LANGUAGE = true
 }
 
 object ApiResponseCode {
@@ -95,6 +96,7 @@ object SharedPreferencesKeys {
     const val VIEW_MODE = "view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
+    const val APP_LANGUAGE = "app_language"
 }
 
 object MiniCalendarGestures {
