@@ -20,8 +20,8 @@ object CustomLocale {
 
     private fun updateResources(context: Context, locale: String): Context {
 
-        var languageToSet = locale.substringBefore("_")
-        var countryToSet = locale.substringAfter("_", "")
+        var languageToSet = locale.substringBefore("-")
+        var countryToSet = locale.substringAfter("-", "")
 
         if (locale == "") { // go back to default
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -33,8 +33,6 @@ object CustomLocale {
                 countryToSet = country ?: ""
             }
         }
-
-        TimberLogger.e("Test test updateResources languageToSet $languageToSet countryToSet $countryToSet")
 
         val localeToSet = Locale(languageToSet, countryToSet)
         Locale.setDefault(localeToSet)

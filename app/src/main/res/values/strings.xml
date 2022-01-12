@@ -399,7 +399,7 @@
     <string name="settings_value_placeholder">Tap to select</string>
 
     <string name="settings_general_title">General</string>
-    <string name="settings_general_info">Theme, timezone, calendar layout etc.</string>
+    <string name="settings_general_info">Theme, language, time zone, calendar layout etc.</string>
     <string name="settings_calendars">My calendars</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
     <string name="settings_calendar_default">Default</string>

@@ -46,6 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -86,6 +87,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
+import kotlin.system.exitProcess
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -95,6 +98,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var navController: NavController
 
     private val logger: Logger by inject()
+    private val widgetRefresher: WidgetRefresher by inject()
 
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
@@ -168,7 +172,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.putString(SharedPreferencesKeys.APP_LANGUAGE, language)
         editor.apply()
 
-        recreate()
+        lifecycleScope.launch {
+            // Delay so that new value is saved in SharedPreferences
+            delay(100)
+            // Get current intent to restart activity
+            val intent = intent
+            intent.action = null
+            intent.data = null
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            // Restart Application using exit
+            exitProcess(0)
+        }
     }
 
     fun getAppTheme(): AppTheme {
@@ -373,6 +389,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val widgetLanguageTag = sharedPreferences.getString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, null)
+        if (widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
+            widgetRefresher.broadcastRefresh()
+            widgetRefresher.refreshEventList()
+            val editor = sharedPreferences.edit()
+            editor.putString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, getLocaleForFormatting().toLanguageTag())
+            editor.apply()
+        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {

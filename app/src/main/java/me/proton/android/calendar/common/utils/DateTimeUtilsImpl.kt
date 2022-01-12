@@ -359,14 +359,14 @@ object DateTimeUtilsImpl : DateTimeUtils {
     override fun getLocaleForFormatting(): Locale {
         val defaultLocale = getDefault()
         if (!CHANGE_LANGUAGE) return US
-        return when (defaultLocale.toLanguageTag()) {
+        return when (defaultLocale.toLanguageTag().lowercase()) {
             // Check for supported country specific language tags first
-            "fr-CA",
-            "es-ES",
-            "es-MX",
-            "pt-PT" -> defaultLocale
+            "fr-ca",
+            "es-es",
+            "es-mx",
+            "pt-pt" -> defaultLocale
             else -> {
-                when (defaultLocale.language) {
+                when (defaultLocale.language.lowercase()) {
                     // Check for supported languages
                     "fr",
                     "es",
