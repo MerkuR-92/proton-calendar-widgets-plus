@@ -108,6 +108,7 @@ android {
         versionName "0.29.4"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resConfigs "en", "ca", "es-rES", "es-rMX", "fr", "fr-rCA", "pl", "pt-rPT", "ro"
 
         javaCompileOptions {
             annotationProcessorOptions {
