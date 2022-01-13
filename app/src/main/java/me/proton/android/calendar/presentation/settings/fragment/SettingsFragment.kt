@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -82,6 +83,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_general_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
         }
+
+        if (CHANGE_LANGUAGE) settings_general_info.text = getString(R.string.settings_general_info_with_language)
+        else settings_general_info.text = getString(R.string.settings_general_info)
 
         settings_calendars_list_add_layout_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
