@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Calendar Proton</string>
+  <string name="default_event_summary" comment="Event has no title">(fără titlu)</string>
+  <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+  <string name="default_user_email">(lipsă adresă de e-mail)</string>
+  <string name="default_user_display_name">(fără nume)</string>
+  <string name="toast_copied_to_clipboard">Copiat în memorie</string>
+  <!-- DELETE EVENT DIALOG -->
+  <string name="dialog_title_delete_event">Ștergere eveniment</string>
+  <string name="dialog_title_delete_recurring_event">Ștergere eveniment repetitiv</string>
+  <string name="dialog_description_delete_event">Doriți să ștergeți acest eveniment?</string>
+  <string name="dialog_description_delete_recurring_event">Doriţi să ştergeţi toate evenimentele din serie?</string>
+  <string name="dialog_description_delete_non_standalone_single_edit_event">Acest eveniment a fost actualizat de către organizator. Doriți să ştergeți acest eveniment?</string>
+  <string name="dialog_button_delete">Ștergere</string>
+  <string name="dialog_button_cancel">Anulare</string>
+  <string name="dialog_button_close">Închidere</string>
+  <!-- Delete as an organizer -->
+  <string name="dialog_description_delete_event_as_organizer">Un e-mail de anulare va fi trimis participanților la eveniment. Doriți să ștergeți acest eveniment?</string>
+  <string name="dialog_description_delete_event_as_organizer_disabled">Adresa vă este dezactivată. Un e-mail de anulare nu poate fi trimis participanților la eveniment. Doriți totuși să ștergeți acest eveniment?</string>
+  <string name="dialog_description_delete_recurring_event_as_organizer">Un e-mail de anulare va fi trimis participanților la eveniment. Doriți să ștergeți toate evenimentele din această serie?</string>
+  <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresa vă este dezactivată. Un e-mail de anulare nu poate fi trimis participanților la eveniment. Doriți totuși să ștergeți toate evenimentele din această serie?</string>
+  <!-- Delete as an attendee -->
+  <string name="dialog_description_delete_single_event_as_attendee">Organizatorul acestui eveniment va fi notificat că refuzați invitația. Doriți să ștergeți acest eveniment?</string>
+  <string name="dialog_description_delete_single_event_as_attendee_disabled">Organizatorul acestui eveniment nu va fi notificat că refuzați invitația deoarece nu puteți trimite e-mailuri de la adresa invitată. Doriți totuși să ștergeți acest eveniment?</string>
+  <string name="dialog_description_delete_recurring_event_as_attendee">Organizatorul acestei serii de evenimente va fi notificat că refuzați invitația. Doriți să ştergeți toate evenimentele din această serie?</string>
+  <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Organizatorul acestei serii de evenimente nu va fi notificat că refuzați invitația deoarece nu puteți trimite e-mailuri de la adresa invitată. Doriți totuși să ștergeți toate evenimentele din această serie?</string>
+  <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Acest eveniment a fost actualizat. Organizatorul va fi notificat că refuzați invitația. Doriți să ștergeți acest eveniment?</string>
+  <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Acest eveniment a fost actualizat. Organizatorul nu va fi notificat că refuzați invitația deoarece nu puteți trimite e-mailuri de la adresa invitată. Doriți să ștergeți acest eveniment?</string>
+  <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+  <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Evenimentele actualizate anterior de organizator vor fi păstrate, dar răspunsurile dvs. vor fi pierdute.</string>
+  <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Manifestările anterioare actualizate de organizator vor fi păstrate.</string>
+  <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Organizatorul nu poate fi notificat că refuzați invitația: \n\n• %1$s\n\nDoriți totuși să ștergeți evenimentul?</string>
+  <string name="dialog_button_set">Setare</string>
+  <string name="dialog_button_ok">OK</string>
+  <string name="action_save">Salvare</string>
+  <string name="action_done">Gata</string>
+  <string name="action_edit">Editare</string>
+  <string name="action_delete">Ștergere</string>
+  <string name="action_today">Astăzi</string>
+  <string name="action_create_event">Creare eveniment</string>
+  <string name="action_mark_default">Setare ca implicită</string>
+  <!-- MONTH VIEW -->
+  <string name="agenda_no_events">Niciun eveniment</string>
+  <string name="agenda_loading_events">Se încarcă evenimentele…</string>
+  <string name="agenda_loading_events_error">Eroare la încărcarea evenimentelor</string>
+  <string name="day_view_all_day_more">+ încă %d</string>
+  <!-- EVENT DETAILS   -->
+  <string name="event_all_day">Toată ziua</string>
+  <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
+  <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
+  <string name="event_alarm_label_at_event_time">La ora evenimentului</string>
+  <string name="event_alarm_label_at_event_time_by_email">La momentul evenimentului după e-mail</string>
+  <string name="event_alarm_label_on_the_same_day">În aceeași zi</string>
+  <string name="event_alarm_label_before">%1$s înainte</string>
+  <string name="event_alarm_label">%1$s</string>
+  <string name="event_alarm_label_before_by_email">%1$s înainte prin e-mail</string>
+  <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s la %2$s</string>
+  <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s la %2$s prin e-mail</string>
+  <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s înainte la %2$s</string>
+  <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s înainte la %2$s prin e-mail</string>
+  <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">La fiecare %1$d %2$s</string>
+  <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s la %2$s</string>
+  <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s în ziua %2$d</string>
+  <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s la %2$s</string>
+  <string name="event_recurrence_none">Nu se repetă</string>
+  <string name="event_recurrence_daily">Zilnic</string>
+  <string name="event_recurrence_weekly">Săptămânal</string>
+  <string name="event_recurrence_monthly">Lunar</string>
+  <string name="event_recurrence_yearly">Anual</string>
+  <string name="event_recurrence_weekly_on_all_days">toate zilele</string>
+  <string name="event_recurrence_until" comment="Event happens regularly until a date">până la %1$s</string>
+  <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">până la %1$s (%2$s)</string>
+  <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
+  <string name="event_status_canceled">Anulat</string>
+  <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Dezactivat)</i>]]></string>
+  <string name="event_attendee_status_separator">%1$s, %2$s</string>
+  <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d da</string>
+  <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d poate</string>
+  <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nu</string>
+  <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d fără răspuns</string>
+  <string name="event_attendee_is_organizer">Sunteți organizatorul</string>
+  <string name="event_attendee_organizer">Organizator</string>
+  <string name="event_attendee_optional">Opțional</string>
+  <string name="event_attendee_is_current_user">You</string>
+  <string name="event_answer_attending">Participați?</string>
+  <string name="event_answer_yes">Da</string>
+  <string name="event_answer_no">Nu</string>
+  <string name="event_answer_maybe">Probabil</string>
+  <string name="event_decryption_error_dialog_title">Evenimentul a eșuat decriptarea</string>
+  <string name="event_decryption_error_dialog_message">Decriptarea acestui eveniment nu a reușit.</string>
+  <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
+  <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
+  <string name="event_decryption_error_dialog_close">Închidere</string>
+  <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Detalii</a>
+  </string>
+  <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
+  <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
+  <string name="event_change_answer_recurring_overwrite_description">Doriți să schimbați răspunsul pentru toate evenimentele din această serie?\nUnele dintre răspunsurile dvs. la manifestările anterioare actualizate de către organizator vor fi pierdute.</string>
+  <string name="event_change_answer_recurring_single_edit_description">Acest eveniment a fost actualizat de către organizator. Doriți să vă schimbați răspunsul doar pentru această manifestare din serie?</string>
+  <string name="event_change_answer_recurring_cancel">Anulare</string>
+  <string name="event_change_answer_recurring_confirm">Actualizare</string>
+  <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Răsp.: Invitație pentru %s</string>
+  <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s v-a acceptat invitația la %2$s</string>
+  <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s v-a refuzat invitația la %2$s</string>
+  <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s v-a acceptat provizoriu invitația la %2$s</string>
+  <string name="event_organizer_send_prefs_error_title">Organizatorul nu poate fi notificat</string>
+  <string name="event_organizer_send_prefs_message_accepted_title">Organizatorul nu poate fi notificat că ați acceptat invitația</string>
+  <string name="event_organizer_send_prefs_message_declined_title">Organizatorul nu poate fi notificat că ați refuzat invitația</string>
+  <string name="event_organizer_send_prefs_message_tentative_title">Organizatorul nu poate fi notificat că ați acceptat provizoriu invitația</string>
+  <string name="event_organizer_send_prefs_message_default_title">Organizatorul nu poate fi notificat că ați răspuns la invitație</string>
+  <string name="event_organizer_send_prefs_button_title">OK</string>
+  <string name="event_attendees_send_prefs_error_title">Participanții nu pot fi notificați</string>
+  <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Niciunul dintre participanți nu poate fi notificat cu privire la modificările dvs.:\n\n• %1$s\n\nDoriți să continuați?</string>
+  <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Următorii participanți nu pot fi notificați despre modificările dvs.:\n\n• %1$s\n\nDoriți să continuați?</string>
+  <string name="event_attendees_send_prefs_error_confirm">Continuare</string>
+  <string name="event_attendees_send_prefs_error_cancel">Anulare</string>
+  <string name="event_send_prefs_error_address_disabled">această adresă nu există</string>
+  <string name="event_send_prefs_error_getting_contact">nu s-au putut obține datele contactelor</string>
+  <string name="event_send_prefs_error_network">eroare de rețea</string>
+  <string name="event_send_prefs_trusted_keys_invalid">cheile de încredere nu sunt valide</string>
+  <string name="event_send_prefs_public_keys_invalid">cheile publice nu sunt valide</string>
+  <string name="event_send_prefs_trusted_keys_signature_invalid">semnătura contactului nu este validă</string>
+  <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+  <!-- CREATE / EDIT EVENT   -->
+  <string name="title_create_event">Eveniment nou</string>
+  <string name="event_text_edit_event">Editare eveniment</string>
+  <string name="event_hint_title">Adăugare titlu</string>
+  <string name="event_hint_location">Adăugare loc</string>
+  <string name="event_text_add_participants">Adăugare participanți</string>
+  <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participanți (%1$d/%2$d)</string>
+  <string name="event_current_user_organizer">Dvs.</string>
+  <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ încă %1$d</string>
+  <string name="event_text_switch_all_day">Toată ziua</string>
+  <string name="event_text_date_start">Început</string>
+  <string name="event_text_date_end">Sfârșit</string>
+  <string name="event_text_date_repeat">Repetare</string>
+  <string name="event_text_date_repeat_never">Nu se repetă</string>
+  <string name="event_text_attendees">Participanți</string>
+  <string name="event_text_attendees_none">Niciunul</string>
+  <string name="event_text_calendar">Calendar</string>
+  <string name="event_text_timezone_start">Fus orar</string>
+  <!-- TODO Start Timezone / End Timezone? -->
+  <string name="event_text_add_alarm">Adăugare notificare</string>
+  <string name="event_text_description">Descriere</string>
+  <string name="event_hint_description">Adăugare descriere</string>
+  <string name="event_text_custom">personal</string>
+  <string name="event_alert_invalid_start_end_date">Data de începere a evenimentului nu poate fi după data de sfârșit</string>
+  <string name="event_alarms_title">Notificări</string>
+  <string name="event_custom_alarms_field">Notificare</string>
+  <string name="event_custom_alarms_title">Notificări personalizate</string>
+  <string name="event_alarm_partial_day_1">la ora evenimentului</string>
+  <string name="event_alarm_partial_day_2">10 minute</string>
+  <string name="event_alarm_partial_day_3">30 de minute</string>
+  <string name="event_alarm_partial_day_4">o oră</string>
+  <string name="event_alarm_partial_day_5">o săptămână</string>
+  <string name="event_alarm_all_day_1">în aceeași zi, la %1$s</string>
+  <string name="event_alarm_all_day_2">Cu o zi înainte, la %1$s</string>
+  <string name="event_alarm_all_day_3">Cu o săptămână înainte, la %1$s</string>
+  <string name="event_alarm_all_day_4">Cu trei săptămâni înainte, la %1$s</string>
+  <string name="event_alarm_at_time" comment="Example: at 15:00">la %1$s</string>
+  <string name="event_alarm_action">Trimitere prin</string>
+  <string name="event_alarm_action_notification">notificare</string>
+  <string name="event_alarm_action_email">e-mail</string>
+  <string name="event_alarm_same_day">în ziua</string>
+  <string name="event_recurrence_1">fără repetare</string>
+  <string name="event_recurrence_2">zilnic</string>
+  <string name="event_recurrence_3">săptămânal</string>
+  <string name="event_recurrence_4">lunar</string>
+  <string name="event_recurrence_5">anual</string>
+  <string name="event_recurrence_title">Frecvența</string>
+  <string name="event_recurrence_custom_title">Frecvență personalizată</string>
+  <string name="event_recurrence_occurs_every">Repetare la fiecare</string>
+  <string name="event_recurrence_occurs_on">Repetare la</string>
+  <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">în ziua %1$d</string>
+  <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s</string>
+  <string name="event_recurrence_ends_on">Se încheie</string>
+  <string name="event_recurrence_ends_never">niciodată</string>
+  <string name="event_recurrence_ends_on_date_empty">în ziua</string>
+  <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">la %1$s</string>
+  <string name="event_recurrence_ends_after_count_prefix">după</string>
+  <string name="event_recurring_edit_this">Acest eveniment</string>
+  <string name="event_recurring_edit_this_and_future">Acesta și viitoarele evenimente</string>
+  <string name="event_recurring_edit_all_events">Toate evenimentele</string>
+  <string name="event_discard_changes_title">Anulare modificări?</string>
+  <string name="event_discard_changes_description">Veți pierde toate modificările nesalvate.</string>
+  <string name="event_discard_changes_cancel">Continuare editare</string>
+  <string name="event_discard_changes_confirm">Renunțare</string>
+  <string name="event_recurring_update_this_title">Actualizare eveniment recurent</string>
+  <string name="event_recurring_update_this_description">Modificările de frecvență vor fi pierdute</string>
+  <string name="event_recurring_update_all_description">Modificările anterioare ale acestei serii vor fi pierdute</string>
+  <string name="event_recurring_update_this_cancel">Anulare</string>
+  <string name="event_recurring_update_this_confirm">Actualizare</string>
+  <string name="event_allow_contacts_title">Permiteți ca Proton Calendar să vă acceseze contactele?</string>
+  <string name="event_allow_contacts_description">Calendarul Proton are nevoie de acces la contacte pentru a vă oferi autocompletarea.</string>
+  <string name="event_allow_contacts_cancel">Refuzare</string>
+  <string name="event_allow_contacts_confirm">Permitere</string>
+  <string name="event_send_invite_mail_subject_prefix">Invitație pentru %s</string>
+  <string name="event_send_invite_mail_subject_all_day">un eveniment la %1$s</string>
+  <string name="event_send_invite_mail_subject_all_day_multiple">un eveniment începând de la %1$s</string>
+  <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">un eveniment începând de la %1$s la %2$s %3$s</string>
+  <string name="event_send_invite_mail_body">Sunteți invitat la %1$s\nCând: %2$s</string>
+  <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (toată ziua)</string>
+  <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
+  <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s la %2$s %3$s - %4$s la %5$s %6$s</string>
+  <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nUnde: %1$s</string>
+  <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nDescriere: %1$s</string>
+  <string name="event_send_invite_dialog_title">Trimitere invitație</string>
+  <string name="event_send_invite_dialog_description">O invitație va fi trimisă participanților adăugați.</string>
+  <string name="event_send_invite_dialog_confirm">Trimitere</string>
+  <string name="event_send_invite_dialog_cancel">Anulare</string>
+  <string name="event_add_participants_dialog_title">Adăugare participanți</string>
+  <string name="event_add_participants_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.</string>
+  <string name="event_add_participants_overwrite_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.\nModificările anterioare pentru această serie vor fi pierdute.</string>
+  <string name="event_add_participants_dialog_confirm">Trimitere</string>
+  <string name="event_add_participants_dialog_cancel">Anulare</string>
+  <string name="event_send_cancel_mail_subject_prefix">Anulare pentru %s</string>
+  <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">un eveniment începând de la %1$s la %2$s %3$s</string>
+  <string name="event_send_cancel_mail_subject_all_day_multiple">un eveniment începând de la %1$s</string>
+  <string name="event_send_cancel_mail_subject_all_day">un eveniment la %1$s</string>
+  <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s a fost anulat.</string>
+  <!-- NAVIGATION VIEW   -->
+  <string name="nav_view_calendars">Calendarele mele</string>
+  <string name="nav_view_subscribed_calendars">Calendare abonate</string>
+  <string name="nav_view_disabled_calendars">%s (Dezactivat)</string>
+  <string name="nav_view_not_synced_calendars">%s (Nesincronizat)</string>
+  <string name="nav_view_syncing_calendars">%s (se sincronizează)</string>
+  <string name="nav_view_more">Mai mult</string>
+  <string name="nav_view_switcher">Afișare</string>
+  <string name="nav_view_switcher_day">zi</string>
+  <string name="nav_view_switcher_agenda">Agendă</string>
+  <string name="nav_view_timezone">Fus orar</string>
+  <string name="nav_view_more_settings">Setări</string>
+  <string name="nav_view_more_general_settings">Generale</string>
+  <string name="nav_view_more_bug">Raportare eroare</string>
+  <string name="nav_view_more_logout">Deconectare</string>
+  <string name="nav_view_more_login">Autentificare</string>
+  <string name="nav_view_version_name">Proton Calendar %1$s</string>
+  <!-- SnackBar messages -->
+  <string name="snack_feature_coming_soon">Această funcție va fi disponibilă în curând</string>
+  <string name="snack_event_deleted">Eveniment șters</string>
+  <string name="snack_event_deleted_as_organizer">Anularea a fost trimisă și evenimentul a fost șters</string>
+  <string name="snack_event_deleted_as_attendee">Răspuns trimis și eveniment șters</string>
+  <string name="snack_event_deleted_error">Eroare la ștergerea evenimentului</string>
+  <string name="snack_event_deleted_as_organizer_error">E-mailul de anulare nu poate fi trimis. Mai reîncercaţi.</string>
+  <string name="snack_event_opening_error">Eroare la deschiderea evenimentului</string>
+  <string name="snack_event_saving">Se salvează evenimentul</string>
+  <string name="snack_event_deleting">Se șterge evenimentul</string>
+  <string name="snack_event_changing_answer">Se actualizează răspunsul</string>
+  <string name="snack_event_updated">Eveniment actualizat</string>
+  <string name="snack_event_updated_error_failed_mail">Invitația nu a putut fi trimisă</string>
+  <string name="snack_event_updated_error">Eroare la actualizarea evenimentului</string>
+  <string name="snack_event_created">Eveniment creat</string>
+  <string name="snack_event_created_failed_mail">Eveniment creat, dar invitația nu a putut fi trimisă.</string>
+  <string name="snack_event_created_error">Eroare la crearea evenimentului</string>
+  <string name="snack_event_opening_edit_error">Eroare la deschiderea evenimentului pentru editare</string>
+  <string name="snack_event_edit_with_attendees_error">Editarea evenimentelor cu participanţii nu este încă suportată</string>
+  <string name="snack_event_edit_calendar_with_attendees_error">Nu puteți adăuga participanți și modifica calendarul în același timp.</string>
+  <string name="snack_event_init_error">Eroare la inițializarea unui nou eveniment</string>
+  <string name="snack_event_calendar_error">Eroare la comutarea calendarului</string>
+  <string name="snack_event_maximum_alarm_reached_error">Numărul maxim de notificări a fost atins.</string>
+  <string name="snack_send_bug_report_success">Raportul a fost trimis, vă mulțumim.</string>
+  <string name="snack_send_bug_report_error">Eroare la trimiterea raportului. Reîncercați mai târziu.</string>
+  <string name="snack_send_bug_report_description_empty">Furnizați o descriere a raportului</string>
+  <string name="snack_create_event_no_active_personal_calendar">Aveți nevoie de un calendar activ personal pentru a crea evenimente.</string>
+  <string name="snack_add_self_as_participant">Autoinvitarea nu este permisă</string>
+  <string name="snack_maximum_participants_reached">Numărul maxim de participanți a fost atins.</string>
+  <string name="snack_add_participant_error">Eroare la adăugarea participantului</string>
+  <string name="snack_add_participant_invalid_email">E-mail nevalid</string>
+  <string name="snack_change_attendee_answer_error">Eroare la trimiterea răspunsului. Reîncercați mai târziu.</string>
+  <string name="snack_network_error">Eroare de rețea. Reîncercați mai târziu.</string>
+  <string name="snack_import_event_signed_out">Trebuie să vă autentificați pentru a importa evenimente</string>
+  <string name="snack_app_link_signed_out">Trebuie să vă autentificați pentru a vă vedea evenimentul.</string>
+  <string name="snack_update_default_calendar">Calendar implicit actualizat</string>
+  <string name="snack_update_default_calendar_error">Eroare actualizare calendar implicit. Reîncercați mai târziu.</string>
+  <string name="snack_calendar_init_error">Eroare încărcare informații calendar.</string>
+  <string name="snack_update_calendar_error">Eroare actualizare informații calendar. Reîncercați mai târziu.</string>
+  <string name="snack_update_calendar_settings_error">Eroare actualizare unele informații din calendar. Reîncercați mai târziu.</string>
+  <string name="snack_update_calendar_success">Calendar actualizat</string>
+  <string name="snack_create_calendar_success">Calendar creat</string>
+  <string name="snack_calendar_saving">Se salvează calendarul</string>
+  <string name="snack_create_calendar_error">Eroare la crearea calendarului. Reîncercați mai tărziu.</string>
+  <string name="snack_create_calendar_settings_error">Calendarul a fost creat, dar unele informații nu au fost actualizate. Reîncercați mai târziu.</string>
+  <string name="snack_ics_default_error">Eroare la deschiderea calendarului</string>
+  <string name="snack_ics_event_not_found_error">Evenimentul nu a fost găsit</string>
+  <string name="snack_ics_create_error">Eroare la crearea evenimentului</string>
+  <string name="snack_ics_parsing_error">Eroare la citirea calendarului</string>
+  <string name="snack_ics_unsupported_method_error">Acest tip de eveniment nu este încă suportat</string>
+  <string name="snack_ics_unsupported_add_error">Adăugarea de noi manifestări ale unui eveniment nu este suportată momentan</string>
+  <string name="snack_ics_unsupported_counter_error">Reprogramarea evenimentului nu este momentan suportată</string>
+  <string name="snack_ics_unsupported_refresh_error">Reîmprospătarea evenimentului nu este momentan suportată</string>
+  <string name="snack_ics_unsupported_publish_error">Importarea evenimentului nu este încă suportată</string>
+  <string name="snack_ics_unsupported_single_edit_reply_error">Momentan, suportăm doar răspunsurile la toate evenimentele dintr-o serie</string>
+  <string name="snack_ics_party_crasher_error">Adresa dvs. de e-mail nu se află în lista de participanți</string>
+  <string name="snack_ics_reply_party_crasher_error">Participanții care nu au fost invitați de către organizator nu pot fi adăugați</string>
+  <string name="snack_ics_missing_uid_error">Evenimentul nu are UID</string>
+  <string name="snack_ics_no_active_calendar_error">Nu există nici un calendar activ asociat cu acest cont</string>
+  <string name="snack_ics_unsupported_duration_error">Durata proprietății nu este suportată</string>
+  <string name="snack_ics_too_many_events_error">Multiple evenimente nu sunt încă acceptate</string>
+  <string name="snack_ics_no_events_error">Calendarul nu conține nici un eveniment</string>
+  <string name="snack_ics_invalid_error">Această invitație nu este validă</string>
+  <string name="snack_ics_disabled_calendar_error">Reactivați adresa asociată acestui calendar pentru a actualiza acest eveniment</string>
+  <string name="snack_ics_event_deleted_error">Evenimentul nu mai există în calendar</string>
+  <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s v-a acceptat invitația</string>
+  <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s v-a acceptat provizoriu invitația</string>
+  <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s v-a refuzat invitația</string>
+  <string name="snack_app_link_invalid">Legătură nevalidă la eveniment.</string>
+  <string name="snack_app_link_error">Eroare deschidere eveniment.</string>
+  <string name="snack_notification_already_added">Notificarea a fost deja actualizată.</string>
+  <!-- Dialogs -->
+  <string name="error_event_does_not_exist">Evenimentul nu există</string>
+  <string name="error_occurrence_does_not_exist">Căutarea nu există.</string>
+  <string name="update_timezone_dialog_title">Fus orar schimbat</string>
+  <string name="update_timezone_dialog_message">Fusul orar al sistemului pare să se fi schimbat la %1$s. Doriți să actualizați fusul orar preferat?</string>
+  <string name="update_timezone_dialog_confirmation">Actualizare</string>
+  <string name="update_timezone_dialog_cancel">Anulare</string>
+  <string name="contacts_permission_dialog_title">Permiteți ca Proton Calendar să vă acceseze contactele?</string>
+  <string name="contacts_permission_dialog_message">Proton Calendar are nevoie de acces la contactele din telefon pentru a vă ajuta să le adăugați cu ușurință la evenimente.</string>
+  <string name="contacts_permission_dialog_allow">Permitere</string>
+  <string name="contacts_permission_dialog_open_settings">Deschidere setări</string>
+  <string name="contacts_permission_dialog_cancel">Refuzare</string>
+  <string name="dialog_title_calendar_picker">Calendar</string>
+  <!-- NOTIFICATIONS -->
+  <string name="notification_channel_alarms">Notificări eveniment</string>
+  <string name="notification_channel_sync">Sincronizare calendar</string>
+  <string name="notification_sync">Se sincronizează calendarele…</string>
+  <string name="notification_text_today">Astăzi</string>
+  <string name="notification_text_today_part_time">Astăzi, la %1$s</string>
+  <string name="notification_text_tomorrow">Mâine</string>
+  <string name="notification_text_tomorrow_part_time">Mâine la %1$s</string>
+  <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s la %2$s</string>
+  <!-- Bug report -->
+  <string name="bug_report_hint_title">Subiect</string>
+  <string name="bug_report_hint_description">Descrieți problema incluzând și mesajele de eroare care apar.</string>
+  <string name="bug_report_discard_changes_title">Modificări nesalvate</string>
+  <string name="bug_report_discard_changes_description">Există date nesalvate în acest formular. Sigur doriți să renunțați la ele?</string>
+  <string name="bug_report_discard_changes_cancel">Continuare scriere</string>
+  <string name="bug_report_discard_changes_confirm">Renunțare</string>
+  <!-- Settings -->
+  <string name="settings_theme_title">Tema</string>
+  <string name="settings_theme_info">Această setare afectează doar aspectul aplicației Proton Calendar pe acest dispozitiv. Aplicația va reporni după schimbarea temei.</string>
+  <string name="settings_timezone_title">Fus orar</string>
+  <string name="settings_language_title">Limbă aplicație</string>
+  <string name="settings_language_default">Autodetectare</string>
+  <string name="settings_update_timezone_title">Setare solicitare actualizare fus orar</string>
+  <string name="settings_update_timezone_subtitle">Dacă fusul orar al sistemului nu se potrivește cu cel din setări, vi se va solicita să-l actualizați.</string>
+  <string name="settings_update_timezone_checkbox">Nu mă mai întreba</string>
+  <string name="settings_week_start_title">Început săptămână</string>
+  <string name="settings_time_format_title">Format oră</string>
+  <string name="settings_week_numbers_title">Afișare număr săptămână</string>
+  <string name="settings_alternative_routing_title">Permitere rută alternativă</string>
+  <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
+  <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
+  <string name="settings_general_title">Generale</string>
+  <string name="settings_general_info">Temă, fus orar, aspect calendar, etc.</string>
+  <string name="settings_calendars">Calendarele mele</string>
+  <string name="settings_subscribed_calendars">Abonări la calendare</string>
+  <string name="settings_calendar_default">Implicit</string>
+  <string name="settings_calendar_disabled">Dezactivat</string>
+  <string name="settings_calendar_not_synced">Nesincronizat</string>
+  <string name="settings_calendar_syncing">Se sincronizează</string>
+  <string name="settings_calendar_subscribed_invalid_ics">Format de calendar nesuportat.</string>
+  <string name="settings_calendar_subscribed_too_big">Calendarul este prea mare.</string>
+  <string name="settings_calendar_subscribed_not_accessible">Legătura calendarului nu este accesibilă.</string>
+  <string name="settings_calendar_subscribed_tmp_not_accessible">Legătura calendarului nu este disponibilă momentan.</string>
+  <string name="settings_calendar_subscribed_last_sync_old">Au trecut mai mult de 12 ore de la ultima actualizare.</string>
+  <string name="settings_calendar_subscribed_not_decrypted">Calendarul nu a putut fi decriptat.</string>
+  <!-- Calendar form -->
+  <string name="calendar_form_create_title">Creare calendar</string>
+  <string name="calendar_form_update_title">Editare calendar</string>
+  <string name="calendar_form_save">Salvare</string>
+  <string name="calendar_form_name">Nume</string>
+  <string name="calendar_form_name_placeholder">Adăugare nume calendar</string>
+  <string name="calendar_form_name_character_limit">%d/%d caractere</string>
+  <string name="calendar_form_color">Culoare calendar</string>
+  <string name="calendar_form_default_event_duration">Durată eveniment</string>
+  <string name="calendar_form_default_event_duration_value">%s minute</string>
+  <string name="calendar_form_default_event_notifications">Notificări eveniment</string>
+  <string name="calendar_form_default_all_day_event_notifications">Notificări pe durata evenimentului</string>
+  <string name="calendar_form_add_notification">Adăugare notificare</string>
+  <string name="calendar_form_default_email">Adresa de e-mail</string>
+  <string name="calendar_form_default_email_value_error">Eșuare încărcare e-mail implicit</string>
+  <string name="calendar_form_name_hint">Adăugare nume calendar</string>
+  <string name="calendar_form_name_required_error">Numele este obligatoriu</string>
+  <string name="add_calendar_text">Adăugare calendar</string>
+  <string name="create_calendar_limit_reached_free">Ați atins numărul maxim de calendare.</string>
+  <string name="create_calendar_limit_reached_paid_title">Limita de 20 de calendare a fost atinsă.</string>
+  <string name="create_calendar_limit_reached_paid_message">Ștergeți calendarele neutilizate pentrru a crea altele.</string>
+  <string name="create_calendar_limit_reached_paid_manage">Gestionare calendare</string>
+  <string name="create_calendar_limit_reached_close">Închidere</string>
+  <!-- Bootstrap errors -->
+  <string name="bootstrap_error_default_confirm">OK</string>
+  <string name="bootstrap_error_no_calendar_title">Nu există calendare asociate cu acest cont.</string>
+  <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
+  </string>
+  <string name="bootstrap_error_some_calendars_failed_title">Eroare pregătire calendar</string>
+  <string name="bootstrap_error_some_calendars_failed_message">Următoarele calendare nu au putut fi setate</string>
+  <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar activ asociat cu acest cont.</string>
+  <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://protonmail.com/support/">baza de cunoștințe</a>
+  </string>
+  <string name="bootstrap_error_store_quota_reached_message">Nu mai există spațiu de stocare disponibil.</string>
+  <string name="bootstrap_error_store_quota_reached_learn_more">Detalii</string>
+  <string name="bootstrap_error_reset_needed_title">Resetare chei calendar</string>
+  <string name="bootstrap_error_reset_needed_message">V-ați resetat parola și evenimentele legate la următoarele calendare nu s-au putut decripta. Orice calendar activ abonat va fi sincronizat din nou după câteva minute.</string>
+  <string name="bootstrap_error_update_passphrase_title">Reactivare chei calendar</string>
+  <string name="bootstrap_error_update_passphrase_message">Ați reactivat cheile, iar evenimentele legate de următoarele calendare se pot decripta acum.</string>
+  <string name="bootstrap_error_continue_button">Continuare</string>
+  <string name="splash_after_login_init">Se pregătesc calendarele</string>
+  <string name="splash_init">Se decriptează evenimentele</string>
+  <string name="default_calendar_name">Calendarul meu</string>
+  <!-- Calendar Widget -->
+  <string name="calendar_widget_description">Proton Calendar widget</string>
+  <string name="calendar_widget_no_upcoming_events_today">Astăzi nu sunt evenimente</string>
+  <string name="calendar_widget_loading_events">Se încarcă evenimentele…</string>
+  <string name="calendar_widget_no_upcoming_events">Nu urmează evenimente</string>
+  <string name="calendar_widget_please_log_in">Conectați-vă pentru a vă vedea evenimentele</string>
+  <string name="calendar_widget_part_day_event_starts_at">Începe la %1$s</string>
+  <string name="calendar_widget_part_day_event_ends_at">Se încheie la %1$s</string>
+  <!--  STRING PLURALS  -->
+  <plurals name="plural_minute">
+    <item quantity="one">minute</item>
+    <item quantity="few">minutes</item>
+    <item quantity="other">minutes</item>
+  </plurals>
+  <plurals name="plural_hour">
+    <item quantity="one">hour</item>
+    <item quantity="few">hours</item>
+    <item quantity="other">hours</item>
+  </plurals>
+  <plurals name="plural_day">
+    <item quantity="one">day</item>
+    <item quantity="few">days</item>
+    <item quantity="other">days</item>
+  </plurals>
+  <plurals name="plural_week">
+    <item quantity="one">week</item>
+    <item quantity="few">weeks</item>
+    <item quantity="other">weeks</item>
+  </plurals>
+  <plurals name="plural_month">
+    <item quantity="one">month</item>
+    <item quantity="few">months</item>
+    <item quantity="other">months</item>
+  </plurals>
+  <plurals name="plural_year">
+    <item quantity="one">year</item>
+    <item quantity="few">years</item>
+    <item quantity="other">years</item>
+  </plurals>
+  <plurals name="plural_recurrence_count">
+    <item quantity="one">once</item>
+    <item quantity="few">times</item>
+    <item quantity="other">times</item>
+  </plurals>
+  <plurals name="plural_occurrence">
+    <item quantity="one">occurrence</item>
+    <item quantity="few">occurrences</item>
+    <item quantity="other">occurrences</item>
+  </plurals>
+  <plurals name="plural_participant_uppercase">
+    <item quantity="one">participant</item>
+    <item quantity="few">participants</item>
+    <item quantity="other">participants</item>
+  </plurals>
+  <!--  STRING ARRAYS  -->
+  <string-array name="ordinals_as_words">
+    <item/>
+    <item>first</item>
+    <item>second</item>
+    <item>third</item>
+    <item>fourth</item>
+    <item>fifth</item>
+  </string-array>
+  <string-array name="ordinals_as_words_backwards">
+    <item/>
+    <item>last</item>
+    <item>second to last</item>
+    <item>third to last</item>
+    <item>fourth to last</item>
+    <item>fifth to last</item>
+  </string-array>
+  <string-array name="app_themes">
+    <item>Light</item>
+    <item>Dark</item>
+    <item>System default</item>
+  </string-array>
+  <string-array name="time_formats">
+    <item>System default</item>
+    <item>13:00</item>
+    <item>1:00pm</item>
+  </string-array>
+  <string-array name="week_start">
+    <item>System default</item>
+    <item>Monday</item>
+    <item>Saturday</item>
+    <item>Sunday</item>
+  </string-array>
+</resources>

@@ -1264,11 +1264,6 @@ object AndroidUtils {
         addTextChangedListener(watcher)
         return watcher
     }
-
-
-
-
-
 }
 
 

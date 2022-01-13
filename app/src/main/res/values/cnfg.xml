@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="custom_language_labels" translatable="false">
+        <item>English</item>
+        <item>Català</item>
+        <item>Español (España)</item>
+        <item>Español (México)</item>
+        <item>Français</item>
+        <item>Français (Canada)</item>
+        <item>Polski</item>
+        <item>Português (Portugal)</item>
+        <item>Română</item>
+    </array>
+    <array name="custom_language_values" translatable="false">
+        <item>en</item>
+        <item>ca</item>
+        <item>es</item>
+        <item>es-MX</item>
+        <item>fr</item>
+        <item>fr-CA</item>
+        <item>pl</item>
+        <item>pt</item>
+        <item>ro</item>
+    </array>
+</resources>

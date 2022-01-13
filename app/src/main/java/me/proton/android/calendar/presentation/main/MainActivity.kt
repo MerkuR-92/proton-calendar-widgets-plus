@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.main
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -58,6 +60,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -84,6 +87,8 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
+import kotlin.system.exitProcess
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -93,6 +98,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var navController: NavController
 
     private val logger: Logger by inject()
+    private val widgetRefresher: WidgetRefresher by inject()
 
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
@@ -152,6 +158,36 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
                 }
             }
+        }
+    }
+
+    fun getAppLanguage(): String {
+        return PreferenceManager.getDefaultSharedPreferences(this).getString(SharedPreferencesKeys.APP_LANGUAGE, null) ?: ""
+    }
+
+    fun changeAppLanguage(language: String) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val editor = sharedPreferences.edit()
+        editor.putString(SharedPreferencesKeys.APP_LANGUAGE, language)
+        editor.apply()
+
+        restartApplication()
+    }
+
+    private fun restartApplication() {
+        lifecycleScope.launch {
+            // Delay so that new value is saved in SharedPreferences
+            delay(100)
+            // Get current intent to restart activity
+            val intent = intent
+            intent.action = null
+            intent.data = null
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            // Restart Application using exit
+            exitProcess(0)
         }
     }
 
@@ -222,6 +258,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             //  at the top of the stack (ie: the last state of this task)
             finish()
             return
+        }
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val widgetLanguageTag = sharedPreferences.getString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, null)
+        val appLanguage = getAppLanguage()
+        // If we use System default as language settings for the app, check whether we need to restart Application to apply new language
+        if (appLanguage.isBlank() && widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
+            restartApplication()
         }
 
         setContentView(R.layout.activity_main)
@@ -357,6 +401,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
+
+        if (widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
+            widgetRefresher.broadcastRefresh()
+            val editor = sharedPreferences.edit()
+            editor.putString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, getLocaleForFormatting().toLanguageTag())
+            editor.apply()
+        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
@@ -949,5 +1000,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(CustomLocale.apply(newBase))
     }
 }

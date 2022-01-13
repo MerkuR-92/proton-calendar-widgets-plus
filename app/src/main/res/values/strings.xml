@@ -386,6 +386,8 @@
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_info">This setting affects only the appearance of the Proton Calendar app on this device. The app will restart after changing the theme.</string>
     <string name="settings_timezone_title">Time zone</string>
+    <string name="settings_language_title">App language</string>
+    <string name="settings_language_default">Auto-detect</string>
     <string name="settings_update_timezone_title">Ask to update time zone setting</string>
     <string name="settings_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>
     <string name="settings_update_timezone_checkbox">Don\'t ask me again</string>
@@ -397,7 +399,7 @@
     <string name="settings_value_placeholder">Tap to select</string>
 
     <string name="settings_general_title">General</string>
-    <string name="settings_general_info">Theme, timezone, calendar layout etc.</string>
+    <string name="settings_general_info">Theme, language, time zone, calendar layout etc.</string>
     <string name="settings_calendars">My calendars</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
     <string name="settings_calendar_default">Default</string>

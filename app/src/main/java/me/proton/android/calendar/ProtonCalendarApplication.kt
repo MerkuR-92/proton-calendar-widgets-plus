@@ -1,6 +1,7 @@
 package me.proton.android.calendar
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
@@ -9,6 +10,7 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.logger.LoggerImpl
 import me.proton.android.calendar.common.logger.SentryTree
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
+import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.worker.SyncWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.EmailMessageRepository
@@ -164,4 +166,7 @@ class ProtonCalendarApplication : Application() {
         }
     }
 
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(CustomLocale.apply(base))
+    }
 }

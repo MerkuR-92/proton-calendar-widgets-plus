@@ -73,10 +73,63 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/settings_timezone"
+        android:id="@+id/settings_language"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/settings_theme_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <include
+            android:id="@+id/settings_language_press"
+            layout="@layout/view_press_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/settings_language_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_language_title"
+            style="@style/Text.Default"
+            android:layout_marginTop="@dimen/default_margin_text_vertical"
+            android:layout_marginStart="@dimen/spacing_page"
+            android:layout_marginEnd="@dimen/spacing_page"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/settings_language_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:text="English"
+            android:text="@string/settings_value_placeholder"
+            style="@style/Text.DefaultSmall.Weak"
+            android:layout_marginBottom="@dimen/default_margin_text_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/settings_language_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/settings_language_title"
+            app:layout_constraintEnd_toEndOf="@+id/settings_language_title"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/settings_language_separator"
+        style="@style/Separator"
+        app:layout_constraintTop_toBottomOf="@+id/settings_language"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_timezone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/settings_language_separator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

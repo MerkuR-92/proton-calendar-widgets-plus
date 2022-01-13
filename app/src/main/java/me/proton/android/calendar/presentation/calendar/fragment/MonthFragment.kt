@@ -688,7 +688,7 @@ class MonthFragment : BaseFragment() {
             false
         )
         val textView = weekDayHeaderView as TextView
-        textView.text = dayOfWeek.format(firstLetter = true)
+        textView.text = dayOfWeek.format(firstLetter = true).uppercase()
         if (highlight) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
         else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
         headerLayout.addView(weekDayHeaderView)
