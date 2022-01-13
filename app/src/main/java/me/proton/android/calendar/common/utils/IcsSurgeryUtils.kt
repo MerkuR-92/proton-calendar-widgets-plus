@@ -611,9 +611,9 @@ object IcsSurgeryUtils {
             // We allow any values for attendee email during the surgery, but we check the email validity in HandleIcsUseCase
             //  if we are in organizerMode, as there we require the attendee email to be canonicalizable to generate the token
             val email = attendee.extractEmail() ?:
-            attendee.email.takeIfNotBlank() ?:
+            attendee.email?.takeIfNotBlank() ?:
             attendee.uri?.substringAfter("mailto:")?.takeIfNotBlank() ?:
-            attendee.commonName.takeIfNotBlank() ?: return false
+            attendee.commonName?.takeIfNotBlank() ?: return false
 
             // Remove URI parameter if it's clearly not an email
             if (attendee.uri?.contains("@") == false) {
