@@ -83,7 +83,7 @@ object FeatureFlag {
     const val DELETE_CALENDAR = false
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
-    const val CHANGE_LANGUAGE = true
+    const val CHANGE_LANGUAGE = false
 }
 
 object ApiResponseCode {
