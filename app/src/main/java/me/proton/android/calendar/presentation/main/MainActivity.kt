@@ -172,6 +172,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.putString(SharedPreferencesKeys.APP_LANGUAGE, language)
         editor.apply()
 
+        restartApplication()
+    }
+
+    private fun restartApplication() {
         lifecycleScope.launch {
             // Delay so that new value is saved in SharedPreferences
             delay(100)
@@ -254,6 +258,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             //  at the top of the stack (ie: the last state of this task)
             finish()
             return
+        }
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val widgetLanguageTag = sharedPreferences.getString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, null)
+        val appLanguage = getAppLanguage()
+        // If we use System default as language settings for the app, check whether we need to restart Application to apply new language
+        if (appLanguage.isBlank() && widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
+            restartApplication()
         }
 
         setContentView(R.layout.activity_main)
@@ -390,11 +402,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val widgetLanguageTag = sharedPreferences.getString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, null)
         if (widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
             widgetRefresher.broadcastRefresh()
-            widgetRefresher.refreshEventList()
             val editor = sharedPreferences.edit()
             editor.putString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, getLocaleForFormatting().toLanguageTag())
             editor.apply()

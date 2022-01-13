@@ -8,6 +8,7 @@ import androidx.preference.PreferenceManager
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import java.util.*
 
 object CustomLocale {
@@ -24,14 +25,9 @@ object CustomLocale {
         var countryToSet = locale.substringAfter("-", "")
 
         if (locale == "") { // go back to default
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Resources.getSystem().configuration.locales.get(0)
-            } else {
-                Resources.getSystem().configuration.locale
-            }.apply {
-                languageToSet = language ?: "en"
-                countryToSet = country ?: ""
-            }
+            val defaultSupportedLanguageTag = getLocaleForFormatting().toLanguageTag()
+            languageToSet = defaultSupportedLanguageTag.substringBefore("-")
+            countryToSet = defaultSupportedLanguageTag.substringAfter("-", "")
         }
 
         val localeToSet = Locale(languageToSet, countryToSet)

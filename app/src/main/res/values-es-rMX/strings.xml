@@ -341,7 +341,7 @@
   <string name="settings_theme_info">Este ajuste sólo afecta a la apariencia de la aplicación Proton Calendar en este dispositivo. La aplicación se reiniciará después de cambiar el tema.</string>
   <string name="settings_timezone_title">Zona horaria</string>
   <string name="settings_language_title">Idioma de la aplicación</string>
-  <string name="settings_language_default">Del sistema</string>
+  <string name="settings_language_default">Detectar automáticamente</string>
   <string name="settings_update_timezone_title">Solicitar actualizar la configuración de zona horaria</string>
   <string name="settings_update_timezone_subtitle">Si la zona horaria del sistema no coincide con la configuración actual de zona horaria, se le pedirá actualizarla.</string>
   <string name="settings_update_timezone_checkbox">No volver a preguntarme</string>

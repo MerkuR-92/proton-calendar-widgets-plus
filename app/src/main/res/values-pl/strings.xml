@@ -341,7 +341,7 @@
   <string name="settings_theme_info">To ustawienie wpływa na wygląd aplikacji Proton Calendar tylko na tym urządzeniu. Po zmianie motywu, aplikacja zostanie ponownie uruchomiona.</string>
   <string name="settings_timezone_title">Strefa czasowa</string>
   <string name="settings_language_title">Język aplikacji</string>
-  <string name="settings_language_default">Domyślny systemu</string>
+  <string name="settings_language_default">Automatyczne wykrywanie</string>
   <string name="settings_update_timezone_title">Zapytaj o aktualizację strefy czasowej</string>
   <string name="settings_update_timezone_subtitle">Zostaniesz poproszony o aktualizację strefy czasowej, jeśli nie będzie odpowiadać strefie czasowej systemu.</string>
   <string name="settings_update_timezone_checkbox">Nie pytaj ponownie</string>
