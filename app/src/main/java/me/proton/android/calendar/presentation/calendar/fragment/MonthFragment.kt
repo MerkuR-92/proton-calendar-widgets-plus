@@ -104,7 +104,6 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var miniCalendarPageChangeCallback: ViewPager2.OnPageChangeCallback
 
-    private val headerDaysMediator = MediatorLiveData<Pair<DayOfWeek, String>>()
     private var startWeekOn: DayOfWeek? = null
     private var timeZoneId: String? = null
 
@@ -460,9 +459,7 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        if (headerDaysMediator.hasObservers()) {
-            headerDaysMediator.removeObservers(viewLifecycleOwner)
-        }
+        val headerDaysMediator = MediatorLiveData<Pair<DayOfWeek, String>>()
         // Setup header with week's days
         headerDaysMediator.addSource(calendarViewModel.timeZoneId) { zoneId ->
             timeZoneId = zoneId?.id

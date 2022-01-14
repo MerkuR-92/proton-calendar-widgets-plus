@@ -498,7 +498,11 @@ class CalendarsRepositoryImpl(
                 // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
                 // all we need to do is decrypt EventEntity and return full Events with correct occurrences
 
-                val eventEntities = database.eventsDao().selectAllById(eventSkeletons.map { it.id })
+                val eventIds = eventSkeletons.map { it.id }
+                val chunkedEventIds = eventIds.chunked(100)
+                val eventEntities = chunkedEventIds.flatMap {
+                    database.eventsDao().selectAllById(it)
+                }
 
                 val transformedEvents = eventEntities.map { eventEntity ->
                     async {

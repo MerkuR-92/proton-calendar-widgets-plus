@@ -59,6 +59,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
+import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
@@ -777,6 +778,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_switcher_month_layout.visibleOrGone(MONTH_VIEW)
         nav_view_switcher_month_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setViewMode(ViewMode.MONTH)
@@ -1030,7 +1032,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if (returnToMonthView) {
+        } else if (returnToMonthView && MONTH_VIEW) {
             // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
                 calendarViewModel.handleDaySelected(it)

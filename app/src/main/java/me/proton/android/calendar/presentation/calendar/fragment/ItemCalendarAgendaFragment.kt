@@ -52,7 +52,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
     private var userAddresses: List<UserAddress>? = null
-    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -87,6 +86,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 

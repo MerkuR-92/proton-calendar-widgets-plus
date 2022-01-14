@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
@@ -57,7 +58,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var weekStart: DayOfWeek? = null
-    private val monthViewMediator = MediatorLiveData<Pair<String, DayOfWeek>>()
 
     private var skeletonList: List<LocalDate> = listOf()
 
@@ -128,6 +128,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             monthView.setShowWeekNumbers(displayWeekNumber)
         }
 
+        val monthViewMediator = MediatorLiveData<Pair<String, DayOfWeek>>()
         monthViewMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
@@ -392,6 +393,9 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
             // Get the map of MonthViewEvent indexed by day
             val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(events, fromDate, maxEventCount, timeZoneId, isSkeletonEvent)
+
+            // Clear keyboard to make sure it doesn't affect MonthView usable height
+            requireActivity().clearFocusAndHideKeyboard(view)
 
             // Set the month view events so that they can be drawn
             monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false)

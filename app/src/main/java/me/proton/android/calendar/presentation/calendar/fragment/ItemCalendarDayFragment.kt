@@ -36,6 +36,7 @@ import kotlinx.coroutines.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
@@ -73,7 +74,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
     private var userAddresses: List<UserAddress>? = null
-    private val dayMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -434,6 +434,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         all_day_layout.visibleOrGone(true)
         all_day_header_date.visibleOrGone(true)
 
+        val dayMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
         dayMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
@@ -633,6 +634,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_no_events.text = resources.getString(R.string.agenda_loading_events)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
+
+                        // Clear keyboard to make sure it doesn't affect DayView usable height
+                        requireActivity().clearFocusAndHideKeyboard(view)
 
                         val partDayEvents = it.events.filter {
                             !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header

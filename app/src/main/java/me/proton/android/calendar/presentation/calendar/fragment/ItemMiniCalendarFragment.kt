@@ -49,8 +49,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var weekStart: DayOfWeek? = null
-    private val miniCalendarMediator =
-        MediatorLiveData<Pair<String, DayOfWeek>>() // Month view value is not needed if week component is disabled
 
     private var fullWeeksInMonth = 0
 
@@ -143,6 +141,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val miniCalendarMediator = MediatorLiveData<Pair<String, DayOfWeek>>() // Month view value is not needed if week component is disabled
         miniCalendarMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
