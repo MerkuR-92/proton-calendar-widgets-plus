@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZon
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -849,7 +850,7 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel getUserAddresses")
             return null
         }
-        return userAddresses.value ?: userManager.getAddresses(userId)
+        return userAddresses.value ?: userManager.getAddressesOrNull(userId)
     }
 
     suspend fun getTimeZoneId(): ZoneId? {

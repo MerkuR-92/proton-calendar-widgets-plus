@@ -28,6 +28,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCo
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -469,9 +470,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
                 val userId = accountManager.getPrimaryAccount().firstOrNull()?.userId
 
-                val userEmails = kotlin.runCatching {
-                    userManager.getAddresses(userId ?: UserId(""), refresh = false).map { it.email }
-                }.getOrNull() ?: emptyList()
+                val userEmails = userManager.getAddressesOrNull(userId ?: UserId(""))?.map { it.email } ?: emptyList()
 
                 // show or hide "logged out" or "loading" info
                 if (userEmails.isEmpty()) { // user is logged out

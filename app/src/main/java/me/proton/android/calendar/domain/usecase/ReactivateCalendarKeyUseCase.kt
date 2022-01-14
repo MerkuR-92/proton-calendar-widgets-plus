@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ReenableKeyApiRequest
 import me.proton.android.calendar.data.api.ReenableKeyApiResponse
@@ -66,7 +67,7 @@ class ReactivateCalendarKeyUseCase(
                     } ?: return@members
 
                     // Load Address linked to member
-                    val memberAddress = userManager.getAddresses(userId, refresh = true).find {
+                    val memberAddress = userManager.getAddressesOrNull(userId, refresh = true)?.find {
                         it.email.equalsNoCase(member.email)
                     } ?: return@members
 

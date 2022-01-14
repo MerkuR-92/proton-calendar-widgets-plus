@@ -13,6 +13,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isValidForEncryption
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
@@ -50,7 +51,7 @@ class EditCreateEventUseCase(
             database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")
         } else null
 
-        val userAddresses = userManager.getAddresses(userId, refresh = false).ifEmpty { return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty") }
+        val userAddresses = userManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")
 
         // 0. split Event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)

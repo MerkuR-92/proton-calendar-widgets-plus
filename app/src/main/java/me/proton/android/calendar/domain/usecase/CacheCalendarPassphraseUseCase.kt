@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.core.crypto.common.context.CryptoContext
@@ -40,7 +41,7 @@ class CacheCalendarPassphraseUseCase( // TODO TEST
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
             ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no user address")
 
-        val memberAddress = userManager.getAddresses(userId).find {
+        val memberAddress = userManager.getAddressesOrNull(userId)?.find {
             it.email.equals(member.email, ignoreCase = true)
         } ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Member Address found")
 

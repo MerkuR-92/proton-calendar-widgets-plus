@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.crypto.tink.subtle.Base64
 import com.google.crypto.tink.subtle.Random
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PassphraseApiRequest
 import me.proton.android.calendar.data.api.SetupKeyApiRequest
@@ -67,7 +68,7 @@ class KeySetupUseCase(
     }
 
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
-        val address = userManager.getAddresses(userId, refresh = true).firstOrNull {
+        val address = userManager.getAddressesOrNull(userId, refresh = true)?.firstOrNull {
             it.canSend && it.canReceive
         } ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
 

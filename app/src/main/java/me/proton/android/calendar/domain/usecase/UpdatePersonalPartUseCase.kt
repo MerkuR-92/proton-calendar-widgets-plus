@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PersonalEventContentApiRequest
 import me.proton.android.calendar.data.api.UpdateEventPersonalPartApiRequest
@@ -34,7 +35,7 @@ class UpdatePersonalPartUseCase(
 
         if (personalPartICalString.isNotEmpty()) {
 
-            val memberAddressKey = userManager.getAddresses(userId, refresh = false).find {
+            val memberAddressKey = userManager.getAddressesOrNull(userId)?.find {
                 it.email.equalsNoCase(member.email)
             }?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
 
