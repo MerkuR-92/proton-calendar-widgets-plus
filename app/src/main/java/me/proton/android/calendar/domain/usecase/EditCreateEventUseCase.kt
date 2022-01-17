@@ -13,6 +13,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isValidForEncryption
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
@@ -50,7 +51,7 @@ class EditCreateEventUseCase(
             database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")
         } else null
 
-        val userAddresses = userManager.getAddresses(userId, refresh = false).ifEmpty { return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty") }
+        val userAddresses = userManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")
 
         // 0. split Event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
@@ -70,10 +71,10 @@ class EditCreateEventUseCase(
 
         // 3. get old Session Keys if they were already present in old Event
         val oldSessionKeys = if (oldEventEntity != null) {
-             when (val result = extractSessionKeys(oldEventEntity, oldCalendarKey)) {
-                 is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<SessionKeys>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting oldSessionKeys")
-                 else -> return result
-             }
+            when (val result = extractSessionKeys(oldEventEntity, oldCalendarKey)) {
+                is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<SessionKeys>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting oldSessionKeys")
+                else -> return result
+            }
         } else null
 
         val isCalendarBeingChanged = oldCalendarId != newEvent.calendar.id
@@ -229,32 +230,29 @@ class EditCreateEventUseCase(
         } else null
 
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
-        if (attendeesEventContent != null) {
-            val newEventAttendees =
-                if (createLinkedEventAsAttendee) {
-                    // The array must only contain one Attendee (the user itself) with his own token and answered participation status
-                    val member = database.membersDao().select(newEvent.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member in createLinkedEventAsAttendee")
-                    val canonicalMemberEmails = userAddresses.filter { it.email.equalsNoCase(member.email) }.map { address ->
-                        canonicalizeProtonEmail(address.email, forceCanonicalization = true)
-                    }
-                    val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
-                        canonicalMemberEmails.firstOrNull { userEmail ->
-                            val attendeeEmail = attendee.extractEmail()
-                            attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(userEmail, ignoreCase = true)
-                        } != null
-                    } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from newEvent")
-                    listOf(userAttendee)
-                } else newEvent.iCalEvent.attendees
-
-            newEventAttendees.forEach { attendee ->
-                if (attendee.participationStatus == null) attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
-                val status = attendee.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
-                attendee.extractEmail()?.let {
-                    val xpmToken = attendee.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it), newEvent.uid) // TODO Maybe use API route ?
-                    attendees.add(
-                        Event.AttendeeStatusEvent(null, xpmToken, status, null)
-                    )
+        val newEventAttendees =
+            if (createLinkedEventAsAttendee) {
+                // The array must only contain one Attendee (the user itself) with his own token and answered participation status
+                val canonicalMemberEmails = userAddresses.map { address ->
+                    canonicalizeProtonEmail(address.email, forceCanonicalization = true)
                 }
+                val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
+                    canonicalMemberEmails.firstOrNull { userEmail ->
+                        val attendeeEmail = attendee.extractEmail()
+                        attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(userEmail, ignoreCase = true)
+                    } != null
+                } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from newEvent")
+                listOf(userAttendee)
+            } else newEvent.iCalEvent.attendees
+
+        newEventAttendees.forEach { attendee ->
+            if (attendee.participationStatus == null) attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
+            val status = attendee.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
+            attendee.extractEmail()?.let {
+                val xpmToken = attendee.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it), newEvent.uid) // TODO Maybe use API route ?
+                attendees.add(
+                    Event.AttendeeStatusEvent(null, xpmToken, status, null)
+                )
             }
         }
 
@@ -268,48 +266,48 @@ class EditCreateEventUseCase(
             else 0
 
         val syncRequestBody = if (newEvent.isSyncedWithApi()) {
-                if (isCalendarBeingChanged) {
-                    // CREATE in new calendar
-                    SyncEventsUpdateApiRequest(
-                        memberId = newMemberKey.memberId,
-                        events = listOf(
-                            SyncEventCreateContainer(
-                                event = SyncEvent(
-                                    permissions = 1,
-                                    isOrganizer = isOrganizer,
-                                    sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
-                                    sharedEventContent = sharedEventContent,
-                                    calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
-                                    calendarEventContent = calendarEventContent,
-                                    personalEventContent = personalEventContent,
-                                    sharedEventId = newEvent.sharedEventId,
-                                    uid = newEvent.uid,
-                                    sourceCalendarId = oldCalendarId
-                                )
+            if (isCalendarBeingChanged) {
+                // CREATE in new calendar
+                SyncEventsUpdateApiRequest(
+                    memberId = newMemberKey.memberId,
+                    events = listOf(
+                        SyncEventCreateContainer(
+                            event = SyncEvent(
+                                permissions = 1,
+                                isOrganizer = isOrganizer,
+                                sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
+                                sharedEventContent = sharedEventContent,
+                                calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
+                                calendarEventContent = calendarEventContent,
+                                personalEventContent = personalEventContent,
+                                sharedEventId = newEvent.sharedEventId,
+                                uid = newEvent.uid,
+                                sourceCalendarId = oldCalendarId
                             )
                         )
                     )
-                } else { // UPDATE
-                    SyncEventsUpdateApiRequest(
-                        memberId = newMemberKey.memberId,
-                        events = listOf(
-                            SyncEventUpdateContainer(
-                                id = newEvent.id,
-                                event = SyncEvent(
-                                    permissions = 1,
-                                    isOrganizer = isOrganizer,
-                                    sharedKeyPacket = null, // this is already present in existing event
-                                    sharedEventContent = sharedEventContent,
-                                    calendarKeyPacket = if (oldSessionKeys?.calendar == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
-                                    calendarEventContent = calendarEventContent,
-                                    personalEventContent = personalEventContent,
-                                    attendeesEventContent = attendeesEventContent,
-                                    attendees = attendees.takeIfNotEmpty() // TODO to remove all attendees from event, send null value
-                                )
+                )
+            } else { // UPDATE
+                SyncEventsUpdateApiRequest(
+                    memberId = newMemberKey.memberId,
+                    events = listOf(
+                        SyncEventUpdateContainer(
+                            id = newEvent.id,
+                            event = SyncEvent(
+                                permissions = 1,
+                                isOrganizer = isOrganizer,
+                                sharedKeyPacket = null, // this is already present in existing event
+                                sharedEventContent = sharedEventContent,
+                                calendarKeyPacket = if (oldSessionKeys?.calendar == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
+                                calendarEventContent = calendarEventContent,
+                                personalEventContent = personalEventContent,
+                                attendeesEventContent = attendeesEventContent,
+                                attendees = attendees.takeIfNotEmpty() // TODO to remove all attendees from event, send null value
                             )
                         )
                     )
-                }
+                )
+            }
         } else { // CREATE
             if (createLinkedEventAsAttendee) {
                 // This is a proton to proton invite

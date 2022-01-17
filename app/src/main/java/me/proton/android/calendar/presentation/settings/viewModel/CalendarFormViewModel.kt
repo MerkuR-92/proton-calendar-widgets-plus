@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MIN
 import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -209,7 +210,8 @@ class CalendarFormViewModel(
         _userId.value = userId
 
         // Save user emails for calendar email picker dialog
-        val userAddresses = userManager.getAddresses(userId)
+        // TODO empty Addresses should not happen but it's better than crashing
+        val userAddresses = userManager.getAddressesOrNull(userId) ?: emptyList()
         userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.sortedBy { it.order }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email

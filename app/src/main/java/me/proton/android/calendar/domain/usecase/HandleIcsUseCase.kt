@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProto
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmails
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -61,9 +62,9 @@ class HandleIcsUseCase(
 
         if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
 
-        val canonicalUserEmails = userManager.getAddresses(userId).map { address ->
+        val canonicalUserEmails = userManager.getAddressesOrNull(userId)?.map { address ->
             canonicalizeProtonEmail(address.email, forceCanonicalization = true)
-        }
+        } ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
         val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
 
         // Find out if we are in organizer mode or attendee mode

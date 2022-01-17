@@ -19,6 +19,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.isValidForEncryption
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
@@ -82,15 +83,14 @@ class SendEmailUseCase(
         } else getResponseIcs(event.iCalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail, forceCanonicalization = true)
-        val senderAddressId = userManager.getAddresses(userId).find {
+        val senderAddressId = userManager.getAddressesOrNull(userId)?.find {
             canonicalizeProtonEmail(it.email, forceCanonicalization = true) == userAttendeeCanonicalEmail
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address ID for sender") // TODO better error
 
-        val senderAddress = kotlin.runCatching {
-            userManager.getAddresses(userId, refresh = true).find {
+        val senderAddress =
+            userManager.getAddressesOrNull(userId, refresh = true)?.find {
                 it.addressId.id == senderAddressId
-            }
-        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address for sender") // TODO better error
+            } ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address for sender") // TODO better error
 
         if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
             return UseCase.Result.Error("couldn't get UserAddress valid for encryption to organizer", UseCase.Error.Crypto.UserAddressInvalidForEncryption)
@@ -267,16 +267,15 @@ class SendEmailUseCase(
     private suspend fun getSenderAddress(userId: UserId, eventEntity: EventEntity): UseCase.Result {
         val member = database.membersDao().select(eventEntity.calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: there is no valid first Member when creating Event")
         val senderCanonicalEmail = canonicalizeProtonEmail(member.email, forceCanonicalization = true)
-        val senderAddressId = userManager.getAddresses(userId).find {
+        val senderAddressId = userManager.getAddressesOrNull(userId)?.find {
             canonicalizeProtonEmail(it.email, forceCanonicalization = true) == senderCanonicalEmail
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
 
         // TODO Check with core if refresh true can be removed
-        val senderAddress = kotlin.runCatching {
-            userManager.getAddresses(userId, refresh = true).find {
+        val senderAddress =
+            userManager.getAddressesOrNull(userId, refresh = true)?.find {
                 it.addressId.id == senderAddressId
-            }
-        }.getOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
+            } ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
 
         if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
             return UseCase.Result.Error("couldn't get UserAddress valid for encryption to attendees", UseCase.Error.Crypto.UserAddressInvalidForEncryption)

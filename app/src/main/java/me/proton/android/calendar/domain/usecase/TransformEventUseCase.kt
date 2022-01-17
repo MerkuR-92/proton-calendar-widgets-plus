@@ -12,6 +12,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateXPmToken
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.*
@@ -60,7 +61,7 @@ class TransformEventUseCase(
             logger.e("TransformEventUseCase, keyPassphrase is null")
             return null
         }
-        val userAddresses = kotlin.runCatching { userManager.getAddresses(UserId(userId)) }.getOrNull()
+        val userAddresses = userManager.getAddressesOrNull(UserId(userId))
         if (userAddresses == null) {
             logger.e("TransformEventUseCase, userAddresses is null")
             return null

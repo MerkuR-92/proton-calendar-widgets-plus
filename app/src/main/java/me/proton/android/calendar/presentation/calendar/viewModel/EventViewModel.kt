@@ -52,6 +52,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddress
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.*
@@ -1838,10 +1839,15 @@ class EventViewModel(
             return
         }
 
+        val userAddresses = userManager.getAddressesOrNull(userId)
+        if (userAddresses == null) {
+            logger.e("EventViewModel onDeleteClick, userAddresses == null")
+            return
+        }
+
         // Post deleting event value to true to display loading state
         eventDetailsState.value = EventState.Processing.Deleting
 
-        val userAddresses = userManager.getAddresses(userId)
         val canonicalUserEmails = userAddresses.map { address ->
             ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         }
@@ -2485,8 +2491,13 @@ class EventViewModel(
 
         if (eventDetailsState.value is EventState.Processing || attendeeAnswerState.value?.second == true) return
 
-        val userEmails = userManager.getAddresses(userId).map { address ->
+        val userEmails = userManager.getAddressesOrNull(userId)?.map { address ->
             address.email
+        }
+
+        if (userEmails == null) {
+            logger.e("EventViewModel onChangeAnswerClick userEmails == null")
+            return
         }
 
         val currentParticipationStatus = event.getParticipationStatus(userEmails) ?: ParticipationStatus.NEEDS_ACTION
@@ -2666,8 +2677,13 @@ class EventViewModel(
     ) {
         val status = participationStatus.toInt()
 
-        val userEmails = userManager.getAddresses(userId).map { address ->
+        val userEmails = userManager.getAddressesOrNull(userId)?.map { address ->
             address.email
+        }
+
+        if (userEmails == null) {
+            logger.e("EventViewModel changeAnswer userEmails == null")
+            return
         }
 
         val userAttendee = event.iCalEvent.attendees.find { attendee ->

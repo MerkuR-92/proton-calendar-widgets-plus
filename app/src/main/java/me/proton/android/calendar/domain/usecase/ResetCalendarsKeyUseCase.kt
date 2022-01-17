@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.crypto.tink.subtle.Base64
 import com.google.crypto.tink.subtle.Random
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PassphraseApiRequest
 import me.proton.android.calendar.data.api.ResetCalendarApiRequest
@@ -35,7 +36,7 @@ class ResetCalendarsKeyUseCase(
 
         val setupKeyApiRequestMap = hashMapOf<String, SetupKeyApiRequest>()
 
-        val addresses = userManager.getAddresses(userId, refresh = true)
+        val addresses = userManager.getAddressesOrNull(userId, refresh = true) ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: error getting Addresses")
 
         // Reset key for each calendar
         resetInfoResponse.data.calendars.forEach {
