@@ -977,7 +977,9 @@ class CalendarViewModel(
             while (!start.isAfter(end)) {
                 val dayIndex = ChronoUnit.DAYS.between(fromDate, start).toInt()
                 val current = monthGridMap[dayIndex]
-                current?.add(skeletonEvent)
+                if (current?.contains(skeletonEvent) == false) {
+                    current.add(skeletonEvent)
+                }
                 monthGridMap[dayIndex] = current ?: arrayListOf(skeletonEvent)
                 start = start.plusDays(1)
 
