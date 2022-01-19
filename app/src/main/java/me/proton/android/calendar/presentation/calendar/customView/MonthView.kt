@@ -508,7 +508,7 @@ class MonthView : ViewGroup {
             // Prepare the event main rect
             eventRectPaint = Paint().apply {
                 style =
-                    if (strikeThroughTitle) Paint.Style.STROKE
+                    if (strikeThroughTitle && !decryptionFailed) Paint.Style.STROKE
                     else Paint.Style.FILL
                 color =
                     if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
@@ -527,7 +527,7 @@ class MonthView : ViewGroup {
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
                 strokeWidth = sideStripWidth + eventRectAdjustmentEndMargin
                 style = Paint.Style.FILL
-                if (strikeThroughTitle) color = ContextCompat.getColor(context, R.color.background_norm)
+                if (strikeThroughTitle && !decryptionFailed) color = ContextCompat.getColor(context, R.color.background_norm)
             }
             eventStripSeparationLine = floatArrayOf(
                 eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
