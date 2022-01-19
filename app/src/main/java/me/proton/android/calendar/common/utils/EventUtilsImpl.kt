@@ -79,19 +79,24 @@ object EventUtilsImpl : EventUtils {
     /**
      * For given LocalDate and TimeZoneId, returns
      * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
-     *
-     * // TODO it will return nonsensical values if the Event doesn't span the [date]
+     * Pair<-1, x> if event doesn't span the given date
      */
     override fun Event.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> {
 
         val occurrenceStart = getOccurrenceStart(timeZoneId).toLocalDate()
-        val occurrenceEndAdjustedForMidnight = getOccurrenceEnd(timeZoneId).toLocalDate().minusDays(if (getOccurrenceEnd(timeZoneId).toLocalTime() == LocalTime.MIDNIGHT) 1 else 0)
+        val occurrenceEndAdjustedForMidnight = getOccurrenceEnd(timeZoneId).toLocalDate()
+            .minusDays(if (getOccurrenceEnd(timeZoneId).toLocalTime() == LocalTime.MIDNIGHT) 1 else 0)
 
         val todayOffset = ChronoUnit.DAYS.between(occurrenceStart, date).toInt() + 1
         val durationInDays = ChronoUnit.DAYS.between(occurrenceStart, occurrenceEndAdjustedForMidnight).toInt() + 1
 
         // special case for zero-duration event
-        return Pair(todayOffset, if (durationInDays == 0) 1 else durationInDays)
+        val maxOffset = if (durationInDays == 0) 1 else durationInDays
+        return if (todayOffset > maxOffset) {
+            Pair (-1, maxOffset)
+        } else {
+            Pair(todayOffset, maxOffset)
+        }
     }
 
     override fun Event.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {

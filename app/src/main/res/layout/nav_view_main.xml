@@ -192,6 +192,60 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/nav_view_switcher_month_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_agenda_layout">
+
+                    <View
+                        android:id="@+id/nav_view_switcher_month_press"
+                        android:background="@drawable/ripple_nav_items"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_view_switcher_month_separator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/nav_view_switcher_month_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_calendar"
+                        style="@style/Icon"
+                        app:tint="@color/sidebar_icon_weak"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/nav_view_switcher_month_title"
+                        app:layout_constraintBottom_toBottomOf="@+id/nav_view_switcher_month_title"/>
+
+                    <TextView
+                        android:id="@+id/nav_view_switcher_month_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_view_switcher_month"
+                        style="@style/Text.DefaultSmall"
+                        android:textColor="@color/sidebar_text_norm"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="14dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/nav_view_switcher_month_icon"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <View
+                        android:id="@+id/nav_view_switcher_month_separator"
+                        style="@style/Separator"
+                        android:background="@color/sidebar_separator"
+                        android:visibility="invisible"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_view_switcher_month_title"
+                        app:layout_constraintStart_toStartOf="@+id/nav_view_switcher_month_title"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

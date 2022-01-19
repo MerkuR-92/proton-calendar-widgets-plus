@@ -55,6 +55,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.filterFromTheEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -776,31 +777,31 @@ internal class ICalUtilsTest {
         ), iCal, null)!!
         val displayTimeZoneId = "UTC"
 
-                assertThat(event.overlapsWithFullDayRange(
+        assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 24),
             LocalDate.of(2020, 6, 24),
             displayTimeZoneId
         )).isFalse()
 
-                assertThat(event.overlapsWithFullDayRange(
+        assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 24),
             LocalDate.of(2020, 6, 25),
             displayTimeZoneId
         )).isTrue()
 
-                assertThat(event.overlapsWithFullDayRange(
+        assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 25),
             LocalDate.of(2020, 6, 25),
             displayTimeZoneId
         )).isTrue()
 
-                assertThat(event.overlapsWithFullDayRange(
+        assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 25),
             LocalDate.of(2020, 6, 26),
             displayTimeZoneId
         )).isTrue()
 
-                assertThat(event.overlapsWithFullDayRange(
+        assertThat(event.overlapsWithFullDayRange(
             LocalDate.of(2020, 6, 27),
             LocalDate.of(2020, 6, 27),
             displayTimeZoneId
@@ -4204,4 +4205,77 @@ internal class ICalUtilsTest {
 
     }
 
+    @Test
+    fun `sort for month view`() {
+
+        // List of event with the 5th as common date
+
+        val timeZoneId = "Europe/Paris"
+        val events = listOf(
+            createEvent(
+                ZonedDateTime.of(2021, 10, 3, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                ZonedDateTime.of(2021, 10, 6, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                false,
+                timeZoneId,
+                "Multi day all day 3 - 5"
+            ),
+            createEvent(
+                ZonedDateTime.of(2021, 10, 5, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                ZonedDateTime.of(2021, 10, 8, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                false,
+                timeZoneId,
+                "Multi day all day 5 - 7"
+            ),
+            createEvent(
+                ZonedDateTime.of(2021, 10, 5, 11, 0, 0, 0, ZoneId.of(timeZoneId)),
+                ZonedDateTime.of(2021, 10, 6, 13, 0, 0, 0, ZoneId.of(timeZoneId)),
+                true,
+                timeZoneId,
+                "Multi day part day 5 - 6 11h - 13h"
+            ),
+            createEvent(
+                ZonedDateTime.of(2021, 10, 5, 11, 30, 0, 0, ZoneId.of(timeZoneId)),
+                ZonedDateTime.of(2021, 10, 7, 13, 30, 0, 0, ZoneId.of(timeZoneId)),
+                true,
+                timeZoneId,
+                "Multi day part day 5 - 7 11h30 - 13h30"
+            ),
+            createEvent(
+                ZonedDateTime.of(2021, 10, 5, 10, 0, 0, 0, ZoneId.of(timeZoneId)),
+                ZonedDateTime.of(2021, 10, 5, 11, 0, 0, 0, ZoneId.of(timeZoneId)),
+                true,
+                timeZoneId,
+                "Part day 5 10h - 11h"
+            ),
+            createEvent(
+                ZonedDateTime.of(2021, 10, 5, 10, 30, 0, 0, ZoneId.of(timeZoneId)),
+                ZonedDateTime.of(2021, 10, 5, 11, 30, 0, 0, ZoneId.of(timeZoneId)),
+                true,
+                timeZoneId,
+                "Part day 5 10h30 - 11h30"
+            )
+        )
+
+        val sortedList = events.sortForMonthView(timeZoneId)
+
+        assertThat(sortedList[0].summary).isEqualTo("Multi day all day 3 - 5")
+        assertThat(sortedList[1].summary).isEqualTo("Multi day all day 5 - 7")
+        assertThat(sortedList[2].summary).isEqualTo("Multi day part day 5 - 6 11h - 13h")
+        assertThat(sortedList[3].summary).isEqualTo("Multi day part day 5 - 7 11h30 - 13h30")
+        assertThat(sortedList[4].summary).isEqualTo("Part day 5 10h - 11h")
+        assertThat(sortedList[5].summary).isEqualTo("Part day 5 10h30 - 11h30")
+
+    }
+
+    private fun createEvent(startZonedDateTime: ZonedDateTime, endZonedDateTime: ZonedDateTime, hasTime: Boolean, timeZoneId: String, summary: String? = null): Event {
+        val iCalendar = createNewVEvent().apply {
+            setDateStart(Date.from(startZonedDateTime.toInstant()), hasTime)
+            setDateEnd(Date.from(endZonedDateTime.toInstant()), hasTime)
+            if (summary != null) setSummary(summary)
+        }.wrapInICalendar()
+        iCalendar.setStartTimeZone(timeZoneId)
+        iCalendar.setEndTimeZone(timeZoneId)
+
+        return Event.from("", Calendar("", "", "", 1, true, 0), iCalendar)!!
+    }
 }

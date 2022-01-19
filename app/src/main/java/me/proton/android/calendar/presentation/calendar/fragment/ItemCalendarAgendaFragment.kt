@@ -19,10 +19,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
+import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -36,6 +36,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDate
+import java.util.*
 
 
 class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
@@ -51,7 +52,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
     private var userAddresses: List<UserAddress>? = null
-    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -86,6 +86,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
@@ -219,14 +220,32 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
 
-                        if (it.events.isEmpty()) {
+                        // Sort the events
+                        val sortedEvents = it.events.sortForAgendaView(timeZoneId)
+
+                        if (immutableDate == calendarViewModel.selectedDate.value) {
+                            val partDayEvents = it.events.filter {
+                                !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
+                            }
+                            // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
+                            calendarViewModel.firstEventOfTheDayTime =
+                                if (partDayEvents.isNotEmpty()) {
+                                    Collections.min(
+                                        partDayEvents.map {
+                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                        }
+                                    )
+                                } else null
+                        }
+
+                        if (sortedEvents.isEmpty()) {
                             list_view_status.visibleOrInvisible(true)
                             list_view_status.text = resources.getString(R.string.agenda_no_events)
                         } else {
                             list_view_status.visibleOrInvisible(false)
                         }
                         (rv_agenda.adapter as? EventAdapter)?.submitList(
-                            listOf(fakeHeaderEvent).plus(it.events.sortForAgendaView(timeZoneId))
+                            listOf(fakeHeaderEvent).plus(sortedEvents)
                         )
                         calendarViewModel.setLoading(false, position)
 
@@ -249,9 +268,5 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onDestroyView() {
         super.onDestroyView()
         calendarViewModel.setLoading(false, position)
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
-            logger.v("events flow: remove observers in on destroy for $date")
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
     }
 }

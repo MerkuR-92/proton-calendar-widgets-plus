@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar.viewModel
 
 import android.app.Application
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
+import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.dialog_checkbox.view.*
@@ -22,6 +24,9 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffs
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
@@ -34,15 +39,18 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.DayPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
+import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
 import java.time.LocalTime
@@ -62,7 +70,8 @@ class CalendarViewModel(
     private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
-    private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase
+    private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
+    private val resourceProvider: ResourceProvider
 ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -80,6 +89,13 @@ class CalendarViewModel(
         super.onCleared()
         viewModelJob.cancel()
     }
+
+    private lateinit var miniCalendarPager: ViewPager2
+    private lateinit var agendaPager: ViewPager2
+    private lateinit var agendaViewMode: ViewMode
+
+    var pagersInitialised = false
+    var updateSelectedLocalDate: LocalDate? = null
 
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
     val selectedDate: LiveData<LocalDate> = _selectedDate
@@ -108,6 +124,14 @@ class CalendarViewModel(
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    // Pair with position of the resumed fragment and loading status for the view
+    //  so that we know when to load and display the events for a fragment without having multiple process running
+    val monthViewLoading = MutableLiveData<Pair<Int, Boolean>>()
+    val dayViewLoading = MutableLiveData<Pair<Int, Boolean>>()
+
+    // Position of the currently resumed month view fragment. We use to start loading the next view only after the swipe is finished.
+    val resumedMonthViewPosition = MutableLiveData<Int>()
+
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
 
@@ -125,6 +149,11 @@ class CalendarViewModel(
 
     var showAutoDetectPrimaryTimezone = true
     var initialAutoDetectPrimaryTimezoneValue: Boolean? = null
+
+    // Used to save the month view currently displayed month
+    var monthViewDate: LocalDate? = null
+    // Time of the first event of the day, used to adjust the day view scroll position
+    var firstEventOfTheDayTime: LocalTime? = null
 
     // TODO Rename
     // This is used to store the current month mini calendar height when in month mode
@@ -225,14 +254,12 @@ class CalendarViewModel(
         calendarsRepository.shutdown()
     }
 
-    private lateinit var miniCalendarPager: ViewPager2
-    private lateinit var agendaPager: ViewPager2
-    var pagersInitialised = false
-    var updateSelectedLocalDate: LocalDate? = null
-
-    fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2) {
+    fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2, agendaViewMode: ViewMode?) {
         this.miniCalendarPager = miniCalendarPager
         this.agendaPager = agendaPager
+        agendaViewMode?.let {
+            this.agendaViewMode = agendaViewMode
+        }
         pagersInitialised = true
     }
 
@@ -266,7 +293,9 @@ class CalendarViewModel(
         // adjust Mini Calendar
         val monthStartingDate = initialToday.withDayOfMonth(1)
         val offset = ChronoUnit.MONTHS.between(monthStartingDate, date.withDayOfMonth(1)).toInt()
-        val monthStartingPosition = (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
+        val monthStartingPosition =
+            if (viewMode.value == ViewMode.MONTH) (miniCalendarPager.adapter as MonthPagerAdapter).startingPosition
+            else (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
         val miniCalendarIndex = monthStartingPosition + offset
         if (miniCalendarPager.currentItem != miniCalendarIndex) {
             // smooth-scroll only when switching between adjacent months
@@ -276,13 +305,31 @@ class CalendarViewModel(
         }
 
         // adjust Agenda
-        val agendaAdapter = if (viewMode.value == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter else agendaPager.adapter as? DayPagerAdapter
+        val agendaAdapter =
+            when (val viewMode = viewMode.value) {
+                ViewMode.AGENDA -> {
+                    // Agenda view
+                    agendaViewMode = viewMode
+                    agendaPager.adapter as? AgendaPagerAdapter
+                }
+                ViewMode.DAY -> {
+                    // Day view
+                    agendaViewMode = viewMode
+                    agendaPager.adapter as? DayPagerAdapter
+                }
+                else -> {
+                    if (this::agendaViewMode.isInitialized) {
+                        if (agendaViewMode == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter
+                        else agendaPager.adapter as? DayPagerAdapter
+                    } else null
+                }
+            }
         if (agendaAdapter != null) {
             val startingDate =
-                if (viewMode.value == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
+                if (agendaViewMode == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
                 else (agendaPager.adapter as DayPagerAdapter).startingDate
             val startingPosition =
-                if (viewMode.value == ViewMode.AGENDA) (agendaPager.adapter as AgendaPagerAdapter).startingPosition
+                if (agendaViewMode == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingPosition
                 else (agendaPager.adapter as DayPagerAdapter).startingPosition
 
             val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, date).toInt()
@@ -327,13 +374,13 @@ class CalendarViewModel(
         }
     }
 
-    private fun skeletonEventsForIndicatorsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+    fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
         return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId).asLiveData()
     }
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
 
-        return skeletonEventsForIndicatorsLiveData(fromDate, toDate, timeZoneId).map { skeletonResult ->
+        return getSkeletonEvents(fromDate, toDate, timeZoneId).map { skeletonResult ->
             when (skeletonResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     emptyMap()
@@ -909,6 +956,121 @@ class CalendarViewModel(
             return null
         }
         return weekStart.value ?: userSettingsRepository.selectWeekStart(userId.id)
+    }
+
+    suspend fun getMonthViewEventsMap(
+        events: List<Event>,
+        fromDate:LocalDate,
+        maxEventCount: Int,
+        timeZoneId: String,
+        isSkeletonEvent: Boolean
+    ): Map<Int, List<MonthView.MonthViewEvent>> {
+
+        val monthGridMap = mutableMapOf<Int, ArrayList<Event>>()
+        // Split the events for each day of the month
+        events.forEach { skeletonEvent ->
+            val partTimeEndsOnMidnight = (!skeletonEvent.isAllDay() && skeletonEvent.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
+            var start = skeletonEvent.getOccurrenceStart(timeZoneId).toLocalDate()
+            val end = skeletonEvent.getOccurrenceEnd(timeZoneId).toLocalDate()
+
+            // Use !start.isAfter(end) to iterate inclusive
+            while (!start.isAfter(end)) {
+                val dayIndex = ChronoUnit.DAYS.between(fromDate, start).toInt()
+                val current = monthGridMap[dayIndex]
+                current?.add(skeletonEvent)
+                monthGridMap[dayIndex] = current ?: arrayListOf(skeletonEvent)
+                start = start.plusDays(1)
+
+                // All day events end on next day 00:00 so we need to break loop to exclude end day
+                if (start == end && (skeletonEvent.isAllDay() || partTimeEndsOnMidnight)) break
+            }
+        }
+
+        val monthViewEventsMap = hashMapOf<Int, List<MonthView.MonthViewEvent>>()
+
+        monthGridMap.forEach {
+            // Filter out the events spanning multiple days if it is not the first day
+            val filteredList = it.value.filterNot { event ->
+                it.key != 0 &&
+                        !event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        event.calculateFullDayCounter(
+                            fromDate.plusDays(it.key.toLong()),
+                            timeZoneId
+                        ).first > 1
+            }
+            // Sort the list for the month view
+            val sortedList: MutableList<Event> = filteredList.sortForMonthView(timeZoneId).toMutableList()
+            it.value.clear()
+            it.value.addAll(sortedList)
+        }
+
+        val rootMap: MutableMap<Int, Map<Int, Event>> = mutableMapOf()
+        for (key in 0 until MonthView.MonthViewSettings.MONTH_GRID_ITEMS_MAX) {
+            val eventList = monthGridMap[key]
+
+            val childMap = mutableMapOf<Int, Event>()
+            if (key > 0) {
+                // Insert the events spanning multiple days depending on the previous day list, in order to extend the multi day event on this day with the same index
+                val previousChildMap = rootMap[key - 1]
+                previousChildMap?.forEach { (index, event) ->
+                    if (!event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        event.calculateFullDayCounter(
+                            fromDate.plusDays(key.toLong()),
+                            timeZoneId
+                        ).first > 1) {
+                        childMap[index] = event
+                    }
+                }
+            }
+            var nextAvailableMapIndex = 0
+            // Fill the remaining indexes with the sorted events list
+            eventList?.forEach { event ->
+                while (childMap.containsKey(nextAvailableMapIndex)) nextAvailableMapIndex++
+                if (nextAvailableMapIndex >= maxEventCount + MonthView.MonthViewSettings.MINI_EVENTS_MAX + 1) return@forEach
+                childMap[nextAvailableMapIndex] = event
+                nextAvailableMapIndex++
+            }
+
+            rootMap[key] = childMap
+        }
+
+        val userEmails = getUserEmails()
+
+        // Transform the child map of events to a list of MonthViewEvent
+        rootMap.forEach { (dayIndex, childMap) ->
+
+            val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
+
+            childMap.forEach { (indexInDay, event) ->
+
+                val fullDayCounter = event.calculateFullDayCounter(
+                    fromDate.plusDays(dayIndex.toLong()),
+                    timeZoneId
+                )
+                val participationStatus =
+                    if (userEmails != null) event.getParticipationStatus(userEmails)
+                    else null
+
+                monthViewEvents.add(
+                    MonthView.MonthViewEvent(
+                        indexInDay = indexInDay,
+                        daySpanCount = fullDayCounter.second,
+                        daySpanIndex = fullDayCounter.first,
+                        calendarColor = if (isSkeletonEvent) resourceProvider.provideColor(R.color.interaction_weak_norm)
+                        else Color.parseColor(event.calendar.color),
+                        pastEvent = event.isInThePast(timeZoneId),
+                        isUnanswered = !event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
+                        strikeThroughTitle = event.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
+                        decryptionFailed = event.decryptionStatus == Event.DecryptionStatus.FAILURE,
+                        eventTitle = if (isSkeletonEvent) null
+                        else event.summary?.nullIfBlank() ?: resourceProvider.provideString(R.string.default_event_summary)
+                    )
+                )
+            }
+            monthViewEventsMap[dayIndex] = monthViewEvents
+        }
+
+        return monthViewEventsMap
     }
 
 }

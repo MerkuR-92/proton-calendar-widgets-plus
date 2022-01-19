@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright 2019 LinkedIn Corporation -->
-<!-- All Rights Reserved. -->
-<!-- -->
-<!-- Licensed under the BSD 2-Clause License (the "License").  See License in the project root -->
-<!-- for license information. -->
 <resources>
+
+    <declare-styleable name="CalendarWidgetAttrs">
+        <attr name="appWidgetPadding" format="dimension" />
+        <attr name="appWidgetInnerRadius" format="dimension" />
+        <attr name="appWidgetRadius" format="dimension" />
+    </declare-styleable>
+
+    <!-- Copyright 2019 LinkedIn Corporation -->
+    <!-- All Rights Reserved. -->
+    <!-- -->
+    <!-- Licensed under the BSD 2-Clause License (the "License").  See License in the project root -->
+    <!-- for license information. -->
     <declare-styleable name="DayView">
         <attr name="dividerHeight" format="dimension"/>
         <attr name="hourDividerColor" format="color"/>
@@ -16,10 +23,5 @@
         <attr name="eventMargin" format="dimension"/>
         <attr name="startHour" format="integer"/>
         <attr name="endHour" format="integer"/>
-    </declare-styleable>
-    <declare-styleable name="CalendarWidgetAttrs">
-        <attr name="appWidgetPadding" format="dimension" />
-        <attr name="appWidgetInnerRadius" format="dimension" />
-        <attr name="appWidgetRadius" format="dimension" />
     </declare-styleable>
 </resources>

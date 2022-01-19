@@ -86,6 +86,7 @@
 
     <dimen name="current_time_indicator_dot_size">7dp</dimen>
 
+    <!-- WIDGET -->
     <dimen name="widget_background_corner_radius">16dp</dimen>
     <dimen name="widget_padding">8dp</dimen>
     <dimen name="widget_padding_event_normal">4dp</dimen>
@@ -93,5 +94,42 @@
     <dimen name="widget_calendar_item_height">40dp</dimen>
     <dimen name="widget_calendar_item_height_with_interaction_margin">44dp</dimen>
     <dimen name="widget_calendar_item_interaction_margin">2dp</dimen>
+
+    <!-- MONTH VIEW -->
+
+    <!--  Grid  -->
+    <dimen name="month_view_grid_separator_width">1dp</dimen>
+    <dimen name="month_view_grid_item_top_margin">1dp</dimen>
+    <dimen name="month_view_grid_item_bottom_margin">1dp</dimen>
+
+    <!--  Day  -->
+    <dimen name="month_view_day_number_text_size">12sp</dimen>
+    <dimen name="month_view_day_number_text_baseline_margin_top">20dp</dimen>
+    <dimen name="month_view_day_header_height">26dp</dimen>
+
+    <!--  Event  -->
+    <dimen name="month_view_event_title_text_size">10sp</dimen>
+    <dimen name="month_view_event_title_start_margin">2dp</dimen>
+    <dimen name="month_view_event_title_end_margin">2dp</dimen>
+    <dimen name="month_view_event_corner_radius">4dp</dimen>
+    <dimen name="month_view_event_height">16dp</dimen>
+    <dimen name="month_view_event_top_margin">1dp</dimen>
+    <dimen name="month_view_event_start_margin">1dp</dimen>
+    <dimen name="month_view_event_end_margin">2dp</dimen>
+    <dimen name="month_view_event_adjustment_end_margin">1dp</dimen>
+    <dimen name="month_view_event_side_strip_width">3dp</dimen>
+    <dimen name="month_view_event_decryption_failed_margin">5dp</dimen>
+    <dimen name="month_view_event_unanswered_stripes_width">0.5dp</dimen>
+    <dimen name="month_view_event_unanswered_stripes_gap">4dp</dimen>
+
+    <!--  Mini Event  -->
+    <dimen name="month_view_mini_event_height">6dp</dimen>
+    <dimen name="month_view_mini_event_top_margin">2dp</dimen>
+    <dimen name="month_view_mini_event_end_margin">2dp</dimen>
+
+    <!--  Plus icon  -->
+    <dimen name="month_view_plus_icon_width">6dp</dimen>
+    <dimen name="month_view_plus_icon_line_width">0.7dp</dimen>
+    <dimen name="month_view_plus_icon_end_margin">5dp</dimen>
 
 </resources>

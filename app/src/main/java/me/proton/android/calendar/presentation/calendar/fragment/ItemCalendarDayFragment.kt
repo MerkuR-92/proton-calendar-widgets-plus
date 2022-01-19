@@ -35,15 +35,16 @@ import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
-import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -65,13 +66,14 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by sharedViewModel()
     private val logger: Logger by inject()
 
+    private var loading = true
+
     private var position: Int? = null
     private var date: LocalDate? = null
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
     private var userAddresses: List<UserAddress>? = null
-    private val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -213,6 +215,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // Set scrolling position using previous view value if it exists
         day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
         day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
+
+        position?.let {
+            calendarViewModel.dayViewLoading.value = Pair(it, loading)
+        }
     }
 
     private fun onEventsChange(timeZoneId: String, userAddresses: List<UserAddress>) {
@@ -229,7 +235,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
         // Reclaim all of the existing event views so we can reuse them if needed, this process
         // can be useful if your day view is hosted in a recycler view for example
-        val recycled: List<View> = dayView.removeEventViews() as List<View>
+        val recycled: List<View> =
+            if (dayView.eventViewsSize() > 0) dayView.removeEventViews() as List<View>
+            else listOf()
         var remaining = recycled.size
         for (event in partialDayEvents) {
             // Try to recycle an existing event view if there are enough left, otherwise inflate
@@ -426,7 +434,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         all_day_layout.visibleOrGone(true)
         all_day_header_date.visibleOrGone(true)
 
-        agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
+        val dayMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
+        dayMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
             value?.let {
@@ -447,26 +456,48 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
                 onEventsChange(timeZoneId!!, userAddresses!!)
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
         }
-        agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
+        dayMediator.addSource(calendarViewModel.timeFormat) { value ->
             timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
         }
-        agendaMediator.addSource(calendarViewModel.userAddresses) { value ->
+        dayMediator.addSource(calendarViewModel.userAddresses) { value ->
             userAddresses = value
 
             if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
             }
         }
-        agendaMediator.observe(viewLifecycleOwner) {
+        dayMediator.observe(viewLifecycleOwner) {
             it?.let {
-                setupItemMiniCalendarContent(it.first, it.second, it.third)
+
+                // Check if we load the events now or if we need to wait
+                if (this.isResumed) {
+                    // We first load and display the events for the selected month
+                    position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, true) }
+                    setupItemMiniCalendarContent(it.first, it.second, it.third)
+                } else {
+                    loading = false
+                    calendarViewModel.dayViewLoading.observe(viewLifecycleOwner) { dayViewLoading ->
+                        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
+                            // Remove the dayViewLoading observers if we started loading the events for that fragment as it won't be needed anymore
+                            calendarViewModel.dayViewLoading.removeObservers(viewLifecycleOwner)
+                            return@observe
+                        }
+
+                        // Load the events for that fragment if no other fragment is currently doing the same process
+                        if (!loading && (dayViewLoading.first == position || !dayViewLoading.second)) {
+                            loading = true
+                            position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, true) }
+                            setupItemMiniCalendarContent(it.first, it.second, it.third)
+                        }
+                    }
+                }
             }
         }
 
@@ -526,8 +557,19 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 }
             }
         } else {
-            // Use previous view scrolling position if it exists
-            scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+            // If fragment is currently selected day, scroll to time of the first event of the day if it was previously saved
+            val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
+            if (calendarViewModel.selectedDate.value == date && firstEventOfTheDayTime != null) {
+                val yPos = dayView.getHourTop(
+                    if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
+                    else firstEventOfTheDayTime.hour
+                )
+                scrollView.scrollY = yPos
+                calendarViewModel.dayViewScrollYPosition.value = yPos
+            } else {
+                // Use previous view scrolling position if it exists
+                scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+            }
         }
         scrollView.setOnScrollChangeListener(onScrollChangeListener)
         preDrawDone = true
@@ -592,6 +634,36 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_no_events.text = resources.getString(R.string.agenda_loading_events)
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
+
+                        // Clear keyboard to make sure it doesn't affect DayView usable height
+                        requireActivity().clearFocusAndHideKeyboard(view)
+
+                        val partDayEvents = it.events.filter {
+                            !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
+                        }
+
+                        // If fragment is currently selected day, check time of the first event of the day so that we can adjust the view's scroll position
+                        if (immutableDate == calendarViewModel.selectedDate.value) {
+                            val firstEventOfTheDayTime =
+                                if (partDayEvents.isNotEmpty()) {
+                                    Collections.min(
+                                        partDayEvents.map {
+                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                        }
+                                    )
+                                } else null
+                            // Save time of the first event of the day
+                            calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
+                            if (immutableDate != LocalDate.now() && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
+                                val yPos = dayView.getHourTop(
+                                    if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
+                                    else firstEventOfTheDayTime.hour
+                                )
+                                day_scroll_view.scrollY = yPos
+                                calendarViewModel.dayViewScrollYPosition.value = yPos
+                            }
+                        }
+
                         allEvents = it.events
                         onEventsChange(timeZoneId, userAddresses)
 
@@ -712,12 +784,18 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         all_day_create_event_view.setOnSingleClickListener { _ ->
                             if (allDayEvents.isNullOrEmpty()) openCreateEventForm(isAllDay = true)
                         }
+
+                        loading = false
+                        // Clear dayViewLoading value so that we can load the adjacent fragments content
+                        position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, false) }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         // TODO Handle error for DayView event fetching
                         calendarViewModel.setLoading(false, position)
                         all_day_no_events.visibleOrGone(true)
                         all_day_no_events.text = resources.getString(R.string.agenda_loading_events_error)
+                        loading = false
+                        position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, false) }
                     }
                 }
             }
@@ -727,11 +805,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     override fun onDestroyView() {
         super.onDestroyView()
         calendarViewModel.setLoading(false, position)
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
-            logger.v("ItemCalendarDayFragment: events flow: remove observers in on destroy for $date")
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
         dayView.removeEventViews()
+        if (loading) {
+            // Clear dayViewLoading value
+            position?.let { calendarViewModel.dayViewLoading.value = Pair(it, false) }
+        }
     }
 
     private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalTime? = null) {

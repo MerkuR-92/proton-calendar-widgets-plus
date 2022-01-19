@@ -207,6 +207,15 @@ interface ICalUtils {
     fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event>
 
     /**
+     * Sorts events with following order:
+     * 1- All day spanning multiple days
+     * 2- All day
+     * 3- Partial day spanning multiple days
+     * 4- Partial day
+     */
+    fun List<Event>.sortForMonthView(timeZoneId: String): List<Event>
+
+    /**
      * Copies all multi-day events across each day in the range, so we can display them day by day.
      */
     fun List<Event>.explodeDayByDay(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Map<LocalDate, List<Event>>

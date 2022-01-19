@@ -59,6 +59,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
+import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
@@ -113,6 +114,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private var subscribedCalendars: List<CalendarEntity>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
     private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
+
+    // Save the current view mode so that we know if we are navigating to day view from the month view
+    private var currentViewMode: ViewMode? = null
+    // Lets us know whether we need to navigate back to month when triggering back action
+    private var returnToMonthView: Boolean = false
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -755,6 +761,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
+            returnToMonthView = currentViewMode == ViewMode.MONTH && viewMode == ViewMode.DAY
+            currentViewMode = viewMode
+        })
+
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setViewMode(ViewMode.DAY)
@@ -767,6 +778,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_switcher_month_layout.visibleOrGone(MONTH_VIEW)
+        nav_view_switcher_month_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.MONTH)
+            mainViewModel.setViewMode(ViewMode.MONTH)
+            drawer_layout.close()
+        }
+
         nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
             onClickCreateCalendar()
         }
@@ -776,22 +794,41 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
-            if (viewMode == ViewMode.AGENDA) {
-                // Set selected background
-                nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
-                nav_view_main_content.nav_view_switcher_day_layout.background = null
+            viewMode ?: return@Observer
+            when (viewMode) {
+                ViewMode.AGENDA -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_month_layout.background = null
 
-                // Set icon tint
-                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
-                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-            } else {
-                // Set selected background
-                nav_view_main_content.nav_view_switcher_agenda_layout.background = null
-                nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                }
+                ViewMode.DAY -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                    nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_month_layout.background = null
 
-                // Set icon tint
-                nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                }
+                ViewMode.MONTH -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                    nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_month_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                }
             }
         })
     }
@@ -995,6 +1032,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
+        } else if (returnToMonthView && MONTH_VIEW) {
+            // Navigate back to month view
+            calendarViewModel.monthViewDate?.let {
+                calendarViewModel.handleDaySelected(it)
+            }
+            calendarViewModel.viewMode.postValue(ViewMode.MONTH)
+            mainViewModel.setViewMode(ViewMode.MONTH)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
             moveTaskToBack(true)
         } else {

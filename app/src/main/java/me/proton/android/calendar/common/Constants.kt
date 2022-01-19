@@ -84,6 +84,7 @@ object FeatureFlag {
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
     const val CHANGE_LANGUAGE = false
+    const val MONTH_VIEW = false
 }
 
 object ApiResponseCode {
@@ -128,7 +129,8 @@ enum class AlarmAction(val value: Int) {
 
 enum class ViewMode(val value: Int) {
     AGENDA(0),
-    DAY(1)
+    DAY(1),
+    MONTH(2)
 }
 
 enum class EventEditDeleteOption {

@@ -751,15 +751,22 @@ object AndroidUtils {
         return maxWidth
     }
 
-    fun darkenCalendarColor(colorString: String): String {
+    private fun updateColorLightness(colorString: String, increaseBy: Float): String {
         val outHSL = FloatArray(3)
         ColorUtils.colorToHSL(Integer.valueOf(colorString.substringAfter("#"), 16), outHSL)
 
-        // magic number, reducing lightness by 12
-        val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] - 0.12f, 1.0f))))
+        val color = ColorUtils.HSLToColor(floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] + increaseBy, 1.0f))))
         return "#${color.toHexString()}"
     }
 
+    fun darkenCalendarColor(colorString: String): String {
+        // magic number, reducing lightness by 12
+        return updateColorLightness(colorString, -0.12f)
+    }
+
+    fun brightenCalendarColor(colorString: String, increaseBy: Float): String {
+        return updateColorLightness(colorString, increaseBy)
+    }
 
     fun Activity.clearFocusAndHideKeyboard(view: View?) {
         val windowToken = view?.rootView?.windowToken
@@ -1205,8 +1212,16 @@ object AndroidUtils {
         return (dp * resources.displayMetrics.density).toInt()
     }
 
+    fun Context.dpToPixel(dp: Float): Float {
+        return dp * resources.displayMetrics.density
+    }
+
     fun Context.pixelToDp(pixel: Int): Int {
         return (pixel / resources.displayMetrics.density).toInt()
+    }
+
+    fun Context.spToPixel(sp: Float): Float {
+        return sp * this.resources.displayMetrics.scaledDensity
     }
 
     fun getWeekStartDayOfWeek(index: Int): java.time.DayOfWeek = when (index) {

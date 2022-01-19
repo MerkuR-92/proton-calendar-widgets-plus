@@ -9,6 +9,7 @@ import androidx.work.*
 import kotlinx.coroutines.Job
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
@@ -84,8 +85,9 @@ class MainViewModel(
     }
 
     fun getLastViewMode(): ViewMode {
-        // By default we display the agenda view
-        return ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.AGENDA.value)]
+        // By default we display the month view
+        val lastViewMode = ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.MONTH.value)]
+        return if (!MONTH_VIEW && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
     }
 
     // TODO sync all "active" accounts

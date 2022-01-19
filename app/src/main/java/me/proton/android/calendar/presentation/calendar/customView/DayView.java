@@ -299,6 +299,15 @@ public class DayView extends ViewGroup {
         return eventViews;
     }
 
+    /**
+     * @return the size of the event views list
+     */
+    public int eventViewsSize() {
+        int size = 0;
+        if (this.eventViews != null && !this.eventViews.isEmpty()) size = this.eventViews.size();
+        return size;
+    }
+
     public int getStartHour() {
         return startHour;
     }

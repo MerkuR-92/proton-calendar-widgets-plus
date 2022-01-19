@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
@@ -48,8 +49,6 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var weekStart: DayOfWeek? = null
-    private val miniCalendarMediator =
-        MediatorLiveData<Pair<String, DayOfWeek>>() // Month view value is not needed if week component is disabled
 
     private var fullWeeksInMonth = 0
 
@@ -142,6 +141,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val miniCalendarMediator = MediatorLiveData<Pair<String, DayOfWeek>>() // Month view value is not needed if week component is disabled
         miniCalendarMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
@@ -301,7 +301,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                         miniCalendarItemView.context,
                         R.style.Text_DefaultSmall_Strong_Inverted
                     )
-                    miniCalendarItemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
                 }
                 item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
                     miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
@@ -314,7 +314,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                             R.color.brand_norm
                         )
                     )
-                    miniCalendarItemView.selected_background.setBackgroundResource(0)
+                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
                 }
                 item.date.month != forDate.month -> {
                     miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
@@ -327,14 +327,14 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                             R.color.text_hint
                         )
                     )
-                    miniCalendarItemView.selected_background.setBackgroundResource(0)
+                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
                 }
                 else -> {
                     miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
                         miniCalendarItemView.context,
                         R.style.Text_DefaultSmall_Strong
                     )
-                    miniCalendarItemView.selected_background.setBackgroundResource(0)
+                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
                 }
             }
 
@@ -377,7 +377,10 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                         itemView.ll_calendar_dots,
                         false
                     )
-                    (miniCalendarDotView as ImageView).drawable.setTint(Color.parseColor(indicatorColor))
+
+                    (miniCalendarDotView as View).backgroundTintList = ColorStateList.valueOf(
+                        Color.parseColor(indicatorColor)
+                    )
                     itemView.ll_calendar_dots.addView(miniCalendarDotView)
                 }
             }
@@ -413,7 +416,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                                 R.color.brand_norm
                             )
                         )
-                        miniCalendarItemView.selected_background.setBackgroundResource(0)
+                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
                     } else if (selectedDate.month != firstMiniCalendarDay.plusDays(
                             selectedMiniCalendarItem.toLong()
                         ).month &&
@@ -434,14 +437,14 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                                 R.color.text_hint
                             )
                         )
-                        miniCalendarItemView.selected_background.setBackgroundResource(0)
+                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
                     } else {
                         // Apply default items style
                         miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
                             miniCalendarItemView.context,
                             R.style.Text_DefaultSmall_Strong
                         )
-                        miniCalendarItemView.selected_background.setBackgroundResource(0)
+                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
                     }
                 }
             }
@@ -456,7 +459,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
                         miniCalendarItemView.context,
                         R.style.Text_DefaultSmall_Strong_Inverted
                     )
-                    miniCalendarItemView.selected_background.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
                 }
             }
         }
