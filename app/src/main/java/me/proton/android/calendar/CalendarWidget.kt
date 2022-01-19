@@ -522,17 +522,18 @@ internal class CalendarWidgetRemoteViewsFactory(
                     sortedEvents.forEachIndexed { index, event ->
                         // show date column only in the first Event on a given day
                         // show bottom spacing below last Event on a given day
-                        widgetEvents.add(
-                            event.toWidgetEvent(
-                                entry.key,
-                                zoneId.id,
-                                index == 0,
-                                index == sortedEvents.size - 1,
-                                false,
-                                userEmails,
-                                is24Hour
-                            )
+                        val widgetEvent = event.toWidgetEvent(
+                            entry.key,
+                            zoneId.id,
+                            index == 0,
+                            index == sortedEvents.size - 1,
+                            false,
+                            userEmails,
+                            is24Hour
                         )
+                        if (!widgetEvents.contains(widgetEvent)) {
+                            widgetEvents.add(widgetEvent)
+                        }
                     }
                 }
 
