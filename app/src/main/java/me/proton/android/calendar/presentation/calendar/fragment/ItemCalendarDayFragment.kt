@@ -331,10 +331,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_weak))
             )
 
-            if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+            if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
-            } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+            } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
                 AndroidUtils.setStripedBackground(
@@ -350,11 +350,11 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 decryptionErrorView.alpha = 0.1f
             }
         } else {
-            if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+            if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                 eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))
-            } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+            } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                 eventItemTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
                 viewMainSurface.setTint(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 viewBorder.setTint(ContextCompat.getColor(requireContext(), R.color.interaction_weak_pressed))

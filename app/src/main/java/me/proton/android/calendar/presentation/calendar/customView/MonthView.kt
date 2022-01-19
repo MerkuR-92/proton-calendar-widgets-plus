@@ -207,7 +207,7 @@ class MonthView : ViewGroup {
             monthViewEvent.eventRectPaint
         )
 
-        if (monthViewEvent.strikeThroughTitle && !monthViewEvent.decryptionFailed) {
+        if (monthViewEvent.strikeThroughTitle && !monthViewEvent.decryptionFailed && !monthViewEvent.isMiniEvent && !monthViewEvent.isPlusIcon) {
             // Draw the main rect stroke if event is cancelled or declined
             canvas?.drawRoundRect(
                 monthViewEvent.eventRect,
