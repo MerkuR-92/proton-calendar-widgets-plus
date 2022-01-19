@@ -207,6 +207,16 @@ class MonthView : ViewGroup {
             monthViewEvent.eventRectPaint
         )
 
+        if (monthViewEvent.strikeThroughTitle && !monthViewEvent.decryptionFailed) {
+            // Draw the main rect stroke if event is cancelled or declined
+            canvas?.drawRoundRect(
+                monthViewEvent.eventRect,
+                eventRadius,
+                eventRadius,
+                monthViewEvent.eventRectStrokePaint
+            )
+        }
+
         // Draw side strip after to cover the left side of original rect
         canvas?.drawRoundRect(
             monthViewEvent.eventLeftSideStripRect,
@@ -419,6 +429,7 @@ class MonthView : ViewGroup {
 
         lateinit var eventRect: RectF
         lateinit var eventRectPaint: Paint
+        lateinit var eventRectStrokePaint: Paint
 
         lateinit var eventStripSeparationPaint: Paint
         lateinit var eventStripSeparationLine: FloatArray
@@ -507,14 +518,23 @@ class MonthView : ViewGroup {
 
             // Prepare the event main rect
             eventRectPaint = Paint().apply {
-                style =
-                    if (strikeThroughTitle && !decryptionFailed) Paint.Style.STROKE
-                    else Paint.Style.FILL
+                style = Paint.Style.FILL
                 color =
-                    if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                    if (isUnanswered || (strikeThroughTitle && !decryptionFailed)) ContextCompat.getColor(context, R.color.background_norm)
                     else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
                     else calendarColor
                 isAntiAlias = true
+            }
+            if (strikeThroughTitle && !decryptionFailed) {
+                // Prepare the event main rect stroke paint if event is cancelled or declined
+                eventRectStrokePaint = Paint().apply {
+                    style = Paint.Style.STROKE
+                    color =
+                        if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                        else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                        else calendarColor
+                    isAntiAlias = true
+                }
             }
             eventRect = RectF(
                 start,
