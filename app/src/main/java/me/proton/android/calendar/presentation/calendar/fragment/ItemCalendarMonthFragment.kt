@@ -204,6 +204,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         skeletonList = AndroidUtils.concatenate(previousMonthDayItems, dayItems, upcomingMonthDayItems)
 
         // Save the skeleton list in the month view so that it can be drawn along with the events
+        monthView.setTimeZoneId(timeZoneId)
         monthView.prepareMonthGrid(skeletonList, forDate.month)
 
         if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {

@@ -19,6 +19,7 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView.Mon
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.ROWS_MAX
 import java.time.LocalDate
 import java.time.Month
+import java.time.ZoneId
 import kotlin.math.PI
 import kotlin.math.cos
 
@@ -60,6 +61,7 @@ class MonthView : ViewGroup {
     private var month: Month? = null
 
     private var showWeekNumbers: Boolean = false
+    private var timeZoneId: String = ""
 
     private val res = context.resources
 
@@ -139,7 +141,7 @@ class MonthView : ViewGroup {
                     text.length,
                     gridItemStart + (gridItemWidth / 2),
                     gridItemTop,
-                    if (date == LocalDate.now()) highlightDayTitlePaint
+                    if (date == LocalDate.now(ZoneId.of(timeZoneId))) highlightDayTitlePaint
                     else if (date.month != month) offsetDayTitlePaint
                     else dayTitlePaint
                 )
@@ -353,6 +355,14 @@ class MonthView : ViewGroup {
     fun setShowWeekNumbers(showWeekNumbers: Boolean) {
 
         this.showWeekNumbers = showWeekNumbers
+    }
+
+    /**
+     * Set Time Zone Id in order to highlight today's day number.
+     */
+    fun setTimeZoneId(timeZoneId: String) {
+
+        this.timeZoneId = timeZoneId
     }
 
     /**
