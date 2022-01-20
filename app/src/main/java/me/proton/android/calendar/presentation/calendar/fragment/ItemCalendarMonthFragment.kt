@@ -206,6 +206,13 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Save the skeleton list in the month view so that it can be drawn along with the events
         monthView.prepareMonthGrid(skeletonList, forDate.month)
 
+        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
+            skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+
         // Check if we load the events now or if we need to wait
         if (this.isResumed) {
             // Set the grid selectable items
