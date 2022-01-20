@@ -472,6 +472,12 @@
     <string name="calendar_widget_part_day_event_starts_at">Starts at %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Ends at %1$s</string>
 
+    <!-- Spotlight Dialogs -->
+    <string name="spotlight_dialog_month_header">What\'s new</string>
+    <string name="spotlight_dialog_month_confirmation_button">OK</string>
+    <string name="spotlight_dialog_month_view_title">Calendar views</string>
+    <string name="spotlight_dialog_month_view_description">Choose the events overview that you would like to see by switching between the month, the day and the agenda view.</string>
+
     <!--  STRING PLURALS  -->
 
     <plurals name="plural_minute">

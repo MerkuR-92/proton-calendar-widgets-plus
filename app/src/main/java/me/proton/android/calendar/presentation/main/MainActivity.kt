@@ -17,7 +17,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -48,11 +47,6 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
-import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
-import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
-import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.AppLinksAction.VIEW
 import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
@@ -61,10 +55,16 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
+import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
+import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
-import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -83,13 +83,11 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.*
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
 import kotlin.system.exitProcess
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {

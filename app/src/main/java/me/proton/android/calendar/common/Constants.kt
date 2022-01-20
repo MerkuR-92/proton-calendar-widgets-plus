@@ -72,6 +72,10 @@ const val DAY_VIEW_ALL_DAY_MAX = 3
 const val MAX_CALENDAR_PAID = 20
 const val MAX_CALENDAR_FREE = 1
 
+val SPOTLIGHT_VERSION_CODES = arrayListOf(
+    112 // Month view (0.30.3)
+)
+
 object FeatureFlag {
     const val SETTINGS_DRAWER = true
     const val ADD_ATTENDEES = true
@@ -85,6 +89,7 @@ object FeatureFlag {
     const val USE_EVENT_DECRYPTOR = true
     const val CHANGE_LANGUAGE = false
     const val MONTH_VIEW = false
+    const val SPOTLIGHT = false
 }
 
 object ApiResponseCode {
@@ -99,6 +104,7 @@ object SharedPreferencesKeys {
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
     const val APP_LANGUAGE = "app_language"
     const val WIDGET_LANGUAGE_TAG = "widget_language_tag"
+    const val LAST_SPOTLIGHT_SHOWN = "last_spotlight_shown"
 }
 
 object MiniCalendarGestures {
