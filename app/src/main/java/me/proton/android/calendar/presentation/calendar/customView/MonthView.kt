@@ -692,7 +692,9 @@ class MonthView : ViewGroup {
                     if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
                     else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
                     else calendarColor
-                style = Paint.Style.FILL
+                style =
+                    if (strikeThroughTitle && !decryptionFailed) Paint.Style.STROKE
+                    else Paint.Style.FILL
                 isAntiAlias = true
             }
             eventRect = RectF(
@@ -704,6 +706,7 @@ class MonthView : ViewGroup {
 
             // The event strip separation is used to cover the right half of the event strip round rectangle
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
+                if (strikeThroughTitle && !decryptionFailed) color = ContextCompat.getColor(context, R.color.background_norm)
                 strokeWidth = sideStripWidth + eventRectAdjustmentEndMargin
             }
             eventStripSeparationLine = floatArrayOf(
