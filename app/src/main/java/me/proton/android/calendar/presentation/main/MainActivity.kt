@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.putString(SharedPreferencesKeys.APP_LANGUAGE, language)
         editor.apply()
 
-        restartApplication()
+//        restartApplication()
     }
 
     private fun restartApplication() {
@@ -270,9 +270,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val widgetLanguageTag = sharedPreferences.getString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, null)
         val appLanguage = getAppLanguage()
         // If we use System default as language settings for the app, check whether we need to restart Application to apply new language
-        if (appLanguage.isBlank() && widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
-            restartApplication()
-        }
+//        if (appLanguage.isBlank() && widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
+//            restartApplication()
+//        }
 
         setContentView(R.layout.activity_main)
 
