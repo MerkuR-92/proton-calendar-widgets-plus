@@ -103,9 +103,9 @@ object SharedPreferencesKeys {
     const val VIEW_MODE = "view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
-    const val APP_LANGUAGE = "app_language"
-    const val WIDGET_LANGUAGE_TAG = "widget_language_tag"
     const val LAST_SPOTLIGHT_SHOWN = "last_spotlight_shown"
+    const val APP_SETTINGS_LANGUAGE = "app_settings_language"
+    const val APP_CURRENT_LANGUAGE = "app_current_language"
 }
 
 object MiniCalendarGestures {

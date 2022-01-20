@@ -128,7 +128,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
         val appLanguagesLabels = resources.getStringArray(R.array.custom_language_labels)
         val appLanguagesValues = resources.getStringArray(R.array.custom_language_values)
-        val selectedLanguageValue = (activity as MainActivity).getAppLanguage()
+        val selectedLanguageValue = (activity as MainActivity).getAppSettingsLanguage()
         val selectedLanguageIndex = appLanguagesValues.indexOfFirst { it == selectedLanguageValue }
         val systemDefaultLabel = resources.getString(R.string.settings_language_default)
         settings_language_value.text = if (selectedLanguageIndex == -1) systemDefaultLabel else appLanguagesLabels[selectedLanguageIndex]
@@ -143,7 +143,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 getString(R.string.settings_language_title),
                 appLanguageDialogLabels.toTypedArray(),
                 run {
-                    val selectedLanguageDialogIndex = appLanguagesValues.indexOfFirst { it == (activity as MainActivity).getAppLanguage() }
+                    val selectedLanguageDialogIndex = appLanguagesValues.indexOfFirst { it == (activity as MainActivity).getAppSettingsLanguage() }
                     if (selectedLanguageDialogIndex == -1) 0 else selectedLanguageDialogIndex + 1
                 }
             ) { index ->
