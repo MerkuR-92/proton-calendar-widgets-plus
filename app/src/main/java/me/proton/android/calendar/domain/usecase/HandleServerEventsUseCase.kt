@@ -119,7 +119,11 @@ class HandleServerEventsUseCase(
             eventsResponse.addresses?.forEach {
                 it.handleAction(
                     delete = {
-                        userAddressRepository.deleteAddresses(listOf(AddressId(it.id)))
+                        kotlin.runCatching {
+                            userAddressRepository.deleteAddresses(listOf(AddressId(it.id)))
+                        }.getOrElse {
+                            logger.e("HandleServerEventsUseCase deleteAddresses threw exception ${it.message}", it)
+                        }
                     },
                     create = {
                         it.address?.toAddress(userId)?.let { address ->
