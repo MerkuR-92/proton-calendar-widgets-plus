@@ -20,10 +20,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
-import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
@@ -135,9 +135,6 @@ class CalendarViewModel(
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
 
-    // Those addresses contains non-canonical email addresses
-    var userAddresses: LiveData<List<UserAddress>?> = MutableLiveData() // TODO Check usage of those values, make sure we compare canonical values
-
     val initialToday: LocalDate = LocalDate.now()
 
     val lifeCycleScope: CoroutineScope = this.viewModelScope
@@ -195,8 +192,6 @@ class CalendarViewModel(
                 emit(CalendarsRepository.InitingState.Error)
                 return@flow
             }
-
-            userAddresses = userManager.getAddressesFlow(userId).mapSuccessValueOrNull().asLiveData(Dispatchers.Default)
 
             timeZoneId = calendarsRepository.flowCalendarUserSettingsPrimaryTimezone(userId.id).map {
                 if (it != null) {
@@ -897,7 +892,21 @@ class CalendarViewModel(
             logger.e("User ID was null in CalendarViewModel getUserAddresses")
             return null
         }
-        return userAddresses.value ?: userManager.getAddressesOrNull(userId)
+        return userManager.getAddressesOrNull(userId)
+    }
+
+    fun getUserAddressesFlow(): LiveData<List<UserAddress>?>? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getUserAddresses")
+            return null
+        }
+        return kotlin.runCatching {
+            userManager.getAddressesFlow(userId).mapSuccessValueOrNull()?.asLiveData(Dispatchers.Default)
+        }.getOrElse {
+            logger.e("CalendarViewModel getAddressesFlow threw exception ${it.message}", it)
+            null
+        }
     }
 
     suspend fun getTimeZoneId(): ZoneId? {

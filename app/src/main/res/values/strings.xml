@@ -475,8 +475,8 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_month_header">What\'s new</string>
     <string name="spotlight_dialog_month_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Calendar views</string>
-    <string name="spotlight_dialog_month_view_description">Choose the events overview that you would like to see by switching between the month, the day and the agenda view.</string>
+    <string name="spotlight_dialog_month_view_title">Month view</string>
+    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
 
     <!--  STRING PLURALS  -->
 

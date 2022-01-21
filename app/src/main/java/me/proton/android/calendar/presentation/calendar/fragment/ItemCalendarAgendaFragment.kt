@@ -51,7 +51,6 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
-    private var userAddresses: List<UserAddress>? = null
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -86,36 +85,29 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val agendaMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
+        val agendaMediator = MediatorLiveData<Pair<String, Boolean>>()
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
-            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            if (timeZoneId != null && timeFormatIs24Hour != null) {
+                agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
             }
         }
         agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
             timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
 
-            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
-            }
-        }
-        agendaMediator.addSource(calendarViewModel.userAddresses) { value ->
-            userAddresses = value
-
-            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                agendaMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            if (timeZoneId != null && timeFormatIs24Hour != null) {
+                agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
             }
         }
         agendaMediator.observe(viewLifecycleOwner) {
             it?.let {
-                setupItemMiniCalendarContent(it.first, it.second, it.third)
+                setupItemMiniCalendarContent(it.first, it.second)
             }
         }
     }
 
-    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
+    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean) {
         val immutableDate = date ?: return
 
         // Check if recycler view is not null because of the delay
@@ -124,7 +116,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
         rv_agenda.apply {
             layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
 
-            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate, userAddresses.map { it.email }) {
+            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate) {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(
@@ -244,11 +236,17 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                         } else {
                             list_view_status.visibleOrInvisible(false)
                         }
-                        (rv_agenda.adapter as? EventAdapter)?.submitList(
-                            listOf(fakeHeaderEvent).plus(sortedEvents)
-                        )
-                        calendarViewModel.setLoading(false, position)
 
+                        lifecycleScope.launch {
+                            val userAddresses = calendarViewModel.getUserAddresses()
+                            userAddresses?.let {
+                                (rv_agenda.adapter as? EventAdapter)?.setUserEmails(it.map { it.email })
+                            }
+                            (rv_agenda.adapter as? EventAdapter)?.submitList(
+                                listOf(fakeHeaderEvent).plus(sortedEvents)
+                            )
+                            calendarViewModel.setLoading(false, position)
+                        }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         list_view_status.visibleOrInvisible(true)

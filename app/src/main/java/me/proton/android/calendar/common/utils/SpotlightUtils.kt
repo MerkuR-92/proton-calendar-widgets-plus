@@ -61,8 +61,11 @@ object SpotlightUtils {
         description: String
     ) {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
-            .setCancelable(false)
+            .setCancelable(true)
             .setPositiveButton(R.string.spotlight_dialog_month_confirmation_button) { _, _ ->
+                // Nothing to do here
+            }
+            .setOnDismissListener {
                 // Set current version name as last spotlight shown
                 this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
             }

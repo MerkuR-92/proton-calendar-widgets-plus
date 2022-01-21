@@ -73,7 +73,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
-    private var userAddresses: List<UserAddress>? = null
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
@@ -221,8 +220,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         }
     }
 
-    private fun onEventsChange(timeZoneId: String, userAddresses: List<UserAddress>) {
-        val userEmails = userAddresses.map { userAddress -> userAddress.email }
+    private fun onEventsChange(timeZoneId: String, userEmails: List<String>) {
         // The day view needs a list of event views and a corresponding list of event time ranges
         var eventViews: MutableList<View?>? = null
         var eventTimeRanges: MutableList<DayView.EventTimeRange?>? = null
@@ -434,7 +432,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         all_day_layout.visibleOrGone(true)
         all_day_header_date.visibleOrGone(true)
 
-        val dayMediator = MediatorLiveData<Triple<String, Boolean, List<UserAddress>>>()
+        val dayMediator = MediatorLiveData<Pair<String, Boolean>>()
         dayMediator.addSource(calendarViewModel.timeZoneId) { value ->
             timeZoneId = value?.id
 
@@ -454,23 +452,18 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 updateCurrentTimeIndicatorDelayed(it)
             }
 
-            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                onEventsChange(timeZoneId!!, userAddresses!!)
-                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            if (timeZoneId != null && timeFormatIs24Hour != null) {
+                lifecycleScope.launch {
+                    onEventsChange(timeZoneId!!, calendarViewModel.getUserEmails() ?: arrayListOf())
+                }
+                dayMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
             }
         }
         dayMediator.addSource(calendarViewModel.timeFormat) { value ->
             timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
 
-            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
-            }
-        }
-        dayMediator.addSource(calendarViewModel.userAddresses) { value ->
-            userAddresses = value
-
-            if (timeZoneId != null && timeFormatIs24Hour != null && userAddresses != null) {
-                dayMediator.value = Triple(timeZoneId!!, timeFormatIs24Hour!!, userAddresses!!)
+            if (timeZoneId != null && timeFormatIs24Hour != null) {
+                dayMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
             }
         }
         dayMediator.observe(viewLifecycleOwner) {
@@ -480,7 +473,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 if (this.isResumed) {
                     // We first load and display the events for the selected month
                     position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, true) }
-                    setupItemMiniCalendarContent(it.first, it.second, it.third)
+                    setupItemMiniCalendarContent(it.first, it.second)
                 } else {
                     loading = false
                     calendarViewModel.dayViewLoading.observe(viewLifecycleOwner) { dayViewLoading ->
@@ -494,7 +487,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         if (!loading && (dayViewLoading.first == position || !dayViewLoading.second)) {
                             loading = true
                             position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, true) }
-                            setupItemMiniCalendarContent(it.first, it.second, it.third)
+                            setupItemMiniCalendarContent(it.first, it.second)
                         }
                     }
                 }
@@ -577,8 +570,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private fun setupItemMiniCalendarContent(
         timeZoneId: String,
-        timeFormatIs24Hour: Boolean,
-        userAddresses: List<UserAddress>
+        timeFormatIs24Hour: Boolean
     ) {
         val immutableDate = date ?: return
 
@@ -587,7 +579,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // TODO remove UserID livedata
         calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
             userId?.let {
-                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour, userAddresses)
+                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour)
             }
         }
 
@@ -613,12 +605,12 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         immutableDate == selectedDate.plusDays(1))
             ) {
                 logger.v("ItemCalendarDayFragment: events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
-                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour, userAddresses)
+                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour)
             }
         }
     }
 
-    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, timeFormatIs24Hour: Boolean, userAddresses: List<UserAddress>) {
+    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, timeFormatIs24Hour: Boolean) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove already existing observer for $immutableDate")
             eventsLiveData.removeObservers(viewLifecycleOwner)
@@ -638,151 +630,153 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         // Clear keyboard to make sure it doesn't affect DayView usable height
                         requireActivity().clearFocusAndHideKeyboard(view)
 
-                        val partDayEvents = it.events.filter {
-                            !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
-                        }
+                        lifecycleScope.launch {
+                            val partDayEvents = it.events.filter {
+                                !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
+                            }
 
-                        // If fragment is currently selected day, check time of the first event of the day so that we can adjust the view's scroll position
-                        if (immutableDate == calendarViewModel.selectedDate.value) {
-                            val firstEventOfTheDayTime =
-                                if (partDayEvents.isNotEmpty()) {
-                                    Collections.min(
-                                        partDayEvents.map {
-                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
-                                        }
+                            // If fragment is currently selected day, check time of the first event of the day so that we can adjust the view's scroll position
+                            if (immutableDate == calendarViewModel.selectedDate.value) {
+                                val firstEventOfTheDayTime =
+                                    if (partDayEvents.isNotEmpty()) {
+                                        Collections.min(
+                                            partDayEvents.map {
+                                                it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                            }
+                                        )
+                                    } else null
+                                // Save time of the first event of the day
+                                calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
+                                if (immutableDate != LocalDate.now() && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
+                                    val yPos = dayView.getHourTop(
+                                        if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
+                                        else firstEventOfTheDayTime.hour
                                     )
-                                } else null
-                            // Save time of the first event of the day
-                            calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
-                            if (immutableDate != LocalDate.now() && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
-                                val yPos = dayView.getHourTop(
-                                    if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
-                                    else firstEventOfTheDayTime.hour
-                                )
-                                day_scroll_view.scrollY = yPos
-                                calendarViewModel.dayViewScrollYPosition.value = yPos
+                                    day_scroll_view.scrollY = yPos
+                                    calendarViewModel.dayViewScrollYPosition.value = yPos
+                                }
                             }
-                        }
 
-                        allEvents = it.events
-                        onEventsChange(timeZoneId, userAddresses)
+                            val userEmails = calendarViewModel.getUserEmails() ?: arrayListOf()
 
-                        val allDayEvents = it.events.filter { event -> !event.spansSingleDay(true, timeZoneId) }
-                        val croppedList = allDayEvents.take(
-                            if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) DAY_VIEW_ALL_DAY_MAX - 1
-                            else DAY_VIEW_ALL_DAY_MAX
-                        )
-                        val moreEvents =
-                            if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) allDayEvents.takeLast(allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
-                            else listOf()
+                            allEvents = it.events
+                            onEventsChange(timeZoneId, userEmails)
 
-                        all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
-                        if (it.events.isNullOrEmpty()) all_day_no_events.text = getString(R.string.agenda_no_events)
-                        else all_day_no_events.text = null
-                        all_day_more_items_layout.removeAllViews()
-
-                        val userEmails = userAddresses.map { userAddress -> userAddress.email }
-
-                        /* Cropped list */
-                        val allDayEventsCroppedListLayoutManager =
-                            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-                        all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
-                        allDayEventCroppedListAdapter =
-                            DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
-                                onEventClick(event)
-                            }
-                        all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
-                        allDayEventCroppedListAdapter.submitList(croppedList)
-
-                        /* Rest of the list */
-                        val allDayEventsMoreListLayoutManager =
-                            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-                        all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
-                        allDayEventListAdapter =
-                            DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
-                                onEventClick(event)
-                            }
-                        all_day_items_list.adapter = allDayEventListAdapter
-                        allDayEventListAdapter.submitList(moreEvents)
-
-                        all_day_more_collapse_button.setOnSingleClickListener { view ->
-                            val duration = collapse(all_day_items_list).second
-                            view?.run {
-                                postDelayed({
-                                    all_day_more_items_layout.visibleOrGone(true)
-                                }, duration / 2)
-                                postDelayed({
-                                    all_day_more_collapse_button.visibleOrGone(false)
-                                }, duration)
-                            }
-                        }
-
-                        if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) {
-                            val eventView = layoutInflater.inflate(R.layout.item_day_view_event_all_day, dayView, false)
-
-                            val title = (eventView.findViewById<View>(R.id.text_title) as TextView)
-                            val titleParams = title.layoutParams
-                            titleParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                            title.layoutParams = titleParams
-                            title.gravity = Gravity.CENTER_VERTICAL
-                            title.text = getString(
-                                R.string.day_view_all_day_more,
-                                allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1)
+                            val allDayEvents = it.events.filter { event -> !event.spansSingleDay(true, timeZoneId) }
+                            val croppedList = allDayEvents.take(
+                                if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) DAY_VIEW_ALL_DAY_MAX - 1
+                                else DAY_VIEW_ALL_DAY_MAX
                             )
-                            title.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                            val moreEvents =
+                                if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) allDayEvents.takeLast(allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1))
+                                else listOf()
 
-                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
-                                R.id.main_surface
-                            ).setTint(
-                                ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
-                            )
-                            (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
-                                R.id.side_strip
-                            ).setTint(
-                                ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
-                            )
+                            all_day_no_events.visibleOrGone(allDayEvents.isNullOrEmpty())
+                            if (it.events.isNullOrEmpty()) all_day_no_events.text = getString(R.string.agenda_no_events)
+                            else all_day_no_events.text = null
+                            all_day_more_items_layout.removeAllViews()
 
-                            // When an event is clicked, start a new draft event and show the edit event dialog
-                            eventView.setOnClickListener { view ->
-                                val duration = expand(all_day_items_list).second
+                            /* Cropped list */
+                            val allDayEventsCroppedListLayoutManager =
+                                LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                            all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
+                            allDayEventCroppedListAdapter =
+                                DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
+                                    onEventClick(event)
+                                }
+                            all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
+                            allDayEventCroppedListAdapter.submitList(croppedList)
+
+                            /* Rest of the list */
+                            val allDayEventsMoreListLayoutManager =
+                                LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                            all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
+                            allDayEventListAdapter =
+                                DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
+                                    onEventClick(event)
+                                }
+                            all_day_items_list.adapter = allDayEventListAdapter
+                            allDayEventListAdapter.submitList(moreEvents)
+
+                            all_day_more_collapse_button.setOnSingleClickListener { view ->
+                                val duration = collapse(all_day_items_list).second
                                 view?.run {
                                     postDelayed({
-                                        all_day_more_items_layout.visibleOrGone(false)
+                                        all_day_more_items_layout.visibleOrGone(true)
                                     }, duration / 2)
                                     postDelayed({
-                                        all_day_more_collapse_button.visibleOrGone(true)
+                                        all_day_more_collapse_button.visibleOrGone(false)
                                     }, duration)
                                 }
                             }
 
-                            val layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                resources.getDimensionPixelSize(R.dimen.all_day_item_height)
-                            )
-                            layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_end)
-                            layoutParams.bottomMargin =
-                                resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
-                            all_day_more_items_layout.addView(eventView, layoutParams)
-                            all_day_more_items_layout.visibleOrGone(all_day_items_list.isVisible.not())
-                        } else {
-                            all_day_items_list.visibleOrGone(false)
-                            all_day_more_collapse_button.visibleOrGone(false)
-                        }
+                            if (allDayEvents.size > DAY_VIEW_ALL_DAY_MAX) {
+                                val eventView = layoutInflater.inflate(R.layout.item_day_view_event_all_day, dayView, false)
 
-                        if (all_day_items_list.isVisible) all_day_items_list.layoutParams =
-                            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                                val title = (eventView.findViewById<View>(R.id.text_title) as TextView)
+                                val titleParams = title.layoutParams
+                                titleParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                                title.layoutParams = titleParams
+                                title.gravity = Gravity.CENTER_VERTICAL
+                                title.text = getString(
+                                    R.string.day_view_all_day_more,
+                                    allDayEvents.size - (DAY_VIEW_ALL_DAY_MAX - 1)
+                                )
+                                title.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
 
-                        calendarViewModel.setLoading(false, position)
+                                (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
+                                    R.id.main_surface
+                                ).setTint(
+                                    ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
+                                )
+                                (eventView.findViewById<View>(R.id.view_background).background as LayerDrawable).findDrawableByLayerId(
+                                    R.id.side_strip
+                                ).setTint(
+                                    ContextCompat.getColor(requireContext(), R.color.interaction_weak_norm)
+                                )
 
-                        all_day_more_items_layout.doOnPreDraw {
-                            // This allow us to properly set the scroll position after changes have been made to the all day header
-                            //  because the scroll view top position depends on the all day header height (top to bottom constraint)
-                            day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
-                            day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
-                        }
+                                // When an event is clicked, start a new draft event and show the edit event dialog
+                                eventView.setOnClickListener { view ->
+                                    val duration = expand(all_day_items_list).second
+                                    view?.run {
+                                        postDelayed({
+                                            all_day_more_items_layout.visibleOrGone(false)
+                                        }, duration / 2)
+                                        postDelayed({
+                                            all_day_more_collapse_button.visibleOrGone(true)
+                                        }, duration)
+                                    }
+                                }
 
-                        all_day_create_event_view.setOnSingleClickListener { _ ->
-                            if (allDayEvents.isNullOrEmpty()) openCreateEventForm(isAllDay = true)
+                                val layoutParams = LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    resources.getDimensionPixelSize(R.dimen.all_day_item_height)
+                                )
+                                layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.all_day_item_margin_end)
+                                layoutParams.bottomMargin =
+                                    resources.getDimensionPixelSize(R.dimen.all_day_item_margin_bottom)
+                                all_day_more_items_layout.addView(eventView, layoutParams)
+                                all_day_more_items_layout.visibleOrGone(all_day_items_list.isVisible.not())
+                            } else {
+                                all_day_items_list.visibleOrGone(false)
+                                all_day_more_collapse_button.visibleOrGone(false)
+                            }
+
+                            if (all_day_items_list.isVisible) all_day_items_list.layoutParams =
+                                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+                            calendarViewModel.setLoading(false, position)
+
+                            all_day_more_items_layout.doOnPreDraw {
+                                // This allow us to properly set the scroll position after changes have been made to the all day header
+                                //  because the scroll view top position depends on the all day header height (top to bottom constraint)
+                                day_scroll_view.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+                                day_scroll_view.setOnScrollChangeListener(onScrollChangeListener)
+                            }
+
+                            all_day_create_event_view.setOnSingleClickListener { _ ->
+                                if (allDayEvents.isNullOrEmpty()) openCreateEventForm(isAllDay = true)
+                            }
                         }
 
                         loading = false
