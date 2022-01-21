@@ -259,8 +259,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 launch {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
-                calendarViewModel.userAddresses.distinctUntilChanged().observe(viewLifecycleOwner) { userAddresses ->
+                calendarViewModel.getUserAddressesFlow()?.distinctUntilChanged()?.observe(viewLifecycleOwner) { userAddresses ->
                     userAddresses ?: return@observe
+                    handleAttendeeAnswerViewVisibility(userAddresses)
+                } ?: run {
+                    val userAddresses = calendarViewModel.getUserAddresses()
+                    userAddresses ?: return@run
                     handleAttendeeAnswerViewVisibility(userAddresses)
                 }
                 observeEventLiveData(coroutineContext)

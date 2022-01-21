@@ -19,6 +19,7 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView.Mon
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.ROWS_MAX
 import java.time.LocalDate
 import java.time.Month
+import java.time.ZoneId
 import kotlin.math.PI
 import kotlin.math.cos
 
@@ -60,6 +61,7 @@ class MonthView : ViewGroup {
     private var month: Month? = null
 
     private var showWeekNumbers: Boolean = false
+    private var timeZoneId: String = ""
 
     private val res = context.resources
 
@@ -139,7 +141,7 @@ class MonthView : ViewGroup {
                     text.length,
                     gridItemStart + (gridItemWidth / 2),
                     gridItemTop,
-                    if (date == LocalDate.now()) highlightDayTitlePaint
+                    if (date == LocalDate.now(ZoneId.of(timeZoneId))) highlightDayTitlePaint
                     else if (date.month != month) offsetDayTitlePaint
                     else dayTitlePaint
                 )
@@ -206,6 +208,16 @@ class MonthView : ViewGroup {
             eventRadius,
             monthViewEvent.eventRectPaint
         )
+
+        if (monthViewEvent.strikeThroughTitle && !monthViewEvent.decryptionFailed && !monthViewEvent.isMiniEvent && !monthViewEvent.isPlusIcon) {
+            // Draw the main rect stroke if event is cancelled or declined
+            canvas?.drawRoundRect(
+                monthViewEvent.eventRect,
+                eventRadius,
+                eventRadius,
+                monthViewEvent.eventRectStrokePaint
+            )
+        }
 
         // Draw side strip after to cover the left side of original rect
         canvas?.drawRoundRect(
@@ -346,6 +358,14 @@ class MonthView : ViewGroup {
     }
 
     /**
+     * Set Time Zone Id in order to highlight today's day number.
+     */
+    fun setTimeZoneId(timeZoneId: String) {
+
+        this.timeZoneId = timeZoneId
+    }
+
+    /**
      * Iterate through the event list and prepare the elements to draw onto the view.
      */
     private fun prepareAndDrawMonthViewEvents() {
@@ -419,6 +439,7 @@ class MonthView : ViewGroup {
 
         lateinit var eventRect: RectF
         lateinit var eventRectPaint: Paint
+        lateinit var eventRectStrokePaint: Paint
 
         lateinit var eventStripSeparationPaint: Paint
         lateinit var eventStripSeparationLine: FloatArray
@@ -507,14 +528,23 @@ class MonthView : ViewGroup {
 
             // Prepare the event main rect
             eventRectPaint = Paint().apply {
-                style =
-                    if (strikeThroughTitle) Paint.Style.STROKE
-                    else Paint.Style.FILL
+                style = Paint.Style.FILL
                 color =
-                    if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                    if (isUnanswered || (strikeThroughTitle && !decryptionFailed)) ContextCompat.getColor(context, R.color.background_norm)
                     else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
                     else calendarColor
                 isAntiAlias = true
+            }
+            if (strikeThroughTitle && !decryptionFailed) {
+                // Prepare the event main rect stroke paint if event is cancelled or declined
+                eventRectStrokePaint = Paint().apply {
+                    style = Paint.Style.STROKE
+                    color =
+                        if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
+                        else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                        else calendarColor
+                    isAntiAlias = true
+                }
             }
             eventRect = RectF(
                 start,
@@ -527,7 +557,7 @@ class MonthView : ViewGroup {
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
                 strokeWidth = sideStripWidth + eventRectAdjustmentEndMargin
                 style = Paint.Style.FILL
-                if (strikeThroughTitle) color = ContextCompat.getColor(context, R.color.background_norm)
+                if (strikeThroughTitle && !decryptionFailed) color = ContextCompat.getColor(context, R.color.background_norm)
             }
             eventStripSeparationLine = floatArrayOf(
                 eventLeftSideStripRect.centerX() + (sideStripWidth / 2), top, eventLeftSideStripRect.centerX() + (sideStripWidth / 2), bottom
@@ -662,7 +692,9 @@ class MonthView : ViewGroup {
                     if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
                     else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
                     else calendarColor
-                style = Paint.Style.FILL
+                style =
+                    if (strikeThroughTitle && !decryptionFailed) Paint.Style.STROKE
+                    else Paint.Style.FILL
                 isAntiAlias = true
             }
             eventRect = RectF(
@@ -674,6 +706,7 @@ class MonthView : ViewGroup {
 
             // The event strip separation is used to cover the right half of the event strip round rectangle
             eventStripSeparationPaint = Paint(eventRectPaint).apply {
+                if (strikeThroughTitle && !decryptionFailed) color = ContextCompat.getColor(context, R.color.background_norm)
                 strokeWidth = sideStripWidth + eventRectAdjustmentEndMargin
             }
             eventStripSeparationLine = floatArrayOf(

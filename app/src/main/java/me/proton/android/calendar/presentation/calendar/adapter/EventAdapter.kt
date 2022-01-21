@@ -37,9 +37,15 @@ class EventAdapter(
     private val timeZoneId: String,
     private val is24Hour: Boolean,
     private val date: LocalDate,
-    private val userEmails: List<String>?,
     private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
 ) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
+
+    private val userEmails = mutableListOf<String>()
+
+    fun setUserEmails(userEmails: List<String>) {
+        this.userEmails.clear()
+        this.userEmails.addAll(userEmails)
+    }
 
     sealed class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

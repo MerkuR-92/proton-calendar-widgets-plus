@@ -60,6 +60,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
     private val fetchingEventsScope = CoroutineScope(Dispatchers.IO)
 
+    private var todayCurrentValue: LocalDate? = null
+
     data class MiniCalendarItem(
         val date: LocalDate,
         val isSelected: Boolean,
@@ -235,7 +237,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
         // Submit month skeleton with only days and weekday names
         val skeletonList = AndroidUtils.concatenate(previousMonthDayItems, dayItems, upcomingMonthDayItems)
-        setMiniCalendarSkeletonList(skeletonList, forDate, firstDayOfTheMonth, firstMiniCalendarDay, startWeekOn)
+        setMiniCalendarSkeletonList(skeletonList, forDate, firstDayOfTheMonth, firstMiniCalendarDay, startWeekOn, timeZoneId)
 
         calendarViewModel.lifeCycleScope.launch {
 
@@ -249,7 +251,12 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
             }
 
             calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->
-                applySelectedDate(selectedDate, firstMiniCalendarDay, firstDayOfTheMonth)
+                applySelectedDate(
+                    selectedDate,
+                    firstMiniCalendarDay,
+                    firstDayOfTheMonth,
+                    this@ItemMiniCalendarFragment.timeZoneId ?: timeZoneId
+                )
             }
         }
     }
@@ -259,9 +266,11 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
         forDate: LocalDate,
         firstDay: LocalDate,
         firstMiniCalendarDay: LocalDate,
-        startWeekOn: DayOfWeek
+        startWeekOn: DayOfWeek,
+        timeZoneId: String
     ) {
-        if (currentMiniCalendarMonthList == skeletonList) return
+        if (currentMiniCalendarMonthList == skeletonList && todayCurrentValue == LocalDate.now(ZoneId.of(timeZoneId))) return
+        todayCurrentValue = LocalDate.now(ZoneId.of(timeZoneId))
         currentMiniCalendarMonthList = skeletonList
         view?.findViewById<GridLayout>(R.id.gl_mini_calendar)?.run {
             this.removeAllViews()
@@ -276,7 +285,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
         val selectedDate = calendarViewModel.selectedDate.value
         if (selectedDate != null) {
-            applySelectedDate(selectedDate, firstMiniCalendarDay, firstDay)
+            applySelectedDate(selectedDate, firstMiniCalendarDay, firstDay, timeZoneId)
         }
     }
 
@@ -390,7 +399,8 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
     private fun applySelectedDate(
         selectedDate: LocalDate,
         firstMiniCalendarDay: LocalDate,
-        firstDayOfTheMonth: LocalDate
+        firstDayOfTheMonth: LocalDate,
+        timeZoneId: String
     ) {
         if (gl_mini_calendar.childCount <= 0) return
 
@@ -404,7 +414,7 @@ class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
 
                 val miniCalendarItemView = gl_mini_calendar.getChildAt(selectedMiniCalendarItem)
                 miniCalendarItemView?.let {
-                    if (firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()) == LocalDate.now()) {
+                    if (firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()) == LocalDate.now(ZoneId.of(timeZoneId))) {
                         // Apply today's style
                         miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
                             miniCalendarItemView.context,

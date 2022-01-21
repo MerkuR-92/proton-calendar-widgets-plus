@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/dialog_spotlight_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Text.DefaultSmall.Strong.Brand"
+        android:text="@string/spotlight_dialog_month_header"
+        android:layout_marginStart="@dimen/material_dialog_inset_start"
+        android:layout_marginEnd="@dimen/material_dialog_inset_end"
+        android:layout_marginTop="40dp"/>
+
+    <TextView
+        android:id="@+id/dialog_spotlight_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Text.Headline"
+        tools:text="@string/spotlight_dialog_month_view_title"
+        android:layout_marginStart="@dimen/material_dialog_inset_start"
+        android:layout_marginEnd="@dimen/material_dialog_inset_end"
+        android:layout_marginTop="@dimen/spacing_element_small"/>
+
+    <TextView
+        android:id="@+id/dialog_spotlight_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Text.DefaultSmall.Weak"
+        tools:text="@string/spotlight_dialog_month_view_description"
+        android:paddingBottom="22dp"
+        android:layout_marginStart="@dimen/material_dialog_inset_start"
+        android:layout_marginEnd="@dimen/material_dialog_inset_end"
+        android:layout_marginTop="@dimen/spacing_large"/>
+
+</LinearLayout>
