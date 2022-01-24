@@ -11,6 +11,7 @@ import biweekly.property.RecurrenceRule
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
@@ -26,14 +27,12 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProto
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.utils.EventUtils
 import me.proton.core.user.domain.entity.UserAddress
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import java.time.temporal.Temporal
 import java.util.*
 
 object EventUtilsImpl : EventUtils {
@@ -258,6 +257,7 @@ object EventUtilsImpl : EventUtils {
         val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, TimeZone.getTimeZone(iteratorZoneId.id))
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
+        val eventDurationInDays = Period.between(Instant.ofEpochMilli(iCalEvent.dateStart.value.time).atZone(iteratorZoneId).toLocalDate(), Instant.ofEpochMilli(iCalEvent.dateEnd.value.time).atZone(iteratorZoneId).toLocalDate()).days.toLong()
 
         val formatZoneId = ZoneId.of(timeZoneId)
         val formatToZonedDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
@@ -277,7 +277,11 @@ object EventUtilsImpl : EventUtils {
             val iteratorDateStart = iterator.next()
 
             val occurrenceStart = localizeIteratorDate(iteratorDateStart, iteratorZoneId, iteratorZonedDateTimeStart, formatZoneId, hasBySetPos)
-            val occurrenceEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+            val occurrenceEnd = if (isAllDay()) {
+                occurrenceStart.plus(eventDurationInDays, ChronoUnit.DAYS)
+            } else {
+                occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+            }
 
             // we generated enough occurrences already
             if (occurrenceCount != null && (count > occurrenceCount)) break
@@ -306,9 +310,15 @@ object EventUtilsImpl : EventUtils {
                 if (this.isAllDay()) iteratorZonedDateTimeStart.withZoneSameLocal(formatZoneId)
                 else iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
 
+            val potentiallySkippedEnd = if (isAllDay()) {
+                potentiallySkippedStart.plus(eventDurationInDays, ChronoUnit.DAYS)
+            } else {
+                potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+            }
+
             val potentiallySkippedOccurrence = Event.Occurrence(
                 potentiallySkippedStart,
-                potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS),
+                potentiallySkippedEnd,
                 1
             )
 

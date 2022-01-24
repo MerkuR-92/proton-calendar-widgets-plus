@@ -59,9 +59,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.utils.ICalUtils
 import me.proton.android.calendar.mocks.EventMocks
-import me.proton.android.calendar.mocks.calendarId
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.*
@@ -937,6 +935,97 @@ internal class ICalUtilsTest {
             displayTimeZoneId
         )).isFalse()
 
+    }
+
+    @Test
+    fun `all-day event occurrence happening during DST-change lasts 24h`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar 0.30.3//EN
+    BEGIN:VEVENT
+    DTSTAMP:20220124T093706Z
+    DTSTART;VALUE=DATE:20220227
+    DTEND;VALUE=DATE:20220228
+    RRULE:FREQ=MONTHLY
+    SEQUENCE:0
+    SUMMARY:27th
+    STATUS:CONFIRMED
+    UID:dmBGpmqvRvfwGyuFj5qiT05P18Vk@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        // In Europe/Vilnius DST change is on Sunday, 27 March 2022 — 1 hour forward
+
+        // this case doesn't fail if DTSTART is 27 March, it needs to be before that date
+        // adding event_duration == 24h to START in order to get END makes the event last 25h
+        // we have to add full days
+
+        val occurrenceDuringDSTChange = event.generateOccurrence(2, displayTimeZoneId)!!
+
+        assertThat(occurrenceDuringDSTChange.startDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrenceDuringDSTChange.endDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 28, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+    }
+
+    @Test
+    fun `occurrences of all-day event starting during DST-change last 24h`() {
+
+        val iCalString = """
+            BEGIN:VCALENDAR
+            VERSION:2.0
+            PRODID:-//Proton AG//AndroidCalendar 0.30.3//EN
+            BEGIN:VEVENT
+            DTSTAMP:20220124T092125Z
+            DTSTART;VALUE=DATE:20220327
+            DTEND;VALUE=DATE:20220328
+            RRULE:FREQ=DAILY;COUNT=49
+            SEQUENCE:1
+            SUMMARY:Daily
+            STATUS:CONFIRMED
+            UID:zWhxzFUgDVXiog_ZxjJXuOAxXw2u@proton.me
+            END:VEVENT
+            END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        // In Europe/Vilnius DST change is on Sunday, 27 March 2022 — 1 hour forward
+
+        // subtracting event END from START gives us event_duration == 23h, because it starts on the day of DST change
+        // we can't add event_duration to START in order to get END, we have to add full days
+
+        val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)!!
+        val occurrence10 = event.generateOccurrence(10, displayTimeZoneId)!!
+
+        assertThat(occurrence1.startDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrence1.endDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 28, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrence1.occurrenceNumber).isEqualTo(1)
+
+        assertThat(occurrence10.startDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrence10.endDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 6, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrence10.occurrenceNumber).isEqualTo(10)
     }
 
     @Test
