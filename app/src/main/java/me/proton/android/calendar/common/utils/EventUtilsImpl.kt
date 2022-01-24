@@ -257,7 +257,10 @@ object EventUtilsImpl : EventUtils {
         val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, TimeZone.getTimeZone(iteratorZoneId.id))
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
-        val eventDurationInDays = Period.between(Instant.ofEpochMilli(iCalEvent.dateStart.value.time).atZone(iteratorZoneId).toLocalDate(), Instant.ofEpochMilli(iCalEvent.dateEnd.value.time).atZone(iteratorZoneId).toLocalDate()).days.toLong()
+        val eventStart = Instant.ofEpochMilli(iCalEvent.dateStart.value.time).atZone(iteratorZoneId)
+        val eventEnd = Instant.ofEpochMilli(iCalEvent.dateEnd.value.time).atZone(iteratorZoneId)
+
+        val eventDurationInDays = Period.between(eventStart.toLocalDate(), eventEnd.toLocalDate()).days.toLong()
 
         val formatZoneId = ZoneId.of(timeZoneId)
         val formatToZonedDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
@@ -280,7 +283,13 @@ object EventUtilsImpl : EventUtils {
             val occurrenceEnd = if (isAllDay()) {
                 occurrenceStart.plus(eventDurationInDays, ChronoUnit.DAYS)
             } else {
-                occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+                val calculatedEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+
+                val startTZOffset = ZoneId.of(timeZoneId).rules.getOffset(occurrenceStart.toInstant())
+                val endTZOffset = ZoneId.of(timeZoneId).rules.getOffset(calculatedEnd.toInstant())
+                val startEndOffsetDifference = startTZOffset.compareTo(endTZOffset)
+
+                calculatedEnd.minusSeconds(startEndOffsetDifference.toLong())
             }
 
             // we generated enough occurrences already
@@ -313,7 +322,13 @@ object EventUtilsImpl : EventUtils {
             val potentiallySkippedEnd = if (isAllDay()) {
                 potentiallySkippedStart.plus(eventDurationInDays, ChronoUnit.DAYS)
             } else {
-                potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+                val calculatedEnd = potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
+
+                val startTZOffset = ZoneId.of(timeZoneId).rules.getOffset(potentiallySkippedStart.toInstant())
+                val endTZOffset = ZoneId.of(timeZoneId).rules.getOffset(calculatedEnd.toInstant())
+                val startEndOffsetDifference = startTZOffset.compareTo(endTZOffset)
+
+                calculatedEnd.minusSeconds(startEndOffsetDifference.toLong())
             }
 
             val potentiallySkippedOccurrence = Event.Occurrence(

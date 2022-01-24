@@ -1029,6 +1029,58 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `part-day event occurrences happening during DST-change have the same time of START and END`() {
+
+        val iCalString = """
+            BEGIN:VCALENDAR
+            VERSION:2.0
+            PRODID:-//Proton AG//AndroidCalendar 0.30.3//EN
+            BEGIN:VEVENT
+            DTSTAMP:20220124T115649Z
+            DTSTART;TZID=Europe/Vilnius:20220227T010000
+            DTEND;TZID=Europe/Vilnius:20220227T050000
+            RRULE:FREQ=MONTHLY
+            SEQUENCE:0
+            SUMMARY:01:00-05:00 every 27th
+            STATUS:CONFIRMED
+            UID:sch4mDryiYH6aDkw3VsklnzfhKoW@proton.me
+            END:VEVENT
+            END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        // In Europe/Vilnius DST change is on Sunday, 27 March 2022 — 1 hour forward
+
+        // we can't add event_duration to START in order to get END, because we might shorten/lengthen the duration
+        // of an event by 1 hour due to DST change that affected END
+
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 3)!!
+
+        assertThat(occurrences[0].occurrenceNumber).isEqualTo(1)
+        assertThat(occurrences[0].startDateTime).isEqualTo(ZonedDateTime.of(2022, 2, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[0].endDateTime).isEqualTo(ZonedDateTime.of(2022, 2, 27, 5, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences[1].occurrenceNumber).isEqualTo(2)
+        assertThat(occurrences[1].startDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[1].endDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 5, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences[2].occurrenceNumber).isEqualTo(3)
+        assertThat(occurrences[2].startDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[2].endDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 27, 5, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
     fun `generate occurrences of part-day event with no timezone assignment`() {
 
         val iCalString = """
