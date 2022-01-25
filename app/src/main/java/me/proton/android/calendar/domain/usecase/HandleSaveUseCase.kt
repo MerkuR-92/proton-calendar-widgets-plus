@@ -473,7 +473,7 @@ class HandleSaveUseCase(
                 dbEventWithOccurrenceStartDate
             })?.truncatedTo(ChronoUnit.DAYS) != event.getStart(event.defaultTimeZone!!).truncatedTo(ChronoUnit.DAYS)
 
-        return if (!hasDayChanged && !rruleManuallyEdited) {
+        val handleResult = if (!hasDayChanged && !rruleManuallyEdited) {
 
             // update the original event's DTSTART only with new time (leave day the same)
 
@@ -597,6 +597,20 @@ class HandleSaveUseCase(
                 HandleSaveOptionResult.Success(event)
             }
         }
+
+        dbEvent?.let {
+            val wasSequenceUpdated = it.iCalEvent.sequence?.value != handleResult.event.iCalEvent.sequence?.value
+            val wasStartChanged = it.getStart("UTC") != handleResult.event.getStart("UTC")
+
+            // bump SEQUENCE if it was not updated but should have been
+            // because of different DTSTART of original Event and just-edited
+            // that is about to overwrite the original one
+            if (!wasSequenceUpdated && wasStartChanged) {
+                handleResult.event.iCalEvent.setSequence((handleResult.event.iCalEvent.sequence?.value ?: 0) + 1)
+            }
+        }
+
+        return handleResult
     }
 
     private suspend fun editEventWithAttendees(
