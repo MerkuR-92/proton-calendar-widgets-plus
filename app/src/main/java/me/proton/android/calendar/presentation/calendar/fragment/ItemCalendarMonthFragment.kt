@@ -213,6 +213,9 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
+        if (calendarViewModel.monthViewLoading.hasActiveObservers()) {
+            calendarViewModel.monthViewLoading.removeObservers(viewLifecycleOwner)
+        }
 
         // Check if we load the events now or if we need to wait
         if (this.isResumed) {
