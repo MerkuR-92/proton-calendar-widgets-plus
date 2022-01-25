@@ -68,7 +68,10 @@ class HandleSaveUseCase(
             event.iCalendar.adjustStartEndTimeZones(eventTimeZoneId, event.defaultTimeZone!!)
         }
 
-        event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
+        // we adjust RRule to WKST if event is newly created or if the recurrence rule is modified when editing
+        if (isCreate || (!isCreate && rruleManuallyEdited)) {
+            event.iCalEvent.recurrenceRule?.adjustToWeekStart(userSettings.weekStartDayOfWeek())
+        }
 
         val eventEntity = calendarsRepository.selectEventEntity(event.id)
         val dbEvent = eventEntity?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
