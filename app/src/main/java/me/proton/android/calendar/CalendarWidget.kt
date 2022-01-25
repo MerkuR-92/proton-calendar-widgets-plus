@@ -531,9 +531,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                             userEmails,
                             is24Hour
                         )
-                        if (!widgetEvents.contains(widgetEvent)) {
-                            widgetEvents.add(widgetEvent)
-                        }
+                        widgetEvents.add(widgetEvent)
                     }
                 }
 
@@ -567,7 +565,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                 logger.e("widgetEvents == null in onDataSetChanged")
                 displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_loading_events_error))
             } else {
-                adapterData = widgetEvents
+                adapterData = widgetEvents.distinctBy { Pair(it.id, it.occurrenceNumber) } // TODO hack for duplicated events
             }
         }
 
