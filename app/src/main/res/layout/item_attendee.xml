@@ -58,6 +58,7 @@
                     android:id="@+id/item_attendee_title"
                     style="@style/Text.Default"
                     android:breakStrategy="simple"
+                    android:textIsSelectable="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:text="John Doe" />
@@ -67,6 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:breakStrategy="simple"
+                    android:textIsSelectable="true"
                     android:visibility="gone"
                     tools:visibility="visible"
                     style="@style/Text.DefaultSmall.Weak"
