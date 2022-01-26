@@ -513,6 +513,8 @@ internal class CalendarWidgetRemoteViewsFactory(
                 events.explodeDayByDay(fromDate, toDate, zoneId.id).toSortedMap().forEach { entry ->
 
                     val upcomingEvents = entry.value.filter { !it.isInThePast(zoneId.id) }
+                        .distinctBy { Pair(it.id, it.occurrence?.occurrenceNumber) } // TODO hack for duplicated events
+
                     val sortedEvents = upcomingEvents.sortedBy {
                         "${!it.isAllDay()}${
                             it.getStart(zoneId.id).toEpochSecond()
@@ -565,7 +567,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                 logger.e("widgetEvents == null in onDataSetChanged")
                 displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_loading_events_error))
             } else {
-                adapterData = widgetEvents.distinctBy { Pair(it.id, it.occurrenceNumber) } // TODO hack for duplicated events
+                adapterData = widgetEvents
             }
         }
 
