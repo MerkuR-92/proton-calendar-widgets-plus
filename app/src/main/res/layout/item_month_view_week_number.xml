@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/monthViewWeekNumberText"
     style="@style/Text.Overline.Strong"
-    android:textColor="@color/text_hint"
+    android:textColor="@color/text_weak"
     android:layout_width="@dimen/calendar_week_number_width"
     android:layout_height="@dimen/calendar_week_number_height"
     android:gravity="center"

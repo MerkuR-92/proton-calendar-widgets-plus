@@ -493,7 +493,7 @@
                         android:id="@+id/nav_view_more_settings_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/nav_view_more_settings"
+                        android:text="@string/nav_view_settings"
                         style="@style/Text.DefaultSmall"
                         android:textColor="@color/sidebar_text_norm"
                         android:layout_marginStart="12dp"

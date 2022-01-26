@@ -51,7 +51,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_more_settings)
+        toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_more_general_settings)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

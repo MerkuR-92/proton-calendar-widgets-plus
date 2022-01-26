@@ -160,18 +160,16 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             weekDays,
             CalendarSettings.DAYS_IN_A_WEEK - (weekStart.value - 1)
         )
-        var weekDaysViewIndex = 0
-        weekDays.forEach { dayOfWeek ->
-            val textView = monthFragmentWeekDaysLayout.getChildAt(weekDaysViewIndex) as TextView
+        weekDays.forEachIndexed { index, dayOfWeek ->
+            val textView = monthFragmentWeekDaysLayout.getChildAt(index) as TextView
             val firstLetterDayOfWeek = dayOfWeek.format(firstLetter = true)
             textView.text = firstLetterDayOfWeek
             val currentDate = LocalDate.now(ZoneId.of(timeZoneId))
             if (dayOfWeek == currentDate.dayOfWeek && currentDate.month == firstDayMonthView.month && currentDate.year == firstDayMonthView.year) {
                 textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
             } else {
-                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
+                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
             }
-            weekDaysViewIndex++
         }
     }
 

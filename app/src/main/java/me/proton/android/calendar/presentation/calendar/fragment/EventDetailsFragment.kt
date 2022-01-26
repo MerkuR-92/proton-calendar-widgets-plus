@@ -152,7 +152,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
                 ContextCompat.getDrawable(
                     this.context,
-                    R.drawable.ic_pencil
+                    R.drawable.ic_pen
                 )
             )
             setOnSingleClickListener {
@@ -169,26 +169,20 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
                 ContextCompat.getDrawable(
                     this.context,
-                    R.drawable.ic_three_dots_vertical
+                    R.drawable.ic_trash
                 )
             )
             setOnSingleClickListener {
-                AndroidUtils.displayPopupMenu(
-                    view = it,
-                    labels = listOf(Pair(R.string.action_delete, R.color.notification_error)),
-                    icons = listOf(Pair(R.drawable.ic_trash, R.color.notification_error))
-                ) {
-                    if (mainViewModel.isConnectedToNetwork.not()) {
-                        view?.displaySnackBar(getString(R.string.snack_network_error))
-                        return@displayPopupMenu
-                    }
-                    lifecycleScope.launch {
-                        eventViewModel.onDeleteClick(
-                            provideDisplayDialog(),
-                            navigationArguments.occurrenceNumber,
-                            calendarViewModel.timeFormatIs24Hour(requireContext())
-                        )
-                    }
+                if (mainViewModel.isConnectedToNetwork.not()) {
+                    view?.displaySnackBar(getString(R.string.snack_network_error))
+                    return@setOnSingleClickListener
+                }
+                lifecycleScope.launch {
+                    eventViewModel.onDeleteClick(
+                        provideDisplayDialog(),
+                        navigationArguments.occurrenceNumber,
+                        calendarViewModel.timeFormatIs24Hour(requireContext())
+                    )
                 }
             }
         }
