@@ -119,11 +119,11 @@ class DayViewAllDayEventAdapter(
                     decryptionErrorView.alpha = 0.1f
                 }
             } else {
-                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
-                } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
