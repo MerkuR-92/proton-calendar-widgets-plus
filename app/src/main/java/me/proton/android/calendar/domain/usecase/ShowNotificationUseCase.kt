@@ -76,7 +76,7 @@ class ShowNotificationUseCase(
                         val occurrenceStartEpoch =
                             Instant.ofEpochSecond(eventAlarm.occurrence - (trigger.duration.toMillis() / 1000))
 
-                        logger.v("xxx calculated occurrence start for event: ${occurrenceStartEpoch.atZone(ZoneId.systemDefault())}")
+                        logger.v("calculated occurrence start for event: ${occurrenceStartEpoch.atZone(ZoneId.systemDefault())}")
 
                         // generate occurrence based on Alarm Trigger and Alarm Occurrence
                         val alarmOccurrence = dbEvent.generateFirstOccurrenceSince(
@@ -85,15 +85,13 @@ class ShowNotificationUseCase(
                                 systemDefaultZoneId
                             ))
 
-                        logger.v("xxx occurrence for alarm: $alarmOccurrence")
+                        logger.v("occurrence for alarm: $alarmOccurrence")
                         if (alarmOccurrence == null) {
                             logger.e("could not generate occurrence for notification of recurring event")
                             null
                         } else Event.withOccurrence(dbEvent, alarmOccurrence)
 
                     } else null
-
-                    logger.v("xxx generated occurrence: ${eventWithOccurrence}")
 
                     val intent = MainViewModel.createMainIntentToShowEventDetails(
                         context,
@@ -174,11 +172,9 @@ class ShowNotificationUseCase(
         logger.v("lastAlarmForCurrentEvent: $lastAlarmForCurrentEvent")
 
         if (lastAlarmForCurrentEvent != null && now.isAfter(Instant.ofEpochSecond(lastAlarmForCurrentEvent.occurrence).atZone(zoneId))) {
-            logger.v("createAlarmsForNextOccurrence for ${currentEvent.summary}, current occurrence: ${currentOccurrence}")
 
             val nextOccurrenceNumber = currentOccurrence.occurrenceNumber + 1
             val nextEvent = Event.withOccurrence(originalEvent, nextOccurrenceNumber, zoneId.id)
-            logger.v("createAlarmsForNextOccurrence: next event with next occurrence: ${nextEvent}")
 
             if (nextEvent != null) { // maybe [currentOccurrence] was the last valid occurrence of this event
                 val alarmsForNextOccurrence = ICalUtilsImpl.calculateAlarmEntities(nextEvent, zoneId.id, "TODO")

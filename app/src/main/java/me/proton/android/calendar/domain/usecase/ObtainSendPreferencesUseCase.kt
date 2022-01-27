@@ -61,6 +61,10 @@ class ObtainSendPreferencesUseCase(
 
         val user = userManager.getUserOrNull(userId, logger)
 
+        if (user == null) {
+            logger.i("ObtainSendPreferencesUseCase User is null")
+        }
+
         // 1. get User's Mail Settings
         val mailSettings = mailSettingsApi.getMailSettings(userId).valueOrNullAndLogErrors(
             logger,
@@ -69,7 +73,10 @@ class ObtainSendPreferencesUseCase(
 
         // 2. get all User's contacts
         val contactEmails =
-            kotlin.runCatching { contactEmailsRepository.getAllContactEmails(userId, refresh = true) }.getOrNull()
+            kotlin.runCatching { contactEmailsRepository.getAllContactEmails(userId, refresh = true) }.getOrElse {
+                logger.i("ObtainSendPreferencesUseCase error getting all contact emails", it)
+                null
+            }
 
         if (mailSettings == null || contactEmails == null || user == null) {
             return canonicalEmails.mapValues { Result.Error.NetworkError }
@@ -90,8 +97,10 @@ class ObtainSendPreferencesUseCase(
 
         // 5. fetch full Contact info for those contacts
         val fullContactsWithCustomPreferences = contactEmailsWithCustomPreferences.mapValues { entry ->
-            kotlin.runCatching { contactEmailsRepository.getContactWithCards(userId, entry.value.contactId, refresh = true) }
-                .getOrNull()
+            kotlin.runCatching { contactEmailsRepository.getContactWithCards(userId, entry.value.contactId, refresh = true) }.getOrElse {
+                logger.i("ObtainSendPreferencesUseCase error getting full contacts", it)
+                null
+            }
         }
         fullContactsWithCustomPreferences.forEach {
             if (it.value == null && !result.containsKey(it.key)) result[it.key] = Result.Error.NetworkError

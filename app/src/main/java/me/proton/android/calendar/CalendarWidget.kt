@@ -513,6 +513,8 @@ internal class CalendarWidgetRemoteViewsFactory(
                 events.explodeDayByDay(fromDate, toDate, zoneId.id).toSortedMap().forEach { entry ->
 
                     val upcomingEvents = entry.value.filter { !it.isInThePast(zoneId.id) }
+                        .distinctBy { Pair(it.id, it.occurrence?.occurrenceNumber) } // TODO hack for duplicated events
+
                     val sortedEvents = upcomingEvents.sortedBy {
                         "${!it.isAllDay()}${
                             it.getStart(zoneId.id).toEpochSecond()
@@ -531,9 +533,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                             userEmails,
                             is24Hour
                         )
-                        if (!widgetEvents.contains(widgetEvent)) {
-                            widgetEvents.add(widgetEvent)
-                        }
+                        widgetEvents.add(widgetEvent)
                     }
                 }
 
