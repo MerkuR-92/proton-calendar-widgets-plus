@@ -213,9 +213,9 @@ class EventAdapter(
                     textViewSubheader.setTextAppearance(R.style.Text_Default)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
 
-                    if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                    if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
-                    } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                    } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                         viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                         textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                         textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))

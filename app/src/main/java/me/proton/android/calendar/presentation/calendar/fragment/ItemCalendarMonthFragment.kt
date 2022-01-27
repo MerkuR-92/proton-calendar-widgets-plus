@@ -41,6 +41,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 
 class ItemCalendarMonthFragment : Fragment(), KoinComponent {
@@ -139,26 +140,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         monthViewMediator.addSource(calendarViewModel.weekStart) { value ->
             val newWeekStart = value?.let { AndroidUtils.getWeekStartDayOfWeek(it) }
 
-            if (newWeekStart != null && newWeekStart != weekStart) {
-                val weekDays = DayOfWeek.values().toList()
-                Collections.rotate(
-                    weekDays,
-                    CalendarSettings.DAYS_IN_A_WEEK - (newWeekStart.value - 1)
-                )
-                var weekDaysViewIndex = 0
-                weekDays.forEach { dayOfWeek ->
-                    val textView = monthFragmentWeekDaysLayout.getChildAt(weekDaysViewIndex) as TextView
-                    val firstLetterDayOfWeek = dayOfWeek.format(firstLetter = true)
-                    textView.text = firstLetterDayOfWeek
-                    if (dayOfWeek == LocalDate.now().dayOfWeek && LocalDate.now().month == firstDayMonthView.month && LocalDate.now().year == firstDayMonthView.year) {
-                        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
-                    } else {
-                        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
-                    }
-                    weekDaysViewIndex++
-                }
-            }
-
             weekStart = newWeekStart
 
             if (timeZoneId != null && weekStart != null) {
@@ -173,7 +154,29 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         }
     }
 
+    private fun setWeekDaysHeader(weekStart: DayOfWeek, timeZoneId: String, firstDayMonthView: LocalDate) {
+        val weekDays = DayOfWeek.values().toList()
+        Collections.rotate(
+            weekDays,
+            CalendarSettings.DAYS_IN_A_WEEK - (weekStart.value - 1)
+        )
+        weekDays.forEachIndexed { index, dayOfWeek ->
+            val textView = monthFragmentWeekDaysLayout.getChildAt(index) as TextView
+            val firstLetterDayOfWeek = dayOfWeek.format(firstLetter = true)
+            textView.text = firstLetterDayOfWeek
+            val currentDate = LocalDate.now(ZoneId.of(timeZoneId))
+            if (dayOfWeek == currentDate.dayOfWeek && currentDate.month == firstDayMonthView.month && currentDate.year == firstDayMonthView.year) {
+                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+            } else {
+                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
+            }
+        }
+    }
+
     private fun setupMonthViewGrid(forDate: LocalDate, timeZoneId: String, startWeekOn: DayOfWeek, position: Int) {
+        // Set week days header
+        setWeekDaysHeader(startWeekOn, timeZoneId, forDate)
+
         // Prepare the list of dates we'll display in the month view
         val firstDayOfTheMonth = forDate.withDayOfMonth(1)
         val firstDayOfTheWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
@@ -212,6 +215,9 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         }
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
+        if (calendarViewModel.monthViewLoading.hasActiveObservers()) {
+            calendarViewModel.monthViewLoading.removeObservers(viewLifecycleOwner)
         }
 
         // Check if we load the events now or if we need to wait
