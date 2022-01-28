@@ -18,7 +18,7 @@ class CalendarApiClient @Inject constructor(
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
 ) : ApiClient {
 
-    override val appVersionHeader = "${API_APPLICATION_NAME}_${BuildConfig.VERSION_NAME}"
+    override val appVersionHeader = "${API_APPLICATION_NAME}@${BuildConfig.VERSION_NAME}"
     override val enableDebugLogging = BuildConfig.DEBUG
     override val shouldUseDoh get() = defaultSharedPreferencesProvider.sharedPreferences.getBoolean(
         SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
