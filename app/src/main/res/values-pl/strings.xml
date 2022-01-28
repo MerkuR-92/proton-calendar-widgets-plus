@@ -230,7 +230,7 @@
   <string name="nav_view_switcher_day">Dzień</string>
   <string name="nav_view_switcher_agenda">Plan</string>
   <string name="nav_view_timezone">Strefa czasowa</string>
-  <string name="nav_view_more_settings">Ustawienia</string>
+  <string name="nav_view_settings">Ustawienia</string>
   <string name="nav_view_more_general_settings">Ogólne</string>
   <string name="nav_view_more_bug">Zgłoś błąd</string>
   <string name="nav_view_more_logout">Wyloguj</string>

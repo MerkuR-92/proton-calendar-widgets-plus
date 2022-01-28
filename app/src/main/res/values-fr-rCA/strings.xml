@@ -230,7 +230,7 @@
   <string name="nav_view_switcher_day">Jour</string>
   <string name="nav_view_switcher_agenda">Agenda</string>
   <string name="nav_view_timezone">Fuseau horaire</string>
-  <string name="nav_view_more_settings">Paramètres</string>
+  <string name="nav_view_settings">Paramètres</string>
   <string name="nav_view_more_general_settings">Général</string>
   <string name="nav_view_more_bug">Signaler une erreur</string>
   <string name="nav_view_more_logout">Se déconnecter</string>

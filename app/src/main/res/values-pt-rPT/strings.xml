@@ -230,7 +230,7 @@
   <string name="nav_view_switcher_day">Dia</string>
   <string name="nav_view_switcher_agenda">Agenda</string>
   <string name="nav_view_timezone">Fuso horário</string>
-  <string name="nav_view_more_settings">Definições</string>
+  <string name="nav_view_settings">Definições</string>
   <string name="nav_view_more_general_settings">General</string>
   <string name="nav_view_more_bug">Comunicar erro</string>
   <string name="nav_view_more_logout">Terminar sessão</string>

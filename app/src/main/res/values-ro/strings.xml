@@ -230,7 +230,7 @@
   <string name="nav_view_switcher_day">zi</string>
   <string name="nav_view_switcher_agenda">Agendă</string>
   <string name="nav_view_timezone">Fus orar</string>
-  <string name="nav_view_more_settings">Setări</string>
+  <string name="nav_view_settings">Setări</string>
   <string name="nav_view_more_general_settings">Generale</string>
   <string name="nav_view_more_bug">Raportare eroare</string>
   <string name="nav_view_more_logout">Deconectare</string>
