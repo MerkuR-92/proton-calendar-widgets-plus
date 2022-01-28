@@ -11,9 +11,11 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,6 +31,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.presentation.calendar.adapter.DayViewAllDayEventAdapter
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.core.user.domain.entity.UserAddress
@@ -54,6 +57,8 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
 
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
     private var selectedDate: LocalDate? = null
+
+    private lateinit var eventsListLayoutAdapter: EventAdapter
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment {
@@ -85,38 +90,11 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val agendaMediator = MediatorLiveData<Pair<String, Boolean>>()
-        agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
-            timeZoneId = value?.id
-
-            if (timeZoneId != null && timeFormatIs24Hour != null) {
-                agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
-            }
-        }
-        agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
-            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
-
-            if (timeZoneId != null && timeFormatIs24Hour != null) {
-                agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
-            }
-        }
-        agendaMediator.observe(viewLifecycleOwner) {
-            it?.let {
-                setupItemMiniCalendarContent(it.first, it.second)
-            }
-        }
-    }
-
-    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean) {
-        val immutableDate = date ?: return
-
-        // Check if recycler view is not null because of the delay
-        if (rv_agenda == null) return
-
-        rv_agenda.apply {
-            layoutManager = LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
-
-            adapter = EventAdapter(timeZoneId, timeFormatIs24Hour, immutableDate) {
+        val eventsListLayoutManager =
+            LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
+        rv_agenda.layoutManager = eventsListLayoutManager
+        eventsListLayoutAdapter =
+            EventAdapter {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(
@@ -155,8 +133,41 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                         .show()
                 }
             }
-            (this.adapter as? EventAdapter)?.submitList(listOf(fakeHeaderEvent))
+        rv_agenda.adapter = eventsListLayoutAdapter
+
+        val agendaMediator = MediatorLiveData<Pair<String, Boolean>>()
+        agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
+            timeZoneId = value?.id
+
+            if (timeZoneId != null && timeFormatIs24Hour != null) {
+                agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
+            }
         }
+        agendaMediator.addSource(calendarViewModel.timeFormat) { value ->
+            timeFormatIs24Hour = value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) }
+
+            if (timeZoneId != null && timeFormatIs24Hour != null) {
+                agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
+            }
+        }
+        agendaMediator.observe(viewLifecycleOwner) {
+            it?.let {
+                setupItemMiniCalendarContent(it.first, it.second)
+            }
+        }
+    }
+
+    private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean) {
+        val immutableDate = date ?: return
+
+        eventsListLayoutAdapter.setDate(immutableDate)
+        eventsListLayoutAdapter.setTimeZoneId(timeZoneId)
+        eventsListLayoutAdapter.setTimeFormatIs24Hour(timeFormatIs24Hour)
+
+        // Check if recycler view is not null because of the delay
+        if (rv_agenda == null) return
+
+        eventsListLayoutAdapter.submitList(listOf(fakeHeaderEvent))
 
         // TODO remove UserID livedata
         calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
@@ -203,8 +214,8 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
-                        val currentList = (rv_agenda.adapter as? EventAdapter)?.currentList
-                        if (currentList == null || currentList.size <= 1 && this.isResumed) {
+                        val currentList = eventsListLayoutAdapter.currentList
+                        if (currentList.size <= 1 && this.isResumed) {
                             calendarViewModel.setLoading(true, position)
                             list_view_status.visibleOrInvisible(true)
                             list_view_status.text = resources.getString(R.string.agenda_loading_events)
@@ -240,9 +251,9 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                         lifecycleScope.launch {
                             val userAddresses = calendarViewModel.getUserAddresses()
                             userAddresses?.let {
-                                (rv_agenda.adapter as? EventAdapter)?.setUserEmails(it.map { it.email })
+                                eventsListLayoutAdapter.setUserEmails(it.map { it.email })
                             }
-                            (rv_agenda.adapter as? EventAdapter)?.submitList(
+                            eventsListLayoutAdapter.submitList(
                                 listOf(fakeHeaderEvent).plus(sortedEvents)
                             )
                             calendarViewModel.setLoading(false, position)
@@ -253,7 +264,7 @@ class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
                         list_view_status.text =
                             resources.getString(R.string.agenda_loading_events_error)
 
-                        (rv_agenda.adapter as? EventAdapter)?.submitList(
+                        eventsListLayoutAdapter.submitList(
                             listOf(fakeHeaderEvent)
                         )
                         calendarViewModel.setLoading(false, position)
