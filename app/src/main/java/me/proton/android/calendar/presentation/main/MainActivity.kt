@@ -17,8 +17,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
-import androidx.lifecycle.*
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -35,8 +36,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_month.*
-import kotlinx.android.synthetic.main.fragment_root.*
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.*
@@ -82,10 +81,10 @@ import me.proton.core.util.kotlin.toBoolean
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
-import java.io.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -226,6 +225,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
+            if (!shouldHandleIntent(intent)) return
             mainViewModel.handleIntent(intent)
             with(accountViewModel) {
                 val state = state.value
@@ -256,18 +256,22 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    private fun shouldHandleIntent(intent: Intent): Boolean {
+        return intent.action == INVITE_PROTON_INTENT_ACTION ||
+                intent.action == Intent.ACTION_VIEW ||
+                intent.type == INVITE_ICS_MIME_TYPE ||
+                intent.action == MainViewModel.INTENT_ACTION_NEW_EVENT ||
+                intent.action == MainViewModel.INTENT_ACTION_SHOW_DAY ||
+                intent.action == MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         handleAppTheme()
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
         if (!isTaskRoot &&
-            intent.action != INVITE_PROTON_INTENT_ACTION &&
-            intent.action != Intent.ACTION_VIEW &&
-            intent.type != INVITE_ICS_MIME_TYPE &&
-            intent.action != MainViewModel.INTENT_ACTION_NEW_EVENT &&
-            intent.action != MainViewModel.INTENT_ACTION_SHOW_DAY &&
-            intent.action != MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
+            !shouldHandleIntent(intent)
         ) {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
