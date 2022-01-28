@@ -53,7 +53,6 @@ val commonModule = module {
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
     single<ValueStoreProvider> { ValueStoreProviderImpl(get()) }
     single<ResourceProvider> { ResourceProviderImpl(androidApplication().resources) }
-    single<AppDatabase> { AppDatabase.buildDatabase(androidApplication()) }
     single<Crypto> { CryptoImpl(get()) }
     single<WidgetRefresher> { CalendarWidgetRefresher(androidApplication()) }
 
@@ -147,7 +146,8 @@ fun coreModule(
     sendEmailDirect: SendEmailDirect,
     publicAddressRepository: PublicAddressRepository,
     networkManager: NetworkManager,
-    defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
+    defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
+    appDatabase: AppDatabase
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -169,4 +169,5 @@ fun coreModule(
     single<PublicAddressRepository> { publicAddressRepository }
     single<NetworkManager> { networkManager }
     single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
+    single<AppDatabase> { appDatabase }
 }
