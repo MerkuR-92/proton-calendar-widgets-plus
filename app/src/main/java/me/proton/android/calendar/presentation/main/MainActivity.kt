@@ -223,6 +223,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let {
+            mainViewModel.handleIntent(intent)
+            with(accountViewModel) {
+                val state = state.value
+                if (state != AccountViewModel.State.Ready) logger.i("onNewIntent accountViewModel state was not ready: $state")
+                handleAccountState(this, state)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         with(accountViewModel) {
@@ -719,14 +731,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else {
             val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_navigation_bar
             window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
-        }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        intent?.let {
-            logger.i("MainActivity onNewIntent received non null Intent")
-            mainViewModel.handleIntent(intent)
         }
     }
 

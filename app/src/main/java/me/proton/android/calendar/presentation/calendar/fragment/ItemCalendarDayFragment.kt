@@ -263,7 +263,16 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
             val dtStart = event.getStart(timeZoneId)
             val dtEnd = event.getEnd(timeZoneId)
             val startMinute: Int = 60 * dtStart.hour + dtStart.minute
-            val eventDuration = Duration.between(dtStart, dtEnd).toMinutes().toInt()
+
+            val startTZOffset = ZoneId.of(timeZoneId).rules.getOffset(dtStart.toInstant())
+            val endTZOffset = ZoneId.of(timeZoneId).rules.getOffset(dtEnd.toInstant())
+            val startEndOffsetDifference = startTZOffset.compareTo(endTZOffset)
+
+            // if event starts and ends in different DST timezones we have to calculate duration
+            //  "from the start-TZ perspective" because entire day-view acts like it's displayed in that TZ
+            val dstAlignedDtEnd = dtEnd.plusSeconds(startEndOffsetDifference.toLong())
+            val eventDuration = Duration.between(dtStart, dstAlignedDtEnd).toMinutes().toInt()
+
             // if event lasts past Midnight, start drawing it aligned to the bottom of the view
             val alignedStartMinute = min(startMinute, Duration.ofDays(1).toMinutes().toInt() - minimumSpanningMinutes)
             val endMinute: Int = alignedStartMinute + if (eventDuration < minimumSpanningMinutes) minimumSpanningMinutes else eventDuration
