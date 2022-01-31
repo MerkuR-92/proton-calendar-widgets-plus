@@ -229,9 +229,10 @@
   <string name="nav_view_switcher">Afișare</string>
   <string name="nav_view_switcher_day">zi</string>
   <string name="nav_view_switcher_agenda">Agendă</string>
+  <string name="nav_view_switcher_month">Month</string>
   <string name="nav_view_timezone">Fus orar</string>
-  <string name="nav_view_settings">Setări</string>
-  <string name="nav_view_more_general_settings">Generale</string>
+  <string name="nav_view_settings">Settings</string>
+  <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
   <string name="nav_view_more_bug">Raportare eroare</string>
   <string name="nav_view_more_logout">Deconectare</string>
   <string name="nav_view_more_login">Autentificare</string>
@@ -340,8 +341,8 @@
   <string name="settings_theme_title">Tema</string>
   <string name="settings_theme_info">Această setare afectează doar aspectul aplicației Proton Calendar pe acest dispozitiv. Aplicația va reporni după schimbarea temei.</string>
   <string name="settings_timezone_title">Fus orar</string>
-  <string name="settings_language_title">Limbă aplicație</string>
-  <string name="settings_language_default">Autodetectare</string>
+  <string name="settings_language_title">App language</string>
+  <string name="settings_language_default">Auto-detect</string>
   <string name="settings_update_timezone_title">Setare solicitare actualizare fus orar</string>
   <string name="settings_update_timezone_subtitle">Dacă fusul orar al sistemului nu se potrivește cu cel din setări, vi se va solicita să-l actualizați.</string>
   <string name="settings_update_timezone_checkbox">Nu mă mai întreba</string>
@@ -352,7 +353,8 @@
   <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
   <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
   <string name="settings_general_title">Generale</string>
-  <string name="settings_general_info">Temă, fus orar, aspect calendar, etc.</string>
+  <string name="settings_general_info">Theme, time zone, calendar layout etc.</string>
+  <string name="settings_general_info_with_language">Theme, language, time zone, calendar layout etc.</string>
   <string name="settings_calendars">Calendarele mele</string>
   <string name="settings_subscribed_calendars">Abonări la calendare</string>
   <string name="settings_calendar_default">Implicit</string>
@@ -412,10 +414,16 @@
   <string name="calendar_widget_description">Proton Calendar widget</string>
   <string name="calendar_widget_no_upcoming_events_today">Astăzi nu sunt evenimente</string>
   <string name="calendar_widget_loading_events">Se încarcă evenimentele…</string>
+  <string name="calendar_widget_loading_events_error">Could not load events</string>
   <string name="calendar_widget_no_upcoming_events">Nu urmează evenimente</string>
   <string name="calendar_widget_please_log_in">Conectați-vă pentru a vă vedea evenimentele</string>
   <string name="calendar_widget_part_day_event_starts_at">Începe la %1$s</string>
   <string name="calendar_widget_part_day_event_ends_at">Se încheie la %1$s</string>
+  <!-- Spotlight Dialogs -->
+  <string name="spotlight_dialog_month_header">What\'s new</string>
+  <string name="spotlight_dialog_month_confirmation_button">OK</string>
+  <string name="spotlight_dialog_month_view_title">Month view</string>
+  <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
   <!--  STRING PLURALS  -->
   <plurals name="plural_minute">
     <item quantity="one">minute</item>
