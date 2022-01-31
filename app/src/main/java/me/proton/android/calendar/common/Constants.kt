@@ -89,8 +89,8 @@ object FeatureFlag {
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
     const val CHANGE_LANGUAGE = false
-    const val MONTH_VIEW = false
-    const val SPOTLIGHT = false
+    const val MONTH_VIEW = true
+    const val SPOTLIGHT = true
 }
 
 object ApiResponseCode {

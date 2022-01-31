@@ -360,46 +360,49 @@ object DateTimeUtilsImpl : DateTimeUtils {
      */
     override fun getLocaleForFormatting(): Locale {
         if (!CHANGE_LANGUAGE) return US
+        val appDefaultLocale = getDefault()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val defaultLocales = Resources.getSystem().configuration.locales
-            defaultLocales.getFirstMatch(
-                arrayListOf(
-                    "fr-ca",
-                    "es-es",
-                    "es-mx",
-                    "pt-pt",
+            val systemDefaultLocales = Resources.getSystem().configuration.locales
+            val supportedLanguagesArray = arrayListOf(
+                "fr-ca",
+                "es-es",
+                "es-mx",
+                "pt-pt",
+                "fr",
+                "es",
+                "ca",
+                "pl",
+                "ro",
+                "pt",
+                "de",
+                "en"
+            ).toTypedArray()
+            getSupportedLocaleOrNull(appDefaultLocale) ?: systemDefaultLocales.getFirstMatch(supportedLanguagesArray) ?: US // Fallback to English (US)
+        } else {
+            val systemDefaultLocale = Resources.getSystem().configuration.locale
+            getSupportedLocaleOrNull(appDefaultLocale) ?: getSupportedLocaleOrNull(systemDefaultLocale) ?: US // Fallback to English (US)
+        }
+    }
+
+    private fun getSupportedLocaleOrNull(locale: Locale): Locale? {
+        return when (locale.toLanguageTag().lowercase()) {
+            // Check for supported country specific language tags first
+            "fr-ca",
+            "es-es",
+            "es-mx",
+            "pt-pt" -> locale
+            else -> {
+                when (locale.language.lowercase()) {
+                    // Check for supported languages
                     "fr",
                     "es",
                     "ca",
                     "pl",
                     "ro",
                     "pt",
-                    "de",
-                    "en"
-                ).toTypedArray()
-            ) ?: US
-        } else {
-            val defaultLocale = Resources.getSystem().configuration.locale
-            when (defaultLocale.toLanguageTag().lowercase()) {
-                // Check for supported country specific language tags first
-                "fr-ca",
-                "es-es",
-                "es-mx",
-                "pt-pt" -> return defaultLocale
-                else -> {
-                    when (defaultLocale.language.lowercase()) {
-                        // Check for supported languages
-                        "fr",
-                        "es",
-                        "ca",
-                        "pl",
-                        "ro",
-                        "pt",
-                        "de" -> return defaultLocale
-                        else -> {
-                            // Force Locale to English (US)
-                            US
-                        }
+                    "de" -> locale
+                    else -> {
+                        null
                     }
                 }
             }

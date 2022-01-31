@@ -87,7 +87,6 @@ import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -178,7 +177,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.putString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, language)
         editor.commit()
 
-//        restartApplication()
+        restartApplication()
     }
 
     private fun setAppCurrentLanguage(currentLanguage: String) {
@@ -189,17 +188,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun restartApplication() {
-        lifecycleScope.launch {
-            // Get current intent to restart activity
-            val intent = intent
-            intent.action = null
-            intent.data = null
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            // Restart Application using exit
-            exitProcess(0)
-        }
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+        Runtime.getRuntime().exit(0)
     }
 
     fun getAppTheme(): AppTheme {
