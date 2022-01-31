@@ -229,9 +229,10 @@
   <string name="nav_view_switcher">Widok</string>
   <string name="nav_view_switcher_day">Dzień</string>
   <string name="nav_view_switcher_agenda">Plan</string>
+  <string name="nav_view_switcher_month">Miesiąc</string>
   <string name="nav_view_timezone">Strefa czasowa</string>
   <string name="nav_view_settings">Ustawienia</string>
-  <string name="nav_view_more_general_settings">Ogólne</string>
+  <string name="nav_view_more_general_settings" comment="General Settings">Ogólne</string>
   <string name="nav_view_more_bug">Zgłoś błąd</string>
   <string name="nav_view_more_logout">Wyloguj</string>
   <string name="nav_view_more_login">Zaloguj się</string>
@@ -353,6 +354,7 @@
   <string name="settings_value_placeholder">Kliknij, aby wybrać</string>
   <string name="settings_general_title">Ogólne</string>
   <string name="settings_general_info">Motyw, strefa czasowa, widok kalendarza itp.</string>
+  <string name="settings_general_info_with_language">Motyw, język, strefa czasowa, widok kalendarza itp.</string>
   <string name="settings_calendars">Moje kalendarze</string>
   <string name="settings_subscribed_calendars">Subskrybowane kalendarze</string>
   <string name="settings_calendar_default">Domyślny</string>
@@ -412,10 +414,16 @@
   <string name="calendar_widget_description">Widżet Proton Calendar</string>
   <string name="calendar_widget_no_upcoming_events_today">Brak dzisiaj nadchodzących wydarzeń</string>
   <string name="calendar_widget_loading_events">Ładowanie wydarzeń…</string>
+  <string name="calendar_widget_loading_events_error">Nie można załadować wydarzeń</string>
   <string name="calendar_widget_no_upcoming_events">Brak nadchodzących wydarzeń</string>
   <string name="calendar_widget_please_log_in">Zaloguj się, aby zobaczyć wydarzenia</string>
-  <string name="calendar_widget_part_day_event_starts_at">Rozpoczyna się o godzinie %1$s</string>
+  <string name="calendar_widget_part_day_event_starts_at">Rozpocznie się o godzinie %1$s</string>
   <string name="calendar_widget_part_day_event_ends_at">Kończy się o godzinie %1$s </string>
+  <!-- Spotlight Dialogs -->
+  <string name="spotlight_dialog_month_header">Co nowego</string>
+  <string name="spotlight_dialog_month_confirmation_button">OK</string>
+  <string name="spotlight_dialog_month_view_title">Widok miesiąca</string>
+  <string name="spotlight_dialog_month_view_description">Uzyskaj podsumowanie swoich wydarzeń dzięki nowemu widokowi miesiąca. Przełącz się między widokami za pomocą menu.</string>
   <!--  STRING PLURALS  -->
   <plurals name="plural_minute">
     <item quantity="one">minuta</item>

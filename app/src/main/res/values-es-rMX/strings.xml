@@ -229,9 +229,10 @@
   <string name="nav_view_switcher">Vista</string>
   <string name="nav_view_switcher_day">Día</string>
   <string name="nav_view_switcher_agenda">Agenda</string>
+  <string name="nav_view_switcher_month">Mes</string>
   <string name="nav_view_timezone">Zona horaria</string>
-  <string name="nav_view_settings">Ajustes</string>
-  <string name="nav_view_more_general_settings">General</string>
+  <string name="nav_view_settings">Configuración</string>
+  <string name="nav_view_more_general_settings" comment="General Settings">General</string>
   <string name="nav_view_more_bug">Reportar error</string>
   <string name="nav_view_more_logout">Cerrar sesión</string>
   <string name="nav_view_more_login">Iniciar sesión</string>
@@ -340,8 +341,8 @@
   <string name="settings_theme_title">Tema</string>
   <string name="settings_theme_info">Este ajuste sólo afecta a la apariencia de la aplicación Proton Calendar en este dispositivo. La aplicación se reiniciará después de cambiar el tema.</string>
   <string name="settings_timezone_title">Zona horaria</string>
-  <string name="settings_language_title">Idioma de la aplicación</string>
-  <string name="settings_language_default">Detectar automáticamente</string>
+  <string name="settings_language_title">Idioma de la app</string>
+  <string name="settings_language_default">Auto detectar</string>
   <string name="settings_update_timezone_title">Solicitar actualizar la configuración de zona horaria</string>
   <string name="settings_update_timezone_subtitle">Si la zona horaria del sistema no coincide con la configuración actual de zona horaria, se le pedirá actualizarla.</string>
   <string name="settings_update_timezone_checkbox">No volver a preguntarme</string>
@@ -353,6 +354,7 @@
   <string name="settings_value_placeholder">Tocar para seleccionar</string>
   <string name="settings_general_title">General</string>
   <string name="settings_general_info">Tema, zona horaria, diseño del calendario, etc.</string>
+  <string name="settings_general_info_with_language">Tema, idioma, zona horaria, diseño del calendario, etc.</string>
   <string name="settings_calendars">Mis calendarios</string>
   <string name="settings_subscribed_calendars">Calendarios suscritos</string>
   <string name="settings_calendar_default">Por defecto</string>
@@ -412,10 +414,16 @@
   <string name="calendar_widget_description">Widget de Proton Calendar</string>
   <string name="calendar_widget_no_upcoming_events_today">No hay eventos próximos para hoy</string>
   <string name="calendar_widget_loading_events">Cargando eventos…</string>
+  <string name="calendar_widget_loading_events_error">No se pudieron cargar los eventos</string>
   <string name="calendar_widget_no_upcoming_events">No hay eventos próximos</string>
   <string name="calendar_widget_please_log_in">Inicie sesión para ver sus eventos</string>
   <string name="calendar_widget_part_day_event_starts_at">Inicia a las %1$s</string>
   <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
+  <!-- Spotlight Dialogs -->
+  <string name="spotlight_dialog_month_header">Novedades</string>
+  <string name="spotlight_dialog_month_confirmation_button">OK</string>
+  <string name="spotlight_dialog_month_view_title">Vista de mes</string>
+  <string name="spotlight_dialog_month_view_description">Obtenga una vista general de sus eventos con nuestra nueva vista de mes. Cambie entre vistas usando el menú.</string>
   <!--  STRING PLURALS  -->
   <plurals name="plural_minute">
     <item quantity="one">minuto</item>
@@ -442,8 +450,8 @@
     <item quantity="other">años</item>
   </plurals>
   <plurals name="plural_recurrence_count">
-    <item quantity="one">once</item>
-    <item quantity="other">times</item>
+    <item quantity="one">una vez</item>
+    <item quantity="other">veces</item>
   </plurals>
   <plurals name="plural_occurrence">
     <item quantity="one">ocurrencia</item>
@@ -465,10 +473,10 @@
   <string-array name="ordinals_as_words_backwards">
     <item/>
     <item>último</item>
-    <item>second to last</item>
-    <item>third to last</item>
-    <item>fourth to last</item>
-    <item>fifth to last</item>
+    <item>penúltimo</item>
+    <item>antepenúltimo</item>
+    <item>cuarto al último</item>
+    <item>quinto al último</item>
   </string-array>
   <string-array name="app_themes">
     <item>Claro</item>

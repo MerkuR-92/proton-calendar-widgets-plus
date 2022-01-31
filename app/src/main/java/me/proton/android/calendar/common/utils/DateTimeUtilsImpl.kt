@@ -373,7 +373,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
                     "ca",
                     "pl",
                     "ro",
-                    "pt" -> defaultLocale
+                    "pt",
+                    "de" -> defaultLocale
                     else -> {
                         // Force Locale to English (US)
                         US

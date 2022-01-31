@@ -229,9 +229,10 @@
   <string name="nav_view_switcher">Vista</string>
   <string name="nav_view_switcher_day">Día</string>
   <string name="nav_view_switcher_agenda">Agenda</string>
+  <string name="nav_view_switcher_month">Month</string>
   <string name="nav_view_timezone">Zona horaria</string>
   <string name="nav_view_settings">Ajustes</string>
-  <string name="nav_view_more_general_settings">General</string>
+  <string name="nav_view_more_general_settings" comment="General Settings">General</string>
   <string name="nav_view_more_bug">Notificar un error</string>
   <string name="nav_view_more_logout">Cerrar sesión</string>
   <string name="nav_view_more_login">Iniciar sesión</string>
@@ -340,8 +341,8 @@
   <string name="settings_theme_title">Tema</string>
   <string name="settings_theme_info">This setting affects only the appearance of the Proton Calendar app on this device. The app will restart after changing the theme.</string>
   <string name="settings_timezone_title">Zona horaria</string>
-  <string name="settings_language_title">Idioma de la aplicación</string>
-  <string name="settings_language_default">Detectar automáticamente</string>
+  <string name="settings_language_title">App language</string>
+  <string name="settings_language_default">Auto-detect</string>
   <string name="settings_update_timezone_title">Preguntar para actualizar la configuración de zona horaria</string>
   <string name="settings_update_timezone_subtitle">Si la zona horaria del sistema no coincide con la configuración actual de zona horaria, se te preguntará si quieres actualizarla.</string>
   <string name="settings_update_timezone_checkbox">No volver a preguntarme</string>
@@ -352,7 +353,8 @@
   <string name="settings_alternative_routing_subtitle">In case Proton sites are blocked, this setting allows the app to try alternative network routing to reach Proton, which can be useful for bypassing firewalls or network issues. We recommend keeping this setting on for greater reliability.</string>
   <string name="settings_value_placeholder">Tocar para seleccionar</string>
   <string name="settings_general_title">General</string>
-  <string name="settings_general_info">Theme, timezone, calendar layout etc.</string>
+  <string name="settings_general_info">Theme, time zone, calendar layout etc.</string>
+  <string name="settings_general_info_with_language">Theme, language, time zone, calendar layout etc.</string>
   <string name="settings_calendars">Mis calendarios</string>
   <string name="settings_subscribed_calendars">Calendarios suscritos</string>
   <string name="settings_calendar_default">Predeterminado</string>
@@ -412,10 +414,16 @@
   <string name="calendar_widget_description">Proton Calendar widget</string>
   <string name="calendar_widget_no_upcoming_events_today">No upcoming events today</string>
   <string name="calendar_widget_loading_events">Cargando eventos…</string>
+  <string name="calendar_widget_loading_events_error">Could not load events</string>
   <string name="calendar_widget_no_upcoming_events">No upcoming events</string>
   <string name="calendar_widget_please_log_in">Sign in to see your events</string>
   <string name="calendar_widget_part_day_event_starts_at">Starts at %1$s</string>
   <string name="calendar_widget_part_day_event_ends_at">Ends at %1$s</string>
+  <!-- Spotlight Dialogs -->
+  <string name="spotlight_dialog_month_header">What\'s new</string>
+  <string name="spotlight_dialog_month_confirmation_button">OK</string>
+  <string name="spotlight_dialog_month_view_title">Month view</string>
+  <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
   <!--  STRING PLURALS  -->
   <plurals name="plural_minute">
     <item quantity="one">minute</item>
