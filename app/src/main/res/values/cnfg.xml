@@ -10,6 +10,7 @@
         <item>Polski</item>
         <item>Português (Portugal)</item>
         <item>Română</item>
+        <item>Deutsch</item>
     </array>
     <array name="custom_language_values" translatable="false">
         <item>en</item>
@@ -21,5 +22,6 @@
         <item>pl</item>
         <item>pt</item>
         <item>ro</item>
+        <item>de</item>
     </array>
 </resources>

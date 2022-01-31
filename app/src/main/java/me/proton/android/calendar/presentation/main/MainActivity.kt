@@ -52,6 +52,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
+import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
@@ -86,7 +87,6 @@ import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
@@ -164,34 +164,34 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    fun getAppLanguage(): String {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString(SharedPreferencesKeys.APP_LANGUAGE, null) ?: ""
+    fun getAppSettingsLanguage(): String {
+        return PreferenceManager.getDefaultSharedPreferences(this).getString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, null) ?: ""
     }
 
     fun changeAppLanguage(language: String) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         val editor = sharedPreferences.edit()
-        editor.putString(SharedPreferencesKeys.APP_LANGUAGE, language)
-        editor.apply()
+        editor.putString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, language)
+        // We restart the app next, so we can directly set the app current language to the new one
+        editor.putString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, language)
+        editor.commit()
 
-//        restartApplication()
+        restartApplication()
+    }
+
+    private fun setAppCurrentLanguage(currentLanguage: String) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = sharedPreferences.edit()
+        editor.putString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, currentLanguage)
+        editor.commit()
     }
 
     private fun restartApplication() {
-        lifecycleScope.launch {
-            // Delay so that new value is saved in SharedPreferences
-            delay(100)
-            // Get current intent to restart activity
-            val intent = intent
-            intent.action = null
-            intent.data = null
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            // Restart Application using exit
-            exitProcess(0)
-        }
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+        Runtime.getRuntime().exit(0)
     }
 
     fun getAppTheme(): AppTheme {
@@ -281,12 +281,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val widgetLanguageTag = sharedPreferences.getString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, null)
-        val appLanguage = getAppLanguage()
+        val appCurrentLanguage = sharedPreferences.getString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, null)
+        val appSettingsLanguage = getAppSettingsLanguage()
         // If we use System default as language settings for the app, check whether we need to restart Application to apply new language
-//        if (appLanguage.isBlank() && widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
-//            restartApplication()
-//        }
+        if (appSettingsLanguage.isBlank() && appCurrentLanguage != getLocaleForFormatting().toLanguageTag()) {
+            setAppCurrentLanguage(getLocaleForFormatting().toLanguageTag())
+            if (CHANGE_LANGUAGE) {
+                widgetRefresher.broadcastRefresh()
+                restartApplication()
+            }
+        }
 
         setContentView(R.layout.activity_main)
 
@@ -421,13 +425,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
-
-        if (widgetLanguageTag != getLocaleForFormatting().toLanguageTag()) {
-            widgetRefresher.broadcastRefresh()
-            val editor = sharedPreferences.edit()
-            editor.putString(SharedPreferencesKeys.WIDGET_LANGUAGE_TAG, getLocaleForFormatting().toLanguageTag())
-            editor.apply()
-        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {

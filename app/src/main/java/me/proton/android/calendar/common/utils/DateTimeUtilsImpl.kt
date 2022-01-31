@@ -1,5 +1,7 @@
 package me.proton.android.calendar.common.utils
 
+import android.content.res.Resources
+import android.os.Build
 import biweekly.util.DateTimeComponents
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
@@ -357,16 +359,40 @@ object DateTimeUtilsImpl : DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     override fun getLocaleForFormatting(): Locale {
-        val defaultLocale = getDefault()
         if (!CHANGE_LANGUAGE) return US
-        return when (defaultLocale.toLanguageTag().lowercase()) {
+        val appDefaultLocale = getDefault()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val systemDefaultLocales = Resources.getSystem().configuration.locales
+            val supportedLanguagesArray = arrayListOf(
+                "fr-ca",
+                "es-es",
+                "es-mx",
+                "pt-pt",
+                "fr",
+                "es",
+                "ca",
+                "pl",
+                "ro",
+                "pt",
+                "de",
+                "en"
+            ).toTypedArray()
+            getSupportedLocaleOrNull(appDefaultLocale) ?: systemDefaultLocales.getFirstMatch(supportedLanguagesArray) ?: US // Fallback to English (US)
+        } else {
+            val systemDefaultLocale = Resources.getSystem().configuration.locale
+            getSupportedLocaleOrNull(appDefaultLocale) ?: getSupportedLocaleOrNull(systemDefaultLocale) ?: US // Fallback to English (US)
+        }
+    }
+
+    private fun getSupportedLocaleOrNull(locale: Locale): Locale? {
+        return when (locale.toLanguageTag().lowercase()) {
             // Check for supported country specific language tags first
             "fr-ca",
             "es-es",
             "es-mx",
-            "pt-pt" -> defaultLocale
+            "pt-pt" -> locale
             else -> {
-                when (defaultLocale.language.lowercase()) {
+                when (locale.language.lowercase()) {
                     // Check for supported languages
                     "fr",
                     "es",
@@ -374,10 +400,9 @@ object DateTimeUtilsImpl : DateTimeUtils {
                     "pl",
                     "ro",
                     "pt",
-                    "de" -> defaultLocale
+                    "de" -> locale
                     else -> {
-                        // Force Locale to English (US)
-                        US
+                        null
                     }
                 }
             }

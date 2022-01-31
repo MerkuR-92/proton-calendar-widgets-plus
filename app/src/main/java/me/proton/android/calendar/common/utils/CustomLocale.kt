@@ -14,7 +14,7 @@ object CustomLocale {
     fun apply(context: Context): Context {
         if (!CHANGE_LANGUAGE) return updateResources(context, "en-US")
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return updateResources(context, preferences.getString(SharedPreferencesKeys.APP_LANGUAGE, null) ?: "")
+        return updateResources(context, preferences.getString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, null) ?: "")
     }
 
     private fun updateResources(context: Context, locale: String): Context {
