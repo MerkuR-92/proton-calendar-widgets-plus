@@ -438,8 +438,24 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         val dateFormat = SimpleDateFormat("EEE", DateTimeUtilsImpl.getLocaleForFormatting())
         all_day_header.text = dateFormat.format(Date.from(date?.atStartOfDay(ZoneId.systemDefault())?.toInstant()))
         all_day_header_date.text = date?.dayOfMonth.toString()
-        all_day_layout.visibleOrGone(true)
-        all_day_header_date.visibleOrGone(true)
+
+        val allDayEventsCroppedListLayoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
+        allDayEventCroppedListAdapter =
+            DayViewAllDayEventAdapter { event ->
+                onEventClick(event)
+            }
+        all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
+
+        val allDayEventsMoreListLayoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
+        allDayEventListAdapter =
+            DayViewAllDayEventAdapter { event ->
+                onEventClick(event)
+            }
+        all_day_items_list.adapter = allDayEventListAdapter
 
         val dayMediator = MediatorLiveData<Pair<String, Boolean>>()
         dayMediator.addSource(calendarViewModel.timeZoneId) { value ->
@@ -583,12 +599,21 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     ) {
         val immutableDate = date ?: return
 
+        allDayEventCroppedListAdapter.setDate(immutableDate)
+        allDayEventListAdapter.setDate(immutableDate)
+
+        allDayEventCroppedListAdapter.setTimeFormatIs24Hour(timeFormatIs24Hour)
+        allDayEventListAdapter.setTimeFormatIs24Hour(timeFormatIs24Hour)
+
+        allDayEventCroppedListAdapter.setTimeZoneId(timeZoneId)
+        allDayEventListAdapter.setTimeZoneId(timeZoneId)
+
         if (day_view == null) return
 
         // TODO remove UserID livedata
         calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
             userId?.let {
-                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour)
+                getEvents(immutableDate, timeZoneId)
             }
         }
 
@@ -614,12 +639,12 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         immutableDate == selectedDate.plusDays(1))
             ) {
                 logger.v("ItemCalendarDayFragment: events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
-                getEvents(immutableDate, timeZoneId, timeFormatIs24Hour)
+                getEvents(immutableDate, timeZoneId)
             }
         }
     }
 
-    private fun getEvents(immutableDate: LocalDate, timeZoneId: String, timeFormatIs24Hour: Boolean) {
+    private fun getEvents(immutableDate: LocalDate, timeZoneId: String) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             logger.v("ItemCalendarDayFragment: events flow: remove already existing observer for $immutableDate")
             eventsLiveData.removeObservers(viewLifecycleOwner)
@@ -667,6 +692,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             }
 
                             val userEmails = calendarViewModel.getUserEmails() ?: arrayListOf()
+                            allDayEventCroppedListAdapter.setUserEmails(userEmails)
+                            allDayEventListAdapter.setUserEmails(userEmails)
 
                             allEvents = it.events
                             onEventsChange(timeZoneId, userEmails)
@@ -686,25 +713,9 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                             all_day_more_items_layout.removeAllViews()
 
                             /* Cropped list */
-                            val allDayEventsCroppedListLayoutManager =
-                                LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-                            all_day_items_cropped_list.layoutManager = allDayEventsCroppedListLayoutManager
-                            allDayEventCroppedListAdapter =
-                                DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
-                                    onEventClick(event)
-                                }
-                            all_day_items_cropped_list.adapter = allDayEventCroppedListAdapter
                             allDayEventCroppedListAdapter.submitList(croppedList)
 
                             /* Rest of the list */
-                            val allDayEventsMoreListLayoutManager =
-                                LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-                            all_day_items_list.layoutManager = allDayEventsMoreListLayoutManager
-                            allDayEventListAdapter =
-                                DayViewAllDayEventAdapter(userEmails, timeZoneId, timeFormatIs24Hour, immutableDate) { event ->
-                                    onEventClick(event)
-                                }
-                            all_day_items_list.adapter = allDayEventListAdapter
                             allDayEventListAdapter.submitList(moreEvents)
 
                             all_day_more_collapse_button.setOnSingleClickListener { view ->

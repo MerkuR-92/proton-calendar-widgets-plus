@@ -29,12 +29,29 @@ import me.proton.android.calendar.domain.model.Event
 import java.time.LocalDate
 
 class DayViewAllDayEventAdapter(
-    private val userEmails: List<String>,
-    private val timeZoneId: String,
-    private val timeFormatIs24Hour: Boolean,
-    private val date: LocalDate,
     private val clickListener: (Event) -> Unit
 ) : ListAdapter<Event, DayViewAllDayEventAdapter.ViewHolder>(EventDiffCallback()) {
+
+    private var userEmails: List<String>? = null
+    private var timeZoneId: String? = null
+    private var date: LocalDate? = null
+    private var timeFormatIs24Hour: Boolean? = null
+
+    fun setUserEmails(userEmails: List<String>) {
+        this.userEmails = userEmails
+    }
+
+    fun setTimeZoneId(timeZoneId: String) {
+        this.timeZoneId = timeZoneId
+    }
+
+    fun setTimeFormatIs24Hour(timeFormatIs24Hour: Boolean) {
+        this.timeFormatIs24Hour = timeFormatIs24Hour
+    }
+
+    fun setDate(date: LocalDate) {
+        this.date = date
+    }
 
     class EventDiffCallback : DiffUtil.ItemCallback<Event>() {
         override fun areItemsTheSame(oldItem: Event, newItem: Event): Boolean {
@@ -72,19 +89,24 @@ class DayViewAllDayEventAdapter(
 
         fun bind(event : Event, position : Int) {
 
-            val participationStatus = event.getParticipationStatus(userEmails)
+            val immutableTimeZoneId = timeZoneId
+            val immutableTimeFormatIs24Hour = timeFormatIs24Hour
+            val immutableDate = date
+            if (immutableTimeZoneId == null || immutableTimeFormatIs24Hour == null || immutableDate == null) return
+
+            val participationStatus = event.getParticipationStatus(userEmails ?: arrayListOf())
             viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
             eventItemTitle.text = if (event.summary.isNullOrEmpty()) view.context.getString(R.string.default_event_summary) else event.summary
-            if (!event.spansSingleDay(timeZoneId = timeZoneId)) {
-                if (event.getStart(timeZoneId).toLocalDate() == date && !event.isAllDay()) {
+            if (!event.spansSingleDay(timeZoneId = immutableTimeZoneId)) {
+                if (event.getStart(immutableTimeZoneId).toLocalDate() == date && !event.isAllDay()) {
                     eventItemTitle.text = view.context.getString(
                         R.string.multiple_days_event_summary,
-                        event.getStart(timeZoneId).formatTime(timeZoneId, timeFormatIs24Hour),
+                        event.getStart(immutableTimeZoneId).formatTime(immutableTimeZoneId, immutableTimeFormatIs24Hour),
                         eventItemTitle.text
                     )
                 }
-                eventItemTitleSide.text = event.formatFullDayCounter(date, timeZoneId)
+                eventItemTitleSide.text = event.formatFullDayCounter(immutableDate, immutableTimeZoneId)
                 eventItemTitleSide.visibleOrGone(true)
             } else eventItemTitleSide.visibleOrGone(false)
 
@@ -99,7 +121,7 @@ class DayViewAllDayEventAdapter(
 
             viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
 
-            if (event.isInThePast(timeZoneId)) {
+            if (event.isInThePast(immutableTimeZoneId)) {
                 eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))

@@ -11,7 +11,8 @@ import java.time.ZonedDateTime
 const val API_VERSION_CALENDAR = "v1"
 const val API_HOST = "api.protonmail.ch"
 const val BASE_URL = "https://$API_HOST/"
-const val API_APPLICATION_NAME = "AndroidCalendar"
+const val API_APPLICATION_NAME = "android-calendar"
+const val PROD_ID_APPLICATION_NAME = "AndroidCalendar"
 
 const val DEFAULT_DOMAIN_HOST = "protonmail.com"
 

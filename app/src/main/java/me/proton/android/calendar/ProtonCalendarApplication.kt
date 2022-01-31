@@ -12,6 +12,7 @@ import me.proton.android.calendar.common.logger.SentryTree
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.worker.SyncWorker
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
@@ -109,6 +110,9 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
+    @Inject
+    lateinit var appDatabase: AppDatabase
+
     private val logger: Logger by inject()
 
     override fun onCreate() {
@@ -140,7 +144,8 @@ class ProtonCalendarApplication : Application() {
                     sendEmailDirect,
                     publicAddressRepository,
                     networkManager,
-                    defaultSharedPreferencesProvider
+                    defaultSharedPreferencesProvider,
+                    appDatabase
                 )
             )
         }

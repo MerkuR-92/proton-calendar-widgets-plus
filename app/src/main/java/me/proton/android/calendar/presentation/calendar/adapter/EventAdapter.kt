@@ -34,13 +34,25 @@ import me.proton.core.util.kotlin.nullIfBlank
 import java.time.LocalDate
 
 class EventAdapter(
-    private val timeZoneId: String,
-    private val is24Hour: Boolean,
-    private val date: LocalDate,
     private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
 ) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
     private val userEmails = mutableListOf<String>()
+    private var timeZoneId: String? = null
+    private var is24Hour: Boolean? = null
+    private var date: LocalDate? = null
+
+    fun setDate(date: LocalDate) {
+        this.date = date
+    }
+
+    fun setTimeZoneId(timeZoneId: String) {
+        this.timeZoneId = timeZoneId
+    }
+
+    fun setTimeFormatIs24Hour(is24Hour: Boolean) {
+        this.is24Hour = is24Hour
+    }
 
     fun setUserEmails(userEmails: List<String>) {
         this.userEmails.clear()
@@ -55,7 +67,7 @@ class EventAdapter(
             }
         }
 
-        class PartialDayEventViewHolder(private val itemView: View, private val timeZoneId: String, private val is24Hour: Boolean) : EventViewHolder(
+        class PartialDayEventViewHolder(private val itemView: View) : EventViewHolder(
             itemView
         ) {
 
@@ -68,7 +80,7 @@ class EventAdapter(
             private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
 
             // TODO consider databinding
-            fun bind(event: Event, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, timeZoneId: String, is24Hour: Boolean, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
 
                 val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
 
@@ -130,7 +142,7 @@ class EventAdapter(
         }
 
         // TODO this viewholder can actually is used also for partial-day events, that span more than one day
-        class AllDayEventViewHolder(itemView: View, private val timeZoneId: String, private val is24Hour: Boolean) : EventViewHolder(itemView) {
+        class AllDayEventViewHolder(itemView: View) : EventViewHolder(itemView) {
 
 //            private val ivBackground: ImageView = itemView.findViewById(R.id.background)
 
@@ -149,7 +161,7 @@ class EventAdapter(
             private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
 
             // TODO consider databinding
-            fun bind(event: Event, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: Event, timeZoneId: String, is24Hour: Boolean, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
 
                 val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
                 viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
@@ -290,9 +302,7 @@ class EventAdapter(
                     R.layout.item_agenda_event_partial_day,
                     parent,
                     false
-                ),
-                timeZoneId,
-                is24Hour
+                )
             )
         } else {
             EventViewHolder.AllDayEventViewHolder(
@@ -300,26 +310,33 @@ class EventAdapter(
                     R.layout.item_agenda_event_all_day,
                     parent,
                     false
-                ),
-                timeZoneId,
-                is24Hour
+                )
             )
         }
     }
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
 
+        val immutableTimeZoneId = timeZoneId
+        val immutableTimeFormatIs24Hour = is24Hour
+        val immutableDate = date
+        if (immutableTimeZoneId == null || immutableTimeFormatIs24Hour == null || immutableDate == null) return
+
         when (holder) {
-            is EventViewHolder.HeaderViewHolder -> holder.bind(date)
+            is EventViewHolder.HeaderViewHolder -> holder.bind(immutableDate)
             is EventViewHolder.PartialDayEventViewHolder -> holder.bind(
                 getItem(position),
-                date,
+                immutableTimeZoneId,
+                immutableTimeFormatIs24Hour,
+                immutableDate,
                 userEmails,
                 clickListener
             )
             is EventViewHolder.AllDayEventViewHolder -> holder.bind(
                 getItem(position),
-                date,
+                immutableTimeZoneId,
+                immutableTimeFormatIs24Hour,
+                immutableDate,
                 userEmails,
                 clickListener
             )

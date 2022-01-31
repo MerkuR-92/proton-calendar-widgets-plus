@@ -10,7 +10,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/all_day_layout"
-        android:visibility="gone"
+        android:visibility="visible"
         tools:visibility="visible"
         android:background="@color/background_norm"
         android:elevation="1dp"
@@ -32,7 +32,7 @@
         <TextView
             android:id="@+id/all_day_header_date"
             style="@style/Text.Headline.Small"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:visibility="visible"
             android:layout_width="71dp"
             android:layout_height="wrap_content"
