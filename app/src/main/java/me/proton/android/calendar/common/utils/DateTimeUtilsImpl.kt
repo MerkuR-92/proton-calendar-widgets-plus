@@ -276,8 +276,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
                 val alternative = alternativeTimezones.firstOrNull { it.startsWith(timeZone.substringBefore("/")) } ?: alternativeTimezones.firstOrNull()
 
                 alternative ?: if (fallbackToDefault) TimeZone.getDefault().id else null
-            } else if (!windowsTimeZoneMap[timeZone.toLowerCase(getDefault()).replace(".", "")].isNullOrEmpty()) {
-                val windowsIdReplacement = windowsTimeZoneMap[timeZone.toLowerCase(getDefault()).replace(".", "")]
+            } else if (!windowsTimeZoneMap[timeZone.lowercase(getDefault()).replace(".", "")].isNullOrEmpty()) {
+                val windowsIdReplacement = windowsTimeZoneMap[timeZone.lowercase(getDefault()).replace(".", "")]
                     ?: return if (fallbackToDefault) TimeZone.getDefault().id
                     else null
                 fallbackTimeZone(windowsIdReplacement, fallbackToDefault)
@@ -340,8 +340,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
         val dateFormat = SimpleDateFormat("LLLL", getLocaleForFormatting())
         val formattedMonth = dateFormat.format(Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant()))
         if (capitalize)
-            return formattedMonth.substring(0, 1).toUpperCase(getLocaleForFormatting()) +
-                    formattedMonth.substring(1).toLowerCase(getLocaleForFormatting())
+            return formattedMonth.substring(0, 1).uppercase(getLocaleForFormatting()) +
+                    formattedMonth.substring(1).lowercase(getLocaleForFormatting())
         return formattedMonth
     }
 
@@ -362,7 +362,6 @@ object DateTimeUtilsImpl : DateTimeUtils {
         if (!CHANGE_LANGUAGE) return US
         val appDefaultLocale = getDefault()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val systemDefaultLocales = Resources.getSystem().configuration.locales
             val supportedLanguagesArray = arrayListOf(
                 "fr-ca",
                 "es-es",
@@ -377,10 +376,17 @@ object DateTimeUtilsImpl : DateTimeUtils {
                 "de",
                 "en"
             ).toTypedArray()
-            getSupportedLocaleOrNull(appDefaultLocale) ?: systemDefaultLocales.getFirstMatch(supportedLanguagesArray) ?: US // Fallback to English (US)
+            getSupportedLocaleOrNull(
+                appDefaultLocale
+            ) ?: Resources.getSystem().configuration.locales.getFirstMatch(
+                supportedLanguagesArray
+            ) ?: US // Fallback to English (US)
         } else {
-            val systemDefaultLocale = Resources.getSystem().configuration.locale
-            getSupportedLocaleOrNull(appDefaultLocale) ?: getSupportedLocaleOrNull(systemDefaultLocale) ?: US // Fallback to English (US)
+            getSupportedLocaleOrNull(
+                appDefaultLocale
+            ) ?: getSupportedLocaleOrNull(
+                Resources.getSystem().configuration.locale
+            ) ?: US // Fallback to English (US)
         }
     }
 
@@ -400,7 +406,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
                     "pl",
                     "ro",
                     "pt",
-                    "de" -> locale
+                    "de",
+                    "en" -> locale
                     else -> {
                         null
                     }

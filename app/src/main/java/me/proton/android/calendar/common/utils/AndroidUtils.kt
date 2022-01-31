@@ -976,8 +976,8 @@ object AndroidUtils {
 
     fun getInitials(name: String, takeFirstOnly: Boolean? = false): String {
         if (name.isBlank()) return ""
-        if (takeFirstOnly == true) return name.toUpperCase().take(1)
-        val initials = name.toUpperCase().split(' ')
+        if (takeFirstOnly == true) return name.uppercase().take(1)
+        val initials = name.uppercase().split(' ')
             .mapNotNull { it.firstOrNull()?.toString() }
             .reduce { acc, s -> acc + s }
         //Keep only the first and last initials

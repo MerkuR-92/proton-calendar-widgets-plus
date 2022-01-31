@@ -27,10 +27,10 @@ object ProtonUtilsImpl : ProtonUtils {
         //  Can be forced with forceCanonicalization when we are certain the address belongs to a Proton user.
         //  forceCanonicalization should be used when comparing email with an attendee email, but not for the organizer.
         //  forceCanonicalization should only be used when comparing email, but not when using the value (ex: DO NOT force when saving it or generating xpm tokens with it).
-        if (!forceCanonicalization && !isProtonDomain(email)) return email.toLowerCase(getLocaleForFormatting())
+        if (!forceCanonicalization && !isProtonDomain(email)) return email.lowercase(getLocaleForFormatting())
 
         val regex = Regex("(?:\\.|\\-|\\_|\\+.*)(?=.*@)")
-        return email.replace(regex, "").toLowerCase(getLocaleForFormatting())
+        return email.replace(regex, "").lowercase(getLocaleForFormatting())
     }
 
     override fun isProtonDomain(email: String): Boolean {
