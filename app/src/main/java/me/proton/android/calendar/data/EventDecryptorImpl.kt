@@ -1,6 +1,7 @@
 package me.proton.android.calendar.data
 
-import me.proton.android.calendar.common.logger.TimberLogger
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.EventDecryptor
@@ -24,11 +25,9 @@ class EventDecryptorImpl(
     )
 
     private val cache = mutableMapOf<CacheKey, CacheValue>()
+    private val mutex = Mutex()
 
-    // TODO better synchronisation, maybe coroutine scope
-    @Synchronized
-    override suspend fun decrypt(eventEntity: EventEntity): Event? {
-
+    override suspend fun decrypt(eventEntity: EventEntity): Event? = mutex.withLock {
         val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId)
         val cacheValue = cache[cacheKey]
         val cachedEntity = cacheValue?.eventEntity
@@ -69,8 +68,7 @@ class EventDecryptorImpl(
         }
     }
 
-    @Synchronized
-    override suspend fun clearCache() {
+    override suspend fun clearCache() = mutex.withLock {
         cache.clear()
     }
 
