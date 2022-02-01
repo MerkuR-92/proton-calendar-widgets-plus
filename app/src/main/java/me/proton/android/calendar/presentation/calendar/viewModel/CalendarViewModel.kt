@@ -90,11 +90,6 @@ class CalendarViewModel(
         viewModelJob.cancel()
     }
 
-    private lateinit var miniCalendarPager: ViewPager2
-    private lateinit var agendaPager: ViewPager2
-    private lateinit var agendaViewMode: ViewMode
-
-    var pagersInitialised = false
     var updateSelectedLocalDate: LocalDate? = null
 
     private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
@@ -249,15 +244,6 @@ class CalendarViewModel(
         calendarsRepository.shutdown()
     }
 
-    fun setCalendarPagers(miniCalendarPager: ViewPager2, agendaPager: ViewPager2, agendaViewMode: ViewMode?) {
-        this.miniCalendarPager = miniCalendarPager
-        this.agendaPager = agendaPager
-        agendaViewMode?.let {
-            this.agendaViewMode = agendaViewMode
-        }
-        pagersInitialised = true
-    }
-
     fun handleInitialDaySelection(date: LocalDate) {
         // Select specific date if it has been provided instead of default init value.
         // Lets us handle selected date when navigating back from event details / form if it was opened from a notification
@@ -284,59 +270,6 @@ class CalendarViewModel(
         }
 
         _selectedDate.value = date
-
-        // adjust Mini Calendar
-        val monthStartingDate = initialToday.withDayOfMonth(1)
-        val offset = ChronoUnit.MONTHS.between(monthStartingDate, date.withDayOfMonth(1)).toInt()
-        val monthStartingPosition =
-            if (viewMode.value == ViewMode.MONTH) (miniCalendarPager.adapter as MonthPagerAdapter).startingPosition
-            else (miniCalendarPager.adapter as MiniCalendarPagerAdapter).startingPosition
-        val miniCalendarIndex = monthStartingPosition + offset
-        if (miniCalendarPager.currentItem != miniCalendarIndex) {
-            // smooth-scroll only when switching between adjacent months
-            miniCalendarPager.post {
-                miniCalendarPager.setCurrentItem(miniCalendarIndex, Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1)
-            }
-        }
-
-        // adjust Agenda
-        val agendaAdapter =
-            when (val viewMode = viewMode.value) {
-                ViewMode.AGENDA -> {
-                    // Agenda view
-                    agendaViewMode = viewMode
-                    agendaPager.adapter as? AgendaPagerAdapter
-                }
-                ViewMode.DAY -> {
-                    // Day view
-                    agendaViewMode = viewMode
-                    agendaPager.adapter as? DayPagerAdapter
-                }
-                else -> {
-                    if (this::agendaViewMode.isInitialized) {
-                        if (agendaViewMode == ViewMode.AGENDA) agendaPager.adapter as? AgendaPagerAdapter
-                        else agendaPager.adapter as? DayPagerAdapter
-                    } else null
-                }
-            }
-        if (agendaAdapter != null) {
-            val startingDate =
-                if (agendaViewMode == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingDate
-                else (agendaPager.adapter as DayPagerAdapter).startingDate
-            val startingPosition =
-                if (agendaViewMode == ViewMode.AGENDA) (agendaAdapter as AgendaPagerAdapter).startingPosition
-                else (agendaPager.adapter as DayPagerAdapter).startingPosition
-
-            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, date).toInt()
-            val agendaIndex = startingPosition + selectedDayOffset
-
-            if (agendaPager.currentItem != agendaIndex) {
-                agendaPager.post {
-                    agendaPager.setCurrentItem(agendaIndex, false)
-                }
-            }
-        }
-
     }
 
     private fun calculateCalendarIndicators(events: List<Event>, timeZoneId: String): Map<LocalDate, List<String>> {
