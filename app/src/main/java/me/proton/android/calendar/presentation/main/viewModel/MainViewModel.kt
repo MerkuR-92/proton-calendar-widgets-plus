@@ -156,6 +156,8 @@ class MainViewModel(
         }
     }
 
+    fun containsIntent() = intents.isNotEmpty()
+    
     fun containsIntent(action: String) = intents.containsKey(action)
 
     /**
