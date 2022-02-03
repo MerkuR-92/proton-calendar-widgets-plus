@@ -11,8 +11,9 @@ import me.proton.core.domain.entity.UserId
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import javax.inject.Inject
 
-class UpdateAlarmsUseCase(
+class UpdateAlarmsUseCase @Inject constructor(
     private val logger: Logger,
     private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,

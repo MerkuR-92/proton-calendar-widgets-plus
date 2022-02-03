@@ -13,9 +13,9 @@ import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.equalsNoCase
+import javax.inject.Inject
 
-class UpdatePersonalPartUseCase(
-    private val logger: Logger,
+class UpdatePersonalPartUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
     private val cryptoContext: CryptoContext,

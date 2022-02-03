@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_general_settings.*
@@ -41,6 +43,7 @@ import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendar
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 
+@AndroidEntryPoint
 class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override val TAG: String
@@ -50,10 +53,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = true
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel()
-    private val mainViewModel: MainViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
+    private val eventViewModel: EventViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
     private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter

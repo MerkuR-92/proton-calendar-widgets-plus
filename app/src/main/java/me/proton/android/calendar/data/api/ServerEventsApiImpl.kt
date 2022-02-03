@@ -12,6 +12,7 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.GET
 import retrofit2.http.Path
+import javax.inject.Inject
 
 // ServerEvent is an Event happening in Event Loop
 
@@ -31,7 +32,7 @@ interface ServerEventsApiService : BaseRetrofitApi {
 
 }
 
-class ServerEventsApiImpl(private val apiProvider: ApiProvider) : ServerEventsApi {
+class ServerEventsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : ServerEventsApi {
 
     override suspend fun getLatestServerCoreEvent(userId: UserId): ApiResponse<LatestServerCoreEventApiResponse> =
         apiProvider.get<ServerEventsApiService>(userId).invoke {
@@ -157,7 +158,7 @@ data class ServerCalendarEventsApiResponse(
     @SerialName("CalendarAlarms")
     val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
     @SerialName("CalendarSubscriptions")
-    val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null
+    val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null,
 )
 
 

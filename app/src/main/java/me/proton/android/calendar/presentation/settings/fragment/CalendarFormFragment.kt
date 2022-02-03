@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -18,6 +19,7 @@ import androidx.navigation.fragment.navArgs
 import biweekly.component.VAlarm
 import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
 import kotlinx.android.synthetic.main.fragment_calendar_form.*
@@ -50,6 +52,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
+@AndroidEntryPoint
 class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     private val navigationArguments: CalendarFormFragmentArgs by navArgs()
@@ -61,11 +64,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = true
 
-    private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val mainViewModel: MainViewModel by sharedViewModel()
-
-    private val logger: Logger by inject()
+    private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var loadingAction: View
     private lateinit var buttonSave: View

@@ -58,7 +58,6 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Coroutin
     }
 
     private suspend fun syncServerEvents() {
-
         try {
             accountManager.getAccounts(AccountState.Ready).first().forEach {
                 syncServerEventsUseCase.execute(it.userId).ifSuccessAndLogErrors(logger) {}

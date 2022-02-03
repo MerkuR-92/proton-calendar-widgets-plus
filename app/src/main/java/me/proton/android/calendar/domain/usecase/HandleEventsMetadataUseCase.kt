@@ -13,11 +13,12 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 
 /**
  * Handles all the updates to Events in proton-event-loop.
  */
-class HandleEventsMetadataUseCase(
+class HandleEventsMetadataUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
@@ -62,7 +63,7 @@ class HandleEventsMetadataUseCase(
                                 calendarsRepository.persistEvents(*entities.toTypedArray())
 
                                 updateAlarmsUseCase.execute(userId.id, entities.map { it.id })
-                                fetchPublicKeysUseCase.execute(userId, entities)
+                                fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, eventEntities)
                                 widgetRefresher.refreshEventList()
                             }
 
@@ -102,7 +103,7 @@ class HandleEventsMetadataUseCase(
     /**
      * Events outside sensible range should not be fetched automatically.
      */
-    private fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean {
+    internal fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean {
 
         val startInstant = Instant.ofEpochSecond(metadata.startTime)
         val endInstant = Instant.ofEpochSecond(metadata.endTime)

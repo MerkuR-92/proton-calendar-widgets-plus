@@ -35,8 +35,9 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class HandleIcsUseCase(
+class HandleIcsUseCase @Inject constructor(
     private val logger: Logger,
     private val json: Json,
     private val userManager: UserManager,

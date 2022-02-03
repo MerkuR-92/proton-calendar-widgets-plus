@@ -207,6 +207,7 @@ dependencies {
     implementation "me.proton.core:data:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:data-room:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:domain:${rootProject.ext.version.proton_core}"
+    implementation "me.proton.core:event-manager:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:human-verification:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:key:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:mail-message:${rootProject.ext.version.proton_core}"

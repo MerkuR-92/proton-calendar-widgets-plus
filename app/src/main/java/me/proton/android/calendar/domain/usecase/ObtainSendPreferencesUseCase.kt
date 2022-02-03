@@ -27,12 +27,13 @@ import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.filterNullValues
+import javax.inject.Inject
 
 /**
  * Combines User's default MailSettings, Contact VCard data and Composer preferences
  * into [SendPreferences] used when sending emails.
  */
-class ObtainSendPreferencesUseCase(
+class ObtainSendPreferencesUseCase @Inject constructor(
     private val logger: Logger,
     private val contactEmailsRepository: ContactRepository,
     private val userManager: UserManager,

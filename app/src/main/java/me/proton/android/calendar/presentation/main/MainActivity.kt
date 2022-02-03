@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -95,16 +96,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private lateinit var navController: NavController
 
-    private val logger: Logger by inject()
-    private val widgetRefresher: WidgetRefresher by inject()
+    @Inject
+    lateinit var logger: Logger
+    @Inject
+    lateinit var widgetRefresher: WidgetRefresher
 
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
-    private val calendarViewModel: CalendarViewModel by viewModel()
-    private val eventViewModel: EventViewModel by viewModel()
-    private val mainViewModel: MainViewModel by viewModel()
-    private val accountViewModel: AccountViewModel by viewModel()
+    private val calendarViewModel: CalendarViewModel by viewModels()
+    private val eventViewModel: EventViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 

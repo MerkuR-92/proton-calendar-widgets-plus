@@ -1,12 +1,12 @@
 package me.proton.android.calendar.domain
 
 import biweekly.property.RecurrenceId
-import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.model.Event
 import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
+import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
@@ -63,6 +63,8 @@ interface CalendarsRepository {
     suspend fun refreshCalendars(userId: UserId): Boolean
 
     suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
+
+    suspend fun fetchCalendar(userId: UserId, calendarId: String): CalendarEntity?
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
@@ -140,6 +142,8 @@ interface CalendarsRepository {
 
     suspend fun deleteEventsById(ids: List<String>)
 
+    suspend fun deleteAllEvents(calendarId: String)
+
     suspend fun getEventsByUid(userId: UserId, eventUid: String): ApiResponse<EventsByUidApiResponse>
 
     suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse>
@@ -150,7 +154,6 @@ interface CalendarsRepository {
     suspend fun persistCalendarKey(calendarKey: CalendarKeyEntity) // calendarId is already there
 
     suspend fun deleteCalendarKeyById(id: String)
-
 
     // passphrases
     suspend fun selectPassphrases(calendarId: String): List<PassphraseEntity>
@@ -240,6 +243,8 @@ interface CalendarsRepository {
     suspend fun deleteEventAlarmsForEvent(eventId: String)
 
     suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long)
+
+    suspend fun deleteAllEventAlarms(calendarId: String)
 
     val fetchingState: Flow<FetchingState>
 

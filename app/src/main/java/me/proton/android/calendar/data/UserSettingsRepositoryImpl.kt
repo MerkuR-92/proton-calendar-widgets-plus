@@ -5,8 +5,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.UserSettingsRepository
+import javax.inject.Inject
 
-class UserSettingsRepositoryImpl(
+class UserSettingsRepositoryImpl @Inject constructor(
     private val database: AppDatabase
 ) : UserSettingsRepository {
 

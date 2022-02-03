@@ -38,11 +38,12 @@ import me.proton.core.util.kotlin.toInt
 import java.time.*
 import java.time.temporal.TemporalAdjusters
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class CalendarsRepositoryImpl(
+class CalendarsRepositoryImpl @Inject constructor(
     private val database: AppDatabase,
     private val transformEventUseCase: TransformEventUseCase,
     private val logger: Logger,
@@ -371,6 +372,16 @@ class CalendarsRepositoryImpl(
             null
         } else {
             calendarsResponse.data.calendars
+        }
+    }
+
+    override suspend fun fetchCalendar(userId: UserId, calendarId: String): CalendarEntity? {
+        val calendarsResponse = calendarsApi.getCalendar(userId, calendarId)
+        return if (calendarsResponse !is ApiResponse.Success) {
+            logger.e("error getting calendar from API in CalendarsRepositoryImpl")
+            null
+        } else {
+            calendarsResponse.data.calendar
         }
     }
 
@@ -863,6 +874,10 @@ class CalendarsRepositoryImpl(
         database.eventsDao().deleteByIds(ids)
     }
 
+    override suspend fun deleteAllEvents(calendarId: String) {
+        database.eventsDao().deleteAll(calendarId)
+    }
+
     override suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity> {
         return database.calendarKeysDao().select(calendarId)//.distinctUntilChanged()
     }
@@ -1002,6 +1017,10 @@ class CalendarsRepositoryImpl(
 
     override suspend fun selectEventAlarm(eventAlarmId: String): EventAlarmEntity? {
         return database.eventAlarmsDao().select(eventAlarmId)
+    }
+
+    override suspend fun deleteAllEventAlarms(calendarId: String) {
+        database.eventAlarmsDao().deleteAll(calendarId)
     }
 
     override suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity> {

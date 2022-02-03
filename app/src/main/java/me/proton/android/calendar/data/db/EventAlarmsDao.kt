@@ -29,4 +29,7 @@ abstract class EventAlarmsDao : BaseDao<EventAlarmEntity> {
     @Query("DELETE FROM event_alarms WHERE eventId = :eventId AND occurrence = :occurrence")
     abstract suspend fun deleteAllByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
+    @Query("DELETE FROM event_alarms WHERE calendarId = :calendarId")
+    abstract suspend fun deleteAll(calendarId: String)
+
 }

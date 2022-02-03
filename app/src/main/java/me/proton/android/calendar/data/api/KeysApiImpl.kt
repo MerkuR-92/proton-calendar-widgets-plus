@@ -8,6 +8,7 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.GET
 import retrofit2.http.Query
+import javax.inject.Inject
 
 interface KeysApiService : BaseRetrofitApi {
 
@@ -16,7 +17,7 @@ interface KeysApiService : BaseRetrofitApi {
 
 }
 
-class KeysApiImpl(private val apiProvider: ApiProvider) : KeysApi {
+class KeysApiImpl @Inject constructor(private val apiProvider: ApiProvider) : KeysApi {
 
     override suspend fun getPublicKeys(userId: UserId, email: String): ApiResponse<PublicKeysApiResponse> =
         apiProvider.get<KeysApiService>(userId).invoke {

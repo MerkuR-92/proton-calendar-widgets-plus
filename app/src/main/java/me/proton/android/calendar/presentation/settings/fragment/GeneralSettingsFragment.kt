@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_general_settings.*
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -29,6 +31,7 @@ import org.koin.core.KoinComponent
 import java.time.DayOfWeek
 import java.time.Instant
 
+@AndroidEntryPoint
 class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override val TAG: String
@@ -38,8 +41,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = true
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val mainViewModel: MainViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()

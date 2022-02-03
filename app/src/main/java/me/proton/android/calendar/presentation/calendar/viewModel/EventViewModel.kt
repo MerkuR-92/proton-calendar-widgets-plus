@@ -14,6 +14,7 @@ import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,9 +75,11 @@ import me.proton.core.util.kotlin.toBoolean
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class EventViewModel(
+@HiltViewModel
+class EventViewModel @Inject constructor(
     application: Application,
     private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,

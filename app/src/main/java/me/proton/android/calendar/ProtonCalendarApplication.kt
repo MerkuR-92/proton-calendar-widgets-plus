@@ -1,8 +1,10 @@
 package me.proton.android.calendar
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
@@ -111,9 +113,10 @@ class ProtonCalendarApplication : Application() {
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
     @Inject
-    lateinit var appDatabase: AppDatabase
+    lateinit var logger: Logger
 
-    private val logger: Logger by inject()
+    @Inject
+    lateinit var appDatabase: AppDatabase
 
     override fun onCreate() {
         super.onCreate()
@@ -160,14 +163,16 @@ class ProtonCalendarApplication : Application() {
 
         ShowNotificationUseCase.createNotificationChannels(this)
 
-        SyncWorker.setup(this, logger)
-
         accountStateHandler.start()
 
         forceUpdateViewModel.forceUpdate.observe(ProcessLifecycleOwner.get()) {
             if (it.forceUpdate) {
                 startActivity(ForceUpdateActivity(this, it.apiErrorMessage))
             }
+        }
+
+        if (!FeatureFlag.USE_EVENT_MANAGER) {
+            SyncWorker.setup(this, logger)
         }
     }
 

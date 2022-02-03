@@ -7,8 +7,9 @@ import me.proton.android.calendar.domain.Logger
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import javax.inject.Inject
 
-class CalendarUserSettingsChangedUseCase(
+class CalendarUserSettingsChangedUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val database: AppDatabase,

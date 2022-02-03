@@ -29,8 +29,9 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
+import javax.inject.Inject
 
-class TransformEventUseCase(
+class TransformEventUseCase @Inject constructor(
     private val json: Json,
     private val database: AppDatabase,
     private val userManager: UserManager,

@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -162,6 +163,8 @@ internal class SyncServerEventsUseCaseTest {
 
             assert(useCase.execute(userId) is UseCase.Result.Success<*>)
 
+            if (FeatureFlag.USE_EVENT_MANAGER) return@runBlocking
+
             coVerify(exactly = 1) {
                 bootstrapCalendarsUseCaseMock.executeBootstrap(newCalendarEntity, userId, "Europe/Zurich")
             }
@@ -292,6 +295,8 @@ internal class SyncServerEventsUseCaseTest {
             )
 
             assert(useCase.execute(userId) is UseCase.Result.Success<*>)
+
+            if (FeatureFlag.USE_EVENT_MANAGER) return@runBlocking
 
             coVerify(exactly = 1) {
                 calendarsRepositoryMock.persistEvents(any(), captureCoroutine())

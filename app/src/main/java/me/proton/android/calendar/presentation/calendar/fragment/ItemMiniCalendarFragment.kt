@@ -12,7 +12,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
@@ -31,21 +33,20 @@ import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.FragmentArguments.STARTING_POSITION_ARG
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.*
 import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 import kotlin.math.ceil
 
-
-class ItemMiniCalendarFragment() : Fragment(), KoinComponent {
+@AndroidEntryPoint
+class ItemMiniCalendarFragment : Fragment() {
     private var position: Int? = null
     private var startingPosition: Int? = null
     private var date: LocalDate? = null
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val logger: Logger by inject()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    @Inject
+    lateinit var logger: Logger
 
     private var timeZoneId: String? = null
     private var weekStart: DayOfWeek? = null

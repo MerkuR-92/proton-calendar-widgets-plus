@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import biweekly.component.VAlarm
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -37,8 +38,10 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
+import javax.inject.Inject
 
-class CalendarFormViewModel(
+@HiltViewModel
+class CalendarFormViewModel @Inject constructor(
     application: Application,
     private val json: Json,
     private val resourceProvider: ResourceProvider,

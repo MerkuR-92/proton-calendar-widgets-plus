@@ -31,8 +31,9 @@ import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
+import javax.inject.Inject
 
-class EditCreateEventUseCase(
+class EditCreateEventUseCase @Inject constructor(
     private val logger: Logger,
     private val json: Json,
     private val calendarsApi: CalendarsApi,

@@ -8,6 +8,7 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.GET
 import retrofit2.http.Query
+import javax.inject.Inject
 
 interface AddressesApiService : BaseRetrofitApi {
 
@@ -15,7 +16,7 @@ interface AddressesApiService : BaseRetrofitApi {
     suspend fun getCanonicalEmails(@Query("Emails[]") emails: List<String>): CanonicalEmailsApiResponse
 }
 
-class AddressesApiImpl(private val apiProvider: ApiProvider) : AddressesApi {
+class AddressesApiImpl @Inject constructor(private val apiProvider: ApiProvider) : AddressesApi {
 
     override suspend fun getCanonicalEmails(userId: UserId, emails: List<String>): ApiResponse<CanonicalEmailsApiResponse> =
         apiProvider.get<AddressesApiService>(userId).invoke {

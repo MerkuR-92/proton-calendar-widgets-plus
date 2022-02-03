@@ -6,27 +6,20 @@ import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.utils.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 import java.time.ZoneId
+import javax.inject.Inject
 
-class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
+class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
-    private val addressesApi: AddressesApi,
-    private val keysApi: KeysApi,
-    private val crypto: Crypto,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
-    private val database: AppDatabase
 ) : UseCase {
-    
+
     suspend fun execute(
         userId: UserId,
         calendarIds: List<String>,
@@ -109,7 +102,7 @@ class FetchEventsUseCase( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
 
                     }.awaitAll()
 
-                    fetchPublicKeysUseCase.execute(userId, resultsEventsPairs.flatMap { it.second })
+                    fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, resultsEventsPairs.flatMap { it.second })
 
                     Pair(resultsEventsPairs.flatMap { it.first }, resultsEventsPairs.flatMap { it.second })
                 }

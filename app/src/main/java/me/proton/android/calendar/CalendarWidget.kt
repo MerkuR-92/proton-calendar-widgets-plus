@@ -16,8 +16,12 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import biweekly.parameter.ParticipationStatus
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
@@ -45,6 +49,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDate
 import java.time.ZoneId
+import javax.inject.Inject
 
 interface WidgetRefresher {
     /**
@@ -58,7 +63,7 @@ interface WidgetRefresher {
     fun refreshEventList()
 }
 
-class CalendarWidgetRefresher(private val context: Context) : WidgetRefresher {
+class CalendarWidgetRefresher @Inject constructor(@ApplicationContext private val context: Context) : WidgetRefresher {
 
     override fun broadcastRefresh() {
         CalendarWidget.sendRefreshBroadcast(context)
@@ -586,7 +591,7 @@ internal class CalendarWidgetRemoteViewsFactory(
         } else {
             remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.INVISIBLE)
         }
-        
+
         widgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
 
     }

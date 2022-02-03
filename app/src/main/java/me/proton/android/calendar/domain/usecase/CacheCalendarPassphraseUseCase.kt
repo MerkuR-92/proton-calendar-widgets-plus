@@ -8,12 +8,13 @@ import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.*
 import me.proton.core.user.domain.UserManager
+import javax.inject.Inject
 
 /**
  * We can decrypt and cache CalendarPassphrase locally, but we need to update it whenever
  * we get Server Event with Passphrase payload.
  */
-class CacheCalendarPassphraseUseCase( // TODO TEST
+class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
     private val database: AppDatabase,
     private val json: Json,
     private val cryptoContext: CryptoContext,

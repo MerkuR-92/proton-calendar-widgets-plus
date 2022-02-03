@@ -32,8 +32,9 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
+import javax.inject.Inject
 
-class HandleSaveUseCase(
+class HandleSaveUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val transformEventUseCase: TransformEventUseCase,

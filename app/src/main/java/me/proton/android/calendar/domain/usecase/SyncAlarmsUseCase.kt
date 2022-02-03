@@ -7,9 +7,10 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import java.time.*
 import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 
 
-class SyncAlarmsUseCase(
+class SyncAlarmsUseCase @Inject constructor(
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val calendarsApi: CalendarsApi,
@@ -26,7 +27,7 @@ class SyncAlarmsUseCase(
     private val ALARMS_CACHE_STEP_SIZE = Duration.ofDays(5)
     private val ALARMS_REQUEST_PAGE_SIZE = 100 // server supports maximum 100
 
-    suspend fun execute(userId: UserId): UseCase.Result {
+    suspend fun execute(userId: UserId, force: Boolean = false): UseCase.Result {
 
         logger.v("executing SyncAlarmsUseCase")
 
@@ -40,7 +41,7 @@ class SyncAlarmsUseCase(
             // skip sync for this calendar if last successful sync happend recently
             val lastSuccessfulSyncTimestamp = valueStore.getLongFromSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id)
             val lastSuccessfulSyncDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastSuccessfulSyncTimestamp ?: 0L), ZoneId.of("UTC"))
-            if (lastSuccessfulSyncDate.plus(ALARMS_CACHE_OVERLAP_WINDOW_SIZE).isBefore(syncStartDate)) {
+            if (force || lastSuccessfulSyncDate.plus(ALARMS_CACHE_OVERLAP_WINDOW_SIZE).isBefore(syncStartDate)) {
                 logger.v("have to sync alarms calendar ${it.name}, at $syncStartDate")
                 val result = handleCalendarAlarms(userId, it)
                 result.ifSuccessAndLogErrors(logger) {

@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.Dispatchers
@@ -35,17 +38,17 @@ import me.proton.android.calendar.presentation.calendar.adapter.DayViewAllDayEve
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.core.user.domain.entity.UserAddress
-import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.LocalDate
+import javax.inject.Inject
 import java.util.*
 
+@AndroidEntryPoint
+class ItemCalendarAgendaFragment: Fragment() {
 
-class ItemCalendarAgendaFragment() : Fragment(), KoinComponent {
+    @Inject
+    lateinit var logger: Logger
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val logger: Logger by inject()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
 
     private var position: Int? = null
     private var date: LocalDate? = null

@@ -46,7 +46,6 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 object ICalUtilsImpl : ICalUtils {
 
     override fun parseICalString(iCalendar: String): ICalendar? {

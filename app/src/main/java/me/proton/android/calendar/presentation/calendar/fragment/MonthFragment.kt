@@ -14,6 +14,8 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -22,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.chip_group_day_of_week.*
 import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.fragment_base.*
@@ -78,12 +81,15 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MonthFragment : BaseFragment() {
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val accountViewModel: AccountViewModel by sharedViewModel()
-    private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
+    @Inject
+    lateinit var handleAlarmsUseCase: HandleAlarmsUseCase
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
     private lateinit var agendaPagerAdapter: AgendaPagerAdapter
@@ -94,7 +100,7 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var toolbarTitle: TextView
 
-    private val mainViewModel: MainViewModel by viewModel()
+    private val mainViewModel: MainViewModel by viewModels()
 
     override val TAG: String
         get() = "CalendarFragment"

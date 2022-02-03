@@ -8,8 +8,9 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import javax.inject.Inject
 
-class EventDecryptorImpl(
+class EventDecryptorImpl @Inject constructor(
     private val transformEventUseCase: TransformEventUseCase,
     private val database: AppDatabase
 ): EventDecryptor {

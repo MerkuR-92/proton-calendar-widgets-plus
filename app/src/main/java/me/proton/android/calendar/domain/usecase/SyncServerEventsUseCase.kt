@@ -1,5 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
+import androidx.work.ListenableWorker
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
@@ -23,6 +25,8 @@ class SyncServerEventsUseCase(
     }
 
     suspend fun execute(userId: UserId): UseCase.Result {
+
+        if (FeatureFlag.USE_EVENT_MANAGER) return UseCase.Result.Success<Unit>()
 
         logger.v("executing SyncServerEventsUseCase for $userId")
 

@@ -9,9 +9,10 @@ import com.proton.gopenpgp.crypto.Crypto.*
 import com.proton.gopenpgp.helper.Helper
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
+import javax.inject.Inject
 
 
-class CryptoImpl(private val logger: Logger) : Crypto {
+class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
 
     override fun generateUserPassphrase(passphrase: ByteArray, encodedSalt: String): ByteArray {
         val decodedKeySalt: ByteArray = Base64.decode(encodedSalt, Base64.DEFAULT)
