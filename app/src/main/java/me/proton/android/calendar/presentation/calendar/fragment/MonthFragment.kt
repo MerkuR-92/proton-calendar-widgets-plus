@@ -359,15 +359,6 @@ class MonthFragment : BaseFragment() {
 
         agendaPager.registerOnPageChangeCallback(agendaPageChangeCallback)
 
-        // Init view pagers in VM
-        calendarViewModel.setCalendarPagers(
-            miniCalendarPager,
-            agendaPager,
-            calendarViewModel.viewMode.value?.let {
-                if (it != ViewMode.MONTH) it else null
-            }
-        )
-
         // Init selected date
         val navArgsDate = navigationArguments.date
         val navigationDate = if (navArgsDate == null) {
@@ -399,6 +390,35 @@ class MonthFragment : BaseFragment() {
                     )
                 ) {
                     adjustMiniCalendarView(firstDayOfMonth, startWeekOn)
+                }
+            }
+
+            // Handle selected day change in mini calendar pager
+            if (miniCalendarPager.adapter != null) {
+                val monthStartingDate = calendarViewModel.initialToday.withDayOfMonth(1)
+                val offset = ChronoUnit.MONTHS.between(monthStartingDate, selectedDate.withDayOfMonth(1)).toInt()
+                val miniCalendarIndex = monthStartingPosition + offset
+                if (miniCalendarPager.currentItem != miniCalendarIndex) {
+                    // smooth-scroll only when switching between adjacent months
+                    miniCalendarPager.post {
+                        miniCalendarPager.setCurrentItem(
+                            miniCalendarIndex,
+                            Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1
+                        )
+                    }
+                }
+            }
+
+            // Handle selected day change in agenda pager
+            if (agendaPager.adapter != null) {
+                val startingDate = dayPagerAdapter.startingDate
+                val startingPosition = dayPagerAdapter.startingPosition
+                val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                val agendaIndex = startingPosition + selectedDayOffset
+                if (agendaPager.currentItem != agendaIndex) {
+                    agendaPager.post {
+                        agendaPager.setCurrentItem(agendaIndex, false)
+                    }
                 }
             }
         }
@@ -738,10 +758,6 @@ class MonthFragment : BaseFragment() {
             // TODO Try and see if this is still needed
             // (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
             // (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
-        }
-        if (miniCalendarPager != null && agendaPager != null) {
-            // Set the calendar pagers in VM
-            calendarViewModel.setCalendarPagers(miniCalendarPager, agendaPager, if (viewMode != ViewMode.MONTH) viewMode else null)
         }
 
         if (viewMode == ViewMode.MONTH) {

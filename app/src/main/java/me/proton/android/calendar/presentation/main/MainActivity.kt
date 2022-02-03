@@ -225,12 +225,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
-            if (!shouldHandleIntent(intent)) return
-            mainViewModel.handleIntent(intent)
-            with(accountViewModel) {
-                val state = state.value
-                if (state != AccountViewModel.State.Ready) logger.i("onNewIntent accountViewModel state was not ready: $state")
-                handleAccountState(this, state)
+            if (shouldHandleIntent(intent)) {
+                mainViewModel.handleIntent(intent)
             }
         }
     }
@@ -239,7 +235,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onResume()
         with(accountViewModel) {
             val state = state.value
-            if (state == AccountViewModel.State.Ready && navController.currentDestination?.id == R.id.rootFragment) {
+            if (mainViewModel.containsIntent()) {
+                handleAccountState(this, state)
+            } else if (state == AccountViewModel.State.Ready && navController.currentDestination?.id == R.id.rootFragment) {
                 logger.i("MainActivity onResume force handleAccountState to get out of limbo")
                 handleAccountState(this, state)
             }
@@ -442,14 +440,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         Toast.makeText(this, getString(R.string.snack_app_link_signed_out), Toast.LENGTH_LONG).show()
                     }
                 }
-                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(Navigation.Deeplink.toRoot())
                 accountViewModel.addAccount()
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
             AccountViewModel.State.Ready -> {
-                // Default navigate to root
-                navController.navigate(Navigation.Deeplink.toRoot())
-
                 val eventDetailsIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
@@ -604,12 +598,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
         val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
         lifecycleScope.launch {
-            displaySplashScreen(
-                display = true,
-                spinner = true,
-                spinnerText = resources.getString(R.string.splash_init)
-            )
-
             val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader, senderEmail, recipientEmail)
             if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
                 when (handleIcsImportResult.action) {
