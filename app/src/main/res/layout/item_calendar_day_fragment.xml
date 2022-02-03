@@ -20,7 +20,7 @@
         <TextView
             android:id="@+id/all_day_header"
             style="@style/Text.Caption.Strong"
-            android:textColor="@color/text_hint"
+            android:textColor="@color/text_weak"
             android:layout_width="71dp"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/all_day_header_date"
-            style="@style/Text.Headline.Small"
+            style="@style/Text.Subheadline"
             android:visibility="visible"
             tools:visibility="visible"
             android:layout_width="71dp"

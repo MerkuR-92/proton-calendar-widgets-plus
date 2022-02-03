@@ -470,7 +470,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                     all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
                     all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
                 } else {
-                    all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
+                    all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
                     all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
                 }
 

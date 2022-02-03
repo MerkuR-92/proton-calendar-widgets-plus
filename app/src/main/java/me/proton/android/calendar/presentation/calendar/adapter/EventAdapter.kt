@@ -23,15 +23,16 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.setStripedBackground
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatWithDayOfWeek
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter.EventViewHolder.HeaderViewHolder
 import me.proton.core.util.kotlin.nullIfBlank
 import java.time.LocalDate
+import java.time.ZoneId
 
 class EventAdapter(
     private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
@@ -62,8 +63,13 @@ class EventAdapter(
     sealed class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         class HeaderViewHolder(itemView: View) : EventViewHolder(itemView) {
-            fun bind(date: LocalDate) {
-                itemView.text_header.text = date.formatWithDayOfWeek(showDayOfWeek = true)
+            fun bind(date: LocalDate, timeZoneId: String) {
+                if (date == LocalDate.now(ZoneId.of(timeZoneId))) {
+                    itemView.text_header.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
+                } else {
+                    itemView.text_header.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                }
+                itemView.text_header.text = itemView.context.getString(R.string.agenda_header_date, date.formatDayOfWeek(), date.dayOfMonth)
             }
         }
 
@@ -323,7 +329,10 @@ class EventAdapter(
         if (immutableTimeZoneId == null || immutableTimeFormatIs24Hour == null || immutableDate == null) return
 
         when (holder) {
-            is EventViewHolder.HeaderViewHolder -> holder.bind(immutableDate)
+            is EventViewHolder.HeaderViewHolder -> holder.bind(
+                immutableDate,
+                immutableTimeZoneId
+            )
             is EventViewHolder.PartialDayEventViewHolder -> holder.bind(
                 getItem(position),
                 immutableTimeZoneId,
