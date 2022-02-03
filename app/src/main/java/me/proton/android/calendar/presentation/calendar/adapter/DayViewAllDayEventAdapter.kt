@@ -126,9 +126,9 @@ class DayViewAllDayEventAdapter(
                 eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
 
-                if (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED) {
+                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
-                } else if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     AndroidUtils.setStripedBackground(
                         viewBackgroundStriped,
