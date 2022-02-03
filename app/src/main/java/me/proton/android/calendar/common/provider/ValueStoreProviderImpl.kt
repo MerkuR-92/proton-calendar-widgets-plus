@@ -4,12 +4,16 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStore
 import me.proton.android.calendar.domain.ValueStoreProvider
+import javax.inject.Inject
 
 
-class ValueStoreProviderImpl(private val sharedPreferencesProvider: SharedPreferencesProvider) : ValueStoreProvider {
+class ValueStoreProviderImpl @Inject constructor(
+    private val sharedPreferencesProvider: SharedPreferencesProvider
+) : ValueStoreProvider {
 
     private val valueStores = mutableMapOf<String, ValueStore>()
 
@@ -76,7 +80,7 @@ class ValueStoreProviderImpl(private val sharedPreferencesProvider: SharedPrefer
 }
 
 // TODO instrumented test
-class SharedPreferencesProvider(private val applicationContext: Context) {
+class SharedPreferencesProvider @Inject constructor(@ApplicationContext private val applicationContext: Context) {
 
     private val encryptedSharedPreferences = mutableMapOf<String, SharedPreferences>()
 

@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.AlarmAction
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
@@ -15,11 +16,12 @@ import me.proton.core.domain.entity.UserId
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class HandleAlarmsUseCase(
+class HandleAlarmsUseCase @Inject constructor(
     private val logger: Logger,
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val database: AppDatabase,
     private val showNotificationUseCase: ShowNotificationUseCase,
     private val valueStoreProvider: ValueStoreProvider

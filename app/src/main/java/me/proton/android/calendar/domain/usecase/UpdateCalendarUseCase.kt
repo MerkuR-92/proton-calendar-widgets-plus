@@ -11,8 +11,9 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
+import javax.inject.Inject
 
-class UpdateCalendarUseCase(
+class UpdateCalendarUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,

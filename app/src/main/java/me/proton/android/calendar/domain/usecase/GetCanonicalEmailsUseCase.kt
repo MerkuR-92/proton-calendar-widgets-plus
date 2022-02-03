@@ -4,12 +4,13 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.core.domain.entity.UserId
+import javax.inject.Inject
 
 private const val MAX_EMAILS_PER_QUERY: Int = 8
 
 // TODO move this class to core
 
-class GetCanonicalEmailsUseCase(
+class GetCanonicalEmailsUseCase @Inject constructor(
     private val addressesApi: AddressesApi,
     private val logger: Logger
 ) {

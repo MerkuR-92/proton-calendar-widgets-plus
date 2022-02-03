@@ -25,8 +25,9 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import javax.inject.Inject
 
-class HandleDeleteUseCase( // TODO TESTS
+class HandleDeleteUseCase @Inject constructor( // TODO TESTS
     private val logger: Logger, // TODO remove unnecessary dependencies
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val calendarsApi: CalendarsApi,

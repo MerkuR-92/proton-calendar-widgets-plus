@@ -24,6 +24,9 @@ import me.proton.core.contact.data.local.db.entity.ContactEntity
 import me.proton.core.crypto.android.keystore.CryptoConverters
 import me.proton.core.data.room.db.BaseDatabase
 import me.proton.core.data.room.db.CommonConverters
+import me.proton.core.eventmanager.data.db.EventManagerConverters
+import me.proton.core.eventmanager.data.db.EventMetadataDatabase
+import me.proton.core.eventmanager.data.entity.EventMetadataEntity
 import me.proton.core.humanverification.data.db.HumanVerificationConverters
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.humanverification.data.entity.HumanVerificationEntity
@@ -70,6 +73,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         ContactEmailEntity::class,
         ContactEmailLabelEntity::class,
         ContactEntity::class,
+        EventMetadataEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -94,6 +98,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
     HumanVerificationConverters::class,
     UserSettingsConverters::class,
     ContactConverters::class,
+    EventManagerConverters::class,
     // Calendar
     DatabaseTypeConverters::class
 )
@@ -108,7 +113,8 @@ abstract class AppDatabase :
     MailSettingsDatabase,
     UserSettingsDatabase,
     OrganizationDatabase,
-    ContactDatabase {
+    ContactDatabase,
+    EventMetadataDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -139,7 +145,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 34
+        const val version = 35
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -156,6 +162,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_31_32,
             AppDatabaseMigrations.MIGRATION_32_33,
             AppDatabaseMigrations.MIGRATION_33_34,
+            AppDatabaseMigrations.MIGRATION_34_35,
         )
 
         fun buildDatabase(context: Context): AppDatabase =
@@ -166,6 +173,7 @@ abstract class AppDatabase :
                 .addMigrations(AppDatabaseMigrations.MIGRATION_28_29(context))
                 // Add new post v29 migrations.
                 .apply { migrations.forEach { addMigrations(it) } }
+                .enableMultiInstanceInvalidation()
                 .build()
     }
 }

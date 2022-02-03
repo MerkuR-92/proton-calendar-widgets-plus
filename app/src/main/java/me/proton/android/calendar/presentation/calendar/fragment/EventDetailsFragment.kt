@@ -14,6 +14,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
@@ -29,6 +30,7 @@ import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Organizer
 import biweekly.property.Status
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.event_attendees_view.*
 import kotlinx.android.synthetic.main.event_info.view.*
 import kotlinx.android.synthetic.main.fragment_base_dialog.*
@@ -79,10 +81,11 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
-
+@AndroidEntryPoint
 class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override val TAG = "EventDetailsFragment"
@@ -98,12 +101,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
 
-    private val logger: Logger by inject()
+    @Inject
+    lateinit var logger: Logger
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel()
-    private val accountViewModel: AccountViewModel by sharedViewModel()
-    private val mainViewModel: MainViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val eventViewModel: EventViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private fun jumpToMonthView() {
         // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
@@ -225,6 +229,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             getString(R.string.event_answer_no)
         section_answer.item_change_answer_button_maybe.item_change_answer_button_title.text =
             getString(R.string.event_answer_maybe)
+
+        // `by activityViewModels` is lazy and must be resolved in main thread so sadly, this is needed
+        eventViewModel
 
         lifecycleScope.launch {
 

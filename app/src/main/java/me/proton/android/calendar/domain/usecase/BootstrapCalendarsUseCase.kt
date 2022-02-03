@@ -13,11 +13,12 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Sets up all the user's calendars, call this only once after successful login.
  */
-class BootstrapCalendarsUseCase( // TODO TEST
+class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val settingsApi: SettingsApi,

@@ -62,6 +62,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("DELETE FROM events WHERE id IN (:ids)")
     abstract suspend fun deleteByIds(ids: List<String>)
 
+    @Query("DELETE FROM events WHERE calendarId = :calendarId")
+    abstract suspend fun deleteAll(calendarId: String)
+
     // TODO select for given timespan
 
 }

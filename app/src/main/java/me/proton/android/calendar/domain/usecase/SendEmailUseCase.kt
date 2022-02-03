@@ -32,8 +32,9 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.util.*
+import javax.inject.Inject
 
-class SendEmailUseCase(
+class SendEmailUseCase @Inject constructor(
     private val logger: Logger,
     private val sendEmailDirectUseCase: SendEmailDirect,
     private val userManager: UserManager,

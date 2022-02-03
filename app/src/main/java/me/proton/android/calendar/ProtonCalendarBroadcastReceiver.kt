@@ -5,22 +5,26 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.worker.SyncWorker
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import javax.inject.Inject
 
-class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
+@AndroidEntryPoint
+class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
 
-    private val logger: Logger by inject()
-    private val accountManager: AccountManager by inject()
+    @Inject
+    lateinit var logger: Logger
+    @Inject
+    lateinit var accountManager: AccountManager
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -36,7 +40,9 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver(), KoinComponent {
                 if (context == null) {
                     logger.e("null Context in ProtonCalendarBroadcastReceiver ACTION_BOOT_COMPLETED")
                 } else {
-                    SyncWorker.setup(context, logger)
+                    if (!FeatureFlag.USE_EVENT_MANAGER) {
+                        SyncWorker.setup(context, logger)
+                    }
 
                     try {
                         GlobalScope.launch(Dispatchers.IO) {

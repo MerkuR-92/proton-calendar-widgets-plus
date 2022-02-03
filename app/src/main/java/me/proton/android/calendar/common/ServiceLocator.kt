@@ -14,6 +14,8 @@ import me.proton.android.calendar.data.EventDecryptorImpl
 import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.di.AppDatabaseModule_ProvideAppDatabaseFactory
+import me.proton.android.calendar.di.CalendarsModule_ProvideKotlinxJsonFactory
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
 import me.proton.android.calendar.domain.usecase.*
@@ -47,7 +49,7 @@ import org.koin.dsl.module
  */
 
 val commonModule = module {
-    single<Json> { Json { ignoreUnknownKeys = true } }
+    single<Json> { CalendarsModule_ProvideKotlinxJsonFactory.provideKotlinxJson() }
     single<ICalUtilsImpl> { ICalUtilsImpl } // TODO maybe extract interface
     single<Logger> { TimberLogger }
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
@@ -80,7 +82,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
             get(),
@@ -96,8 +98,8 @@ val viewModelModule = module {
 }
 
 val useCaseModule = module {
-    factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get()) }
-    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
+    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarsUseCase> { BootstrapCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
@@ -123,7 +125,7 @@ val useCaseModule = module {
     factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get()) }
     factory<SendEmailUseCase> { SendEmailUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleIcsUseCase> { HandleIcsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get(), get()) }
+    factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get()) }
     factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get()) }
 }

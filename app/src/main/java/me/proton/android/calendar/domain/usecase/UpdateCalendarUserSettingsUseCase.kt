@@ -8,8 +8,9 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toInt
+import javax.inject.Inject
 
-class UpdateCalendarUserSettingsUseCase(
+class UpdateCalendarUserSettingsUseCase @Inject constructor(
     private val logger: Logger,
     private val settingsApi: SettingsApi,
     private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,

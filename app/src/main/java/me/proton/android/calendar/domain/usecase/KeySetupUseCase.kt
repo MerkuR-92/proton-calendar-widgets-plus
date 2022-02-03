@@ -15,8 +15,9 @@ import me.proton.core.key.domain.entity.keyholder.KeyHolderPrivateKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
+import javax.inject.Inject
 
-class KeySetupUseCase(
+class KeySetupUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,

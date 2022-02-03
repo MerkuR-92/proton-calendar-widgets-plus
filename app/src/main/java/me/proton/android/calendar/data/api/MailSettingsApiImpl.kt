@@ -10,6 +10,7 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import me.proton.core.util.kotlin.toBoolean
 import retrofit2.http.GET
+import javax.inject.Inject
 
 interface MailSettingsApiService : BaseRetrofitApi {
 
@@ -18,7 +19,7 @@ interface MailSettingsApiService : BaseRetrofitApi {
 
 }
 
-class MailSettingsApiImpl(private val apiProvider: ApiProvider) : MailSettingsApi {
+class MailSettingsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : MailSettingsApi {
 
     override suspend fun getMailSettings(userId: UserId): ApiResponse<MailSettingsApiResponse> =
         apiProvider.get<MailSettingsApiService>(userId).invoke {

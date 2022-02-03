@@ -13,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.dialog_checkbox.view.*
 import kotlinx.android.synthetic.main.fragment_settings.*
@@ -57,17 +58,18 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
+import javax.inject.Inject
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
-class CalendarViewModel(
+@HiltViewModel
+class CalendarViewModel @Inject constructor(
     application: Application,
     private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,
     private val userSettingsRepository: UserSettingsRepository,
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
-    private val valueStoreProvider: ValueStoreProvider,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,

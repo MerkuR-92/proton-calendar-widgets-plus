@@ -12,6 +12,8 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.*
 import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface CalendarsApiService : BaseRetrofitApi {
 
@@ -101,7 +103,7 @@ interface CalendarsApiService : BaseRetrofitApi {
     ) : UpdateCalendarSettingsApiResponse
 }
 
-class CalendarsApiImpl(private val apiProvider: ApiProvider) : CalendarsApi {
+class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : CalendarsApi {
 
     override suspend fun getCalendars(userId: UserId): ApiResponse<CalendarsApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {

@@ -6,7 +6,9 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
@@ -15,18 +17,19 @@ import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.usecase.*
-import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
+import me.proton.core.account.domain.repository.AccountRepository
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import java.io.BufferedReader
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     application: Application,
-    private val accountViewModel: AccountViewModel,
+    private val accountRepository: AccountRepository,
     private val handleIcsUseCase: HandleIcsUseCase,
     private val networkManager: NetworkManager,
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
@@ -182,7 +185,7 @@ class MainViewModel(
     }
 
     suspend fun handleIcsFile(bufferedReader: BufferedReader, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
-        val userId = accountViewModel.getPrimaryUserId() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
+        val userId = accountRepository.getPrimaryUserId().firstOrNull() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
         val iCalString = bufferedReader.use { it.readText() }
         if (isConnectedToNetwork.not()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)

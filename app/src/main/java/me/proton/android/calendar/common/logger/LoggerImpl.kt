@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common.logger
 
 import me.proton.android.calendar.BuildConfig
+import me.proton.core.eventmanager.data.LogTag
 import me.proton.core.network.data.ProtonErrorException
 import me.proton.core.util.kotlin.Logger
 import me.proton.core.util.kotlin.LoggerLogTag
@@ -62,7 +63,9 @@ object LoggerImpl : Logger {
     override fun v(tag: String, e: Throwable, message: String) =
         Timber.tag(tag).v(e, message)
 
-    override fun log(tag: LoggerLogTag, message: String) = if (BuildConfig.DEBUG) {
-        Timber.tag(tag.name).d(message)
-    } else Unit
+    override fun log(tag: LoggerLogTag, message: String) =
+        when {
+            tag.name == LogTag.REPORT_MAX_RETRY.name -> Timber.tag(tag.name).e(message)
+            else -> Timber.tag(tag.name).d(message)
+        }
 }

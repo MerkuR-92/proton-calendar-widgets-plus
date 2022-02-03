@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.Duration
+import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartForNotification
@@ -24,10 +25,11 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import javax.inject.Inject
 
-class ShowNotificationUseCase(
+class ShowNotificationUseCase @Inject constructor(
     private val logger: Logger,
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val transformEventUseCase: TransformEventUseCase,
     private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,

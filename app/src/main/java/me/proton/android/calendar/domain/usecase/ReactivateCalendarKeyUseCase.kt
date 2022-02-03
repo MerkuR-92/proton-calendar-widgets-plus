@@ -18,8 +18,9 @@ import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.equalsNoCase
+import javax.inject.Inject
 
-class ReactivateCalendarKeyUseCase(
+class ReactivateCalendarKeyUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val json: Json,
