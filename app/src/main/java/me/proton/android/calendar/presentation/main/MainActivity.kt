@@ -457,26 +457,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     val occurrenceNumber = eventDetailsIntent.data?.getQueryParameter("occurrenceNumber")
                     if (eventId != null && occurrenceNumber != null) {
                         val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, occurrenceNumber.toInt())
-                        navigateTo(eventDetailsDeepLink)
+                        safeNavigateToDialogFragment(eventDetailsDeepLink)
                     } else {
                         logger.e("could not get eventId/occurrenceNumber from INTENT_ACTION_SHOW_EVENT_DETAILS")
-                        navigateTo(Navigation.Deeplink.toMonth())
+                        safeNavigateToMonth()
                     }
 
                 } else if (newEventIntent != null) {
 
-                    navigateTo(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtilsImpl.generateEventStartTime(ZoneId.systemDefault())))
+                    safeNavigateToDialogFragment(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtilsImpl.generateEventStartTime(ZoneId.systemDefault())))
 
                 } else if (showDayIntent != null && showDayIntent.data != null) {
 
                     val dayToShow = showDayIntent.data?.getQueryParameter("date")?.let { LocalDate.parse(it) }
-
-                    if (dayToShow != null) {
-                        navigateTo(Navigation.Deeplink.toMonth(dayToShow))
-                    } else {
-                        logger.e("could not get date from INTENT_ACTION_SHOW_DAY")
-                        navigateTo(Navigation.Deeplink.toMonth())
-                    }
+                    safeNavigateToMonth(dayToShow)
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
@@ -497,10 +491,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 handleAppLinkIntent(eventId, calendarId, recurrenceId)
                             } else {
                                 this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
-                                navigateTo(Navigation.Deeplink.toMonth())
+                                safeNavigateToMonth()
                             }
-                        } else navigateTo(Navigation.Deeplink.toMonth())
-                    } else navigateTo(Navigation.Deeplink.toMonth())
+                        } else safeNavigateToMonth()
+                    } else safeNavigateToMonth()
                 }
             }
             AccountViewModel.State.Processing -> {
@@ -512,29 +506,65 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
+    private fun safeNavigateToMonth(dayToShow: LocalDate? = null) {
+        if (calendarViewModel.initialised) {
+            // If CalendarViewModel was initialised already, we try to pop backstack up to MonthFragment and just update the selected date
+            if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar ||
+                safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.nav_calendar, false)) {
+                if (dayToShow != null) calendarViewModel.handleDaySelected(dayToShow)
+            } else {
+                // If we failed to pop backstack up to MonthFragment then we go through navigateTo
+                if (dayToShow != null) navigateTo(Navigation.Deeplink.toMonth(dayToShow))
+                else navigateTo(Navigation.Deeplink.toMonth())
+            }
+        } else {
+            // If CalendarViewModel was not initialised yet, we go through navigateTo in order to perform initForUser
+            safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.nav_calendar, true)
+            if (dayToShow != null) navigateTo(Navigation.Deeplink.toMonth(dayToShow))
+            else navigateTo(Navigation.Deeplink.toMonth())
+        }
+    }
+
+    private fun safeNavigateToDialogFragment(uri: Uri) {
+        when (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id) {
+            R.id.nav_settings,
+            R.id.nav_general_settings,
+            R.id.nav_calendar_form,
+            R.id.nav_bug_report,
+            R.id.nav_event_details,
+            R.id.nav_event_form,
+            R.id.nav_event_form_attendees,
+            R.id.nav_event_form_alarm,
+            R.id.nav_event_form_recurrence -> {
+                safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.nav_calendar, false)
+            }
+        }
+        navigateTo(uri)
+    }
+
     private fun handleIcsIntent(openIcsIntent: Intent) {
         val uri = openIcsIntent.data
         if (uri != null) {
             val senderEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_SENDER_EMAIL)
             val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)
             handleOpenIcsIntent(uri, senderEmail, recipientEmail)
-        } else navigateTo(Navigation.Deeplink.toMonth())
+        } else safeNavigateToMonth()
     }
 
     private fun handleAppLinkIntent(eventId: String, calendarId: String, recurrenceId: String) {
         lifecycleScope.launch {
             val userId = accountViewModel.getPrimaryUserId()
             if (userId == null) {
-                navigateTo(Navigation.Deeplink.toMonth())
+                safeNavigateToMonth()
                 return@launch // TODO Display error ?
             }
             when (val handleEventLinkResult = eventViewModel.handleEventLink(userId, eventId, calendarId, recurrenceId)) {
                 is EventViewModel.EventLinkResult.Success -> {
                     val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, handleEventLinkResult.occurrenceNumber)
-                    navigateTo(eventDetailsDeepLink)
+                    safeNavigateToDialogFragment(eventDetailsDeepLink)
                 }
                 is EventViewModel.EventLinkResult.DecryptionFailed -> {
-                    navigateTo(Navigation.Deeplink.toMonth())
+                    safeNavigateToMonth()
                     val confirmationMessage =
                         if (handleEventLinkResult.event.isRecurring()) R.string.event_decryption_error_dialog_confirmation_recurring
                         else R.string.event_decryption_error_dialog_confirmation
@@ -566,15 +596,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
                 is EventViewModel.EventLinkResult.EventDoesNotExist -> {
                     this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
-                    navigateTo(Navigation.Deeplink.toMonth())
+                    safeNavigateToMonth()
                 }
                 is EventViewModel.EventLinkResult.OccurrenceDoesNotExist -> {
                     this@MainActivity.displaySnackBar(getString(R.string.error_occurrence_does_not_exist))
-                    navigateTo(Navigation.Deeplink.toMonth())
+                    safeNavigateToMonth()
                 }
                 is EventViewModel.EventLinkResult.Error -> {
                     this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_error))
-                    navigateTo(Navigation.Deeplink.toMonth())
+                    safeNavigateToMonth()
                 }
             }
         }
@@ -585,7 +615,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         if (!OPEN_ICS_FILES) {
             if (senderEmail == null || recipientEmail == null) {
                 this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
-                navigateTo(Navigation.Deeplink.toMonth())
+                safeNavigateToMonth()
                 return
             }
         }
@@ -613,7 +643,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 val eventId = handleIcsImportResult.eventId
                 val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else 0)
-                navigateTo(eventDetailsDeepLink)
+                safeNavigateToDialogFragment(eventDetailsDeepLink)
             } else {
                 var navigatedToDetails = false
                 when (handleIcsImportResult) {
@@ -647,7 +677,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
                 }
 
-                if (!navigatedToDetails) navigateTo(Navigation.Deeplink.toMonth())
+                if (!navigatedToDetails) safeNavigateToMonth()
             }
         }
     }
@@ -687,7 +717,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         return if (eventId != null) {
             Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_LONG).show()
             val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId)
-            navigateTo(eventDetailsDeepLink)
+            safeNavigateToDialogFragment(eventDetailsDeepLink)
             true
         } else {
             this@MainActivity.displaySnackBar(errorMessage, Snackbar.LENGTH_LONG)
@@ -739,9 +769,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
             accountViewModel.logoutPrimary()
             displaySplashScreen(true, spinnerText = "")
-            if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar) {
-                safeFindNavController(R.id.nav_host_fragment_container_view).navigateUp()
-            }
+            safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.rootFragment, false)
             drawer_layout.close()
         }
         nav_view_main_content.nav_view_more_login_press.setOnSingleClickListener {
