@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
-            if (shouldHandleIntent(intent)) {
+            if (mainViewModel.shouldHandleIntent(intent)) {
                 mainViewModel.handleIntent(intent)
             }
         }
@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onResume()
         with(accountViewModel) {
             val state = state.value
-            if (mainViewModel.containsIntent()) {
+            if (mainViewModel.containsIntentToHandle()) {
                 handleAccountState(this, state)
             } else if (state == AccountViewModel.State.Ready && navController.currentDestination?.id == R.id.rootFragment) {
                 logger.i("MainActivity onResume force handleAccountState to get out of limbo")
@@ -257,22 +257,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private fun shouldHandleIntent(intent: Intent): Boolean {
-        return intent.action == INVITE_PROTON_INTENT_ACTION ||
-                intent.action == Intent.ACTION_VIEW ||
-                intent.type == INVITE_ICS_MIME_TYPE ||
-                intent.action == MainViewModel.INTENT_ACTION_NEW_EVENT ||
-                intent.action == MainViewModel.INTENT_ACTION_SHOW_DAY ||
-                intent.action == MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         handleAppTheme()
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
         if (!isTaskRoot &&
-            !shouldHandleIntent(intent)
+            !mainViewModel.shouldHandleIntent(intent)
         ) {
             // Android launched another instance of the root activity into an existing task
             //  so just quietly finish and go away, dropping the user back into the activity
@@ -308,7 +299,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             ), drawer_layout
         )
 
-        intent?.let { if (savedInstanceState == null) mainViewModel.handleIntent(intent) }
+        intent?.let {
+            if (savedInstanceState == null && mainViewModel.shouldHandleIntent(intent)) mainViewModel.handleIntent(intent)
+        }
 
         with(accountViewModel) {
             init(this@MainActivity)
@@ -1042,5 +1035,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(CustomLocale.apply(newBase))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (this::updateCalendarsJob.isInitialized && updateCalendarsJob.isActive) {
+            updateCalendarsJob.cancel()
+        }
     }
 }
