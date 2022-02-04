@@ -124,6 +124,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     null
                 )
             if (viewModeInitStatus == EventViewModel.InitResult.Success) {
+                requireActivity().clearFocusAndHideKeyboard(view)
                 findNavController().navigateUp()
             } else {
                 when (viewModeInitStatus) {
@@ -157,17 +158,16 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
-                requireActivity().clearFocusAndHideKeyboard(view)
                 jumpToMonthView()
             }
         } else {
-            requireActivity().clearFocusAndHideKeyboard(view)
             jumpToMonthView()
         }
         return true
     }
 
     private fun jumpToMonthView() {
+        requireActivity().clearFocusAndHideKeyboard(view)
         if (!findNavController().popBackStack(R.id.nav_calendar, false)) {
             // TODO this is a workaround for navigating back to month view after opening EventForm from EventDetails
             //  that was opened from system notification
@@ -195,6 +195,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                 // Go back to main view if no changes have been made
                 if (navigationArguments.eventId?.isNotEmpty() == true && eventViewModel.hasEventBeenEdited().not()) {
+                    requireActivity().clearFocusAndHideKeyboard(view)
                     findNavController().navigateUp()
                     return@setOnSingleClickListener
                 }
