@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     when (it) {
                         CalendarsRepository.InitingState.Initing -> {
                             withContext(Dispatchers.Main) {
-                                displaySplashScreen(true, true, resources.getString(R.string.splash_init))
+                                displaySplashScreen(true, resources.getString(R.string.splash_init))
                             }
                             logger.v("regular init, waiting in main activity")
                         }
@@ -506,7 +506,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             AccountViewModel.State.Processing -> {
                 displaySplashScreen(
                     display = true,
-                    spinner = true,
                     spinnerText = resources.getString(R.string.splash_after_login_init)
                 )
             }
@@ -696,12 +695,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    fun displaySplashScreen(display: Boolean, spinner: Boolean = false, spinnerText: String? = null) {
+    fun displaySplashScreen(display: Boolean, spinnerText: String? = null) {
         // TODO Status bar and navigation bar colors are set to brand_norm on dark / light mode change because of activity recreation
 
-        if (spinner) {
-            calendarViewModel.fetchingEvents.postValue(spinnerText)
-        }
+        calendarViewModel.fetchingEvents.postValue(spinnerText)
 
         drawer_layout.setDrawerLockMode(if (display) LOCK_MODE_LOCKED_CLOSED else LOCK_MODE_UNLOCKED)
 
@@ -741,6 +738,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         })
         nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
             accountViewModel.logoutPrimary()
+            displaySplashScreen(true, spinnerText = "")
+            if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar) {
+                safeFindNavController(R.id.nav_host_fragment_container_view).navigateUp()
+            }
             drawer_layout.close()
         }
         nav_view_main_content.nav_view_more_login_press.setOnSingleClickListener {
