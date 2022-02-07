@@ -131,7 +131,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.shutdown()
 
             } else {
-
                 calendarViewModel.initForUser(userId).collect {
                     when (it) {
                         CalendarsRepository.InitingState.Initing -> {
@@ -153,10 +152,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             logger.v("regular init, got finished")
                             withContext(Dispatchers.Main) {
                                 displaySplashScreen(false)
-
-                                // Refresh drawer content now that we are logged in.
-                                initDrawerHeader()
-                                initDrawerCalendarsListContent()
 
                                 safeFindNavController(R.id.nav_host_fragment_container_view).navigate(uri)
                             }
@@ -190,10 +185,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.commit()
     }
 
-    private fun restartApplication() {
+    private fun restartActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
+    }
+
+    private fun restartApplication() {
+        restartActivity()
         Runtime.getRuntime().exit(0)
     }
 
@@ -209,18 +208,35 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         editor.apply()
 
         handleAppTheme()
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
     }
 
     private fun handleAppTheme() {
+        val defaultNightMode = AppCompatDelegate.getDefaultNightMode()
         when (getAppTheme()) {
             AppTheme.LIGHT -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_YES ||
+                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+                    restartActivity()
+                }
             }
             AppTheme.DARK -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_NO ||
+                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+                    restartActivity()
+                }
             }
             else -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_NO ||
+                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+                    restartActivity()
+                }
             }
         }
     }
@@ -417,6 +433,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         initDrawerCalendarsList()
 
+        calendarViewModel.initialised.observe(this@MainActivity, Observer { initialised ->
+            if (initialised) {
+                // Refresh drawer content now that we are logged in.
+                initDrawerHeader()
+                initDrawerCalendarsListContent()
+            }
+        })
+
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
     }
@@ -436,6 +460,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         Toast.makeText(this, getString(R.string.snack_app_link_signed_out), Toast.LENGTH_LONG).show()
                     }
                 }
+                safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.rootFragment, false)
                 accountViewModel.addAccount()
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
@@ -507,7 +532,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun safeNavigateToMonth(dayToShow: LocalDate? = null) {
-        if (calendarViewModel.initialised) {
+        if (calendarViewModel.initialised.value == true) {
             // If CalendarViewModel was initialised already, we try to pop backstack up to MonthFragment and just update the selected date
             if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar ||
                 safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.nav_calendar, false)) {

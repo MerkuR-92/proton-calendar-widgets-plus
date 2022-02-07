@@ -235,7 +235,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
 
-            if (!calendarViewModel.initialised) {
+            if (calendarViewModel.initialised.value != true) {
                 //TODO Workaround since we create event details twice with current deeplink handling
                 return@launch
             }
