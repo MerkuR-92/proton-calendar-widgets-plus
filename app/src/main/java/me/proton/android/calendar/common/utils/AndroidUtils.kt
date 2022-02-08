@@ -25,11 +25,21 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.view.animation.Transformation
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ListAdapter
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.SimpleAdapter
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckedTextView
+import androidx.appcompat.widget.ListPopupWindow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Guideline
 import androidx.core.animation.doOnEnd
@@ -46,34 +56,38 @@ import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
-import kotlinx.android.synthetic.main.event_attendees_view.*
-import kotlinx.android.synthetic.main.item_popup_error.view.*
+import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_header
+import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_recycler_view
+import kotlinx.android.synthetic.main.item_popup_error.view.press_popup
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Animation.HEIGHT_CHANGE_DURATION
 import me.proton.android.calendar.common.CLICK_INTERVAL_MS
+import me.proton.android.calendar.common.MAX_ANIM_DURATION
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
-import me.proton.android.calendar.common.MAX_ANIM_DURATION
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import okhttp3.internal.toHexString
 import java.text.Normalizer
-import java.time.*
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.Period
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.WeekFields
-import java.util.*
+import java.util.Locale
 import java.util.Locale.getDefault
+import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.math.min
 
 object AndroidUtils {
@@ -145,7 +159,7 @@ object AndroidUtils {
         selectedIndex: Int,
         callback: (selectedIndex: Int, isCancel: Boolean) -> Unit
     ) {
-        var selectedItem: Int = 0
+        var selectedItem = 0
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         title?.apply { builder.setTitle(this) }
         builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
@@ -478,12 +492,15 @@ object AndroidUtils {
 
             TimberLogger.d("timezone start=${startTimeZone} format=${formatTimeZone}")
 
-            if (shouldShowRecurrenceTimeZone(recurrence) && startTimeZone?.id != null && formatTimeZone.id != startTimeZone.id) {
-                return "${label} (${formatTimeZone.id})"
+            return if (
+                shouldShowRecurrenceTimeZone(recurrence)
+                && startTimeZone?.id != null
+                && formatTimeZone.id != startTimeZone.id
+            ) {
+                "$label (${formatTimeZone.id})"
             } else {
-                return label
+                label
             }
-
         }
 
         return null
@@ -564,7 +581,7 @@ object AndroidUtils {
                     resources.getString(R.string.event_alarm_label_on_the_same_day)
                 } else null,
                 weeksFormatted?.let {
-                    "${it} ${
+                    "$it ${
                         resources.getQuantityString(
                             R.plurals.plural_week,
                             it,
@@ -573,7 +590,7 @@ object AndroidUtils {
                     }"
                 },
                 daysFormatted?.let {
-                    "${it} ${
+                    "$it ${
                         resources.getQuantityString(
                             R.plurals.plural_day,
                             it,
@@ -1038,7 +1055,7 @@ object AndroidUtils {
                     v.layoutParams.height = initialHeight - (initialHeight * interpolatedTime).toInt()
                     v.requestLayout()
                 }
-                TimberLogger.d("animation collapse : applyTransformation interpolatedTime = ${interpolatedTime} & height = ${v.layoutParams.height}")
+                TimberLogger.d("animation collapse : applyTransformation interpolatedTime = $interpolatedTime & height = ${v.layoutParams.height}")
             }
 
             override fun willChangeBounds(): Boolean {

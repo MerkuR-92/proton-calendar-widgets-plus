@@ -1,28 +1,46 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.util.Log
-import me.proton.android.calendar.common.logger.TestsLogger
-import me.proton.android.calendar.domain.*
-import me.proton.android.calendar.domain.api.ServerEventsApi
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventApiResponse
+import me.proton.android.calendar.data.api.LatestServerCalendarEventApiResponse
+import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
+import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
+import me.proton.android.calendar.data.api.toServerEventsApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.UserSettingsRepository
+import me.proton.android.calendar.domain.ValueKey
+import me.proton.android.calendar.domain.ValueSet
+import me.proton.android.calendar.domain.ValueStore
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.File
 
 // TODO add test for verification when there are different authors for different Event Parts
 

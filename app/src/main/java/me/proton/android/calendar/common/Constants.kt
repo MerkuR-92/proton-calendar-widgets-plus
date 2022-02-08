@@ -7,6 +7,7 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+typealias CalDuration = biweekly.util.Duration
 
 const val API_VERSION_CALENDAR = "v1"
 const val API_HOST = "api.protonmail.ch"
@@ -26,12 +27,12 @@ const val CLICK_INTERVAL_MS: Long = 500L
 
 const val WORKER_MAX_RETRY_COUNT = 5
 
-val SYNC_EVENTS_IN_APP_REFRESH_PERIOD = Duration.ofSeconds(30)
-val SYNC_EVENTS_PERIODIC_REFRESH_PERIOD = Duration.ofHours(1)
-val SYNC_EVENTS_PERIODIC_DELAY_START = Duration.ofMinutes(5)
+val SYNC_EVENTS_IN_APP_REFRESH_PERIOD: Duration = Duration.ofSeconds(30)
+val SYNC_EVENTS_PERIODIC_REFRESH_PERIOD: Duration = Duration.ofHours(1)
+val SYNC_EVENTS_PERIODIC_DELAY_START: Duration = Duration.ofMinutes(5)
 
-val SYNC_CALENDARS_DELAY = Duration.ofSeconds(3)
-val UPDATE_PASSPHRASE_CALENDARS_DELAY = Duration.ofSeconds(5)
+val SYNC_CALENDARS_DELAY: Duration = Duration.ofSeconds(3)
+val UPDATE_PASSPHRASE_CALENDARS_DELAY: Duration = Duration.ofSeconds(5)
 
 val REFRESH_CURRENT_TIME_INDICATOR = Duration.ofMinutes(1).toMillis()
 
@@ -61,10 +62,10 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 const val SESSION_KEY_ALGO = "aes256"
 
 val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
-val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
+const val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
-val PROTON_UID = "@proton.me"
-val PROTON_OLD_UID = "proton-calendar"
+const val PROTON_UID = "@proton.me"
+const val PROTON_OLD_UID = "proton-calendar"
 
 const val MAX_EMAILS_PER_QUERY: Int = 8
 
@@ -184,8 +185,12 @@ object AppLinksAction {
 
 object FormValidation {
 
-    val MIN_SUPPORTED_DATETIME = LocalDate.of(1970, 1, 1).atStartOfDay(ZoneId.of("UTC"))
-    val MAX_SUPPORTED_DATETIME = LocalDate.of(2038, 12, 31).atStartOfDay(ZoneId.of("UTC"))
+    val MIN_SUPPORTED_DATETIME: ZonedDateTime =
+        LocalDate.of(1970, 1, 1)
+            .atStartOfDay(ZoneId.of("UTC"))
+    val MAX_SUPPORTED_DATETIME: ZonedDateTime =
+        LocalDate.of(2038, 12, 31)
+            .atStartOfDay(ZoneId.of("UTC"))
 
     const val OCCURRENCE_COUNT_DEFAULT = 2
     const val OCCURRENCE_COUNT_MIN = 1
@@ -212,7 +217,6 @@ object FormValidation {
     const val EVENT_LOCATION_MAX_LENGTH = 255
     const val EVENT_DESCRIPTION_MAX_LENGTH = 3000
 
-
     const val ALARM_COUNT_MAX = 10
 
     const val ALARM_PERIOD_COUNT_ALL_DAY_DEFAULT = 1
@@ -237,10 +241,13 @@ object CalendarForm {
 
     val EVENT_DEFAULT_DURATION_MINUTES = listOf(30, 60, 90, 120)
 
-    val DEFAULT_PART_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).minutes(15).build(), Related.START), null)
-    val DEFAULT_PART_DAY_EMAIL_ALARM: VAlarm = VAlarm.email(Trigger(biweekly.util.Duration.builder().prior(true).minutes(15).build(), Related.START), null, null)
-    val DEFAULT_ALL_DAY_ALARM: VAlarm = VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(15).build(), Related.START), null)
-    val DEFAULT_ALL_DAY_EMAIL_ALARM: VAlarm = VAlarm.email(Trigger(biweekly.util.Duration.builder().prior(true).hours(15).build(), Related.START), null, null)
+    private val prior15Minutes = CalDuration.builder().prior(true).minutes(15).build()
+    private val prior15Hours = CalDuration.builder().prior(true).hours(15).build()
+
+    val DEFAULT_PART_DAY_ALARM = VAlarm.display(Trigger(prior15Minutes, Related.START), null)!!
+    val DEFAULT_PART_DAY_EMAIL_ALARM = VAlarm.email(Trigger(prior15Minutes, Related.START), null, null)!!
+    val DEFAULT_ALL_DAY_ALARM = VAlarm.display(Trigger(prior15Hours, Related.START), null)!!
+    val DEFAULT_ALL_DAY_EMAIL_ALARM = VAlarm.email(Trigger(prior15Hours, Related.START), null, null)!!
 }
 
 object FragmentArguments {

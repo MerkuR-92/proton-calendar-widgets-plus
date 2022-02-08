@@ -141,9 +141,11 @@ class MonthView : ViewGroup {
                     text.length,
                     gridItemStart + (gridItemWidth / 2),
                     gridItemTop,
-                    if (date == LocalDate.now(ZoneId.of(timeZoneId))) highlightDayTitlePaint
-                    else if (date.month != month) offsetDayTitlePaint
-                    else dayTitlePaint
+                    when {
+                        date == LocalDate.now(ZoneId.of(timeZoneId)) -> highlightDayTitlePaint
+                        date.month != month -> offsetDayTitlePaint
+                        else -> dayTitlePaint
+                    }
                 )
 
                 listIndex++
@@ -540,9 +542,11 @@ class MonthView : ViewGroup {
                 eventRectStrokePaint = Paint().apply {
                     style = Paint.Style.STROKE
                     color =
-                        if (isUnanswered) ContextCompat.getColor(context, R.color.background_norm)
-                        else if (pastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
-                        else calendarColor
+                        when {
+                            isUnanswered -> ContextCompat.getColor(context, R.color.background_norm)
+                            pastEvent -> ContextCompat.getColor(context, R.color.interaction_weak_norm)
+                            else -> calendarColor
+                        }
                     isAntiAlias = true
                 }
             }
@@ -632,11 +636,11 @@ class MonthView : ViewGroup {
             val end: Float
 
             // Mini event rect top
-            val top = ((row * gridItemHeight) +
+            val top = row * gridItemHeight +
                     headerHeight +
-                    (maxEventCount * eventHeight) +
-                    (maxEventCount * res.getDimension(R.dimen.month_view_event_top_margin)) +
-                    res.getDimension(R.dimen.month_view_mini_event_top_margin))
+                    maxEventCount * eventHeight +
+                    maxEventCount * res.getDimension(R.dimen.month_view_event_top_margin) +
+                    res.getDimension(R.dimen.month_view_mini_event_top_margin)
 
             // Mini event rect bottom
             val bottom = top + miniEventHeight

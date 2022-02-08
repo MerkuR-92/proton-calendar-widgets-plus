@@ -1,3 +1,4 @@
+@file:Suppress("MaxLineLength", "RedundantExplicitType")
 package me.proton.android.calendar.common
 
 import kotlinx.serialization.json.Json

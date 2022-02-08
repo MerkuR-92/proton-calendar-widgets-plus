@@ -1,14 +1,28 @@
 package me.proton.android.calendar.domain.usecase
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import assertk.fail
 import biweekly.Biweekly
 import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.parameter.Related
-import biweekly.property.*
+import biweekly.property.Attendee
+import biweekly.property.Organizer
+import biweekly.property.Status
+import biweekly.property.Transparency
+import biweekly.property.Trigger
 import biweekly.util.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.Date
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -19,8 +33,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import org.junit.jupiter.api.Test
-import java.time.*
-import java.util.*
 
 internal class EditCreateEventUseCaseTest {
 
@@ -131,7 +143,7 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.attendees[0].getParameter("X-PM-TOKEN")).isEqualTo("X-PM-TOKEN")
         }
         // TODO Attendees Part
-        
+
         // TODO sequence
         // recurrence id
         // RRULE

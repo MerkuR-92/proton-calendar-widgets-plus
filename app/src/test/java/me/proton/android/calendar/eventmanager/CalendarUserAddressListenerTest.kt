@@ -33,11 +33,22 @@ class CalendarUserAddressListenerTest {
     }
 
     @Test
-    fun `onCreateOrUpdate persists the user addresses`() {
+    fun `onCreate persists the user addresses`() {
         runBlocking {
             val addressResponse = createAddressResponse(addressId.id)
 
-            listener.onCreateOrUpdate(config, listOf(addressResponse))
+            listener.onCreate(config, listOf(addressResponse))
+
+            coVerify { userAddressRepository.updateAddresses(any()) }
+        }
+    }
+
+    @Test
+    fun `onUpdate persists the user addresses`() {
+        runBlocking {
+            val addressResponse = createAddressResponse(addressId.id)
+
+            listener.onUpdate(config, listOf(addressResponse))
 
             coVerify { userAddressRepository.updateAddresses(any()) }
         }

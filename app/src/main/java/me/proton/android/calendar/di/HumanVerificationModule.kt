@@ -1,11 +1,12 @@
 package me.proton.android.calendar.di
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import me.proton.android.calendar.common.API_HOST
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.humanverification.data.HumanVerificationListenerImpl
 import me.proton.core.humanverification.data.HumanVerificationManagerImpl
@@ -13,16 +14,18 @@ import me.proton.core.humanverification.data.HumanVerificationProviderImpl
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.humanverification.data.repository.HumanVerificationRepositoryImpl
 import me.proton.core.humanverification.data.repository.UserVerificationRepositoryImpl
+import me.proton.core.humanverification.data.utils.NetworkRequestOverriderImpl
 import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.domain.HumanVerificationWorkflowHandler
 import me.proton.core.humanverification.domain.repository.HumanVerificationRepository
 import me.proton.core.humanverification.domain.repository.UserVerificationRepository
-import me.proton.core.humanverification.presentation.CaptchaApiHost
+import me.proton.core.humanverification.domain.utils.NetworkRequestOverrider
+import me.proton.core.humanverification.presentation.HumanVerificationApiHost
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.network.data.ApiProvider
-import me.proton.core.network.domain.client.ClientIdProvider
 import me.proton.core.network.domain.humanverification.HumanVerificationListener
 import me.proton.core.network.domain.humanverification.HumanVerificationProvider
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 @Module
@@ -30,8 +33,8 @@ import javax.inject.Singleton
 object HumanVerificationModule {
 
     @Provides
-    @CaptchaApiHost
-    fun provideCaptchaApiHost(): String = API_HOST
+    @HumanVerificationApiHost
+    fun provideCaptchaApiHost(): String = "https://verify.protonmail.com"
 
     @Provides
     fun provideHumanVerificationOrchestrator(): HumanVerificationOrchestrator =
@@ -73,6 +76,12 @@ object HumanVerificationModule {
         humanVerificationRepository: HumanVerificationRepository
     ): HumanVerificationManagerImpl =
         HumanVerificationManagerImpl(humanVerificationProvider, humanVerificationListener, humanVerificationRepository)
+
+    @Provides
+    fun provideNetworkRequestOverrider(
+        @ApplicationContext context: Context,
+    ): NetworkRequestOverrider =
+        NetworkRequestOverriderImpl(OkHttpClient(), context)
 }
 
 @Module

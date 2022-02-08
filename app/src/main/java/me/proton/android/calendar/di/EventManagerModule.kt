@@ -29,7 +29,6 @@ import me.proton.core.eventmanager.domain.repository.EventMetadataRepository
 import me.proton.core.eventmanager.domain.work.EventWorkerManager
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.presentation.app.AppLifecycleProvider
-import me.proton.core.user.data.UserAddressEventListener
 import me.proton.core.user.data.UserEventListener
 import me.proton.core.usersettings.data.UserSettingsEventListener
 import javax.inject.Singleton

@@ -1,10 +1,8 @@
 package me.proton.android.calendar
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
@@ -39,7 +37,6 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
 import me.proton.core.util.kotlin.CoreLogger
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber

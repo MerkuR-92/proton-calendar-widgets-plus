@@ -4,19 +4,25 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 import at.favre.lib.crypto.bcrypt.Radix64Encoder
 import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.armor.Armor
-import com.proton.gopenpgp.crypto.*
-import com.proton.gopenpgp.crypto.Crypto.*
+import com.proton.gopenpgp.crypto.Crypto.generateSessionKey
+import com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored
+import com.proton.gopenpgp.crypto.Crypto.newKeyRing
+import com.proton.gopenpgp.crypto.KeyRing
+import com.proton.gopenpgp.crypto.PGPMessage
+import com.proton.gopenpgp.crypto.PGPSignature
+import com.proton.gopenpgp.crypto.PlainMessage
+import com.proton.gopenpgp.crypto.SessionKey
 import com.proton.gopenpgp.helper.Helper
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
 import javax.inject.Inject
 
-
 class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
 
     override fun generateUserPassphrase(passphrase: ByteArray, encodedSalt: String): ByteArray {
         val decodedKeySalt: ByteArray = Base64.decode(encodedSalt, Base64.DEFAULT)
-        val generatedUserPassphraseByteRawHash = BCrypt.with(BCrypt.Version.VERSION_2Y).hashRaw(10, decodedKeySalt, passphrase).rawHash
+        val generatedUserPassphraseByteRawHash = BCrypt.with(BCrypt.Version.VERSION_2Y)
+            .hashRaw(10, decodedKeySalt, passphrase).rawHash
         return Radix64Encoder.Default().encode(generatedUserPassphraseByteRawHash)
     }
 

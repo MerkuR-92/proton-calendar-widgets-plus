@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 object Navigation {
 
     object Deeplink {
-        fun toRoot() = Uri.parse("proton-calendar://protonmail.com/root")
+        fun toRoot() = Uri.parse("proton-calendar://protonmail.com/root")!!
         fun toMonth(selectedDate: LocalDate? = null): Uri {
             return Uri.parse(
                 "proton-calendar://protonmail.com/month" +

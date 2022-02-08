@@ -5,15 +5,15 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.fail
-import biweekly.property.DateTimeStamp
-import me.proton.android.calendar.common.logger.TestsLogger
-import me.proton.android.calendar.common.utils.ICalUtilsImpl
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
-import org.junit.jupiter.api.Test
 import java.text.SimpleDateFormat
-import java.time.*
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.TimeZone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import org.junit.jupiter.api.Test
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 internal class ICalTest {
 

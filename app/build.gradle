@@ -1,6 +1,6 @@
 plugins {
 //    id 'org.jetbrains.kotlin.multiplatform' version '1.4.10'
-    id 'org.jetbrains.kotlin.plugin.serialization' version "1.5.31"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.6.10"
 }
 
 apply plugin: 'com.android.application'
@@ -19,18 +19,14 @@ def storePass = project.hasProperty('keyStorePassword') ? keyStorePassword : "\"
 def storeKeyPass = project.hasProperty('keyStoreKeyPassword') ? keyStoreKeyPassword : "\"Store key password\""
 
 detekt {
-    failFast = false
     config = files("$projectDir/config/detekt/detekt.yml")
+}
+tasks.named("detekt").configure {
+    jvmTarget = "1.8"
     reports {
-        xml {
-            enabled = false
-        }
-        html {
-            enabled = true
-        }
-        txt {
-            enabled = false
-        }
+        xml.required.set(false)
+        html.required.set(true)
+        txt.required.set(false)
         custom {
             reportId = "DetektQualityOutputReport"
             destination = file("build/reports/detekt.json")
@@ -96,14 +92,14 @@ tasks.withType(Test) {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
     ndkVersion "21.3.6528147"
 
     defaultConfig {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 116
         versionName "0.30.7"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
@@ -149,8 +145,8 @@ android {
     }
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     testOptions {
         unitTests.all {
@@ -158,7 +154,7 @@ android {
         }
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     dataBinding {
         enabled = true
@@ -191,7 +187,7 @@ tasks.withType(Test) {
 
 dependencies {
 
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
 
@@ -298,7 +294,6 @@ dependencies {
 
     detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
     detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'
-    detektPlugins 'pm.algirdas.detekt:codeanalysis:0.3.3'
     detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
 
     androidTestImplementation "io.mockk:mockk-android:1.12.0"

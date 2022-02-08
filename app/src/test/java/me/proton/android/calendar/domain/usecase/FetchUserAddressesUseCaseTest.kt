@@ -2,7 +2,6 @@ package me.proton.android.calendar.domain.usecase
 
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 
 internal class FetchUserAddressesUseCaseTest {

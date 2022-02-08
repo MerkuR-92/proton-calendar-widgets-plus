@@ -5,7 +5,6 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 
-
 fun ApiResponse.Error.isTimeout(): Boolean {
     // TODO hardcoded string because there is no dedicated code for timeout
     return this.httpCode == 0 && this.errorCode == 0 && this.error == "timeout"

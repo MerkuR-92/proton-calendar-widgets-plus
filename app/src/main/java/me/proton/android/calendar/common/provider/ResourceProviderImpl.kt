@@ -2,9 +2,7 @@ package me.proton.android.calendar.common.provider
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import me.proton.android.calendar.R
 import me.proton.android.calendar.domain.ResourceProvider
 
 class ResourceProviderImpl(

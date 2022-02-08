@@ -4,8 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
-import androidx.work.*
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,6 +23,7 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import javax.inject.Inject
 
+@DelicateCoroutinesApi
 @AndroidEntryPoint
 class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
 
@@ -33,7 +39,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
             return
         }
 
-        logger.v("intent in ProtonCalendarBroadcastReceiver: ${intent}")
+        logger.v("intent in ProtonCalendarBroadcastReceiver: $intent")
 
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED -> {
@@ -91,7 +97,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    fun handleAlarms(userId: UserId, context: Context, alarmEpochSeconds: Long? = null): LiveData<Operation.State> {
+    private fun handleAlarms(userId: UserId, context: Context, alarmEpochSeconds: Long? = null): LiveData<Operation.State> {
 
         val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
             .setInputData(

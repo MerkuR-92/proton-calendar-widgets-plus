@@ -2,13 +2,12 @@ package me.proton.android.calendar.eventmanager.listeners.calendar
 
 import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.CacheCalendarPassphraseUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
-import me.proton.core.eventmanager.domain.EventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
