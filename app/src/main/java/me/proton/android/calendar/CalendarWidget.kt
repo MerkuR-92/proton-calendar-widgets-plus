@@ -17,11 +17,10 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import biweekly.parameter.ParticipationStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
@@ -83,8 +82,6 @@ class CalendarWidgetRefresher @Inject constructor(@ApplicationContext private va
  */
 class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
-    private val logger: Logger by inject()
-
     override fun onReceive(context: Context, intent: Intent?) {
         intent?.let {
             // manually refresh Widget when we get the refresh broadcast
@@ -130,8 +127,12 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         remoteViews.setTextViewText(R.id.tv_main_text, monthAndDay)
 
         // intent for "Open the App"
-        val openAppPendingIntent =
-            PendingIntent.getActivity(context, 0, createOpenAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT)
+        val openAppPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            createOpenAppIntent(context),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         remoteViews.setOnClickPendingIntent(R.id.rl_header_container, openAppPendingIntent)
 
         // open the app when user clicks on main info text
@@ -143,13 +144,17 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
                 context,
                 0,
                 createWidgetRefreshIntent(context),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         remoteViews.setOnClickPendingIntent(R.id.ib_refresh, refreshPendingIntent)
 
         // intent for "New Event"
-        val newEventPendingIntent =
-            PendingIntent.getActivity(context, 0, createNewEventIntent(context), PendingIntent.FLAG_UPDATE_CURRENT)
+        val newEventPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            createNewEventIntent(context),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         remoteViews.setOnClickPendingIntent(R.id.ib_plus, newEventPendingIntent)
 
         // intent for RemoteViewService that creates the ListView with Events
@@ -194,7 +199,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         return TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(intentTemplate)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
     companion object {
@@ -310,18 +315,22 @@ internal class CalendarWidgetRemoteViewsFactory(
             resourceProvider.provideString(R.string.event_all_day)
         } else {
             if (fullDayCounter.second > 1) { // multi-day part-day
-                if (fullDayCounter.first == 1) { // first day
-                    resourceProvider.provideString(
-                        R.string.calendar_widget_part_day_event_starts_at,
-                        getOccurrenceStart(timeZoneId).formatTime(timeZoneId, is24Hour)
-                    )
-                } else if (fullDayCounter.first == fullDayCounter.second) { // last day
-                    resourceProvider.provideString(
-                        R.string.calendar_widget_part_day_event_ends_at,
-                        getOccurrenceEnd(timeZoneId).formatTime(timeZoneId, is24Hour)
-                    )
-                } else { // day in the middle
-                    resourceProvider.provideString(R.string.event_all_day)
+                when (fullDayCounter.first) {
+                    1 -> { // first day
+                        resourceProvider.provideString(
+                            R.string.calendar_widget_part_day_event_starts_at,
+                            getOccurrenceStart(timeZoneId).formatTime(timeZoneId, is24Hour)
+                        )
+                    }
+                    fullDayCounter.second -> { // last day
+                        resourceProvider.provideString(
+                            R.string.calendar_widget_part_day_event_ends_at,
+                            getOccurrenceEnd(timeZoneId).formatTime(timeZoneId, is24Hour)
+                        )
+                    }
+                    else -> { // day in the middle
+                        resourceProvider.provideString(R.string.event_all_day)
+                    }
                 }
             } else { // single-day part-day
                 "${
@@ -333,7 +342,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             }
         }
 
-        val locationText = this.location?.takeIfNotBlank()?.let { " • ${it}" }
+        val locationText = this.location?.takeIfNotBlank()?.let { " • $it" }
 
         val subheaderContent = "${dateText}${locationText ?: ""}"
 

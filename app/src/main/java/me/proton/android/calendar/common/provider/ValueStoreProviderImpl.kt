@@ -10,7 +10,6 @@ import me.proton.android.calendar.domain.ValueStore
 import me.proton.android.calendar.domain.ValueStoreProvider
 import javax.inject.Inject
 
-
 class ValueStoreProviderImpl @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider
 ) : ValueStoreProvider {

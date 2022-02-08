@@ -1,6 +1,5 @@
 package me.proton.android.calendar.common.logger
 
-import me.proton.android.calendar.BuildConfig
 import me.proton.core.eventmanager.data.LogTag
 import me.proton.core.network.data.ProtonErrorException
 import me.proton.core.util.kotlin.Logger

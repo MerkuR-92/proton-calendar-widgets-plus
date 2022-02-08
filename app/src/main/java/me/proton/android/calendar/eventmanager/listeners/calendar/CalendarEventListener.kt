@@ -85,7 +85,6 @@ class CalendarEventListener @Inject constructor(
 
 class CalendarEventListenerDelegate @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
-    private val logger: Logger,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val widgetRefresher: WidgetRefresher,
     private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase,
@@ -99,9 +98,7 @@ class CalendarEventListenerDelegate @Inject constructor(
         entities = eventsMetadata.filter { handleEventsMetadataUseCase.shouldFetchEvent(it) }
             .mapNotNull { metadata ->
                 fetchEventEntity(config.userId, metadata)
-            }
-            .map { event -> event.id to event }
-            .toMap()
+            }.associateBy { event -> event.id }
     }
 
     suspend fun onCreate(entityIds: List<String>) {

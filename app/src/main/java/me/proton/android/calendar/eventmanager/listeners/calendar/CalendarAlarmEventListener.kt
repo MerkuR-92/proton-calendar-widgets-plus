@@ -1,6 +1,5 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
@@ -8,7 +7,9 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
+import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action

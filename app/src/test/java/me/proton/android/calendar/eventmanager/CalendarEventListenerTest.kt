@@ -195,7 +195,6 @@ class CalendarEventListenerDelegateTest {
     fun setup() {
         delegate = CalendarEventListenerDelegate(
             calendarsRepository,
-            logger,
             fetchPublicKeysUseCase,
             widgetRefresher,
             handleEventsMetadataUseCase,

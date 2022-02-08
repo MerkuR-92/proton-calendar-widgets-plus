@@ -13,7 +13,11 @@ import kotlinx.coroutines.Job
 import me.proton.android.calendar.common.BASE_URL
 import me.proton.android.calendar.data.api.CalendarApiClient
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.network.data.*
+import me.proton.core.network.data.ApiManagerFactory
+import me.proton.core.network.data.ApiProvider
+import me.proton.core.network.data.NetworkManager
+import me.proton.core.network.data.NetworkPrefs
+import me.proton.core.network.data.ProtonCookieStore
 import me.proton.core.network.data.client.ClientIdProviderImpl
 import me.proton.core.network.data.client.ExtraHeaderProviderImpl
 import me.proton.core.network.domain.ApiClient
@@ -23,6 +27,7 @@ import me.proton.core.network.domain.client.ClientIdProvider
 import me.proton.core.network.domain.client.ExtraHeaderProvider
 import me.proton.core.network.domain.humanverification.HumanVerificationListener
 import me.proton.core.network.domain.humanverification.HumanVerificationProvider
+import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.network.domain.server.ServerTimeListener
 import me.proton.core.network.domain.session.SessionListener
 import me.proton.core.network.domain.session.SessionProvider
@@ -54,7 +59,8 @@ object NetworkModule {
         sessionProvider: SessionProvider,
         sessionListener: SessionListener,
         humanVerificationProvider: HumanVerificationProvider,
-        humanVerificationListener: HumanVerificationListener
+        humanVerificationListener: HumanVerificationListener,
+        missingScopeListener: MissingScopeListener,
     ): ApiManagerFactory = ApiManagerFactory(
         BASE_URL,
         apiClient,
@@ -66,6 +72,7 @@ object NetworkModule {
         sessionListener,
         humanVerificationProvider,
         humanVerificationListener,
+        missingScopeListener,
         protonCookieStore,
         CoroutineScope(Job() + Dispatchers.Default),
         apiConnectionListener = null

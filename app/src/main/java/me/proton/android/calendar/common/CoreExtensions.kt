@@ -10,12 +10,10 @@ suspend fun UserManager.getUserOrNull(
     logger: Logger? = null,
     refresh: Boolean = false
 ): User? {
-
     return kotlin.runCatching {
         this.getUser(sessionUserId, refresh)
     }.getOrElse {
         logger?.e("Exception in UserManager.getUserOrNull: ${it.message}", it)
         null
     }
-
 }

@@ -1,7 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
 import androidx.lifecycle.Lifecycle
-import androidx.work.WorkContinuation.combine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
