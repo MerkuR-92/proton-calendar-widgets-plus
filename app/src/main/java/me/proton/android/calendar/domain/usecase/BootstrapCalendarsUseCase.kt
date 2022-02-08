@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.*
@@ -9,6 +10,7 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserManager
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
@@ -33,6 +35,7 @@ class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val serverEventsApi: ServerEventsApi,
     private val valueStoreProvider: ValueStoreProvider,
+    private val userManager: UserManager,
     private val widgetRefresher: WidgetRefresher
 ): UseCase {
 
@@ -83,10 +86,14 @@ class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
         }
 
         // We fix both normal and subscribed calendars
+        val addresses = if (calendarsResponse.data.calendars.any { it.hasIncompleteKeySetup || it.hasUpdatePassphrase }) {
+            // Fetch the user addresses only once if we need to do key setup or reactivate calendar keys
+            userManager.getAddressesOrNull(userId, refresh = true)
+        } else null
         calendarsResponse.data.calendars.forEach {
             if (it.hasIncompleteKeySetup) {
                 // Handle flag INCOMPLETE_SETUP
-                val keySetupResult = keySetupUseCase.execute(userId, it.id)
+                val keySetupResult = keySetupUseCase.execute(userId, it.id, addresses)
 
                 keySetupResult.ifSuccessAndLogErrors(logger) { }
 
@@ -99,7 +106,7 @@ class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
                 // Skip confirmation dialog if we just handled flag RESET_NEEDED
                 if (showConfirmationDialog) return UseCase.Result.Error("BootstrapCalendarsUseCase: error update passphrase for calendar", UseCase.Error.Bootstrap.UpdatePassphrase)
 
-                val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id)
+                val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, it.id, addresses)
 
                 reactivateCalendarKeyResult.ifSuccessAndLogErrors(logger) { }
 
