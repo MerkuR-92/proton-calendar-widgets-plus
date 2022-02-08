@@ -38,22 +38,26 @@ class UpdateParticipationStatusUseCase @Inject constructor(
             is ApiResponse.Success -> {
 
                 // personalPartICalString == null ignore alarms update, personalPartICalString == "" clear alarms, else update event with new alarms
-                personalPartICalString?.let {
+                if (personalPartICalString != null) {
                     // TODO Ignore update alarms errors or display snack ?
                     val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, personalPartICalString)
                     updatePersonalPartUseCaseUseCaseResult.ifSuccessAndLogErrors(logger) { }
-                }
 
-                when (val eventResponse = calendarsApi.getEvent(userId, calendarId, eventId)) {
-                    is ApiResponse.Success -> {
-                        calendarsRepository.persistEvents(eventResponse.data.event)
+                    // Fetch updated event after updating its alarms
+                    when (val eventResponse = calendarsApi.getEvent(userId, calendarId, eventId)) {
+                        is ApiResponse.Success -> {
+                            calendarsRepository.persistEvents(eventResponse.data.event)
+                        }
+                        is ApiResponse.Error -> {
+                            logger.e("api error fetching event by id: $eventResponse")
+                        }
+                        is ApiResponse.Exception -> {
+                            logger.e("api error fetching event by id: ${eventResponse.exception.message ?: "(no exception message)"}")
+                        }
                     }
-                    is ApiResponse.Error -> {
-                        logger.e("api error fetching event by id: $eventResponse")
-                    }
-                    is ApiResponse.Exception -> {
-                        logger.e("api error fetching event by id: ${eventResponse.exception.message ?: "(no exception message)"}")
-                    }
+                } else {
+                    // Use EventEntity returned by updateParticipationStatus route if we don't need to update alarms
+                    calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event)
                 }
 
                 // If getEvent failed we still return success and will receive updated event in next server event loop
