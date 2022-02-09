@@ -80,7 +80,7 @@ class CalendarViewModel @Inject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
-    var initialised = false
+    val initialised = MutableLiveData(false)
 
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
@@ -228,7 +228,7 @@ class CalendarViewModel @Inject constructor(
                     }
                     CalendarsRepository.InitingState.Finished -> {
                         logger.v("finished initing calendars repo")
-                        initialised = true
+                        initialised.postValue(true)
                         emit(it)
                     }
                     CalendarsRepository.InitingState.Error -> {
@@ -242,7 +242,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun shutdown() {
-        initialised = false
+        initialised.value = false
         calendarsRepository.shutdown()
     }
 

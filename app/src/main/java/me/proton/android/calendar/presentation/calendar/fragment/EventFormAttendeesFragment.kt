@@ -256,7 +256,9 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 }
 
                 val userEmails = calendarViewModel.getUserAddresses()?.map { it.email } ?: listOf()
-                if (userEmails.firstOrNull { canonicalizeProtonEmail(it, forceCanonicalization = true).equals(canonicalEmail, true) } != null) {
+                if (userEmails.firstOrNull { canonicalizeProtonEmail(it, forceCanonicalization = true).equals(
+                        canonicalizeProtonEmail(canonicalEmail, forceCanonicalization = true), true
+                    ) } != null) {
                     view?.displaySnackBar(getString(R.string.snack_add_self_as_participant))
                     searchAttendeeListAdapter.notifyDataSetChanged() // Clear loading icon visibility
                     return@launch

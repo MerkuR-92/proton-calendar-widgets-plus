@@ -163,6 +163,17 @@ class MainViewModel @Inject constructor(
     
     fun containsIntent(action: String) = intents.containsKey(action)
 
+    fun containsIntentToHandle() = intents.any { shouldHandleIntent(it.value) }
+
+    fun shouldHandleIntent(intent: Intent): Boolean {
+        return intent.action == INVITE_PROTON_INTENT_ACTION ||
+                intent.action == Intent.ACTION_VIEW ||
+                intent.type == INVITE_ICS_MIME_TYPE ||
+                intent.action == MainViewModel.INTENT_ACTION_NEW_EVENT ||
+                intent.action == MainViewModel.INTENT_ACTION_SHOW_DAY ||
+                intent.action == MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
+    }
+
     /**
      * Returns and deletes intent with given [action], if it has been handled previously.
      */
