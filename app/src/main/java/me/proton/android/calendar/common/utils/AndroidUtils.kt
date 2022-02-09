@@ -384,8 +384,9 @@ object AndroidUtils {
                                 if (recurrence.interval == null || recurrence.interval == 1) {
                                     resources.getString(R.string.event_recurrence_daily)
                                 } else {
-                                    resources.getString(
-                                        R.string.event_recurrence_every_some_period,
+                                    resources.getQuantityString(
+                                        R.plurals.event_recurrence_every_some_day,
+                                        recurrence.interval,
                                         recurrence.interval,
                                         resources.getQuantityString(
                                             R.plurals.plural_day,
@@ -401,8 +402,9 @@ object AndroidUtils {
                                 if (recurrence.interval == null || recurrence.interval == 1) {
                                     resources.getString(R.string.event_recurrence_weekly)
                                 } else {
-                                    resources.getString(
-                                        R.string.event_recurrence_every_some_period,
+                                    resources.getQuantityString(
+                                        R.plurals.event_recurrence_every_some_week,
+                                        recurrence.interval,
                                         recurrence.interval,
                                         resources.getQuantityString(
                                             R.plurals.plural_week,
@@ -424,8 +426,9 @@ object AndroidUtils {
                                 if (recurrence.interval == null || recurrence.interval == 1) {
                                     resources.getString(R.string.event_recurrence_monthly)
                                 } else {
-                                    resources.getString(
-                                        R.string.event_recurrence_every_some_period,
+                                    resources.getQuantityString(
+                                        R.plurals.event_recurrence_every_some_month,
+                                        recurrence.interval,
                                         recurrence.interval,
                                         resources.getQuantityString(
                                             R.plurals.plural_month,
@@ -455,8 +458,9 @@ object AndroidUtils {
                                 if (recurrence.interval == null || recurrence.interval == 1) {
                                     resources.getString(R.string.event_recurrence_yearly)
                                 } else {
-                                    resources.getString(
-                                        R.string.event_recurrence_every_some_period,
+                                    resources.getQuantityString(
+                                        R.plurals.event_recurrence_every_some_year,
+                                        recurrence.interval,
                                         recurrence.interval,
                                         resources.getQuantityString(
                                             R.plurals.plural_year,
