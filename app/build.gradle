@@ -200,6 +200,7 @@ dependencies {
     implementation "me.proton.core:contact-hilt:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:country:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:crypto:${rootProject.ext.version.proton_core}"
+    implementation "me.proton.core:crypto-validator:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:data:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:data-room:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:domain:${rootProject.ext.version.proton_core}"
