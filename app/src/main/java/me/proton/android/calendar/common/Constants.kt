@@ -10,6 +10,7 @@ import java.time.ZonedDateTime
 typealias CalDuration = biweekly.util.Duration
 
 const val API_VERSION_CALENDAR = "v1"
+const val HV_HOST = "protonmail.com"
 const val API_HOST = "api.protonmail.ch"
 const val BASE_URL = "https://$API_HOST/"
 const val API_APPLICATION_NAME = "android-calendar"

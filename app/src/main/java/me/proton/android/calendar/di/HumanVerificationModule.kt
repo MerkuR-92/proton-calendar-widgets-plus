@@ -7,6 +7,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import me.proton.android.calendar.common.API_HOST
+import me.proton.android.calendar.common.HV_HOST
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.humanverification.data.HumanVerificationListenerImpl
 import me.proton.core.humanverification.data.HumanVerificationManagerImpl
@@ -20,8 +22,10 @@ import me.proton.core.humanverification.domain.HumanVerificationWorkflowHandler
 import me.proton.core.humanverification.domain.repository.HumanVerificationRepository
 import me.proton.core.humanverification.domain.repository.UserVerificationRepository
 import me.proton.core.humanverification.domain.utils.NetworkRequestOverrider
+import me.proton.core.humanverification.presentation.CaptchaApiHost
 import me.proton.core.humanverification.presentation.HumanVerificationApiHost
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
+import me.proton.core.humanverification.presentation.utils.HumanVerificationVersion
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.domain.humanverification.HumanVerificationListener
 import me.proton.core.network.domain.humanverification.HumanVerificationProvider
@@ -33,12 +37,21 @@ import javax.inject.Singleton
 object HumanVerificationModule {
 
     @Provides
-    @HumanVerificationApiHost
-    fun provideCaptchaApiHost(): String = "https://verify.protonmail.com"
+    fun provideHumanVerificationVersion() = HumanVerificationVersion.HV2
 
     @Provides
-    fun provideHumanVerificationOrchestrator(): HumanVerificationOrchestrator =
-        HumanVerificationOrchestrator()
+    @HumanVerificationApiHost
+    fun provideHumanVerificationApiHost(): String = "https://verify.${HV_HOST}"
+
+    @Provides
+    @CaptchaApiHost
+    fun provideCaptchaApiHost(): String = API_HOST
+
+    @Provides
+    fun provideHumanVerificationOrchestrator(
+        humanVerificationVersion: HumanVerificationVersion
+    ): HumanVerificationOrchestrator =
+        HumanVerificationOrchestrator(humanVerificationVersion)
 
     @Provides
     @Singleton
