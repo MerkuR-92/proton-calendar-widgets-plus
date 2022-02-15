@@ -206,7 +206,11 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             calendar_form_default_email_value.text = calendarEmail
         }
         calendarFormViewModel.defaultEventDuration.observe(viewLifecycleOwner) { defaultEventDuration ->
-            calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, defaultEventDuration.toString())
+            calendar_form_default_event_duration_value.text = resources.getQuantityString(
+                R.plurals.calendar_form_default_event_duration_value,
+                defaultEventDuration,
+                defaultEventDuration.toString()
+            )
         }
         calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
             if (calendarColor.isEmpty()) {
@@ -374,7 +378,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 requireContext(),
                 null,
                 CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map {
-                    getString(R.string.calendar_form_default_event_duration_value, it.toString())
+                    resources.getQuantityString(R.plurals.calendar_form_default_event_duration_value, it, it.toString())
                 }.toTypedArray(),
                 calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.indexOf(it) } ?: 0
             ) {

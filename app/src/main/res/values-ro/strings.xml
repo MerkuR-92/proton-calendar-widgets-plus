@@ -375,7 +375,6 @@
   <string name="calendar_form_name_character_limit">%d/%d caractere</string>
   <string name="calendar_form_color">Culoare calendar</string>
   <string name="calendar_form_default_event_duration">Durată eveniment</string>
-  <string name="calendar_form_default_event_duration_value">%s minute</string>
   <string name="calendar_form_default_event_notifications">Notificări eveniment</string>
   <string name="calendar_form_default_all_day_event_notifications">Notificări pe durata evenimentului</string>
   <string name="calendar_form_add_notification">Adăugare notificare</string>

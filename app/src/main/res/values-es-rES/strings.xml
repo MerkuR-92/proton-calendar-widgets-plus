@@ -375,7 +375,6 @@
   <string name="calendar_form_name_character_limit">%d/%d characters</string>
   <string name="calendar_form_color">Calendar color</string>
   <string name="calendar_form_default_event_duration">Event duration</string>
-  <string name="calendar_form_default_event_duration_value">%s minutos</string>
   <string name="calendar_form_default_event_notifications">Event notifications</string>
   <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
   <string name="calendar_form_add_notification">Añadir notificación</string>
