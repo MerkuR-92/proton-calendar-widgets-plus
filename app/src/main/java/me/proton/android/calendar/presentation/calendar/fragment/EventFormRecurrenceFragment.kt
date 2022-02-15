@@ -9,17 +9,38 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.chip_group_day_of_week.*
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.*
+import kotlinx.android.synthetic.main.chip_group_day_of_week.chip_group_day_of_week_layout
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_chips_layout
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_count
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_count_layout
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_1
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_2
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_3
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_count
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_count_suffix
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_group
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_1
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_2
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_3
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_radio_group
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_1
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_2
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_3
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_4
+import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_radio_group
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.event_form_recurrence_custom_edit
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.event_form_recurrence_custom_layout
+import kotlinx.android.synthetic.main.fragment_event_form_recurrence.event_form_recurrence_radio_group
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FormValidation
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.doAfterFilteredIntValueChanged
 import me.proton.android.calendar.common.utils.AndroidUtils.formatMonthlyDayOfWeek
@@ -29,24 +50,21 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatWithDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatWithDayOfWeek
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.customView.NoLayoutRadioGroup
-import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import java.time.*
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.temporal.WeekFields
-import java.util.*
-import kotlin.collections.HashMap
 
 class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
@@ -59,9 +77,8 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
-    private val calendarViewModel: CalendarViewModel by inject()
     private val logger: Logger by inject()
-    private val eventViewModel: EventViewModel by sharedViewModel() //inject()
+    private val eventViewModel: EventViewModel by activityViewModels() //inject()
     private lateinit var monthlyRecurrenceOnMap: HashMap<Int, EventViewModel.MonthlyRepeatOnOption>
 
     // index of the day of the week of Event start, used for forcing weekday picker to have it always picked

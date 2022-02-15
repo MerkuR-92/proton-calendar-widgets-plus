@@ -5,10 +5,11 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.view.*
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -21,15 +22,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.property.Attendee
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
-import kotlinx.android.synthetic.main.item_add_attendee.view.*
-import kotlinx.android.synthetic.main.nav_view_main.view.*
-import kotlinx.android.synthetic.main.toolbar_action_text.view.*
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_appbar
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_done
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_list
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_list_header
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_list_layout
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_search_clear
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_search_input
+import kotlinx.android.synthetic.main.fragment_event_form_attendees.nav_event_form_attendees_search_list
+import kotlinx.android.synthetic.main.item_add_attendee.view.item_add_attendee_press
+import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CONTACTS_SEARCH_QUERY
+import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.onTextChange
@@ -37,17 +43,14 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.validateEmail
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.adapter.AddAttendeeListAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import org.koin.core.KoinComponent
-
 
 class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -57,8 +60,8 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val eventViewModel: EventViewModel by activityViewModels()
 
     private val _searchAttendeeList: MutableLiveData<List<Attendee>> = MutableLiveData()
     private val searchAttendeeList: LiveData<List<Attendee>> = _searchAttendeeList
