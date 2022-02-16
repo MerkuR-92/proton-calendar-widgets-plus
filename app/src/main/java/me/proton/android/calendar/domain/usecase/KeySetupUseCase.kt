@@ -16,6 +16,7 @@ import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
 import javax.inject.Inject
+import me.proton.core.user.domain.entity.UserAddress
 
 class KeySetupUseCase @Inject constructor(
     private val logger: Logger,
@@ -68,8 +69,11 @@ class KeySetupUseCase @Inject constructor(
         }
     }
 
-    suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
-        val address = userManager.getAddressesOrNull(userId, refresh = true)?.firstOrNull {
+    suspend fun execute(userId: UserId, calendarId: String, addresses: List<UserAddress>? = null) : UseCase.Result {
+
+        // We pass the user address list as a parameter because it has refresh flag set at true so we want to reduce
+        //  the amount of calls needed in case we're reactivating keys for a list of calendars.
+        val address = (addresses ?: userManager.getAddressesOrNull(userId, refresh = true))?.firstOrNull {
             it.canSend && it.canReceive
         } ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
 
