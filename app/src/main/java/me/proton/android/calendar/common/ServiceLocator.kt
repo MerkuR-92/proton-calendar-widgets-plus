@@ -75,7 +75,6 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<CalendarsRepository> { CalendarsRepositoryImpl(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     single<UserSettingsRepository> { UserSettingsRepositoryImpl(get()) }
     single<EventDecryptor> { EventDecryptorImpl(get(), get()) }
 //    single { FlightRepository(get(), get()) }
@@ -150,7 +149,8 @@ fun coreModule(
     publicAddressRepository: PublicAddressRepository,
     networkManager: NetworkManager,
     defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
-    appDatabase: AppDatabase
+    appDatabase: AppDatabase,
+    calendarsRepository: CalendarsRepository
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -173,4 +173,5 @@ fun coreModule(
     single<NetworkManager> { networkManager }
     single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
     single<AppDatabase> { appDatabase }
+    single<CalendarsRepository> { calendarsRepository }
 }

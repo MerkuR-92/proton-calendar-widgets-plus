@@ -13,6 +13,7 @@ import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvid
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.worker.SyncWorker
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
@@ -115,6 +116,9 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var appDatabase: AppDatabase
 
+    @Inject
+    lateinit var calendarsRepository: CalendarsRepository
+
     override fun onCreate() {
         super.onCreate()
 
@@ -145,7 +149,8 @@ class ProtonCalendarApplication : Application() {
                     publicAddressRepository,
                     networkManager,
                     defaultSharedPreferencesProvider,
-                    appDatabase
+                    appDatabase,
+                    calendarsRepository
                 )
             )
         }
