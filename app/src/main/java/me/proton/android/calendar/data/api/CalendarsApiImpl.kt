@@ -524,15 +524,7 @@ data class ReenableKeyApiRequest(
 @Serializable
 data class AttendeeApiResponse(
     @SerialName("Event")
-    val event: AttendeeStatusApiResponse
-)
-
-@Serializable
-data class AttendeeStatusApiResponse(
-    @SerialName("ID")
-    val id: String,
-    @SerialName("ModifyTime")
-    val modifyTime: Int
+    val event: EventEntity
 )
 
 @Serializable
