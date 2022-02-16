@@ -400,32 +400,28 @@ class MonthFragment : BaseFragment() {
                 }
             }
 
-            // Handle selected day change in mini calendar pager
+            // Handle selected day change in miniCalendarPager (mini calendar / month views)
             if (miniCalendarPager.adapter != null) {
                 val monthStartingDate = calendarViewModel.initialToday.withDayOfMonth(1)
                 val offset = ChronoUnit.MONTHS.between(monthStartingDate, selectedDate.withDayOfMonth(1)).toInt()
                 val miniCalendarIndex = monthStartingPosition + offset
                 if (miniCalendarPager.currentItem != miniCalendarIndex) {
                     // smooth-scroll only when switching between adjacent months
-                    miniCalendarPager.post {
-                        miniCalendarPager.setCurrentItem(
-                            miniCalendarIndex,
-                            Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1
-                        )
-                    }
+                    miniCalendarPager.setCurrentItem(
+                        miniCalendarIndex,
+                        Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1
+                    )
                 }
             }
 
-            // Handle selected day change in agenda pager
+            // Handle selected day change in agendaPager (agenda / day views)
             if (agendaPager.adapter != null) {
                 val startingDate = dayPagerAdapter.startingDate
                 val startingPosition = dayPagerAdapter.startingPosition
                 val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
                 val agendaIndex = startingPosition + selectedDayOffset
                 if (agendaPager.currentItem != agendaIndex) {
-                    agendaPager.post {
-                        agendaPager.setCurrentItem(agendaIndex, false)
-                    }
+                    agendaPager.setCurrentItem(agendaIndex, false)
                 }
             }
         }
