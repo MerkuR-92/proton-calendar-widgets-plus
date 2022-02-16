@@ -98,6 +98,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.core.presentation.utils.clearText
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import java.time.ZoneId
@@ -403,7 +404,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event_form_title.hint = resources.getString(R.string.event_hint_title)
             event.summary?.let {
                 if (it.isNotEmpty()) event_form_title.setText(it)
-            }
+            } ?: event_form_title.clearText()
             event.location?.let { event_form_location.setText(it) }
             event.description?.let { event_form_description.setText(it) }
 
