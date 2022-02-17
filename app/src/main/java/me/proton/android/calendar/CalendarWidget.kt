@@ -10,6 +10,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
+import android.os.Build
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
@@ -126,12 +127,16 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         )
         remoteViews.setTextViewText(R.id.tv_main_text, monthAndDay)
 
+        val pendingIntentFlags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            else PendingIntent.FLAG_UPDATE_CURRENT
+
         // intent for "Open the App"
         val openAppPendingIntent = PendingIntent.getActivity(
             context,
             0,
             createOpenAppIntent(context),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            pendingIntentFlags
         )
         remoteViews.setOnClickPendingIntent(R.id.rl_header_container, openAppPendingIntent)
 
@@ -144,7 +149,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
                 context,
                 0,
                 createWidgetRefreshIntent(context),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                pendingIntentFlags
             )
         remoteViews.setOnClickPendingIntent(R.id.ib_refresh, refreshPendingIntent)
 
@@ -153,7 +158,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
             context,
             0,
             createNewEventIntent(context),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            pendingIntentFlags
         )
         remoteViews.setOnClickPendingIntent(R.id.ib_plus, newEventPendingIntent)
 
@@ -197,9 +202,12 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         // Intent 'data' and 'action' will be filled in later by FillInIntent
         val intentTemplate = Intent(context, MainActivity::class.java)
 
+        val pendingIntentFlags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            else PendingIntent.FLAG_UPDATE_CURRENT
         return TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(intentTemplate)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            .getPendingIntent(0, pendingIntentFlags)
     }
 
     companion object {
