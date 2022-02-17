@@ -1,51 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Proton Calendar</string>
-
     <string name="default_event_summary" comment="Event has no title">(no title)</string>
     <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
     <string name="default_user_email">(no email address)</string>
     <string name="default_user_display_name">(no name)</string>
-
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
-
     <!-- DELETE EVENT DIALOG -->
-
     <string name="dialog_title_delete_event">Delete event</string>
     <string name="dialog_title_delete_recurring_event">Delete recurring event</string>
-
     <string name="dialog_description_delete_event">Would you like to delete this event?</string>
     <string name="dialog_description_delete_recurring_event">Would you like to delete all the events in the series?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event">This event has been updated by the organizer. Would you like to delete this event?</string>
-
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_button_close">Close</string>
-
     <!-- Delete as an organizer -->
-
     <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete all events in this series?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete all events in this series anyway?</string>
-
     <!-- Delete as an attendee -->
-
     <string name="dialog_description_delete_single_event_as_attendee">The organizer of this event will be notified that you decline the invitation. Would you like to delete this event?</string>
     <string name="dialog_description_delete_single_event_as_attendee_disabled">The organizer of this event will not be notified that you decline the invitation as you can\'t send emails from the invited address. Would you like to delete this event anyway?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee">The organizer of this series of events will be notified that you decline the invitation. Would you like to delete all the events in this series?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">The organizer of this series of events will not be notified that you decline the invitation as you can\'t send emails from the invited address. Would you like to delete all the events in this series anyway?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">This event has been updated. The organizer will be notified that you decline the invitation. Would you like to delete this event?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">This event has been updated. The organizer will not be notified that you decline the invitation as you can\'t send emails from the invited address. Would you like to delete this event?</string>
-
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Occurrences previously updated by the organizer will be kept, but your answers will be lost</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Occurrences previously updated by the organizer will be kept</string>
-
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">The organizer cannot be notified that you decline the invitation:\n\n• %1$s\n\nWould you like to delete the event anyway?</string>
-
     <string name="dialog_button_set">Set</string>
     <string name="dialog_button_ok">OK</string>
-
     <string name="action_save">Save</string>
     <string name="action_done">Done</string>
     <string name="action_edit">Edit</string>
@@ -53,16 +40,12 @@
     <string name="action_today">Today</string>
     <string name="action_create_event">Create event</string>
     <string name="action_mark_default">Mark as default</string>
-
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">No events</string>
     <string name="agenda_loading_events">Loading events…</string>
     <string name="agenda_loading_events_error">Error loading events</string>
     <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
-
     <string name="day_view_all_day_more">+ %d more</string>
-
-
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">All Day</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -95,25 +78,22 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d yes</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d maybe</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pending</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d unanswered</string>
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
     <string name="event_attendee_is_current_user">You</string>
-
     <string name="event_answer_attending">Attending?</string>
     <string name="event_answer_yes">Yes</string>
     <string name="event_answer_no">No</string>
     <string name="event_answer_maybe">Maybe</string>
-
     <string name="event_decryption_error_dialog_title">Event failed to decrypt</string>
     <string name="event_decryption_error_dialog_message">Decryption of this event’s content failed.</string>
     <string name="event_decryption_error_dialog_confirmation">Delete event</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Delete events</string>
     <string name="event_decryption_error_dialog_close">Close</string>
-
-    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a></string>
-
+    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a>
+    </string>
     <string name="event_change_answer_recurring_title">Update recurring event</string>
     <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
     <string name="event_change_answer_recurring_overwrite_description">Would you like to change your answer for all the events in this series?\nSome of your answers to occurrences previously updated by the organizer will be lost.</string>
@@ -124,20 +104,17 @@
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s has accepted your invitation to %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s has declined your invitation to %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s has tentatively accepted your invitation to %2$s</string>
-
     <string name="event_organizer_send_prefs_error_title">Organizer cannot be notified</string>
     <string name="event_organizer_send_prefs_message_accepted_title">The organizer cannot be notified that you accepted the invitation</string>
     <string name="event_organizer_send_prefs_message_declined_title">The organizer cannot be notified that you declined the invitation</string>
     <string name="event_organizer_send_prefs_message_tentative_title">The organizer cannot be notified that you tentatively accepted the invitation</string>
     <string name="event_organizer_send_prefs_message_default_title">The organizer cannot be notified that you responded to the invitation</string>
     <string name="event_organizer_send_prefs_button_title">OK</string>
-
     <string name="event_attendees_send_prefs_error_title">Participants cannot be notified</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">None of the participants can be notified about your changes:\n\n• %1$s\n\nWould you like to continue anyway?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">The following participants cannot be notified about your changes:\n\n• %1$s\n\nWould you like to continue anyway?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continue</string>
     <string name="event_attendees_send_prefs_error_cancel">Cancel</string>
-
     <string name="event_send_prefs_error_address_disabled">this address does not exist</string>
     <string name="event_send_prefs_error_getting_contact">could not get contact data</string>
     <string name="event_send_prefs_error_network">network error</string>
@@ -145,7 +122,6 @@
     <string name="event_send_prefs_public_keys_invalid">public keys are invalid</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">contact signature invalid</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
-
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
@@ -163,7 +139,8 @@
     <string name="event_text_attendees">Attendees</string>
     <string name="event_text_attendees_none">None</string>
     <string name="event_text_calendar">Calendar</string>
-    <string name="event_text_timezone_start">Time zone</string> <!-- TODO Start Timezone / End Timezone? -->
+    <string name="event_text_timezone_start">Time zone</string>
+    <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Add notification</string>
     <string name="event_text_description">Description</string>
     <string name="event_hint_description">Add description</string>
@@ -193,7 +170,6 @@
     <string name="event_recurrence_5">every year</string>
     <string name="event_recurrence_title">Frequency</string>
     <string name="event_recurrence_custom_title">Custom frequency</string>
-
     <string name="event_recurrence_occurs_every">Repeats every</string>
     <string name="event_recurrence_occurs_on">Repeats on</string>
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">on day %1$d</string>
@@ -203,27 +179,22 @@
     <string name="event_recurrence_ends_on_date_empty">on day</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">on %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">after</string>
-
     <string name="event_recurring_edit_this">This event</string>
     <string name="event_recurring_edit_this_and_future">This and future events</string>
     <string name="event_recurring_edit_all_events">All events</string>
-
     <string name="event_discard_changes_title">Discard changes?</string>
     <string name="event_discard_changes_description">You will lose all unsaved changes.</string>
     <string name="event_discard_changes_cancel">Keep editing</string>
     <string name="event_discard_changes_confirm">Discard</string>
-
     <string name="event_recurring_update_this_title">Update recurring event</string>
     <string name="event_recurring_update_this_description">Frequency modifications will be lost</string>
     <string name="event_recurring_update_all_description">Previous modifications on this series will be lost</string>
     <string name="event_recurring_update_this_cancel">Cancel</string>
     <string name="event_recurring_update_this_confirm">Update</string>
-
     <string name="event_allow_contacts_title">Allow Proton Calendar to access your contacts?</string>
     <string name="event_allow_contacts_description">Proton Calendar needs access to your contacts to provide you with autocompletion</string>
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
-
     <string name="event_send_invite_mail_subject_prefix">Invitation for %s</string>
     <string name="event_send_invite_mail_subject_all_day">an event on %1$s</string>
     <string name="event_send_invite_mail_subject_all_day_multiple">an event starting on %1$s</string>
@@ -234,24 +205,20 @@
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s at %2$s %3$s - %4$s at %5$s %6$s</string>
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nWhere: %1$s</string>
     <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nDescription: %1$s</string>
-
     <string name="event_send_invite_dialog_title">Send invitation</string>
     <string name="event_send_invite_dialog_description">An invitation will be sent to added participants.</string>
     <string name="event_send_invite_dialog_confirm">Send</string>
     <string name="event_send_invite_dialog_cancel">Cancel</string>
-
     <string name="event_add_participants_dialog_title">Add participants</string>
     <string name="event_add_participants_dialog_description">An invitation will be sent to added participants for all the events in this series.</string>
     <string name="event_add_participants_overwrite_dialog_description">An invitation will be sent to added participants for all the events in this series.\nPrevious modifications on this series will be lost.</string>
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Cancel</string>
-
     <string name="event_send_cancel_mail_subject_prefix">Cancellation of %s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">an event starting on %1$s at %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day_multiple">an event starting on %1$s</string>
     <string name="event_send_cancel_mail_subject_all_day">an event on %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s has been canceled.</string>
-
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
@@ -270,7 +237,6 @@
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
-
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">This feature is coming soon</string>
     <string name="snack_event_deleted">Event deleted</string>
@@ -316,7 +282,6 @@
     <string name="snack_calendar_saving">Saving calendar</string>
     <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
     <string name="snack_create_calendar_settings_error">The calendar was created but some information was not updated, please try again later</string>
-
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>
     <string name="snack_ics_create_error">Error creating event</string>
@@ -337,33 +302,25 @@
     <string name="snack_ics_invalid_error">This invitation is invalid</string>
     <string name="snack_ics_disabled_calendar_error">Re-enable the address linked to this calendar to update this event</string>
     <string name="snack_ics_event_deleted_error">The event does not exist in your calendar anymore</string>
-
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s accepted your invitation</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s tentatively accepted your invitation</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s declined your invitation</string>
-
     <string name="snack_app_link_invalid">Invalid link to the event</string>
     <string name="snack_app_link_error">Error opening event</string>
-
     <string name="snack_notification_already_added">The notification has already been added</string>
-
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
     <string name="error_occurrence_does_not_exist">The occurrence does not exist</string>
-
     <string name="update_timezone_dialog_title">Time zone changed</string>
     <string name="update_timezone_dialog_message">Your system time zone seems to have changed to %1$s. Do you want to update your time zone preference?</string>
     <string name="update_timezone_dialog_confirmation">Update</string>
     <string name="update_timezone_dialog_cancel">Cancel</string>
-
     <string name="contacts_permission_dialog_title">Allow Proton Calendar to access your contacts?</string>
     <string name="contacts_permission_dialog_message">Proton Calendar needs access to your phone contacts to help you easily add them to your events.</string>
     <string name="contacts_permission_dialog_allow">Allow</string>
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
-
     <string name="dialog_title_calendar_picker">Calendar</string>
-
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
     <string name="notification_channel_sync">Calendar Synchronisation</string>
@@ -373,16 +330,13 @@
     <string name="notification_text_tomorrow">Tomorrow</string>
     <string name="notification_text_tomorrow_part_time">Tomorrow at %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s at %2$s</string>
-
     <!-- Bug report -->
     <string name="bug_report_hint_title">Subject</string>
     <string name="bug_report_hint_description">Please describe the problem and include any error messages.</string>
-
     <string name="bug_report_discard_changes_title">Unsaved Changes</string>
     <string name="bug_report_discard_changes_description">There are unsaved entries in the form. Are you sure you want to discard them?</string>
     <string name="bug_report_discard_changes_cancel">Keep writing</string>
     <string name="bug_report_discard_changes_confirm">Discard</string>
-
     <!-- Settings -->
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_info">This setting affects only the appearance of the Proton Calendar app on this device. The app will restart after changing the theme.</string>
@@ -398,7 +352,6 @@
     <string name="settings_alternative_routing_title">Allow alternative routing</string>
     <string name="settings_alternative_routing_subtitle">In case Proton sites are blocked, this setting allows the app to try alternative network routing to reach Proton, which can be useful for bypassing firewalls or network issues. We recommend keeping this setting on for greater reliability.</string>
     <string name="settings_value_placeholder">Tap to select</string>
-
     <string name="settings_general_title">General</string>
     <string name="settings_general_info">Theme, time zone, calendar layout etc.</string>
     <string name="settings_general_info_with_language">Theme, language, time zone, calendar layout etc.</string>
@@ -408,14 +361,12 @@
     <string name="settings_calendar_disabled">Disabled</string>
     <string name="settings_calendar_not_synced">Not synced</string>
     <string name="settings_calendar_syncing">Syncing</string>
-
     <string name="settings_calendar_subscribed_invalid_ics">Unsupported calendar format</string>
     <string name="settings_calendar_subscribed_too_big">Calendar is too big</string>
     <string name="settings_calendar_subscribed_not_accessible">Calendar link is not accessible</string>
     <string name="settings_calendar_subscribed_tmp_not_accessible">Calendar link is temporarily inaccessible</string>
     <string name="settings_calendar_subscribed_last_sync_old">More than 12 hours passed since last update</string>
     <string name="settings_calendar_subscribed_not_decrypted">Calendar could not be decrypted</string>
-
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Create calendar</string>
     <string name="calendar_form_update_title">Edit calendar</string>
@@ -432,23 +383,22 @@
     <string name="calendar_form_default_email_value_error">Failed to load default email</string>
     <string name="calendar_form_name_hint">Add a calendar name</string>
     <string name="calendar_form_name_required_error">Name required</string>
-
     <string name="add_calendar_text">Add calendar</string>
-
     <string name="create_calendar_limit_reached_free">You have reached the maximum number of calendars.</string>
     <string name="create_calendar_limit_reached_paid_title">20-calendar maximum reached</string>
     <string name="create_calendar_limit_reached_paid_message">Delete unused calendars to create new calendars.</string>
     <string name="create_calendar_limit_reached_paid_manage">Manage calendars</string>
     <string name="create_calendar_limit_reached_close">Close</string>
-
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>
-    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
+    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
+    </string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparing calendars</string>
     <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
     <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
-    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a>
+    </string>
     <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Learn more</string>
     <string name="bootstrap_error_reset_needed_title">Reset calendar keys</string>
@@ -456,11 +406,9 @@
     <string name="bootstrap_error_update_passphrase_title">Reactivate calendar keys</string>
     <string name="bootstrap_error_update_passphrase_message">You have reactivated your keys and events linked to the following calendars can now be decrypted.</string>
     <string name="bootstrap_error_continue_button">Continue</string>
-
     <string name="splash_after_login_init">Preparing calendars</string>
     <string name="splash_init">Decrypting events</string>
     <string name="default_calendar_name">My calendar</string>
-
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Proton Calendar widget</string>
     <string name="calendar_widget_no_upcoming_events_today">No upcoming events today</string>
@@ -470,122 +418,98 @@
     <string name="calendar_widget_please_log_in">Sign in to see your events</string>
     <string name="calendar_widget_part_day_event_starts_at">Starts at %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Ends at %1$s</string>
-
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_month_header">What\'s new</string>
     <string name="spotlight_dialog_month_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Month view</string>
     <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
-
     <!--  STRING PLURALS  -->
-
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
         <item quantity="other">minutes</item>
     </plurals>
-
     <plurals name="plural_hour">
         <item quantity="one">hour</item>
         <item quantity="other">hours</item>
     </plurals>
-
     <plurals name="plural_day">
         <item quantity="one">day</item>
         <item quantity="other">days</item>
     </plurals>
-
     <plurals name="plural_week">
         <item quantity="one">week</item>
         <item quantity="other">weeks</item>
     </plurals>
-
     <plurals name="plural_month">
         <item quantity="one">month</item>
         <item quantity="other">months</item>
     </plurals>
-
     <plurals name="plural_year">
         <item quantity="one">year</item>
         <item quantity="other">years</item>
     </plurals>
-
     <plurals name="plural_recurrence_count">
         <item quantity="one">once</item>
         <item quantity="other">times</item>
     </plurals>
-
     <plurals name="plural_occurrence">
         <item quantity="one">occurrence</item>
         <item quantity="other">occurrences</item>
     </plurals>
-
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participant</item>
         <item quantity="other">participants</item>
     </plurals>
-
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Every %1$d %2$s</item>
+    <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
-
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Every %1$d %2$s</item>
+    <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
-
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Every %1$d %2$s</item>
+    <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
-
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Every %1$d %2$s</item>
+    <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
-
-    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s minute</item>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">%s minutes<item quantity="one">%s minute</item>
         <item quantity="other">%s minutes</item>
     </plurals>
-
     <!--  STRING ARRAYS  -->
-
     <string-array name="ordinals_as_words">
-        <item></item>
+        <item/>
         <item>first</item>
         <item>second</item>
         <item>third</item>
         <item>fourth</item>
         <item>fifth</item>
     </string-array>
-
     <string-array name="ordinals_as_words_backwards">
-        <item></item>
+        <item/>
         <item>last</item>
         <item>second to last</item>
         <item>third to last</item>
         <item>fourth to last</item>
         <item>fifth to last</item>
     </string-array>
-
     <string-array name="app_themes">
         <item>Light</item>
         <item>Dark</item>
         <item>System default</item>
     </string-array>
-
     <string-array name="time_formats">
         <item>System default</item>
         <item>13:00</item>
         <item>1:00pm</item>
     </string-array>
-
     <string-array name="week_start">
         <item>System default</item>
         <item>Monday</item>
         <item>Saturday</item>
         <item>Sunday</item>
     </string-array>
-
 </resources>
