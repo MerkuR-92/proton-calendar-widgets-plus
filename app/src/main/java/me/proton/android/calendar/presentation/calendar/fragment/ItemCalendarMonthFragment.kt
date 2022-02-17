@@ -9,13 +9,18 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
-import kotlinx.android.synthetic.main.item_calendar_month_fragment.*
-import kotlinx.android.synthetic.main.item_month_view_grid.view.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.item_calendar_month_fragment.monthFragmentWeekDaysLayout
+import kotlinx.android.synthetic.main.item_calendar_month_fragment.monthFragmentWeekNumberLayout
+import kotlinx.android.synthetic.main.item_calendar_month_fragment.month_fragment_loader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.FragmentArguments
@@ -36,18 +41,17 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView.Mon
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.ROWS_MAX
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.*
+import java.util.Collections
 
 class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val mainViewModel: MainViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private val logger: Logger by inject()
 

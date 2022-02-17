@@ -20,6 +20,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -29,15 +30,57 @@ import androidx.preference.PreferenceManager
 import biweekly.property.Action
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_checkbox.view.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_event_form.*
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.*
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_icon
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_list
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_all_day_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_all_day_switch
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_icon
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_description
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_description_icon
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_date
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_date_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_time
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_time_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_location
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_location_icon
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_partial_day_end
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_partial_day_start
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_chip_group
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_icon
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_layout
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_recurrence
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_recurrence_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_date
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_date_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_time
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_time_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone_layout
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone_press
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_title
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
+import me.proton.android.calendar.common.FormValidation
+import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
+import me.proton.android.calendar.common.FragmentArguments.IS_ALL_DAY_ARG
+import me.proton.android.calendar.common.FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.allowedTimezoneIds
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToId
@@ -48,32 +91,26 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
-import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
-import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
-import me.proton.android.calendar.common.FragmentArguments.IS_ALL_DAY_ARG
-import me.proton.android.calendar.common.FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
-import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.core.presentation.utils.clearText
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.ZoneId
-import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val eventViewModel: EventViewModel by sharedViewModel()
-    private val accountViewModel: AccountViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val eventViewModel: EventViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -267,7 +304,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
             val userId = accountViewModel.getPrimaryUserId()
-            val viewModeInitStatus = withContext(Dispatchers.Default) {
+            val viewModeInitStatus = withContext(Dispatchers.Main) {
                 if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
                 else eventViewModel.initialise(
                     userId,
@@ -293,10 +330,16 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             } else {
                 when (viewModeInitStatus) {
                     EventViewModel.InitResult.OccurrenceDoesNotExist -> {
-                        AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_occurrence_does_not_exist))
+                        AndroidUtils.displaySimpleOkAlert(
+                            requireContext(),
+                            getString(R.string.error_occurrence_does_not_exist)
+                        )
                     }
                     EventViewModel.InitResult.EventDoesNotExist -> {
-                        AndroidUtils.displaySimpleOkAlert(requireContext(), getString(R.string.error_event_does_not_exist))
+                        AndroidUtils.displaySimpleOkAlert(
+                            requireContext(),
+                            getString(R.string.error_event_does_not_exist)
+                        )
                     }
                     is EventViewModel.InitResult.Error -> {
                         logger.e(viewModeInitStatus.message)
@@ -361,7 +404,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event_form_title.hint = resources.getString(R.string.event_hint_title)
             event.summary?.let {
                 if (it.isNotEmpty()) event_form_title.setText(it)
-            }
+            } ?: event_form_title.clearText()
             event.location?.let { event_form_location.setText(it) }
             event.description?.let { event_form_description.setText(it) }
 

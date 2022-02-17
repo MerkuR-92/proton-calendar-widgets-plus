@@ -59,7 +59,6 @@
   <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s à %2$s par message</string>
   <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s avant, à %2$s</string>
   <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s avant, à %2$s par message</string>
-  <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">Chaque %2$s %1$d</string>
   <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s le %2$s</string>
   <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s le %2$d</string>
   <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s le %2$s</string>
@@ -376,7 +375,6 @@
   <string name="calendar_form_name_character_limit">%d/%d caractères</string>
   <string name="calendar_form_color">Couleur de calendrier</string>
   <string name="calendar_form_default_event_duration">Durée de l’événement</string>
-  <string name="calendar_form_default_event_duration_value">%s minutes</string>
   <string name="calendar_form_default_event_notifications">Notifications de l’événement</string>
   <string name="calendar_form_default_all_day_event_notifications">Notifications d\'événement sur journée complète</string>
   <string name="calendar_form_add_notification">Ajouter une notification</string>

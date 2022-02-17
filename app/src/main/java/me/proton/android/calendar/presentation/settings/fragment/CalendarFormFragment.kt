@@ -20,33 +20,43 @@ import biweekly.component.VAlarm
 import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_calendar_form.*
-import kotlinx.android.synthetic.main.fragment_event_form.*
+import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.dialog_calendar_color_picker_layout
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_color_icon
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_color_press
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_icon
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_list
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_press
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_email_press
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_email_value
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_press
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_value
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_icon
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_list
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_press
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_name_value
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.CalendarForm
+import me.proton.android.calendar.common.CalendarForm.CALENDAR_NAME_CHARACTER_LIMIT
+import me.proton.android.calendar.common.CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX
+import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.CalendarForm
-import me.proton.android.calendar.common.CalendarForm.CALENDAR_NAME_CHARACTER_LIMIT
-import me.proton.android.calendar.common.CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.common.FragmentArguments
-import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.presentation.utils.onTextChange
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
@@ -206,7 +216,11 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             calendar_form_default_email_value.text = calendarEmail
         }
         calendarFormViewModel.defaultEventDuration.observe(viewLifecycleOwner) { defaultEventDuration ->
-            calendar_form_default_event_duration_value.text = getString(R.string.calendar_form_default_event_duration_value, defaultEventDuration.toString())
+            calendar_form_default_event_duration_value.text = resources.getQuantityString(
+                R.plurals.calendar_form_default_event_duration_value,
+                defaultEventDuration,
+                defaultEventDuration.toString()
+            )
         }
         calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
             if (calendarColor.isEmpty()) {
@@ -374,7 +388,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 requireContext(),
                 null,
                 CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.map {
-                    getString(R.string.calendar_form_default_event_duration_value, it.toString())
+                    resources.getQuantityString(R.plurals.calendar_form_default_event_duration_value, it, it.toString())
                 }.toTypedArray(),
                 calendarFormViewModel.defaultEventDuration.value?.let { CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.indexOf(it) } ?: 0
             ) {

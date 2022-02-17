@@ -131,7 +131,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
             context,
             0,
             createOpenAppIntent(context),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT
         )
         remoteViews.setOnClickPendingIntent(R.id.rl_header_container, openAppPendingIntent)
 
@@ -144,7 +144,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
                 context,
                 0,
                 createWidgetRefreshIntent(context),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT
             )
         remoteViews.setOnClickPendingIntent(R.id.ib_refresh, refreshPendingIntent)
 
@@ -153,7 +153,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
             context,
             0,
             createNewEventIntent(context),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT
         )
         remoteViews.setOnClickPendingIntent(R.id.ib_plus, newEventPendingIntent)
 
@@ -199,7 +199,7 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         return TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(intentTemplate)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     companion object {

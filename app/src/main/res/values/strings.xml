@@ -77,7 +77,6 @@
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s at %2$s by email</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s before at %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s before at %2$s by email</string>
-    <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">Every %1$d %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s on %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s on day %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s on %2$s</string>
@@ -96,7 +95,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d yes</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d maybe</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d unanswered</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pending</string>
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>
@@ -426,7 +425,6 @@
     <string name="calendar_form_name_character_limit">%d/%d characters</string>
     <string name="calendar_form_color">Calendar color</string>
     <string name="calendar_form_default_event_duration">Event duration</string>
-    <string name="calendar_form_default_event_duration_value">%s minutes</string>
     <string name="calendar_form_default_event_notifications">Event notifications</string>
     <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
     <string name="calendar_form_add_notification">Add notification</string>
@@ -524,6 +522,31 @@
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participant</item>
         <item quantity="other">participants</item>
+    </plurals>
+
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s minute</item>
+        <item quantity="other">%s minutes</item>
     </plurals>
 
     <!--  STRING ARRAYS  -->

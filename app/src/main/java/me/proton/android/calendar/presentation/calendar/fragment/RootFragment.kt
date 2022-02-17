@@ -5,17 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import kotlinx.android.synthetic.main.fragment_root.*
+import kotlinx.android.synthetic.main.fragment_root.root_progress_bar
+import kotlinx.android.synthetic.main.fragment_root.root_progress_text
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 
 class RootFragment : Fragment(), KoinComponent {
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

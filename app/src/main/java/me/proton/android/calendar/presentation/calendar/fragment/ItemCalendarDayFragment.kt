@@ -7,7 +7,11 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -18,6 +22,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
@@ -28,13 +33,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_month.*
-import kotlinx.android.synthetic.main.item_agenda_event_all_day.view.*
-import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
-import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_create_event_view
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_header
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_header_date
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_items_cropped_list
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_items_list
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_more_collapse_button
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_more_items_layout
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.all_day_no_events
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.day_scroll_view
+import kotlinx.android.synthetic.main.item_calendar_day_fragment.day_view
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.DAY_VIEW_ALL_DAY_MAX
+import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FragmentArguments
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.REFRESH_CURRENT_TIME_INDICATOR
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
@@ -52,18 +71,20 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.DayViewAllDayEventAdapter
 import me.proton.android.calendar.presentation.calendar.customView.DayView
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.core.user.domain.entity.UserAddress
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.SimpleDateFormat
-import java.time.*
-import java.util.*
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.util.Collections
+import java.util.Date
 import kotlin.math.min
 
 class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val logger: Logger by inject()
 
     private var loading = true

@@ -242,7 +242,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun shutdown() {
-        initialised.value = false
+        initialised.postValue(false)
         calendarsRepository.shutdown()
     }
 

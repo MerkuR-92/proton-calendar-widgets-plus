@@ -10,15 +10,38 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import kotlinx.android.synthetic.main.event_form_custom_alarm_view.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_event_form_alarm.*
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_1
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_2
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_3
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_4
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_field
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_field_layout
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_radio_group
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_same_day
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_same_day_layout
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_time
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_time_layout
+import kotlinx.android.synthetic.main.event_form_custom_alarm_view.custom_alarm_time_press
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_1
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_2
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_3
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_4
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_5
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_action_notification
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_action_radio_group
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_custom_layout
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_radio_group
+import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_send_by_layout
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
+import me.proton.android.calendar.common.FormValidation
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.doAfterFilteredIntValueChanged
 import me.proton.android.calendar.common.utils.AndroidUtils.getCheckedRadioButtonIndex
@@ -26,16 +49,12 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setCustomOnCheckedCh
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
-import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
-import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
 import java.time.LocalTime
-
 
 class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
@@ -46,9 +65,9 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
     private lateinit var toolbarTitle: TextView
 
-    private val eventViewModel: EventViewModel by sharedViewModel()
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
-    private val calendarFormViewModel: CalendarFormViewModel by sharedViewModel()
+    private val eventViewModel: EventViewModel by activityViewModels()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
+    private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
 
     private var isAllDay: Boolean = false
     private var isCalendarDefaultEventNotification: Boolean = false

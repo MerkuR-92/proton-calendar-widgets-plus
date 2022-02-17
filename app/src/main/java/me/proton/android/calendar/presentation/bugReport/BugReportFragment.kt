@@ -10,28 +10,25 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.Operation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_base.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_bug_report.*
-import kotlinx.android.synthetic.main.nav_view_main.view.*
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
+import kotlinx.android.synthetic.main.fragment_bug_report.bug_report_description
+import kotlinx.android.synthetic.main.fragment_bug_report.bug_report_title
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import org.koin.core.KoinComponent
 
 class BugReportFragment : BaseDialogFragment(), KoinComponent {
@@ -46,7 +43,7 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var buttonSend: View
     private lateinit var loadingAction: View
 
-    private val calendarViewModel: CalendarViewModel by sharedViewModel()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
 
     override fun onBackPressedCustom() {
         if (bug_report_title.text.isNotEmpty() || bug_report_description.text.isNotEmpty()) {

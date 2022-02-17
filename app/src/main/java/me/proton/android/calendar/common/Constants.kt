@@ -91,7 +91,7 @@ object FeatureFlag {
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
     const val USE_EVENT_MANAGER = true
-    const val CHANGE_LANGUAGE = false
+    const val CHANGE_LANGUAGE = true
     const val MONTH_VIEW = true
     const val SPOTLIGHT = true
 }
