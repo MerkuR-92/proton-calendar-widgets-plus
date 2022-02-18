@@ -302,7 +302,7 @@ class EventViewModel @Inject constructor(
 
         hasEmailNotifications = event.hasEmailNotifications
 
-        _event.postValue(event)
+        _event.value = event
 
         return InitResult.Success
     }

@@ -405,8 +405,8 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event.summary?.let {
                 if (it.isNotEmpty()) event_form_title.setText(it)
             } ?: event_form_title.clearText()
-            event.location?.let { event_form_location.setText(it) }
-            event.description?.let { event_form_description.setText(it) }
+            event.location?.let { event_form_location.setText(it) } ?: event_form_location.clearText()
+            event.description?.let { event_form_description.setText(it) } ?: event_form_description.clearText()
 
             ImageViewCompat.setImageTintList(
                 event_form_location_icon,
