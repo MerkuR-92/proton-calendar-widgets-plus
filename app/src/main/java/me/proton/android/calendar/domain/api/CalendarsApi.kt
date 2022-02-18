@@ -46,6 +46,11 @@ interface CalendarsApi {
     suspend fun getBootstrap(userId: UserId, calendarId: String): ApiResponse<BootstrapApiResponse>
 
     /**
+     * Deletes the Calendar.
+     */
+    suspend fun deleteCalendar(userId: UserId, calendarId: String): ApiResponse<StatusCodeApiResponse>
+
+    /**
      * Gets all "active" (occuring in the future) alarms of type "DISPLAY" for given calendar.
      */
     suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int) : ApiResponse<AlarmsApiResponse>

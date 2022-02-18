@@ -1,13 +1,16 @@
 package me.proton.android.calendar.presentation.settings.fragment
 
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.asLiveData
@@ -35,12 +38,16 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 @AndroidEntryPoint
 class SettingsFragment : BaseDialogFragment(), KoinComponent {
@@ -55,6 +62,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    private val resourceProvider: ResourceProvider by inject()
 
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
     private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter
@@ -76,6 +85,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_settings)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        calendarFormViewModel.registerAuthOrchestrator(this, requireActivity())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -280,7 +294,40 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         deletePress?.setOnSingleClickListener {
-            bottomSheetDialog.dismiss()
+            lifecycleScope.launch {
+                val prepareOption = calendarViewModel.prepareDeleteCalendar(calendarEntity.id)
+
+                val dialogMessage = when (prepareOption) {
+                    is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultLastActive -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
+                    is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultNextActive -> resourceProvider.provideString(R.string.delete_default_calendar_dialog_message, prepareOption.nextDefaultName)
+                    is DeleteCalendarUseCase.DeleteCalendarOption.Error -> null
+                    is DeleteCalendarUseCase.DeleteCalendarOption.Delete.NonDefault -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
+                }
+
+                if (prepareOption is DeleteCalendarUseCase.DeleteCalendarOption.Error) {
+                    bottomSheetDialog.dismiss()
+                    view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
+                } else {
+                    with (AlertDialog.Builder(requireContext())) {
+                        setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
+                        setMessage(dialogMessage)
+                        setPositiveButton(R.string.dialog_button_delete, object : DialogInterface.OnClickListener {
+                            override fun onClick(p0: DialogInterface?, p1: Int) {
+                                lifecycleScope.launch {
+                                    val deleteResult = calendarViewModel.deleteCalendar(prepareOption)
+                                    when (deleteResult) {
+                                        is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
+                                        is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
+                                        is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))
+                                    }
+                                    bottomSheetDialog.dismiss()
+                                }
+                            }
+                        })
+                        setNegativeButton(R.string.dialog_button_cancel, null)
+                    }.create().show()
+                }
+            }
         }
 
         val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)

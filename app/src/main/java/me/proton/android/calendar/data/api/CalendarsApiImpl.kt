@@ -40,6 +40,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/bootstrap")
     suspend fun getBootstrap(@Path("calendarId") calendarId: String): BootstrapApiResponse
 
+    @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}")
+    suspend fun deleteCalendar(@Path("calendarId") calendarId: String): StatusCodeApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/alarms")
     suspend fun getAlarms(@Path("calendarId") calendarId: String, @Query("Start") startTimestamp: Long, @Query("End") endTimestamp: Long, @Query("PageSize") pageSize: Int) : AlarmsApiResponse
 
@@ -147,6 +150,11 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     override suspend fun getBootstrap(userId: UserId, calendarId: String): ApiResponse<BootstrapApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getBootstrap(calendarId)
+        }.toApiResponse()
+
+    override suspend fun deleteCalendar(userId: UserId, calendarId: String): ApiResponse<StatusCodeApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            deleteCalendar(calendarId)
         }.toApiResponse()
 
     override suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int): ApiResponse<AlarmsApiResponse> =
