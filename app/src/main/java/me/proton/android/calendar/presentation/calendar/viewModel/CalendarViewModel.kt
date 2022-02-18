@@ -1019,4 +1019,10 @@ class CalendarViewModel @Inject constructor(
         return monthViewEventsMap
     }
 
+    suspend fun getCalendarEmail(calendarId: String): String? {
+        return calendarsRepository.selectMembers(calendarId).firstOrNull {
+            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+        }?.email
+    }
+
 }
