@@ -52,25 +52,26 @@ class FetchPublicKeysUseCase @Inject constructor(
     }
 
     fun enqueueFetchPublicKeys(userId: UserId, eventEntities: List<EventEntity>) {
-        val emails = getEmails(eventEntities)
+        val chunkedEmails = getEmails(eventEntities).chunked(100)
+        chunkedEmails.forEach { emails ->
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_PUBLIC_KEYS,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                    UseCaseWorker.INPUT_USER_EMAILS to emails.toTypedArray(),
+            val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+                .setConstraints(constraints)
+                .setInputData(
+                    workDataOf(
+                        UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_PUBLIC_KEYS,
+                        UseCaseWorker.INPUT_USER_ID to userId.id,
+                        UseCaseWorker.INPUT_USER_EMAILS to emails.toTypedArray(),
+                    )
                 )
-            )
-            .build()
+                .build()
 
-        val workManager = WorkManager.getInstance(context)
-        workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_PUBLIC_KEYS, ExistingWorkPolicy.REPLACE, work)
+            val workManager = WorkManager.getInstance(context)
+            workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_PUBLIC_KEYS, ExistingWorkPolicy.APPEND, work)
+        }
     }
 
     private fun getEmails(eventEntities: List<EventEntity>): List<String> {

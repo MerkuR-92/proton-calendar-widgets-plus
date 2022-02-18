@@ -124,11 +124,14 @@ object DateTimeUtilsImpl : DateTimeUtils {
     override fun LocalDate.toDate(timeZoneId: String?): Date = Date.from(this.atStartOfDay(ZoneId.of(timeZoneId ?: ZoneId.systemDefault().id)).toInstant())
 
     override fun DayOfWeek.format(firstLetter: Boolean): String {
+        val locale = getLocaleForFormatting()
+        val edgeCaseAbbreviation = locale.language == "ca"
+        val textStyle = if (!firstLetter) TextStyle.FULL else if (edgeCaseAbbreviation) TextStyle.SHORT else TextStyle.NARROW
         val formatted = this.getDisplayName(
-            TextStyle.FULL,
-            getLocaleForFormatting()
+            textStyle,
+            locale
         )
-        return if (firstLetter) formatted.firstOrNull()?.toString() ?: "" else formatted
+        return if (firstLetter) formatted.replaceFirstChar { it.titlecase(locale) } else formatted
     }
 
     override fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {
