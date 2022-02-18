@@ -461,22 +461,23 @@
         <item quantity="other">participants</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-    <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-    <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-    <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-    <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="one">Every %1$d %2$s</item>
         <item quantity="other">Every %1$d %2$s</item>
     </plurals>
-    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">%s minutes<item quantity="one">%s minute</item>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s minute</item>
         <item quantity="other">%s minutes</item>
     </plurals>
     <!--  STRING ARRAYS  -->
