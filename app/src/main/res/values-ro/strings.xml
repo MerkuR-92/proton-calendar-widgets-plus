@@ -60,7 +60,6 @@
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s la %2$s prin e-mail</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s înainte la %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s înainte la %2$s prin e-mail</string>
-    <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">La fiecare %1$d %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s la %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s în ziua %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s la %2$s</string>
@@ -79,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d da</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d poate</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nu</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d fără răspuns</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d unanswered</string>
     <string name="event_attendee_is_organizer">Sunteți organizatorul</string>
     <string name="event_attendee_organizer">Organizator</string>
     <string name="event_attendee_optional">Opțional</string>
@@ -93,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
-    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Detalii</a>
+    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a>
     </string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
@@ -163,7 +162,7 @@
     <string name="event_alarm_action">Trimitere prin</string>
     <string name="event_alarm_action_notification">notificare</string>
     <string name="event_alarm_action_email">e-mail</string>
-    <string name="event_alarm_same_day" comment="event_alarm_same_day&#10;Notify on the (same) day">în ziua</string>
+    <string name="event_alarm_same_day">în ziua</string>
     <string name="event_recurrence_1">fără repetare</string>
     <string name="event_recurrence_2">zilnic</string>
     <string name="event_recurrence_3">săptămânal</string>
@@ -377,7 +376,6 @@
     <string name="calendar_form_name_character_limit">%d/%d caractere</string>
     <string name="calendar_form_color">Culoare calendar</string>
     <string name="calendar_form_default_event_duration">Durată eveniment</string>
-    <string name="calendar_form_default_event_duration_value" comment="calendar_form_default_event_duration_value&#10;Value is always greater than 0.">%s minute</string>
     <string name="calendar_form_default_event_notifications">Notificări eveniment</string>
     <string name="calendar_form_default_all_day_event_notifications">Notificări pe durata evenimentului</string>
     <string name="calendar_form_add_notification">Adăugare notificare</string>
@@ -394,12 +392,12 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Nu există calendare asociate cu acest cont.</string>
-    <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
+    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
     </string>
     <string name="bootstrap_error_some_calendars_failed_title">Eroare pregătire calendar</string>
     <string name="bootstrap_error_some_calendars_failed_message">Următoarele calendare nu au putut fi setate</string>
     <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar activ asociat cu acest cont.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://protonmail.com/support/">baza de cunoștințe</a>
+    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a>
     </string>
     <string name="bootstrap_error_store_quota_reached_message">Nu mai există spațiu de stocare disponibil.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Detalii</string>
@@ -470,6 +468,31 @@
         <item quantity="one">participant</item>
         <item quantity="few">participanți</item>
         <item quantity="other">de participanţi</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="few">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="few">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="few">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Every %1$d %2$s</item>
+        <item quantity="few">Every %1$d %2$s</item>
+        <item quantity="other">Every %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s minute</item>
+        <item quantity="few">%s minutes</item>
+        <item quantity="other">%s minutes</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

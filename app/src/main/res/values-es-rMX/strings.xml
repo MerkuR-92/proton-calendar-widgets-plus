@@ -60,7 +60,6 @@
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s a las %2$s por correo</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s antes a las %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s antes a las %2$s por correo</string>
-    <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">Cada %1$d %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s los %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s el día %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s el %2$s</string>
@@ -163,7 +162,7 @@
     <string name="event_alarm_action">Enviar por</string>
     <string name="event_alarm_action_notification">notificación</string>
     <string name="event_alarm_action_email">correo</string>
-    <string name="event_alarm_same_day" comment="event_alarm_same_day&#10;Notify on the (same) day">en el día</string>
+    <string name="event_alarm_same_day">en el día</string>
     <string name="event_recurrence_1">no repetir</string>
     <string name="event_recurrence_2">cada día</string>
     <string name="event_recurrence_3">cada semana</string>
@@ -377,7 +376,6 @@
     <string name="calendar_form_name_character_limit">%d/%d caracteres</string>
     <string name="calendar_form_color">Color del calendario</string>
     <string name="calendar_form_default_event_duration">Duración del evento</string>
-    <string name="calendar_form_default_event_duration_value" comment="calendar_form_default_event_duration_value&#10;Value is always greater than 0.">%s minutos</string>
     <string name="calendar_form_default_event_notifications">Notificaciones del evento</string>
     <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos durante todo el día</string>
     <string name="calendar_form_add_notification">Añadir notificación</string>
@@ -461,6 +459,26 @@
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participante</item>
         <item quantity="other">participantes</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Cada %1$d %2$s</item>
+        <item quantity="other">Cada %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Cada %1$d %2$s</item>
+        <item quantity="other">Cada %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Cada %1$d %2$s</item>
+        <item quantity="other">Cada %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Cada %1$d %2$s</item>
+        <item quantity="other">Cada %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s minuto</item>
+        <item quantity="other">%s minutos</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

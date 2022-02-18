@@ -60,7 +60,6 @@
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s o godzinie %2$s przez wiadomość</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s wcześniej o godzinie %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s wcześniej o godzinie %2$s przez wiadomość</string>
-    <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">Co %1$d %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s on %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s %2$d. dnia miesiąca</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s w %2$s</string>
@@ -163,7 +162,7 @@
     <string name="event_alarm_action">Wyślij przez</string>
     <string name="event_alarm_action_notification">powiadomienie</string>
     <string name="event_alarm_action_email">wiadomość</string>
-    <string name="event_alarm_same_day" comment="event_alarm_same_day&#10;Notify on the (same) day">w tym samym dniu</string>
+    <string name="event_alarm_same_day">w tym samym dniu</string>
     <string name="event_recurrence_1">nie powtarzaj</string>
     <string name="event_recurrence_2">codziennie</string>
     <string name="event_recurrence_3">co tydzień</string>
@@ -229,7 +228,7 @@
     <string name="nav_view_more">Więcej</string>
     <string name="nav_view_switcher">Widok</string>
     <string name="nav_view_switcher_day">Dzień</string>
-    <string name="nav_view_switcher_agenda">Plan</string>
+    <string name="nav_view_switcher_agenda">Harmonogram</string>
     <string name="nav_view_switcher_month">Miesiąc</string>
     <string name="nav_view_timezone">Strefa czasowa</string>
     <string name="nav_view_settings">Ustawienia</string>
@@ -377,7 +376,6 @@
     <string name="calendar_form_name_character_limit">%d/%d znaków</string>
     <string name="calendar_form_color">Kolor kalendarza</string>
     <string name="calendar_form_default_event_duration">Czas trwania wydarzenia</string>
-    <string name="calendar_form_default_event_duration_value" comment="calendar_form_default_event_duration_value&#10;Value is always greater than 0.">%s minut</string>
     <string name="calendar_form_default_event_notifications">Powiadomienia wydarzenia</string>
     <string name="calendar_form_default_all_day_event_notifications">Powiadomienia wydarzenia całodniowego</string>
     <string name="calendar_form_add_notification">Dodaj powiadomienie</string>
@@ -399,7 +397,7 @@
     <string name="bootstrap_error_some_calendars_failed_title">Wystąpił błąd podczas przygotowywania kalendarzy</string>
     <string name="bootstrap_error_some_calendars_failed_message">Następujące kalendarze nie mogły zostać skonfigurowane</string>
     <string name="bootstrap_error_no_active_calendar_title">Brak aktywnego kalendarza skojarzonego z tym kontem.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Aby dowiedzieć się jak aktywować kalendarze, odwiedź naszą <a href="https://protonmail.com/support/">bazę wiedzy</a>
+    <string name="bootstrap_error_no_active_calendar_message">Aby dowiedzieć się jak aktywować kalendarz, odwiedź naszą <a href="https://protonmail.com/support/">bazę wiedzy</a>
     </string>
     <string name="bootstrap_error_store_quota_reached_message">Brak dostępnej przestrzeni dyskowej.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Dowiedz się więcej</string>
@@ -479,6 +477,36 @@
         <item quantity="few">uczestników</item>
         <item quantity="many">uczestników</item>
         <item quantity="other">uczestników</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Codziennie</item>
+        <item quantity="few">Co %1$d %2$s</item>
+        <item quantity="many">Co %1$d %2$s</item>
+        <item quantity="other">Co %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Co %2$s</item>
+        <item quantity="few">Co %1$d %2$s</item>
+        <item quantity="many">Co %1$d %2$s</item>
+        <item quantity="other">Co %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Co %2$s</item>
+        <item quantity="few">Co %1$d %2$s</item>
+        <item quantity="many">Co %1$d %2$s</item>
+        <item quantity="other">Co %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Co %2$s</item>
+        <item quantity="few">Co %1$d %2$s</item>
+        <item quantity="many">Co %1$d %2$s</item>
+        <item quantity="other">Co %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s minuta</item>
+        <item quantity="few">%s minuty</item>
+        <item quantity="many">%s minut</item>
+        <item quantity="other">%s minuty</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

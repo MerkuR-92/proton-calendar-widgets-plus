@@ -60,7 +60,6 @@
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s um %2$s per E-Mail</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s vorher um %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s vorher um %2$s per E-Mail</string>
-    <string name="event_recurrence_every_some_period" comment="Example: Every 1 day">Alle %1$d %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s am %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s am %2$d. Tag</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s am %2$s</string>
@@ -93,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Termin löschen</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
-    <string name="event_signature_verification_warning">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Mehr erfahren</a>
+    <string name="event_signature_verification_warning">Die Überprüfung der Ereignissignatur ist fehlgeschlagen. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Mehr erfahren</a>
     </string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
@@ -149,7 +148,7 @@
     <string name="event_alert_invalid_start_end_date">Startdatum des Termins darf nicht später als das Enddatum sein</string>
     <string name="event_alarms_title">Benachrichtigungen</string>
     <string name="event_custom_alarms_field">Benachrichtigen</string>
-    <string name="event_custom_alarms_title">Benutzerdefinierte Benachrichtigungen</string>
+    <string name="event_custom_alarms_title">Eigene Benachrichtigungen</string>
     <string name="event_alarm_partial_day_1">zum Zeitpunkt des Termins</string>
     <string name="event_alarm_partial_day_2">10 Minuten</string>
     <string name="event_alarm_partial_day_3">30 Minuten</string>
@@ -163,7 +162,7 @@
     <string name="event_alarm_action">Senden via</string>
     <string name="event_alarm_action_notification">Benachrichtigung</string>
     <string name="event_alarm_action_email">E‐Mail</string>
-    <string name="event_alarm_same_day" comment="event_alarm_same_day&#10;Notify on the (same) day">An diesem Tag</string>
+    <string name="event_alarm_same_day">An diesem Tag</string>
     <string name="event_recurrence_1">Keine Wiederholungen</string>
     <string name="event_recurrence_2">Täglich</string>
     <string name="event_recurrence_3">Wöchentlich</string>
@@ -377,7 +376,6 @@
     <string name="calendar_form_name_character_limit">%d/%d Zeichen</string>
     <string name="calendar_form_color">Kalenderfarbe</string>
     <string name="calendar_form_default_event_duration">Standard-Termindauer</string>
-    <string name="calendar_form_default_event_duration_value" comment="calendar_form_default_event_duration_value&#10;Value is always greater than 0.">%s Minuten</string>
     <string name="calendar_form_default_event_notifications">Terminbenachrichtigungen</string>
     <string name="calendar_form_default_all_day_event_notifications">Benachrichtigungen zu ganztägigem Termin</string>
     <string name="calendar_form_add_notification">Benachrichtigung hinzufügen</string>
@@ -461,6 +459,26 @@
     <plurals name="plural_participant_uppercase">
         <item quantity="one">Teilnehmer</item>
         <item quantity="other">Teilnehmer</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Jeden Tag</item>
+        <item quantity="other">Aller %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Jede Woche</item>
+        <item quantity="other">Alle %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Jeden Monat</item>
+        <item quantity="other">Alle %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Jedes Jahr</item>
+        <item quantity="other">Alle %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s Minute</item>
+        <item quantity="other">%s Minuten</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
