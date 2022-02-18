@@ -398,7 +398,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun observeEventLiveData() {
-        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
+        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { nullableEvent: Event? ->
+
+            val event = nullableEvent ?: return@Observer
 
             // TODO Fix transition so title hint doesn't blink on screen
             event_form_title.hint = resources.getString(R.string.event_hint_title)

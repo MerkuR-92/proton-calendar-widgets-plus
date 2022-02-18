@@ -136,8 +136,8 @@ class EventViewModel @Inject constructor(
 
     private var originalDbEvent: Event? = null
 
-    private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
-    val eventLiveData: LiveData<Event> = _event
+    private val _event = MutableLiveData<Event?>() // TODO see if there's less ugly way
+    val eventLiveData: LiveData<Event?> = _event
 
     // TimeZone used when displaying event is taken from settings
     lateinit var displayTimeZoneId: String
@@ -231,6 +231,8 @@ class EventViewModel @Inject constructor(
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
         hasEmailNotifications = false
+
+        _event.postValue(null)
     }
 
     /**

@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
@@ -186,13 +187,14 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         (nav_event_form_attendees_search_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         nav_event_form_attendees_search_list.adapter = searchAttendeeListAdapter
 
-        searchAttendeeList.observe(viewLifecycleOwner, { searchAttendeeList ->
+        searchAttendeeList.observe(viewLifecycleOwner) { searchAttendeeList ->
             searchAttendeeListAdapter.submitList(searchAttendeeList.sortedBy { it.commonName })
             // TODO Try to find a way to refresh the highlighted text and icons visibility without calling notifyDataSetChanged
             searchAttendeeListAdapter.notifyDataSetChanged()
-        })
+        }
 
-        eventViewModel.eventLiveData.observe(viewLifecycleOwner, { event ->
+        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { nullableEvent ->
+            val event = nullableEvent ?: return@Observer
             lifecycleScope.launch {
                 // Get non canonical email
                 val organizerEmail = calendarViewModel.getCalendarDefaultEmail(event.calendar.id) // TODO What is the behavior if we fail to get calendar default email

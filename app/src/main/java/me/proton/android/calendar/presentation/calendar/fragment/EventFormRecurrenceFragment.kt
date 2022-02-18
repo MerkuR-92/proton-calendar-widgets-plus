@@ -509,9 +509,11 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun observeEventLiveData() {
-        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer {
+        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { nullableEvent ->
 
-            val radioButtonId = when (it.iCalEvent.recurrenceRule?.value?.frequency) {
+            val event = nullableEvent ?: return@Observer
+
+            val radioButtonId = when (event.iCalEvent.recurrenceRule?.value?.frequency) {
                 Frequency.DAILY -> R.id.event_form_recurrence_2
                 Frequency.WEEKLY -> R.id.event_form_recurrence_3
                 Frequency.MONTHLY -> R.id.event_form_recurrence_4
@@ -519,10 +521,10 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 else -> R.id.event_form_recurrence_1
             }
 
-            if (it.isCustomRecurring()) {
+            if (event.isCustomRecurring()) {
                 //Set custom edit radio button text
                 event_form_recurrence_custom_edit.visibleOrGone(true)
-                event_form_recurrence_custom_edit.text = AndroidUtils.formatRecurrence(requireContext().resources, it, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+                event_form_recurrence_custom_edit.text = AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
                 // handle custom recurrence rule
                 custom_recurrence_occurrence_time_radio_group.check(
@@ -578,7 +580,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
 
             event_form_recurrence_radio_group.check(
-                if (it.isCustomRecurring()) R.id.event_form_recurrence_custom_edit
+                if (event.isCustomRecurring()) R.id.event_form_recurrence_custom_edit
                 else radioButtonId
             )
         })

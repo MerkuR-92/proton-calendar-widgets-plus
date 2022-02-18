@@ -377,8 +377,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun observeEventLiveData(coroutineContext: CoroutineContext) {
 
-        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
+        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { nullableEvent: Event? ->
+
             (requireActivity() as? MainActivity)?.displaySplashScreen(false)
+
+            val event = nullableEvent ?: return@Observer
 
             eventViewModel.attendeeAnswerState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { attendeeAnswerState ->
                 attendeeAnswerState?.let { displayAttendeeAnswerState(attendeeAnswerState.first, attendeeAnswerState.second) }
