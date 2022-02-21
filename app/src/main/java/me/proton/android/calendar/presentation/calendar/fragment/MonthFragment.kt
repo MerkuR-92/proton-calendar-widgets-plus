@@ -407,10 +407,12 @@ class MonthFragment : BaseFragment() {
                 val miniCalendarIndex = monthStartingPosition + offset
                 if (miniCalendarPager.currentItem != miniCalendarIndex) {
                     // smooth-scroll only when switching between adjacent months
-                    miniCalendarPager.setCurrentItem(
-                        miniCalendarIndex,
-                        Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1
-                    )
+                    miniCalendarPager.post {
+                        miniCalendarPager.setCurrentItem(
+                            miniCalendarIndex,
+                            Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1
+                        )
+                    }
                 }
             }
 
