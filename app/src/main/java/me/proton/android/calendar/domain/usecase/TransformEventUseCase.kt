@@ -224,7 +224,11 @@ class TransformEventUseCase @Inject constructor(
     )
 
     private suspend fun getPublicKeysForAuthor(userId: UserId, eventPart: Event.EventPart, userAddresses: List<UserAddress>): List<PublicKey> {
-        return kotlin.runCatching {
+
+        // TODO fix when we properly get public keys for authors
+        return emptyList()
+
+        /*return kotlin.runCatching {
             userAddresses.firstOrNull {
                 canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(
                     canonicalizeProtonEmail(eventPart.author, forceCanonicalization = true)
@@ -235,7 +239,7 @@ class TransformEventUseCase @Inject constructor(
 
                 // Source.LocalIfAvailable, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
             } ?: publicAddressRepository.getPublicAddress(userId, eventPart.author, source = Source.LocalIfAvailable).keys.map { it.publicKey }
-        }.getOrNull() ?: emptyList()
+        }.getOrNull() ?: emptyList()*/
     }
 
     /**
