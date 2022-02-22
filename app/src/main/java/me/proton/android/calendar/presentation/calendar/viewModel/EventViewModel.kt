@@ -256,7 +256,7 @@ class EventViewModel @Inject constructor(
 
         // Default calendar and its settings is only needed in edit mode
         val defaultCalendar: CalendarEntity? =
-            if (editMode) {
+            if (isCreate) {
                 // Get default calendar and its settings if we are in edit mode
                 val initializeDefaultCalendarResult = initializeDefaultCalendar()
                 if (initializeDefaultCalendarResult !is InitResult.InitDefaultCalendarSuccess) {
@@ -452,6 +452,12 @@ class EventViewModel @Inject constructor(
         }
         // return error only if event dbEvent is recurring, if it's a single edit it's okay that occurrence can't be generated
         if (occurrenceNumber != null && (dbEvent?.isRecurring() == true) && dbEventWithOccurrence == null) return InitResult.OccurrenceDoesNotExist
+
+        if (editMode) {
+            // Load the settings for the event's calendar
+            val event = dbEventWithOccurrence ?: dbEvent ?: return InitResult.Error("EventViewModel: event was null when loading settings for calendar in EventViewModel")
+            loadSettingsForCalendar(event.calendar.id)
+        }
 
         val adjustedEvent =
             (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
