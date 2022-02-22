@@ -36,6 +36,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getSingleEditOriginalOccurrenceNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.updateParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustRRuleToStartDate
@@ -1279,13 +1280,19 @@ class EventViewModel @Inject constructor(
                 // Update Event Form state
                 eventFormState.value = EventState.Processing.Saving
 
+                val originalOccurrenceNumber =
+                    if (event.isSingleEdit() && originalDbEvent != null && occurrenceNumber == 0) {
+                        // If event is a single edit and occurrence number is 0, check that we are using the correct original event occurrence number
+                        event.getSingleEditOriginalOccurrenceNumber(originalDbEvent!!, eventTimeZoneId) ?: occurrenceNumber
+                    } else occurrenceNumber
+
                 if (eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty().not()) {
 
                     // Handle edit / create for event with attendees
                     saveEventWithAttendees(
                         displayDialog,
                         eventId,
-                        occurrenceNumber,
+                        originalOccurrenceNumber,
                         timeFormatIs24Hour
                     )
                 } else {
@@ -1294,7 +1301,7 @@ class EventViewModel @Inject constructor(
                     saveEvent(
                         displayDialog,
                         mapOf(),
-                        occurrenceNumber,
+                        originalOccurrenceNumber,
                         timeFormatIs24Hour
                     )
                 }
@@ -1862,17 +1869,33 @@ class EventViewModel @Inject constructor(
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
 
+        val originalOccurrenceNumber =
+            if (event.isSingleEdit() && occurrenceNumber == 0) {
+                // If event is a single edit and occurrence number is 0, check that we are using the correct original event occurrence number
+                val eventUid = dbEvent?.uid
+                if (originalDbEvent == null && eventUid != null) {
+                    // We only set originalDbEvent in editMode, but we do delete from details so we need to get it here
+                    originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)?.let {
+                        if (USE_EVENT_DECRYPTOR) eventDecryptor.decrypt(it)
+                        else transformEventUseCase.execute(it)
+                    }
+                }
+                originalDbEvent?.let {
+                    event.getSingleEditOriginalOccurrenceNumber(it, eventTimeZoneId) ?: occurrenceNumber
+                } ?: occurrenceNumber
+            } else occurrenceNumber
+
         if (deleteAsAnOrganizer) { // Check deleteAsAnOrganizer before deleteAsAnAttendee because user can be both organizer and attendee
 
             deleteEventAsAnOrganizer(displayDialog, timeFormatIs24Hour)
 
         } else if (deleteAsAnAttendee) { // Check deleteAsAnAttendee after deleteAsAnOrganizer because user can be both organizer and attendee
 
-            deleteEventAsAnAttendeeSendPreferences(displayDialog, userAddresses, event, occurrenceNumber, timeFormatIs24Hour)
+            deleteEventAsAnAttendeeSendPreferences(displayDialog, userAddresses, event, originalOccurrenceNumber, timeFormatIs24Hour)
 
         } else if (event.isPartOfChain() && dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false && event.calendar.isActive) {
 
-            deleteRecurringEvent(displayDialog, dbEvent, occurrenceNumber)
+            deleteRecurringEvent(displayDialog, dbEvent, originalOccurrenceNumber)
 
         } else {
             // TODO Check if we need to handle inactive calendars the same way
@@ -1886,7 +1909,7 @@ class EventViewModel @Inject constructor(
             }
             else {
 
-                deleteEvent(displayDialog, occurrenceNumber)
+                deleteEvent(displayDialog, originalOccurrenceNumber)
             }
         }
     }

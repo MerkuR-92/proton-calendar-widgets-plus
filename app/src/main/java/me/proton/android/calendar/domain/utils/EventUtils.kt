@@ -93,4 +93,10 @@ interface EventUtils {
     fun Event.overlapsWithFullDayRange(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Boolean
 
     fun Event.overlapsWithDateRange(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime): Boolean
+
+    /**
+     * For Single edits only
+     * @returns the occurrence number of the original event
+     */
+    fun Event.getSingleEditOriginalOccurrenceNumber(rootEvent: Event, timeZoneId: String): Int?
 }

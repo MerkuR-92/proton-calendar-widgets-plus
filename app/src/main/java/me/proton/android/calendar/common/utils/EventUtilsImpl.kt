@@ -19,6 +19,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.startEndOverlapsWithFullDayRange
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
@@ -573,4 +574,19 @@ object EventUtilsImpl : EventUtils {
                 || ((getStart(fromDateTime.zone.id).isBefore(fromDateTime)) && getEnd(toDateTime.zone.id).isAfter(toDateTime)) // starts before or ends after range, but happens during range
     }
 
+    /**
+     * For Single edits only
+     * @returns the occurrence number of the original event
+     */
+    override fun Event.getSingleEditOriginalOccurrenceNumber(rootEvent: Event, timeZoneId: String): Int? {
+        val eventTimeZoneId = rootEvent.iCalendar.timezoneInfo?.getTimezone(rootEvent.iCalEvent.dateStart)?.timeZone?.id
+            ?: timeZoneId
+        return rootEvent.generateOccurrencesUntil(
+            ZonedDateTime.ofInstant(Instant.ofEpochMilli(this.iCalEvent.recurrenceId.value.time), ZoneId.of(eventTimeZoneId))
+                .toLocalDate(),
+            eventTimeZoneId
+        )?.lastIndex?.let {
+            it + 1
+        }
+    }
 }

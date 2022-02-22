@@ -9,6 +9,7 @@ import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getSingleEditOriginalOccurrenceNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
@@ -86,15 +87,14 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                         } }
                             ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
 
-                        val timeZoneId = rootEvent.iCalendar.timezoneInfo?.getTimezone(rootEvent.iCalEvent.dateStart)?.timeZone?.id
-                            ?: timezone
-                        val originalOccurrenceNumber = rootEvent.generateOccurrencesUntil(
-                            ZonedDateTime.ofInstant(Instant.ofEpochMilli(event.iCalEvent.recurrenceId.value.time), ZoneId.of(timeZoneId))
-                                .toLocalDate(),
-                            timeZoneId ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: Time zone id was null")
-                        )?.lastIndex?.let {
-                            it + 1
-                        } ?: occurrenceNumber!!
+                        val originalOccurrenceNumber =
+                            if (occurrenceNumber == 0) {
+                                // If event is a single edit and occurrence number is 0, check that we are using the correct original event occurrence number
+                                event.getSingleEditOriginalOccurrenceNumber(
+                                    rootEvent,
+                                    timezone ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: Time zone id was null")
+                                ) ?: occurrenceNumber
+                            } else occurrenceNumber!!
 
                         // add EXDATE to root event
                         rootEvent.addExceptionDate(originalOccurrenceNumber, timezone) // TODO
@@ -136,13 +136,23 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                     } }
                         ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
                     else event
+
+                val originalOccurrenceNumber =
+                    if (occurrenceNumber == 0) {
+                        // If event is a single edit and occurrence number is 0, check that we are using the correct original event occurrence number
+                        event.getSingleEditOriginalOccurrenceNumber(
+                            rootEvent,
+                            timezone ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: Time zone id was null")
+                        ) ?: occurrenceNumber
+                    } else occurrenceNumber!!
+
                 val occurrenceStart = rootEvent.generateOccurrence(
-                    occurrenceNumber!!,
+                    originalOccurrenceNumber,
                     if (rootEvent.isAllDay()) ZoneId.systemDefault().id else rootEvent.iCalendar.iCalTimeZone(rootEvent.iCalEvent.dateStart).id
                 )?.startDateTime
                     ?: return UseCase.Result.Error("HandleDeleteUseCase: could not generate occurrence in >delete this and following< events")
 
-                rootEvent.handleDeleteThisAndFuture(occurrenceNumber)
+                rootEvent.handleDeleteThisAndFuture(originalOccurrenceNumber)
                 val editResult = editCreateEventUseCase.execute(userId, rootEvent)
                 editResult.ifSuccessAndLogErrors(logger) {}
 
@@ -364,9 +374,9 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
             if (sendCancellationResult is UseCase.Result.Error) {
                 return UseCase.Result.Error(
-                        "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}",
-                        sendCancellationResult.error
-                    )
+                    "HandleDeleteUseCase: handleDeleteAsAttendee error in send email: ${sendCancellationResult.message}",
+                    sendCancellationResult.error
+                )
             } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
                 return UseCase.Result.InvalidParams(
                     "HandleDeleteUseCase: handleDeleteAsAttendee invalid params in send email: ${sendCancellationResult.message}"
