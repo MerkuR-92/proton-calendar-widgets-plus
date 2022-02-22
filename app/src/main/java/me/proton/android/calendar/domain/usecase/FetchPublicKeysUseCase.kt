@@ -25,7 +25,10 @@ class FetchPublicKeysUseCase @Inject constructor(
 ) : UseCase {
 
     private suspend fun fetchPublicKeys(userId: UserId, email: String): UseCase.Result {
-        val publicAddress = kotlin.runCatching {
+        // TODO returning right away, not to use the publicAddressRepository because it might cause app freezes
+        return UseCase.Result.Success<Unit>()
+
+        /*val publicAddress = kotlin.runCatching {
             publicAddressRepository.getPublicAddress(userId, email, source = Source.RemoteNoCache)
         }.getOrNull()
 
@@ -33,7 +36,7 @@ class FetchPublicKeysUseCase @Inject constructor(
             UseCase.Result.Success<Unit>()
         } else {
             UseCase.Result.Error("error fetching public keys")
-        }
+        }*/
     }
 
     suspend fun execute(userId: UserId, eventEntities: List<EventEntity>): UseCase.Result {
