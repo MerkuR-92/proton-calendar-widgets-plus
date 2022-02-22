@@ -136,7 +136,7 @@ interface CalendarsRepository {
 
     suspend fun isOrphanSingleEdit(userId: UserId, eventUid: String): Boolean?
 
-    suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String, occurrenceNumber: Int): Boolean?
+    suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String): Boolean?
 
     suspend fun persistEvents(vararg events: EventEntity)
 

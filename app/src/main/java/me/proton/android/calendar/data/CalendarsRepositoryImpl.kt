@@ -833,7 +833,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     /**
      * Main chain has no other occurrences left and event is the only single edit
      */
-    override suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String, occurrenceNumber: Int): Boolean? {
+    override suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String): Boolean? {
         // Check if single edit is the only occurrence of a recurring event
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {

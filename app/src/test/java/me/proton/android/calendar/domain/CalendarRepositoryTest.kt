@@ -79,8 +79,7 @@ internal class CalendarRepositoryTest {
                     LocalDate.of(2021, 9, 24).toDate(TimeZone.getDefault().id),
                     false
                 ),
-                TimeZone.getDefault().id,
-                0
+                TimeZone.getDefault().id
             )
 
             assertThat(isStandaloneSingleEdit).isEqualTo(true)
@@ -101,8 +100,7 @@ internal class CalendarRepositoryTest {
                     LocalDate.of(2021, 9, 24).toDate(TimeZone.getDefault().id),
                     false
                 ),
-                TimeZone.getDefault().id,
-                0
+                TimeZone.getDefault().id
             )
 
             assertThat(isStandaloneSingleEdit).isEqualTo(false)
@@ -123,8 +121,7 @@ internal class CalendarRepositoryTest {
                     LocalDate.of(2021, 9, 24).toDate(TimeZone.getDefault().id),
                     false
                 ),
-                TimeZone.getDefault().id,
-                0
+                TimeZone.getDefault().id
             )
 
             assertThat(isStandaloneSingleEdit).isEqualTo(false)
@@ -145,8 +142,7 @@ internal class CalendarRepositoryTest {
                     LocalDate.of(2021, 9, 24).toDate(TimeZone.getDefault().id),
                     false
                 ),
-                TimeZone.getDefault().id,
-                0
+                TimeZone.getDefault().id
             )
 
             assertThat(isStandaloneSingleEdit).isEqualTo(false)
@@ -167,8 +163,7 @@ internal class CalendarRepositoryTest {
                     LocalDate.of(2021, 9, 24).toDate(TimeZone.getDefault().id),
                     false
                 ),
-                TimeZone.getDefault().id,
-                0
+                TimeZone.getDefault().id
             )
 
             assertThat(isStandaloneSingleEdit).isEqualTo(false)

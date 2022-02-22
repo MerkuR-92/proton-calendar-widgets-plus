@@ -8,6 +8,7 @@ import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
@@ -85,15 +86,24 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                         } }
                             ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: root event for $eventId doesn't exist in DB")
 
+                        val timeZoneId = rootEvent.iCalendar.timezoneInfo?.getTimezone(rootEvent.iCalEvent.dateStart)?.timeZone?.id
+                            ?: timezone
+                        val originalOccurrenceNumber = rootEvent.generateOccurrencesUntil(
+                            ZonedDateTime.ofInstant(Instant.ofEpochMilli(event.iCalEvent.recurrenceId.value.time), ZoneId.of(timeZoneId))
+                                .toLocalDate(),
+                            timeZoneId ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: Time zone id was null")
+                        )?.lastIndex?.let {
+                            it + 1
+                        } ?: occurrenceNumber!!
+
                         // add EXDATE to root event
-                        rootEvent.addExceptionDate(occurrenceNumber!!, timezone) // TODO
+                        rootEvent.addExceptionDate(originalOccurrenceNumber, timezone) // TODO
 
                         val isStandaloneSingleEdit = calendarsRepository.isStandaloneSingleEdit(
                             userId,
                             event.uid,
                             event.iCalEvent.recurrenceId,
-                            timezone ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: timezone was null for isStandaloneSingleEdit"),
-                            occurrenceNumber
+                            timezone ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: timezone was null for isStandaloneSingleEdit")
                         ) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: isStandaloneSingleEdit was null, error in call for getEventsByUid")
 
                         if (isStandaloneSingleEdit) {
