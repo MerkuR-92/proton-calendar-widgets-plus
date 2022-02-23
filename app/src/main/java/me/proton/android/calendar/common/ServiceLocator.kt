@@ -12,7 +12,6 @@ import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.EventDecryptorImpl
-import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.di.AppDatabaseModule_ProvideAppDatabaseFactory
@@ -41,6 +40,7 @@ import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -75,7 +75,6 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<UserSettingsRepository> { UserSettingsRepositoryImpl(get()) }
     single<EventDecryptor> { EventDecryptorImpl(get(), get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
@@ -150,7 +149,8 @@ fun coreModule(
     networkManager: NetworkManager,
     defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     appDatabase: AppDatabase,
-    calendarsRepository: CalendarsRepository
+    calendarsRepository: CalendarsRepository,
+    userSettingsRepository: UserSettingsRepository
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -174,4 +174,5 @@ fun coreModule(
     single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
     single<AppDatabase> { appDatabase }
     single<CalendarsRepository> { calendarsRepository }
+    single<UserSettingsRepository> { userSettingsRepository }
 }

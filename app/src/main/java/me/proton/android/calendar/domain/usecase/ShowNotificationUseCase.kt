@@ -12,6 +12,7 @@ import biweekly.util.Duration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.getTimeFormat
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartForNotification
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -19,9 +20,10 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.core.domain.entity.UserId
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -50,7 +52,7 @@ class ShowNotificationUseCase @Inject constructor(
             logger.e("empty displayTimeZoneId in ShowNotificationUseCase")
         }
 
-        val is24Hour = when (userSettingsRepository.selectTimeFormat(userId)) {
+        val is24Hour = when (userSettingsRepository.getTimeFormat(UserId(userId))) {
             0 -> null
             1 -> true
             2 -> false

@@ -37,6 +37,7 @@ import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.CoreLogger
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -67,6 +68,9 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var userAddressRepository: UserAddressRepository
+
+    @Inject
+    lateinit var userSettingsRepository: UserSettingsRepository
 
     @Inject
     lateinit var authOrchestrator: AuthOrchestrator
@@ -150,7 +154,8 @@ class ProtonCalendarApplication : Application() {
                     networkManager,
                     defaultSharedPreferencesProvider,
                     appDatabase,
-                    calendarsRepository
+                    calendarsRepository,
+                    userSettingsRepository
                 )
             )
         }

@@ -18,12 +18,15 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import biweekly.parameter.ParticipationStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.getTimeFormat
+import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
@@ -36,7 +39,6 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -44,6 +46,7 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getPrimaryAccount
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.takeIfNotBlank
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -506,8 +509,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                 }
 
                 val is24Hour = if (userId != null) {
-                    userSettingsRepository.selectUserSettings(userId.id)
-                        ?.timeFormatIs24Hour(DateFormat.is24HourFormat(applicationContext)) ?: true
+                    userSettingsRepository.getUserSettingsEntity(userId).timeFormatIs24Hour(DateFormat.is24HourFormat(applicationContext))
                 } else true
 
                 val zoneId = ZoneId.systemDefault()

@@ -71,6 +71,7 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
 import java.time.*
@@ -273,8 +274,8 @@ class EventViewModel @Inject constructor(
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
             ?: return InitResult.Error("EventViewModel: could not get Calendar User Settings")
-        userSettings = userSettingsRepository.selectUserSettings(userId.id)
-            ?: return InitResult.Error("EventViewModel: could not get User Settings")
+
+        userSettings = userSettingsRepository.getUserSettingsEntity(userId)
 
         user = userManager.getUserOrNull(userId, logger) ?: return InitResult.Error("EventViewModel: could not get User")
 

@@ -13,7 +13,6 @@ import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.EventDecryptorImpl
-import me.proton.android.calendar.data.UserSettingsRepositoryImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
@@ -72,10 +71,6 @@ abstract class CalendarsBindModule {
 
     @Binds
     abstract fun bindCrypto(cryptoImpl: CryptoImpl): Crypto
-
-    @Binds
-    @Singleton
-    abstract fun bindUserSettingsRepository(userSettingsRepositoryImpl: UserSettingsRepositoryImpl): UserSettingsRepository
 
     @Binds
     abstract fun bindEventDecryptor(eventDecryptorImpl: EventDecryptorImpl): EventDecryptor

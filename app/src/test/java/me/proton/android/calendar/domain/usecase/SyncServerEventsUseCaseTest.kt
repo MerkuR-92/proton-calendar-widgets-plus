@@ -29,7 +29,6 @@ import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStore
@@ -39,6 +38,7 @@ import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -94,7 +94,6 @@ internal class SyncServerEventsUseCaseTest {
         coEvery { userAddressRepositoryMock.addAddresses(any()) } just Runs
         coEvery { userAddressRepositoryMock.updateAddresses(any()) } just Runs
         coEvery { userAddressRepositoryMock.deleteAddresses(any()) } just Runs
-        coEvery { userSettingsRepositoryMock.persistUserSettings(any(), any()) } just Runs
         coEvery { calendarsRepositoryMock.persistEventAlarm(any()) } just Runs
         coEvery { calendarsRepositoryMock.deleteEventAlarmById(any()) } just Runs
         coEvery { calendarsRepositoryMock.persistCalendarKey(any()) } just Runs
@@ -194,9 +193,6 @@ internal class SyncServerEventsUseCaseTest {
             }
             coVerify(exactly = 1) {
                 userAddressRepositoryMock.updateAddresses(any())
-            }
-            coVerify(exactly = 1) {
-                userSettingsRepositoryMock.persistUserSettings(userId.id, any())
             }
             coVerify(exactly = 1) {
                 userRepositoryMock.updateUser(any())

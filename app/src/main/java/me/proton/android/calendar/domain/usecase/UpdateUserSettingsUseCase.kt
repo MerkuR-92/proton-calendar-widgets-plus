@@ -2,9 +2,10 @@ package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.usersettings.domain.entity.UserSettings
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 
 class UpdateUserSettingsUseCase(
     private val logger: Logger,
@@ -22,7 +23,9 @@ class UpdateUserSettingsUseCase(
             settingsApi.updateUserTimeFormat(userId, timeFormat)
         ) {
             is ApiResponse.Success -> {
-                userSettingsRepository.persistUserSettings(userId.id, updateUserTimeFormatResponse.data.userSettings)
+                val responseValue = UserSettings.TimeFormat.enumOf(updateUserTimeFormatResponse.data.userSettings.timeFormat)
+                val localSettings = userSettingsRepository.getUserSettings(userId).copy(timeFormat = responseValue)
+                userSettingsRepository.updateUserSettings(localSettings)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
@@ -41,7 +44,9 @@ class UpdateUserSettingsUseCase(
             settingsApi.updateUserWeekStart(userId, weekStart)
         ) {
             is ApiResponse.Success -> {
-                userSettingsRepository.persistUserSettings(userId.id, updateUserWeekStartResponse.data.userSettings)
+                val responseValue = UserSettings.WeekStart.enumOf(updateUserWeekStartResponse.data.userSettings.weekStart)
+                val localSettings = userSettingsRepository.getUserSettings(userId).copy(weekStart = responseValue)
+                userSettingsRepository.updateUserSettings(localSettings)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {

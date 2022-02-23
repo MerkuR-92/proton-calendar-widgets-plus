@@ -16,6 +16,7 @@ import java.time.temporal.WeekFields
 import java.util.*
 
 // User settings for entire account
+// TODO Remove this entire class and DB entity
 
 @Entity(tableName = AppDatabase.TABLE_USER_SETTINGS,
     foreignKeys = [ForeignKey(

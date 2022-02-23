@@ -7,7 +7,6 @@ import me.proton.core.domain.entity.UserId
 
 interface SettingsApi {
     suspend fun getCalendarUserSettings(userId: UserId): ApiResponse<CalendarUserSettingsApiResponse>
-    suspend fun getUserSettings(userId: UserId): ApiResponse<UserSettingsApiResponse>
     suspend fun updateCalendarUserPrimaryTimezone(userId: UserId, primaryTimezone: String): ApiResponse<CalendarUserSettingsApiResponse>
     suspend fun updateCalendarUserAutoDetectTimezone(userId: UserId, autoDetectPrimaryTimezone: Int): ApiResponse<CalendarUserSettingsApiResponse>
     suspend fun updateCalendarUserDisplayWeekNumber(userId: UserId, displayWeekNumber: Int): ApiResponse<CalendarUserSettingsApiResponse>
