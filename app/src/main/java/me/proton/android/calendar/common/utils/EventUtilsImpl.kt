@@ -579,12 +579,12 @@ object EventUtilsImpl : EventUtils {
      * @returns the occurrence number of the original event
      */
     override fun Event.getSingleEditOriginalOccurrenceNumber(rootEvent: Event, timeZoneId: String): Int? {
-        val eventTimeZoneId = rootEvent.iCalendar.timezoneInfo?.getTimezone(rootEvent.iCalEvent.dateStart)?.timeZone?.id
+        val rootEventTimeZoneId = rootEvent.iCalendar.timezoneInfo?.getTimezone(rootEvent.iCalEvent.dateStart)?.timeZone?.id
             ?: timeZoneId
         return rootEvent.generateOccurrencesUntil(
-            ZonedDateTime.ofInstant(Instant.ofEpochMilli(this.iCalEvent.recurrenceId.value.time), ZoneId.of(eventTimeZoneId))
+            ZonedDateTime.ofInstant(Instant.ofEpochMilli(this.iCalEvent.recurrenceId.value.time), ZoneId.of(rootEventTimeZoneId))
                 .toLocalDate(),
-            eventTimeZoneId
+            rootEventTimeZoneId
         )?.lastIndex?.let {
             it + 1
         }

@@ -255,10 +255,10 @@ class EventViewModel @Inject constructor(
         this.userId = userId
         this.isCreate = eventId == null
 
-        // Default calendar and its settings is only needed in edit mode
+        // Default calendar and its settings is only needed in create mode
         val defaultCalendar: CalendarEntity? =
             if (isCreate) {
-                // Get default calendar and its settings if we are in edit mode
+                // Get default calendar and its settings if we are in create mode
                 val initializeDefaultCalendarResult = initializeDefaultCalendar()
                 if (initializeDefaultCalendarResult !is InitResult.InitDefaultCalendarSuccess) {
                     // Handle initialisation error
