@@ -78,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d da</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d poate</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nu</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d unanswered</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d fără răspuns</string>
     <string name="event_attendee_is_organizer">Sunteți organizatorul</string>
     <string name="event_attendee_organizer">Organizator</string>
     <string name="event_attendee_optional">Opțional</string>
@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
-    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a>
+    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Detalii</a>
     </string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
@@ -392,12 +392,12 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Nu există calendare asociate cu acest cont.</string>
-    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
+    <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
     </string>
     <string name="bootstrap_error_some_calendars_failed_title">Eroare pregătire calendar</string>
     <string name="bootstrap_error_some_calendars_failed_message">Următoarele calendare nu au putut fi setate</string>
     <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar activ asociat cu acest cont.</string>
-    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a>
+    <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://protonmail.com/support/">baza de cunoștințe</a>
     </string>
     <string name="bootstrap_error_store_quota_reached_message">Nu mai există spațiu de stocare disponibil.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Detalii</string>
@@ -470,29 +470,29 @@
         <item quantity="other">de participanţi</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="few">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">La fiecare %1$d %2$s</item>
+        <item quantity="few">La fiecare %1$d %2$s</item>
+        <item quantity="other">La fiecare %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="few">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">La fiecare %1$d %2$s</item>
+        <item quantity="few">La fiecare %1$d %2$s</item>
+        <item quantity="other">La fiecare %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="few">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">La fiecare %1$d %2$s</item>
+        <item quantity="few">La fiecare %1$d %2$s</item>
+        <item quantity="other">La fiecare %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="few">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">La fiecare %1$d %2$s</item>
+        <item quantity="few">La fiecare %1$d %2$s</item>
+        <item quantity="other">La fiecare %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s minute</item>
-        <item quantity="few">%s minutes</item>
-        <item quantity="other">%s minutes</item>
+        <item quantity="one">%s minut</item>
+        <item quantity="few">%s minute</item>
+        <item quantity="other">%s de minute</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
