@@ -720,8 +720,10 @@ class EventViewModel @Inject constructor(
 
     fun handleTimeZone(timeZoneId: String) {
         markEventAsEdited()
+        val old = event.getStart(eventTimeZoneId)
         event.iCalendar.setDefaultTimeZone(timeZoneId)
         eventTimeZoneId = timeZoneId
+        event.iCalendar.adjustRRuleToStartDate(old)
         _event.postValue(event)
     }
 
