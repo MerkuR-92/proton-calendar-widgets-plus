@@ -9,14 +9,11 @@ import android.text.Spanned
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import androidx.lifecycle.*
-import androidx.viewpager2.widget.ViewPager2
 import androidx.work.*
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.android.synthetic.main.dialog_calendar_list.view.*
 import kotlinx.android.synthetic.main.dialog_checkbox.view.*
-import kotlinx.android.synthetic.main.fragment_settings.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.R
@@ -41,16 +38,13 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
-import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPagerAdapter
-import me.proton.android.calendar.presentation.calendar.pagerAdapter.DayPagerAdapter
-import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
-import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
@@ -210,13 +204,9 @@ class CalendarViewModel @Inject constructor(
                 it
             }.asLiveData(Dispatchers.Default)
 
-            timeFormat = userSettingsRepository.flowTimeFormat(userId.id).map {
-                it ?: 0 // Locale default
-            }.asLiveData(Dispatchers.Default)
+            timeFormat = userSettingsRepository.getTimeFormatFlow(userId).asLiveData(Dispatchers.Default)
 
-            weekStart = userSettingsRepository.flowWeekStart(userId.id).map {
-                it ?: 0 // Locale default
-            }.asLiveData(Dispatchers.Default)
+            weekStart = userSettingsRepository.getWeekStartFlow(userId).asLiveData(Dispatchers.Default)
 
             this@CalendarViewModel._userId.postValue(userId)
 
@@ -863,7 +853,7 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel getTimeFormat")
             return null
         }
-        return timeFormat.value ?: userSettingsRepository.selectTimeFormat(userId.id)
+        return timeFormat.value ?: userSettingsRepository.getTimeFormat(userId)
     }
 
     suspend fun getDefaultCalendarId(): String? {
@@ -899,7 +889,7 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel getWeekStart")
             return null
         }
-        return weekStart.value ?: userSettingsRepository.selectWeekStart(userId.id)
+        return weekStart.value ?: userSettingsRepository.getWeekStart(userId)
     }
 
     suspend fun getMonthViewEventsMap(
@@ -1017,6 +1007,12 @@ class CalendarViewModel @Inject constructor(
         }
 
         return monthViewEventsMap
+    }
+
+    suspend fun getCalendarEmail(calendarId: String): String? {
+        return calendarsRepository.selectMembers(calendarId).firstOrNull {
+            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
+        }?.email
     }
 
 }

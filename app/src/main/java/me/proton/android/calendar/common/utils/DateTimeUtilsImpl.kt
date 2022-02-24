@@ -365,24 +365,10 @@ object DateTimeUtilsImpl : DateTimeUtils {
         if (!CHANGE_LANGUAGE) return US
         val appDefaultLocale = getDefault()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val supportedLanguagesArray = arrayListOf(
-                "fr-ca",
-                "es-es",
-                "es-mx",
-                "pt-pt",
-                "fr",
-                "es",
-                "ca",
-                "pl",
-                "ro",
-                "pt",
-                "de",
-                "en"
-            ).toTypedArray()
             getSupportedLocaleOrNull(
                 appDefaultLocale
-            ) ?: Resources.getSystem().configuration.locales.getFirstMatch(
-                supportedLanguagesArray
+            ) ?: getSupportedLocaleOrNull(
+                Resources.getSystem().configuration.locales[0]
             ) ?: US // Fallback to English (US)
         } else {
             getSupportedLocaleOrNull(

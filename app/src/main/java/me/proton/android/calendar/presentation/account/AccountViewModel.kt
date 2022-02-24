@@ -19,10 +19,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.containsUserSettings
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
@@ -52,6 +52,7 @@ import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -85,7 +86,7 @@ class AccountViewModel @Inject constructor(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    private suspend fun Account.isBootstrapped() = userSettingsRepository.selectUserSettings(userId.id) != null
+    private suspend fun Account.isBootstrapped() = userSettingsRepository.containsUserSettings(userId)
 
     private suspend fun checkAccount(account: Account) {
         runCatching {

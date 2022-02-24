@@ -11,6 +11,7 @@ import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
@@ -24,7 +25,6 @@ class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val settingsApi: SettingsApi,
-    private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val createCalendarUseCase: CreateCalendarUseCase,
@@ -36,7 +36,8 @@ class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
     private val serverEventsApi: ServerEventsApi,
     private val valueStoreProvider: ValueStoreProvider,
     private val userManager: UserManager,
-    private val widgetRefresher: WidgetRefresher
+    private val widgetRefresher: WidgetRefresher,
+    private val userSettingsRepository: UserSettingsRepository
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String, showConfirmationDialog: Boolean): UseCase.Result {
@@ -143,12 +144,11 @@ class BootstrapCalendarsUseCase @Inject constructor( // TODO TEST
             calendarUserSettingsResponse.data.calendarUserSettings
         )
 
-        val userSettingsResponse = settingsApi.getUserSettings(userId)
-        if (userSettingsResponse !is ApiResponse.Success) {
-            logger.e("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponse")
-            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponse")
+        val userSettingsResponseException = kotlin.runCatching { userSettingsRepository.getUserSettings(userId, refresh = true) }.exceptionOrNull()
+        if (userSettingsResponseException != null) {
+            logger.e("BootstrapCalendarsUseCase: error getting user settings from API: ${userSettingsResponseException.message}", userSettingsResponseException)
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponseException")
         }
-        userSettingsRepository.persistUserSettings(userId.id, userSettingsResponse.data.userSettings)
 
         val failedCalendarIds = mutableListOf<String>()
 

@@ -7,7 +7,6 @@ import me.proton.android.calendar.data.api.ServerEventsApiResponse
 import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
@@ -17,6 +16,7 @@ import me.proton.core.user.data.extension.toUser
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
 import java.time.ZoneId
@@ -52,7 +52,8 @@ class HandleServerEventsUseCase(
                 userRepository.updateUser(it)
             }
             eventsResponse.userSettings?.let {
-                userSettingsRepository.persistUserSettings(userId.id, it)
+                // TODO we are not using this entire UseCase anyway
+                //userSettingsRepository.persistUserSettings(userId.id, it)
             }
             eventsResponse.calendarUserSettings?.let {
                 calendarUserSettingsChangedUseCase.execute(userId.id, it)

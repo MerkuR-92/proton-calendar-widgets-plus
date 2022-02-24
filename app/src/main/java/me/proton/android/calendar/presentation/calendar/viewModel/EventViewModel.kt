@@ -36,6 +36,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getSingleEditOriginalOccurrenceNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.updateParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustRRuleToStartDate
@@ -70,6 +71,7 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
 import java.time.*
@@ -136,8 +138,8 @@ class EventViewModel @Inject constructor(
 
     private var originalDbEvent: Event? = null
 
-    private val _event = MutableLiveData<Event>() // TODO see if there's less ugly way
-    val eventLiveData: LiveData<Event> = _event
+    private val _event = MutableLiveData<Event?>() // TODO see if there's less ugly way
+    val eventLiveData: LiveData<Event?> = _event
 
     // TimeZone used when displaying event is taken from settings
     lateinit var displayTimeZoneId: String
@@ -231,6 +233,8 @@ class EventViewModel @Inject constructor(
         singleEditsInfo = null
         tempRecurrenceUntilLocalDate = null
         hasEmailNotifications = false
+
+        _event.postValue(null)
     }
 
     /**
@@ -251,10 +255,10 @@ class EventViewModel @Inject constructor(
         this.userId = userId
         this.isCreate = eventId == null
 
-        // Default calendar and its settings is only needed in edit mode
+        // Default calendar and its settings is only needed in create mode
         val defaultCalendar: CalendarEntity? =
-            if (editMode) {
-                // Get default calendar and its settings if we are in edit mode
+            if (isCreate) {
+                // Get default calendar and its settings if we are in create mode
                 val initializeDefaultCalendarResult = initializeDefaultCalendar()
                 if (initializeDefaultCalendarResult !is InitResult.InitDefaultCalendarSuccess) {
                     // Handle initialisation error
@@ -270,8 +274,8 @@ class EventViewModel @Inject constructor(
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
             ?: return InitResult.Error("EventViewModel: could not get Calendar User Settings")
-        userSettings = userSettingsRepository.selectUserSettings(userId.id)
-            ?: return InitResult.Error("EventViewModel: could not get User Settings")
+
+        userSettings = userSettingsRepository.getUserSettingsEntity(userId)
 
         user = userManager.getUserOrNull(userId, logger) ?: return InitResult.Error("EventViewModel: could not get User")
 
@@ -449,6 +453,12 @@ class EventViewModel @Inject constructor(
         }
         // return error only if event dbEvent is recurring, if it's a single edit it's okay that occurrence can't be generated
         if (occurrenceNumber != null && (dbEvent?.isRecurring() == true) && dbEventWithOccurrence == null) return InitResult.OccurrenceDoesNotExist
+
+        if (editMode) {
+            // Load the settings for the event's calendar
+            val event = dbEventWithOccurrence ?: dbEvent ?: return InitResult.Error("EventViewModel: event was null when loading settings for calendar in EventViewModel")
+            loadSettingsForCalendar(event.calendar.id)
+        }
 
         val adjustedEvent =
             (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
@@ -1277,13 +1287,19 @@ class EventViewModel @Inject constructor(
                 // Update Event Form state
                 eventFormState.value = EventState.Processing.Saving
 
+                val originalOccurrenceNumber =
+                    if (event.isSingleEdit() && originalDbEvent != null && occurrenceNumber == 0) {
+                        // If event is a single edit and occurrence number is 0, check that we are using the correct original event occurrence number
+                        event.getSingleEditOriginalOccurrenceNumber(originalDbEvent!!, eventTimeZoneId) ?: occurrenceNumber
+                    } else occurrenceNumber
+
                 if (eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty().not()) {
 
                     // Handle edit / create for event with attendees
                     saveEventWithAttendees(
                         displayDialog,
                         eventId,
-                        occurrenceNumber,
+                        originalOccurrenceNumber,
                         timeFormatIs24Hour
                     )
                 } else {
@@ -1292,7 +1308,7 @@ class EventViewModel @Inject constructor(
                     saveEvent(
                         displayDialog,
                         mapOf(),
-                        occurrenceNumber,
+                        originalOccurrenceNumber,
                         timeFormatIs24Hour
                     )
                 }
@@ -1860,17 +1876,33 @@ class EventViewModel @Inject constructor(
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
 
+        val originalOccurrenceNumber =
+            if (event.isSingleEdit() && occurrenceNumber == 0) {
+                // If event is a single edit and occurrence number is 0, check that we are using the correct original event occurrence number
+                val eventUid = dbEvent?.uid
+                if (originalDbEvent == null && eventUid != null) {
+                    // We only set originalDbEvent in editMode, but we do delete from details so we need to get it here
+                    originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)?.let {
+                        if (USE_EVENT_DECRYPTOR) eventDecryptor.decrypt(it)
+                        else transformEventUseCase.execute(it)
+                    }
+                }
+                originalDbEvent?.let {
+                    event.getSingleEditOriginalOccurrenceNumber(it, eventTimeZoneId) ?: occurrenceNumber
+                } ?: occurrenceNumber
+            } else occurrenceNumber
+
         if (deleteAsAnOrganizer) { // Check deleteAsAnOrganizer before deleteAsAnAttendee because user can be both organizer and attendee
 
             deleteEventAsAnOrganizer(displayDialog, timeFormatIs24Hour)
 
         } else if (deleteAsAnAttendee) { // Check deleteAsAnAttendee after deleteAsAnOrganizer because user can be both organizer and attendee
 
-            deleteEventAsAnAttendeeSendPreferences(displayDialog, userAddresses, event, occurrenceNumber, timeFormatIs24Hour)
+            deleteEventAsAnAttendeeSendPreferences(displayDialog, userAddresses, event, originalOccurrenceNumber, timeFormatIs24Hour)
 
         } else if (event.isPartOfChain() && dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false && event.calendar.isActive) {
 
-            deleteRecurringEvent(displayDialog, dbEvent, occurrenceNumber)
+            deleteRecurringEvent(displayDialog, dbEvent, originalOccurrenceNumber)
 
         } else {
             // TODO Check if we need to handle inactive calendars the same way
@@ -1884,7 +1916,7 @@ class EventViewModel @Inject constructor(
             }
             else {
 
-                deleteEvent(displayDialog, occurrenceNumber)
+                deleteEvent(displayDialog, originalOccurrenceNumber)
             }
         }
     }

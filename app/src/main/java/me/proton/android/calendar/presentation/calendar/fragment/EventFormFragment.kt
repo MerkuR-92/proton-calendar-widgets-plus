@@ -398,15 +398,17 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun observeEventLiveData() {
-        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { event: Event ->
+        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { nullableEvent: Event? ->
+
+            val event = nullableEvent ?: return@Observer
 
             // TODO Fix transition so title hint doesn't blink on screen
             event_form_title.hint = resources.getString(R.string.event_hint_title)
             event.summary?.let {
                 if (it.isNotEmpty()) event_form_title.setText(it)
             } ?: event_form_title.clearText()
-            event.location?.let { event_form_location.setText(it) }
-            event.description?.let { event_form_description.setText(it) }
+            event.location?.let { event_form_location.setText(it) } ?: event_form_location.clearText()
+            event.description?.let { event_form_description.setText(it) } ?: event_form_description.clearText()
 
             ImageViewCompat.setImageTintList(
                 event_form_location_icon,

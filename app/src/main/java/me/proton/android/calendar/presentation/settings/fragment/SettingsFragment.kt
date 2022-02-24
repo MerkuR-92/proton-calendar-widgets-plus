@@ -36,7 +36,6 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
@@ -55,7 +54,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
-    private val eventViewModel: EventViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
@@ -150,7 +148,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
                     val calendarEmails = hashMapOf<String, String>()
                     subscribedCalendars.forEach { userCalendar ->
-                        val calendarEmail = eventViewModel.getCalendarEmail(userCalendar.id)
+                        val calendarEmail = calendarViewModel.getCalendarEmail(userCalendar.id)
                         calendarEmail?.let {
                             calendarEmails[userCalendar.id] = it
                         }
@@ -199,7 +197,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             val calendarEmails = hashMapOf<String, String>()
             userCalendars.forEach { userCalendar ->
-                val calendarEmail = eventViewModel.getCalendarEmail(userCalendar.id)
+                val calendarEmail = calendarViewModel.getCalendarEmail(userCalendar.id)
                 calendarEmail?.let {
                     calendarEmails[userCalendar.id] = it
                 }

@@ -47,11 +47,6 @@ class SettingsApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
             getCalendarUserSettings()
         }.toApiResponse()
 
-    override suspend fun getUserSettings(userId: UserId): ApiResponse<UserSettingsApiResponse> =
-        apiProvider.get<SettingsApiService>(userId).invoke {
-            getUserSettings()
-        }.toApiResponse()
-
     override suspend fun updateCalendarUserPrimaryTimezone(userId: UserId, primaryTimezone: String): ApiResponse<CalendarUserSettingsApiResponse> =
         apiProvider.get<SettingsApiService>(userId).invoke {
             updateCalendarUserPrimaryTimezone(

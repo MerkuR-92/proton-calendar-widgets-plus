@@ -380,6 +380,7 @@ class MonthView : ViewGroup {
 
             var miniEventIndex = 0 // Workaround for monthViewEvent.indexInDay skipping some indexes because of previous day multi day events
 
+            val maxIndex = it.value.maxOfOrNull { it.indexInDay }
             it.value.forEach { monthViewEvent ->
                 if (monthViewEvent.indexInDay >= maxEventCount) {
                     val miniEventCount = it.value.size - maxEventCount
@@ -402,7 +403,8 @@ class MonthView : ViewGroup {
                             column,
                             row,
                             maxEventCount,
-                            miniEventCount,
+                            if (maxIndex != null && maxIndex >= maxEventCount + miniEventCount) miniEventCount + 1
+                            else miniEventCount,
                             miniEventIndex
                         )
                     }
