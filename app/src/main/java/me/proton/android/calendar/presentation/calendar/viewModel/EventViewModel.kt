@@ -305,6 +305,7 @@ class EventViewModel @Inject constructor(
         }
 
         hasEmailNotifications = event.hasEmailNotifications
+        if (editMode) saveUserEditedAlarms()
 
         _event.postValue(event)
 
@@ -783,6 +784,7 @@ class EventViewModel @Inject constructor(
     }
 
     fun handleAllDaySwitch(isAllDay: Boolean) {
+        if (event.isAllDay() == isAllDay) return
         val timeStart = timeStartBackup
         val timeEnd = timeEndBackup
         if (timeStart == null || timeEnd == null) return
