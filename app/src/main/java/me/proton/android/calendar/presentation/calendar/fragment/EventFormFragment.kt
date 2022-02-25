@@ -558,9 +558,9 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun attachActionHandlers() {
-        event_form_title.doAfterTextChanged { persistFormData() }
-        event_form_location.doAfterTextChanged { persistFormData() }
-        event_form_description.doAfterTextChanged { persistFormData() }
+        event_form_title.doAfterTextChanged { if (event_form_title.hasFocus()) persistFormData() }
+        event_form_location.doAfterTextChanged { if (event_form_location.hasFocus()) persistFormData() }
+        event_form_description.doAfterTextChanged { if (event_form_description.hasFocus()) persistFormData() }
 
         event_form_location.setOnFocusChangeListener { _, hasFocus ->
             when {
