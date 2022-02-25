@@ -19,7 +19,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.containsUserSettings
+import me.proton.android.calendar.common.getUserSettingsEntityFlow
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -52,6 +53,8 @@ import me.proton.core.humanverification.domain.HumanVerificationManager
 import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
 import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
+import me.proton.core.usersettings.data.db.UserSettingsDatabase
+import me.proton.core.usersettings.data.entity.PasswordEntity
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import javax.inject.Inject
 
@@ -69,7 +72,9 @@ class AccountViewModel @Inject constructor(
     private val logger: Logger,
     private val product: Product,
     private val widgetRefresher: WidgetRefresher,
-    private val eventDecryptor: EventDecryptor
+    private val eventDecryptor: EventDecryptor,
+    private val database: AppDatabase,
+    private val userSettingsDatabase: UserSettingsDatabase
 ) : ViewModel() {
 
     sealed class State {
@@ -86,7 +91,7 @@ class AccountViewModel @Inject constructor(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    private suspend fun Account.isBootstrapped() = userSettingsRepository.containsUserSettings(userId)
+    private suspend fun Account.isBootstrapped() = userSettingsRepository.getUserSettingsEntityFlow(userId, database).firstOrNull() != null
 
     private suspend fun checkAccount(account: Account) {
         runCatching {

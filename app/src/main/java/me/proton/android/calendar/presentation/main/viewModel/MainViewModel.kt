@@ -7,8 +7,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
@@ -21,7 +25,9 @@ import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.io.BufferedReader
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -32,7 +38,8 @@ class MainViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val handleIcsUseCase: HandleIcsUseCase,
     private val networkManager: NetworkManager,
-    private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
+    private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
+    private val userSettingsRepository: UserSettingsRepository
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -143,7 +150,20 @@ class MainViewModel @Inject constructor(
 
     }
 
+    /**
+     * Makes sure we have the Core UserSettings stored locally.
+     */
+    fun fetchUserSettings(userId: UserId) {
+        ioScope.launch {
+            withTimeoutOrNull(Duration.ofSeconds(30).toMillis()) {
+                // we don't need the most up-to-date value, just need to make sure we have anything in Store
+                val downloaded = kotlin.runCatching { userSettingsRepository.getUserSettings(userId, refresh = false) }.getOrNull()
+            }
+        }
+    }
+
     private var viewModelJob = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     override fun onCleared() {
         super.onCleared()
