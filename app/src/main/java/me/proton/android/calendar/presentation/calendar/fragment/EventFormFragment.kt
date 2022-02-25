@@ -204,7 +204,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun jumpToMonthView() {
-        requireActivity().clearFocusAndHideKeyboard(view)
         if (!findNavController().popBackStack(R.id.nav_calendar, false)) {
             // TODO this is a workaround for navigating back to month view after opening EventForm from EventDetails
             //  that was opened from system notification
