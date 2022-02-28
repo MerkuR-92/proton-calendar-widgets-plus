@@ -343,7 +343,7 @@
     <string name="settings_timezone_title">Fuseau horaire</string>
     <string name="settings_language_title">Langue de l\'application</string>
     <string name="settings_language_default">Détection automatique</string>
-    <string name="settings_update_timezone_title">Demander à mettre à jour le réglage du fuseau horaire</string>
+    <string name="settings_update_timezone_title">Demander de mettre à jour le réglage du fuseau horaire</string>
     <string name="settings_update_timezone_subtitle">Si le fuseau horaire du système ne correspond pas à la configuration actuelle du fuseau horaire, il vous sera demandé de le mettre à jour.</string>
     <string name="settings_update_timezone_checkbox">Ne plus me demander</string>
     <string name="settings_week_start_title">Début de la semaine</string>
