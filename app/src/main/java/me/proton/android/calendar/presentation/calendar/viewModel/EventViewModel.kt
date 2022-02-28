@@ -57,6 +57,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddr
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -99,7 +100,8 @@ class EventViewModel @Inject constructor(
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val resourceProvider: ResourceProvider,
     private val widgetRefresher: WidgetRefresher,
-    private val handleAlarmsUseCase: HandleAlarmsUseCase
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val database: AppDatabase
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -275,7 +277,7 @@ class EventViewModel @Inject constructor(
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
             ?: return InitResult.Error("EventViewModel: could not get Calendar User Settings")
 
-        userSettings = userSettingsRepository.getUserSettingsEntity(userId)
+        userSettings = userSettingsRepository.getUserSettingsEntity(userId, database)
 
         user = userManager.getUserOrNull(userId, logger) ?: return InitResult.Error("EventViewModel: could not get User")
 
@@ -305,6 +307,7 @@ class EventViewModel @Inject constructor(
         }
 
         hasEmailNotifications = event.hasEmailNotifications
+        if (editMode) saveUserEditedAlarms()
 
         _event.postValue(event)
 
@@ -720,8 +723,10 @@ class EventViewModel @Inject constructor(
 
     fun handleTimeZone(timeZoneId: String) {
         markEventAsEdited()
+        val old = event.getStart(eventTimeZoneId)
         event.iCalendar.setDefaultTimeZone(timeZoneId)
         eventTimeZoneId = timeZoneId
+        event.iCalendar.adjustRRuleToStartDate(old)
         _event.postValue(event)
     }
 
@@ -781,6 +786,7 @@ class EventViewModel @Inject constructor(
     }
 
     fun handleAllDaySwitch(isAllDay: Boolean) {
+        if (event.isAllDay() == isAllDay) return
         val timeStart = timeStartBackup
         val timeEnd = timeEndBackup
         if (timeStart == null || timeEnd == null) return

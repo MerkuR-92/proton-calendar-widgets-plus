@@ -52,7 +52,7 @@ class ShowNotificationUseCase @Inject constructor(
             logger.e("empty displayTimeZoneId in ShowNotificationUseCase")
         }
 
-        val is24Hour = when (userSettingsRepository.getTimeFormat(UserId(userId))) {
+        val is24Hour = when (userSettingsRepository.getTimeFormat(UserId(userId), database)) {
             0 -> null
             1 -> true
             2 -> false

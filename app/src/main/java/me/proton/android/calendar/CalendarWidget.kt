@@ -25,7 +25,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.getTimeFormat
 import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
@@ -36,6 +35,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCount
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.getAddressesOrNull
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -248,6 +248,7 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
     private val userManager: UserManager by inject()
     private val userSettingsRepository: UserSettingsRepository by inject()
     private val logger: Logger by inject()
+    private val database: AppDatabase by inject()
 
     override fun onGetViewFactory(intent: Intent?): RemoteViewsFactory {
 
@@ -271,7 +272,8 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
             userManager,
             userSettingsRepository,
             applicationContext,
-            logger
+            logger,
+            database
         )
     }
 }
@@ -301,7 +303,8 @@ internal class CalendarWidgetRemoteViewsFactory(
     private val userManager: UserManager,
     private val userSettingsRepository: UserSettingsRepository,
     private val applicationContext: Context,
-    private val logger: Logger
+    private val logger: Logger,
+    private val database: AppDatabase
 ) : RemoteViewsService.RemoteViewsFactory {
 
     private var adapterData = emptyList<WidgetEvent>()
@@ -509,7 +512,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                 }
 
                 val is24Hour = if (userId != null) {
-                    userSettingsRepository.getUserSettingsEntity(userId).timeFormatIs24Hour(DateFormat.is24HourFormat(applicationContext))
+                    userSettingsRepository.getUserSettingsEntity(userId, database).timeFormatIs24Hour(DateFormat.is24HourFormat(applicationContext))
                 } else true
 
                 val zoneId = ZoneId.systemDefault()

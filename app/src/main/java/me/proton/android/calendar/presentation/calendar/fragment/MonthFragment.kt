@@ -462,6 +462,8 @@ class MonthFragment : BaseFragment() {
                         calendarViewModel.setLoading(false)
                     }
                 }
+
+                mainViewModel.fetchUserSettings(userId = userId)
             }
 
             val notificationManager: NotificationManager =

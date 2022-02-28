@@ -2,8 +2,11 @@ package me.proton.android.calendar.common
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.transform
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.arch.DataResult
@@ -26,33 +29,59 @@ suspend fun UserManager.getUserOrNull(
     }
 }
 
-fun UserSettingsRepository.getTimeFormatFlow(userId: UserId): Flow<Int> {
-    return this.getUserSettingsFlow(userId).map { if (it is DataResult.Success) it.value.timeFormat?.value ?: 0 else 0 /* locale default */ }.distinctUntilChanged()
+suspend fun UserSettingsRepository.getTimeFormatFlow(userId: UserId, database: AppDatabase): Flow<Int> {
+    return this.getUserSettingsEntityFlow(userId, database).map { it.timeFormat }.distinctUntilChanged()
 }
 
-suspend fun UserSettingsRepository.getTimeFormat(userId: UserId): Int {
-    return this.getUserSettingsEntity(userId).timeFormat
+suspend fun UserSettingsRepository.getTimeFormat(userId: UserId, database: AppDatabase): Int {
+    return this.getUserSettingsEntity(userId, database).timeFormat
 }
 
-fun UserSettingsRepository.getWeekStartFlow(userId: UserId): Flow<Int> {
-    return this.getUserSettingsFlow(userId).map { if (it is DataResult.Success) it.value.weekStart?.value ?: 0 else 0 /* locale default = 0 */ }.distinctUntilChanged()
+suspend fun UserSettingsRepository.getWeekStartFlow(userId: UserId, database: AppDatabase): Flow<Int> {
+    return this.getUserSettingsEntityFlow(userId, database).map { it.weekStart }.distinctUntilChanged()
 }
 
-suspend fun UserSettingsRepository.getWeekStart(userId: UserId): Int {
-    return this.getUserSettingsEntity(userId).weekStart
+suspend fun UserSettingsRepository.getWeekStart(userId: UserId, database: AppDatabase): Int {
+    return this.getUserSettingsEntity(userId, database).weekStart
 }
 
-suspend fun UserSettingsRepository.containsUserSettings(userId: UserId): Boolean {
-    return this.getUserSettingsFlow(userId).map { if (it is DataResult.Success) it.value else null }.firstOrNull() != null
+suspend fun UserSettingsRepository.getUserSettingsEntityFlow(
+    userId: UserId,
+    database: AppDatabase
+): Flow<UserSettingsEntity> {
+
+    val legacyUserSettings = database.deprecatedUserSettingsDao().select(userId.id)
+    val coreUserSettings = database.userSettingsDao().getByUserId(userId)
+
+    return getUserSettingsFlow(userId).transform { userSettingsResult ->
+        if (userSettingsResult is DataResult.Success) {
+            emit(
+                UserSettingsEntity(
+                    fkUserId = userId.id,
+                    weekStart = userSettingsResult.value.weekStart?.value ?: 0,
+                    dateFormat = userSettingsResult.value.dateFormat?.value ?: 0,
+                    timeFormat = userSettingsResult.value.timeFormat?.value ?: 0
+                )
+            )
+        }
+    }.onStart {
+        // the Core flow will not emit until the data is pulled from server
+        // so we need to fake the UserSettings for the time being
+        //
+        // we will use legacy settings if they are available in the DB (should be)
+        if (coreUserSettings == null) {
+            emit(
+                UserSettingsEntity(
+                    fkUserId = userId.id,
+                    weekStart = legacyUserSettings?.weekStart ?: 0,
+                    dateFormat = legacyUserSettings?.dateFormat ?: 0,
+                    timeFormat = legacyUserSettings?.timeFormat ?: 0
+                )
+            )
+        }
+    }
 }
 
-suspend fun UserSettingsRepository.getUserSettingsEntity(userId: UserId): UserSettingsEntity {
-    val coreUserSettings = this.getUserSettingsFlow(userId).map { if (it is DataResult.Success) it.value else null }.firstOrNull()
-
-    return UserSettingsEntity(
-        fkUserId = userId.id,
-        weekStart = coreUserSettings?.weekStart?.value ?: 0,
-        dateFormat = coreUserSettings?.dateFormat?.value ?: 0,
-        timeFormat = coreUserSettings?.timeFormat?.value ?: 0
-    )
+suspend fun UserSettingsRepository.getUserSettingsEntity(userId: UserId, database: AppDatabase): UserSettingsEntity {
+    return this.getUserSettingsEntityFlow(userId, database).first()
 }

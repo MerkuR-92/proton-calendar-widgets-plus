@@ -28,6 +28,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
@@ -67,7 +68,8 @@ class CalendarViewModel @Inject constructor(
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val database: AppDatabase
 ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -204,9 +206,9 @@ class CalendarViewModel @Inject constructor(
                 it
             }.asLiveData(Dispatchers.Default)
 
-            timeFormat = userSettingsRepository.getTimeFormatFlow(userId).asLiveData(Dispatchers.Default)
+            timeFormat = userSettingsRepository.getTimeFormatFlow(userId, database).asLiveData(Dispatchers.Default)
 
-            weekStart = userSettingsRepository.getWeekStartFlow(userId).asLiveData(Dispatchers.Default)
+            weekStart = userSettingsRepository.getWeekStartFlow(userId, database).asLiveData(Dispatchers.Default)
 
             this@CalendarViewModel._userId.postValue(userId)
 
@@ -853,7 +855,7 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel getTimeFormat")
             return null
         }
-        return timeFormat.value ?: userSettingsRepository.getTimeFormat(userId)
+        return timeFormat.value ?: userSettingsRepository.getTimeFormat(userId, database)
     }
 
     suspend fun getDefaultCalendarId(): String? {
@@ -889,7 +891,7 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel getWeekStart")
             return null
         }
-        return weekStart.value ?: userSettingsRepository.getWeekStart(userId)
+        return weekStart.value ?: userSettingsRepository.getWeekStart(userId, database)
     }
 
     suspend fun getMonthViewEventsMap(
