@@ -57,9 +57,7 @@ class CalendarFormViewModel @Inject constructor(
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val userManager: UserManager,
     private val accountManager: AccountManager,
-    private val createCalendarUseCase: CreateCalendarUseCase,
-    private val authOrchestrator: AuthOrchestrator,
-    private val missingScopeListener: MissingScopeListener
+    private val createCalendarUseCase: CreateCalendarUseCase
 ) : AndroidViewModel(application) {
 
     sealed class CalendarFormSnackState {
@@ -136,19 +134,6 @@ class CalendarFormViewModel @Inject constructor(
         calendarEdited = false
         calendarSettingsEdited = false
         userEmails = null
-    }
-
-    fun registerAuthOrchestrator(fragment: Fragment, context: FragmentActivity) {
-        authOrchestrator.register(fragment)
-
-        logger.d("calendar form registered for observer")
-
-        with(authOrchestrator) {
-            missingScopeListener.observe(context.lifecycle, minActiveState = Lifecycle.State.CREATED)
-                .onConfirmPasswordNeeded { startConfirmPasswordWorkflow(it) }
-                .onMissingScopeSuccess { logger.d("calendar form onMissingScopeSuccess") }
-                .onMissingScopeFailed { logger.d("calendar form onMissingScopeFailed") }
-        }
     }
 
     suspend fun initUpdateCalendarForm(calendarId: String) {

@@ -87,11 +87,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_settings)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        calendarFormViewModel.registerAuthOrchestrator(this, requireActivity())
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
