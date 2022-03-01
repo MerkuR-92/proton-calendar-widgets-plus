@@ -30,6 +30,7 @@ import me.proton.core.account.data.entity.SessionEntity
 import me.proton.core.contact.data.local.db.ContactDatabase
 import me.proton.core.data.room.db.extension.*
 import me.proton.core.eventmanager.data.db.EventMetadataDatabase
+import me.proton.core.featureflag.data.db.FeatureFlagDatabase
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.humanverification.data.entity.HumanVerificationEntity
 import me.proton.core.key.data.db.KeySaltDatabase
@@ -199,6 +200,14 @@ object AppDatabaseMigrations {
         override fun migrate(database: SupportSQLiteDatabase) {
             // One new migration in core.
             EventMetadataDatabase.MIGRATION_0.migrate(database)
+        }
+    }
+
+    val MIGRATION_35_36 = object : Migration(35, 36) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            OrganizationDatabase.MIGRATION_1.migrate(database)
+            FeatureFlagDatabase.MIGRATION_0.migrate(database)
+            FeatureFlagDatabase.MIGRATION_1.migrate(database)
         }
     }
 }
