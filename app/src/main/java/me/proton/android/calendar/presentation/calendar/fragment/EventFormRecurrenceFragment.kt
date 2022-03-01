@@ -248,10 +248,10 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                 custom_recurrence_end_count.clearFocus()
             }
 
-            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)
+            val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)
                 .toLocalDate()
 
-            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toZonedDateTime(eventViewModel.displayTimeZoneId)
+            val currentRecurrenceUntilInstant = eventViewModel.eventLiveData.value!!.iCalEvent.recurrenceRule?.value?.until?.toZonedDateTime(eventViewModel.eventTimeZoneId)
 
             val untilDate = eventViewModel.tempRecurrenceUntilLocalDate
                 ?: if (currentRecurrenceUntilInstant != null) {
@@ -265,7 +265,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     eventViewModel.userSettings.weekStartDayOfWeek(),
                     untilDate,
                     eventStartDate,
-                    FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.displayTimeZoneId)).toLocalDate()
+                    FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()
                 ) { newDate ->
                     eventViewModel.handleRecurrenceUntilDate(newDate)
                     custom_recurrence_end_2.text = getString(
@@ -410,7 +410,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // DayOfWeek of java.time starts on Monday (ordinal 0) and ends on Sunday (ordinal 6)
         val indexOfEventStartDay =
-            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!.dayOfWeek.ordinal
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)!!.dayOfWeek.ordinal
         val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
         val weekDayLetters = (DayOfWeek.MONDAY.value .. DayOfWeek.SUNDAY.value).map { DayOfWeek.of(it).format(firstLetter = true) }
@@ -441,7 +441,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // TODO get this from VM
         val eventStartDate =
-            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.displayTimeZoneId)!!
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)!!
                 .toLocalDate()
 
         // applies only to month

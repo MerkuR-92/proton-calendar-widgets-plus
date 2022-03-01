@@ -593,7 +593,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_timezone_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            val forInstant = eventViewModel.eventLiveData.value?.getStart(eventViewModel.displayTimeZoneId)?.toInstant()!!
+            val forInstant = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!
             val formattedTimeZoneIds = allowedTimezoneIds.map {
                 formatTimeZoneId(it, forInstant)
             }.toTypedArray()
@@ -781,7 +781,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
-                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), event.getStart(eventViewModel.displayTimeZoneId), alarm)
+                text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), event.getStart(eventViewModel.eventTimeZoneId), alarm)
                 isClickable = false
             }
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {

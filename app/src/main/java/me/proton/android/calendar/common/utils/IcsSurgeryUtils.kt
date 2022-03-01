@@ -459,6 +459,10 @@ object IcsSurgeryUtils {
         // Special case: YEARLY with BYMONTHDAY but no BYMONTH
         if (recurrenceRule.value.frequency == Frequency.YEARLY && !recurrenceRule.value.byMonthDay.isNullOrEmpty() && recurrenceRule.value.byMonth.isNullOrEmpty()) return false
 
+        // If event is recurring with DAILY, WEEKLY, MONTHLY and has BYYEARDAY parameter - reject invite as invalid
+        if ((recurrenceRule.value.frequency == Frequency.DAILY || recurrenceRule.value.frequency == Frequency.WEEKLY || recurrenceRule.value.frequency == Frequency.MONTHLY)
+            && !recurrenceRule.value.byYearDay.isNullOrEmpty()) return false
+
         return true
     }
 
