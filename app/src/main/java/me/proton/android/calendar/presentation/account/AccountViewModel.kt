@@ -91,7 +91,7 @@ class AccountViewModel @Inject constructor(
 
     private var defaultCalendarName: String = "My calendar" // This value is set in init.
 
-    private suspend fun Account.isBootstrapped() = userSettingsRepository.getUserSettingsEntityFlow(userId, database).firstOrNull() != null
+    private suspend fun Account.isBootstrapped() = calendarsRepository.selectCalendarUserSettings(userId.id) != null
 
     private suspend fun checkAccount(account: Account) {
         runCatching {
