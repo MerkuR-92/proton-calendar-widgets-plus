@@ -307,7 +307,7 @@ class EventViewModel @Inject constructor(
         }
 
         hasEmailNotifications = event.hasEmailNotifications
-        if (editMode) saveUserEditedAlarms()
+        if (editMode && !isCreate) saveUserEditedAlarms()
 
         _event.postValue(event)
 
