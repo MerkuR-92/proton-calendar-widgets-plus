@@ -29,6 +29,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.core.account.data.db.AccountDatabase
 import me.proton.core.contact.data.local.db.ContactDatabase
 import me.proton.core.eventmanager.data.db.EventMetadataDatabase
+import me.proton.core.featureflag.data.db.FeatureFlagDatabase
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
 import me.proton.core.key.data.db.KeySaltDatabase
 import me.proton.core.key.data.db.PublicAddressDatabase
@@ -85,4 +86,7 @@ abstract class AppDatabaseBindsModule {
 
     @Binds
     abstract fun provideEventMetadataDatabase(appDatabase: AppDatabase): EventMetadataDatabase
+
+    @Binds
+    abstract fun provideFeatureFlagDatabase(appDatabase: AppDatabase): FeatureFlagDatabase
 }

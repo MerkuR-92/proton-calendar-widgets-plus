@@ -204,6 +204,7 @@ dependencies {
     implementation "me.proton.core:data-room:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:domain:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:event-manager:${rootProject.ext.version.proton_core}"
+    implementation "me.proton.core:feature-flag:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:human-verification:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:key:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:mail-message:${rootProject.ext.version.proton_core}"
@@ -289,8 +290,6 @@ dependencies {
 
     // Shared preferences
     implementation 'androidx.preference:preference-ktx:1.1.1'
-
-    implementation "net.gotev:cookie-store:${rootProject.ext.version.cookie_store}"
 
     detekt 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
     detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'
