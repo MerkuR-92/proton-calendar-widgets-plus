@@ -2,7 +2,10 @@ package me.proton.android.calendar.presentation.settings.viewModel
 
 import android.app.Application
 import androidx.annotation.VisibleForTesting
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import biweekly.component.VAlarm
@@ -36,7 +39,10 @@ import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.auth.presentation.*
 import me.proton.core.domain.entity.UserId
+import me.proton.core.network.domain.scopes.MissingScopeListener
+import me.proton.core.presentation.utils.showToast
 import me.proton.core.user.domain.UserManager
 import javax.inject.Inject
 

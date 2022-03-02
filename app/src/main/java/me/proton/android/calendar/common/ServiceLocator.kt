@@ -37,6 +37,7 @@ import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.domain.NetworkManager
+import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -81,7 +82,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
             get(),
@@ -93,7 +94,7 @@ val viewModelModule = module {
         )
     }
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
@@ -128,6 +129,7 @@ val useCaseModule = module {
     factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get()) }
     factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get()) }
+    factory<DeleteCalendarUseCase> { DeleteCalendarUseCase(get(), get(), get(), get()) }
 }
 
 fun coreModule(
@@ -151,7 +153,8 @@ fun coreModule(
     defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     appDatabase: AppDatabase,
     calendarsRepository: CalendarsRepository,
-    userSettingsRepository: UserSettingsRepository
+    userSettingsRepository: UserSettingsRepository,
+    missingScopeListener: MissingScopeListener,
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -176,4 +179,5 @@ fun coreModule(
     single<AppDatabase> { appDatabase }
     single<CalendarsRepository> { calendarsRepository }
     single<UserSettingsRepository> { userSettingsRepository }
+    factory<MissingScopeListener> { missingScopeListener }
 }

@@ -30,7 +30,8 @@ abstract class BaseApiResponse {
     val isSuccessful: Boolean get() = code == 1000 || code == 1001 // single- and multiple-success
 }
 
-class StatusCodeApiResponse(override val code: Int) : BaseApiResponse()
+@Serializable
+class StatusCodeApiResponse(@SerialName("Code") override val code: Int) : BaseApiResponse()
 
 /**
  * @return response object or `null` and logs errors, if they should be logged

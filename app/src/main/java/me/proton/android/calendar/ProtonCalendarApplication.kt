@@ -33,6 +33,7 @@ import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.domain.NetworkManager
+import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
@@ -74,6 +75,9 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var authOrchestrator: AuthOrchestrator
+
+    @Inject
+    lateinit var missingScopeListener: MissingScopeListener
 
     @Inject
     lateinit var humanVerificationManager: HumanVerificationManager
@@ -155,7 +159,8 @@ class ProtonCalendarApplication : Application() {
                     defaultSharedPreferencesProvider,
                     appDatabase,
                     calendarsRepository,
-                    userSettingsRepository
+                    userSettingsRepository,
+                    missingScopeListener
                 )
             )
         }
