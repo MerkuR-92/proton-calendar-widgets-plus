@@ -536,6 +536,45 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `adjust UNTIL RRULE to new timezone for part-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Paris:20220302T123000
+    DTEND;TZID=Europe/Paris:20220302T130000
+    RRULE:FREQ=DAILY;UNTIL=20220309T235959
+    SEQUENCE:0
+    SUMMARY:blah
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val oldTimeZoneId = "Europe/Paris"
+        val newTimeZoneId = "Europe/Vilnius"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        event.iCalendar.setDefaultTimeZone(newTimeZoneId)
+        event.iCalendar.adjustRRuleToStartDate(event.getStart(oldTimeZoneId))
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.until).isEqualTo(ICalDate.from(ZonedDateTime.of(2022, 3, 9, 23, 59, 59, 0, ZoneId.of(newTimeZoneId)).toInstant()))
+
+    }
+
+    @Test
     fun `adjust RRULE to WEEK START`() {
 
         val eventNoAdjustment = createNewVEvent()
