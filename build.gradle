@@ -10,6 +10,7 @@ buildscript {
                 "navigation": "2.3.3",
                 "work": "2.6.0",
                 "security": "1.1.0-alpha03",
+                "splashscreen": "1.0.0-beta01",
                 "timber": "5.0.1",
                 "koin": "2.1.2",
                 "biweekly": "0.6.5",

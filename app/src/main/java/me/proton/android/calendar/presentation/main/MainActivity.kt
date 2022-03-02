@@ -13,6 +13,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -196,51 +197,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         Runtime.getRuntime().exit(0)
     }
 
-    fun getAppTheme(): AppTheme {
-        return AppTheme.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)]
-    }
-
-    fun changeAppTheme(theme: AppTheme) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val editor = sharedPreferences.edit()
-        editor.putInt(SharedPreferencesKeys.THEME, theme.value)
-        editor.apply()
-
-        handleAppTheme()
-
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun handleAppTheme() {
-        val defaultNightMode = AppCompatDelegate.getDefaultNightMode()
-        when (getAppTheme()) {
-            AppTheme.LIGHT -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_YES ||
-                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-                    restartActivity()
-                }
-            }
-            AppTheme.DARK -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_NO ||
-                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-                    restartActivity()
-                }
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_NO ||
-                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-                    restartActivity()
-                }
-            }
-        }
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
@@ -274,7 +230,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        handleAppTheme()
+        installSplashScreen().setKeepOnScreenCondition {
+            accountViewModel.state.value in listOf(
+                AccountViewModel.State.Initial,
+                AccountViewModel.State.StepNeeded,
+            )
+        }
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508

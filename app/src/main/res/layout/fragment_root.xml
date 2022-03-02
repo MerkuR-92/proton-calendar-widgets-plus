@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="@+id/root_splash_logo"
         app:layout_constraintEnd_toEndOf="@+id/root_splash_logo"
         android:layout_marginTop="48dp"
-        android:indeterminateTint="@color/white"
+        android:indeterminateTint="@color/brand_norm"
         android:clickable="false"
         android:focusable="false" />
 
@@ -40,7 +40,7 @@
         android:visibility="gone"
         tools:visibility="visible"
         android:text=""
-        android:textColor="@color/white"
+        android:textColor="@color/text_norm"
         app:layout_constraintTop_toBottomOf="@+id/root_progress_bar"
         app:layout_constraintStart_toStartOf="@+id/root_progress_bar"
         app:layout_constraintEnd_toEndOf="@+id/root_progress_bar"

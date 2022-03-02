@@ -4,12 +4,12 @@
 
     <color name="brand_norm">@color/cornflower_blue</color>
     <color name="brand_darken_20">@color/san_marino</color>
-    <color name="splash_screen_color">@color/brand_norm</color>
     <color name="interaction_norm">@color/cornflower_blue</color>
     <color name="interaction_norm_pressed">@color/san_marino</color>
     <color name="interaction_norm_disabled">@color/perano</color>
     <color name="interaction_weak_norm">@color/interaction_weak</color>
     <color name="interaction_weak_disabled_pressed">@color/interaction_weak_pressed</color>
+    <color name="splash_screen_color">@color/background_norm</color>
 
     <!-- colors to use in the app -->
 
