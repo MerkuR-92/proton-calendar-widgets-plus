@@ -1,49 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
-        <item name="colorAccent">@color/brand_norm</item>
-
-        <item name="appBarLayoutStyle">@style/AppTheme.Toolbar</item>
-        <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
-
-        <item name="android:textColorLink">@color/interaction_norm</item>
-        <item name="android:textColorPrimary">@color/text_norm</item>
-        <item name="android:textColor">@color/text_norm</item>
-
-        <item name="android:colorControlHighlight">@color/interaction_weak_pressed</item>
-
-        <item name="android:windowBackground">@color/background_norm</item>
-
+    <style name="AppTheme" parent="ProtonTheme.Calendar">
         <item name="android:datePickerDialogTheme">@style/PickerDialog</item>
         <item name="android:timePickerDialogTheme">@style/PickerDialog</item>
-
-        <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
-
-        <item name="android:colorEdgeEffect">@color/brand_norm</item>
-
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
-    </style>
-
-    <style name="AppTheme.DayNight">
-        <!-- Styling specific to light mode -->
-        <!-- TODO windowLightStatusBar is API 23 Minimum, check if we need to support below APIs -->
-        <item name="android:statusBarColor">@color/background_norm</item>
-        <item name="android:windowLightStatusBar">true</item>
-
-        <item name="android:navigationBarColor">@color/background_navigation_bar</item>
-    </style>
-
-    <style name="AppTheme.DayNight.Splash">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:statusBarColor">@color/splash_screen_color</item>
-        <item name="android:navigationBarColor">@color/splash_screen_color</item>
-    </style>
-
-    <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-        <item name="tint">@color/icon_norm</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">

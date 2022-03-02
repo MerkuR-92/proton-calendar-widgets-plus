@@ -22,7 +22,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.DayNight"
+        android:theme="@style/ProtonTheme.Calendar"
         tools:replace="android:allowBackup,android:theme">
 
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
@@ -47,7 +47,7 @@
             android:name=".presentation.main.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.DayNight.Splash"
+            android:theme="@style/ProtonTheme.Splash.Calendar"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -94,17 +94,14 @@
         <activity
             android:name="me.proton.core.auth.presentation.ui.AuthHelpActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.ChooseAddressActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.CreateAddressActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.AddAccountActivity"
@@ -114,22 +111,18 @@
         <activity
             android:name="me.proton.core.auth.presentation.ui.LoginActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.signup.SignupActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.TwoPassModeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.SecondFactorActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="me.proton.core.presentation.ui.alert.ForceUpdateActivity"
@@ -138,7 +131,6 @@
         <activity
             android:name="me.proton.core.auth.presentation.ui.ConfirmPasswordActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
 
         <receiver

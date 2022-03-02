@@ -21,7 +21,6 @@
                 android:id="@+id/dialog_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:theme="@style/AppTheme.Toolbar"
                 app:contentInsetStartWithNavigation="0dp"
                 app:layout_scrollFlags="noScroll"
                 android:background="@null">

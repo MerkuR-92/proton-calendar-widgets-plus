@@ -271,9 +271,8 @@
     </style>
 
     <style name="TextViewWarning" parent="Text.DefaultSmall">
-        <!-- TODO temporary woodsmoke color until we switch to V5 (change back to text_inverted) -->
-        <item name="android:textColor">@color/woodsmoke</item>
-        <item name="android:textColorLink">@color/woodsmoke</item>
+        <item name="android:textColor">@color/text_inverted</item>
+        <item name="android:textColorLink">@color/text_inverted</item>
         <item name="android:padding">16dp</item>
         <item name="android:background">@drawable/shape_background_warning</item>
     </style>
