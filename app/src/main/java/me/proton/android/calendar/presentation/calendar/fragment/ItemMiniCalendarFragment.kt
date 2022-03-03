@@ -324,7 +324,7 @@ class ItemMiniCalendarFragment : Fragment() {
                             R.color.brand_norm
                         )
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
+                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
                 }
                 item.date.month != forDate.month -> {
                     miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
@@ -427,7 +427,7 @@ class ItemMiniCalendarFragment : Fragment() {
                                 R.color.brand_norm
                             )
                         )
-                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
+                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
                     } else if (selectedDate.month != firstMiniCalendarDay.plusDays(
                             selectedMiniCalendarItem.toLong()
                         ).month &&
