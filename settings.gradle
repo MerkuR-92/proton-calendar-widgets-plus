@@ -1,2 +1,10 @@
 include ':app'
 rootProject.name = "ProtonCalendar"
+
+println("useCoreGitSubmodule raw value: ${properties['useCoreGitSubmodule']}")
+if (Boolean.valueOf(properties['useCoreGitSubmodule'])) {
+    println("Use core libs from git submodule \'./proton-libs\'")
+    includeBuild("proton-libs")
+} else {
+    println("Use core libs from Maven artifacts")
+}
