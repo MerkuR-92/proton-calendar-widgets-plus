@@ -12,11 +12,11 @@ apply plugin: 'io.gitlab.arturbosch.detekt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'jacoco'
 
-def sentryDsn = project.hasProperty("sentryDsn") ? sentryDsn : "https://abc@sentry.com/666"
+def sentryDsn = System.getenv("SENTRY_DSN") ?: "https://abc@sentry.com/666"
 def storeFilePath = project.hasProperty('keyStoreFilePath') ? keyStoreFilePath : "protonkey.jks"
-def storeKeyAlias = project.hasProperty('keyStoreKeyAlias') ? keyStoreKeyAlias : 'proton'
-def storePass = project.hasProperty('keyStorePassword') ? keyStorePassword : "\"Store password\""
-def storeKeyPass = project.hasProperty('keyStoreKeyPassword') ? keyStoreKeyPassword : "\"Store key password\""
+def storeKeyAlias = System.getenv("KEY_STORE_KEY_ALIAS") ?: 'proton'
+def storePass = System.getenv("KEY_STORE_PASSWORD") ?: "\"Store password\""
+def storeKeyPass = System.getenv("KEY_STORE_KEY_PASSWORD") ?: "\"Store key password\""
 
 detekt {
     config = files("$projectDir/config/detekt/detekt.yml")
