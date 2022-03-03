@@ -79,10 +79,8 @@ import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.core.util.kotlin.nullIfBlank
+import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.util.kotlin.toBoolean
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -109,6 +107,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val eventViewModel: EventViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
+    private val accountSwitcherViewModel: AccountSwitcherViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
@@ -391,14 +390,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             BuildConfig.VERSION_NAME
         )
 
+        initDrawerHeader()
         initDrawerListeners()
-
         initDrawerCalendarsList()
 
         calendarViewModel.initialised.observe(this@MainActivity, Observer { initialised ->
             if (initialised) {
                 // Refresh drawer content now that we are logged in.
-                initDrawerHeader()
                 initDrawerCalendarsListContent()
             }
         })
@@ -880,15 +878,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initDrawerHeader() {
-        lifecycleScope.launch {
-            val user = calendarViewModel.selectUser()
-            if (user != null) {
-                nav_view_main_content.nav_view_user_name.text = user.displayName?.nullIfBlank() ?: resources.getString(R.string.default_user_display_name)
-                nav_view_main_content.nav_view_user_mail.text = user.email?.nullIfBlank() ?: resources.getString(R.string.default_user_email)
-                val initials: String = getInitials(user.displayName ?: " ", true)
-                nav_view_main_content.nav_view_user_initials.text = initials
-            }
-        }
+        nav_view_user_layout.setViewModel(accountSwitcherViewModel)
     }
 
     private fun initDrawerCalendarsList() {
