@@ -72,7 +72,7 @@ class CalendarListAdapter(
                 } else if (calendarSubscription?.isSynced == true) {
                     // Synced
                     calendarEntityItemTitle.text = calendarEntity.name
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                 } else {
                     // Not synced
                     calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
@@ -80,7 +80,7 @@ class CalendarListAdapter(
                 }
             } else {
                 calendarEntityItemTitle.text = calendarEntity.name
-                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
             }
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
