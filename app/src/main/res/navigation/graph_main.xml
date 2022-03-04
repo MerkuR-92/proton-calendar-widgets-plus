@@ -17,9 +17,6 @@
             android:id="@+id/action_nav_calendar_to_nav_event_form"
             app:destination="@id/nav_event_form" />
         <action
-            android:id="@+id/action_nav_calendar_to_nav_bug_report"
-            app:destination="@id/nav_bug_report" />
-        <action
             android:id="@+id/action_nav_calendar_to_nav_settings"
             app:destination="@id/nav_settings" />
         <action
@@ -74,16 +71,6 @@
         <action
             android:id="@+id/action_nav_calendar_form_to_nav_settings"
             app:destination="@id/nav_settings" />
-    </dialog>
-
-    <dialog
-        android:id="@+id/nav_bug_report"
-        android:name="me.proton.android.calendar.presentation.bugReport.BugReportFragment"
-        android:label=""
-        tools:layout="@layout/fragment_bug_report">
-        <action
-            android:id="@+id/action_nav_bug_report_to_nav_event_form"
-            app:destination="@id/nav_event_form" />
     </dialog>
 
     <dialog

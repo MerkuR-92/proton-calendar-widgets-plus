@@ -260,9 +260,6 @@
     <string name="snack_event_init_error">Error inicialitzant el nou esdeveniment</string>
     <string name="snack_event_calendar_error">Error canviant de calendari</string>
     <string name="snack_event_maximum_alarm_reached_error">Ha arribat al numero màxim de notificacions</string>
-    <string name="snack_send_bug_report_success">Informe enviat. Gràcies pels vostres comentaris</string>
-    <string name="snack_send_bug_report_error">Error enviant l\'informe, torneu-ho a provar més tard</string>
-    <string name="snack_send_bug_report_description_empty">Proporcioneu una descripció del vostre informe</string>
     <string name="snack_create_event_no_active_personal_calendar">Necessiteu un calendari personal actiu per poder crear esdeveniments</string>
     <string name="snack_add_self_as_participant">No es permet autoconvidar-se</string>
     <string name="snack_maximum_participants_reached">S\'ha assolit el número màxim de participants.</string>
@@ -330,13 +327,6 @@
     <string name="notification_text_tomorrow">Demà</string>
     <string name="notification_text_tomorrow_part_time">Demà, %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s, %2$s</string>
-    <!-- Bug report -->
-    <string name="bug_report_hint_title">Assumpte</string>
-    <string name="bug_report_hint_description">Descriviu el problema i incloeu qualsevol missatge d\'error.</string>
-    <string name="bug_report_discard_changes_title">Canvis no desats</string>
-    <string name="bug_report_discard_changes_description">Al formulari hi ha entrades sense desar. N\'esteu segur, de descartar-los?</string>
-    <string name="bug_report_discard_changes_cancel">Continueu escrivint</string>
-    <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Aquesta configuració afecta només l\'aparença de l\'aplicació Proton Calendar a aquest dispositiu. L\'aplicació es reiniciarà després de canviar el tema.</string>

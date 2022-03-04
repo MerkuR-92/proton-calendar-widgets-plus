@@ -260,9 +260,6 @@
     <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termines</string>
     <string name="snack_event_calendar_error">Fehler beim Wechseln des Kalenders</string>
     <string name="snack_event_maximum_alarm_reached_error">Die maximale Anzahl von Benachrichtigungen wurde erreicht</string>
-    <string name="snack_send_bug_report_success">Bericht gesendet. Vielen Dank für deine Rückmeldung.</string>
-    <string name="snack_send_bug_report_error">Fehler beim Senden des Berichts. Bitte versuche es später erneut</string>
-    <string name="snack_send_bug_report_description_empty">Bitte gib eine Beschreibung deines Berichts an</string>
     <string name="snack_create_event_no_active_personal_calendar">Du benötigst einen persönlichen aktiven Kalender, um Termine erstellen zu können</string>
     <string name="snack_add_self_as_participant">Selbsteinladung nicht erlaubt</string>
     <string name="snack_maximum_participants_reached">Die maximale Anzahl an Teilnehmern wurde erreicht.</string>
@@ -330,13 +327,6 @@
     <string name="notification_text_tomorrow">Morgen</string>
     <string name="notification_text_tomorrow_part_time">Morgen um %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s um %2$s</string>
-    <!-- Bug report -->
-    <string name="bug_report_hint_title">Betreff</string>
-    <string name="bug_report_hint_description">Bitte beschreibe das Problem und füge alle Fehlermeldungen hinzu.</string>
-    <string name="bug_report_discard_changes_title">Ungesicherte Änderungen</string>
-    <string name="bug_report_discard_changes_description">Ungesicherte Elemente im Formular vorhanden. Möchtest du diese wirklich verwerfen?</string>
-    <string name="bug_report_discard_changes_cancel">Bearbeitung fortsetzen</string>
-    <string name="bug_report_discard_changes_confirm">Verwerfen</string>
     <!-- Settings -->
     <string name="settings_theme_title">Farbschema</string>
     <string name="settings_theme_info">Diese Einstellung wirkt sich ausschließlich auf das Aussehen der Proton Calendar App auf diesem Gerät aus. Die App wird nach dem Ändern des Farbschemas neu gestartet.</string>
