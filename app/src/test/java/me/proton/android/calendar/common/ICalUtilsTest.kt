@@ -543,9 +543,9 @@ internal class ICalUtilsTest {
     VERSION:2.0
     PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
     BEGIN:VEVENT
-    DTSTART;TZID=Europe/Paris:20220302T123000
-    DTEND;TZID=Europe/Paris:20220302T130000
-    RRULE:FREQ=DAILY;UNTIL=20220309T235959
+    DTSTART;TZID=Europe/Vilnius:20220302T123000
+    DTEND;TZID=Europe/Vilnius:20220302T130000
+    RRULE:FREQ=DAILY;UNTIL=20220309T215959Z
     SEQUENCE:0
     SUMMARY:blah
     STATUS:CONFIRMED
@@ -556,8 +556,8 @@ internal class ICalUtilsTest {
     """.trimIndent()
 
         val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
-        val oldTimeZoneId = "Europe/Paris"
-        val newTimeZoneId = "Europe/Vilnius"
+        val oldTimeZoneId = "Europe/Vilnius"
+        val newTimeZoneId = "Asia/Omsk"
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
