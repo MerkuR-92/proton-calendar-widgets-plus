@@ -260,9 +260,6 @@
     <string name="snack_event_init_error">Erreur lors de l\'initialisation du nouvel événement</string>
     <string name="snack_event_calendar_error">Erreur lors du changement de calendrier</string>
     <string name="snack_event_maximum_alarm_reached_error">Le nombre maximum de notifications a été atteint</string>
-    <string name="snack_send_bug_report_success">Rapport envoyé, merci pour vos commentaires</string>
-    <string name="snack_send_bug_report_error">Erreur lors de l\'envoi du rapport, veuillez réessayer ultérieurement</string>
-    <string name="snack_send_bug_report_description_empty">Veuillez fournir une description de votre rapport</string>
     <string name="snack_create_event_no_active_personal_calendar">Vous avez besoin d\'un calendrier personnel actif pour créer des événements</string>
     <string name="snack_add_self_as_participant">L\'auto-invitation n\'est pas autorisée</string>
     <string name="snack_maximum_participants_reached">Le nombre maximum de participants est atteint.</string>
@@ -330,13 +327,6 @@
     <string name="notification_text_tomorrow">Demain</string>
     <string name="notification_text_tomorrow_part_time">Demain à %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s à %2$s</string>
-    <!-- Bug report -->
-    <string name="bug_report_hint_title">Objet</string>
-    <string name="bug_report_hint_description">Veuillez décrire le problème et inclure tous les messages d\'erreur.</string>
-    <string name="bug_report_discard_changes_title">Modifications non enregistrées</string>
-    <string name="bug_report_discard_changes_description">Le formulaire contient des modifications non enregistrées. Êtes-vous sûr de ne pas vouloir les conserver ?</string>
-    <string name="bug_report_discard_changes_cancel">Continuer à écrire</string>
-    <string name="bug_report_discard_changes_confirm">Abandonner</string>
     <!-- Settings -->
     <string name="settings_theme_title">Thème</string>
     <string name="settings_theme_info">Ce paramètre n\'affecte que l\'apparence de l\'application Proton Calendar sur cet appareil. L\'application redémarrera après avoir changé de thème.</string>

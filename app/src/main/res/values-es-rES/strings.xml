@@ -260,9 +260,6 @@
     <string name="snack_event_init_error">Error al inicializar el nuevo evento</string>
     <string name="snack_event_calendar_error">Error al cambiar el calendario</string>
     <string name="snack_event_maximum_alarm_reached_error">Se ha alcanzado el número máximo de notificaciones</string>
-    <string name="snack_send_bug_report_success">Informe enviado, gracias por tus comentarios</string>
-    <string name="snack_send_bug_report_error">Error al enviar el informe, inténtalo de nuevo más tarde</string>
-    <string name="snack_send_bug_report_description_empty">Proporciona una descripción de tu informe</string>
     <string name="snack_create_event_no_active_personal_calendar">Necesitas un calendario personal activo para crear eventos</string>
     <string name="snack_add_self_as_participant">La autoinvitación no está permitida</string>
     <string name="snack_maximum_participants_reached">Se ha alcanzado el número máximo de participantes.</string>
@@ -330,13 +327,6 @@
     <string name="notification_text_tomorrow">Mañana</string>
     <string name="notification_text_tomorrow_part_time">Mañana a las %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s a las %2$s</string>
-    <!-- Bug report -->
-    <string name="bug_report_hint_title">Asunto</string>
-    <string name="bug_report_hint_description">Por favor, describe el problema e incluye cualquier mensaje de error.</string>
-    <string name="bug_report_discard_changes_title">Cambios sin guardar</string>
-    <string name="bug_report_discard_changes_description">Hay entradas sin guardar en el formulario. ¿Estás seguro de querer descartarlos?</string>
-    <string name="bug_report_discard_changes_cancel">Seguir escribiendo</string>
-    <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Este ajuste sólo afecta a la apariencia de la aplicación Proton Calendar en este dispositivo. La aplicación se reiniciará después de cambiar el tema.</string>

@@ -540,41 +540,6 @@ class CalendarViewModel @Inject constructor(
         return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR, ExistingWorkPolicy.REPLACE, work).state
     }
 
-    fun sendBugReport(
-        osName: String,
-        osVersion: String,
-        client: String,
-        appVersionName: String,
-        title: String,
-        description: String,
-        username: String,
-        email: String
-    ) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SEND_BUG_REPORT,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_OS_NAME to osName,
-                    UseCaseWorker.INPUT_OS_VERSION to osVersion,
-                    UseCaseWorker.INPUT_CLIENT to client,
-                    UseCaseWorker.INPUT_APP_VERSION_NAME to appVersionName,
-                    UseCaseWorker.INPUT_TITLE to title,
-                    UseCaseWorker.INPUT_DESCRIPTION to description,
-                    UseCaseWorker.INPUT_USERNAME to username,
-                    UseCaseWorker.INPUT_EMAIL to email,
-                )
-            )
-            .build()
-
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
-    }
-
     suspend fun updateInactiveCalendarsPassphrase() {
         val userId = userId.value
         if (userId == null) {

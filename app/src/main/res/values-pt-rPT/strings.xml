@@ -260,9 +260,6 @@
     <string name="snack_event_init_error">Erro ao inicializar novo evento</string>
     <string name="snack_event_calendar_error">Erro ao trocar a agenda</string>
     <string name="snack_event_maximum_alarm_reached_error">Atingiu o número máximo de notificações</string>
-    <string name="snack_send_bug_report_success">Relatório enviado, obrigado pelos comentários</string>
-    <string name="snack_send_bug_report_error">Erro ao enviar o relatório, por favor tente mais tarde</string>
-    <string name="snack_send_bug_report_description_empty">Forneça uma descrição do seu relatório</string>
     <string name="snack_create_event_no_active_personal_calendar">Precisa de uma agenda pessoal activa para criar eventos</string>
     <string name="snack_add_self_as_participant">Impossível convidar-se a si próprio</string>
     <string name="snack_maximum_participants_reached">O número máximo de participantes foi atingido.</string>
@@ -330,13 +327,6 @@
     <string name="notification_text_tomorrow">Amanhã</string>
     <string name="notification_text_tomorrow_part_time">Amanhã ás %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s ás %2$s</string>
-    <!-- Bug report -->
-    <string name="bug_report_hint_title">Assunto</string>
-    <string name="bug_report_hint_description">Por favor, descreva o problema e inclua quaisquer mensagens de erro.</string>
-    <string name="bug_report_discard_changes_title">Alterações por gravar</string>
-    <string name="bug_report_discard_changes_description">Há entradas por gravar no formulário. Tem a certeza de que deseja descartá-las?</string>
-    <string name="bug_report_discard_changes_cancel">Continuar a escrever</string>
-    <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
     <string name="settings_theme_title"> Tema</string>
     <string name="settings_theme_info">Esta definição só afecta a aparência do Proton Calendar neste dispositivo. A aplicação será reiniciada após alterar o tema.</string>

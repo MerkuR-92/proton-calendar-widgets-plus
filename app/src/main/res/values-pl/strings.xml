@@ -260,9 +260,6 @@
     <string name="snack_event_init_error">Wystąpił błąd podczas tworzenia wydarzenia</string>
     <string name="snack_event_calendar_error">Wystąpił błąd przełączania kalendarza</string>
     <string name="snack_event_maximum_alarm_reached_error">Limit maksymalnej liczby powiadomień został osiągnięty</string>
-    <string name="snack_send_bug_report_success">Raport został wysłany. Dziękujemy za opinię</string>
-    <string name="snack_send_bug_report_error">Wystąpił błąd podczas wysyłania raportu. Spróbuj ponownie później</string>
-    <string name="snack_send_bug_report_description_empty">Wpisz opis raportu</string>
     <string name="snack_create_event_no_active_personal_calendar">Musisz aktywować osobisty kalendarz, aby utworzyć wydarzania</string>
     <string name="snack_add_self_as_participant">Zaproszenie samego siebie nie jest dozwolone</string>
     <string name="snack_maximum_participants_reached">Limit maksymalnej liczby uczestników został osiągnięty.</string>
@@ -330,13 +327,6 @@
     <string name="notification_text_tomorrow">Jutro</string>
     <string name="notification_text_tomorrow_part_time">Jutro o godzinie %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s o godzinie %2$s</string>
-    <!-- Bug report -->
-    <string name="bug_report_hint_title">Temat</string>
-    <string name="bug_report_hint_description">Opisz problem i dołącz wszelkie informacje o błędach.</string>
-    <string name="bug_report_discard_changes_title">Niezapisane zmiany</string>
-    <string name="bug_report_discard_changes_description">W formularzu są niezapisane dane. Czy na pewno chcesz je odrzucić?</string>
-    <string name="bug_report_discard_changes_cancel">Edytuj dalej</string>
-    <string name="bug_report_discard_changes_confirm">Odrzuć</string>
     <!-- Settings -->
     <string name="settings_theme_title">Motyw</string>
     <string name="settings_theme_info">To ustawienie wpływa na wygląd aplikacji Proton Calendar tylko na tym urządzeniu. Po zmianie motywu, aplikacja zostanie ponownie uruchomiona.</string>

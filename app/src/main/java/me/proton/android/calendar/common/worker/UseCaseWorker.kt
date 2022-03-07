@@ -29,7 +29,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val HANDLE_ALARMS = HandleAlarmsUseCase.WORKER_ID
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
-            const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
             const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_AUTO_DETECT
             const val UPDATE_DISPLAY_WEEK_NUMBER = UpdateCalendarUserSettingsUseCase.WORKER_ID_WEEK_NUMBER
@@ -61,16 +60,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_UPDATE_TIME = "INPUT_UPDATE_TIME"
         const val INPUT_EVENT_UID = "INPUT_EVENT_UID"
         const val INPUT_USER_EMAILS = "INPUT_USER_EMAILS"
-
-        // Bug Report
-        const val INPUT_OS_NAME = "INPUT_OS_NAME"
-        const val INPUT_OS_VERSION = "INPUT_OS_VERSION"
-        const val INPUT_CLIENT = "INPUT_CLIENT"
-        const val INPUT_APP_VERSION_NAME = "INPUT_APP_VERSION_NAME"
-        const val INPUT_TITLE = "INPUT_TITLE"
-        const val INPUT_DESCRIPTION = "INPUT_DESCRIPTION"
-        const val INPUT_USERNAME = "INPUT_USERNAME"
-        const val INPUT_EMAIL = "INPUT_EMAIL"
     }
 
     /**
@@ -83,7 +72,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val HANDLE_ALARMS = "HANDLE_ALARMS"
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
-            const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
             const val UPDATE_PRIMARY_TIMEZONE = "UPDATE_PRIMARY_TIMEZONE"
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = "UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE"
             const val UPDATE_DISPLAY_WEEK_NUMBER = "UPDATE_DISPLAY_WEEK_NUMBER"
@@ -127,19 +115,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             UseCaseId.UPDATE_CALENDAR_LIST -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
                 updateCalendarUseCase.executeUpdateList(userId)
-            }
-            UseCaseId.SEND_BUG_REPORT -> {
-                val sendBugReportUseCase: SendBugReportUseCase = get()
-                sendBugReportUseCase.execute(
-                    userId,
-                    inputData.getString(INPUT_OS_NAME) ?: return Result.failure(),
-                    inputData.getString(INPUT_OS_VERSION) ?: return Result.failure(),
-                    inputData.getString(INPUT_CLIENT) ?: return Result.failure(),
-                    inputData.getString(INPUT_APP_VERSION_NAME) ?: return Result.failure(),
-                    inputData.getString(INPUT_TITLE) ?: return Result.failure(),
-                    inputData.getString(INPUT_DESCRIPTION) ?: return Result.failure(),
-                    inputData.getString(INPUT_USERNAME) ?: return Result.failure(),
-                    inputData.getString(INPUT_EMAIL) ?: return Result.failure())
             }
             UseCaseId.UPDATE_PRIMARY_TIMEZONE -> {
                 val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
