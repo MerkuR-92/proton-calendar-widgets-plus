@@ -104,8 +104,13 @@
 
     <!--  Day  -->
     <dimen name="month_view_day_number_text_size">12sp</dimen>
-    <dimen name="month_view_day_number_text_baseline_margin_top">20dp</dimen>
+    <dimen name="month_view_day_number_text_baseline_margin_top">18dp</dimen>
     <dimen name="month_view_day_header_height">26dp</dimen>
+    <dimen name="month_view_event_title_highlight_top_margin">4dp</dimen>
+    <dimen name="month_view_event_title_highlight_radius">5dp</dimen>
+    <dimen name="month_view_event_title_highlight_width">21dp</dimen>
+    <dimen name="month_view_event_title_highlight_height">20dp</dimen>
+    <dimen name="month_view_event_title_highlight_stroke">1dp</dimen>
 
     <!--  Event  -->
     <dimen name="month_view_event_title_text_size">10sp</dimen>

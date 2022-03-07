@@ -48,6 +48,12 @@ class MonthView : ViewGroup {
     private var parentHeight = 0F
 
     private var eventRadius: Float = 0F
+    private var highlightDayTitleRectRadius: Float = 0F
+
+    private var highlightDayTitleRectWidth: Float = 0F
+    private var highlightDayTitleRectHeight: Float = 0F
+
+    private var highlightDayTitleRectTopMargin: Float = 0F
 
     private var basicTitlePaint: TextPaint
 
@@ -55,6 +61,7 @@ class MonthView : ViewGroup {
     private var offsetDayTitlePaint: TextPaint
     private var highlightDayTitlePaint: TextPaint
 
+    private var highlightDayTitleRectPaint: Paint
     private var gridItemSeparatorPaint: Paint
 
     private var dayList: List<LocalDate>? = null
@@ -71,6 +78,12 @@ class MonthView : ViewGroup {
         val res = context.resources
 
         eventRadius = res.getDimension(R.dimen.month_view_event_corner_radius)
+        highlightDayTitleRectRadius = res.getDimension(R.dimen.month_view_event_title_highlight_radius)
+
+        highlightDayTitleRectWidth = res.getDimension(R.dimen.month_view_event_title_highlight_width)
+        highlightDayTitleRectHeight = res.getDimension(R.dimen.month_view_event_title_highlight_height)
+
+        highlightDayTitleRectTopMargin = res.getDimension(R.dimen.month_view_event_title_highlight_top_margin)
 
         val robotoMediumTypeface = Typeface.createFromAsset(context.assets, MONTH_VIEW_FONT_PATH)
 
@@ -93,6 +106,13 @@ class MonthView : ViewGroup {
 
         highlightDayTitlePaint = TextPaint(dayTitlePaint).apply {
             color = ContextCompat.getColor(context, R.color.brand_norm)
+        }
+
+        highlightDayTitleRectPaint = Paint().apply {
+            style = Paint.Style.STROKE
+            color = ContextCompat.getColor(context, R.color.interaction_norm)
+            strokeWidth = res.getDimension(R.dimen.month_view_event_title_highlight_stroke)
+            isAntiAlias = true
         }
 
         offsetDayTitlePaint = TextPaint(dayTitlePaint).apply {
@@ -147,6 +167,26 @@ class MonthView : ViewGroup {
                         else -> dayTitlePaint
                     }
                 )
+
+                if (date == LocalDate.now(ZoneId.of(timeZoneId))) {
+                    val fontMetrics = highlightDayTitlePaint.fontMetrics
+                    val textHeight = fontMetrics.bottom - fontMetrics.top + fontMetrics.leading
+                    val stroke = res.getDimension(R.dimen.month_view_event_title_highlight_stroke)
+
+                    val start = gridItemStart + (gridItemWidth / 2) - (highlightDayTitleRectWidth / 2)
+                    val top = gridItemTop - (textHeight / 4) - (highlightDayTitleRectHeight / 2) - (stroke / 2)
+                    canvas?.drawRoundRect(
+                        RectF(
+                            start,
+                            top,
+                            start + highlightDayTitleRectWidth,
+                            top + highlightDayTitleRectHeight
+                        ),
+                        highlightDayTitleRectRadius,
+                        highlightDayTitleRectRadius,
+                        highlightDayTitleRectPaint
+                    )
+                }
 
                 listIndex++
             }
