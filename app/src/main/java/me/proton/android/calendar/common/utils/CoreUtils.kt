@@ -4,6 +4,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
+import okhttp3.internal.toHexString
 
 fun ApiResponse.Error.isTimeout(): Boolean {
     // TODO hardcoded string because there is no dedicated code for timeout
@@ -12,4 +13,10 @@ fun ApiResponse.Error.isTimeout(): Boolean {
 
 suspend fun UserManager.getAddressesOrNull(userId: UserId, refresh: Boolean = false): List<UserAddress>? {
     return kotlin.runCatching { getAddresses(userId, refresh) }.getOrNull()
+}
+
+/** Create an hex color in the '#FFFFFF' format. */
+fun Int.toHexColor(): String {
+    return "#" + this.toHexString()
+        .let { if (it.count() > 6) it.drop(it.count()-6) else it } // Remove alpha values for backend
 }

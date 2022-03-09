@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.provider.CalendarContract
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.UpdateCalendarApiRequest
 import me.proton.android.calendar.data.api.UpdateCalendarDisplayApiRequest
@@ -12,6 +13,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
+import okhttp3.internal.toHexString
 import javax.inject.Inject
 
 class UpdateCalendarUseCase @Inject constructor(
@@ -47,11 +49,11 @@ class UpdateCalendarUseCase @Inject constructor(
         }
     }
 
-    suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
+    suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: Int? = null, display: Int? = null) : UseCase.Result {
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
             name = name,
             description = description,
-            color = color,
+            color = color?.toHexColor(),
             display = display
         )
         return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {

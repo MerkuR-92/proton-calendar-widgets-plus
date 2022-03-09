@@ -14,14 +14,14 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.core.util.kotlin.equalsNoCase
 
 class CalendarColorListAdapter(
-    val colors: List<String>,
-    val selectedColor: String?,
-    val listener: (String) -> Unit
+    val colors: List<Int>,
+    val selectedColor: Int?,
+    val listener: (Int) -> Unit
 ): BaseAdapter() {
 
     override fun getCount(): Int = colors.size
 
-    override fun getItem(position: Int): String = colors[position]
+    override fun getItem(position: Int): Int = colors[position]
 
     override fun getItemId(position: Int): Long = position.toLong()
 
@@ -35,19 +35,13 @@ class CalendarColorListAdapter(
 
         val color = getItem(position)
 
-        colorItemFilled.backgroundTintList = ColorStateList.valueOf(
-            Color.parseColor(color)
-        )
+        colorItemFilled.backgroundTintList = ColorStateList.valueOf(color)
 
-        colorItemMain.backgroundTintList = ColorStateList.valueOf(
-            Color.parseColor(color)
-        )
+        colorItemMain.backgroundTintList = ColorStateList.valueOf(color)
 
-        colorItemOuter.backgroundTintList = ColorStateList.valueOf(
-            Color.parseColor(AndroidUtils.darkenCalendarColor(color))
-        )
+        colorItemOuter.backgroundTintList = ColorStateList.valueOf(color)
 
-        val selected = color.equalsNoCase(selectedColor)
+        val selected = color == selectedColor
         colorItemFilled.visibleOrGone(!selected)
         colorItemMain.visibleOrGone(selected)
         colorItemOuter.visibleOrGone(selected)

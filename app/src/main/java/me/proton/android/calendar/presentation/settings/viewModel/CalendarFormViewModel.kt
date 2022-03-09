@@ -1,6 +1,7 @@
 package me.proton.android.calendar.presentation.settings.viewModel
 
 import android.app.Application
+import android.graphics.Color
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -45,6 +46,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.presentation.utils.showToast
 import me.proton.core.user.domain.UserManager
+import okhttp3.internal.toHexString
 import javax.inject.Inject
 
 @HiltViewModel
@@ -96,8 +98,8 @@ class CalendarFormViewModel @Inject constructor(
     private val _calendarEmail = MutableLiveData<String>()
     val calendarEmail: LiveData<String> = _calendarEmail
 
-    private val _calendarColor = MutableLiveData<String>()
-    val calendarColor: LiveData<String> = _calendarColor
+    private val _calendarColor = MutableLiveData<Int>()
+    val calendarColor: LiveData<Int> = _calendarColor
 
     private val _defaultEventDuration = MutableLiveData<Int>()
     val defaultEventDuration: LiveData<Int> = _defaultEventDuration
@@ -125,7 +127,7 @@ class CalendarFormViewModel @Inject constructor(
 
     fun resetFormValues() {
         _calendarName.value = ""
-        _calendarColor.value = ""
+        _calendarColor.value = 0
         _calendarEmail.value = ""
         _defaultEventDuration.value = EVENT_DEFAULT_DURATION_MINUTES.first()
         _defaultPartDayAlarms.value = arrayListOf()
@@ -181,7 +183,7 @@ class CalendarFormViewModel @Inject constructor(
         _calendarEmail.value = calendarEmail ?: ""
 
         // Calendar color
-        _calendarColor.value = calendarEntity.color
+        _calendarColor.value = Color.parseColor(calendarEntity.color)
 
         // Default event duration
         _defaultEventDuration.value = calendarSettings.defaultEventDuration
@@ -193,8 +195,7 @@ class CalendarFormViewModel @Inject constructor(
         setDefaultAlarms(calendarSettings.defaultFullDayNotifications, isAllDay = true)
     }
 
-    suspend fun initCreateCalendarForm(calendarColor: String) {
-
+    suspend fun initCreateCalendarForm(calendarColor: Int) {
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
 
@@ -317,7 +318,7 @@ class CalendarFormViewModel @Inject constructor(
         _calendarName.value = calendarName
     }
 
-    fun handleCalendarColor(calendarColor: String) {
+    fun handleCalendarColor(calendarColor: Int) {
         if (_calendarColor.value == calendarColor) return
         calendarEdited = true
         _calendarColor.value = calendarColor

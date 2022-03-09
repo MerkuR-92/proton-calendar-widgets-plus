@@ -23,27 +23,4 @@
     <!-- navigation bar color used for api < 27 -->
     <color name="background_navigation_bar">?proton_background_norm</color>
 
-    <string-array name="calendar_colors">
-        <item>#7272a7</item>
-        <item>#8989ac</item>
-        <item>#cf5858</item>
-        <item>#cf7e7e</item>
-        <item>#c26cc7</item>
-        <item>#c793ca</item>
-        <item>#7569d1</item>
-        <item>#9b94d1</item>
-        <item>#69a9d1</item>
-        <item>#a8c4d5</item>
-        <item>#5ec7b7</item>
-        <item>#97c9c1</item>
-        <item>#72bb75</item>
-        <item>#9db99f</item>
-        <item>#c3d261</item>
-        <item>#c6cd97</item>
-        <item>#e6c04c</item>
-        <item>#e7d292</item>
-        <item>#e6984c</item>
-        <item>#dfb286</item>
-    </string-array>
-
 </resources>

@@ -8,13 +8,18 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.calculateWeekNu
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLastWeekOfMonthOffset
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimezoneOffsetDifferenceSeconds
-import me.proton.android.calendar.common.utils.IcsSurgeryUtils.getBiweeklyDstParsingFix
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.IcsSurgeryUtils.getBiweeklyDstParsingFix
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
-import java.time.*
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 internal class DateTimeUtilsTest {
 
@@ -180,7 +185,7 @@ internal class DateTimeUtilsTest {
         val timeZoneId = "Europe/Berlin"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -245,7 +250,7 @@ internal class DateTimeUtilsTest {
         val timeZoneId = "Europe/Berlin"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!

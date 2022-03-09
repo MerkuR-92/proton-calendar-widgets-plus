@@ -6,6 +6,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import org.junit.jupiter.api.Test
@@ -36,7 +37,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -44,7 +45,7 @@ internal class EventUtilsTest {
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isTrue()
 
     }
-    
+
     @Test
     fun `spans single day for part-time zero-duration at Midnight`() {
 
@@ -67,7 +68,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -98,7 +99,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -129,7 +130,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -160,7 +161,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -191,7 +192,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -222,7 +223,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -254,7 +255,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -285,7 +286,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -316,7 +317,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
+            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
