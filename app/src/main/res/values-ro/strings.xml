@@ -92,8 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
-    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Detalii</a>
-    </string>
+    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Detalii</a></string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Doriți să schimbați răspunsul pentru toate evenimentele din această serie?\nUnele dintre răspunsurile dvs. la manifestările anterioare actualizate de către organizator vor fi pierdute.</string>
@@ -379,16 +378,20 @@
     <string name="create_calendar_limit_reached_paid_message">Ștergeți calendarele neutilizate pentrru a crea altele.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionare calendare</string>
     <string name="create_calendar_limit_reached_close">Închidere</string>
+    <string name="delete_calendar_dialog_title">Ștergere calendar</string>
+    <string name="delete_calendar_dialog_message">Sigur doriți să ștergeți acest calendar?</string>
+    <string name="delete_default_calendar_dialog_message">Sigur doriți ștergerea acestui calendar? „%1$s” va fi setat ca și calendar implicit.</string>
+    <string name="delete_calendar_snack_deleted">Calendarul a fost șters</string>
+    <string name="delete_calendar_snack_error">Eroare la ștergerea calendarului</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Confirmarea parolei a eșuat</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Nu există calendare asociate cu acest cont.</string>
-    <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
-    </string>
+    <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Eroare pregătire calendar</string>
     <string name="bootstrap_error_some_calendars_failed_message">Următoarele calendare nu au putut fi setate</string>
     <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar activ asociat cu acest cont.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://protonmail.com/support/">baza de cunoștințe</a>
-    </string>
+    <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://protonmail.com/support/">baza de cunoștințe</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Nu mai există spațiu de stocare disponibil.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Detalii</string>
     <string name="bootstrap_error_reset_needed_title">Resetare chei calendar</string>
