@@ -183,6 +183,7 @@ class HandleIcsUseCase @Inject constructor(
                 if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
                     existingEventEntity = eventEntity
+                    calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
                     break
                 }
             }
@@ -266,7 +267,6 @@ class HandleIcsUseCase @Inject constructor(
                 if (immutableExistingEventEntity.isProtonProtonInvite?.toBoolean() == true || immutableExistingEvent.sharedEventId == newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID)?.value) {
                     // Event is a proton to proton invite
                     // Fetch event to make sure we have the latest version
-                    if (refreshEventEntityIfNeeded(userId, newEvent, immutableExistingEvent, immutableExistingEventEntity) == null) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
@@ -276,7 +276,6 @@ class HandleIcsUseCase @Inject constructor(
                 if (newEvent.hasProtonProtonProperties || newEvent.isProtonProtonReply) {
                     // Attendee added the event as a Proton to Proton invite
                     // Fetch event to make sure we have the latest version
-                    if (refreshEventEntityIfNeeded(userId, newEvent, immutableExistingEvent, immutableExistingEventEntity) == null) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
@@ -288,32 +287,11 @@ class HandleIcsUseCase @Inject constructor(
 
         if (immutableExistingEventEntity != null && immutableExistingEvent != null) {
             // Fetch event to make sure we have the latest version
-            if (refreshEventEntityIfNeeded(userId, newEvent, immutableExistingEvent, immutableExistingEventEntity) == null) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
             makeCalendarVisible(immutableExistingEvent, userId)
         }
 
         // If no update is needed, return the existing event id
         return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
-    }
-
-    private suspend fun refreshEventEntityIfNeeded(userId: UserId, newEvent: Event, existingEvent: Event, existingEventEntity: EventEntity): EventEntity? {
-        // Compare sequence & dateTimeStamp of ICS with existing DB event to check if it needs to be updated
-        val newEventSequence = newEvent.iCalEvent.sequence?.value
-        val existingEventSequence = existingEvent.iCalEvent.sequence?.value
-        val sequenceBumped = newEventSequence != null && existingEventSequence != null && newEventSequence > existingEventSequence
-
-        val newEventDtStamp = newEvent.iCalEvent.dateTimeStamp?.value
-        val existingEventDtStamp = existingEvent.iCalEvent.dateTimeStamp?.value
-        val dtStampBumped = newEventDtStamp != null && existingEventDtStamp != null && newEventDtStamp > existingEventDtStamp
-
-        if (sequenceBumped || dtStampBumped) {
-            val upToDateEventEntity = calendarsRepository.fetchEventById(userId, existingEvent.calendar.id, existingEvent.id).valueOrNullAndLogErrors(logger)?.event
-            upToDateEventEntity?.let {
-                calendarsRepository.persistEvents(*(listOf(upToDateEventEntity)).toTypedArray())
-            }
-            return upToDateEventEntity
-        }
-        return existingEventEntity
     }
 
     private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId, isOrganizerMode: Boolean): Boolean {
