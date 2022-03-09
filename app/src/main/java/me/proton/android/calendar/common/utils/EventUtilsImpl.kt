@@ -11,7 +11,6 @@ import biweekly.property.RecurrenceRule
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
@@ -19,7 +18,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.startEndOverlapsWithFullDayRange
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
@@ -33,7 +31,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import java.time.temporal.Temporal
 import java.util.*
 
 object EventUtilsImpl : EventUtils {
@@ -261,7 +258,11 @@ object EventUtilsImpl : EventUtils {
         val eventStart = Instant.ofEpochMilli(iCalEvent.dateStart.value.time).atZone(iteratorZoneId)
         val eventEnd = Instant.ofEpochMilli(iCalEvent.dateEnd.value.time).atZone(iteratorZoneId)
 
-        val eventDurationInDays = Period.between(eventStart.toLocalDate(), eventEnd.toLocalDate()).days.toLong()
+        // take into account TimeZone UTC offsets when calculating how many full days the event lasts (only used for All-Day Events)
+        val eventStartTZOffset = ZoneId.of(timeZoneId).rules.getOffset(eventStart.toInstant())
+        val eventEndTZOffset = ZoneId.of(timeZoneId).rules.getOffset(eventEnd.toInstant())
+        val eventStartEndOffsetDifference = eventStartTZOffset.compareTo(eventEndTZOffset)
+        val eventDurationInDays = Duration.ofSeconds(ChronoUnit.SECONDS.between(eventStart, eventEnd).plus(eventStartEndOffsetDifference)).toDays()
 
         val formatZoneId = ZoneId.of(timeZoneId)
         val formatToZonedDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))

@@ -176,7 +176,7 @@ object ICalUtilsImpl : ICalUtils {
         }
 
         iCalEvent.recurrenceRule.value.until?.let {
-            val untilDate = it.toZonedDateTime(startTimeZone.id)
+            val untilDate = it.toZonedDateTime(oldDateTime?.zone?.id ?: startTimeZone.id)
 
             val newUntilDate = if (startDate.isAfter(untilDate)) startDate else untilDate
 

@@ -536,6 +536,45 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `adjust UNTIL RRULE to new timezone for part-day event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton Technologies//AndroidCalendar 0.2.3//EN
+    BEGIN:VEVENT
+    DTSTART;TZID=Europe/Vilnius:20220302T123000
+    DTEND;TZID=Europe/Vilnius:20220302T130000
+    RRULE:FREQ=DAILY;UNTIL=20220309T215959Z
+    SEQUENCE:0
+    SUMMARY:blah
+    STATUS:CONFIRMED
+    DTSTAMP:20200728T103442Z
+    UID:TaDoa1gh-CVheCqJbaIc86Up96cX@proton.me
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val oldTimeZoneId = "Europe/Vilnius"
+        val newTimeZoneId = "Asia/Omsk"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        event.iCalendar.setDefaultTimeZone(newTimeZoneId)
+        event.iCalendar.adjustRRuleToStartDate(event.getStart(oldTimeZoneId))
+        assertThat(event.iCalEvent.recurrenceRule.value.until.hasTime()).isTrue()
+        assertThat(event.iCalEvent.recurrenceRule.value.until).isEqualTo(ICalDate.from(ZonedDateTime.of(2022, 3, 9, 23, 59, 59, 0, ZoneId.of(newTimeZoneId)).toInstant()))
+
+    }
+
+    @Test
     fun `adjust RRULE to WEEK START`() {
 
         val eventNoAdjustment = createNewVEvent()
@@ -1182,6 +1221,61 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate occurrences of all-day recurring event ending in different month`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar 0.31.6//EN
+    BEGIN:VEVENT
+    DTSTAMP:20220302T174715Z
+    UID:9tRjtkUZB_GoQtAOk_BpdDyXdIfs@proton.me
+    STATUS:CONFIRMED
+    SEQUENCE:0
+    RRULE:FREQ=DAILY
+    SUMMARY:Ddd
+    DTSTART;VALUE=DATE:20220301
+    DTEND;VALUE=DATE:20220402
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER;RELATED=START:-PT15H
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Paris"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, null)!!
+
+        val occurrences = event.generateOccurrencesUntil(LocalDate.of(2023, 2, 1), displayTimeZoneId)!!
+
+        assertThat(occurrences[0].occurrenceNumber).isEqualTo(1)
+        assertThat(occurrences[0].startDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 1, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[0].endDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 2, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences[4].occurrenceNumber).isEqualTo(5)
+        assertThat(occurrences[4].startDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[4].endDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 6, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences[31].occurrenceNumber).isEqualTo(32) // Apr 1 2022 - May 2 2022
+        assertThat(occurrences[31].startDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 1, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[31].endDateTime).isEqualTo(ZonedDateTime.of(2022, 5, 3, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(occurrences.last().occurrenceNumber).isEqualTo(338) // Feb 1 2023 - Mar 4 2023
+        assertThat(occurrences.last().startDateTime).isEqualTo(ZonedDateTime.of(2023, 2, 1, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.last().endDateTime).isEqualTo(ZonedDateTime.of(2023, 3, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
     fun `generate occurrences of all-day event with BYDAY within full-day range`() {
 
         val iCalString = """
@@ -1210,15 +1304,19 @@ internal class ICalUtilsTest {
             0
         ), iCal, null)!!
 
-        val displayRangeTo = LocalDate.of(2020, 12, 31)
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 5)!!
 
-        val occurrence5 = event.generateOccurrence(5, displayTimeZoneId)
+        assertThat(occurrences[0].occurrenceNumber).isEqualTo(1)
+        assertThat(occurrences[0].startDateTime).isEqualTo(ZonedDateTime.of(2020, 5, 1, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[0].endDateTime).isEqualTo(ZonedDateTime.of(2020, 5, 2, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
-        assertThat(occurrence5!!).isNotNull()
+        assertThat(occurrences[2].occurrenceNumber).isEqualTo(3)
+        assertThat(occurrences[2].startDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 3, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[2].endDateTime).isEqualTo(ZonedDateTime.of(2020, 7, 4, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
-        assertThat(occurrence5.occurrenceNumber).isEqualTo(5)
-        assertThat(occurrence5.startDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 4, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
-        assertThat(occurrence5.endDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[4].occurrenceNumber).isEqualTo(5)
+        assertThat(occurrences[4].startDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 4, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[4].endDateTime).isEqualTo(ZonedDateTime.of(2020, 9, 5, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
     }
 

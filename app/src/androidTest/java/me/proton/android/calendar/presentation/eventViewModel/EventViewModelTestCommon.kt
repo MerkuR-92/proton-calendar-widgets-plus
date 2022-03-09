@@ -1,23 +1,50 @@
 package me.proton.android.calendar.presentation.eventViewModel
 
 import android.app.Application
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.just
+import io.mockk.mockk
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.getUserSettingsEntity
+import me.proton.android.calendar.common.getUserSettingsEntityFlow
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.ResourceProvider
-import me.proton.android.calendar.domain.UserSettingsRepository
-import me.proton.android.calendar.domain.usecase.*
-import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
+import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
+import me.proton.android.calendar.domain.usecase.SendEmailUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.mocks.CalendarMocks
+import me.proton.android.calendar.mocks.EventMocks
+import me.proton.android.calendar.mocks.UserMocks
+import me.proton.android.calendar.mocks.calendarId
+import me.proton.android.calendar.mocks.eventId
+import me.proton.android.calendar.mocks.singleEditEventId
+import me.proton.android.calendar.mocks.userId
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.user.domain.UserManager
+import me.proton.core.usersettings.data.db.UserSettingsDatabase
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.junit.Before
 import org.junit.Rule
 import org.koin.core.KoinComponent
@@ -55,7 +82,7 @@ open class EventViewModelTestCommon: KoinComponent {
     @Before
     fun beforeEach() {
         clearAllMocks()
-        appDatabaseMock = mockk()
+        appDatabaseMock = buildMultiThreaded()
         val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
         protonCalendarApplication = application
 
@@ -65,7 +92,8 @@ open class EventViewModelTestCommon: KoinComponent {
         coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity())
         coEvery { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) } returns CalendarMocks.provideCalendarUserSettingsEntity()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
-        coEvery { userSettingsRepositoryMock.selectUserSettings(userId.id) } returns UserMocks.provideUserSettingsEntity()
+        coEvery { userSettingsRepositoryMock.getUserSettingsEntity(userId, appDatabaseMock) } returns UserMocks.provideUserSettingsEntity()
+        coEvery { userSettingsRepositoryMock.getUserSettingsEntityFlow(userId, appDatabaseMock) } returns MutableLiveData(UserMocks.provideUserSettingsEntity()).asFlow()
         coEvery { userManagerMock.getUser(userId) } returns UserMocks.provideUser()
         coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
@@ -77,6 +105,12 @@ open class EventViewModelTestCommon: KoinComponent {
     /**
      * Utils private methods
      */
+
+    private fun buildMultiThreaded(): AppDatabase {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .build()
+    }
 
     fun getEventViewModel(): EventViewModel {
         return EventViewModel(
@@ -97,7 +131,8 @@ open class EventViewModelTestCommon: KoinComponent {
             resourceProvider = resourceProviderMock,
             widgetRefresher = calendarWidgetRefresherMock,
             handleAlarmsUseCase = handleAlarmsUseCaseMock,
-            eventDecryptor = eventDecryptorMock
+            eventDecryptor = eventDecryptorMock,
+            database = appDatabaseMock
         )
     }
 
@@ -119,13 +154,15 @@ open class EventViewModelTestCommon: KoinComponent {
         )
 
         if (editMode) {
-            coVerify(exactly = 1) { calendarsRepositoryMock.getDefaultCalendarIdOrFirstActiveId(any()) }
-            coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendar(any()) }
+            if (eventId == null) {
+                coVerify(exactly = 1) { calendarsRepositoryMock.getDefaultCalendarIdOrFirstActiveId(any()) }
+                coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendar(any()) }
+            }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(any()) }
         }
 
         coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(any()) }
-        coVerify(exactly = 1) { userSettingsRepositoryMock.selectUserSettings(any()) }
+        coVerify(exactly = 1) { userSettingsRepositoryMock.getUserSettingsEntity(userId, appDatabaseMock) }
         coVerify(exactly = 1) { userManagerMock.getUser(any()) }
 
         if (eventId != null && eventId == singleEditEventId) {

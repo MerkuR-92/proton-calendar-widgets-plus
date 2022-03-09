@@ -4,6 +4,8 @@ import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.usersettings.domain.entity.PasswordSetting
+import me.proton.core.usersettings.domain.entity.UserSettings
 
 object UserMocks {
 
@@ -13,6 +15,32 @@ object UserMocks {
             weekStart = weekStart, // 0: Locale default, 1: Monday, 6: Saturday 7: Sunday
             dateFormat = dateFormat, // 0: Locale default, 1: DD_MM_YYYY, 2: MM_DD_YYYY, 3: YYYY_MM_DD
             timeFormat = timeFormat // 0: Locale default, 1: 24H, 2: 12H
+        )
+    }
+
+    fun provideUserSettings(): UserSettings {
+        return UserSettings(
+            userId = userId,
+            email = null,
+            phone = null,
+            password = PasswordSetting(
+                null,
+                null
+            ),
+            twoFA = null,
+            news = null,
+            locale = null,
+            logAuth = null,
+            invoiceText = null,
+            density = null,
+            theme = null,
+            themeType = null,
+            weekStart = UserSettings.WeekStart.enumOf(weekStart),
+            dateFormat = UserSettings.DateFormat.enumOf(dateFormat),
+            timeFormat = UserSettings.TimeFormat.enumOf(timeFormat),
+            welcome = null,
+            earlyAccess = null,
+            flags = null
         )
     }
 
