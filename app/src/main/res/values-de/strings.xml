@@ -92,8 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Termin löschen</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
-    <string name="event_signature_verification_warning">Die Überprüfung der Ereignissignatur ist fehlgeschlagen. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Mehr erfahren</a>
-    </string>
+    <string name="event_signature_verification_warning">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Mehr erfahren</a></string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
     <string name="event_change_answer_recurring_overwrite_description">Möchtest du deine Antwort für alle Termine in dieser Serie ändern?\nEinige deiner Antworten auf Wiederholungen, die zuvor vom Organisator aktualisiert wurden, gehen dabei verloren.</string>
@@ -379,16 +378,20 @@
     <string name="create_calendar_limit_reached_paid_message">Lösche ungenutzte Kalender, um neue Kalender erstellen zu können.</string>
     <string name="create_calendar_limit_reached_paid_manage">Kalender verwalten</string>
     <string name="create_calendar_limit_reached_close">Schließen</string>
+    <string name="delete_calendar_dialog_title">Kalender löschen</string>
+    <string name="delete_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen?</string>
+    <string name="delete_default_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen? \"%1$s\" wird dann zum Standardkalender.</string>
+    <string name="delete_calendar_snack_deleted">Kalender gelöscht</string>
+    <string name="delete_calendar_snack_error">Fehler beim Löschen des Kalenders</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Passwort-Bestätigung fehlgeschlagen</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Mit diesem Konto sind keine Kalender verknüpft.</string>
-    <string name="bootstrap_error_no_calendar_message">Um jetzt einen einzurichten, besuche <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
-    </string>
+    <string name="bootstrap_error_no_calendar_message">Um jetzt einen einzurichten, besuche <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Fehler beim Einrichten der Kalender</string>
     <string name="bootstrap_error_some_calendars_failed_message">Die folgenden Kalender konnten nicht eingerichtet werden</string>
     <string name="bootstrap_error_no_active_calendar_title">Derzeit ist kein aktiver Kalender mit diesem Konto verknüpft.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Um zu erfahren, wie du einen Kalender aktivieren kannst, besuche unsere <a href="https://protonmail.com/support/">Wissensdatenbank</a>
-    </string>
+    <string name="bootstrap_error_no_active_calendar_message">Um zu erfahren, wie du einen Kalender aktivieren kannst, besuche unsere <a href="https://protonmail.com/support/">Wissensdatenbank</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Kein Speicherplatz mehr verfügbar.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Mehr erfahren</string>
     <string name="bootstrap_error_reset_needed_title">Kalenderschlüssel zurücksetzen</string>

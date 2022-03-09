@@ -92,8 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Eliminar evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Eliminar eventos</string>
     <string name="event_decryption_error_dialog_close">Cerrar</string>
-    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a>
-    </string>
+    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a></string>
     <string name="event_change_answer_recurring_title">Actualizar evento recurrente</string>
     <string name="event_change_answer_recurring_description">¿Quieres cambiar tu respuesta para todos los eventos de la serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">¿Quieres cambiar tu respuesta para todos los eventos de esta serie?\nAlgunas de tus respuestas a ocurrencias previamente actualizadas por el organizador se perderán.</string>
@@ -269,7 +268,7 @@
     <string name="snack_network_error">Error de red. Inténtalo de nuevo más tarde</string>
     <string name="snack_import_event_signed_out">Necesitas iniciar sesión para importar eventos</string>
     <string name="snack_app_link_signed_out">Necesitas iniciar sesión para acceder al eventos</string>
-    <string name="snack_update_default_calendar">Default calendar updated</string>
+    <string name="snack_update_default_calendar">Calendario por defecto actualizado</string>
     <string name="snack_update_default_calendar_error">Error actualizando el calendario, inténtalo de nuevo más tarde</string>
     <string name="snack_calendar_init_error">Error loading calendar information</string>
     <string name="snack_update_calendar_error">Error actualizando el calendario, inténtalo de nuevo más tarde</string>
@@ -379,16 +378,20 @@
     <string name="create_calendar_limit_reached_paid_message">Delete unused calendars to create new calendars.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar calendario</string>
     <string name="create_calendar_limit_reached_close">Cerrar</string>
+    <string name="delete_calendar_dialog_title">Delete calendar</string>
+    <string name="delete_calendar_dialog_message">Are you sure you want to delete this calendar?</string>
+    <string name="delete_default_calendar_dialog_message">Are you sure you want to delete this calendar? \"%1$s\" will be set as default calendar.</string>
+    <string name="delete_calendar_snack_deleted">Calendar deleted</string>
+    <string name="delete_calendar_snack_error">Error deleting calendar</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Password confirmation failed</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">No hay ningún calendario asociado con esta cuenta.</string>
-    <string name="bootstrap_error_no_calendar_message">Para configurar uno ahora, visita <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
-    </string>
+    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparando calendarios</string>
     <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
     <string name="bootstrap_error_no_active_calendar_title">No hay ningún calendario activo asociado con esta cuenta.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Para aprender a activar un calendario, visita nuestra <a href="https://protonmail.com/support/">base de conocimientos</a>
-    </string>
+    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No hay más espacio de almacenamiento disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Más información</string>
     <string name="bootstrap_error_reset_needed_title">Restablecer claves del calendario</string>
