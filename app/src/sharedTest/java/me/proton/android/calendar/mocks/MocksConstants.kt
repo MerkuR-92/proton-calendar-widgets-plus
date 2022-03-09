@@ -62,9 +62,9 @@ const val attendeeId = "attendeeId"
  * User mocks
  */
 
-const val weekStart = 1
-const val dateFormat = 1
-const val timeFormat = 1
+const val weekStart = 0
+const val dateFormat = 0
+const val timeFormat = 0
 
 const val userEmail = "userEmail@pm.me"
 const val userName = "userName"

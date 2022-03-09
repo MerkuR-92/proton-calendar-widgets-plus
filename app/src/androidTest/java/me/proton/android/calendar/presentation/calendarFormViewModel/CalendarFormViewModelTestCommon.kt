@@ -11,12 +11,12 @@ import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ResourceProvider
-import me.proton.android.calendar.domain.UserSettingsRepository
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.user.domain.UserManager
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.junit.Before
 import org.junit.Rule
 import org.koin.core.KoinComponent

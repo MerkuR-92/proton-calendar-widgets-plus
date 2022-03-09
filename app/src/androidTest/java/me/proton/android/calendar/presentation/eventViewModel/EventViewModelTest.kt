@@ -135,7 +135,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
      * Initialise EventVM for editing an event with no default calendar
      */
     @Test
-    fun initialiseEditEventNoDefaultCalendarTest() {
+    fun initialiseCreateEventNoDefaultCalendarTest() {
         runBlocking {
 
             // Mock event
@@ -157,13 +157,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
-                eventId = eventId,
+                eventId = null,
                 occurrenceNumber = 0,
                 initStartDate = null,
                 initStartTime = null
             )
-
-            coVerify(exactly = 1) { calendarsRepositoryMock.selectActiveUserCalendars(any()) }
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) }
 
@@ -175,7 +173,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
      * Initialise EventVM for editing an event with disabled default calendar
      */
     @Test
-    fun initialiseEditEventDisabledDefaultCalendarTest() {
+    fun initialiseCreateEventDisabledDefaultCalendarTest() {
         runBlocking {
 
             // Mock event
@@ -198,13 +196,11 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             val eventViewModel = getInitialisedEventViewModel(
                 editMode = true,
-                eventId = eventId,
+                eventId = null,
                 occurrenceNumber = 0,
                 initStartDate = null,
                 initStartTime = null
             )
-
-            coVerify(exactly = 1) { calendarsRepositoryMock.selectActiveUserCalendars(any()) }
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) }
 
