@@ -90,7 +90,16 @@ object ICalUtilsImpl : ICalUtils {
 
         if (this.dateStart == null) return false
 
-        // add DTEND
+        // TODO events with DTSTART == DTEND should not come from the API and we can't simply
+        //  force this change, because we rely on this in some places in the code
+
+        // set DTEND to be RFC compliant for all-day event with DTSTART == DTEND
+        /*if (this.dateStart?.value == this.dateEnd?.value && this.dateStart?.value?.hasTime() == false) {
+            val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
+            this.setDateEnd(endLocalDate.toDate(), false)
+        }*/
+
+        // add DTEND if not present
         if (this.dateEnd == null) {
             if (this.dateStart.value.hasTime()) {
                 this.setDateEnd(this.dateStart.value)
@@ -98,8 +107,6 @@ object ICalUtilsImpl : ICalUtils {
                 val endLocalDate = this.getStart(ZoneId.systemDefault().id)!!.toLocalDate().plusDays(1)
                 this.setDateEnd(endLocalDate.toDate(), false)
             }
-
-            // TODO maybe we should force DTEND+1 when dtstart=dtend
         }
 
         return true
