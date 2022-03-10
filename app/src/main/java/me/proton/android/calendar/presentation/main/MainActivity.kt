@@ -555,6 +555,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             R.id.nav_settings,
             R.id.nav_general_settings,
             R.id.nav_calendar_form,
+            R.id.nav_bug_report,
             R.id.nav_event_details,
             R.id.nav_event_form,
             R.id.nav_event_form_attendees,

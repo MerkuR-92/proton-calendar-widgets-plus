@@ -408,7 +408,7 @@ class MonthFragment : BaseFragment() {
                 if (miniCalendarPager.currentItem != miniCalendarIndex) {
                     // smooth-scroll only when switching between adjacent months
                     miniCalendarPager.post {
-                        miniCalendarPager?.setCurrentItem(
+                        miniCalendarPager.setCurrentItem(
                             miniCalendarIndex,
                             Math.abs(miniCalendarPager.currentItem - miniCalendarIndex) == 1
                         )
