@@ -168,7 +168,7 @@ class ProtonCalendarApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         } else {
-            SentryIntegration.initSentry(this)
+            SentryIntegration.initSentry(this, defaultSharedPreferencesProvider.sharedPreferences)
             Timber.plant(SentryTree())
         }
 
