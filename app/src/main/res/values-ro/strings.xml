@@ -259,6 +259,9 @@
     <string name="snack_event_init_error">Eroare la inițializarea unui nou eveniment</string>
     <string name="snack_event_calendar_error">Eroare la comutarea calendarului</string>
     <string name="snack_event_maximum_alarm_reached_error">Numărul maxim de notificări a fost atins.</string>
+    <string name="snack_send_bug_report_success">Raportul a fost trimis, vă mulțumim.</string>
+    <string name="snack_send_bug_report_error">Eroare la trimiterea raportului. Reîncercați mai târziu.</string>
+    <string name="snack_send_bug_report_description_empty">Furnizați o descriere a raportului</string>
     <string name="snack_create_event_no_active_personal_calendar">Aveți nevoie de un calendar activ personal pentru a crea evenimente.</string>
     <string name="snack_add_self_as_participant">Autoinvitarea nu este permisă</string>
     <string name="snack_maximum_participants_reached">Numărul maxim de participanți a fost atins.</string>
@@ -326,6 +329,13 @@
     <string name="notification_text_tomorrow">Mâine</string>
     <string name="notification_text_tomorrow_part_time">Mâine la %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s la %2$s</string>
+    <!-- Bug report -->
+    <string name="bug_report_hint_title">Subiect</string>
+    <string name="bug_report_hint_description">Descrieți problema incluzând și mesajele de eroare care apar.</string>
+    <string name="bug_report_discard_changes_title">Modificări nesalvate</string>
+    <string name="bug_report_discard_changes_description">Există date nesalvate în acest formular. Sigur doriți să renunțați la ele?</string>
+    <string name="bug_report_discard_changes_cancel">Continuare scriere</string>
+    <string name="bug_report_discard_changes_confirm">Renunțare</string>
     <!-- Settings -->
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Această setare afectează doar aspectul aplicației Proton Calendar pe acest dispozitiv. Aplicația va reporni după schimbarea temei.</string>
