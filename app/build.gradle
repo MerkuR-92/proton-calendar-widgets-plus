@@ -12,7 +12,7 @@ apply plugin: 'io.gitlab.arturbosch.detekt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'jacoco'
 
-def sentryDsn = System.getenv("SENTRY_DSN") ?: "https://abc@sentry.com/666"
+def sentryDsn = System.getenv("SENTRY_DSN_NEW") ?: ""
 def storeFilePath = project.hasProperty('keyStoreFilePath') ? keyStoreFilePath : "protonkey.jks"
 def storeKeyAlias = System.getenv("KEY_STORE_KEY_ALIAS") ?: 'proton'
 def storePass = System.getenv("KEY_STORE_PASSWORD") ?: "\"Store password\""
@@ -135,11 +135,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
 
-            buildConfigField("String", "SENTRY_DSN", "\"${sentryDsn}\"")
+            buildConfigField("String", "SENTRY_DSN_NEW", "\"${sentryDsn}\"")
 //            resValue("string", "build_time", "${minutesSinceEpoch}")
         }
         debug {
-            buildConfigField("String", "SENTRY_DSN", "\"null\"")
+            buildConfigField("String", "SENTRY_DSN_NEW", "\"null\"")
             testCoverageEnabled true
         }
     }
@@ -282,7 +282,7 @@ dependencies {
     implementation "androidx.security:security-crypto:${rootProject.ext.version.security}"
     implementation "com.google.crypto.tink:tink-android:1.5.0" // it's included in security-crypto
 
-    implementation 'io.sentry:sentry-android:1.7.30'
+    implementation 'io.sentry:sentry-android:5.6.2'
 
     implementation "at.favre.lib:bcrypt:0.9.0"
 //    implementation "org.mnode.ical4j:ical4j:${rootProject.ext.version.ical}"

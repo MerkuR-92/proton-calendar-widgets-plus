@@ -4,10 +4,9 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
 import dagger.hilt.android.HiltAndroidApp
-import io.sentry.Sentry
-import io.sentry.android.AndroidSentryClientFactory
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.logger.LoggerImpl
+import me.proton.android.calendar.common.logger.SentryIntegration
 import me.proton.android.calendar.common.logger.SentryTree
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
@@ -169,7 +168,7 @@ class ProtonCalendarApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         } else {
-            Sentry.init(BuildConfig.SENTRY_DSN, AndroidSentryClientFactory(this))
+            SentryIntegration.initSentry(this, defaultSharedPreferencesProvider.sharedPreferences)
             Timber.plant(SentryTree())
         }
 

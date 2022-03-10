@@ -109,6 +109,7 @@ object SharedPreferencesKeys {
     const val LAST_SPOTLIGHT_SHOWN = "last_spotlight_shown"
     const val APP_SETTINGS_LANGUAGE = "app_settings_language"
     const val APP_CURRENT_LANGUAGE = "app_current_language"
+    const val APP_INSTALLATION_ID = "app_installation_id"
 }
 
 object MiniCalendarGestures {
