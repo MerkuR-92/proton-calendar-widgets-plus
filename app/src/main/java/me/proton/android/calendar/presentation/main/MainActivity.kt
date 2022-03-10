@@ -73,7 +73,6 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
-import me.proton.android.calendar.presentation.bugReport.BugReportViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
@@ -105,7 +104,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
-    private val bugReportViewModel by viewModels<BugReportViewModel>()
     private val calendarViewModel: CalendarViewModel by viewModels()
     private val eventViewModel: EventViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
@@ -320,11 +318,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         intent?.let {
             if (savedInstanceState == null && mainViewModel.shouldHandleIntent(intent)) mainViewModel.handleIntent(intent)
         }
-
-        bugReportViewModel.register(this)
-        bugReportViewModel.bugReportSent
-            .onEach { displaySnackBar(it) }
-            .launchIn(lifecycleScope)
 
         with(accountViewModel) {
             init(this@MainActivity)
@@ -784,7 +777,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_main_content.nav_view_more_bug_press.setOnSingleClickListener {
-            bugReportViewModel.reportBugs()
+            navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
             drawer_layout.close()
         }
         // TODO Remove feature flag

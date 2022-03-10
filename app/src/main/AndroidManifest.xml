@@ -137,11 +137,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/ProtonTheme"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name="me.proton.core.report.presentation.ui.BugReportActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme.Calendar"
-            tools:replace="android:theme" />
 
         <receiver
             android:name="me.proton.android.calendar.CalendarWidget"
