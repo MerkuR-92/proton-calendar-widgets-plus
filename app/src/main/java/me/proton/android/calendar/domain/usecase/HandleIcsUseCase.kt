@@ -56,6 +56,8 @@ class HandleIcsUseCase @Inject constructor(
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
 
         if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            // Only log error as it doesn't contain any sensitive information
+            if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error) logger.i("HandleIcsUseCase parsing error $cleanIcsResult")
             return cleanIcsResult
         }
 
@@ -66,7 +68,10 @@ class HandleIcsUseCase @Inject constructor(
         val canonicalUserEmails = userManager.getAddressesOrNull(userId)?.map { address ->
             canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         } ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
-        val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
+        val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: run {
+            logger.i("HandleIcsUseCase error missing organizer")
+            return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
+        }
 
         // Find out if we are in organizer mode or attendee mode
         val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)
@@ -127,7 +132,10 @@ class HandleIcsUseCase @Inject constructor(
             if (it.participationStatus == null) it.participationStatus = ParticipationStatus.NEEDS_ACTION
 
             // When in organizer mode, we do not accept invalid emails, as there we require the attendee email to be canonicalizable to generate the token
-            if (isOrganizerMode && it.extractEmail() == null) IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
+            if (isOrganizerMode && it.extractEmail() == null) {
+                logger.i("HandleIcsUseCase organizer mode invalid attendee email")
+                return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
+            }
         }
 
         // If current user is not in the attendee list and is not the organizer then it is a party crasher
@@ -168,7 +176,10 @@ class HandleIcsUseCase @Inject constructor(
         } else null
 
         // IMPORTANT: Unlike the rest of the surgery, clean recurrence id is called outside of cleanIcs, but it is still mandatory
-        if (!iCalendar.cleanRecurrenceId(iCalendar.method == Method.reply(), parentEvent?.iCalendar)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RecurrenceId
+        if (!iCalendar.cleanRecurrenceId(iCalendar.method == Method.reply(), parentEvent?.iCalendar)) {
+            logger.i("HandleIcsUseCase error invalid recurrence id")
+            return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RecurrenceId
+        }
 
         // Find an existing event from the ones sharing the same UID
         var existingEvent: Event? = null
@@ -183,6 +194,7 @@ class HandleIcsUseCase @Inject constructor(
                 if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
                     existingEventEntity = eventEntity
+                    calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
                     break
                 }
             }
@@ -244,13 +256,17 @@ class HandleIcsUseCase @Inject constructor(
         if (isReInvitation && immutableExistingEvent != null) {
             val deleteResult = handleDeleteUseCase.handleDelete(userId, immutableExistingEvent.id, EventEditDeleteOption.ALL_EVENTS, null)
             if (deleteResult !is UseCase.Result.Success<*>) {
+                deleteResult.ifSuccessAndLogErrors(logger) {}
                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }
         }
 
         if (isNewNonCancelled || isNewSingleEditCancelled || isReInvitation) {
             // Create brand new event
-            if (!newEvent.iCalendar.setAttendeesXPmToken(userId, isOrganizerMode)) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
+            if (!newEvent.iCalendar.setAttendeesXPmToken(userId, isOrganizerMode)) {
+                logger.i("HandleIcsUseCase error failed to set attendees xpm token")
+                return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Attendees
+            }
             if (isNewSingleEditCancelled) {
                 newEvent.iCalendar.method = Method.request()
                 newEvent.iCalEvent.status = Status.cancelled() // In case of un-invite, the status needs to be set to cancelled
@@ -266,7 +282,6 @@ class HandleIcsUseCase @Inject constructor(
                 if (immutableExistingEventEntity.isProtonProtonInvite?.toBoolean() == true || immutableExistingEvent.sharedEventId == newEvent.iCalEvent.getExperimentalProperty(X_PM_SHARED_EVENT_ID)?.value) {
                     // Event is a proton to proton invite
                     // Fetch event to make sure we have the latest version
-                    if (refreshEventEntityIfNeeded(userId, newEvent, immutableExistingEvent, immutableExistingEventEntity) == null) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
@@ -276,7 +291,6 @@ class HandleIcsUseCase @Inject constructor(
                 if (newEvent.hasProtonProtonProperties || newEvent.isProtonProtonReply) {
                     // Attendee added the event as a Proton to Proton invite
                     // Fetch event to make sure we have the latest version
-                    if (refreshEventEntityIfNeeded(userId, newEvent, immutableExistingEvent, immutableExistingEventEntity) == null) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
                     makeCalendarVisible(immutableExistingEvent, userId)
                     return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
                 }
@@ -288,32 +302,11 @@ class HandleIcsUseCase @Inject constructor(
 
         if (immutableExistingEventEntity != null && immutableExistingEvent != null) {
             // Fetch event to make sure we have the latest version
-            if (refreshEventEntityIfNeeded(userId, newEvent, immutableExistingEvent, immutableExistingEventEntity) == null) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
             makeCalendarVisible(immutableExistingEvent, userId)
         }
 
         // If no update is needed, return the existing event id
         return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
-    }
-
-    private suspend fun refreshEventEntityIfNeeded(userId: UserId, newEvent: Event, existingEvent: Event, existingEventEntity: EventEntity): EventEntity? {
-        // Compare sequence & dateTimeStamp of ICS with existing DB event to check if it needs to be updated
-        val newEventSequence = newEvent.iCalEvent.sequence?.value
-        val existingEventSequence = existingEvent.iCalEvent.sequence?.value
-        val sequenceBumped = newEventSequence != null && existingEventSequence != null && newEventSequence > existingEventSequence
-
-        val newEventDtStamp = newEvent.iCalEvent.dateTimeStamp?.value
-        val existingEventDtStamp = existingEvent.iCalEvent.dateTimeStamp?.value
-        val dtStampBumped = newEventDtStamp != null && existingEventDtStamp != null && newEventDtStamp > existingEventDtStamp
-
-        if (sequenceBumped || dtStampBumped) {
-            val upToDateEventEntity = calendarsRepository.fetchEventById(userId, existingEvent.calendar.id, existingEvent.id).valueOrNullAndLogErrors(logger)?.event
-            upToDateEventEntity?.let {
-                calendarsRepository.persistEvents(*(listOf(upToDateEventEntity)).toTypedArray())
-            }
-            return upToDateEventEntity
-        }
-        return existingEventEntity
     }
 
     private suspend fun ICalendar.setAttendeesXPmToken(userId: UserId, isOrganizerMode: Boolean): Boolean {
@@ -426,8 +419,8 @@ class HandleIcsUseCase @Inject constructor(
                         newUpdateTime
                     )
 
-                    updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
                     if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
+                        updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
                         return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
                     }
 
@@ -467,11 +460,11 @@ class HandleIcsUseCase @Inject constructor(
                 return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action, isRecurring = newEvent.isRecurring())
             }
             is UseCase.Result.InvalidParams -> {
-                logger.e("MainViewModel: invalid params in create event: ${editCreateEventResult.message}")
+                logger.i("HandleIcsUseCase: invalid params in create event: ${editCreateEventResult.message}")
                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }
             is UseCase.Result.Error -> {
-                logger.e("MainViewModel: error in create event: ${editCreateEventResult.message}")
+                logger.i("HandleIcsUseCase: error in create event: ${editCreateEventResult.message}")
                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
             }
         }

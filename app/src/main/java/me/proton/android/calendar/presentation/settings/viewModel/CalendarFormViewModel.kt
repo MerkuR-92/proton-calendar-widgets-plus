@@ -37,6 +37,7 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.auth.presentation.*
@@ -57,7 +58,8 @@ class CalendarFormViewModel @Inject constructor(
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val userManager: UserManager,
     private val accountManager: AccountManager,
-    private val createCalendarUseCase: CreateCalendarUseCase
+    private val createCalendarUseCase: CreateCalendarUseCase,
+    private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase
 ) : AndroidViewModel(application) {
 
     sealed class CalendarFormSnackState {
@@ -408,6 +410,10 @@ class CalendarFormViewModel @Inject constructor(
             // Set loading state
             calendarFormState.value = CalendarFormState.Processing.Saving
 
+            // Get current active user calendars to check if new one needs to be set to default
+            val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
+            val setNewCalendarAsDefault = activeUserCalendars.isNullOrEmpty()
+
             // Create calendar
             val createCalendarResult = createCalendarUseCase.execute(
                 userId = userId,
@@ -444,6 +450,14 @@ class CalendarFormViewModel @Inject constructor(
                     // Clear loading state
                     calendarFormState.value = CalendarFormState.Idle
                     return
+                }
+
+                // Set newly created calendar as default if needed
+                if (setNewCalendarAsDefault) {
+                    updateCalendarUserSettingsUseCase.executeDefaultCalendarId(
+                        userId,
+                        this
+                    )
                 }
             }
 

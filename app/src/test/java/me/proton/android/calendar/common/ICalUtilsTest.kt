@@ -1585,7 +1585,7 @@ internal class ICalUtilsTest {
     UID:ZrsZ8COhD5FpNFbptwnRsOumvMrE@proton.me
     STATUS:CONFIRMED
     DTSTART;VALUE=DATE:20211217
-    DTEND;VALUE=DATE:20211217
+    DTEND;VALUE=DATE:20211218
     END:VEVENT
     END:VCALENDAR
     """.trimIndent()
@@ -1606,13 +1606,13 @@ internal class ICalUtilsTest {
         assertThat(occurrences.size).isEqualTo(3)
 
         assertThat(occurrences[0].startDateTime).isEqualTo(ZonedDateTime.of(2021, 12, 17, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
-        assertThat(occurrences[0].endDateTime).isEqualTo(ZonedDateTime.of(2021, 12,  17, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[0].endDateTime).isEqualTo(ZonedDateTime.of(2021, 12,  18, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
         assertThat(occurrences[1].startDateTime).isEqualTo(ZonedDateTime.of(2022, 12, 16, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
-        assertThat(occurrences[1].endDateTime).isEqualTo(ZonedDateTime.of(2022, 12,  16, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[1].endDateTime).isEqualTo(ZonedDateTime.of(2022, 12,  17, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
         assertThat(occurrences[2].startDateTime).isEqualTo(ZonedDateTime.of(2023, 12, 15, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
-        assertThat(occurrences[2].endDateTime).isEqualTo(ZonedDateTime.of(2023, 12,  15, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[2].endDateTime).isEqualTo(ZonedDateTime.of(2023, 12,  16, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
     }
 
@@ -2781,7 +2781,7 @@ internal class ICalUtilsTest {
     DTSTAMP:20201203T172430Z
     UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
     DTSTART;VALUE=DATE:20210107
-    DTEND;VALUE=DATE:20210107
+    DTEND;VALUE=DATE:20210108
     END:VEVENT
     END:VCALENDAR
     """.trimIndent()
@@ -2801,6 +2801,7 @@ internal class ICalUtilsTest {
 
         assertThat(firstOccurrence.occurrenceNumber).isEqualTo(15)
         assertThat(firstOccurrence.startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2021, 1, 21), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+        assertThat(firstOccurrence.endDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2021, 1, 22), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
     }
 
     @Test
@@ -2822,7 +2823,7 @@ internal class ICalUtilsTest {
     DTSTAMP:20201203T172430Z
     UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
     DTSTART;VALUE=DATE:20210107
-    DTEND;VALUE=DATE:20210107
+    DTEND;VALUE=DATE:20210108
     END:VEVENT
     END:VCALENDAR
     """.trimIndent()
@@ -2844,6 +2845,7 @@ internal class ICalUtilsTest {
 
         assertThat(firstOccurrence.occurrenceNumber).isEqualTo(18)
         assertThat(firstOccurrence.startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2021, 1, 24), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+        assertThat(firstOccurrence.endDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2021, 1, 25), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
     }
 
     @Test
