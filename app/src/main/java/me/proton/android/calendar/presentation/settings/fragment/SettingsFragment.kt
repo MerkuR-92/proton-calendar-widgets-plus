@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation.settings.fragment
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -10,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.asLiveData
@@ -36,6 +36,7 @@ import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.ResourceProvider
@@ -94,8 +95,29 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
         }
 
-        if (CHANGE_LANGUAGE) settings_general_info.text = getString(R.string.settings_general_info_with_language)
-        else settings_general_info.text = getString(R.string.settings_general_info)
+        // Build the general settings description
+        var generalSettingsDescription = getString(
+            R.string.settings_general_info_separator,
+            getString(R.string.settings_general_info_time_zone),
+            getString(R.string.settings_general_info_calendar_layout)
+        )
+        if (CHANGE_LANGUAGE) {
+            generalSettingsDescription = getString(
+                R.string.settings_general_info_separator,
+                getString(R.string.settings_general_info_language),
+                generalSettingsDescription
+            )
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            generalSettingsDescription = getString(
+                R.string.settings_general_info_separator,
+                getString(R.string.settings_general_info_theme),
+                generalSettingsDescription
+            )
+        }
+        settings_general_info.text = getString(R.string.settings_general_info, generalSettingsDescription).replaceFirstChar {
+            it.titlecase(DateTimeUtilsImpl.getLocaleForFormatting())
+        }
 
         settings_calendars_list_add_layout_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)

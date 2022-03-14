@@ -352,8 +352,12 @@
     <string name="settings_alternative_routing_subtitle">En caso de que los sitios de Proton estén bloqueados, este ajuste permite a la aplicación probar rutas alternativas para llegar a Proton, lo que puede ser útil para evitar problemas de red o firewalls. Recomendamos mantener este ajuste activado para mayor confiabilidad.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>
     <string name="settings_general_title">General</string>
-    <string name="settings_general_info">Tema, zona horaria, diseño del calendario, etc.</string>
-    <string name="settings_general_info_with_language">Tema, idioma, zona horaria, diseño del calendario, etc.</string>
+    <string name="settings_general_info">%s etc.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">tema</string>
+    <string name="settings_general_info_language">idioma</string>
+    <string name="settings_general_info_time_zone">zona horaria</string>
+    <string name="settings_general_info_calendar_layout">diseño del calendario</string>
     <string name="settings_calendars">Mis calendarios</string>
     <string name="settings_subscribed_calendars">Calendarios suscritos</string>
     <string name="settings_calendar_default">Por defecto</string>

@@ -352,8 +352,12 @@
     <string name="settings_alternative_routing_subtitle">En cas que es bloquegin els llocs de Proton, aquest paràmetre permet a l\'aplicació provar l\'encaminament de xarxa alternatiu per arribar a Proton, cosa que pot ser útil per evitar els tallafocs o problemes de xarxa. Recomanem mantenir aquesta configuració per a una major fiabilitat.</string>
     <string name="settings_value_placeholder">Toqueu per seleccionar</string>
     <string name="settings_general_title">General</string>
-    <string name="settings_general_info">Tema, fus horari, disseny del calendari, etc.</string>
-    <string name="settings_general_info_with_language">Theme, language, time zone, calendar layout etc.</string>
+    <string name="settings_general_info">%s etc.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">tema</string>
+    <string name="settings_general_info_language">language</string>
+    <string name="settings_general_info_time_zone">fus horari</string>
+    <string name="settings_general_info_calendar_layout">disseny del calendari</string>
     <string name="settings_calendars">Els meus calendaris</string>
     <string name="settings_subscribed_calendars">Calendaris subscrits</string>
     <string name="settings_calendar_default">Per defecte</string>

@@ -352,8 +352,12 @@
     <string name="settings_alternative_routing_subtitle">Für den Fall, dass Proton-Websites gesperrt sind, ermöglicht diese Einstellung der App, ein alternative Netzwerkweiterleitung auszuprobieren, um Proton zu erreichen, was zur Umgehung von Firewalls oder Netzwerkproblemen nützlich sein kann. Wir empfehlen, diese Einstellung für eine größere Zuverlässigkeit an zu lassen.</string>
     <string name="settings_value_placeholder">Zum Auswählen antippen</string>
     <string name="settings_general_title">Allgemein</string>
-    <string name="settings_general_info">Farbschema, Zeitzone, Kalenderanordnung usw.</string>
-    <string name="settings_general_info_with_language">Farbschema, Sprache, Zeitzone, Kalenderanordnung usw.</string>
+    <string name="settings_general_info">%s usw.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">Farbschema</string>
+    <string name="settings_general_info_language">Sprache</string>
+    <string name="settings_general_info_time_zone">Zeitzone</string>
+    <string name="settings_general_info_calendar_layout">Kalenderanordnung</string>
     <string name="settings_calendars">Meine Kalender</string>
     <string name="settings_subscribed_calendars">Abonnierte Kalender</string>
     <string name="settings_calendar_default">Standard</string>

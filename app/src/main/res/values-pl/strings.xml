@@ -352,8 +352,12 @@
     <string name="settings_alternative_routing_subtitle">W przypadku zablokowania dostępu do stron Proton, ta konfiguracja pozwoli aplikacji wypróbować alternatywne połączenia sieciowe, które mogą przywrócić ten dostęp. Ta funkcja może być przydatna podczas problemów z siecią lub w celu ominięcia zapór. Zalecamy włączenie tego ustawienia dla zapewnienia większej niezawodności.</string>
     <string name="settings_value_placeholder">Kliknij, aby wybrać</string>
     <string name="settings_general_title">Ogólne</string>
-    <string name="settings_general_info">Motyw, strefa czasowa, widok kalendarza itp.</string>
-    <string name="settings_general_info_with_language">Motyw, język, strefa czasowa, widok kalendarza itp.</string>
+    <string name="settings_general_info">%s itp.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">motyw</string>
+    <string name="settings_general_info_language">język</string>
+    <string name="settings_general_info_time_zone">strefa czasowa</string>
+    <string name="settings_general_info_calendar_layout">widok kalendarza</string>
     <string name="settings_calendars">Moje kalendarze</string>
     <string name="settings_subscribed_calendars">Subskrybowane kalendarze</string>
     <string name="settings_calendar_default">Domyślny</string>
