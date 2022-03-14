@@ -352,7 +352,7 @@
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un routage réseau alternatif pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de conserver ce paramètre activé pour une plus grande fiabilité.</string>
     <string name="settings_value_placeholder">Touchez pour sélectionner</string>
     <string name="settings_general_title">Général</string>
-    <string name="settings_general_info">%s etc.</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
     <string name="settings_general_info_separator">%s, %s</string>
     <string name="settings_general_info_theme">thème</string>
     <string name="settings_general_info_language">langue</string>

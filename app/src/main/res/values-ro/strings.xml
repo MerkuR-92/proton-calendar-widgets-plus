@@ -352,7 +352,7 @@
     <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
     <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
     <string name="settings_general_title">Generale</string>
-    <string name="settings_general_info">%s etc.</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
     <string name="settings_general_info_separator">%s, %s</string>
     <string name="settings_general_info_theme">tema</string>
     <string name="settings_general_info_language">limba</string>
