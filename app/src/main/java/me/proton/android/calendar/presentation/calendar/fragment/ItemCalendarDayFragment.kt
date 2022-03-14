@@ -571,19 +571,22 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     }
 
     private fun doOnPreDraw(scrollView: View, zoneId: ZoneId? = null) {
-        scrollView.setOnScrollChangeListener(null)
-        val jumpToCurrentTime = calendarViewModel.jumpToCurrentTime.value
-        if (jumpToCurrentTime == true) {
-            // Set scrolling position to current time minus 1 hour
-            calendarViewModel.jumpToCurrentTime.value = false
-            lifecycleScope.launch {
-                val timeZoneId =
-                    if (zoneId != null) {
-                        zoneId
-                    } else {
-                        val primaryTimeZone = calendarViewModel.getCalendarUserSettingsPrimaryTimezone()
-                        if (primaryTimeZone != null) ZoneId.of(primaryTimeZone) else null
-                    }
+        lifecycleScope.launch {
+            val timeZoneId =
+                if (zoneId != null) {
+                    zoneId
+                } else {
+                    val primaryTimeZone = calendarViewModel.getCalendarUserSettingsPrimaryTimezone()
+                    if (primaryTimeZone != null) ZoneId.of(primaryTimeZone) else null
+                }
+            val todaySelected =
+                if (timeZoneId != null) date == LocalDate.now(timeZoneId)
+                else date == LocalDate.now()
+            scrollView.setOnScrollChangeListener(null)
+            val jumpToCurrentTime = calendarViewModel.jumpToCurrentTime.value
+            if (jumpToCurrentTime == true || todaySelected) {
+                // Set scrolling position to current time minus 1 hour
+                calendarViewModel.jumpToCurrentTime.value = false
                 timeZoneId?.let {
                     val currentTime = LocalTime.now(it).hour
                     val yPos = dayView.getHourTop(
@@ -594,24 +597,24 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                     if (this@ItemCalendarDayFragment.isResumed) calendarViewModel.dayViewScrollYPosition.value = yPos
                     updateCurrentTimeIndicatorDelayed(it)
                 }
-            }
-        } else {
-            // If fragment is currently selected day, scroll to time of the first event of the day if it was previously saved
-            val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
-            if (calendarViewModel.selectedDate.value == date && firstEventOfTheDayTime != null) {
-                val yPos = dayView.getHourTop(
-                    if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
-                    else firstEventOfTheDayTime.hour
-                )
-                scrollView.scrollY = yPos
-                calendarViewModel.dayViewScrollYPosition.value = yPos
             } else {
-                // Use previous view scrolling position if it exists
-                scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+                // If fragment is currently selected day, scroll to time of the first event of the day if it was previously saved
+                val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
+                if (calendarViewModel.selectedDate.value == date && firstEventOfTheDayTime != null) {
+                    val yPos = dayView.getHourTop(
+                        if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
+                        else firstEventOfTheDayTime.hour
+                    )
+                    scrollView.scrollY = yPos
+                    calendarViewModel.dayViewScrollYPosition.value = yPos
+                } else {
+                    // Use previous view scrolling position if it exists
+                    scrollView.scrollY = calendarViewModel.dayViewScrollYPosition.value ?: 0
+                }
             }
+            scrollView.setOnScrollChangeListener(onScrollChangeListener)
+            preDrawDone = true
         }
-        scrollView.setOnScrollChangeListener(onScrollChangeListener)
-        preDrawDone = true
     }
 
     private fun setupItemMiniCalendarContent(
@@ -702,7 +705,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                                     } else null
                                 // Save time of the first event of the day
                                 calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
-                                if (immutableDate != LocalDate.now() && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
+                                if (immutableDate != LocalDate.now(ZoneId.of(timeZoneId)) && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
                                     val yPos = dayView.getHourTop(
                                         if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
                                         else firstEventOfTheDayTime.hour

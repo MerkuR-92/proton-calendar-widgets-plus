@@ -353,8 +353,12 @@
     <string name="settings_alternative_routing_subtitle">In case Proton sites are blocked, this setting allows the app to try alternative network routing to reach Proton, which can be useful for bypassing firewalls or network issues. We recommend keeping this setting on for greater reliability.</string>
     <string name="settings_value_placeholder">Tap to select</string>
     <string name="settings_general_title">General</string>
-    <string name="settings_general_info">Theme, time zone, calendar layout etc.</string>
-    <string name="settings_general_info_with_language">Theme, language, time zone, calendar layout etc.</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">theme</string>
+    <string name="settings_general_info_language">language</string>
+    <string name="settings_general_info_time_zone">time zone</string>
+    <string name="settings_general_info_calendar_layout">calendar layout</string>
     <string name="settings_calendars">My calendars</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
     <string name="settings_calendar_default">Default</string>

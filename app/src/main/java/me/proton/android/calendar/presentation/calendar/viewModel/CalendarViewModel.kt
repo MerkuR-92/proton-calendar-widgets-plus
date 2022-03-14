@@ -1036,4 +1036,12 @@ class CalendarViewModel @Inject constructor(
         }?.email
     }
 
+    suspend fun setJumpToCurrentTimeIfNeeded(date: LocalDate) {
+        val primaryTimeZone = getCalendarUserSettingsPrimaryTimezone()
+        val zoneId = if (primaryTimeZone != null) ZoneId.of(primaryTimeZone) else null
+        val jumpToCurrentTime =
+            if (zoneId != null) date == LocalDate.now(zoneId)
+            else date == LocalDate.now()
+        if (jumpToCurrentTime) this.jumpToCurrentTime.value = true
+    }
 }

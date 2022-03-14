@@ -352,8 +352,12 @@
     <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
     <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
     <string name="settings_general_title">Generale</string>
-    <string name="settings_general_info">Tema, fus orar, aspect calendar, etc.</string>
-    <string name="settings_general_info_with_language">Tema, limba, fus orar, aspect calendar, etc.</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">tema</string>
+    <string name="settings_general_info_language">limba</string>
+    <string name="settings_general_info_time_zone">fus orar</string>
+    <string name="settings_general_info_calendar_layout">aspect calendar</string>
     <string name="settings_calendars">Calendarele mele</string>
     <string name="settings_subscribed_calendars">Abonări la calendare</string>
     <string name="settings_calendar_default">Implicit</string>
