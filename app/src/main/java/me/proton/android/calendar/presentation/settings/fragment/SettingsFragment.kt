@@ -325,6 +325,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     bottomSheetDialog.dismiss()
                     view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
                 } else {
+                    bottomSheetDialog.dismiss()
                     with (AlertDialog.Builder(requireContext())) {
                         setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
                         setMessage(dialogMessage)
