@@ -235,7 +235,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
             var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
             val defaultCalendar = userCalendars.firstOrNull { it.id == defaultCalendarId }
-            if (defaultCalendar?.isActive == false) defaultCalendarId = userCalendars.firstOrNull { it.isActive }?.id
+            if (defaultCalendar == null || !defaultCalendar.isActive) {
+                defaultCalendarId = userCalendars.firstOrNull { it.isActive }?.id
+            }
             this@SettingsFragment.defaultCalendarId = defaultCalendarId
             val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
             settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
