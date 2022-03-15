@@ -4,6 +4,7 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.ApiResponseCode
+import me.proton.android.calendar.common.EventDeletionReason
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.addExceptionDate
@@ -48,7 +49,8 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         deleteOption: EventEditDeleteOption,
         occurrenceNumber: Int?,
         deleteSingleEdits: Boolean = true,
-        isOrphanSingleEdit: Boolean = false
+        isOrphanSingleEdit: Boolean = false,
+        deletionReason: EventDeletionReason = EventDeletionReason.ByUser
     ) : UseCase.Result {
 
         // TODO migrate to /sync route and handle recurring deletes
@@ -122,7 +124,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                     }
                 } else {
                     // delete the non-recurring event
-                    deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                    deleteEvents(userId, listOf(event.id), event.calendar.id, member.id, deletionReason)
                 }
 
             }
@@ -197,10 +199,10 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         return result
     }
 
-    private suspend fun deleteEvents(userId: UserId, eventIds: List<String>, calendarId: String, memberId: String): UseCase.Result  {
+    private suspend fun deleteEvents(userId: UserId, eventIds: List<String>, calendarId: String, memberId: String, deletionReason: EventDeletionReason = EventDeletionReason.ByUser): UseCase.Result  {
         val syncRequestBody = SyncEventsUpdateApiRequest(
             memberId = memberId,
-            events = eventIds.map { SyncEventDeleteContainer(it) }
+            events = eventIds.map { SyncEventDeleteContainer(id = it, deletionReason = deletionReason.value) }
         )
 
         return when (val syncResponse = calendarsApi.syncEvents(userId, calendarId, syncRequestBody)) {

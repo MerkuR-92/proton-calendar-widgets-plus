@@ -412,7 +412,9 @@ data class SyncEventUpdateContainer(
 @Serializable
 data class SyncEventDeleteContainer(
     @SerialName("ID")
-    val id: String
+    val id: String,
+    @SerialName("DeletionReason")
+    val deletionReason: Int
 ) : SyncEventContainer()
 
 @Serializable
