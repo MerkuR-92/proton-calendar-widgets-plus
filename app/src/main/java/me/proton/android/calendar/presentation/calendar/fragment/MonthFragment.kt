@@ -423,11 +423,7 @@ class MonthFragment : BaseFragment() {
                 val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
                 val agendaIndex = startingPosition + selectedDayOffset
                 if (agendaPager.currentItem != agendaIndex) {
-                    if (agendaPager.isFakeDragging) {
-                        agendaPager.post {
-                            agendaPager.setCurrentItem(agendaIndex, false)
-                        }
-                    } else {
+                    agendaPager.post {
                         agendaPager.setCurrentItem(agendaIndex, false)
                     }
                 }
