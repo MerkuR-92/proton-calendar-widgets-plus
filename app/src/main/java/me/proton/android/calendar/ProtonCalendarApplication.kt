@@ -13,6 +13,8 @@ import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.worker.SyncWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.EmailMessageRepository
 import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
@@ -126,6 +128,12 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var calendarsRepository: CalendarsRepository
 
+    @Inject
+    lateinit var eventDecryptor: EventDecryptor
+
+    @Inject
+    lateinit var crypto: Crypto
+
     override fun onCreate() {
         super.onCreate()
 
@@ -159,7 +167,9 @@ class ProtonCalendarApplication : Application() {
                     appDatabase,
                     calendarsRepository,
                     userSettingsRepository,
-                    missingScopeListener
+                    missingScopeListener,
+                    eventDecryptor,
+                    crypto
                 )
             )
         }
