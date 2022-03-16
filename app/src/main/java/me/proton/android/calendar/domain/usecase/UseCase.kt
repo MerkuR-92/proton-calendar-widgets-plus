@@ -5,8 +5,8 @@ import me.proton.android.calendar.domain.Logger
 interface UseCase {
     sealed class Result {
         class Success<T>(val returnValue: T? = null) : Result()
-        class InvalidParams(val message: String) : Result()
-        class Error(val message: String, val error: UseCase.Error? = null) : Result()
+        class InvalidParams(val message: String, val userErrorMessage: String? = null) : Result()
+        class Error(val message: String, val error: UseCase.Error? = null, val userErrorMessage: String? = null) : Result()
     }
 
     sealed class Error {

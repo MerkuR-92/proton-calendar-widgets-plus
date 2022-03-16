@@ -81,7 +81,6 @@ object IcsSurgeryUtils {
             object DefaultError: Error()
             object EventNotFound: Error()
             object NetworkError: Error()
-            object EditCreateEventError: Error()
             object EventDeleted: Error()
             object ParsingFailed: Error()
             object PartyCrasher: Error()
@@ -91,6 +90,7 @@ object IcsSurgeryUtils {
             object TooManyEvents: Error()
             object NoEvents: Error()
 
+            data class EditCreateEventError(val userErrorMessage: String? = null): Error()
             data class ReplyPartyCrasher(val eventId: String? = null): Error()
             data class DecryptionFailed(val eventId: String? = null, val isRecurring: Boolean? = null): Error()
             data class DisabledCalendar(val eventId: String? = null): Error()

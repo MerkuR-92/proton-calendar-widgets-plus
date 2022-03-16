@@ -118,12 +118,18 @@ class ItemCalendarAgendaFragment: Fragment() {
                                 if (deleteResult is UseCase.Result.Success<*>) {
                                     requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
                                 } else {
+                                    var userErrorMessage: String? = null
                                     if (deleteResult is UseCase.Result.Error) {
                                         logger.e("Error deleting event: ${deleteResult.message}")
+                                        userErrorMessage = deleteResult.userErrorMessage
                                     } else if (deleteResult is UseCase.Result.InvalidParams) {
                                         logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                        userErrorMessage = deleteResult.userErrorMessage
                                     }
-                                    requireActivity().displaySnackBar(getString(R.string.snack_event_deleted_error))
+                                    requireActivity().displaySnackBar(
+                                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                                        else userErrorMessage
+                                    )
                                 }
                             }
                         }
