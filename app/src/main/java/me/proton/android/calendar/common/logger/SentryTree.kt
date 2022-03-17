@@ -27,6 +27,7 @@ internal class SentryTree : Timber.Tree() {
                 Log.ASSERT -> SentryLevel.FATAL
                 else -> SentryLevel.DEBUG
             }
+            tag?.let { this.setTag("TAG", tag) }
         }
         Sentry.captureEvent(event)
     }
