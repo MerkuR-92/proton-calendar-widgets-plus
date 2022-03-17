@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.util.ICalDate
 import biweekly.util.ICalDateFormat
 import biweekly.util.Recurrence
+import me.proton.android.calendar.common.EventDeletionReason
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
@@ -726,7 +727,7 @@ class HandleSaveUseCase @Inject constructor(
             is UseCase.Result.Success<*> -> {
                 val isCalendarBeingChanged = oldCalendarId != null && oldCalendarId != newEvent.calendar.id
                 if (isCalendarBeingChanged) {
-                    val deleteOldEventResult = handleDeleteUseCase.handleDelete(userId, newEvent.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber = null)
+                    val deleteOldEventResult = handleDeleteUseCase.handleDelete(userId, newEvent.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber = null, deletionReason = EventDeletionReason.CalendarChange)
                     if (deleteOldEventResult is UseCase.Result.Success<*>) createEventResult else deleteOldEventResult
                 } else {
                     createEventResult

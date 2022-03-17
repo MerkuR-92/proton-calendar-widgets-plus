@@ -150,6 +150,11 @@ enum class EventEditDeleteOption {
     ALL_EVENTS
 }
 
+enum class EventDeletionReason(val value: Int) {
+    ByUser(0),
+    CalendarChange(1)
+}
+
 object IcsParsingValidation {
     const val UID_MAX_LENGTH = 191
     const val CONTACT_NAME_MAX_LENGTH = 190

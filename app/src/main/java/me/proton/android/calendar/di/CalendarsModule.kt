@@ -70,9 +70,11 @@ abstract class CalendarsBindModule {
     abstract fun bindValueStoreProvider(valueStoreProviderImpl: ValueStoreProviderImpl): ValueStoreProvider
 
     @Binds
+    @Singleton
     abstract fun bindCrypto(cryptoImpl: CryptoImpl): Crypto
 
     @Binds
+    @Singleton
     abstract fun bindEventDecryptor(eventDecryptorImpl: EventDecryptorImpl): EventDecryptor
 
 }

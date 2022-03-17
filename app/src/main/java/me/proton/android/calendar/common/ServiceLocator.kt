@@ -10,11 +10,8 @@ import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.common.provider.SharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
-import me.proton.android.calendar.data.CalendarsRepositoryImpl
-import me.proton.android.calendar.data.EventDecryptorImpl
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.di.AppDatabaseModule_ProvideAppDatabaseFactory
 import me.proton.android.calendar.di.CalendarsModule_ProvideKotlinxJsonFactory
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
@@ -57,7 +54,7 @@ val commonModule = module {
     single<SharedPreferencesProvider> { SharedPreferencesProvider(androidApplication()) }
     single<ValueStoreProvider> { ValueStoreProviderImpl(get()) }
     single<ResourceProvider> { ResourceProviderImpl(androidApplication().resources) }
-    single<Crypto> { CryptoImpl(get()) }
+
     single<WidgetRefresher> { CalendarWidgetRefresher(androidApplication()) }
 
 //    factory { new instance every time }
@@ -76,7 +73,6 @@ val networkModule = module {
 }
 
 val repositoryModule = module {
-    single<EventDecryptor> { EventDecryptorImpl(get(), get()) }
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
 }
@@ -155,6 +151,8 @@ fun coreModule(
     calendarsRepository: CalendarsRepository,
     userSettingsRepository: UserSettingsRepository,
     missingScopeListener: MissingScopeListener,
+    eventDecryptor: EventDecryptor,
+    crypto: Crypto
 ) = module {
     single<Product> { product }
     // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
@@ -180,4 +178,6 @@ fun coreModule(
     single<CalendarsRepository> { calendarsRepository }
     single<UserSettingsRepository> { userSettingsRepository }
     factory<MissingScopeListener> { missingScopeListener }
+    single<EventDecryptor> { eventDecryptor }
+    single<Crypto> { crypto }
 }
