@@ -9,6 +9,6 @@
     android:gravity="center"
     android:layout_marginTop="@dimen/calendar_week_number_spacing_top"
     android:layout_marginBottom="@dimen/calendar_week_number_spacing_bottom"
-    android:background="@drawable/shape_background_rounded_answer_event"
+    android:background="@drawable/shape_background_rounded_week_number"
     android:backgroundTint="@color/background_secondary"
     tools:text="15" />

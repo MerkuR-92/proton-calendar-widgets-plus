@@ -7,6 +7,6 @@
     android:layout_width="@dimen/calendar_week_number_width"
     android:layout_height="@dimen/calendar_week_number_height"
     android:gravity="center"
-    android:background="@drawable/shape_background_rounded_answer_event"
+    android:background="@drawable/shape_background_rounded_week_number"
     android:backgroundTint="@color/background_secondary"
     tools:text="15" />

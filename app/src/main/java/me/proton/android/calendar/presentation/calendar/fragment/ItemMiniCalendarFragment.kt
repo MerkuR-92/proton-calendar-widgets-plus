@@ -15,10 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_month.*
 import kotlinx.android.synthetic.main.item_mini_calendar.view.*
 import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
-import kotlinx.android.synthetic.main.item_mini_calendar_header.view.*
 import kotlinx.coroutines.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -482,12 +480,12 @@ class ItemMiniCalendarFragment : Fragment() {
             this.removeAllViews()
             fullWeeksInMonth = calculateFullWeeksInMonth(firstDay, startWeekOn)
             for (i in 0 until fullWeeksInMonth) {
-                val weekdayView = LayoutInflater.from(this.context).inflate(
-                    R.layout.item_mini_calendar_weekday,
+                val weekNumberView = LayoutInflater.from(this.context).inflate(
+                    R.layout.item_mini_calendar_week_number,
                     this,
                     false
                 )
-                val textView = weekdayView as TextView
+                val textView = weekNumberView as TextView
                 textView.text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
                 if (i == 0) {
                     // Update top margin for first row
@@ -496,7 +494,7 @@ class ItemMiniCalendarFragment : Fragment() {
                         requireContext().resources.getDimensionPixelSize(R.dimen.calendar_week_number_spacing_top_first)
                     textView.layoutParams = layoutParams
                 }
-                addView(weekdayView)
+                addView(weekNumberView)
             }
         }
     }

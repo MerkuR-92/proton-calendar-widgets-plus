@@ -745,21 +745,11 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean) {
         section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
         section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
         section_answer.item_change_answer_button_maybe.item_change_answer_button_layout.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.woodsmoke))
-
-        section_answer.item_change_answer_button_yes.item_change_answer_button_title.setTextColor(
-            resources.getColor(R.color.white, null)
-        )
-        section_answer.item_change_answer_button_no.item_change_answer_button_title.setTextColor(
-            resources.getColor(R.color.white, null)
-        )
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.setTextColor(
-            resources.getColor(R.color.white, null)
-        )
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
 
         section_answer.item_change_answer_button_yes.item_change_answer_button_title.visibleOrInvisible(true)
         section_answer.item_change_answer_button_yes.item_change_answer_button_loader.visibleOrGone(false)
@@ -771,28 +761,28 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         when (participationStatus) {
             ParticipationStatus.ACCEPTED -> {
                 section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                section_answer.item_change_answer_button_yes.item_change_answer_button_title.setTextColor(
-                    resources.getColor(R.color.woodsmoke, null)
-                )
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
+                        if (loading) R.color.background_norm
+                        else R.color.interaction_weak_pressed
+                    ))
                 section_answer.item_change_answer_button_yes.item_change_answer_button_title.visibleOrInvisible(!loading)
                 section_answer.item_change_answer_button_yes.item_change_answer_button_loader.visibleOrGone(loading)
             }
             ParticipationStatus.DECLINED -> {
                 section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                section_answer.item_change_answer_button_no.item_change_answer_button_title.setTextColor(
-                    resources.getColor(R.color.woodsmoke, null)
-                )
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
+                        if (loading) R.color.background_norm
+                        else R.color.interaction_weak_pressed
+                    ))
                 section_answer.item_change_answer_button_no.item_change_answer_button_title.visibleOrInvisible(!loading)
                 section_answer.item_change_answer_button_no.item_change_answer_button_loader.visibleOrGone(loading)
             }
             ParticipationStatus.TENTATIVE -> {
                 section_answer.item_change_answer_button_maybe.item_change_answer_button_layout.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                section_answer.item_change_answer_button_maybe.item_change_answer_button_title.setTextColor(
-                    resources.getColor(R.color.woodsmoke, null)
-                )
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
+                        if (loading) R.color.background_norm
+                        else R.color.interaction_weak_pressed
+                    ))
                 section_answer.item_change_answer_button_maybe.item_change_answer_button_title.visibleOrInvisible(!loading)
                 section_answer.item_change_answer_button_maybe.item_change_answer_button_loader.visibleOrGone(loading)
             }

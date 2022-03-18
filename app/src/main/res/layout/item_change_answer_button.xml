@@ -13,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/item_change_answer_button_layout"
         android:background="@drawable/shape_background_rounded_answer_event"
-        android:backgroundTint="@color/woodsmoke"
+        android:backgroundTint="@color/interaction_weak_pressed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -27,7 +27,6 @@
             android:paddingStart="@dimen/spacing_element"
             android:paddingEnd="@dimen/spacing_element"
             style="@style/Text.DefaultSmall"
-            android:textColor="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,15 +46,18 @@
             app:layout_constraintStart_toStartOf="@id/item_change_answer_button_title"
             app:layout_constraintEnd_toEndOf="@id/item_change_answer_button_title" />
 
-        <include
+        <View
             android:id="@+id/item_change_answer_button_press"
-            layout="@layout/view_press_overlay"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
