@@ -51,7 +51,7 @@
             <ImageView
                 android:id="@+id/event_form_all_day_icon"
                 style="@style/Icon.Form"
-                android:src="@drawable/ic_clock"
+                android:src="@drawable/ic_proton_clock"
                 app:layout_constraintBottom_toBottomOf="@+id/event_form_all_day_title"
                 app:layout_constraintTop_toTopOf="@+id/event_form_all_day_title"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -231,7 +231,7 @@
             <ImageView
                 android:id="@+id/event_form_timezone_icon"
                 style="@style/Icon.Form"
-                android:src="@drawable/ic_globe"
+                android:src="@drawable/ic_proton_earth"
                 app:layout_constraintBottom_toBottomOf="@+id/event_form_timezone"
                 app:layout_constraintTop_toTopOf="@+id/event_form_timezone"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -275,7 +275,7 @@
             <ImageView
                 android:id="@+id/event_form_recurrence_icon"
                 style="@style/Icon.Form"
-                android:src="@drawable/ic_arrows"
+                android:src="@drawable/ic_proton_arrows_rotate"
                 app:layout_constraintTop_toTopOf="@+id/event_form_recurrence"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -309,7 +309,7 @@
                 android:id="@+id/event_form_location_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_hint"
-                android:src="@drawable/ic_map_marker"
+                android:src="@drawable/ic_proton_map_pin"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="@+id/event_form_location"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -368,7 +368,7 @@
                 android:id="@+id/event_form_participant_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_hint"
-                android:src="@drawable/ic_contact_groups"
+                android:src="@drawable/ic_proton_users"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -431,7 +431,7 @@
                 android:id="@+id/event_form_calendar_icon"
                 style="@style/ColoredDot"
                 android:src="@drawable/ic_dot"
-                android:layout_marginStart="@dimen/default_inner_padding_start"
+                android:layout_marginStart="19dp"
                 app:layout_constraintBottom_toBottomOf="@+id/event_form_calendar"
                 app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -486,7 +486,7 @@
                 android:id="@+id/event_form_alarm_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_hint"
-                android:src="@drawable/ic_bell"
+                android:src="@drawable/ic_proton_bell"
                 app:layout_constraintBottom_toBottomOf="@+id/event_form_alarm"
                 app:layout_constraintTop_toTopOf="@+id/event_form_alarm"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -522,7 +522,7 @@
                 android:id="@+id/event_form_description_icon"
                 style="@style/Icon.Form"
                 app:tint="@color/icon_hint"
-                android:src="@drawable/ic_text_align_left"
+                android:src="@drawable/ic_proton_text_align_left"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
                 app:layout_constraintTop_toTopOf="@+id/event_form_description"
                 app:layout_constraintStart_toStartOf="parent" />

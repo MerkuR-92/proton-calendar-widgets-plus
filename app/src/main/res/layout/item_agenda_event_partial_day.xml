@@ -15,7 +15,7 @@
         android:layout_width="4dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        android:backgroundTint="@color/brand_norm"
+        android:backgroundTint="@color/purple_base"
         android:background="@drawable/shape_calendar_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -64,7 +64,7 @@
         android:visibility="gone"
         android:layout_width="@dimen/default_icon_size"
         android:layout_height="@dimen/default_icon_size"
-        android:src="@drawable/ic_lock_exclamation_triangle"
+        android:src="@drawable/ic_lock_exclamation_filled"
         app:layout_constraintStart_toStartOf="@+id/text_header"
         app:layout_constraintTop_toBottomOf="@+id/text_header"/>
 

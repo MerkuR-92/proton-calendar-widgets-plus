@@ -702,7 +702,7 @@ object AndroidUtils {
         data.add(
             hashMapOf(
                 "text" to view.resources.getText(R.string.action_delete),
-                "icon" to R.drawable.ic_trash
+                "icon" to R.drawable.ic_proton_trash
             )
         )
 

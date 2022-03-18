@@ -117,7 +117,7 @@
             app:tint="@color/icon_weak"
             android:layout_width="0dp"
             android:layout_height="36dp"
-            android:paddingBottom="20dp"
+            android:paddingBottom="26dp"
             android:scaleType="centerInside"
             android:rotation="180"
             android:visibility="gone"
@@ -126,7 +126,7 @@
             app:layout_constraintEnd_toEndOf="@+id/all_day_header"
             app:layout_constraintBottom_toTopOf="@+id/all_day_view_separator"
             android:layout_marginBottom="6dp"
-            app:srcCompat="@drawable/ic_chevron_down" />
+            app:srcCompat="@drawable/ic_proton_chevron_down_filled" />
 
         <View
             android:id="@+id/all_day_view_separator"

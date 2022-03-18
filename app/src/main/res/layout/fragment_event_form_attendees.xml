@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/nav_event_form_attendees_search_icon"
         style="@style/Icon.Form"
-        android:src="@drawable/ic_search"
+        android:src="@drawable/ic_proton_magnifier"
         app:layout_constraintTop_toTopOf="@id/nav_event_form_attendees_search_input"
         app:layout_constraintBottom_toBottomOf="@id/nav_event_form_attendees_search_input"
         app:layout_constraintStart_toStartOf="parent" />
@@ -50,7 +50,7 @@
     <ImageView
         android:id="@+id/nav_event_form_attendees_search_clear"
         style="@style/Icon.Form"
-        android:src="@drawable/ic_cross_close"
+        android:src="@drawable/ic_proton_cross_small"
         android:layout_marginEnd="@dimen/spacing_page"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="@id/nav_event_form_attendees_search_input"

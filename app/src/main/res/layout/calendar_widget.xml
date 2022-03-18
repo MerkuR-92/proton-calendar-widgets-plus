@@ -50,11 +50,11 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/widget_padding"
         android:background="@drawable/ripple_action_button_oval"
-        android:src="@drawable/ic_plus"
-        android:visibility="invisible"
-        tools:visibility="visible"
+        android:src="@drawable/ic_proton_plus"
         android:tint="@color/icon_norm"
-        tools:ignore="UseAppTint" />
+        android:visibility="invisible"
+        tools:ignore="UseAppTint"
+        tools:visibility="visible" />
 
     <ImageButton
         android:visibility="gone"
@@ -62,7 +62,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_toStartOf="@id/ib_plus"
-        android:src="@drawable/ic_arrows" />
+        android:src="@drawable/ic_proton_arrows_rotate" />
 
 
     <ListView

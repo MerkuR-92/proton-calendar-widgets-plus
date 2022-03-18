@@ -82,10 +82,12 @@
 
                         <ImageView
                             android:id="@+id/mini_calendar_chevron"
-                            style="@style/Icon.Small"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_marginTop="2dp"
                             android:layout_marginStart="6dp"
-                            android:src="@drawable/ic_chevron_small_down"
-                            app:tint="@color/text_norm"
+                            android:src="@drawable/ic_proton_chevron_down_filled"
+                            app:tint="@color/icon_norm"
                             android:background="@null"
                             android:visibility="gone"
                             tools:visibility="visible"

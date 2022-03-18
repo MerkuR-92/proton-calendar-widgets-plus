@@ -34,7 +34,7 @@ abstract class BaseFragment : Fragment() {
 
         val toolbar = rootView.findViewById(R.id.fragment_toolbar) as Toolbar
         toolbar.apply {
-            setNavigationIcon(R.drawable.ic_hamburger)
+            setNavigationIcon(R.drawable.ic_proton_hamburger)
 
             setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
                 ((requireActivity().findViewById(R.id.drawer_layout) as DrawerLayout).openDrawer(

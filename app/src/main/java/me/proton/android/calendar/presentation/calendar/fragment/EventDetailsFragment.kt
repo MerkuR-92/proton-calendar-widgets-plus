@@ -2,7 +2,6 @@ package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.text.util.Linkify
@@ -29,7 +28,6 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Organizer
-import biweekly.property.Status
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.event_attendees_view.event_attendee_list
 import kotlinx.android.synthetic.main.event_attendees_view.event_attendee_organizer_layout
@@ -76,7 +74,6 @@ import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
-import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.getParticipationStatusPriorityValue
@@ -118,7 +115,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     override val isScrollable = false
 
     private lateinit var buttonEdit: View
-    private lateinit var buttonMenu: View
+    private lateinit var buttonDelete: View
     private lateinit var loadingAction: View
     private lateinit var attendeeListAdapter: AttendeeListAdapter
 
@@ -179,7 +176,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
                 ContextCompat.getDrawable(
                     this.context,
-                    R.drawable.ic_pen
+                    R.drawable.ic_proton_pencil
                 )
             )
             setOnSingleClickListener {
@@ -191,12 +188,12 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 )
             }
         }
-        buttonMenu = layoutInflater.inflate(R.layout.toolbar_action_button, dialog_toolbar_content, false)
-        with(buttonMenu) {
+        buttonDelete = layoutInflater.inflate(R.layout.toolbar_action_button, dialog_toolbar_content, false)
+        with(buttonDelete) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
                 ContextCompat.getDrawable(
                     this.context,
-                    R.drawable.ic_trash
+                    R.drawable.ic_proton_trash
                 )
             )
             setOnSingleClickListener {
@@ -220,7 +217,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
         // TODO Hide buttons by default to avoid any case where edit would be possible. Remove once edit attendees is implemented
         buttonEdit.visibleOrGone(false)
-        buttonMenu.visibleOrGone(false)
+        buttonDelete.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.dialog_toolbar_content)) {
@@ -235,7 +232,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             )
             layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.spacing_element_small)
             addView(
-                buttonMenu, layoutParams
+                buttonDelete, layoutParams
             )
             addView(
                 loadingAction, layoutParams
@@ -419,7 +416,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed)
 
                 val enableDeleteEvents = !deletingEvent && !event.calendar.isSubscribed
-                buttonMenu.visibleOrGone(enableDeleteEvents)
+                buttonDelete.visibleOrGone(enableDeleteEvents)
 
                 if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
                     lifecycleScope.launch {
@@ -501,8 +498,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 with(section_location) {
                     text_header.text = event.location
                     Linkify.addLinks(text_header, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS)
-                    image_icon.setImageResource(R.drawable.ic_map_marker)
-                    image_button_action.setImageResource(R.drawable.ic_copy_clipboard)
+                    image_icon.setImageResource(R.drawable.ic_proton_map_pin)
+                    image_button_action.setImageResource(R.drawable.ic_proton_squares)
                     image_button_action.visibleOrInvisible(true)
                     visibleOrGone(true)
                 }
@@ -537,7 +534,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (alarmLabels.isNotEmpty()) {
                 with(section_alarms) {
                     text_header.text = alarmLabels.joinToString(separator = "\n")
-                    image_icon.setImageResource(R.drawable.ic_bell)
+                    image_icon.setImageResource(R.drawable.ic_proton_bell)
                 }
             }
 
@@ -545,7 +542,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 with(section_description) {
                     text_header.text = event.description
                     Linkify.addLinks(text_header, Linkify.ALL)
-                    image_icon.setImageResource(R.drawable.ic_text_align_left)
+                    image_icon.setImageResource(R.drawable.ic_proton_text_align_left)
                     visibleOrGone(true)
                 }
             }

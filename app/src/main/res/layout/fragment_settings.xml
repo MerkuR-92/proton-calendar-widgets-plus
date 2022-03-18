@@ -114,7 +114,7 @@
             <ImageView
                 android:id="@+id/settings_calendars_list_add_layout_icon"
                 style="@style/Icon.Form"
-                android:src="@drawable/ic_plus"
+                android:src="@drawable/ic_proton_plus"
                 app:layout_constraintBottom_toBottomOf="@+id/settings_calendars_list_add_layout_title"
                 app:layout_constraintTop_toTopOf="@+id/settings_calendars_list_add_layout_title"
                 app:layout_constraintStart_toStartOf="parent" />

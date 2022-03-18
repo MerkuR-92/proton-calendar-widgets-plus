@@ -150,7 +150,7 @@
         <ImageView
             android:id="@+id/custom_alarm_time_icon"
             style="@style/Icon.Form"
-            android:src="@drawable/ic_clock"
+            android:src="@drawable/ic_proton_clock"
             app:layout_constraintBottom_toBottomOf="@+id/custom_alarm_time"
             app:layout_constraintTop_toTopOf="@+id/custom_alarm_time"
             app:layout_constraintStart_toStartOf="parent" />
