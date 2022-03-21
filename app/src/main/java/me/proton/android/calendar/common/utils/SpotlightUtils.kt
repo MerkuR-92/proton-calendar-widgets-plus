@@ -1,16 +1,24 @@
 package me.proton.android.calendar.common.utils
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.LayoutInflater
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_spotlight.view.*
+import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_banner
+import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_close_button
+import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_description
+import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 
 object SpotlightUtils {
 
@@ -32,6 +40,13 @@ object SpotlightUtils {
         )
     }
 
+    private fun Resources.getRebrandingDialogContent(): Pair<String, String> {
+        return Pair(
+            this.getString(R.string.spotlight_v5_dialog_rebranding_title),
+            this.getString(R.string.spotlight_v5_dialog_rebranding_description)
+        )
+    }
+
     fun Context.showLastSpotlightDialog() {
         if (!SPOTLIGHT) return
 
@@ -50,6 +65,14 @@ object SpotlightUtils {
                     monthViewContent.second
                 )
             }
+            128 -> {
+                // Rebranding
+                val monthViewContent = this.resources.getRebrandingDialogContent()
+                this.displayV5SpotlightDialog(
+                    monthViewContent.first,
+                    monthViewContent.second
+                )
+            }
             else -> {
                 // Do nothing if we don't have any dialog to show for that version code
             }
@@ -62,7 +85,7 @@ object SpotlightUtils {
     ) {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
-            .setPositiveButton(R.string.spotlight_dialog_month_confirmation_button) { _, _ ->
+            .setPositiveButton(R.string.spotlight_dialog_confirmation_button) { _, _ ->
                 // Nothing to do here
             }
             .setOnDismissListener {
@@ -78,5 +101,40 @@ object SpotlightUtils {
 
         materialDialogBuilder.setView(view)
         materialDialogBuilder.show()
+    }
+
+    private fun Context.displayV5SpotlightDialog(
+        title: String,
+        description: String
+    ) {
+        val materialDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setCancelable(true)
+            .setOnDismissListener {
+                // Set current version name as last spotlight shown
+                this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
+            }
+
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.dialog_spotlight_v5, null, false)
+
+        view.dialog_spotlight_v5_title.text = title
+        view.dialog_spotlight_v5_description.text = description
+
+        var dialog: AlertDialog? = null
+        view.dialog_spotlight_v5_close_button.setOnSingleClickListener {
+            dialog?.dismiss()
+        }
+
+        when (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                view.dialog_spotlight_v5_banner.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_spotlight_banner_dark))
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+                view.dialog_spotlight_v5_banner.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_spotlight_banner_light))
+            }
+        }
+
+        materialDialogBuilder.setView(view)
+        dialog = materialDialogBuilder.show()
     }
 }

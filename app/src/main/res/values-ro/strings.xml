@@ -426,8 +426,8 @@
     <string name="calendar_widget_part_day_event_starts_at">Începe la %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Se încheie la %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_month_header">Ce este nou</string>
-    <string name="spotlight_dialog_month_confirmation_button">OK</string>
+    <string name="spotlight_dialog_header">Ce este nou</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vedere lunară</string>
     <string name="spotlight_dialog_month_view_description">Obțineți o imagine de ansamblu a evenimentelor cu noua vizualizare lunară. Comutați între vizualizări folosind meniul.</string>
     <!--  STRING PLURALS  -->

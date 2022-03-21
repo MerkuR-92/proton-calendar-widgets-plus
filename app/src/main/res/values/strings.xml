@@ -431,10 +431,14 @@
     <string name="calendar_widget_part_day_event_starts_at">Starts at %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Ends at %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_month_header">What\'s new</string>
-    <string name="spotlight_dialog_month_confirmation_button">OK</string>
+    <string name="spotlight_dialog_header">What\'s new</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Month view</string>
     <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_v5_dialog_read_more_button">Read more</string>
+    <string name="spotlight_v5_dialog_close_button">Close</string>
+    <string name="spotlight_v5_dialog_rebranding_title">New look, same protection</string>
+    <string name="spotlight_v5_dialog_rebranding_description">We’ve changed a few things around to make your encrypted apps fresher and more modern.</string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

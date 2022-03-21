@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Text.DefaultSmall.Strong.Brand"
-        android:text="@string/spotlight_dialog_month_header"
+        android:text="@string/spotlight_dialog_header"
         android:layout_marginStart="@dimen/material_dialog_inset_start"
         android:layout_marginEnd="@dimen/material_dialog_inset_end"
         android:layout_marginTop="40dp"/>

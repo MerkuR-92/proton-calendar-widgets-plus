@@ -426,8 +426,8 @@
     <string name="calendar_widget_part_day_event_starts_at">Beginnt um %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Endet um %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_month_header">Neuigkeiten</string>
-    <string name="spotlight_dialog_month_confirmation_button">OK</string>
+    <string name="spotlight_dialog_header">Neuigkeiten</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Monatsansicht</string>
     <string name="spotlight_dialog_month_view_description">Verschaffe dir einen Überblick über deine Termine mit unserer neuen Monatsansicht. Wechsle über das Menü zwischen den Ansichten.</string>
     <!--  STRING PLURALS  -->
