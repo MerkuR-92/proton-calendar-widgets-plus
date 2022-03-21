@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="ProtonTheme.Calendar">
+    <style name="ProtonTheme.Calendar.V5" parent="ProtonTheme.Calendar">
         <item name="android:datePickerDialogTheme">@style/PickerDialog</item>
         <item name="android:timePickerDialogTheme">@style/PickerDialog</item>
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+    <style name="ProtonTheme.Splash.Calendar.V5" parent="ProtonTheme.Splash.Calendar">
+        <item name="postSplashScreenTheme">@style/ProtonTheme.Calendar.V5</item>
     </style>
 
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
@@ -30,7 +31,7 @@
         <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
     </style>
 
-    <style name="AppTheme.DayNight.AppWidgetContainer">
+    <style name="ProtonTheme.Calendar.V5.AppWidgetContainer">
         <!-- use @android:dimen/system_app_widget_background_radius in dimens-31 when we switch to targetSdk 31 -->
         <item name="appWidgetRadius">@dimen/widget_background_corner_radius</item>
         <item name="appWidgetPadding">@dimen/widget_padding</item>

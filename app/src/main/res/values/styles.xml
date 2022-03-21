@@ -222,7 +222,7 @@
 
     <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">6dp</item>
+        <item name="cornerSize">8dp</item>
     </style>
 
     <style name="TextviewStyle" parent="@android:style/Widget.TextView">
@@ -246,7 +246,7 @@
         <item name="android:textSize">15dp</item>
     </style>
 
-    <style name="AppFullscreenDialogTheme" parent="AppTheme.DayNight">
+    <style name="AppFullscreenDialogTheme" parent="ProtonTheme.Calendar.V5">
         <item name="android:windowEnterAnimation">@anim/custom_fade_in</item>
         <item name="android:windowExitAnimation">@anim/custom_fade_out</item>
     </style>

@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/event_attendees_description"/>
+        app:layout_constraintBottom_toTopOf="@id/event_attendees_separator"/>
 
     <ImageView
         android:id="@+id/event_attendees_icon"
@@ -60,13 +60,23 @@
         app:layout_constraintBottom_toBottomOf="@+id/event_attendees_title"
         app:srcCompat="@drawable/ic_proton_chevron_down_filled" />
 
+    <View
+        android:id="@+id/event_attendees_separator"
+        style="@style/Separator"
+        android:background="@color/sidebar_separator"
+        android:visibility="invisible"
+        android:layout_marginTop="@dimen/spacing_element"
+        app:layout_constraintTop_toBottomOf="@+id/event_attendees_description"
+        app:layout_constraintStart_toStartOf="@+id/event_attendees_description"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/event_attendee_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="false"
         android:overScrollMode="never"
-        app:layout_constraintTop_toBottomOf="@+id/event_attendees_description"
+        app:layout_constraintTop_toBottomOf="@+id/event_attendees_separator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone"

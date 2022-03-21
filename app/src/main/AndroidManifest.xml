@@ -22,7 +22,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/ProtonTheme.Calendar"
+        android:theme="@style/ProtonTheme.Calendar.V5"
         tools:replace="android:allowBackup,android:theme">
 
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
@@ -47,7 +47,7 @@
             android:name=".presentation.main.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/ProtonTheme.Splash.Calendar"
+            android:theme="@style/ProtonTheme.Splash.Calendar.V5"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>

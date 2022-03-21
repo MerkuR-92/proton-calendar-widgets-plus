@@ -171,7 +171,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             ) {
                 lifecycleScope.launch {
                     var selectedItem = defaultSelectedItem
-                    AlertDialog.Builder(requireContext())
+                    MaterialAlertDialogBuilder(requireContext())
                         .setTitle(title)
                         .setSingleChoiceItems(items, defaultSelectedItem) { _, item ->
                             selectedItem = item
