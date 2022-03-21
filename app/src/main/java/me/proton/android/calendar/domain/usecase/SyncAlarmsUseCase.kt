@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -111,7 +112,7 @@ class SyncAlarmsUseCase @Inject constructor(
 
                         if (!calendarsRepository.hasCalendar(alarmEntity.calendarId))           {
                             // Calendar doesn't exist locally, silently fail
-                            logger.e("SyncAlarmsUseCase: calendar ${alarmEntity.calendarId} doesn't exist in DB, can't insert alarm")
+                            logger.e("SyncAlarmsUseCase: calendar doesn't exist in DB, can't insert alarm")
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
                             logger.v("event ${alarmEntity.eventId} for alarm doesn't exist in DB")
                             // event doesn't exist locally, fetch and save it before inserting alarm
@@ -149,7 +150,8 @@ class SyncAlarmsUseCase @Inject constructor(
                         logger.e("SyncAlarmsUseCase: 404 requesting alarms for calendar in handleCalendarAlarms")
                         UseCase.Result.Success<Unit>()
                     } else {
-                        UseCase.Result.Error("SyncAlarmsUseCase: api error getting server events: $alarmsResponse")
+                        alarmsResponse.logErrorIfNeeded("SyncAlarmsUseCase: api error getting server events", logger)
+                        UseCase.Result.Error("SyncAlarmsUseCase: api error getting server events}")
                     }
                 }
                 is ApiResponse.Exception -> return UseCase.Result.Error("SyncAlarmsUseCase: exception getting server events: $alarmsResponse")

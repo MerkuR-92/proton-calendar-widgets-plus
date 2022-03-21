@@ -78,7 +78,9 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
         return try {
             Helper.decryptMessageArmored(armoredPrivateKey, passphrase, cipherText)
         } catch (e: Exception) {
-            logger.i("decrypt failed", e)
+            if (e.message?.contains("incorrect key") == false) {
+                logger.i("decrypt failed", e)
+            }
             null
         }
     }
@@ -102,7 +104,9 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
 
             keyRing.decrypt(PGPMessage(cipherText), null, 0L).string
         } catch (e: Exception) {
-            logger.i("decrypt failed", e)
+            if (e.message?.contains("incorrect key") == false) {
+                logger.i("decrypt failed", e)
+            }
             null
         } finally {
             keyRing?.clearPrivateParams()

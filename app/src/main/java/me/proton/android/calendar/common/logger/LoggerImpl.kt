@@ -12,6 +12,7 @@ object LoggerImpl : Logger {
     private const val HTTP_ERROR_UNAUTHORIZED = 401
     private const val HTTP_ERROR_NOT_FOUND = 404
     private const val HTTP_ERROR_UNPROCESSABLE_ENTITY = 422
+    private const val HTTP_ERROR_SERVICE_TEMPORARILY_UNAVAILABLE = 503
 
     private const val PROTON_ERROR_INVALID_REFRESH_TOKEN = 10013
     private const val PROTON_ERROR_INCORRECT_LOGIN_CREDENTIALS = 8002
@@ -30,6 +31,7 @@ object LoggerImpl : Logger {
                     PROTON_ERROR_FORCE_UPDATE -> false
                     else -> true
                 }
+                HTTP_ERROR_SERVICE_TEMPORARILY_UNAVAILABLE -> false
                 else -> true
             }
             is java.net.SocketTimeoutException -> false

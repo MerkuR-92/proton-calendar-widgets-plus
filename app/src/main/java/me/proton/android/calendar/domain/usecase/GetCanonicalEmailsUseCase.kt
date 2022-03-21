@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.AddressesApi
 import me.proton.core.domain.entity.UserId
@@ -36,10 +37,10 @@ class GetCanonicalEmailsUseCase @Inject constructor(
                     }
                 }
                 is ApiResponse.Error -> {
-                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.error}")
+                    canonicalResult.logErrorIfNeeded("UsersRepositoryImpl: error getting canonical emails", logger)
                 }
                 is ApiResponse.Exception -> {
-                    logger.e("UsersRepositoryImpl: error getting canonical emails: ${canonicalResult.exception.message ?: "(no exception message)"}")
+                    canonicalResult.logErrorIfNeeded("UsersRepositoryImpl: exception getting canonical emails", logger)
                 }
             }
         }

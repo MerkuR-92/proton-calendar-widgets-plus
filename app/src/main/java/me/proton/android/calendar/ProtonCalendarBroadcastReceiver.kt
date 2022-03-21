@@ -35,7 +35,6 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
 
         if (intent == null) {
-            logger.i("null intent in ProtonCalendarBroadcastReceiver")
             return
         }
 
@@ -54,9 +53,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
                         GlobalScope.launch(Dispatchers.IO) {
 
                             val userId = accountManager.getPrimaryUserId().firstOrNull()
-                            if (userId == null) {
-                                logger.i("null userId in ProtonCalendarBroadcastReceiver ACTION_BOOT_COMPLETED")
-                            } else {
+                            if (userId != null) {
                                 handleAlarms(userId, context)
                             }
 
@@ -79,9 +76,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
                             ) else null
 
                             val userId = accountManager.getPrimaryUserId().firstOrNull()
-                            if (userId == null) {
-                                logger.i("null userId in ProtonCalendarBroadcastReceiver INTENT_ACTION_EVENT_ALARM")
-                            } else {
+                            if (userId != null) {
                                 handleAlarms(userId, context, alarmTimestamp)
                             }
 
