@@ -58,6 +58,7 @@ import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
@@ -747,6 +748,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
             drawer_layout.close()
         }
+
+        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(SUBSCRIPTION)
+        nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
+            // TODO Implement Navigation to Core Subscription here
+            drawer_layout.close()
+        }
+
         // TODO Remove feature flag
         nav_view_main_content.nav_view_more_settings_layout.visibleOrGone(FeatureFlag.SETTINGS_DRAWER)
         nav_view_main_content.nav_view_more_settings_press.setOnSingleClickListener {
