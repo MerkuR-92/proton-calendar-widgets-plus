@@ -48,7 +48,7 @@
             style="@style/Icon"
             android:visibility="gone"
             tools:visibility="visible"
-            android:src="@drawable/ic_proton_cross_small"
+            android:src="@drawable/ic_proton_cross"
             android:clickable="true"
             android:focusable="true"
             android:background="?android:selectableItemBackgroundBorderless"/>

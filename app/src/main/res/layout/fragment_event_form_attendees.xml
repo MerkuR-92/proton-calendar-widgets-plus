@@ -50,7 +50,7 @@
     <ImageView
         android:id="@+id/nav_event_form_attendees_search_clear"
         style="@style/Icon.Form"
-        android:src="@drawable/ic_proton_cross_small"
+        android:src="@drawable/ic_proton_cross"
         android:layout_marginEnd="@dimen/spacing_page"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="@id/nav_event_form_attendees_search_input"

@@ -79,7 +79,7 @@ abstract class BaseDialogFragment : DialogFragment() {
                 if (navigateUp) {
                     setNavigationIcon(R.drawable.ic_proton_arrow_left)
                 } else {
-                    setNavigationIcon(R.drawable.ic_proton_cross_small)
+                    setNavigationIcon(R.drawable.ic_proton_cross)
                 }
             }
 

@@ -36,6 +36,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/item_simple_text_button_title"
         app:layout_constraintTop_toTopOf="@+id/item_simple_text_button_title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_proton_cross_small" />
+        app:srcCompat="@drawable/ic_proton_cross" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
