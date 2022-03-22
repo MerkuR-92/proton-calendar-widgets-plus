@@ -342,8 +342,24 @@ object IcsSurgeryUtils {
     }
 
     fun VEvent.cleanDuration(): Boolean {
-        // DURATION: This property (to specify duration of events instead of a DTEND) is not supported.
-        return !(this.duration?.value != null && this.dateEnd?.value == null)
+        // DURATION property should be transformed into the corresponding DTEND
+        if (this.duration?.value != null && this.dateEnd?.value == null) {
+            val dateEnd = this.dateStart.value.clone() as ICalDate
+            val durationInMillis =
+                if (this.dateStart.value.hasTime()) {
+                    this.duration.value.toMillis()
+                } else {
+                    val durationInDays = TimeUnit.MILLISECONDS.toDays(this.duration.value.toMillis())
+                    TimeUnit.DAYS.toMillis(
+                        if (durationInDays == 0L) 1
+                        else durationInDays
+                    )
+                }
+            dateEnd.time += durationInMillis
+            this.setDateEnd(dateEnd)
+            this.removeProperty(this.duration)
+        }
+        return true
     }
 
     fun VEvent.cleanDtEnd(): Boolean {
