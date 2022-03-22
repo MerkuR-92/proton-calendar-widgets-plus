@@ -201,7 +201,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_week_start_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
-                null,
+                getString(R.string.settings_week_start_title),
                 weekStartValues,
                 weekStartValues.indexOf(settings_week_start_value.text)) { index ->
                 if (!mainViewModel.isConnectedToNetwork) {

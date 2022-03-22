@@ -36,7 +36,6 @@ import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckedTextView
 import androidx.appcompat.widget.ListPopupWindow
@@ -142,7 +141,7 @@ object AndroidUtils {
         selectedIndex: Int,
         callback: (selectedIndex: Int) -> Unit
     ) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
             callback(item)
@@ -160,7 +159,7 @@ object AndroidUtils {
         callback: (selectedIndex: Int, isCancel: Boolean) -> Unit
     ) {
         var selectedItem = 0
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
             selectedItem = item
@@ -183,7 +182,7 @@ object AndroidUtils {
         message: String,
         title: String? = null
     ) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setMessage(message)
         builder.setPositiveButton(R.string.dialog_button_ok, null)
@@ -229,7 +228,7 @@ object AndroidUtils {
 
         }
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setAdapter(adapter, null)
         builder.setNegativeButton(R.string.dialog_button_close, null)
@@ -284,7 +283,7 @@ object AndroidUtils {
 
         }
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setAdapter(adapter, null)
         builder.setNegativeButton(R.string.dialog_button_cancel, null)
