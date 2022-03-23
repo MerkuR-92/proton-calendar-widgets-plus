@@ -7,6 +7,7 @@ import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
 import io.sentry.protocol.User
 import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.common.API_HOST
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import java.util.UUID
 
@@ -39,6 +40,7 @@ object SentryIntegration {
             options.isAttachStacktrace = true
             options.isEnableAutoSessionTracking = false
             options.isEnableActivityLifecycleBreadcrumbs = false
+            options.environment = "${if (BuildConfig.DEBUG) "debug" else "release"}\\$API_HOST"
             /*options.setBeforeSend { event, _ ->
                 // filter out events
             }*/

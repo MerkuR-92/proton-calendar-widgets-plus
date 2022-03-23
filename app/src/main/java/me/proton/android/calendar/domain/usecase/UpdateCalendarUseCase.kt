@@ -4,6 +4,7 @@ import android.provider.CalendarContract
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.UpdateCalendarApiRequest
 import me.proton.android.calendar.data.api.UpdateCalendarDisplayApiRequest
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -105,8 +106,14 @@ class UpdateCalendarUseCase @Inject constructor(
 
                 return UseCase.Result.Success<Unit>()
             }
-            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in fetch calendars: ${calendarsResponse.error}")
-            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in fetch calendars: ${calendarsResponse.exception.message ?: "(no exception message)"}")
+            is ApiResponse.Error -> {
+                calendarsResponse.logErrorIfNeeded("UpdateCalendarUseCase: executeUpdateList error in fetch calendars", logger)
+                UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in fetch calendars")
+            }
+            is ApiResponse.Exception -> {
+                calendarsResponse.logErrorIfNeeded("UpdateCalendarUseCase: executeUpdateList exception in fetch calendars", logger)
+                UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList exception in fetch calendars")
+            }
         }
     }
 }

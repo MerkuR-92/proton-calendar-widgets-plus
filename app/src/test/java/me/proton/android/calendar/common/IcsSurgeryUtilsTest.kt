@@ -78,6 +78,44 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
+    fun `drop unsupported properties in ics test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Proton Technologies//ProtonCalendar 4.1.7//EN
+    VERSION:2.0
+    METHOD:REQUEST
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    SUMMARY:Single 02-03
+    STATUS:TENTATIVE
+    DTSTART;TZID=Europe/Paris:20210302T130000
+    DTEND;TZID=Europe/Paris:20210302T133000
+    ATTENDEE;CN=breakingcalendar+alias@pm.me;ROLE=REQ-PARTICIPANT;RSVP=TRUE;PAR
+     TSTAT=NEEDS-ACTION;X-PM-TOKEN=1980a5594f21b76eb27cc969081cf2b85c14895b:mail
+     to:breakingcalendar+alias@pm.me
+    UID:gKdD4Slj5bSH31aLOhwGUengaLzr@proton.me
+    ORGANIZER;CN=benjaminlovesdebugging@pm.me:mailto:benjaminlovesdebugging@pm.
+     me
+    SEQUENCE:0
+    DTSTAMP:20210302T115550Z
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar!!
+
+            // TENTATIVE is valid, but unsupported -- we drop entire property regardless of value anyway
+            assertThat(iCalendar.events.first().status).isNull()
+        }
+    }
+
+    @Test
     fun `cleanRawIcs all day event with time test`() {
 
         val iCalString = """

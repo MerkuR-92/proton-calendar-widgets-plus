@@ -57,7 +57,7 @@ class HandleIcsUseCase @Inject constructor(
 
         if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             // Only log error as it doesn't contain any sensitive information
-            if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error) logger.i("HandleIcsUseCase parsing error $cleanIcsResult")
+            if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error) logger.i("HandleIcsUseCase parsing error ${cleanIcsResult.javaClass}")
             return cleanIcsResult
         }
 

@@ -174,6 +174,8 @@ object IcsSurgeryUtils {
 
             event.applyBiweeklyDstParsingFix(iCalendar)
 
+            event.dropUnsupportedProperties()
+
             if (event.dateTimeStamp?.value == null) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
 
             if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
@@ -236,6 +238,12 @@ object IcsSurgeryUtils {
 
         // Fix ExDates in cleanExDates
 
+    }
+
+    fun VEvent.dropUnsupportedProperties() {
+
+        // only supported status is CONFIRMED but it's also default if empty
+        this.status = null
     }
 
     /**

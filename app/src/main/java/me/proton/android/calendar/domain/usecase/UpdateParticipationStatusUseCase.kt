@@ -5,6 +5,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.toParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -64,10 +65,12 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
-                UseCase.Result.Error("api error updating participation status: ${updateParticipationStatusResponse.error}")
+                updateParticipationStatusResponse.logErrorIfNeeded("api error updating participation status", logger)
+                UseCase.Result.Error("api error updating participation status")
             }
             is ApiResponse.Exception -> {
-                UseCase.Result.Error("api error updating participation status: ${updateParticipationStatusResponse.exception.message ?: "(no exception message)"}")
+                updateParticipationStatusResponse.logErrorIfNeeded("api exception updating participation status", logger)
+                UseCase.Result.Error("api exception updating participation status")
             }
         }
     }

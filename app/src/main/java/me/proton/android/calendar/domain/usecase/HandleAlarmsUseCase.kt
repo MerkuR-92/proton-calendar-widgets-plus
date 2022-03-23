@@ -41,7 +41,7 @@ class HandleAlarmsUseCase @Inject constructor(
         } else 0
 
         if (broadcastReceivedLateMinutes >= 5) {
-            logger.i("HandleAlarmsUseCase executed ${broadcastReceivedLateMinutes} minutes later than scheduled")
+            //logger.i("HandleAlarmsUseCase executed ${broadcastReceivedLateMinutes} minutes later than scheduled")
         }
 
         val lastHandledTimestamp =
@@ -65,7 +65,7 @@ class HandleAlarmsUseCase @Inject constructor(
             alarmsToDisplayNow.minByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
         val minutesLate = ((nowInstant.epochSecond - minAlarmOccurrenceSeconds) / 60.0).roundToInt()
         if (alarmsToDisplayNow.isNotEmpty() && minutesLate >= 5) {
-            logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${minutesLate} minutes")
+            //logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${minutesLate} minutes")
         }
 
         // get next event alarms after currently shown and set system alarm to fire at that timestamp
