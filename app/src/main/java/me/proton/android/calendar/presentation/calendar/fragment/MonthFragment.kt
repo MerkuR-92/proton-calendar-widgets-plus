@@ -47,7 +47,6 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.SYNC_EVENTS_IN_APP_REFRESH_PERIOD
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.animateGuidelineHeightChange
@@ -469,26 +468,6 @@ class MonthFragment : BaseFragment() {
                 mainViewModel.fetchUserSettings(userId = userId)
             }
 
-            val notificationManager: NotificationManager =
-                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            while (true) {
-
-                val activeNotifications = notificationManager.activeNotifications
-                val isBackgroundSyncRunning =
-                    activeNotifications.any { it.id == ShowNotificationUseCase.NOTIFICATION_ID_SYNC_SERVICE }
-
-                if (userId != null && !isBackgroundSyncRunning) {
-                    mainViewModel.syncServerEvents(userId).observe(viewLifecycleOwner) {
-                        if (it is Operation.State.IN_PROGRESS) {
-                            calendarViewModel.setLoading(true)
-                        } else {
-                            calendarViewModel.setLoading(false)
-                        }
-                    }
-                }
-
-                delay(SYNC_EVENTS_IN_APP_REFRESH_PERIOD.toMillis())
-            }
         }
 
         val headerDaysMediator = MediatorLiveData<Pair<DayOfWeek, String>>()

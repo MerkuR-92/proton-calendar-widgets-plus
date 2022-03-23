@@ -15,8 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.worker.SyncWorker
+import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.accountmanager.domain.AccountManager
@@ -45,9 +44,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
                 if (context == null) {
                     logger.e("null Context in ProtonCalendarBroadcastReceiver ACTION_BOOT_COMPLETED")
                 } else {
-                    if (!FeatureFlag.USE_EVENT_MANAGER) {
-                        SyncWorker.setup(context, logger)
-                    }
+                    PeriodicCalendarWorker.setup(context, logger)
 
                     try {
                         GlobalScope.launch(Dispatchers.IO) {

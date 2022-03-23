@@ -11,7 +11,6 @@ import me.proton.android.calendar.eventmanager.CalendarEventManagerStarter
 
 class CalendarEventManagerInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        if (!FeatureFlag.USE_EVENT_MANAGER) return
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
             CalendarEventManagerInitializerEntryPoint::class.java

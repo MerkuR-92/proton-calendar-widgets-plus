@@ -98,7 +98,7 @@ object EventManagerModule {
         calendarKeyEventListener: CalendarKeyEventListener,
         calendarSubscriptionsEventListener: CalendarSubscriptionsEventListener,
         calendarSettingsEventListener: CalendarSettingsEventListener,
-    ): Set<EventListener<*, *>> = if (FeatureFlag.USE_EVENT_MANAGER) setOf(
+    ): Set<EventListener<*, *>> = setOf(
         userEventListener,
         userSettingsEventListener,
         contactEventListener,
@@ -113,6 +113,6 @@ object EventManagerModule {
         calendarKeyEventListener,
         calendarSubscriptionsEventListener,
         calendarSettingsEventListener,
-    ) else emptySet()
+    )
 
 }

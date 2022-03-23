@@ -28,9 +28,7 @@ const val CLICK_INTERVAL_MS: Long = 500L
 
 const val WORKER_MAX_RETRY_COUNT = 5
 
-val SYNC_EVENTS_IN_APP_REFRESH_PERIOD: Duration = Duration.ofSeconds(30)
-val SYNC_EVENTS_PERIODIC_REFRESH_PERIOD: Duration = Duration.ofHours(1)
-val SYNC_EVENTS_PERIODIC_DELAY_START: Duration = Duration.ofMinutes(5)
+val PERIODIC_CALENDAR_WORKER_REFRESH_PERIOD: Duration = Duration.ofHours(1)
 
 val SYNC_CALENDARS_DELAY: Duration = Duration.ofSeconds(3)
 val UPDATE_PASSPHRASE_CALENDARS_DELAY: Duration = Duration.ofSeconds(5)
@@ -90,7 +88,6 @@ object FeatureFlag {
     const val DELETE_CALENDAR = true
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
-    const val USE_EVENT_MANAGER = true
     const val CHANGE_LANGUAGE = true
     const val MONTH_VIEW = true
     const val SPOTLIGHT = true
