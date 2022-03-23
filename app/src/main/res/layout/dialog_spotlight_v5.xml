@@ -1,94 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/dialog_spotlight_v5_banner"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/welcome_header"
-            app:layout_constraintBottom_toBottomOf="@id/guide_header"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_header"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.47" />
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/welcome_header" />
 
         <ImageView
             android:id="@+id/dialog_spotlight_v5_banner_logo"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_gravity="center"
             android:background="@drawable/ic_logo_background_shape"
             android:backgroundTint="@color/white"
+            android:contentDescription="@string/app_name"
             android:elevation="24dp"
             android:outlineProvider="background"
-            app:layout_constraintTop_toTopOf="@+id/dialog_spotlight_v5_banner"
-            app:layout_constraintBottom_toBottomOf="@+id/dialog_spotlight_v5_banner"
-            app:layout_constraintStart_toStartOf="@+id/dialog_spotlight_v5_banner"
-            app:layout_constraintEnd_toEndOf="@+id/dialog_spotlight_v5_banner"
             app:srcCompat="@drawable/ic_logo_calendar" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/dialog_spotlight_v5_title"
+            style="@style/Proton.Text.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_banner"
-            style="@style/Text.Headline"
-            tools:text="@string/spotlight_v5_dialog_rebranding_title"
-            android:layout_marginStart="@dimen/material_dialog_inset_start"
-            android:layout_marginEnd="@dimen/material_dialog_inset_end"
-            android:layout_marginTop="@dimen/spacing_large"/>
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/spotlight_v5_dialog_rebranding_title" />
 
         <TextView
             android:id="@+id/dialog_spotlight_v5_description"
+            style="@style/Proton.Text.DefaultSmall.Weak"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_title"
-            style="@style/Text.DefaultSmall.Weak"
-            tools:text="@string/spotlight_v5_dialog_rebranding_description"
-            android:layout_marginStart="@dimen/material_dialog_inset_start"
-            android:layout_marginEnd="@dimen/material_dialog_inset_end"
-            android:layout_marginTop="@dimen/spacing_element_small"/>
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/spotlight_v5_dialog_rebranding_description" />
 
         <me.proton.core.presentation.ui.view.ProtonButton
             android:id="@+id/dialog_spotlight_v5_read_more_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_description"
-            android:layout_marginStart="@dimen/material_dialog_inset_start"
-            android:layout_marginEnd="@dimen/material_dialog_inset_end"
-            android:layout_marginTop="@dimen/spacing_large"
             android:layout_gravity="center_horizontal"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             android:text="@string/spotlight_v5_dialog_read_more_button" />
 
         <me.proton.core.presentation.ui.view.ProtonButton
             android:id="@+id/dialog_spotlight_v5_close_button"
+            style="@style/ProtonButton.Borderless.Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_read_more_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/ProtonButton.Borderless.Text"
-            android:layout_marginStart="@dimen/material_dialog_inset_start"
-            android:layout_marginEnd="@dimen/material_dialog_inset_end"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="22dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/spotlight_v5_dialog_close_button" />
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+</LinearLayout>
