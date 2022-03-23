@@ -39,7 +39,14 @@ class CalendarColorListAdapter(
 
         colorItemMain.backgroundTintList = ColorStateList.valueOf(color)
 
-        colorItemOuter.backgroundTintList = ColorStateList.valueOf(color)
+        // Set intense color for outer ring
+        val calendarColors = view.context.resources.getIntArray(R.array.accent_colors_base)
+        val calendarColorsIntense = view.context.resources.getIntArray(R.array.accent_colors_intense)
+        val colorIndex = calendarColors.indexOf(color)
+        colorItemOuter.backgroundTintList = ColorStateList.valueOf(
+            if (colorIndex >= calendarColorsIntense.size || colorIndex < 0) color
+            else calendarColorsIntense[calendarColors.indexOf(color)]
+        )
 
         val selected = color == selectedColor
         colorItemFilled.visibleOrGone(!selected)

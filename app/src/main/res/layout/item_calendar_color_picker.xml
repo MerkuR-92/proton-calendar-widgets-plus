@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/item_calendar_color_picker_outer"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:visibility="gone"
         tools:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
@@ -19,8 +19,8 @@
 
     <ImageView
         android:id="@+id/item_calendar_color_picker_main"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:visibility="gone"
         tools:visibility="visible"
         app:layout_constraintTop_toTopOf="@+id/item_calendar_color_picker_outer"
@@ -32,8 +32,8 @@
 
     <ImageView
         android:id="@+id/item_calendar_color_picker_inner"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:visibility="gone"
         tools:visibility="visible"
         app:layout_constraintTop_toTopOf="@+id/item_calendar_color_picker_outer"
@@ -45,8 +45,8 @@
 
     <ImageView
         android:id="@+id/item_calendar_color_picker_filled"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:visibility="visible"
         tools:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
