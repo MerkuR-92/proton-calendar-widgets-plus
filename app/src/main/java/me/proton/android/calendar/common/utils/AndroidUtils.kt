@@ -54,7 +54,6 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_header
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_recycler_view
 import kotlinx.android.synthetic.main.item_popup_error.view.press_popup
@@ -73,6 +72,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
+import me.proton.core.presentation.utils.normSnack
 import okhttp3.internal.toHexString
 import java.text.Normalizer
 import java.time.Duration
@@ -1145,20 +1145,12 @@ object AndroidUtils {
 
     // Call this method to display SnackBar in a Fragment
     fun Activity.displaySnackBar(message: String, length: Int? = null) {
-        Snackbar.make(
-            this.findViewById<View>(android.R.id.content),
-            message,
-            length ?: Snackbar.LENGTH_SHORT
-        ).show()
+        this.findViewById<View>(android.R.id.content).normSnack(message)
     }
 
     // Call this method to display SnackBar in a DialogFragment
     fun View.displaySnackBar(message: String, length: Int? = null) {
-        Snackbar.make(
-            this,
-            message,
-            length ?: Snackbar.LENGTH_SHORT
-        ).show()
+        this.normSnack(message)
     }
 
     @BindingAdapter("onSingleClick")
