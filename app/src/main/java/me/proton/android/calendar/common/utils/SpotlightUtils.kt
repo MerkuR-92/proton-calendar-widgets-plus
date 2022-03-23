@@ -1,15 +1,12 @@
 package me.proton.android.calendar.common.utils
 
 import android.content.Context
-import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_spotlight.view.*
-import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_banner
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_close_button
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_description
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
@@ -123,15 +120,6 @@ object SpotlightUtils {
         var dialog: AlertDialog? = null
         view.dialog_spotlight_v5_close_button.setOnSingleClickListener {
             dialog?.dismiss()
-        }
-
-        when (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-            Configuration.UI_MODE_NIGHT_YES -> {
-                view.dialog_spotlight_v5_banner.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_spotlight_banner_dark))
-            }
-            Configuration.UI_MODE_NIGHT_NO -> {
-                view.dialog_spotlight_v5_banner.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_spotlight_banner_light))
-            }
         }
 
         materialDialogBuilder.setView(view)

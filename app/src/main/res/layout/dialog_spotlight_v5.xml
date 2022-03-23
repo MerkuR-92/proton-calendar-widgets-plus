@@ -7,41 +7,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <ImageView
+            android:id="@+id/dialog_spotlight_v5_banner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/welcome_header"
+            app:layout_constraintBottom_toBottomOf="@id/guide_header"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/dialog_spotlight_v5_banner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_gravity="center"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_spotlight_banner_light"/>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.47" />
 
-            <ImageView
-                android:id="@+id/dialog_spotlight_v5_banner_logo"
-                android:layout_width="96dp"
-                android:layout_height="100dp"
-                app:layout_constraintTop_toTopOf="@+id/dialog_spotlight_v5_banner"
-                app:layout_constraintBottom_toBottomOf="@+id/dialog_spotlight_v5_banner"
-                app:layout_constraintStart_toStartOf="@+id/dialog_spotlight_v5_banner"
-                app:layout_constraintEnd_toEndOf="@+id/dialog_spotlight_v5_banner"
-                android:src="@drawable/ic_logo_calendar"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/dialog_spotlight_v5_banner_logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/ic_logo_background_shape"
+            android:backgroundTint="@color/white"
+            android:elevation="24dp"
+            android:outlineProvider="background"
+            app:layout_constraintTop_toTopOf="@+id/dialog_spotlight_v5_banner"
+            app:layout_constraintBottom_toBottomOf="@+id/dialog_spotlight_v5_banner"
+            app:layout_constraintStart_toStartOf="@+id/dialog_spotlight_v5_banner"
+            app:layout_constraintEnd_toEndOf="@+id/dialog_spotlight_v5_banner"
+            app:srcCompat="@drawable/ic_logo_calendar" />
 
         <TextView
             android:id="@+id/dialog_spotlight_v5_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_banner"
             style="@style/Text.Headline"
             tools:text="@string/spotlight_v5_dialog_rebranding_title"
             android:layout_marginStart="@dimen/material_dialog_inset_start"
@@ -52,6 +57,7 @@
             android:id="@+id/dialog_spotlight_v5_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_title"
             style="@style/Text.DefaultSmall.Weak"
             tools:text="@string/spotlight_v5_dialog_rebranding_description"
             android:layout_marginStart="@dimen/material_dialog_inset_start"
@@ -62,6 +68,7 @@
             android:id="@+id/dialog_spotlight_v5_read_more_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_description"
             android:layout_marginStart="@dimen/material_dialog_inset_start"
             android:layout_marginEnd="@dimen/material_dialog_inset_end"
             android:layout_marginTop="@dimen/spacing_large"
@@ -72,6 +79,8 @@
             android:id="@+id/dialog_spotlight_v5_close_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_spotlight_v5_read_more_button"
+            app:layout_constraintBottom_toBottomOf="parent"
             style="@style/ProtonButton.Borderless.Text"
             android:layout_marginStart="@dimen/material_dialog_inset_start"
             android:layout_marginEnd="@dimen/material_dialog_inset_end"
@@ -80,6 +89,6 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/spotlight_v5_dialog_close_button" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
