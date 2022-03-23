@@ -24,7 +24,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
      */
     class UseCaseId {
         companion object {
-            const val SYNC_SERVER_EVENTS = SyncServerEventsUseCase.WORKER_ID
+            // const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS" deprecated, don't remove this comment
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
             const val HANDLE_ALARMS = HandleAlarmsUseCase.WORKER_ID
             const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
@@ -78,7 +78,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
      */
     class UniqueWorkNames {
         companion object {
-            const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS"
+            // const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS" deprecated, don't remove this comment
             const val SYNC_ALARMS = "SYNC_ALARMS"
             const val HANDLE_ALARMS = "HANDLE_ALARMS"
             const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
@@ -103,10 +103,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         val userId = inputData.getString(INPUT_USER_ID)?.let { UserId(it) } ?: return Result.failure()
         val useCaseId = inputData.getString(INPUT_USE_CASE_ID)
         val useCaseResult = when (useCaseId) {
-            UseCaseId.SYNC_SERVER_EVENTS -> {
-                val syncServerEventsUseCase: SyncServerEventsUseCase = get()
-                syncServerEventsUseCase.execute(userId)
-            }
             UseCaseId.SYNC_ALARMS -> {
                 val syncAlarmsUseCase: SyncAlarmsUseCase = get()
                 syncAlarmsUseCase.execute(userId)

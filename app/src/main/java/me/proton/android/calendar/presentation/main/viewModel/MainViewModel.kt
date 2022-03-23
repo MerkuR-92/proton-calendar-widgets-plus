@@ -100,36 +100,6 @@ class MainViewModel @Inject constructor(
         return if (!MONTH_VIEW && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
     }
 
-    // TODO sync all "active" accounts
-    fun syncServerEvents(userId: UserId) : LiveData<Operation.State> {
-
-        val workState = kotlin.runCatching {
-            WorkManager.getInstance(getApplication<Application>()).getWorkInfosForUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS).get(1, TimeUnit.SECONDS)
-        }.getOrNull()?.firstOrNull()?.state
-
-        val existingWorkPolicy = if (workState == WorkInfo.State.RUNNING) {
-            ExistingWorkPolicy.KEEP
-        } else {
-            ExistingWorkPolicy.REPLACE
-        }
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_SERVER_EVENTS,
-                UseCaseWorker.INPUT_USER_ID to userId.id
-            ))
-            .build()
-
-        // TODO work is unique per user-id, make sure different inputdata => different unique work
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_SERVER_EVENTS, existingWorkPolicy, work).state
-
-    }
-
     // TODO run only after bootstrap & successful "cold fetch" of events for the first required period
     fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
 

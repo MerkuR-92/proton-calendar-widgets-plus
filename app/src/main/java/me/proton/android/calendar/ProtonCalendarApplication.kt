@@ -10,7 +10,7 @@ import me.proton.android.calendar.common.logger.SentryIntegration
 import me.proton.android.calendar.common.logger.SentryTree
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
-import me.proton.android.calendar.common.worker.SyncWorker
+import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
@@ -192,9 +192,7 @@ class ProtonCalendarApplication : Application() {
             }
         }
 
-        if (!FeatureFlag.USE_EVENT_MANAGER) {
-            SyncWorker.setup(this, logger)
-        }
+        PeriodicCalendarWorker.setup(this, logger)
     }
 
     override fun attachBaseContext(base: Context) {

@@ -199,8 +199,10 @@ class ShowNotificationUseCase @Inject constructor(
     companion object {
 
         val CHANNEL_ID_EVENT_ALARMS = "CHANNEL_ID_EVENT_ALARMS"
+        // deprecated but don't remove it, might come in handy
         val CHANNEL_ID_SYNC_SERVICE = "CHANNEL_ID_SYNC_SERVICE"
 
+        // deprecated but don't remove it, might come in handy
         val NOTIFICATION_ID_SYNC_SERVICE: Int = 1
 
         fun createNotificationChannels(context: Context) {
@@ -215,6 +217,7 @@ class ShowNotificationUseCase @Inject constructor(
                 notificationManager.createNotificationChannel(channel)
 
                 // sync service channel
+                // deprecated but don't remove it, might come in handy
                 val nameSync = context.getString(R.string.notification_channel_sync)
                 val importanceSync = NotificationManager.IMPORTANCE_MIN
                 val channelSync = NotificationChannel(CHANNEL_ID_SYNC_SERVICE, nameSync, importanceSync)
