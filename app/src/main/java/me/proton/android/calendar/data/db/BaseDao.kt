@@ -15,7 +15,7 @@ interface BaseDao<T> {
     suspend fun insert(vararg obj: T)
 
     @Deprecated(message = "Do not use this method directly outside of CalendarsRepository", replaceWith = ReplaceWith("updateOrInsert"))
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntity(entity: T)
 
     @Update
