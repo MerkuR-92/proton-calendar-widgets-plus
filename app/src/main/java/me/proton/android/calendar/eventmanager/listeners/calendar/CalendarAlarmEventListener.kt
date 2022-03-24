@@ -59,9 +59,17 @@ class CalendarAlarmEventListener @Inject constructor(
         if (eventIdsToFetch.isEmpty()) return
 
         val missingEvents = eventIdsToFetch.mapNotNull {
-            calendarsRepository.fetchEventById(config.userId, it.calendarId, it.eventId)
+            val event = calendarsRepository.fetchEventById(config.userId, it.calendarId, it.eventId)
                 .valueOrNullAndLogErrors(logger)
                 ?.event
+
+            // if we failed to fetch the missing Event for Alarm, make the Alarm invalid
+            if (event == null) {
+                invalidAlarmIds += it.id
+                logger.i("CalendarAlarmEventListener could not fetch missing Event for Alarm")
+            }
+
+            event
         }
         calendarsRepository.persistEvents(*missingEvents.toTypedArray())
     }
