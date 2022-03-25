@@ -236,7 +236,7 @@ interface CalendarsRepository {
      */
     suspend fun selectAllEventAlarmsBetween(timestampSecondsFrom: Long, timestampSecondsTo: Long): List<EventAlarmEntity>
 
-    suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity)
+    suspend fun persistEventAlarm(logger: Logger, eventAlarm: EventAlarmEntity)
 
     suspend fun deleteEventAlarmById(id: String)
 

@@ -1031,8 +1031,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.eventAlarmsDao().selectAllBetweenInclusive(timestampSecondsFrom, timestampSecondsTo)
     }
 
-    override suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) {
-        database.eventAlarmsDao().updateOrInsert(eventAlarm)
+    override suspend fun persistEventAlarm(logger: Logger, eventAlarm: EventAlarmEntity) {
+        database.eventAlarmsDao().updateOrInsertReplacing(logger, eventAlarm)
     }
 
     override suspend fun deleteEventAlarmById(id: String) {
