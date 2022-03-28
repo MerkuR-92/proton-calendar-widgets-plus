@@ -387,7 +387,7 @@
     <string name="calendar_form_name_hint">Add a calendar name</string>
     <string name="calendar_form_name_required_error">Name required</string>
     <string name="add_calendar_text">Add calendar</string>
-    <string name="create_calendar_limit_reached_free">You have reached the maximum number of calendars.</string>
+    <string name="create_calendar_limit_reached_paid">You have reached the maximum number of calendars.</string>
     <string name="create_calendar_limit_reached_paid_title">20-calendar maximum reached</string>
     <string name="create_calendar_limit_reached_paid_message">Delete unused calendars to create new calendars.</string>
     <string name="create_calendar_limit_reached_paid_manage">Manage calendars</string>

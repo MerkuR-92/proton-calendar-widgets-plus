@@ -387,7 +387,7 @@
     <string name="calendar_form_name_hint">Afegir un nom de calendari</string>
     <string name="calendar_form_name_required_error">Cal indicar un nom</string>
     <string name="add_calendar_text">Afegir calendari</string>
-    <string name="create_calendar_limit_reached_free">Heu assolit el nombre màxim de calendaris.</string>
+    <string name="create_calendar_limit_reached_paid">Heu assolit el nombre màxim de calendaris.</string>
     <string name="create_calendar_limit_reached_paid_title">Màxim de 20 calendaris assolit</string>
     <string name="create_calendar_limit_reached_paid_message">Elimineu calendaris sense ús per crear-ne de nous.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar els calendaris</string>

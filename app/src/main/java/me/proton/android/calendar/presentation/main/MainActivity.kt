@@ -3,7 +3,6 @@ package me.proton.android.calendar.presentation.main
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
@@ -12,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
@@ -61,7 +59,6 @@ import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
-import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
@@ -81,6 +78,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.util.kotlin.toBoolean
 import org.koin.core.KoinComponent
@@ -110,6 +108,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val mainViewModel: MainViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
     private val accountSwitcherViewModel: AccountSwitcherViewModel by viewModels()
+    private val plansViewModel: PlansViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
@@ -281,6 +280,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         intent?.let {
             if (savedInstanceState == null && mainViewModel.shouldHandleIntent(intent)) mainViewModel.handleIntent(intent)
         }
+
+        plansViewModel.register(this)
 
         with(accountViewModel) {
             init(this@MainActivity)
@@ -751,7 +752,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(SUBSCRIPTION)
         nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
-            // TODO Implement Navigation to Core Subscription here
+            plansViewModel.onCurrentPlanClicked(this)
             drawer_layout.close()
         }
 
@@ -873,11 +874,22 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                     drawer_layout.close()
                 }
-                CalendarViewModel.UserCalendarLimit.FREE_REACHED,
-                CalendarViewModel.UserCalendarLimit.PAID_REACHED-> {
-                    // Display limit reached for free user dialog
+                CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                    // Display upgrade dialog for free user dialog
                     MaterialAlertDialogBuilder(this@MainActivity)
-                        .setMessage(R.string.create_calendar_limit_reached_free)
+                        .setTitle(R.string.create_calendar_limit_reached_free_title)
+                        .setMessage(R.string.create_calendar_limit_reached_free_description)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_free_upgrade) { _, _ ->
+                            plansViewModel.onPlansUpgradeClicked(this@MainActivity)
+                        }
+                        .setNegativeButton(R.string.create_calendar_limit_reached_free_not_now) { _, _ ->
+                        }
+                        .show()
+                }
+                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+                    // Display limit reached for paid user dialog
+                    MaterialAlertDialogBuilder(this@MainActivity)
+                        .setMessage(R.string.create_calendar_limit_reached_paid)
                         .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
                         }
                         .show()

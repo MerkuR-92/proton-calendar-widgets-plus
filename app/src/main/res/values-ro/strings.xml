@@ -387,7 +387,7 @@
     <string name="calendar_form_name_hint">Adăugare nume calendar</string>
     <string name="calendar_form_name_required_error">Numele este obligatoriu</string>
     <string name="add_calendar_text">Adăugare calendar</string>
-    <string name="create_calendar_limit_reached_free">Ați atins numărul maxim de calendare.</string>
+    <string name="create_calendar_limit_reached_paid">Ați atins numărul maxim de calendare.</string>
     <string name="create_calendar_limit_reached_paid_title">Limita de 20 de calendare a fost atinsă.</string>
     <string name="create_calendar_limit_reached_paid_message">Ștergeți calendarele neutilizate pentrru a crea altele.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionare calendare</string>
