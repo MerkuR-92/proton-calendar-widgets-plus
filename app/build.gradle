@@ -100,8 +100,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 131
-        versionName "0.32.6"
+        versionCode 132
+        versionName "0.32.7"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs "en", "ca", "es-rES", "es-rMX", "fr", "fr-rCA", "pl", "pt-rPT", "ro", "de"
@@ -216,6 +216,7 @@ dependencies {
     implementation "me.proton.core:user:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:user-settings:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:util-kotlin:${rootProject.ext.version.proton_core}"
+    implementation "me.proton.core:challenge:${rootProject.ext.version.proton_core}"
 
     implementation "androidx.activity:activity-ktx:1.3.0-alpha03"
 

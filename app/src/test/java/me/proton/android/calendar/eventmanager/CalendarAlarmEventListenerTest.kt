@@ -97,7 +97,7 @@ class CalendarAlarmEventListenerTest {
 
             listener.onCreate(config, alarms)
 
-            coVerify(exactly = alarms.count()) { calendarsRepository.persistEventAlarm(any()) }
+            coVerify(exactly = alarms.count()) { calendarsRepository.persistEventAlarm(any(), any()) }
         }
     }
 

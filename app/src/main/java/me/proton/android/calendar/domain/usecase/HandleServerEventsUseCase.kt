@@ -170,7 +170,7 @@ class HandleServerEventsUseCase(
                                             logger.v("event ${it.alarm.eventId} for alarm successfully fetched")
                                             calendarsRepository.persistEvents(event.data.event)
                                             logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
-                                            calendarsRepository.persistEventAlarm(it.alarm)
+                                            calendarsRepository.persistEventAlarm(logger, it.alarm)
                                             updateAlarmsUseCase.execute(userId.id, listOf(event.data.event.id))
                                         }
                                         // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
@@ -187,7 +187,7 @@ class HandleServerEventsUseCase(
 
                             } else {
                                 logger.v("persisting EventAlarm from loop for instant: ${Instant.ofEpochSecond(it.alarm.occurrence)}")
-                                calendarsRepository.persistEventAlarm(it.alarm)
+                                calendarsRepository.persistEventAlarm(logger, it.alarm)
                                 updateAlarmsUseCase.execute(userId.id, listOf(it.alarm.eventId))
                             }
 

@@ -85,6 +85,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
+    private var scopeEventFetching = CoroutineScope(Dispatchers.Default)
 
     // caches already calculated Events for EventsWindow to quickly show them when resubscribing to flow
     private val eventsCache = mutableMapOf<CalendarsRepository.EventsWindow, List<Event>>()
@@ -194,7 +195,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         val flow = MutableStateFlow<CalendarsRepository.InitingState>(CalendarsRepository.InitingState.Initing)
 
         // TODO make sure we also migrate the calendar fetching for new event decryption
-        coroutineScope.launch {
+        scopeEventFetching.launch {
             fetchEventsChannel.consumeEach {
                 logger.v("consuming: $it")
                 fetchEventsInWindow(it)
@@ -275,6 +276,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun shutdown() {
+
+        // cancel any ongoing Event fetching
+        scopeEventFetching.cancel()
+        scopeEventFetching = CoroutineScope(Dispatchers.Default)
 
         fetchedWindows.clear()
         fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -1031,8 +1036,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.eventAlarmsDao().selectAllBetweenInclusive(timestampSecondsFrom, timestampSecondsTo)
     }
 
-    override suspend fun persistEventAlarm(eventAlarm: EventAlarmEntity) {
-        database.eventAlarmsDao().updateOrInsert(eventAlarm)
+    override suspend fun persistEventAlarm(logger: Logger, eventAlarm: EventAlarmEntity) {
+        database.eventAlarmsDao().updateOrInsertReplacing(logger, eventAlarm)
     }
 
     override suspend fun deleteEventAlarmById(id: String) {
