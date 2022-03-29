@@ -259,7 +259,7 @@
     <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termines</string>
     <string name="snack_event_calendar_error">Fehler beim Wechseln des Kalenders</string>
     <string name="snack_event_maximum_alarm_reached_error">Die maximale Anzahl von Benachrichtigungen wurde erreicht</string>
-    <string name="snack_send_bug_report_success">Bericht gesendet. Vielen Dank für deine Rückmeldung.</string>
+    <string name="snack_send_bug_report_success">Bericht gesendet. Vielen Dank für deine Rückmeldung</string>
     <string name="snack_send_bug_report_error">Fehler beim Senden des Berichts. Bitte versuche es später erneut</string>
     <string name="snack_send_bug_report_description_empty">Bitte gib eine Beschreibung deines Berichts an</string>
     <string name="snack_create_event_no_active_personal_calendar">Du benötigst einen persönlichen aktiven Kalender, um Termine erstellen zu können</string>
@@ -332,8 +332,8 @@
     <!-- Bug report -->
     <string name="bug_report_hint_title">Betreff</string>
     <string name="bug_report_hint_description">Bitte beschreibe das Problem und füge alle Fehlermeldungen hinzu.</string>
-    <string name="bug_report_discard_changes_title">Ungesicherte Änderungen</string>
-    <string name="bug_report_discard_changes_description">Ungesicherte Elemente im Formular vorhanden. Möchtest du diese wirklich verwerfen?</string>
+    <string name="bug_report_discard_changes_title">Ungespeicherte Änderungen</string>
+    <string name="bug_report_discard_changes_description">Ungespeicherte Elemente im Formular vorhanden. Möchtest du diese wirklich verwerfen?</string>
     <string name="bug_report_discard_changes_cancel">Bearbeitung fortsetzen</string>
     <string name="bug_report_discard_changes_confirm">Verwerfen</string>
     <!-- Settings -->
@@ -352,12 +352,12 @@
     <string name="settings_alternative_routing_subtitle">Für den Fall, dass Proton-Websites gesperrt sind, ermöglicht diese Einstellung der App, ein alternative Netzwerkweiterleitung auszuprobieren, um Proton zu erreichen, was zur Umgehung von Firewalls oder Netzwerkproblemen nützlich sein kann. Wir empfehlen, diese Einstellung für eine größere Zuverlässigkeit an zu lassen.</string>
     <string name="settings_value_placeholder">Zum Auswählen antippen</string>
     <string name="settings_general_title">Allgemein</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s usw.</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
     <string name="settings_general_info_separator">%s, %s</string>
     <string name="settings_general_info_theme">Farbschema</string>
     <string name="settings_general_info_language">Sprache</string>
     <string name="settings_general_info_time_zone">Zeitzone</string>
-    <string name="settings_general_info_calendar_layout">Kalenderanordnung</string>
+    <string name="settings_general_info_calendar_layout">Kalenderlayout</string>
     <string name="settings_calendars">Meine Kalender</string>
     <string name="settings_subscribed_calendars">Abonnierte Kalender</string>
     <string name="settings_calendar_default">Standard</string>

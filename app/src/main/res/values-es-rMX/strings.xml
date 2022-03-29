@@ -333,7 +333,7 @@
     <string name="bug_report_hint_title">Asunto</string>
     <string name="bug_report_hint_description">Describa el problema e incluya cualquier mensaje de error.</string>
     <string name="bug_report_discard_changes_title">Cambios sin guardar</string>
-    <string name="bug_report_discard_changes_description">Hay entradas sin guardar en el formulario. ¿Está seguro de querer descartarlos?</string>
+    <string name="bug_report_discard_changes_description">Hay entradas sin guardar en el formulario. ¿Está seguro de querer descartarlas?</string>
     <string name="bug_report_discard_changes_cancel">Seguir escribiendo</string>
     <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
@@ -357,7 +357,7 @@
     <string name="settings_general_info_theme">tema</string>
     <string name="settings_general_info_language">idioma</string>
     <string name="settings_general_info_time_zone">zona horaria</string>
-    <string name="settings_general_info_calendar_layout">diseño del calendario</string>
+    <string name="settings_general_info_calendar_layout">diseño de calendario</string>
     <string name="settings_calendars">Mis calendarios</string>
     <string name="settings_subscribed_calendars">Calendarios suscritos</string>
     <string name="settings_calendar_default">Por defecto</string>

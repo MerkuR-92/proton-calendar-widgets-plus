@@ -334,7 +334,7 @@
     <string name="bug_report_hint_description">Descrieți problema incluzând și mesajele de eroare care apar.</string>
     <string name="bug_report_discard_changes_title">Modificări nesalvate</string>
     <string name="bug_report_discard_changes_description">Există date nesalvate în acest formular. Sigur doriți să renunțați la ele?</string>
-    <string name="bug_report_discard_changes_cancel">Continuare scriere</string>
+    <string name="bug_report_discard_changes_cancel">Continuare</string>
     <string name="bug_report_discard_changes_confirm">Renunțare</string>
     <!-- Settings -->
     <string name="settings_theme_title">Tema</string>
