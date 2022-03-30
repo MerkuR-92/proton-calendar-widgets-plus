@@ -11,6 +11,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.core.presentation.utils.ProtonAccentColorCompat
 import me.proton.core.util.kotlin.equalsNoCase
 
 class CalendarColorListAdapter(
@@ -39,14 +40,7 @@ class CalendarColorListAdapter(
 
         colorItemMain.backgroundTintList = ColorStateList.valueOf(color)
 
-        // Set intense color for outer ring
-        val calendarColors = view.context.resources.getIntArray(R.array.accent_colors_base)
-        val calendarColorsIntense = view.context.resources.getIntArray(R.array.accent_colors_intense)
-        val colorIndex = calendarColors.indexOf(color)
-        colorItemOuter.backgroundTintList = ColorStateList.valueOf(
-            if (colorIndex >= calendarColorsIntense.size || colorIndex < 0) color
-            else calendarColorsIntense[calendarColors.indexOf(color)]
-        )
+        colorItemOuter.backgroundTintList = ColorStateList.valueOf(ProtonAccentColorCompat(color).intense)
 
         val selected = color == selectedColor
         colorItemFilled.visibleOrGone(!selected)

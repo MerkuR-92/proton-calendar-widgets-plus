@@ -876,39 +876,38 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
                 CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
                     // Display upgrade dialog for free user dialog
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.create_calendar_limit_reached_free_title)
-                        .setMessage(R.string.create_calendar_limit_reached_free_description)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_free_upgrade) { _, _ ->
-                            plansViewModel.onPlansUpgradeClicked(this@MainActivity)
-                        }
-                        .setNegativeButton(R.string.create_calendar_limit_reached_free_not_now) { _, _ ->
-                        }
-                        .show()
+                    if (SUBSCRIPTION) {
+                        MaterialAlertDialogBuilder(this@MainActivity)
+                            .setTitle(R.string.create_calendar_limit_reached_free_title)
+                            .setMessage(R.string.create_calendar_limit_reached_free_description)
+                            .setPositiveButton(R.string.create_calendar_limit_reached_free_upgrade) { _, _ ->
+                                plansViewModel.onPlansUpgradeClicked(this@MainActivity)
+                            }
+                            .setNegativeButton(R.string.create_calendar_limit_reached_free_not_now) { _, _ ->
+                            }
+                            .show()
+                    } else {
+                        MaterialAlertDialogBuilder(this@MainActivity)
+                            .setMessage(R.string.create_calendar_limit_reached)
+                            .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                            }
+                            .show()
+                    }
                 }
                 CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
                     // Display limit reached for paid user dialog
                     MaterialAlertDialogBuilder(this@MainActivity)
-                        .setMessage(R.string.create_calendar_limit_reached_paid)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
+                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
+                            // Open calendar settings view
+                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                            drawer_layout.close()
+                        }
+                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
                         }
                         .show()
                 }
-                // TODO Use this dialog once we enable delete calendars
-//                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
-//                    // Display limit reached for paid user dialog
-//                    MaterialAlertDialogBuilder(this@MainActivity)
-//                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
-//                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
-//                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
-//                            // Open calendar settings view
-//                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-//                            drawer_layout.close()
-//                        }
-//                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-//                        }
-//                        .show()
-//                }
             }
         }
     }

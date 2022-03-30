@@ -387,7 +387,7 @@
     <string name="calendar_form_name_hint">Dodaj nazwę kalendarza</string>
     <string name="calendar_form_name_required_error">Nazwa jest wymagana</string>
     <string name="add_calendar_text">Dodaj kalendarz</string>
-    <string name="create_calendar_limit_reached_paid">Osiągnięto maksymalną liczbę kalendarzy.</string>
+    <string name="create_calendar_limit_reached">Osiągnięto maksymalną liczbę kalendarzy.</string>
     <string name="create_calendar_limit_reached_paid_title">Limit 20 kalendarzy został osiągnięty</string>
     <string name="create_calendar_limit_reached_paid_message">Aby utworzyć nowe kalendarze, usuń nieużywane.</string>
     <string name="create_calendar_limit_reached_paid_manage">Zarządzaj kalendarzami</string>
