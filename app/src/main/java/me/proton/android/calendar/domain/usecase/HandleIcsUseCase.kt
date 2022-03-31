@@ -68,9 +68,23 @@ class HandleIcsUseCase @Inject constructor(
         val canonicalUserEmails = userManager.getAddressesOrNull(userId)?.map { address ->
             canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         } ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
+
+        val canonicalSenderEmail = canonicalizeProtonEmail(senderEmail ?: "", forceCanonicalization = true)
+        val canonicalRecipientEmail = canonicalizeProtonEmail(recipientEmail ?: "", forceCanonicalization = true)
+
         val organizerEmail = iCalendar.events.first().organizer?.extractEmail() ?: run {
-            logger.i("HandleIcsUseCase error missing organizer")
-            return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
+            // The ORGANIZER field is mandatory in an invitation, but some providers forget about it.
+            //  In those cases, we build one from the sender of the email: ORGANIZER;CN=address:mailto:address
+            if (!senderEmail.isNullOrBlank() && (iCalendar.method.isRequest || iCalendar.method.isCancel)) {
+                iCalendar.events.first().setOrganizer(senderEmail)
+                senderEmail
+            } else if (!recipientEmail.isNullOrBlank() && iCalendar.method.isReply) {
+                iCalendar.events.first().setOrganizer(recipientEmail)
+                recipientEmail
+            } else {
+                logger.i("HandleIcsUseCase error missing organizer")
+                return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.MissingOrganizer
+            }
         }
 
         // Find out if we are in organizer mode or attendee mode
@@ -78,8 +92,6 @@ class HandleIcsUseCase @Inject constructor(
         val isOrganizerMode = canonicalUserEmails.firstOrNull { canonicalOrganizerEmail == it } != null
 
         var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
-        val canonicalSenderEmail = canonicalizeProtonEmail(senderEmail ?: "", forceCanonicalization = true)
-        val canonicalRecipientEmail = canonicalizeProtonEmail(recipientEmail ?: "", forceCanonicalization = true)
         if (!OPEN_ICS_FILES || (canonicalSenderEmail.isNotBlank() && canonicalRecipientEmail.isNotBlank())) {
 
             isCurrentUserSender = canonicalUserEmails.contains(canonicalSenderEmail) == true

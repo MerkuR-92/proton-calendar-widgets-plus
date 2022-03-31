@@ -12,6 +12,7 @@ import me.proton.core.auth.data.MissingScopeListenerImpl
 import me.proton.core.auth.data.repository.AuthRepositoryImpl
 import me.proton.core.auth.domain.ClientSecret
 import me.proton.core.auth.domain.repository.AuthRepository
+import me.proton.core.auth.domain.usecase.LoginChallengeConfig
 import me.proton.core.auth.domain.usecase.PostLoginAccountSetup
 import me.proton.core.auth.domain.usecase.signup.SignupChallengeConfig
 import me.proton.core.auth.presentation.AuthOrchestrator
@@ -35,8 +36,14 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(apiProvider: ApiProvider): AuthRepository =
-        AuthRepositoryImpl(apiProvider)
+    fun provideAuthRepository(
+        apiProvider: ApiProvider,
+        @ApplicationContext context: Context
+    ): AuthRepository = AuthRepositoryImpl(apiProvider, context)
+
+    @Provides
+    @Singleton
+    fun provideLoginChallengeConfig(): LoginChallengeConfig = LoginChallengeConfig()
 
     @Provides
     fun provideAuthOrchestrator(): AuthOrchestrator = AuthOrchestrator()
