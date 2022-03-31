@@ -19,16 +19,19 @@ import me.proton.core.network.data.NetworkManager
 import me.proton.core.network.data.NetworkPrefs
 import me.proton.core.network.data.ProtonCookieStore
 import me.proton.core.network.data.client.ClientIdProviderImpl
+import me.proton.core.network.data.client.ClientVersionValidatorImpl
 import me.proton.core.network.data.client.ExtraHeaderProviderImpl
 import me.proton.core.network.domain.ApiClient
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.network.domain.NetworkPrefs
 import me.proton.core.network.domain.client.ClientIdProvider
+import me.proton.core.network.domain.client.ClientVersionValidator
 import me.proton.core.network.domain.client.ExtraHeaderProvider
 import me.proton.core.network.domain.humanverification.HumanVerificationListener
 import me.proton.core.network.domain.humanverification.HumanVerificationProvider
 import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.network.domain.server.ServerTimeListener
+import me.proton.core.network.domain.serverconnection.DohAlternativesListener
 import me.proton.core.network.domain.session.SessionListener
 import me.proton.core.network.domain.session.SessionProvider
 import javax.inject.Singleton
@@ -61,6 +64,8 @@ object NetworkModule {
         humanVerificationProvider: HumanVerificationProvider,
         humanVerificationListener: HumanVerificationListener,
         missingScopeListener: MissingScopeListener,
+        clientVersionValidator: ClientVersionValidator,
+        dohAlternativesListener: DohAlternativesListener? = null
     ): ApiManagerFactory = ApiManagerFactory(
         BASE_URL,
         apiClient,
@@ -75,7 +80,8 @@ object NetworkModule {
         missingScopeListener,
         protonCookieStore,
         CoroutineScope(Job() + Dispatchers.Default),
-        apiConnectionListener = null
+        clientVersionValidator = clientVersionValidator,
+        dohAlternativesListener = dohAlternativesListener
     )
 
     @Provides
@@ -92,6 +98,13 @@ object NetworkModule {
     @Singleton
     fun provideApiProvider(apiFactory: ApiManagerFactory, sessionProvider: SessionProvider): ApiProvider =
         ApiProvider(apiFactory, sessionProvider)
+
+    @Provides
+    @Singleton
+    fun provideDohAlternativesListener(): DohAlternativesListener? = null
+
+    @Provides
+    fun provideClientVersionValidator(): ClientVersionValidator = ClientVersionValidatorImpl()
 
     @Provides
     @Singleton
