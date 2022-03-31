@@ -14,6 +14,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
+import java.time.ZoneId
 import javax.inject.Inject
 
 class CreateCalendarUseCase @Inject constructor(
@@ -22,7 +23,8 @@ class CreateCalendarUseCase @Inject constructor(
     private val keySetupUseCase: KeySetupUseCase,
     private val userManager: UserManager,
     private val calendarsRepository: CalendarsRepository,
-    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase
+    private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
+    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String? = null) : UseCase.Result {
@@ -110,8 +112,19 @@ class CreateCalendarUseCase @Inject constructor(
                                 keySetupResult
                             }
                             is UseCase.Result.Error -> {
-                                logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}")
-                                keySetupResult
+                                // Try and fetch the calendar to check that the key setup wasn't done by another client in the meantime
+                                val fetchedCalendar = calendarsRepository.fetchCalendar(userId, calendarId)
+                                if (fetchedCalendar == null || fetchedCalendar.hasIncompleteKeySetup) {
+                                    logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}")
+                                    keySetupResult
+                                } else {
+                                    val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+                                        ?: ZoneId.systemDefault().id
+
+                                    val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(fetchedCalendar, userId, timezone)
+                                    executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                                    executeBootstrapResult
+                                }
                             }
                         }
 

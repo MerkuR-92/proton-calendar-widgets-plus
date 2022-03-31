@@ -14,7 +14,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarListener
@@ -31,7 +31,7 @@ class CalendarListenerTest {
     private val db: AppDatabase = mockk()
     private val calendarsRepository: CalendarsRepository = mockk()
     private val logger: Logger = mockk(relaxed = true)
-    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase = mockk()
+    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase = mockk()
     private val keySetupUseCase: KeySetupUseCase = mockk()
 
     private lateinit var listener: CalendarListener
@@ -41,7 +41,7 @@ class CalendarListenerTest {
     fun setup() {
         clearAllMocks()
 
-        listener = CalendarListener(db, calendarsRepository, bootstrapCalendarsUseCase, keySetupUseCase, logger)
+        listener = CalendarListener(db, calendarsRepository, bootstrapCalendarUseCase, keySetupUseCase, logger)
 
         coEvery { calendarsRepository.selectCalendarUserSettings(any()) } returns null
         coEvery { calendarsRepository.persistCalendar(any(), any()) } returns Unit
@@ -125,11 +125,11 @@ class CalendarListenerTest {
             val entities = listOf(
                 CalendarEntity("calendar_id", "Name", "Description", "#fff", display = 1, flags = 0),
             )
-            coEvery { bootstrapCalendarsUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success(Unit)
+            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success(Unit)
 
             listener.onCreate(config, entities)
 
-            coVerify(exactly = 1) { bootstrapCalendarsUseCase.executeBootstrap(any(), any(), any()) }
+            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
             coVerify(exactly = 0) { calendarsRepository.persistCalendar(any(), any()) }
         }
     }
@@ -140,11 +140,11 @@ class CalendarListenerTest {
             val entities = listOf(
                 CalendarEntity("calendar_id", "Name", "Description", "#fff", display = 1, flags = 0),
             )
-            coEvery { bootstrapCalendarsUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("error")
+            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("error")
 
             listener.onCreate(config, entities)
 
-            coVerify(exactly = 1) { bootstrapCalendarsUseCase.executeBootstrap(any(), any(), any()) }
+            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepository.persistCalendar(any(), any()) }
         }
     }
@@ -156,8 +156,44 @@ class CalendarListenerTest {
                 CalendarEntity("calendar_id", "Name", "Description", "#fff", display = 1, flags = 0),
             )
 
+            coEvery { calendarsRepository.selectCalendar(any()) } returns CalendarEntity("calendar_id", "Previous name", "Description", "#fff", display = 1, flags = 0)
+
             listener.onUpdate(config, entities)
 
+            coVerify(exactly = 1) { calendarsRepository.persistCalendar(any(), any()) }
+        }
+    }
+
+    @Test
+    fun `onUpdate calendar doesn't exist yet in db do bootstrap`() {
+        runBlocking {
+            val entities = listOf(
+                CalendarEntity("calendar_id", "Name", "Description", "#fff", display = 1, flags = 0),
+            )
+
+            coEvery { calendarsRepository.selectCalendar(any()) } returns null
+            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+
+            listener.onUpdate(config, entities)
+
+            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
+            coVerify(exactly = 0) { calendarsRepository.persistCalendar(any(), any()) }
+        }
+    }
+
+    @Test
+    fun `onUpdate calendar doesn't exist yet in db bootstrap failed persist calendar`() {
+        runBlocking {
+            val entities = listOf(
+                CalendarEntity("calendar_id", "Name", "Description", "#fff", display = 1, flags = 0),
+            )
+
+            coEvery { calendarsRepository.selectCalendar(any()) } returns null
+            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("Bootstrap failed")
+
+            listener.onUpdate(config, entities)
+
+            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepository.persistCalendar(any(), any()) }
         }
     }

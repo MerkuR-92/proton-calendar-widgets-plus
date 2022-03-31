@@ -19,14 +19,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.getUserSettingsEntityFlow
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.BootstrapAllCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
@@ -59,7 +58,6 @@ import me.proton.core.humanverification.presentation.observe
 import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
 import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.usersettings.data.db.UserSettingsDatabase
-import me.proton.core.usersettings.data.entity.PasswordEntity
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import javax.inject.Inject
 
@@ -69,7 +67,7 @@ class AccountViewModel @Inject constructor(
     private val authOrchestrator: AuthOrchestrator,
     private val humanVerificationManager: HumanVerificationManager,
     private val humanVerificationOrchestrator: HumanVerificationOrchestrator,
-    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
+    private val bootstrapAllCalendarsUseCase: BootstrapAllCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
@@ -120,7 +118,7 @@ class AccountViewModel @Inject constructor(
     private suspend fun setupUser(userId: UserId, showConfirmationDialog: Boolean = true) {
         _state.tryEmit(State.Processing)
 
-        val bootstrapResult = bootstrapCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
+        val bootstrapResult = bootstrapAllCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
         bootstrapResult.ifSuccessAndLogErrors(logger) { }
         if (bootstrapResult !is UseCase.Result.Success<*>) {
             if (bootstrapResult is UseCase.Result.Error) {

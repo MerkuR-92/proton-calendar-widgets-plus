@@ -33,7 +33,7 @@ class HandleServerEventsUseCase(
     private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase,
     private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
     private val keySetupUseCase: KeySetupUseCase,
-    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
+    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
     private val calendarsApi: CalendarsApi,
     private val valueStoreProvider: ValueStoreProvider,
     private val serverEventsApi: ServerEventsApi
@@ -100,14 +100,13 @@ class HandleServerEventsUseCase(
                         // because of the separate event loops for calendars, we need to execute bootstrap
                         // when new calendar is created
                         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone ?: ZoneId.systemDefault().id
-                        val executeBootstrapResult = bootstrapCalendarsUseCase.executeBootstrap(calendarToPersist, userId, timezone)
+                        val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(calendarToPersist, userId, timezone)
                         executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
 
                         // bootstrap persists CalendarEntity on its own
                         if (executeBootstrapResult !is UseCase.Result.Success<*>) {
                             calendarsRepository.persistCalendar(userId.id, calendarToPersist)
                         }
-
                     },
                     { calendarsRepository.updateCalendar(userId.id, it.calendar!!) }
                 )
