@@ -95,7 +95,7 @@ class CalendarEventListenerDelegate @Inject constructor(
 
     suspend fun onPrepare(config: EventManagerConfig, eventsMetadata: List<ServerEvent.EventEntityMetadata>) {
         // Fetch any event not cached as the provided metadata is not enough to create entities
-        entities = eventsMetadata
+        entities = eventsMetadata.filter { calendarsRepository.shouldFetchEvent(it) }
             .mapNotNull { metadata ->
                 fetchEventEntity(config.userId, metadata)
             }.associateBy { event -> event.id }

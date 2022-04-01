@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data
 
+import androidx.annotation.VisibleForTesting
 import biweekly.property.RecurrenceId
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -16,14 +17,15 @@ import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
+import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
+import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -36,8 +38,8 @@ import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toInt
 import java.time.*
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -76,6 +78,15 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     private var fetchedWindows = mutableSetOf<FetchWindow>()
     private var fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    /**
+     * Min and Max FetchWindow requested in the lifetime of Repository. This means user has visited the views
+     * corresponding to these windows, but not necessarily fetched events from backend.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var minRequestedWindowToFetch: FetchWindow? = null
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var maxRequestedWindowToFetch: FetchWindow? = null
 
     private var eventsExpandedUntil: ZonedDateTime = ZonedDateTime.now()
     private val expandEventsToDateFlow = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
@@ -197,6 +208,15 @@ class CalendarsRepositoryImpl @Inject constructor(
         // TODO make sure we also migrate the calendar fetching for new event decryption
         scopeEventFetching.launch {
             fetchEventsChannel.consumeEach {
+
+                minRequestedWindowToFetch = if (minRequestedWindowToFetch != null) {
+                    listOf(it, minRequestedWindowToFetch).minByOrNull { it!!.fromDate }
+                } else it
+
+                maxRequestedWindowToFetch = if (maxRequestedWindowToFetch != null) {
+                    listOf(it, maxRequestedWindowToFetch).maxByOrNull { it!!.toDate }
+                } else it
+
                 logger.v("consuming: $it")
                 fetchEventsInWindow(it)
             }
@@ -280,6 +300,9 @@ class CalendarsRepositoryImpl @Inject constructor(
         // cancel any ongoing Event fetching
         scopeEventFetching.cancel()
         scopeEventFetching = CoroutineScope(Dispatchers.Default)
+
+        minRequestedWindowToFetch = null
+        maxRequestedWindowToFetch = null
 
         fetchedWindows.clear()
         fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -478,14 +501,14 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     }
 
-    private data class FetchWindow(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    data class FetchWindow(
         val userId: UserId,
         val calendarIds: List<String>,
         val fromDate: LocalDate,
         val toDate: LocalDate,
         val timeZoneId: String
     )
-
 
     override suspend fun fetchEvents(
         userId: UserId,
@@ -680,6 +703,41 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean =
         database.eventsDao().hasEvent(eventId, calendarId)
+
+    override suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean {
+
+        val dbEventEntity = database.eventsDao().selectById(metadata.id)
+        val isDbEventUpToDate = dbEventEntity?.modifyTime == metadata.modifyTime
+        if (isDbEventUpToDate) return false
+
+        if (metadata.rRule == null) { // non-recurring event
+
+            val now = Instant.now()
+            val startInstant = Instant.ofEpochSecond(metadata.startTime)
+            val endInstant = Instant.ofEpochSecond(metadata.endTime)
+
+            val isEventRecent = when {
+                now.minus(60, ChronoUnit.DAYS).isAfter(endInstant) -> false
+                now.plus(120, ChronoUnit.DAYS).isBefore(startInstant) -> false
+                else -> true
+            }
+
+            val minWindowStart = minRequestedWindowToFetch?.fromDate?.atStartOfDay(ZoneId.of(minRequestedWindowToFetch?.timeZoneId))
+            val maxWindowEnd = maxRequestedWindowToFetch?.toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(maxRequestedWindowToFetch?.timeZoneId))
+
+            // event is within all requested FetchWindows, it means that user would have displayed it in one of the views
+            val isInsideRequestedFetchingWindows = when {
+                minWindowStart?.toInstant()?.isAfter(endInstant) == true -> false
+                maxWindowEnd?.toInstant()?.isBefore(startInstant) == true -> false
+                else -> minWindowStart != null && maxWindowEnd != null
+            }
+
+            return isEventRecent || isInsideRequestedFetchingWindows
+        } else { // recurring event, we always assume "should fetch" for simplicity
+            return true
+        }
+
+    }
 
     override suspend fun hasCalendar(calendarId: String, ): Boolean = database.calendarsDao().hasCalendar(calendarId)
 
