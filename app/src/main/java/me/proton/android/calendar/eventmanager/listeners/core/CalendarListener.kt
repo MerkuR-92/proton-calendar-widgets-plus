@@ -7,7 +7,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class CalendarListener @Inject constructor(
     database: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
-    private val bootstrapCalendarsUseCase: BootstrapCalendarsUseCase,
+    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
     private val keySetupUseCase: KeySetupUseCase,
     private val logger: Logger,
 ): CalendarBaseEventListener<String, CalendarEntity>(database) {
@@ -71,8 +71,14 @@ class CalendarListener @Inject constructor(
                         entity
                     }
                     is UseCase.Result.Error -> {
-                        logger.e("keySetupResult error: ${result.message}")
-                        entity
+                        // Try and fetch the calendar to check that the key setup wasn't done by another client in the meantime
+                        val fetchedCalendar = calendarsRepository.fetchCalendar(config.userId, entity.id)
+                        if (fetchedCalendar == null || fetchedCalendar.hasIncompleteKeySetup) {
+                            logger.e("keySetupResult error: ${result.message}")
+                            entity
+                        } else {
+                            fetchedCalendar
+                        }
                     }
                 }
             } else {
@@ -89,7 +95,7 @@ class CalendarListener @Inject constructor(
             ?: ZoneId.systemDefault().id
 
         entities.map {
-            val executeBootstrapResult = bootstrapCalendarsUseCase.executeBootstrap(it, config.userId, timezone)
+            val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, config.userId, timezone)
             executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
 
             // If bootstraping failed, persist calendar manually
@@ -102,7 +108,23 @@ class CalendarListener @Inject constructor(
     override suspend fun onUpdate(config: EventManagerConfig, entities: List<CalendarEntity>) {
         super.onUpdate(config, entities)
 
-        entities.map { calendarsRepository.persistCalendar(config.userId.id, it) }
+        val timezone = calendarsRepository.selectCalendarUserSettings(config.userId.id)?.primaryTimezone
+            ?: ZoneId.systemDefault().id
+
+        entities.map {
+            if (calendarsRepository.selectCalendar(it.id) == null) {
+
+                val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, config.userId, timezone)
+                executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+
+                // If bootstraping failed, persist calendar manually
+                if (executeBootstrapResult !is UseCase.Result.Success<*>) {
+                    calendarsRepository.persistCalendar(config.userId.id, it)
+                }
+            } else {
+                calendarsRepository.persistCalendar(config.userId.id, it)
+            }
+        }
     }
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
