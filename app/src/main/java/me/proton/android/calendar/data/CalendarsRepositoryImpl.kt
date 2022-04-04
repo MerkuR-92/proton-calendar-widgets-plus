@@ -1095,7 +1095,13 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun persistEventAlarm(logger: Logger, eventAlarm: EventAlarmEntity) {
-        database.eventAlarmsDao().updateOrInsertReplacing(logger, eventAlarm)
+        database.inTransaction {
+            if (database.eventsDao().hasEvent(eventAlarm.eventId, eventAlarm.calendarId)) {
+                database.eventAlarmsDao().updateOrInsertReplacing(logger, eventAlarm)
+            } else {
+                logger.i("persistEventAlarm, event doesn't exist")
+            }
+        }
     }
 
     override suspend fun deleteEventAlarmById(id: String) {
