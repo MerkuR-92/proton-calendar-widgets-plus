@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/shape_circle_large"
-        android:backgroundTint="@color/brand_darken_20"/>
+        android:backgroundTint="@color/purple_intense"/>
 
     <ImageView
         android:id="@+id/item_calendar_color_picker_main"
@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="@+id/item_calendar_color_picker_outer"
         app:layout_constraintEnd_toEndOf="@+id/item_calendar_color_picker_outer"
         android:background="@drawable/shape_circle_large"
-        android:backgroundTint="@color/brand_norm"/>
+        android:backgroundTint="@color/purple_base"/>
 
     <ImageView
         android:id="@+id/item_calendar_color_picker_inner"
@@ -52,6 +52,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/shape_circle_large"
-        android:backgroundTint="@color/brand_norm"/>
+        android:backgroundTint="@color/purple_base"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

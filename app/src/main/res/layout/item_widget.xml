@@ -59,7 +59,7 @@
         android:layout_marginBottom="@dimen/widget_calendar_item_interaction_margin"
         android:layout_toEndOf="@id/rl_event_day_container"
         android:src="@drawable/shape_calendar_bar"
-        app:tint="@color/brand_norm" />
+        app:tint="?attr/brand_norm" />
 
     <RelativeLayout
         android:id="@+id/rl_event_container"

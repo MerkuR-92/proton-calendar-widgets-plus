@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="@+id/root_splash_logo"
         app:layout_constraintEnd_toEndOf="@+id/root_splash_logo"
         android:layout_marginTop="48dp"
-        android:indeterminateTint="@color/brand_norm"
+        android:indeterminateTint="?attr/proton_icon_accent"
         android:clickable="false"
         android:focusable="false" />
 

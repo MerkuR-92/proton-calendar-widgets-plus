@@ -19,7 +19,7 @@
     <ImageView
         android:id="@+id/item_settings_calendar_icon"
         android:src="@drawable/ic_dot"
-        tools:tint="@color/brand_norm"
+        tools:tint="?attr/brand_norm"
         android:layout_marginStart="19dp"
         style="@style/ColoredDot"
         app:layout_constraintTop_toTopOf="@+id/item_settings_calendar_title"

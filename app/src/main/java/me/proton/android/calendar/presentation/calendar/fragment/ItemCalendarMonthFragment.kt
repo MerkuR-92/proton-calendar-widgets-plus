@@ -27,6 +27,7 @@ import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
@@ -170,7 +171,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             textView.text = firstLetterDayOfWeek
             val currentDate = LocalDate.now(ZoneId.of(timeZoneId))
             if (dayOfWeek == currentDate.dayOfWeek && currentDate.month == firstDayMonthView.month && currentDate.year == firstDayMonthView.year) {
-                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+                textView.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
             } else {
                 textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
             }

@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/dialog_calendar_settings_calendar_icon"
         android:src="@drawable/ic_dot"
-        tools:tint="@color/brand_norm"
+        tools:tint="@color/purple_base"
         android:layout_marginStart="19dp"
         style="@style/ColoredDot"
         app:layout_constraintTop_toTopOf="@+id/dialog_calendar_settings_calendar_title"

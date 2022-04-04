@@ -12,7 +12,7 @@
     </style>
 
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="colorAccent">@color/brand_norm</item>
+        <item name="colorAccent">?attr/proton_icon_accent</item>
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="android:windowBackground">@drawable/shape_dialogs_rounded</item>
         <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
@@ -23,9 +23,9 @@
     </style>
 
     <style name="PickerDialog" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorAccent">@color/brand_norm</item>
-        <item name="colorControlActivated">@color/brand_norm</item>
-        <item name="colorControlHighlight">@color/brand_norm</item>
+        <item name="colorAccent">?attr/proton_icon_accent</item>
+        <item name="colorControlActivated">?attr/proton_icon_accent</item>
+        <item name="colorControlHighlight">?attr/proton_icon_accent</item>
         <item name="android:windowBackground">@drawable/shape_dialogs_rounded</item>
         <item name="android:buttonBarPositiveButtonStyle">@style/PickerDialogButtonStyle</item>
         <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>

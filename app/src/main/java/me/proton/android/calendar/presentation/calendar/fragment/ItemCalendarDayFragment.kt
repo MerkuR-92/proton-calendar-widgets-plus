@@ -59,6 +59,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKey
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
@@ -488,8 +489,8 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 }
 
                 if (date == LocalDate.now(it)) {
-                    all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
-                    all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+                    all_day_header.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
+                    all_day_header_date.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
                 } else {
                     all_day_header.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
                     all_day_header_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))

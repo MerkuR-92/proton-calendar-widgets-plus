@@ -29,6 +29,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.FragmentArguments.STARTING_POSITION_ARG
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.*
@@ -317,9 +318,8 @@ class ItemMiniCalendarFragment : Fragment() {
                         R.style.Text_DefaultSmall_Strong
                     )
                     miniCalendarItemView.itemMiniCalendarText.setTextColor(
-                        ContextCompat.getColor(
-                            miniCalendarItemView.context,
-                            R.color.brand_norm
+                        requireContext().getColorFromAttr(
+                            R.attr.proton_text_accent
                         )
                     )
                     miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
@@ -420,9 +420,8 @@ class ItemMiniCalendarFragment : Fragment() {
                             R.style.Text_DefaultSmall_Strong
                         )
                         miniCalendarItemView.itemMiniCalendarText.setTextColor(
-                            ContextCompat.getColor(
-                                miniCalendarItemView.context,
-                                R.color.brand_norm
+                            requireContext().getColorFromAttr(
+                                R.attr.proton_text_accent
                             )
                         )
                         miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)

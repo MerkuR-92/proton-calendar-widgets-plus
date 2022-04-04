@@ -9,5 +9,5 @@
     android:textColor="@color/white"
     android:background="@drawable/shape_badge"
     tools:text="disabled"
-    tools:backgroundTint="@color/brand_norm" />
+    tools:backgroundTint="?attr/brand_norm" />
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.COLUMNS_MAX
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.DECRYPTION_FAILED_BRIGHTEN_COLOR_BY
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.DECRYPTION_FAILED_PAST_EVENT_BRIGHTEN_COLOR_BY
@@ -105,12 +106,16 @@ class MonthView : ViewGroup {
         }
 
         highlightDayTitlePaint = TextPaint(dayTitlePaint).apply {
-            color = ContextCompat.getColor(context, R.color.brand_norm)
+            color = context.getColorFromAttr(
+                R.attr.proton_text_accent
+            )
         }
 
         highlightDayTitleRectPaint = Paint().apply {
             style = Paint.Style.STROKE
-            color = ContextCompat.getColor(context, R.color.interaction_norm)
+            color = context.getColorFromAttr(
+                R.attr.proton_icon_accent
+            )
             strokeWidth = res.getDimension(R.dimen.month_view_event_title_highlight_stroke)
             isAntiAlias = true
         }

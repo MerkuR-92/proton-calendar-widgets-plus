@@ -51,6 +51,7 @@ import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.animateGuidelineHeightChange
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -848,7 +849,7 @@ class MonthFragment : BaseFragment() {
         )
         val textView = weekDayHeaderView as TextView
         textView.text = dayOfWeek.format(firstLetter = true)
-        if (highlight) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+        if (highlight) textView.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
         else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
         headerLayout.addView(weekDayHeaderView)
     }

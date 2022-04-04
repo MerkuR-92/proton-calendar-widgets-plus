@@ -29,7 +29,7 @@
                 android:visibility="invisible"
                 tools:visibility="visible"
                 android:indeterminateOnly="true"
-                android:indeterminateTint="@color/brand_norm"
+                android:indeterminateTint="?attr/proton_icon_accent"
                 android:indeterminateTintMode="src_in"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="-4dp"/>

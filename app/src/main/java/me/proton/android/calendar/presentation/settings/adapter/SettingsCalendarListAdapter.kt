@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_settings_calendar.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -91,7 +92,12 @@ class SettingsCalendarListAdapter(
             calendarEntityItemBadgeLayout.removeAllViews()
 
             // Display default badge
-            if (calendarEntity.id == defaultCalendarId && calendarEntity.isDisabled.not()) addBadge(itemView.context.getString(R.string.settings_calendar_default), R.color.brand_norm)
+            if (calendarEntity.id == defaultCalendarId && calendarEntity.isDisabled.not()) {
+                addBadge(
+                    itemView.context.getString(R.string.settings_calendar_default),
+                    itemView.context.getColorFromAttr(R.attr.brand_norm)
+                )
+            }
 
             // Display disabled badge
             if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.background_secondary, R.color.text_norm)

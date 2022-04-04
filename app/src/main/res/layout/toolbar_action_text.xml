@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/toolbar_action_text"
         style="@style/Text.Default.Strong"
-        android:textColor="@color/interaction_norm"
+        android:textColor="?attr/proton_text_accent"
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_width="wrap_content"
