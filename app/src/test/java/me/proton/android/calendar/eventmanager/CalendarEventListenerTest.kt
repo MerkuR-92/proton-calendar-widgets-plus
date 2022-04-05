@@ -201,6 +201,7 @@ class CalendarEventListenerDelegateTest {
             updateAlarmsUseCase,
         )
 
+        coEvery { calendarsRepository.shouldFetchEvent(any()) } returns true
         coEvery { calendarsRepository.fetchEventById(any(), any(), any()) } answers {
             val id = args[2] as String
             ApiResponse.Success(
@@ -229,6 +230,7 @@ class CalendarEventListenerDelegateTest {
 
     @Test
     fun `onPrepare won't fetch very distant events`() {
+
         runBlocking {
             val metadata = listOf(
                 // Events that are very distant in time
@@ -237,6 +239,10 @@ class CalendarEventListenerDelegateTest {
                 // This is a valid event
                 createEventMetadata("id_3"),
             )
+
+            coEvery { calendarsRepository.shouldFetchEvent(metadata[0]) } returns false
+            coEvery { calendarsRepository.shouldFetchEvent(metadata[1]) } returns false
+            coEvery { calendarsRepository.shouldFetchEvent(metadata[2]) } returns true
 
             delegate.onPrepare(config, metadata)
 
@@ -313,13 +319,13 @@ class CalendarEventListenerDelegateTest {
     }
 }
 
-fun createEventEntity(id: String) = EventEntity(
+fun createEventEntity(id: String, modifyTime: Long? = null) = EventEntity(
     id,
     calendarId,
     sharedEventId,
     calendarKeyPacket,
     0L,
-    0L,
+    modifyTime ?: 0L,
     0,
     sharedKeyPacket,
     emptyList(),
@@ -333,7 +339,9 @@ fun createEventEntity(id: String) = EventEntity(
 fun createEventMetadata(
     id: String,
     startTime: Long? = null,
-    endTime: Long? = null
+    endTime: Long? = null,
+    modifyTime: Long? = null,
+    rRule: String? = null
 ) = ServerEvent.EventEntityMetadata(
     id,
     calendarId,
@@ -345,9 +353,9 @@ fun createEventMetadata(
     eventUid,
     null,
     emptyList(),
-    null,
+    rRule,
     0L,
-    0L,
+    modifyTime ?: 0L,
     0
 )
 

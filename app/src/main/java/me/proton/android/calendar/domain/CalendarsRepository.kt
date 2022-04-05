@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
+import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -115,6 +116,8 @@ interface CalendarsRepository {
     ): Flow<GetEventsResult<SkeletonEvent>>
 
     suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean
+
+    suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean
 
     suspend fun hasCalendar(calendarId: String, ): Boolean
 

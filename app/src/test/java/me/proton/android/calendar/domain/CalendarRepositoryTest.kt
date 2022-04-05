@@ -3,6 +3,8 @@ package me.proton.android.calendar.domain
 import android.util.Log
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import biweekly.property.RecurrenceId
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -28,6 +30,8 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.eventmanager.createEventEntity
+import me.proton.android.calendar.eventmanager.createEventMetadata
 import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -247,6 +251,97 @@ internal class CalendarRepositoryTest {
             )
 
             assertThat(isOrphanSingleEdit).isEqualTo(false)
+        }
+    }
+
+    @Test
+    fun `should not fetch events from metadata if they are up-to-date`() {
+        runBlocking {
+
+            val metadata = createEventMetadata("id modified at 1", modifyTime = 1)
+            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns createEventEntity(metadata.id, modifyTime = metadata.modifyTime)
+
+            assertThat(getCalendarRepository().shouldFetchEvent(metadata)).isFalse()
+        }
+    }
+
+    @Test
+    fun `should fetch non-recurring events from metadata if they are inside of previously requested windows`() {
+        runBlocking {
+
+            val metadata = createEventMetadata("id",
+                startTime = 1577890800, // 1. January 2020 15:00:00 UTC
+                endTime = 1577894400 // 1. January 2020 16:00:00 UTC
+            )
+            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+
+            val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
+
+            calendarsRepository.minRequestedWindowToFetch = CalendarsRepositoryImpl.FetchWindow(
+                UserId("user ID"),
+                listOf("calendar 1 ID", "calendar 2 ID"),
+                LocalDate.of(2020, 1, 1),
+                LocalDate.of(2020, 1, 31),
+                "UTC"
+            )
+
+            calendarsRepository.maxRequestedWindowToFetch = CalendarsRepositoryImpl.FetchWindow(
+                UserId("user ID"),
+                listOf("calendar 1 ID", "calendar 2 ID"),
+                LocalDate.of(2020, 1, 1),
+                LocalDate.of(2020, 1, 31),
+                "UTC"
+            )
+
+            assertThat(calendarsRepository.shouldFetchEvent(metadata)).isTrue()
+
+        }
+    }
+
+    @Test
+    fun `should not fetch non-recurring events from metadata if they are outside of previously requested windows`() {
+        runBlocking {
+
+            val metadata = createEventMetadata("id",
+                startTime = 1577890800, // 1. January 2020 15:00:00 UTC
+                endTime = 1577894400 // 1. January 2020 16:00:00 UTC
+            )
+            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+
+            val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
+
+            calendarsRepository.minRequestedWindowToFetch = CalendarsRepositoryImpl.FetchWindow(
+                UserId("user ID"),
+                listOf("calendar 1 ID", "calendar 2 ID"),
+                LocalDate.of(2020, 3, 1),
+                LocalDate.of(2020, 3, 31),
+                "UTC"
+            )
+
+            calendarsRepository.maxRequestedWindowToFetch = CalendarsRepositoryImpl.FetchWindow(
+                UserId("user ID"),
+                listOf("calendar 1 ID", "calendar 2 ID"),
+                LocalDate.of(2020, 3, 1),
+                LocalDate.of(2020, 3, 31),
+                "UTC"
+            )
+
+            assertThat(calendarsRepository.shouldFetchEvent(metadata)).isFalse()
+
+        }
+    }
+
+    @Test
+    fun `should fetch recurring events from metadata regardless of previously requested windows`() {
+        runBlocking {
+
+            // here the FetchWindows are empty
+
+            val metadata = createEventMetadata("id modified at 1", modifyTime = 1, rRule = "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR")
+            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+
+            assertThat(getCalendarRepository().shouldFetchEvent(metadata)).isTrue()
+
         }
     }
 

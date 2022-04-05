@@ -78,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d yes</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d maybe</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d unanswered</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pending</string>
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
     <string name="event_attendee_optional">Optional</string>

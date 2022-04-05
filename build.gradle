@@ -21,7 +21,7 @@ buildscript {
                 "assisted_inject" : "0.6.0",
                 "hilt_android": "2.38.1",
                 "hilt_androidx": "1.0.0",
-                "proton_core": "7.1.8",
+                "proton_core": "7.1.9",
         ]
     }
 
