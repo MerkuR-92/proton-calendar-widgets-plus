@@ -793,7 +793,7 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
-    fun `cleanDuration with DURATION and no DTEND taking DST into account test`() {
+    fun `cleanDuration with one hour DURATION and no DTEND taking DST + 1 into account test`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -834,6 +834,276 @@ internal class IcsSurgeryUtilsTest {
             val endDate = ZonedDateTime.of(
                 LocalDate.of(2022, 3, 27),
                 LocalTime.of(4, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(Date.from(startDate), true)
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(Date.from(endDate), true)
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration with three hour DURATION and no DTEND taking DST + 1 into account test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    DTSTAMP:20190719T130854Z
+    CREATED:20200505T173304Z
+    LAST-MODIFIED:20200505T173304Z
+    UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
+    DTSTART;TZID=Europe/Zurich:20220327T010000
+    DURATION:PT3H
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:API deploy
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val defaultTimezone = "Europe/Zurich"
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanDtStart()).isTrue()
+            assertThat(event.cleanDuration()).isTrue()
+            assertThat(event.cleanDtEnd()).isTrue()
+            val startDate = ZonedDateTime.of(
+                LocalDate.of(2022, 3, 27),
+                LocalTime.of(1, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            val endDate = ZonedDateTime.of(
+                LocalDate.of(2022, 3, 27),
+                LocalTime.of(5, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(Date.from(startDate), true)
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(Date.from(endDate), true)
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration with one day DURATION and no DTEND taking DST + 1 into account test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    DTSTAMP:20190719T130854Z
+    CREATED:20200505T173304Z
+    LAST-MODIFIED:20200505T173304Z
+    UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
+    DTSTART;TZID=Europe/Zurich:20220327T020000
+    DURATION:PT1D
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:API deploy
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val defaultTimezone = "Europe/Zurich"
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanDtStart()).isTrue()
+            assertThat(event.cleanDuration()).isTrue()
+            assertThat(event.cleanDtEnd()).isTrue()
+            val startDate = ZonedDateTime.of(
+                LocalDate.of(2022, 3, 27),
+                LocalTime.of(2, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            val endDate = ZonedDateTime.of(
+                LocalDate.of(2022, 3, 28),
+                LocalTime.of(3, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(Date.from(startDate), true)
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(Date.from(endDate), true)
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration with one hour DURATION and no DTEND taking DST - 1 into account test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    DTSTAMP:20190719T130854Z
+    CREATED:20200505T173304Z
+    LAST-MODIFIED:20200505T173304Z
+    UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
+    DTSTART;TZID=Europe/Zurich:20221030T030000
+    DURATION:PT1H
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:API deploy
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val defaultTimezone = "Europe/Zurich"
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanDtStart()).isTrue()
+            assertThat(event.cleanDuration()).isTrue()
+            assertThat(event.cleanDtEnd()).isTrue()
+            val startDate = ZonedDateTime.of(
+                LocalDate.of(2022, 10, 30),
+                LocalTime.of(3, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            val endDate = ZonedDateTime.of(
+                LocalDate.of(2022, 10, 30),
+                LocalTime.of(4, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(Date.from(startDate), true)
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(Date.from(endDate), true)
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration with three hours DURATION and no DTEND taking DST - 1 into account test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    DTSTAMP:20190719T130854Z
+    CREATED:20200505T173304Z
+    LAST-MODIFIED:20200505T173304Z
+    UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
+    DTSTART;TZID=Europe/Zurich:20221030T010000
+    DURATION:PT3H
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:API deploy
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val defaultTimezone = "Europe/Zurich"
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanDtStart()).isTrue()
+            assertThat(event.cleanDuration()).isTrue()
+            assertThat(event.cleanDtEnd()).isTrue()
+            val startDate = ZonedDateTime.of(
+                LocalDate.of(2022, 10, 30),
+                LocalTime.of(1, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            val endDate = ZonedDateTime.of(
+                LocalDate.of(2022, 10, 30),
+                LocalTime.of(3, 0),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(Date.from(startDate), true)
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(Date.from(endDate), true)
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration with one day DURATION and no DTEND taking DST - 1 into account test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    BEGIN:VEVENT
+    DTSTAMP:20190719T130854Z
+    CREATED:20200505T173304Z
+    LAST-MODIFIED:20200505T173304Z
+    UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
+    DTSTART;TZID=Europe/Zurich:20221030T013000
+    DURATION:PT1D
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:API deploy
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val defaultTimezone = "Europe/Zurich"
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
+        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
+        val cleanICalString = cleanRawIcsResult.cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.cleanDtStart()).isTrue()
+            assertThat(event.cleanDuration()).isTrue()
+            assertThat(event.cleanDtEnd()).isTrue()
+            val startDate = ZonedDateTime.of(
+                LocalDate.of(2022, 10, 30),
+                LocalTime.of(1, 30),
+                ZoneId.of(defaultTimezone)
+            ).toInstant()
+            val endDate = ZonedDateTime.of(
+                LocalDate.of(2022, 10, 31),
+                LocalTime.of(0, 30),
                 ZoneId.of(defaultTimezone)
             ).toInstant()
             assertThat(event.dateStart.value).isEqualTo(
