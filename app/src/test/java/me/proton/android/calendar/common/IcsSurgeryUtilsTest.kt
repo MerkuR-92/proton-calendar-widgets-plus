@@ -750,7 +750,7 @@ internal class IcsSurgeryUtilsTest {
     CREATED:20200505T173304Z
     LAST-MODIFIED:20200505T173304Z
     UID:6c4ad96a-632f-4b24-bdee-f5e048f70a0c@proton.test
-    DTSTART;VALUE=DATE:20380102
+    DTSTART;VALUE=DATE:20220102
     DURATION:PT15M
     SEQUENCE:0
     STATUS:CONFIRMED
@@ -767,7 +767,28 @@ internal class IcsSurgeryUtilsTest {
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
         iCalendar.events.forEach { event ->
-            assertThat(event.cleanDuration()).isFalse()
+            assertThat(event.cleanDtStart()).isTrue()
+            assertThat(event.cleanDuration()).isTrue()
+            assertThat(event.cleanDtEnd()).isTrue()
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2022, 1, 2, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2022, 1, 3, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.duration).isNull()
         }
     }
 
