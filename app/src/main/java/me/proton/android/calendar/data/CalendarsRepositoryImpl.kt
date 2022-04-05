@@ -928,9 +928,16 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun persistEvents(vararg events: EventEntity) {
-
-        // update local database first
-        database.eventsDao().updateOrInsert(*events)
+        val eventsByCalendar = events.groupBy { it.calendarId }
+        database.inTransaction {
+            eventsByCalendar.forEach {
+                if (database.calendarsDao().hasCalendar(it.key)) {
+                    database.eventsDao().updateOrInsert(*it.value.toTypedArray())
+                } else {
+                    logger.i("persistEvents couldn't insert because calendar doesn't exist")
+                }
+            }
+        }
     }
 
     override suspend fun deleteEventsById(ids: List<String>) {
