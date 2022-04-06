@@ -20,8 +20,8 @@
         android:id="@+id/event_attendees_icon"
         style="@style/Icon"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/event_attendees_title"
         app:layout_constraintTop_toTopOf="@id/event_attendees_title"
-        android:layout_marginStart="@dimen/spacing_page"
         app:srcCompat="@drawable/ic_contact_groups" />
 
     <TextView
