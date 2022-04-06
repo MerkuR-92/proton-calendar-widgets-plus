@@ -16,6 +16,8 @@ import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
+import kotlinx.android.synthetic.main.event_info.view.view_calendar_bar
+import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
 import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
@@ -77,7 +79,7 @@ class EventAdapter(
             itemView
         ) {
 
-            private val imageViewIcon: ImageView = itemView.findViewById(R.id.image_icon)
+            private val imageViewIcon: View = itemView.findViewById(R.id.image_icon)
             private val textViewHeader: TextView = itemView.findViewById(R.id.text_header)
             private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
             private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
@@ -91,11 +93,11 @@ class EventAdapter(
                 val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
 
                 if (!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION) {
-                    imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_event_unanswered_circle))
+                    imageViewIcon.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
                 } else {
-                    imageViewIcon.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.shape_calendar_circle))
+                    imageViewIcon.setBackgroundResource(R.drawable.shape_calendar_bar)
                 }
-                imageViewIcon.drawable.setTint(Color.parseColor(event.calendar.color))
+                imageViewIcon.background.setTint(Color.parseColor(event.calendar.color))
 
                 textViewHeader.text =
                     "${(event.getOccurrenceStart(

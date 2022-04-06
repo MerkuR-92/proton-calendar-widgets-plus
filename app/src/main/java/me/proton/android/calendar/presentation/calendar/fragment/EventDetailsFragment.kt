@@ -428,7 +428,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // Set default style for calendar bar (overridden by part stat if user is attendee)
-            setCalendarBar(event.calendar.color, null, event.isCancelled())
+            setCalendarBar(event.calendar.color, null)
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
@@ -460,7 +460,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     val userEmails = userAddresses.map { it.email }
                     val participationStatus = event.getParticipationStatus(userEmails)
 
-                    setCalendarBar(event.calendar.color, participationStatus, event.isCancelled())
+                    setCalendarBar(event.calendar.color, participationStatus)
 
                     displayAttendeeAnswerState(participationStatus, false)
 
@@ -471,7 +471,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             with(section_event_info) {
 
                 if (event.isCancelled()) {
-                    setCalendarBar(event.calendar.color, null, true)
                     this.text_status.visibleOrGone(true)
                     this.text_status.text = getString(R.string.event_status_canceled)
                 }
@@ -567,20 +566,13 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         })
     }
 
-    private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {
-        if (participationStatus == ParticipationStatus.TENTATIVE) {
+    private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?) {
+        if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
             section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
-            section_event_info.view_calendar_bar.background.setTint(Color.parseColor(calendarColor))
         } else {
-            section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar_outlined)
-            (section_event_info.view_calendar_bar.background as GradientDrawable).apply {
-                setStroke(requireContext().dpToPixel(2), Color.parseColor(calendarColor))
-                setColor(
-                    if (participationStatus == ParticipationStatus.DECLINED || isCancelled) ContextCompat.getColor(requireContext(), R.color.background_norm)
-                    else Color.parseColor(calendarColor)
-                )
-            }
+            section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar)
         }
+        section_event_info.view_calendar_bar.background.setTint(Color.parseColor(calendarColor))
     }
 
     /**
