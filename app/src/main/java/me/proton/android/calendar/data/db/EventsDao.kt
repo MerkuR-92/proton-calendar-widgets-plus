@@ -50,6 +50,7 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT COUNT(id) FROM events WHERE sharedEvents LIKE '%UID:' || :uid || '%'")
     abstract suspend fun countByUid(uid: String): Int
 
+    @Transaction
     @Query("SELECT EXISTS(SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId)")
     abstract suspend fun hasEvent(eventId: String, calendarId: String): Boolean
 
