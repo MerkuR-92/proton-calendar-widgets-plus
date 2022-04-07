@@ -39,53 +39,6 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
         }
     }
 
-    override fun signTextDetached(
-        plainText: String,
-        armoredPrivateKey: String,
-        passphrase: ByteArray
-    ) : String? {
-        return try {
-            val privateKeyRing: KeyRing = createAndUnlockKeyring(armoredPrivateKey, passphrase)
-            val result = privateKeyRing.signDetached(PlainMessage(plainText)).armored
-            privateKeyRing.clearPrivateParams()
-            return result
-        } catch (e: java.lang.Exception) {
-            logger.i("signTextDetached failed", e)
-            null
-        }
-    }
-
-    override fun verifyTextDetached(
-        plainText: String,
-        armoredSignature: String,
-        armoredPublicKeys: List<String>
-    ): Boolean {
-        return try {
-            val keyring = newKeyRing(null)
-            armoredPublicKeys.forEach { keyring.addKey(newKeyFromArmored(it)) }
-            keyring.verifyDetached(PlainMessage(plainText), PGPSignature(armoredSignature), 0L) // TODO handle actual error? use different method?
-            true
-        } catch (e: Exception) {
-//            logger.i("verifyTextDetached failed", e)
-            false
-        }
-    }
-
-    override fun decryptText(
-        cipherText: String,
-        armoredPrivateKey: String,
-        passphrase: ByteArray
-    ): String? {
-        return try {
-            Helper.decryptMessageArmored(armoredPrivateKey, passphrase, cipherText)
-        } catch (e: Exception) {
-            if (e.message?.contains("incorrect key") == false) {
-                logger.i("decrypt failed", e)
-            }
-            null
-        }
-    }
-
     override fun decryptText(
         cipherText: String,
         armoredPrivateKeys: List<String>,
@@ -183,39 +136,6 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
         }
     }
 
-    override fun encryptSignText(plaintext: String, armoredPublicKey: String, privateKey: String, passphrase: ByteArray): String? {
-        return try {
-            Helper.encryptSignMessageArmored(armoredPublicKey, privateKey, passphrase, plaintext)
-        } catch (e: Exception) {
-            logger.i("encrypt text with public key failed", e)
-            null
-        }
-    }
-
-    override fun encryptTextWithPassphrase(
-        plainText: String,
-        passphrase: ByteArray
-    ): String? {
-        return try {
-            Helper.encryptMessageWithPassword(passphrase, plainText)
-        } catch (e: Exception) {
-            logger.i("encrypt text with passphrase failed", e)
-            null
-        }
-    }
-
-    override fun decryptTextWithPassphrase(
-        encodedText: String,
-        passphrase: ByteArray
-    ): String? {
-        return try {
-            Helper.decryptMessageWithPassword(passphrase, encodedText)
-        } catch (e: Exception) {
-            logger.i("encrypt text with passphrase failed", e)
-            null
-        }
-    }
-
     override fun getArmoredPublicKey(armoredKey: String): String? {
         return try {
             Armor.armorKey(newKeyFromArmored(armoredKey).publicKey)
@@ -257,10 +177,6 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
             logger.i("generate and encrypt ECC key failed", e)
             null
         }
-    }
-
-    private fun createAndUnlockKeyring(armoredPrivateKey: String, passphrase: ByteArray) : KeyRing {
-        return newKeyRing(newKeyFromArmored(armoredPrivateKey).unlock(passphrase))
     }
 
 }

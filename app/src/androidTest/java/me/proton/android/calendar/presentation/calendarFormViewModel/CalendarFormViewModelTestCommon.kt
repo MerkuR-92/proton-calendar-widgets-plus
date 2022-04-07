@@ -37,6 +37,7 @@ open class CalendarFormViewModelTestCommon: KoinComponent {
     val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
     val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     val updateCalendarSettingsUseCaseMock: UpdateCalendarSettingsUseCase = mockk()
+    val updateCalendarUserSettingsUseCaseMock: UpdateCalendarUserSettingsUseCase = mockk()
     val createCalendarsUseCaseMock: CreateCalendarUseCase = mockk()
     val accountManagerMock: AccountManager = mockk()
 
@@ -72,7 +73,8 @@ open class CalendarFormViewModelTestCommon: KoinComponent {
             resourceProvider = resourceProviderMock,
             accountManager = accountManagerMock,
             createCalendarUseCase = createCalendarsUseCaseMock,
-            updateCalendarSettingsUseCase = updateCalendarSettingsUseCaseMock
+            updateCalendarSettingsUseCase = updateCalendarSettingsUseCaseMock,
+            updateCalendarUserSettingsUseCase = updateCalendarUserSettingsUseCaseMock
         )
     }
 

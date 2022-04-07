@@ -16,29 +16,6 @@ interface Crypto {
     fun checkPassphrase(armoredKey: String, passphrase: ByteArray): Boolean
 
     /**
-     * Signs plaintext using private key.
-     */
-    fun signTextDetached(
-        plainText: String,
-        armoredPrivateKey: String,
-        passphrase: ByteArray
-    ): String?
-
-    /**
-     * Verifies plaintext signature, success if at least one key verifies signature correctly.
-     */
-    fun verifyTextDetached(
-        plainText: String,
-        armoredSignature: String,
-        armoredPublicKeys: List<String>
-    ): Boolean
-
-    /**
-     * Decrypts text using private key.
-     */
-    fun decryptText(cipherText: String, armoredPrivateKey: String, passphrase: ByteArray): String?
-
-    /**
      * Decrypts text using private key.
      */
     fun decryptText(cipherText: String, armoredPrivateKeys: List<String>, passphrase: ByteArray): String?
@@ -62,21 +39,6 @@ interface Crypto {
      * Encrypts session key with the given public key and returns Base64 encoded key packet
      */
     fun getKeyPacket(sessionKey: SessionKey, publicKey: String): String?
-
-    /**
-     * Encrypts plaintext with SessionKey and returns Armored PGPMessage as String. This message contains DataPacket but no KeyPacket.
-     */
-    fun encryptSignText(plaintext: String, armoredPublicKey: String, privateKey: String, passphrase: ByteArray): String?
-
-    /**
-     * EncryptMessageWithPassword encrypts a string with a passphrase using AES256.
-     */
-    fun encryptTextWithPassphrase(plainText: String, passphrase: ByteArray): String?
-
-    /**
-     * DecryptMessageWithPassword decrypts a string with a passphrase using AES256.
-     */
-    fun decryptTextWithPassphrase(encodedText: String, passphrase: ByteArray): String?
 
     /**
      * Extracts public key from supplied key (private or public).
