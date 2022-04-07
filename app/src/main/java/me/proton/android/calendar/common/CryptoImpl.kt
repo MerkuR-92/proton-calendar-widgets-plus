@@ -15,6 +15,7 @@ import com.proton.gopenpgp.crypto.SessionKey
 import com.proton.gopenpgp.helper.Helper
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
@@ -102,7 +103,16 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
                 }
             }
 
-            keyRing.decrypt(PGPMessage(cipherText), null, 0L).string
+            String(
+                keyRing.decrypt(
+                    PGPMessage(
+                        cipherText
+                    ),
+                    null,
+                    0L
+                ).data,
+                StandardCharsets.UTF_8
+            )
         } catch (e: Exception) {
             if (e.message?.contains("incorrect key") == false) {
                 logger.i("decrypt failed", e)
@@ -157,7 +167,16 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
 
     override fun encryptText(plainText: String, sessionKey: SessionKey): String? {
         return try {
-            Base64.encodeToString(PGPMessage(sessionKey.encrypt(PlainMessage(plainText))).data, Base64.DEFAULT)
+            Base64.encodeToString(
+                PGPMessage(
+                    sessionKey.encrypt(
+                        PlainMessage(
+                            plainText.toByteArray()
+                        )
+                    )
+                ).data,
+                Base64.DEFAULT
+            )
         } catch (e: Exception) {
             logger.i("encrypt text with session key failed", e)
             null
@@ -174,8 +193,8 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
     }
 
     override fun encryptTextWithPassphrase(
-    plainText: String,
-    passphrase: ByteArray
+        plainText: String,
+        passphrase: ByteArray
     ): String? {
         return try {
             Helper.encryptMessageWithPassword(passphrase, plainText)
