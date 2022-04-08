@@ -4,21 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/spacing_element"
+    android:paddingBottom="@dimen/spacing_element_small"
     android:paddingLeft="@dimen/spacing_page"
     android:paddingRight="@dimen/spacing_page"
     android:background="?selectableItemBackground"
     >
 
-    <ImageView
+    <View
         android:id="@+id/image_icon"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginTop="@dimen/spacing_page"
-        app:tint="@color/brand_norm"
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/brand_norm"
+        android:background="@drawable/shape_calendar_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/shape_calendar_circle" />
+        app:layout_constraintBottom_toBottomOf="@+id/text_subheader"/>
 
     <TextView
         android:id="@+id/text_header"
@@ -27,10 +28,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_element"
         android:layout_marginEnd="@dimen/spacing_page"
-        app:layout_constraintBottom_toBottomOf="@+id/image_icon"
+        android:layout_marginTop="@dimen/spacing_element_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/image_icon"
-        app:layout_constraintTop_toTopOf="@+id/image_icon"
+        app:layout_constraintTop_toTopOf="parent"
         android:maxLines="1"
         android:ellipsize="end"
         tools:text="Klosterstraße 44, 10179 Berlin, Germany" />

@@ -2,9 +2,9 @@ package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.util.TypedValue
 import android.view.View
@@ -31,22 +31,52 @@ import biweekly.property.Attendee
 import biweekly.property.Organizer
 import biweekly.property.Status
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.event_attendees_view.*
-import kotlinx.android.synthetic.main.event_info.view.*
-import kotlinx.android.synthetic.main.fragment_base_dialog.*
-import kotlinx.android.synthetic.main.fragment_event_details.*
-import kotlinx.android.synthetic.main.item_attendee.view.*
-import kotlinx.android.synthetic.main.item_change_answer.view.*
-import kotlinx.android.synthetic.main.item_change_answer_button.view.*
-import kotlinx.android.synthetic.main.item_form_section.view.*
-import kotlinx.android.synthetic.main.item_mini_calendar.view.*
+import kotlinx.android.synthetic.main.event_attendees_view.event_attendee_list
+import kotlinx.android.synthetic.main.event_attendees_view.event_attendee_organizer_layout
+import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_button
+import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_description
+import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_press
+import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_title
+import kotlinx.android.synthetic.main.event_info.view.text_date_time
+import kotlinx.android.synthetic.main.event_info.view.text_recurrence
+import kotlinx.android.synthetic.main.event_info.view.text_status
+import kotlinx.android.synthetic.main.event_info.view.text_summary
+import kotlinx.android.synthetic.main.event_info.view.view_calendar_bar
+import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
+import kotlinx.android.synthetic.main.fragment_event_details.section_alarms
+import kotlinx.android.synthetic.main.fragment_event_details.section_answer
+import kotlinx.android.synthetic.main.fragment_event_details.section_attendees
+import kotlinx.android.synthetic.main.fragment_event_details.section_calendar
+import kotlinx.android.synthetic.main.fragment_event_details.section_description
+import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
+import kotlinx.android.synthetic.main.fragment_event_details.section_location
+import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_description
+import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_initials
+import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_status
+import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_title
+import kotlinx.android.synthetic.main.item_change_answer.view.item_change_answer_button_maybe
+import kotlinx.android.synthetic.main.item_change_answer.view.item_change_answer_button_no
+import kotlinx.android.synthetic.main.item_change_answer.view.item_change_answer_button_yes
+import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_layout
+import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_loader
+import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_press
+import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_title
+import kotlinx.android.synthetic.main.item_form_section.view.image_button_action
+import kotlinx.android.synthetic.main.item_form_section.view.image_dot_icon
+import kotlinx.android.synthetic.main.item_form_section.view.image_icon
+import kotlinx.android.synthetic.main.item_form_section.view.text_header
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.ATTENDEE_AUTO_EXPAND_LIMIT
+import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.getParticipationStatusPriorityValue
@@ -59,30 +89,23 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartEndForActualEndDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
-import me.proton.android.calendar.presentation.main.MainActivity
-import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.AttendeeListAdapter
 import me.proton.android.calendar.presentation.calendar.adapter.initAttendeeStatus
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
-import me.proton.core.crypto.common.pgp.VerificationStatus
+import me.proton.android.calendar.presentation.main.MainActivity
+import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
 import me.proton.core.util.kotlin.nullIfBlank
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.inject
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
@@ -404,6 +427,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
+            // Set default style for calendar bar (overridden by part stat if user is attendee)
+            setCalendarBar(event.calendar.color, null)
+
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
 
@@ -433,6 +459,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     val userAddresses = calendarViewModel.getUserAddresses() ?: return@launch
                     val userEmails = userAddresses.map { it.email }
                     val participationStatus = event.getParticipationStatus(userEmails)
+
+                    setCalendarBar(event.calendar.color, participationStatus)
+
                     displayAttendeeAnswerState(participationStatus, false)
 
                     handleAttendeeAnswerViewVisibility(userAddresses)
@@ -441,13 +470,9 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             with(section_event_info) {
 
-                this.view_calendar_bar.background.setTint(Color.parseColor(event.calendar.color))
-
-                if (event.status != null) {
-                    if ((event.status as Status).isCancelled) {
-                        this.text_status.visibleOrGone(true)
-                        this.text_status.text = getString(R.string.event_status_canceled)
-                    }
+                if (event.isCancelled()) {
+                    this.text_status.visibleOrGone(true)
+                    this.text_status.text = getString(R.string.event_status_canceled)
                 }
 
                 this.text_summary.text =
@@ -539,6 +564,15 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 movementMethod = LinkMovementMethod.getInstance()
             }*/
         })
+    }
+
+    private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?) {
+        if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+            section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
+        } else {
+            section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar)
+        }
+        section_event_info.view_calendar_bar.background.setTint(Color.parseColor(calendarColor))
     }
 
     /**

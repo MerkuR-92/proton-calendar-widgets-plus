@@ -10,8 +10,8 @@
     <ImageView
         android:id="@+id/image_icon"
         style="@style/Icon"
-        android:layout_marginStart="@dimen/default_inner_padding_start"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/text_header"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_map_marker"
         app:tint="@color/icon_norm"
