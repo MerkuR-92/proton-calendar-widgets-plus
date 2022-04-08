@@ -74,7 +74,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
 
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
         if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             val iCalendar = cleanIcsResult.iCalendar
@@ -111,7 +111,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
 
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
         if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             val iCalendar = cleanIcsResult.iCalendar!!
@@ -142,9 +142,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -173,7 +172,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanICalString = iCalString.cleanRawIcs()
 
-        assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty)
+        assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty).isTrue()
     }
 
     @Test
@@ -198,7 +197,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanICalString = cleanIcs(iCalString)
 
-        assert(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty)
+        assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty).isTrue()
     }
 
     @Test
@@ -223,9 +222,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -267,9 +265,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -310,9 +307,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -341,9 +337,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -373,7 +368,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
 
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version)
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version).isTrue()
     }
 
     @Test
@@ -399,7 +394,7 @@ internal class IcsSurgeryUtilsTest {
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
 
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version)
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version).isTrue()
     }
 
     @Test
@@ -423,9 +418,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -454,9 +448,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -486,9 +479,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -519,9 +511,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -551,9 +542,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -584,9 +574,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -605,9 +594,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
 //        val cleanRawIcsResult = iCalString.cleanRawIcs()
-//        assert(cleanRawIcsResult is IcsSurgeryUtils.IcsParsingResult.RawParsingSuccessful)
-//        if (cleanRawIcsResult !is IcsSurgeryUtils.IcsParsingResult.RawParsingSuccessful) return
-//        val cleanICalString = cleanRawIcsResult.cleanICalString
+//        assertThat(cleanRawIcsResult is IcsSurgeryUtils.IcsParsingResult.RawParsingSuccessful).isTrue()
+//        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.IcsParsingResult.RawParsingSuccessful).cleanICalString
 
 //        val iCalendar = Biweekly.parse(cleanICalString).first()
 //        assertThat(iCalendar).isNotNull()
@@ -636,9 +624,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -668,9 +655,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -700,9 +686,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -733,9 +718,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -766,9 +750,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -818,9 +801,8 @@ internal class IcsSurgeryUtilsTest {
         val defaultTimezone = "Europe/Zurich"
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -868,9 +850,8 @@ internal class IcsSurgeryUtilsTest {
         val defaultTimezone = "Europe/Zurich"
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -918,9 +899,8 @@ internal class IcsSurgeryUtilsTest {
         val defaultTimezone = "Europe/Zurich"
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -968,9 +948,8 @@ internal class IcsSurgeryUtilsTest {
         val defaultTimezone = "Europe/Zurich"
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1018,9 +997,8 @@ internal class IcsSurgeryUtilsTest {
         val defaultTimezone = "Europe/Zurich"
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1068,9 +1046,8 @@ internal class IcsSurgeryUtilsTest {
         val defaultTimezone = "Europe/Zurich"
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1113,9 +1090,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1168,9 +1144,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1223,9 +1198,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1279,9 +1253,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1335,9 +1308,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar?.events?.forEach { event ->
@@ -1385,9 +1357,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1417,9 +1388,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1450,9 +1420,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1484,9 +1453,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1518,9 +1486,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1552,9 +1519,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1587,9 +1553,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1620,9 +1585,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1654,9 +1618,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1688,9 +1651,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1722,9 +1684,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1756,9 +1717,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1790,9 +1750,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1824,9 +1783,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1855,9 +1813,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1887,9 +1844,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1928,9 +1884,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -1969,9 +1924,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2009,9 +1963,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2042,9 +1995,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2095,9 +2047,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar!!.events.forEach { event ->
@@ -2153,9 +2104,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar!!.events.forEach { event ->
@@ -2191,9 +2141,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar!!.events.forEach { event ->
@@ -2224,9 +2173,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar!!.events.forEach { event ->
@@ -2276,9 +2224,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanIcsResult = cleanIcs(iCalString)
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
-        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
-        val iCalendar = cleanIcsResult.iCalendar
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
         assertThat(iCalendar).isNotNull()
         iCalendar!!.events.forEach { event ->
@@ -2308,9 +2255,8 @@ internal class IcsSurgeryUtilsTest {
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2357,9 +2303,8 @@ internal class IcsSurgeryUtilsTest {
         val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2445,9 +2390,8 @@ END:VCALENDAR
         val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2496,9 +2440,8 @@ END:VCALENDAR
         val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2546,9 +2489,8 @@ END:VCALENDAR
         val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2645,7 +2587,7 @@ END:VCALENDAR
 
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
 
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
         if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             val iCalendar = cleanIcsResult.iCalendar!!
@@ -2679,9 +2621,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2732,9 +2673,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2766,9 +2706,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2804,9 +2743,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2848,9 +2786,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2884,9 +2821,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2934,9 +2870,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -2984,9 +2919,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -3016,9 +2950,8 @@ END:VCALENDAR
     """.trimIndent()
 
         val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assert(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful)
-        if (cleanRawIcsResult !is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) return
-        val cleanICalString = cleanRawIcsResult.cleanICalString
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
 
         val iCalendar = Biweekly.parse(cleanICalString).first()
         assertThat(iCalendar).isNotNull()
@@ -3059,7 +2992,7 @@ END:VCALENDAR
 
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
 
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
         if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             val iCalendar = cleanIcsResult.iCalendar
@@ -3083,7 +3016,7 @@ END:VCALENDAR
             val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
 
             print("File tested: ${it.name}\n")
-            assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error)
+            assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error).isTrue()
         }
     }
 
@@ -3102,7 +3035,7 @@ END:VCALENDAR
             val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
 
             print("File tested: ${it.name}\n")
-            assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+            assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         }
     }
 
@@ -3115,6 +3048,6 @@ END:VCALENDAR
 
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
 
-        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error)
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error).isTrue()
     }
 }
