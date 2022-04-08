@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.annotation.VisibleForTesting
 import biweekly.property.RecurrenceId
 import kotlinx.coroutines.*
@@ -932,7 +933,18 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.inTransaction {
             eventsByCalendar.forEach {
                 if (database.calendarsDao().hasCalendar(it.key)) {
-                    database.eventsDao().updateOrInsert(*it.value.toTypedArray())
+                    try {
+                        database.eventsDao().updateOrInsert(*it.value.toTypedArray())
+                    } catch (e: SQLiteConstraintException) {
+                        // hack for different SQLite implementations formatting message differently
+                        if (e.message?.contains("787") == true
+                            && e.message?.contains("foreign", ignoreCase = true) == true
+                            && e.message?.contains("constraint", ignoreCase = true) == true
+                        ) {
+                            // ignore, it means this Event's Calendar doesn't exist
+                            logger.e("persistEvents couldn't insert because ${e.message}", e)
+                        } else throw e
+                    }
                 } else {
                     logger.i("persistEvents couldn't insert because calendar doesn't exist")
                 }
@@ -1104,7 +1116,18 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun persistEventAlarm(logger: Logger, eventAlarm: EventAlarmEntity) {
         database.inTransaction {
             if (database.eventsDao().hasEvent(eventAlarm.eventId, eventAlarm.calendarId)) {
-                database.eventAlarmsDao().updateOrInsertReplacing(logger, eventAlarm)
+                try {
+                    database.eventAlarmsDao().updateOrInsert(eventAlarm)
+                } catch (e: SQLiteConstraintException) {
+                    // hack for different SQLite implementations formatting message differently
+                    if (e.message?.contains("787") == true
+                        && e.message?.contains("foreign", ignoreCase = true) == true
+                        && e.message?.contains("constraint", ignoreCase = true) == true
+                    ) {
+                        // ignore, it means this EventAlarms' Event doesn't exist
+                        logger.e("persistEventAlarm couldn't insert because ${e.message}", e)
+                    } else throw e
+                }
             } else {
                 logger.i("persistEventAlarm, event doesn't exist")
             }

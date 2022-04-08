@@ -11,6 +11,7 @@ import biweekly.io.TimezoneAssignment
 import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
+import biweekly.util.Duration
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
@@ -568,7 +569,7 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     override fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
-        return this.distinctBy { "${it.eventId} ${it.occurrence} ${it.trigger} ${it.action}" }
+        return this.distinctBy { "${it.eventId} ${it.occurrence} ${Duration.parse(it.trigger).toMillis()} ${it.action}" }
     }
 
     /**

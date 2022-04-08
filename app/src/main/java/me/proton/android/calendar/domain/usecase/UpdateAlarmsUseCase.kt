@@ -32,13 +32,17 @@ class UpdateAlarmsUseCase @Inject constructor(
         logger.v("executing UpdateAlarmsUseCase")
 
         val eventChains = eventIds.mapNotNull {
-            val originalEvent = database.eventsDao().selectById(it)?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            val dbOriginalEvent = database.eventsDao().selectById(it)
+            val originalEvent = dbOriginalEvent?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
                 eventDecryptor.decrypt(it)
             } else {
                 transformEventUseCase.execute(it)
             } }
 
-            if (originalEvent == null) {
+            if (dbOriginalEvent == null) {
+                logger.e("could not get dbOriginalEvent in UpdateAlarmsUseCase")
+                null
+            } else if (originalEvent == null) {
                 logger.e("could not transform event in UpdateAlarmsUseCase")
                 null
             } else {

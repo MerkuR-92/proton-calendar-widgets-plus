@@ -474,6 +474,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             event.location?.nullIfBlank()?.let {
                 with(section_location) {
                     text_header.text = event.location
+                    Linkify.addLinks(text_header, Linkify.ALL)
                     val typedValue = TypedValue()
                     requireContext().theme.resolveAttribute(
                         android.R.attr.selectableItemBackground,
