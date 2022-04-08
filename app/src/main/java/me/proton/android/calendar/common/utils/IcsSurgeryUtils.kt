@@ -50,6 +50,7 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.ceil
 
 object IcsSurgeryUtils {
 
@@ -349,10 +350,14 @@ object IcsSurgeryUtils {
                 if (this.dateStart.value.hasTime()) {
                     this.duration.value.toMillis()
                 } else {
-                    val durationInDays = TimeUnit.MILLISECONDS.toDays(this.duration.value.toMillis())
+                    // Round up
+                    val durationInMsDouble = this.duration.value.toMillis().toDouble()
+                    val oneDayAsMsDouble = TimeUnit.DAYS.toMillis(1).toDouble()
+                    val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
+                    val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
                     TimeUnit.DAYS.toMillis(
-                        if (durationInDays == 0L) 1
-                        else durationInDays
+                        if (durationInDaysRoundedUp == 0L) 1
+                        else durationInDaysRoundedUp
                     )
                 }
             dateEnd.time += durationInMillis
