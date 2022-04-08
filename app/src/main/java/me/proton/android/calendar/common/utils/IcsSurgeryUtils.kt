@@ -343,28 +343,32 @@ object IcsSurgeryUtils {
     }
 
     fun VEvent.cleanDuration(): Boolean {
+        // DURATION: This property (to specify duration of events instead of a DTEND) is not supported.
+        return !(this.duration?.value != null && this.dateEnd?.value == null)
+
+        // TODO Enable once fixed for all days
         // DURATION property should be transformed into the corresponding DTEND
-        if (this.duration?.value != null && this.dateEnd?.value == null) {
-            val dateEnd = this.dateStart.value.clone() as ICalDate
-            val durationInMillis =
-                if (this.dateStart.value.hasTime()) {
-                    this.duration.value.toMillis()
-                } else {
-                    // Round up
-                    val durationInMsDouble = this.duration.value.toMillis().toDouble()
-                    val oneDayAsMsDouble = TimeUnit.DAYS.toMillis(1).toDouble()
-                    val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
-                    val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
-                    TimeUnit.DAYS.toMillis(
-                        if (durationInDaysRoundedUp == 0L) 1
-                        else durationInDaysRoundedUp
-                    )
-                }
-            dateEnd.time += durationInMillis
-            this.setDateEnd(dateEnd)
-            this.removeProperty(this.duration)
-        }
-        return true
+//        if (this.duration?.value != null && this.dateEnd?.value == null) {
+//            val dateEnd = this.dateStart.value.clone() as ICalDate
+//            val durationInMillis =
+//                if (this.dateStart.value.hasTime()) {
+//                    this.duration.value.toMillis()
+//                } else {
+//                    // Round up
+//                    val durationInMsDouble = this.duration.value.toMillis().toDouble()
+//                    val oneDayAsMsDouble = TimeUnit.DAYS.toMillis(1).toDouble()
+//                    val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
+//                    val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
+//                    TimeUnit.DAYS.toMillis(
+//                        if (durationInDaysRoundedUp == 0L) 1
+//                        else durationInDaysRoundedUp
+//                    )
+//                }
+//            dateEnd.time += durationInMillis
+//            this.setDateEnd(dateEnd)
+//            this.removeProperty(this.duration)
+//        }
+//        return true
     }
 
     fun VEvent.cleanDtEnd(): Boolean {
