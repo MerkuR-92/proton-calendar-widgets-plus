@@ -41,6 +41,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
 import java.time.LocalDate
@@ -343,32 +344,28 @@ object IcsSurgeryUtils {
     }
 
     fun VEvent.cleanDuration(): Boolean {
-        // DURATION: This property (to specify duration of events instead of a DTEND) is not supported.
-        return !(this.duration?.value != null && this.dateEnd?.value == null)
-
-        // TODO Enable once fixed for all days
         // DURATION property should be transformed into the corresponding DTEND
-//        if (this.duration?.value != null && this.dateEnd?.value == null) {
-//            val dateEnd = this.dateStart.value.clone() as ICalDate
-//            val durationInMillis =
-//                if (this.dateStart.value.hasTime()) {
-//                    this.duration.value.toMillis()
-//                } else {
-//                    // Round up
-//                    val durationInMsDouble = this.duration.value.toMillis().toDouble()
-//                    val oneDayAsMsDouble = TimeUnit.DAYS.toMillis(1).toDouble()
-//                    val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
-//                    val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
-//                    TimeUnit.DAYS.toMillis(
-//                        if (durationInDaysRoundedUp == 0L) 1
-//                        else durationInDaysRoundedUp
-//                    )
-//                }
-//            dateEnd.time += durationInMillis
-//            this.setDateEnd(dateEnd)
-//            this.removeProperty(this.duration)
-//        }
-//        return true
+        val dateEnd = this.dateStart.value.clone() as ICalDate
+        if (this.duration?.value != null && this.dateEnd?.value == null) {
+            if (this.dateStart.value.hasTime()) {
+                val durationInMillis = this.duration.value.toMillis()
+                dateEnd.time += durationInMillis
+                this.setDateEnd(dateEnd)
+            } else {
+                // Round up
+                val durationInMsDouble = this.duration.value.toMillis().toDouble()
+                val oneDayAsMsDouble = TimeUnit.DAYS.toMillis(1).toDouble()
+                val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
+                val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
+                dateEnd.time = this.dateStart.value.toZonedDateTime(ZoneId.systemDefault().id).plusDays(
+                    if (durationInDaysRoundedUp == 0L) 1
+                    else durationInDaysRoundedUp
+                ).toInstant().toEpochMilli()
+                this.setDateEnd(dateEnd)
+            }
+            this.removeProperty(this.duration)
+        }
+        return true
     }
 
     fun VEvent.cleanDtEnd(): Boolean {

@@ -744,7 +744,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with DURATION and no DTEND test`() {
 
@@ -795,7 +794,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with one hour DURATION and no DTEND taking DST + 1 into account test`() {
 
@@ -846,7 +844,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with three hour DURATION and no DTEND taking DST + 1 into account test`() {
 
@@ -897,7 +894,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with one day DURATION and no DTEND taking DST + 1 into account test`() {
 
@@ -948,7 +944,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with one hour DURATION and no DTEND taking DST - 1 into account test`() {
 
@@ -999,7 +994,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with three hours DURATION and no DTEND taking DST - 1 into account test`() {
 
@@ -1050,7 +1044,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with one day DURATION and no DTEND taking DST - 1 into account test`() {
 
@@ -1101,7 +1094,6 @@ internal class IcsSurgeryUtilsTest {
         }
     }
 
-    @Disabled
     @Test
     fun `cleanDuration with 36h DURATION and no DTEND test`() {
 
@@ -1141,6 +1133,228 @@ internal class IcsSurgeryUtilsTest {
                     Date.from(
                         ZonedDateTime.of(
                             2021, 10, 7, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration Event starting in one month winter time and ending in another summer time, 32 days with DURATION no DTEND test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20230301
+    DURATION:P32D
+    RRULE:FREQ=MONTHLY;INTERVAL=4;BYMONTHDAY=1
+    DTSTAMP:20220407T081949Z
+    UID:3c8isbf74qqpa679ns3lifb39a21@google.com
+    X-MICROSOFT-CDO-OWNERAPPTID:1096650366
+    CREATED:20220407T081948Z
+    LAST-MODIFIED:20220407T081948Z
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Event starting in one month and ending in another, 32 days with duration
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar?.events?.forEach { event ->
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 3, 1, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 4, 2, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration Event starting in one month summer time and ending in another winter time, 32 days with DURATION no DTEND test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20231015
+    DURATION:P32D
+    RRULE:FREQ=MONTHLY;INTERVAL=4;BYMONTHDAY=15
+    DTSTAMP:20220407T081949Z
+    UID:3c8isbf74qqpa679ns3lifb39a21@google.com
+    X-MICROSOFT-CDO-OWNERAPPTID:1096650366
+    CREATED:20220407T081948Z
+    LAST-MODIFIED:20220407T081948Z
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Event starting in one month and ending in another, 32 days with duration
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar?.events?.forEach { event ->
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 10, 15, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 11, 16, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration Event starting in one month and ending in another, 3 weeks with DURATION no DTEND, starts on 18 test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20230318
+    DURATION:P3W
+    RRULE:FREQ=MONTHLY;INTERVAL=4;BYMONTHDAY=18
+    DTSTAMP:20220407T081949Z
+    UID:3c8isbf74qqpa679ns3lifb39a21124518@google.com
+    X-MICROSOFT-CDO-OWNERAPPTID:1096650366
+    CREATED:20220407T081948Z
+    LAST-MODIFIED:20220407T081948Z
+    LOCATION:Every 4 months
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Event starting in one month and ending in another, 3 weeks with duration, starts on 18
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar?.events?.forEach { event ->
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 3, 18, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 4, 8, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.duration).isNull()
+        }
+    }
+
+    @Test
+    fun `cleanDuration Event starting in one month and ending in another, 6 weeks with DURATION no DTEND test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20230301
+    DURATION:P4W
+    RRULE:FREQ=MONTHLY;INTERVAL=4;BYMONTHDAY=1
+    DTSTAMP:20220407T081949Z
+    UID:3c8isbf74qqpa679ns3lifb39a2112@google.com
+    X-MICROSOFT-CDO-OWNERAPPTID:1096650366
+    CREATED:20220407T081948Z
+    LAST-MODIFIED:20220407T081948Z
+    LOCATION:Every 4 months
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    SUMMARY:Event starting in one month and ending in another, 6 weeks with duration
+    TRANSP:TRANSPARENT
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = cleanIcs(iCalString)
+        assert(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful)
+        if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) return
+        val iCalendar = cleanIcsResult.iCalendar
+
+        assertThat(iCalendar).isNotNull()
+        iCalendar?.events?.forEach { event ->
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 3, 1, 0, 0, 0, 0, ZoneId.systemDefault()
+                        ).toInstant()
+                    ), false
+                )
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate(
+                    Date.from(
+                        ZonedDateTime.of(
+                            2023, 3, 29, 0, 0, 0, 0, ZoneId.systemDefault()
                         ).toInstant()
                     ), false
                 )
