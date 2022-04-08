@@ -428,7 +428,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // Set default style for calendar bar (overridden by part stat if user is attendee)
-            setCalendarBar(event.calendar.color, null)
+            setCalendarBar(event.calendar.color, null, event.isCancelled())
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
@@ -460,7 +460,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     val userEmails = userAddresses.map { it.email }
                     val participationStatus = event.getParticipationStatus(userEmails)
 
-                    setCalendarBar(event.calendar.color, participationStatus)
+                    setCalendarBar(event.calendar.color, participationStatus, event.isCancelled())
 
                     displayAttendeeAnswerState(participationStatus, false)
 
@@ -566,8 +566,8 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         })
     }
 
-    private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?) {
-        if (participationStatus == ParticipationStatus.NEEDS_ACTION) {
+    private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {
+        if (participationStatus == ParticipationStatus.NEEDS_ACTION && !isCancelled) {
             section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
         } else {
             section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar)
