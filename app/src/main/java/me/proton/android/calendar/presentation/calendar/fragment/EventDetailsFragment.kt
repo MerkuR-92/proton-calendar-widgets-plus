@@ -568,11 +568,16 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {
         if (participationStatus == ParticipationStatus.NEEDS_ACTION && !isCancelled) {
-            section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
+            AndroidUtils.setStripedBackground(
+                section_event_info.view_calendar_bar,
+                requireContext(),
+                Color.parseColor(calendarColor),
+                true
+            )
         } else {
             section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar)
+            section_event_info.view_calendar_bar.background.setTint(Color.parseColor(calendarColor))
         }
-        section_event_info.view_calendar_bar.background.setTint(Color.parseColor(calendarColor))
     }
 
     /**

@@ -1107,11 +1107,11 @@ object AndroidUtils {
         v.startAnimation(rotate)
     }
 
-    fun setStripedBackground(view: View, context: Context, stripeColor: Int) {
+    fun setStripedBackground(view: View, context: Context, stripeColor: Int, fullyOpaque: Boolean? = false) {
         val colorDrawable = ColorDrawable(ContextCompat.getColor(context, R.color.background_norm)) // bg color3
         val vDrawable = AppCompatResources.getDrawable(context, R.drawable.vector_stripes) // vector drawable
         vDrawable?.setTint(stripeColor)
-        vDrawable?.alpha = 51 // decimal value for 20% opacity
+        if (fullyOpaque == false) vDrawable?.alpha = 51 // decimal value for 20% opacity
 
         if (vDrawable != null) {
             val bitmap = Bitmap.createBitmap(
