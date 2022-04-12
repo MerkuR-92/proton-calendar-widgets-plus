@@ -295,10 +295,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         if (appSettingsLanguage.isBlank() && appCurrentLanguage != getLocaleForFormatting().toLanguageTag()) {
             setAppCurrentLanguage(getLocaleForFormatting().toLanguageTag())
             if (CHANGE_LANGUAGE) {
-                widgetRefresher.broadcastRefresh()
                 restartApplication()
             }
         }
+
+        widgetRefresher.broadcastRefresh()
 
         setContentView(R.layout.activity_main)
 
