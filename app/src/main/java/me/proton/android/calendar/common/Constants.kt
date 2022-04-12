@@ -90,7 +90,7 @@ object FeatureFlag {
     const val USE_EVENT_DECRYPTOR = true
     const val CHANGE_LANGUAGE = true
     const val MONTH_VIEW = true
-    const val SPOTLIGHT = true
+    const val SPOTLIGHT = false
 }
 
 object ApiResponseCode {
