@@ -22,7 +22,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/event_attendees_title"
         app:layout_constraintTop_toTopOf="@id/event_attendees_title"
-        android:layout_marginStart="@dimen/spacing_page"
         app:srcCompat="@drawable/ic_proton_users" />
 
     <TextView
