@@ -217,4 +217,10 @@ object AppDatabaseMigrations {
             ChallengeDatabase.MIGRATION_0.migrate(database)
         }
     }
+
+    val MIGRATION_37_38 = object : Migration(37, 38) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            ChallengeDatabase.MIGRATION_1.migrate(database)
+        }
+    }
 }
