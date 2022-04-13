@@ -16,11 +16,14 @@ import me.proton.core.auth.domain.usecase.LoginChallengeConfig
 import me.proton.core.auth.domain.usecase.PostLoginAccountSetup
 import me.proton.core.auth.domain.usecase.signup.SignupChallengeConfig
 import me.proton.core.auth.presentation.AuthOrchestrator
+import me.proton.core.auth.presentation.DefaultHelpOptionHandler
+import me.proton.core.auth.presentation.HelpOptionHandler
 import me.proton.core.auth.presentation.ui.LoginActivity
 import me.proton.core.country.data.repository.CountriesRepositoryImpl
 import me.proton.core.country.domain.repository.CountriesRepository
 import me.proton.core.crypto.android.srp.GOpenPGPSrpCrypto
 import me.proton.core.crypto.common.srp.SrpCrypto
+import me.proton.core.domain.entity.Product
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.user.domain.UserManager
@@ -38,8 +41,9 @@ object AuthModule {
     @Singleton
     fun provideAuthRepository(
         apiProvider: ApiProvider,
-        @ApplicationContext context: Context
-    ): AuthRepository = AuthRepositoryImpl(apiProvider, context)
+        @ApplicationContext context: Context,
+        product: Product
+    ): AuthRepository = AuthRepositoryImpl(apiProvider, context, product)
 
     @Provides
     @Singleton
@@ -76,4 +80,8 @@ object AuthModule {
     @Provides
     @Singleton
     fun provideChallengeConfig(): SignupChallengeConfig = SignupChallengeConfig()
+
+    @Provides
+    @Singleton
+    fun provideHelpOptionHandler(): HelpOptionHandler = DefaultHelpOptionHandler()
 }
