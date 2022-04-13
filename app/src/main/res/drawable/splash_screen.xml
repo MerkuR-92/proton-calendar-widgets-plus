@@ -4,5 +4,5 @@
     <item android:drawable="@color/splash_screen_color"/>
     <item
         android:gravity="center"
-        android:drawable="@drawable/ic_logo_proton_calendar_beta"/>
+        android:drawable="@drawable/ic_logo_proton_calendar"/>
 </layer-list>
