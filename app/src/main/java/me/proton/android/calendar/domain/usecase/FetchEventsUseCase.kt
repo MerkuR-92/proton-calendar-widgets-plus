@@ -102,7 +102,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                     }.awaitAll()
 
-                    fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, resultsEventsPairs.flatMap { it.second })
+                    //fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, resultsEventsPairs.flatMap { it.second })
 
                     Pair(resultsEventsPairs.flatMap { it.first }, resultsEventsPairs.flatMap { it.second })
                 }

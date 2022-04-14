@@ -127,7 +127,7 @@ class CalendarEventListenerDelegate @Inject constructor(
         val entitiesToPostProcess = entityIds.mapNotNull { entities[it] }
         if (entitiesToPostProcess.isEmpty()) return
         // Post process received events
-        fetchPublicKeysUseCase.execute(config.userId, entitiesToPostProcess)
+        //fetchPublicKeysUseCase.execute(config.userId, entitiesToPostProcess)
         updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess.map { it.id })
         widgetRefresher.refreshEventList()
         // Clean cached entities
