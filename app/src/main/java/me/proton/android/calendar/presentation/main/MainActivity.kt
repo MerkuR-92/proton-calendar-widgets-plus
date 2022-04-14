@@ -819,14 +819,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     nav_view_main_content.nav_view_switcher_month_layout.background = null
 
                     // Set icon tint
-                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                     nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                     nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-
-                    // Set text color
-                    nav_view_main_content.nav_view_switcher_agenda_title.setTextColor(ContextCompat.getColor(this, R.color.white))
-                    nav_view_main_content.nav_view_switcher_day_title.setTextColor(ContextCompat.getColor(this, R.color.text_norm))
-                    nav_view_main_content.nav_view_switcher_month_title.setTextColor(ContextCompat.getColor(this, R.color.text_norm))
                 }
                 ViewMode.DAY -> {
                     // Set selected background
@@ -836,13 +831,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                     // Set icon tint
                     nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                     nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-
-                    // Set text color
-                    nav_view_main_content.nav_view_switcher_agenda_title.setTextColor(ContextCompat.getColor(this, R.color.text_norm))
-                    nav_view_main_content.nav_view_switcher_day_title.setTextColor(ContextCompat.getColor(this, R.color.white))
-                    nav_view_main_content.nav_view_switcher_month_title.setTextColor(ContextCompat.getColor(this, R.color.text_norm))
                 }
                 ViewMode.MONTH -> {
                     // Set selected background
@@ -853,12 +843,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     // Set icon tint
                     nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                     nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
-
-                    // Set text color
-                    nav_view_main_content.nav_view_switcher_agenda_title.setTextColor(ContextCompat.getColor(this, R.color.text_norm))
-                    nav_view_main_content.nav_view_switcher_day_title.setTextColor(ContextCompat.getColor(this, R.color.text_norm))
-                    nav_view_main_content.nav_view_switcher_month_title.setTextColor(ContextCompat.getColor(this, R.color.white))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 }
             }
         })
